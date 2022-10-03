@@ -19,7 +19,8 @@ sourceCompatibility = 1.17
 targetCompatibility = 1.17
 
 dependencies {
-    implementation "io.javalin:javalin:5.0.1"
+    implementation 'io.javalin:javalin:5.0.1'
+    implementation 'org.slf4j:slf4j-simple:2.0.3'
 
     testImplementation 'org.codehaus.groovy:groovy:3.0.10'  // Use the latest Groovy version for Spock testing
     testImplementation 'org.spockframework:spock-core:2.1-groovy-3.0'
