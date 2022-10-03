@@ -1,13 +1,9 @@
-# Normal text let sit to auto
-*.htm text
-*.html text
-*.css text
-*.js text
+#
+# https://help.github.com/articles/dealing-with-line-endings/
+#
+# Linux start script should use lf
+/gradlew        text eol=lf
 
-## Declare files that will always have LF (aka \n aka 10 aka 0x0a) line endings on checkout.
-*.sh text eol=lf
-*.md text eol=lf
-*.json text eol=lf
-*.yml text eol=lf
-*.csv text eol=lf
+# These are Windows script files and should use crlf
+*.bat           text eol=crlf
 
