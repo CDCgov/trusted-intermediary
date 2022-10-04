@@ -22,7 +22,7 @@ dependencies {
     implementation 'io.javalin:javalin:5.0.1'
     implementation 'org.slf4j:slf4j-simple:2.0.3'
 
-    testImplementation 'org.codehaus.groovy:groovy:3.0.10'  // Use the latest Groovy version for Spock testing
+    testImplementation 'org.codehaus.groovy:groovy:3.0.13'  // Use the latest Groovy version for Spock testing
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
     testImplementation 'junit:junit:4.13.2'
 }
