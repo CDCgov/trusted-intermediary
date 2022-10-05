@@ -9,6 +9,7 @@
 plugins {
     id 'groovy'
     id 'application'
+    id 'com.diffplug.spotless' version '6.11.0'
 }
 
 repositories {
@@ -33,4 +34,19 @@ application {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+spotless {
+    java {
+        googleJavaFormat().aosp()
+    }
+
+    groovy {
+        greclipse().configFile("../greclipse.properties")
+        excludeJava()
+    }
+
+    groovyGradle {
+        greclipse().configFile("../greclipse.properties")
+    }
 }
