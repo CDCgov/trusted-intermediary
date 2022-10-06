@@ -1,0 +1,11 @@
+name: Daily
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+
+  securityScanAnalyze:
+    name: CodeQL Security Scan
+    uses: ./.github/workflows/codeql_reusable.yml
