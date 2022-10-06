@@ -44,3 +44,7 @@ jobs:
 
       - name: Lint
         run: ./gradlew spotlessCheck
+
+  securityScanAnalyze:
+    name: CodeQL Security Scan
+    uses: ./.github/workflows/codeql_reusable.yml
