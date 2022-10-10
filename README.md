@@ -1,6 +1,26 @@
 # CDC Trusted Intermediary
 
+## Requirements
+
+## Running
+
 ## Development
+
+### Compiling
+
+### Testing
+
+#### Unit Tests
+
+### Pre-Commit Hooks
+
+We use [`pre-commit`](https://pre-commit.com) to run [some hooks](./.pre-commit-config.yaml) on every commit.  These
+hooks do linting to ensure things are in a good spot before a commit is made.  Please install `pre-commit` and then
+install the hooks.
+
+```shell
+pre-commit install
+```
 
 ### Contributing
 
@@ -15,18 +35,7 @@ later.
 All comments, messages, pull requests, and other submissions received through
 CDC including this GitHub page may be subject to applicable federal law, including but not limited to the Federal Records Act, and may be archived. Learn more at [http://www.cdc.gov/other/privacy.html](http://www.cdc.gov/other/privacy.html).
 
-
-### Pre-Commit Hooks
-
-We use [`pre-commit`](https://pre-commit.com) to run [some hooks](./.pre-commit-config.yaml) on every commit.  These
-hooks do linting to ensure things are in a good spot before a commit is made.  Please install `pre-commit` and then
-install the hooks.
-
-```shell
-pre-commit install
-```
-
-## Related documents
+## Related Documents
 
 * [Open Practices](open_practices.md)
 * [Rules of Behavior](rules_of_behavior.md)
