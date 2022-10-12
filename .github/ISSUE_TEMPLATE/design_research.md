@@ -17,4 +17,4 @@ High level description of what design or research needs to be accomplished.
 
 ## Additional Context
 
-Add any other context or screenshots about the story here.
+Add any other context or screenshots about the work here.
