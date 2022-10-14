@@ -6,7 +6,7 @@ class HelloWorldTest extends Specification {
 
     def "Hello World is returned"() {
         when:
-        def response = Client.callService("/")
+        def response = Client.get("/")
 
         then:
         response == "Hello World!"
