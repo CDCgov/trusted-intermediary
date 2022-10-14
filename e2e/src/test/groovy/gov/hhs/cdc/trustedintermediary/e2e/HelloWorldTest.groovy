@@ -6,9 +6,9 @@ class HelloWorldTest extends Specification {
 
     def "Hello World is returned"() {
         when:
-        Client.callService("/dogcow")
+        def response = Client.callService("/")
 
         then:
-        true == true
+        response == "Hello World!"
     }
 }
