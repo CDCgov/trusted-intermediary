@@ -15,7 +15,7 @@ As a ___,
 in order to ___,
 I need ___.
 
-## Aceptance Criteria
+## Acceptance Criteria
 
 - [ ] Something.
 
