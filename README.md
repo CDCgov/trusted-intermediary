@@ -39,8 +39,29 @@ Once compiled, the built artifact is _TBD_.
 To run the unit tests, execute...
 
 ```shell
-./gradlew clean test
+./gradlew clean app:test
 ```
+
+#### End-to-end Tests
+
+End-to-end tests are meant to interact and assert the overall flow of the API is operating correctly.
+
+To run them, execute...
+
+```shell
+./gradlew clean e2e:test
+```
+
+That requires the API to be running already.  To help streamline the execution of this flow, a helper Bash script can be executed...
+
+```shell
+./e2e-execute.sh
+```
+
+This will start the API, wait for it to respond, run the end-to-end tests against that running API, and then stop the API.
+
+These tests are located under the `e2e` Gradle sub-project directory.  Like any Gradle project, there are the `main` and `test` directories.
+The `test` directory contains the tests.  The `main` directory contains our custom framework that helps us interact with the API.
 
 ### Pre-Commit Hooks
 

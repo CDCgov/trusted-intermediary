@@ -26,7 +26,24 @@ jobs:
           cache: gradle
 
       - name: Run unit tests
-        run: ./gradlew clean test
+        run: ./gradlew clean app:test
+
+
+  e2e-tests:
+    name: End-to-end Tests
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: corretto
+          cache: gradle
+
+      - name: Run e2e tests
+        run: ./e2e-execute.sh
 
 
   lint:
