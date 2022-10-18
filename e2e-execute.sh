@@ -10,7 +10,7 @@ start_api() {
 
 wait_for_api() {
     attempt_counter=0
-    max_attempts=24
+    max_attempts=36
 
     until curl --output /dev/null --silent --head --fail http://localhost:8080/; do
         if [ "${attempt_counter}" -eq "${max_attempts}" ];then
