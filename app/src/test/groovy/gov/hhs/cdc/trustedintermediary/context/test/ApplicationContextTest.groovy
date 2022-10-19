@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary
+package gov.hhs.cdc.trustedintermediary.context.test
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext
 import spock.lang.Specification
