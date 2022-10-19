@@ -6,6 +6,9 @@
  */
 package gov.hhs.cdc.trustedintermediary.context;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ApplicationContext {
 
     private static volatile ApplicationContext applicationContext = null;
@@ -14,20 +17,19 @@ public class ApplicationContext {
     private ApplicationContext() {}
 
     public static void register(Class<?> clazz, Object implementation) {
-        this.OBJECT_MAP.put(clazz, implementation);
+        OBJECT_MAP.put(clazz, implementation);
     }
 
     public static <T> T getImplementation(Class<T> clazz) {
-        return (T) this.OBJECT_MAP.get(clazz);
+        return (T) OBJECT_MAP.get(clazz);
     }
 
     public static ApplicationContext getInstance() {
-        if (this.applicationContext == null) {
+        if (applicationContext == null) {
             synchronized (ApplicationContext.class) {
-                if (this.applicationContext == null)
-                    this.applicationContext = new ApplicationContext();
+                if (applicationContext == null) applicationContext = new ApplicationContext();
             }
         }
-        return this.applicationContext;
+        return applicationContext;
     }
 }
