@@ -7,7 +7,7 @@ package gov.hhs.cdc.trustedintermediary.context;
 
 public class ApplicationContext {
 
-    private static ApplicationContext obj;
+    private static ApplicationContext applicationContext = new ApplicationContext();
     private static final Map<Class<?>, Object> OBJECT_MAP = new HashMap<>();
 
     private ApplicationContext() {}
@@ -20,8 +20,7 @@ public class ApplicationContext {
         return (T) this.OBJECT_MAP.get(clazz);
     }
 
-    public static synchronized ApplicationContext getInstance() {
-        if (this.obj == null) this.obj = new ApplicationContext();
-        return this.obj;
+    public static ApplicationContext getInstance() {
+        return this.applicationContext;
     }
 }
