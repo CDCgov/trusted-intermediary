@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary;
+package gov.hhs.cdc.trustedintermediary.external.javalin;
 
 import io.javalin.Javalin;
 
