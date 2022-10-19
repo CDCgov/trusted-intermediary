@@ -1,8 +1,8 @@
 /**
  * ApplicationContext class works similar to a factory. The idea is to use this class in conjunction
- * with annoations that will be used to inject the implementations. There is the option of using the
- * getImplementation method to get an implementation of a class. This is a double checked locking
- * singleton class.
+ * with annotations that will be used to inject the implementations. There is the option of using
+ * the getImplementation method to get an implementation of a class. This is a double checked
+ * locking singleton class.
  */
 package gov.hhs.cdc.trustedintermediary.context;
 
