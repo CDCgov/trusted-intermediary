@@ -1,5 +1,6 @@
-package gov.hhs.cdc.trustedintermediary.context
+package gov.hhs.cdc.trustedintermediary
 
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext
 import spock.lang.Specification
 
 class ApplicationContextTest extends Specification {
