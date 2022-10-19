@@ -1,11 +1,12 @@
 package gov.hhs.cdc.trustedintermediary.domainconnector;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class DomainRequest {
-    private String body;
-    private String url;
-    private Map<String, String> headers;
+    private String body = "";
+    private String url = "";
+    private Map<String, String> headers = new HashMap<>();
 
     public String getBody() {
         return body;

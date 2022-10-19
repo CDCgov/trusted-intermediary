@@ -31,7 +31,7 @@ dependencies {
 }
 
 application {
-    mainClass = 'gov.hhs.cdc.trustedintermediary.App'
+    mainClass = 'gov.hhs.cdc.trustedintermediary.external.javalin.App'
 }
 
 tasks.named('test') {
