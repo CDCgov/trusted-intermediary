@@ -51,11 +51,7 @@ public class App {
 
     static void domainResponseFillsInJavalinContext(DomainResponse response, Context ctx) {
         ctx.status(response.getStatusCode());
-        response.getHeaders().entrySet().stream()
-                .forEach(
-                        entry -> {
-                            ctx.header(entry.getKey(), entry.getValue());
-                        });
+        response.getHeaders().forEach(ctx::header);
         ctx.result(response.getBody());
     }
 }
