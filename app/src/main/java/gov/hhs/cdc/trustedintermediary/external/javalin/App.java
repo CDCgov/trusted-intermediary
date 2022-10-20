@@ -10,6 +10,7 @@ import io.javalin.http.HandlerType;
 import java.util.function.Function;
 
 public class App {
+
     public String getGreeting() {
         return "Hello World!";
     }
@@ -47,7 +48,7 @@ public class App {
         };
     }
 
-    private static DomainRequest javalinContextToDomainRequest(Context ctx) {
+    static DomainRequest javalinContextToDomainRequest(Context ctx) {
         var request = new DomainRequest();
 
         request.setBody(ctx.body());
@@ -57,7 +58,7 @@ public class App {
         return request;
     }
 
-    private static void domainResponseFillsInJavalinContext(DomainResponse response, Context ctx) {
+    static void domainResponseFillsInJavalinContext(DomainResponse response, Context ctx) {
         ctx.status(response.getStatusCode());
         response.getHeaders().entrySet().stream()
                 .forEach(
