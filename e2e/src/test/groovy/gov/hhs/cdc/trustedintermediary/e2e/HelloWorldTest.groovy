@@ -6,9 +6,9 @@ class HelloWorldTest extends Specification {
 
     def "Hello World is returned"() {
         when:
-        def response = Client.get("/")
+        def response = Client.post("/v1/order")
 
         then:
-        response == "Hello World!"
+        response == "DogCow requsted a lab order"
     }
 }

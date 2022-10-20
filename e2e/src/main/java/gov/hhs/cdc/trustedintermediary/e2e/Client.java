@@ -9,9 +9,17 @@ public class Client {
     private static String protocolDomain = DEFAULT_PROTOCOL_DOMAIN;
 
     public static String get(String path) throws IOException {
-        System.out.println("Calling the backend at " + path);
+        System.out.println("Calling the backend at GET " + path);
 
         var response = Request.get(protocolDomain + path).execute();
+
+        return response.returnContent().asString();
+    }
+
+    public static String post(String path) throws IOException {
+        System.out.println("Calling the backend at POST " + path);
+
+        var response = Request.post(protocolDomain + path).execute();
 
         return response.returnContent().asString();
     }

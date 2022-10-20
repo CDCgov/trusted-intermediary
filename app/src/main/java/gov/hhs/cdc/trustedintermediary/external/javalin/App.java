@@ -11,31 +11,22 @@ import java.util.function.Function;
 
 public class App {
 
-    public String getGreeting() {
-        return "Hello World!";
-    }
-
     public static void main(String[] args) {
         var app = Javalin.create().start(8080);
+
+        app.get("/health", ctx -> ctx.result("Operational"));
 
         // TODO: this should be dynamic to get the different registrations
         var etorRegistration = new DomainRegistration();
 
         var registrationDetails = etorRegistration.domainRegistration();
 
-        registrationDetails.entrySet().stream()
-                .forEach(
-                        (var entry) -> {
-                            var verbPath = entry.getKey();
-                            var handler = entry.getValue();
-
-                            app.addHandler(
-                                    HandlerType.valueOf(verbPath.getVerb()),
-                                    verbPath.getPath(),
-                                    createHandler(handler));
-                        });
-
-        app.get("/", ctx -> ctx.result(new App().getGreeting()));
+        registrationDetails.forEach(
+                (verbPath, handler) ->
+                        app.addHandler(
+                                HandlerType.valueOf(verbPath.getVerb()),
+                                verbPath.getPath(),
+                                createHandler(handler)));
     }
 
     private static Handler createHandler(Function<DomainRequest, DomainResponse> handler) {
