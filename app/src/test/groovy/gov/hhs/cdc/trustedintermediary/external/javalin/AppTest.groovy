@@ -1,8 +1,13 @@
 package gov.hhs.cdc.trustedintermediary.external.javalin
 
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
+import gov.hhs.cdc.trustedintermediary.domainconnector.HttpVerbPath
 import io.javalin.http.Context
 import spock.lang.Specification
+
+import java.util.function.Function
 
 class AppTest extends Specification {
     def "convert Javalin Context to DomainRequest correctly"() {
@@ -63,5 +68,38 @@ class AppTest extends Specification {
         savedResult == bodyString
         savedStatusCode == statusCode
         savedHeaders == headerMap
+    }
+
+    def "constructNewDomainConnector works correctly with a default constructor"() {
+        when:
+        def connector = App.constructNewDomainConnector(GoodDomainConnector)
+
+        then:
+        noExceptionThrown()
+        connector != null
+    }
+
+    def "constructNewDomainConnector fails when there isn't a default constructor"() {
+        when:
+        def connector = App.constructNewDomainConnector(BadDomainConnector)
+
+        then:
+        thrown RuntimeException
+    }
+
+    static class GoodDomainConnector implements DomainConnector {
+        @Override
+        Map<HttpVerbPath, Function<DomainRequest, DomainResponse>> domainRegistration() {
+            return null
+        }
+    }
+
+    static class BadDomainConnector implements DomainConnector {
+        BadDomainConnector(String differentConstructor) {}
+
+        @Override
+        Map<HttpVerbPath, Function<DomainRequest, DomainResponse>> domainRegistration() {
+            return null
+        }
     }
 }

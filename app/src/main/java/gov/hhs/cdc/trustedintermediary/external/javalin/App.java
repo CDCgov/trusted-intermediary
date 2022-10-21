@@ -36,8 +36,7 @@ public class App {
                                                         createHandler(handler))));
     }
 
-    private static DomainConnector constructNewDomainConnector(
-            Class<? extends DomainConnector> clazz) {
+    static DomainConnector constructNewDomainConnector(Class<? extends DomainConnector> clazz) {
         try {
             Constructor<? extends DomainConnector> constructor = clazz.getConstructor();
             return constructor.newInstance();
