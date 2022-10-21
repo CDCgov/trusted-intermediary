@@ -11,7 +11,7 @@ public class DomainRegistration implements DomainConnector {
 
     @Override
     public Map<HttpVerbPath, Function<DomainRequest, DomainResponse>> domainRegistration() {
-        return Map.of(new HttpVerbPath("POST", "/v1/order"), this::handleOrder);
+        return Map.of(new HttpVerbPath("POST", "/v1/etor/order"), this::handleOrder);
     }
 
     private DomainResponse handleOrder(DomainRequest request) {
