@@ -9,7 +9,6 @@ import java.util.Map;
 
 public class ApplicationContext {
 
-    private static volatile ApplicationContext applicationContext = null;
     private static final Map<Class<?>, Object> OBJECT_MAP = new HashMap<>();
 
     private ApplicationContext() {}
