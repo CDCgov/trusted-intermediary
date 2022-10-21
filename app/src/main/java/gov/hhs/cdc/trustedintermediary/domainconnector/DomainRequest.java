@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.domainconnector;
 import java.util.HashMap;
 import java.util.Map;
 
+/** Represents a request coming into the domain that it should handle. */
 public class DomainRequest {
     private String body = "";
     private String url = "";

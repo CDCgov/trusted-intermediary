@@ -3,6 +3,10 @@ package gov.hhs.cdc.trustedintermediary.domainconnector;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Represents a response that the domain will return to the trusted intermediary which will in turn
+ * send to the client.
+ */
 public class DomainResponse {
     private int statusCode;
     private String body = "";

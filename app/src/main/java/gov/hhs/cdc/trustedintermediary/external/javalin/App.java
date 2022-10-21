@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 import java.util.function.Function;
 
+/** Creates the starting point of our API. Handles the registration of the domains. */
 public class App {
 
     public static void main(String[] args) {

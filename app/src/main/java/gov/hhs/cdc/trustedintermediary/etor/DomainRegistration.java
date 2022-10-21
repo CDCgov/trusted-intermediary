@@ -7,6 +7,9 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.HttpVerbPath;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * The domain connector for the ETOR domain. It connects it with the larger trusted intermediary.
+ */
 public class DomainRegistration implements DomainConnector {
 
     @Override

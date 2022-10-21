@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.domainconnector;
 
+/** Specifies an HTTP endpoint. */
 public class HttpVerbPath {
     private String verb;
     private String path;
