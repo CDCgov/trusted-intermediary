@@ -81,7 +81,7 @@ class AppTest extends Specification {
 
     def "constructNewDomainConnector fails when there isn't a default constructor"() {
         when:
-        def connector = App.constructNewDomainConnector(BadDomainConnector)
+        App.constructNewDomainConnector(BadDomainConnector)
 
         then:
         thrown RuntimeException
