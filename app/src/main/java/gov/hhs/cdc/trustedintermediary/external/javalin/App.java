@@ -1,9 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.external.javalin;
 
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
-import gov.hhs.cdc.trustedintermediary.external.helpers.Reflection;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
@@ -21,7 +21,7 @@ public class App {
         app.get("/health", ctx -> ctx.result("Operational"));
 
         Set<Class<? extends DomainConnector>> domainConnectors =
-                Reflection.getImplementors(DomainConnector.class);
+                ApplicationContext.getImplementors(DomainConnector.class);
 
         domainConnectors.stream()
                 .map(App::constructNewDomainConnector)

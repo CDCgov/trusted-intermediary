@@ -8,6 +8,7 @@ package gov.hhs.cdc.trustedintermediary.context;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class ApplicationContext {
 
@@ -22,6 +23,10 @@ public class ApplicationContext {
 
     public static <T> T getImplementation(Class<T> clazz) {
         return (T) OBJECT_MAP.get(clazz);
+    }
+
+    public static <T> Set<Class<? extends T>> getImplementors(Class<T> interfaze) {
+        return Reflection.getImplementors(interfaze);
     }
 
     public static ApplicationContext getInstance() {

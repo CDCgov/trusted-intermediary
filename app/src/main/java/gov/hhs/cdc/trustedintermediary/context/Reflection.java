@@ -1,11 +1,11 @@
-package gov.hhs.cdc.trustedintermediary.external.helpers;
+package gov.hhs.cdc.trustedintermediary.context;
 
 import static org.reflections.scanners.Scanners.SubTypes;
 
 import java.util.Set;
 import org.reflections.Reflections;
 
-public class Reflection {
+class Reflection {
 
     private Reflection() {}
 
