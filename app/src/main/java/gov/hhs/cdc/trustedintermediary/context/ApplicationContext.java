@@ -23,15 +23,4 @@ public class ApplicationContext {
     public static <T> T getImplementation(Class<T> clazz) {
         return (T) OBJECT_MAP.get(clazz);
     }
-
-    public static ApplicationContext getInstance() {
-        if (applicationContext == null) {
-            synchronized (ApplicationContext.class) {
-                if (applicationContext == null) {
-                    applicationContext = new ApplicationContext();
-                }
-            }
-        }
-        return applicationContext;
-    }
 }
