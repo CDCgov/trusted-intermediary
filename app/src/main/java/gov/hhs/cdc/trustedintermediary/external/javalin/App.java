@@ -1,12 +1,16 @@
 package gov.hhs.cdc.trustedintermediary.external.javalin;
 
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
-import gov.hhs.cdc.trustedintermediary.etor.DomainRegistration;
+import gov.hhs.cdc.trustedintermediary.external.helpers.Reflection;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import io.javalin.http.HandlerType;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Set;
 import java.util.function.Function;
 
 public class App {
@@ -16,17 +20,33 @@ public class App {
 
         app.get("/health", ctx -> ctx.result("Operational"));
 
-        // TODO: this should be dynamic to get the different registrations
-        var etorRegistration = new DomainRegistration();
+        Set<Class<? extends DomainConnector>> domainConnectors =
+                Reflection.getImplementors(DomainConnector.class);
 
-        var registrationDetails = etorRegistration.domainRegistration();
+        domainConnectors.stream()
+                .map(App::constructNewDomainConnector)
+                .map(DomainConnector::domainRegistration)
+                .forEach(
+                        registrationMap ->
+                                registrationMap.forEach(
+                                        (verbPath, handler) ->
+                                                app.addHandler(
+                                                        HandlerType.valueOf(verbPath.getVerb()),
+                                                        verbPath.getPath(),
+                                                        createHandler(handler))));
+    }
 
-        registrationDetails.forEach(
-                (verbPath, handler) ->
-                        app.addHandler(
-                                HandlerType.valueOf(verbPath.getVerb()),
-                                verbPath.getPath(),
-                                createHandler(handler)));
+    private static DomainConnector constructNewDomainConnector(
+            Class<? extends DomainConnector> clazz) {
+        try {
+            Constructor<? extends DomainConnector> constructor = clazz.getConstructor();
+            return constructor.newInstance();
+        } catch (NoSuchMethodException
+                | InstantiationException
+                | IllegalAccessException
+                | InvocationTargetException exception) {
+            throw new RuntimeException(exception);
+        }
     }
 
     private static Handler createHandler(Function<DomainRequest, DomainResponse> handler) {
