@@ -6,9 +6,9 @@ contributions, and we are looking forward to fostering an open, transparent, and
 collaborative environment.
 
 Before contributing, we encourage you to also read or [LICENSE](LICENSE),
-[README](README.md), and [code of conduct](code-of-conduct.md)
-files, also found in this repository. If you have any inquiries or questions not
-answered by the content of this repository, feel free to [contact us](mailto:surveillanceplatform@cdc.gov).
+[README](README.md), [code of conduct](code-of-conduct.md), and [ADRs](/adr).
+If you have any inquiries or questions not answered by the content of this repository, feel free to
+[contact us](mailto:surveillanceplatform@cdc.gov).
 
 ## Public Domain
 
