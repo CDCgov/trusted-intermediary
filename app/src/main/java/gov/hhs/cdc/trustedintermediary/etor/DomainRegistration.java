@@ -17,7 +17,7 @@ public class DomainRegistration implements DomainConnector {
         return Map.of(new HttpEndpoint("POST", "/v1/etor/order"), this::handleOrder);
     }
 
-    private DomainResponse handleOrder(DomainRequest request) {
+    DomainResponse handleOrder(DomainRequest request) {
         var response = new DomainResponse(200);
 
         response.setBody("DogCow requsted a lab order");

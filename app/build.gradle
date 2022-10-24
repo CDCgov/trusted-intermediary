@@ -9,6 +9,7 @@
 plugins {
     id 'groovy'
     id 'application'
+    id 'jacoco'
     id 'com.diffplug.spotless' version '6.11.0'
 }
 
@@ -30,6 +31,7 @@ dependencies {
     testImplementation 'org.apache.groovy:groovy:4.0.6'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
     testImplementation 'com.openpojo:openpojo:0.9.1'
+    testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.10.1'
 }
 
 application {
@@ -46,11 +48,11 @@ spotless {
     }
 
     groovy {
-        greclipse().configFile("../greclipse.properties")
+        greclipse().configFile('../greclipse.properties')
         excludeJava()
     }
 
     groovyGradle {
-        greclipse().configFile("../greclipse.properties")
+        greclipse().configFile('../greclipse.properties')
     }
 }

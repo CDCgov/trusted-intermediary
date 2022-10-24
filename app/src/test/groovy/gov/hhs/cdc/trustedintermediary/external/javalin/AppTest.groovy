@@ -70,6 +70,24 @@ class AppTest extends Specification {
         savedHeaders == headerMap
     }
 
+    def "createHandler successfully stitches things together"() {
+        given:
+        def handlerCalled = false
+        def rawHandler = { request ->
+            handlerCalled = true
+            return new DomainResponse(418)
+        }
+        def javalinContext = Mock(Context)
+
+        when:
+        def javalinHandler = App.createHandler(rawHandler)
+        javalinHandler.handle(javalinContext)
+
+        then:
+        handlerCalled == true
+        1 * javalinContext.status(_ as Integer)
+    }
+
     def "constructNewDomainConnector works correctly with a default constructor"() {
         when:
         def connector = App.constructNewDomainConnector(GoodDomainConnector)

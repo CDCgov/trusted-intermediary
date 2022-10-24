@@ -30,10 +30,10 @@ public class App {
                 .forEach(
                         registrationMap ->
                                 registrationMap.forEach(
-                                        (verbPath, handler) ->
+                                        (endpoint, handler) ->
                                                 app.addHandler(
-                                                        HandlerType.valueOf(verbPath.getVerb()),
-                                                        verbPath.getPath(),
+                                                        HandlerType.valueOf(endpoint.verb()),
+                                                        endpoint.path(),
                                                         createHandler(handler))));
     }
 
@@ -49,7 +49,7 @@ public class App {
         }
     }
 
-    private static Handler createHandler(Function<DomainRequest, DomainResponse> handler) {
+    static Handler createHandler(Function<DomainRequest, DomainResponse> handler) {
         return (Context ctx) -> {
             var request = javalinContextToDomainRequest(ctx);
 

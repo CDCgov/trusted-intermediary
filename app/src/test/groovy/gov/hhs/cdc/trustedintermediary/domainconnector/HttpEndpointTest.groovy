@@ -4,13 +4,6 @@ import gov.hhs.cdc.trustedintermediary.PojoTestUtils
 import spock.lang.Specification
 
 class HttpEndpointTest extends Specification {
-    def "test getters and setters"() {
-        when:
-        PojoTestUtils.validateGettersAndSetters(HttpEndpoint.class)
-
-        then:
-        noExceptionThrown()
-    }
 
     def "test constructor"() {
         given:
@@ -21,7 +14,15 @@ class HttpEndpointTest extends Specification {
         def httpEndpoint = new HttpEndpoint(verb, path)
 
         then:
-        httpEndpoint.getVerb() == verb
-        httpEndpoint.getPath() == path
+        httpEndpoint.verb() == verb
+        httpEndpoint.path() == path
+    }
+
+    def "test equals and hashCode"() {
+        when:
+        PojoTestUtils.validateEqualsAndHashCode(HttpEndpoint.class)
+
+        then:
+        noExceptionThrown()
     }
 }
