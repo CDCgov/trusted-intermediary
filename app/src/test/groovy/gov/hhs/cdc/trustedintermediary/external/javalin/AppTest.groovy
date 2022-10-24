@@ -3,7 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.javalin
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
-import gov.hhs.cdc.trustedintermediary.domainconnector.HttpVerbPath
+import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
 import io.javalin.http.Context
 import spock.lang.Specification
 
@@ -89,7 +89,7 @@ class AppTest extends Specification {
 
     static class GoodDomainConnector implements DomainConnector {
         @Override
-        Map<HttpVerbPath, Function<DomainRequest, DomainResponse>> domainRegistration() {
+        Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
             return null
         }
     }
@@ -98,7 +98,7 @@ class AppTest extends Specification {
         BadDomainConnector(String differentConstructor) {}
 
         @Override
-        Map<HttpVerbPath, Function<DomainRequest, DomainResponse>> domainRegistration() {
+        Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
             return null
         }
     }

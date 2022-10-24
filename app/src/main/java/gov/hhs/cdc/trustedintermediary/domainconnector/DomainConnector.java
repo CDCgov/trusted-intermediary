@@ -22,5 +22,5 @@ public interface DomainConnector {
      * @return A mapping of endpoints to functions. The function will be invoked when an HTTP
      *     request comes in on the associated endpoint.
      */
-    Map<HttpVerbPath, Function<DomainRequest, DomainResponse>> domainRegistration();
+    Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration();
 }

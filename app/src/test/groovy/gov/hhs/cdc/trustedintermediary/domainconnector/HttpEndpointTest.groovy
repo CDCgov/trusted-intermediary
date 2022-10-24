@@ -3,10 +3,10 @@ package gov.hhs.cdc.trustedintermediary.domainconnector
 import gov.hhs.cdc.trustedintermediary.PojoTestUtils
 import spock.lang.Specification
 
-class HttpVerbPathTest extends Specification {
+class HttpEndpointTest extends Specification {
     def "test getters and setters"() {
         when:
-        PojoTestUtils.validateGettersAndSetters(HttpVerbPath.class)
+        PojoTestUtils.validateGettersAndSetters(HttpEndpoint.class)
 
         then:
         noExceptionThrown()
@@ -18,10 +18,10 @@ class HttpVerbPathTest extends Specification {
         def path = "/dogcow"
 
         when:
-        def httpVerbPath = new HttpVerbPath(verb, path)
+        def httpEndpoint = new HttpEndpoint(verb, path)
 
         then:
-        httpVerbPath.getVerb() == verb
-        httpVerbPath.getPath() == path
+        httpEndpoint.getVerb() == verb
+        httpEndpoint.getPath() == path
     }
 }

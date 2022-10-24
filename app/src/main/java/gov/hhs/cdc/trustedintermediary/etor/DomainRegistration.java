@@ -3,7 +3,7 @@ package gov.hhs.cdc.trustedintermediary.etor;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
-import gov.hhs.cdc.trustedintermediary.domainconnector.HttpVerbPath;
+import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -13,8 +13,8 @@ import java.util.function.Function;
 public class DomainRegistration implements DomainConnector {
 
     @Override
-    public Map<HttpVerbPath, Function<DomainRequest, DomainResponse>> domainRegistration() {
-        return Map.of(new HttpVerbPath("POST", "/v1/etor/order"), this::handleOrder);
+    public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
+        return Map.of(new HttpEndpoint("POST", "/v1/etor/order"), this::handleOrder);
     }
 
     private DomainResponse handleOrder(DomainRequest request) {
