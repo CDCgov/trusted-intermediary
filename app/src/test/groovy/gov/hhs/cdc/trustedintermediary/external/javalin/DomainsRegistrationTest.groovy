@@ -112,32 +112,49 @@ class DomainsRegistrationTest extends Specification {
         given:
         def javalinApp = Mock(Javalin)
 
+        Example1DomainConnector.endpointCount = 2
+        Example2DomainConnector.endpointCount = 3
+        def expectedNumberOfAddHandlerCalls = Example1DomainConnector.endpointCount + Example2DomainConnector.endpointCount
         def domains = Set.of(Example1DomainConnector, Example2DomainConnector)
 
         when:
         DomainsRegistration.registerDomains(javalinApp, domains as Set<Class<? extends DomainConnector>>)
 
         then:
-        3 * javalinApp.addHandler(_ as HandlerType, _ as String, _ as Handler)
+        expectedNumberOfAddHandlerCalls * javalinApp.addHandler(_ as HandlerType, _ as String, _ as Handler)
     }
 
     static class Example1DomainConnector implements DomainConnector {
+
+        static def endpointCount = 0
+
         @Override
         Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
-            Function<DomainRequest, DomainResponse> function1 = { request -> new DomainResponse(418) }
-            Function<DomainRequest, DomainResponse> function2 = { request -> new DomainResponse(200) }
-            return Map.of(
-                    new HttpEndpoint("PUT", "/dogcow"), function1,
-                    new HttpEndpoint("POST", "/moof"), function2
-                    )
+            Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> registration = new HashMap<>()
+
+            for (int endpointIndex = 0; endpointIndex < endpointCount; endpointIndex ++) {
+                Function<DomainRequest, DomainResponse> function = { request -> new DomainResponse(418) }
+                registration.put(new HttpEndpoint("PUT", "/dogcow" + endpointIndex), function)
+            }
+
+            return registration
         }
     }
 
     static class Example2DomainConnector implements DomainConnector {
+
+        static def endpointCount = 0
+
         @Override
         Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
-            Function<DomainRequest, DomainResponse> function1 = { request -> new DomainResponse(201) }
-            return Map.of(new HttpEndpoint("GET", "/clarus"), function1)
+            Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> registration = new HashMap<>()
+
+            for (int endpointIndex = 0; endpointIndex < endpointCount; endpointIndex ++) {
+                Function<DomainRequest, DomainResponse> function = { request -> new DomainResponse(418) }
+                registration.put(new HttpEndpoint("POST", "/moof" + endpointIndex), function)
+            }
+
+            return registration
         }
     }
 
