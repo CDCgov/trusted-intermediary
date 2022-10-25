@@ -9,7 +9,7 @@ import spock.lang.Specification
 
 import java.util.function.Function
 
-class AppTest extends Specification {
+class DomainsRegistrationTest extends Specification {
     def "convert Javalin Context to DomainRequest correctly"() {
         given:
 
@@ -25,7 +25,7 @@ class AppTest extends Specification {
         javalinContext.headerMap() >> headerMap
 
         when:
-        def domainRequest = App.javalinContextToDomainRequest(javalinContext)
+        def domainRequest = DomainsRegistration.javalinContextToDomainRequest(javalinContext)
 
         then:
         domainRequest.getBody() == bodyString
@@ -62,7 +62,7 @@ class AppTest extends Specification {
         javalinContext.header(_ as String, _ as String) >> { String key, String value -> savedHeaders.put(key, value) }
 
         when:
-        App.domainResponseFillsInJavalinContext(response, javalinContext)
+        DomainsRegistration.domainResponseFillsInJavalinContext(response, javalinContext)
 
         then:
         savedResult == bodyString
@@ -80,7 +80,7 @@ class AppTest extends Specification {
         def javalinContext = Mock(Context)
 
         when:
-        def javalinHandler = App.createHandler(rawHandler)
+        def javalinHandler = DomainsRegistration.createHandler(rawHandler)
         javalinHandler.handle(javalinContext)
 
         then:
@@ -90,7 +90,7 @@ class AppTest extends Specification {
 
     def "constructNewDomainConnector works correctly with a default constructor"() {
         when:
-        def connector = App.constructNewDomainConnector(GoodDomainConnector)
+        def connector = DomainsRegistration.constructNewDomainConnector(GoodDomainConnector)
 
         then:
         noExceptionThrown()
@@ -99,7 +99,7 @@ class AppTest extends Specification {
 
     def "constructNewDomainConnector fails when there isn't a default constructor"() {
         when:
-        App.constructNewDomainConnector(BadDomainConnector)
+        DomainsRegistration.constructNewDomainConnector(BadDomainConnector)
 
         then:
         thrown RuntimeException
