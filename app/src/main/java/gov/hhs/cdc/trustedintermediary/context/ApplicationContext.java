@@ -4,12 +4,12 @@
  */
 package gov.hhs.cdc.trustedintermediary.context;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ApplicationContext {
 
-    private static final Map<Class<?>, Object> OBJECT_MAP = new HashMap<>();
+    private static final Map<Class<?>, Object> OBJECT_MAP = new ConcurrentHashMap<>();
 
     private ApplicationContext() {}
 
