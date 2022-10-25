@@ -4,7 +4,10 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
+import io.javalin.Javalin
 import io.javalin.http.Context
+import io.javalin.http.Handler
+import io.javalin.http.HandlerType
 import spock.lang.Specification
 
 import java.util.function.Function
@@ -103,6 +106,39 @@ class DomainsRegistrationTest extends Specification {
 
         then:
         thrown RuntimeException
+    }
+
+    def "every DomainConnector is registered"() {
+        given:
+        def javalinApp = Mock(Javalin)
+
+        def domains = Set.of(Example1DomainConnector, Example2DomainConnector)
+
+        when:
+        DomainsRegistration.registerDomains(javalinApp, domains as Set<Class<? extends DomainConnector>>)
+
+        then:
+        3 * javalinApp.addHandler(_ as HandlerType, _ as String, _ as Handler)
+    }
+
+    static class Example1DomainConnector implements DomainConnector {
+        @Override
+        Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
+            Function<DomainRequest, DomainResponse> function1 = { request -> new DomainResponse(418) }
+            Function<DomainRequest, DomainResponse> function2 = { request -> new DomainResponse(200) }
+            return Map.of(
+                    new HttpEndpoint("PUT", "/dogcow"), function1,
+                    new HttpEndpoint("POST", "/moof"), function2
+                    )
+        }
+    }
+
+    static class Example2DomainConnector implements DomainConnector {
+        @Override
+        Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
+            Function<DomainRequest, DomainResponse> function1 = { request -> new DomainResponse(201) }
+            return Map.of(new HttpEndpoint("GET", "/clarus"), function1)
+        }
     }
 
     static class GoodDomainConnector implements DomainConnector {
