@@ -12,7 +12,7 @@ wait_for_api() {
     attempt_counter=0
     max_attempts=36
 
-    until curl --output /dev/null --silent --head --fail http://localhost:8080/; do
+    until curl --output /dev/null --silent --head --fail http://localhost:8080/health; do
         if [ "${attempt_counter}" -eq "${max_attempts}" ];then
             echo 'Done waiting for API to respond'
             exit 1

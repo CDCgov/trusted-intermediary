@@ -4,11 +4,11 @@ import spock.lang.Specification
 
 class HelloWorldTest extends Specification {
 
-    def "Hello World is returned"() {
+    def "DogCow is returned from demo ETOR order endpoint"() {
         when:
-        def response = Client.get("/")
+        def response = Client.post("/v1/etor/order")
 
         then:
-        response == "Hello World!"
+        response == "DogCow requsted a lab order"
     }
 }
