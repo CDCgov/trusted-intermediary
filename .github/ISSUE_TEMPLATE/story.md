@@ -29,4 +29,5 @@ Add any other context or screenshots about the story here.
 
 ## Definition of Done
 
-- [ ] _TBD._
+- [x] Engineering
+- [ ] Research & Discovery
