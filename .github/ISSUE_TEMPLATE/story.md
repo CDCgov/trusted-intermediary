@@ -34,7 +34,7 @@ Add any other context or screenshots about the story here.
 - [ ] Code refactored for clarity and no design/technical debt
 - [ ] Adhere to separation of concerns; code is not tightly coupled, especially to 3rd party dependencies.
 - [ ] Source code is merged to the main branch.
-- [ ] nit test coverage of our code >= 90%
+- [ ] Unit test coverage of our code >= 90%
 - [ ] Code is reviewed or developed by pair; 1 approval is needed but consider requiring an outside-the-pair reviewer.
 - [ ] Build process updated
 - [ ] Feature toggles created and/or deleted.  Document the feature toggle.
