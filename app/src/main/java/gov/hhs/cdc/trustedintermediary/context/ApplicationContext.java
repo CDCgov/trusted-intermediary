@@ -44,6 +44,8 @@ public class ApplicationContext {
                     var fieldImplementation = getImplementation(fieldType);
                     var declaringClassImplementation = getImplementation(declaringClass);
 
+                    field.trySetAccessible();
+
                     try {
                         field.set(declaringClassImplementation, fieldImplementation);
                     } catch (IllegalAccessException | IllegalArgumentException exception) {

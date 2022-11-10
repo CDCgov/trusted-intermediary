@@ -15,7 +15,7 @@ import org.reflections.Reflections;
 class Reflection {
 
     private static final Reflections REFLECTIONS =
-            new Reflections("gov.hhs.cdc.trustedintermediary");
+            new Reflections("gov.hhs.cdc.trustedintermediary", SubTypes, FieldsAnnotated);
 
     private Reflection() {}
 
