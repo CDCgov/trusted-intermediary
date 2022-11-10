@@ -4,12 +4,15 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
+import io.javalin.Javalin
 import io.javalin.http.Context
+import io.javalin.http.Handler
+import io.javalin.http.HandlerType
 import spock.lang.Specification
 
 import java.util.function.Function
 
-class AppTest extends Specification {
+class DomainsRegistrationTest extends Specification {
     def "convert Javalin Context to DomainRequest correctly"() {
         given:
 
@@ -25,7 +28,7 @@ class AppTest extends Specification {
         javalinContext.headerMap() >> headerMap
 
         when:
-        def domainRequest = App.javalinContextToDomainRequest(javalinContext)
+        def domainRequest = DomainsRegistration.javalinContextToDomainRequest(javalinContext)
 
         then:
         domainRequest.getBody() == bodyString
@@ -62,7 +65,7 @@ class AppTest extends Specification {
         javalinContext.header(_ as String, _ as String) >> { String key, String value -> savedHeaders.put(key, value) }
 
         when:
-        App.domainResponseFillsInJavalinContext(response, javalinContext)
+        DomainsRegistration.domainResponseFillsInJavalinContext(response, javalinContext)
 
         then:
         savedResult == bodyString
@@ -80,7 +83,7 @@ class AppTest extends Specification {
         def javalinContext = Mock(Context)
 
         when:
-        def javalinHandler = App.createHandler(rawHandler)
+        def javalinHandler = DomainsRegistration.createHandler(rawHandler)
         javalinHandler.handle(javalinContext)
 
         then:
@@ -90,7 +93,7 @@ class AppTest extends Specification {
 
     def "constructNewDomainConnector works correctly with a default constructor"() {
         when:
-        def connector = App.constructNewDomainConnector(GoodDomainConnector)
+        def connector = DomainsRegistration.constructNewDomainConnector(GoodDomainConnector)
 
         then:
         noExceptionThrown()
@@ -99,10 +102,60 @@ class AppTest extends Specification {
 
     def "constructNewDomainConnector fails when there isn't a default constructor"() {
         when:
-        App.constructNewDomainConnector(BadDomainConnector)
+        DomainsRegistration.constructNewDomainConnector(BadDomainConnector)
 
         then:
         thrown RuntimeException
+    }
+
+    def "every DomainConnector is registered"() {
+        given:
+        def javalinApp = Mock(Javalin)
+
+        Example1DomainConnector.endpointCount = 2
+        Example2DomainConnector.endpointCount = 3
+        def expectedNumberOfAddHandlerCalls = Example1DomainConnector.endpointCount + Example2DomainConnector.endpointCount
+        def domains = Set.of(Example1DomainConnector, Example2DomainConnector)
+
+        when:
+        DomainsRegistration.registerDomains(javalinApp, domains as Set<Class<? extends DomainConnector>>)
+
+        then:
+        expectedNumberOfAddHandlerCalls * javalinApp.addHandler(_ as HandlerType, _ as String, _ as Handler)
+    }
+
+    static class Example1DomainConnector implements DomainConnector {
+
+        static def endpointCount = 0
+
+        @Override
+        Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
+            Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> registration = new HashMap<>()
+
+            for (int endpointIndex = 0; endpointIndex < endpointCount; endpointIndex ++) {
+                Function<DomainRequest, DomainResponse> function = { request -> new DomainResponse(418) }
+                registration.put(new HttpEndpoint("PUT", "/dogcow" + endpointIndex), function)
+            }
+
+            return registration
+        }
+    }
+
+    static class Example2DomainConnector implements DomainConnector {
+
+        static def endpointCount = 0
+
+        @Override
+        Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
+            Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> registration = new HashMap<>()
+
+            for (int endpointIndex = 0; endpointIndex < endpointCount; endpointIndex ++) {
+                Function<DomainRequest, DomainResponse> function = { request -> new DomainResponse(418) }
+                registration.put(new HttpEndpoint("POST", "/moof" + endpointIndex), function)
+            }
+
+            return registration
+        }
     }
 
     static class GoodDomainConnector implements DomainConnector {
