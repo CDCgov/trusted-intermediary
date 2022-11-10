@@ -4,14 +4,10 @@
  */
 package gov.hhs.cdc.trustedintermediary.context;
 
-import static org.reflections.scanners.Scanners.FieldsAnnotated;
-
-import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
-import org.reflections.Reflections;
 
 public class ApplicationContext {
 
@@ -38,8 +34,7 @@ public class ApplicationContext {
     }
 
     public static void injectRegisteredImplementations() {
-        var reflections = new Reflections("gov.hhs.cdc.trustedintermediary");
-        var fields = reflections.get(FieldsAnnotated.with(Inject.class).as(Field.class));
+        var fields = Reflection.getFieldsAnnotatedWith(Inject.class);
 
         fields.forEach(
                 field -> {
