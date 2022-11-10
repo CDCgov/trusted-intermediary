@@ -5,7 +5,6 @@ import static org.reflections.scanners.Scanners.SubTypes;
 
 import java.lang.reflect.Field;
 import java.util.Set;
-import javax.inject.Inject;
 import org.reflections.Reflections;
 
 /**
@@ -26,6 +25,6 @@ class Reflection {
     }
 
     public static Set<Field> getFieldsAnnotatedWith(Class<?> annotation) {
-        return REFLECTIONS.get(FieldsAnnotated.with(Inject.class).as(Field.class));
+        return REFLECTIONS.get(FieldsAnnotated.with(annotation).as(Field.class));
     }
 }
