@@ -34,12 +34,44 @@ dependencies {
     testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.11'
 }
 
+jacoco {
+    toolVersion = '0.8.8'
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.90
+            }
+        }
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, excludes: test.jacoco.excludes)
+        }))
+    }
+}
+
+jacocoTestReport {
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, excludes: test.jacoco.excludes)
+        }))
+    }
+}
+
 application {
     mainClass = 'gov.hhs.cdc.trustedintermediary.external.javalin.App'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+
+    jacoco {
+        excludes = ['**/javalin/App*']
+    }
 }
 
 spotless {
