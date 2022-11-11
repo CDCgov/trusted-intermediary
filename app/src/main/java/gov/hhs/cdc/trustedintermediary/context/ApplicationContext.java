@@ -11,9 +11,9 @@ import javax.inject.Inject;
 
 public class ApplicationContext {
 
-    private static final Map<Class<?>, Object> OBJECT_MAP = new ConcurrentHashMap<>();
+    protected static final Map<Class<?>, Object> OBJECT_MAP = new ConcurrentHashMap<>();
 
-    private ApplicationContext() {}
+    protected ApplicationContext() {}
 
     public static void register(Class<?> clazz, Object implementation) {
         OBJECT_MAP.put(clazz, implementation);
