@@ -30,7 +30,6 @@ class DomainRegistrationTest extends Specification {
         given:
         def domainRegistration = new DomainRegistration()
         def domainRequest = new DomainRequest()
-        domainRequest.setBody("Hello Nurse")
         def orderControllerMock = Mock(OrderController)
         def mockParsedBody = "DogCow"
         orderControllerMock.parseOrder(_ as String) >> mockParsedBody
