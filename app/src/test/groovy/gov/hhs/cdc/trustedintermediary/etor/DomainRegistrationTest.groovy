@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor
 
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import spock.lang.Specification
 
 class DomainRegistrationTest extends Specification {
@@ -20,9 +21,11 @@ class DomainRegistrationTest extends Specification {
     def "handles an order"() {
         given:
         def domainRegistration = new DomainRegistration()
+        def domainRequest = new DomainRequest()
+        domainRequest.setBody("Hello Nurse")
 
         when:
-        def response = domainRegistration.handleOrder(null)
+        def response = domainRegistration.handleOrder(domainRequest)
 
         then:
         response.getStatusCode() < 300
