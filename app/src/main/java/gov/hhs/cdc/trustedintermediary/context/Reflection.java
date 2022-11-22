@@ -1,7 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.context;
 
+import static org.reflections.scanners.Scanners.FieldsAnnotated;
 import static org.reflections.scanners.Scanners.SubTypes;
 
+import java.lang.reflect.Field;
 import java.util.Set;
 import org.reflections.Reflections;
 
@@ -12,11 +14,17 @@ import org.reflections.Reflections;
  */
 class Reflection {
 
+    private static final Reflections REFLECTIONS =
+            new Reflections("gov.hhs.cdc.trustedintermediary", SubTypes, FieldsAnnotated);
+
     private Reflection() {}
 
     public static <T> Set<Class<? extends T>> getImplementors(Class<T> interfaze) {
-        var reflections = new Reflections("gov.hhs.cdc.trustedintermediary");
         return (Set<Class<? extends T>>)
-                reflections.get(SubTypes.of(interfaze).as((Class<? extends T>) Class.class));
+                REFLECTIONS.get(SubTypes.of(interfaze).as((Class<? extends T>) Class.class));
+    }
+
+    public static Set<Field> getFieldsAnnotatedWith(Class<?> annotation) {
+        return REFLECTIONS.get(FieldsAnnotated.with(annotation).as(Field.class));
     }
 }

@@ -9,6 +9,6 @@ class HelloWorldTest extends Specification {
         def response = Client.post("/v1/etor/order")
 
         then:
-        response == "DogCow requsted a lab order"
+        response == "DogCow sent in a lab order"
     }
 }
