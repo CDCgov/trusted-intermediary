@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.javalin;
 
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
@@ -11,12 +12,30 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class DomainsRegistration {
     public static void registerDomains(
             Javalin app, Set<Class<? extends DomainConnector>> domainConnectors) {
-        domainConnectors.stream()
-                .map(DomainsRegistration::constructNewDomainConnector)
+
+        var instantiatedDomains =
+                domainConnectors.stream()
+                        .map(DomainsRegistration::constructNewDomainConnector)
+                        .collect(Collectors.toSet());
+
+        registerDomainsWithApplicationContext(instantiatedDomains);
+
+        registerDomainsHandlers(app, instantiatedDomains);
+
+        ApplicationContext.injectRegisteredImplementations();
+    }
+
+    static void registerDomainsWithApplicationContext(Set<DomainConnector> domains) {
+        domains.forEach(domain -> ApplicationContext.register(domain.getClass(), domain));
+    }
+
+    static void registerDomainsHandlers(Javalin app, Set<DomainConnector> domains) {
+        domains.stream()
                 .map(DomainConnector::domainRegistration)
                 .forEach(
                         registrationMap ->
