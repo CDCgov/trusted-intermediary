@@ -13,13 +13,7 @@ public interface MyLogger {
 
     void logTrace(String traceMessage);
 
-    void logInfo(String infoMessage, Throwable e);
-
-    void logWarning(String warningMessage, Throwable e);
-
     void logDebug(String debugMessage, Throwable e);
 
     void logError(String errorMessage, Throwable e);
-
-    void logTrace(String traceMessage, Throwable e);
 }

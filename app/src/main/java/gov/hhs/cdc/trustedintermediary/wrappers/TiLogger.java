@@ -38,16 +38,6 @@ public class TiLogger implements MyLogger {
     }
 
     @Override
-    public void logInfo(String infoMessage, Throwable e) {
-        LOGGER.info(infoMessage, e);
-    }
-
-    @Override
-    public void logWarning(String warningMessage, Throwable e) {
-        LOGGER.warn(warningMessage, e);
-    }
-
-    @Override
     public void logDebug(String debugMessage, Throwable e) {
         LOGGER.debug(debugMessage, e);
     }
@@ -55,10 +45,5 @@ public class TiLogger implements MyLogger {
     @Override
     public void logError(String errorMessage, Throwable e) {
         LOGGER.error(errorMessage, e);
-    }
-
-    @Override
-    public void logTrace(String traceMessage, Throwable e) {
-        LOGGER.trace(traceMessage, e);
     }
 }
