@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.javalin;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
+import gov.hhs.cdc.trustedintermediary.wrappers.TiLogger;
 import io.javalin.Javalin;
 import java.util.Set;
 
@@ -12,6 +13,8 @@ public class App {
         var app = Javalin.create().start(8080);
 
         app.get("/health", ctx -> ctx.result("Operational"));
+
+        ApplicationContext.register(TiLogger.class, TiLogger.getLogger());
 
         Set<Class<? extends DomainConnector>> domainConnectors =
                 ApplicationContext.getImplementors(DomainConnector.class);

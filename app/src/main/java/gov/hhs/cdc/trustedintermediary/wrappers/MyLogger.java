@@ -11,8 +11,6 @@ public interface MyLogger {
 
     void logError(String errorMessage);
 
-    void logTrace(String traceMessage);
-
     void logDebug(String debugMessage, Throwable e);
 
     void logError(String errorMessage, Throwable e);
