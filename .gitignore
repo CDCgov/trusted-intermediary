@@ -3,3 +3,7 @@
 
 # Ignore Gradle build output directory
 build
+
+# Ignore files created by VSCode Extension Pack for Java
+*/bin/**/*.class
+*/bin/**/*.groovy
