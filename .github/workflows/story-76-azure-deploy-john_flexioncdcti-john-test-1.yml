@@ -26,12 +26,18 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
 
+      - name: 'Restore Project Dependencies Using Mvn'
+        shell: pwsh
+        run: |
+          pushd './${{ env.PACKAGE_DIRECTORY }}'
+          mvn clean package
+          popd
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
         id: fa
         with:
           app-name: 'flexioncdcti-john-test-1'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0890DD785A42405BBB5C2099183EB6DD }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C74B8E20BF4145969F905E16749CA6E4 }}
           package: '${{ env.PACKAGE_DIRECTORY }}'
           respect-pom-xml: true
