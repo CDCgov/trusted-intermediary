@@ -1,0 +1,35 @@
+plugins {
+  id "com.microsoft.azure.azurefunctions" version "1.11.1"
+}
+apply plugin: 'java'
+apply plugin: "com.microsoft.azure.azurefunctions"
+
+group 'gov.hhs.cdc.trustedintermediary'
+version '1.0-SNAPSHOT'
+
+dependencies {
+    implementation 'com.microsoft.azure.functions:azure-functions-java-library:2.0.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.6.2'
+    testImplementation 'org.mockito:mockito-core:3.3.3'
+}
+
+sourceCompatibility = '17'
+targetCompatibility = '17'
+
+compileJava.options.encoding = 'UTF-8'
+
+repositories {
+    mavenCentral()
+}
+
+azurefunctions {
+    resourceGroup = 'java-functions-group'
+    appName = 'trusted-intermediary-1669248101944'
+    pricingTier = 'Consumption'
+    region = 'centeralus'
+    runtime {
+      os = 'windows'
+      javaVersion = '17'
+    }
+    localDebug = "transport=dt_socket,server=y,suspend=n,address=5005"
+}

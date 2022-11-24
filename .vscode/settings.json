@@ -4,5 +4,12 @@
         "CFPB",
         "ISSO",
         "cybersecurity"
-    ]
+    ],
+    "azureFunctions.javaBuildTool": "gradle",
+    "azureFunctions.deploySubpath": "build/azure-functions/trusted-intermediary-1669248101944",
+    "azureFunctions.projectLanguage": "Java",
+    "azureFunctions.projectRuntime": "~3",
+    "debug.internalConsoleOptions": "neverOpen",
+    "azureFunctions.preDeployTask": "package (functions)",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

@@ -2,14 +2,26 @@
 
 ## Requirements
 
-Any distribution of the Java 17 JDK.
+1. Any distribution of the Java 17 JDK, with $JAVA_HOME set accordinly.
+2. Azure Functions Core Tools
+
+On MacOS, for example:
+```shell
+brew install openjdk@17 azure-functions-core-tools@3
+```
+
+Then add to ~/.zshrc (or ~/.bashrc):
+```
+export JAVA_HOME='/opt/homebrew/opt/openjdk@17'
+export PATH="/opt/homebrew/opt/openjdk@17/bin:$PATH"
+```
 
 ## Using and Running
 
-To run the application directly, execute...
+To build and run the application locally, execute...
 
 ```shell
-./gradlew clean run
+./gradlew azureFunctionsRun
 ```
 
 This will run the web API on port 8080.  You can view the API documentation at _TBD_.
@@ -27,7 +39,7 @@ The additional requirements needed to contribute towards development are...
 To compile the application, execute...
 
 ```shell
-./gradlew clean build
+./gradlew azureFunctionsPackage
 ```
 
 Once compiled, the built artifact is _TBD_.

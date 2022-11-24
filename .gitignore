@@ -1,9 +1,67 @@
-# Ignore Gradle project-specific cache directory
-.gradle
+# Compiled class file
+*.class
 
-# Ignore Gradle build output directory
-build
+# Log file
+*.log
 
-# Ignore files created by VSCode Extension Pack for Java
-*/bin/**/*.class
-*/bin/**/*.groovy
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+# Build output
+target/
+
+*.factorypath
+
+# IDE
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.checkstyle
+
+# macOS
+.DS_Store
+
+# gradle-wrapper
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# integration test
+*/src/it/*/bin
+
+jacoco.exec
+bin/
+
+# mvnw
+!.mvn/wrapper/maven-wrapper.jar
+
+build/
+
+.gradle/
+
+# Azure Functions artifacts
+bin
+obj
+appsettings.json
+local.settings.json
+
+# Azurite artifacts
+__blobstorage__
+__queuestorage__
+__azurite_db*__.json
