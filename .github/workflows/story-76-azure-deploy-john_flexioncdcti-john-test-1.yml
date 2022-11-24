@@ -26,12 +26,6 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
 
-      - name: 'Restore Project Dependencies Using Mvn'
-        shell: pwsh
-        run: |
-          pushd './${{ env.PACKAGE_DIRECTORY }}'
-          mvn clean package
-          popd
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
         id: fa
