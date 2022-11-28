@@ -1,9 +1,11 @@
 package gov.hhs.cdc.trustedintermediary.external.javalin
 
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
+import gov.hhs.cdc.trustedintermediary.wrappers.TiLogger
 import io.javalin.Javalin
 import io.javalin.http.Context
 import io.javalin.http.Handler
@@ -26,6 +28,7 @@ class DomainsRegistrationTest extends Specification {
         javalinContext.body() >> bodyString
         javalinContext.url() >> urlString
         javalinContext.headerMap() >> headerMap
+        ApplicationContext.register(TiLogger.class, TiLogger.getLogger())
 
         when:
         def domainRequest = DomainsRegistration.javalinContextToDomainRequest(javalinContext)
