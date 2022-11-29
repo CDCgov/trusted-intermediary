@@ -22,11 +22,10 @@ public class DomainsRegistration {
     public static void registerDomains(
             Javalin app, Set<Class<? extends DomainConnector>> domainConnectors) {
 
-        logger.logInfo("Info - mainly use");
+        logger.logInfo("Info");
         logger.logWarning("Warning");
         logger.logDebug("Debug");
         logger.logError("Error");
-        logger.logError("Testing Error", new Exception());
 
         var instantiatedDomains =
                 domainConnectors.stream()
