@@ -7,6 +7,8 @@ public interface MyLogger {
 
     void logWarning(String warningMessage);
 
+    void logTrace(String traceMessge);
+
     void logDebug(String debugMessage);
 
     void logError(String errorMessage);

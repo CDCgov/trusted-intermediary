@@ -28,7 +28,7 @@ class DomainsRegistrationTest extends Specification {
         javalinContext.body() >> bodyString
         javalinContext.url() >> urlString
         javalinContext.headerMap() >> headerMap
-        ApplicationContext.register(TiLogger.class, TiLogger.getLogger())
+        ApplicationContext.register(TiLogger.class, TiLogger.getLogger()) // Needed since DomainRegistrationTest resets it
 
         when:
         def domainRequest = DomainsRegistration.javalinContextToDomainRequest(javalinContext)
