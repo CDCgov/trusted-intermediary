@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.wrappers;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -8,9 +7,9 @@ import org.slf4j.LoggerFactory;
  * dependency of the logger. The idea is to have the logger dependency only in this class. If there
  * ever is a reason to use a different logger, then we only need to make the changes here.
  */
-public class TiLogger implements MyLogger {
+public class Slf4jLogger implements Logger {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("tilogger");
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger("tilogger");
 
     // ANSI escape code
     public static final String ANSI_RESET = "\u001B[0m";
@@ -23,7 +22,7 @@ public class TiLogger implements MyLogger {
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
 
-    private TiLogger() {}
+    private Slf4jLogger() {}
 
     @Override
     public void logInfo(String infoMessage) {
@@ -60,7 +59,7 @@ public class TiLogger implements MyLogger {
         LOGGER.error(ANSI_RED + errorMessage + ANSI_RESET, e);
     }
 
-    public static TiLogger getLogger() {
-        return new TiLogger();
+    public static Slf4jLogger getLogger() {
+        return new Slf4jLogger();
     }
 }

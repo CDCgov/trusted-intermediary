@@ -1,7 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.wrappers;
 
 /** Interface that will be implemented with a humble object for logging */
-public interface MyLogger {
+public interface Logger {
 
     void logInfo(String infoMessage);
 

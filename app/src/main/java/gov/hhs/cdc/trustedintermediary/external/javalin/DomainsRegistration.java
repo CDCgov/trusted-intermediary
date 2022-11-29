@@ -4,7 +4,7 @@ import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
-import gov.hhs.cdc.trustedintermediary.wrappers.TiLogger;
+import gov.hhs.cdc.trustedintermediary.wrappers.Slf4jLogger;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 public class DomainsRegistration {
 
-    private static TiLogger logger = ApplicationContext.getImplementation(TiLogger.class);
+    private static Slf4jLogger logger = ApplicationContext.getImplementation(Slf4jLogger.class);
 
     public static void registerDomains(
             Javalin app, Set<Class<? extends DomainConnector>> domainConnectors) {

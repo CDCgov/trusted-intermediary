@@ -5,7 +5,7 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
-import gov.hhs.cdc.trustedintermediary.wrappers.TiLogger
+import gov.hhs.cdc.trustedintermediary.wrappers.Slf4jLogger
 import io.javalin.Javalin
 import io.javalin.http.Context
 import io.javalin.http.Handler
@@ -28,7 +28,7 @@ class DomainsRegistrationTest extends Specification {
         javalinContext.body() >> bodyString
         javalinContext.url() >> urlString
         javalinContext.headerMap() >> headerMap
-        ApplicationContext.register(TiLogger.class, TiLogger.getLogger()) // Needed since DomainRegistrationTest resets it
+        ApplicationContext.register(Slf4jLogger.class, Slf4jLogger.getLogger()) // Needed since DomainRegistrationTest resets it
 
         when:
         def domainRequest = DomainsRegistration.javalinContextToDomainRequest(javalinContext)
