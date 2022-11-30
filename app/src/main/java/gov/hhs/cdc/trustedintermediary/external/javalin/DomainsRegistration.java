@@ -26,8 +26,6 @@ public class DomainsRegistration {
         registerDomainsWithApplicationContext(instantiatedDomains);
 
         registerDomainsHandlers(app, instantiatedDomains);
-
-        ApplicationContext.injectRegisteredImplementations();
     }
 
     static void registerDomainsWithApplicationContext(Set<DomainConnector> domains) {
