@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/azure/functions-action
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Java project to Azure Function App - flexioncdcti-john-test-1
+name: Build & Deploy Azure Function App (John's Test)
 
 on:
   push:
@@ -25,16 +25,14 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: ${{ env.JAVA_VERSION }}
+
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
+
       - name: Build with Gradle
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
-          arguments: build
-      - uses: actions/upload-artifact@v3
-        with:
-        name: Package
-        path: build/libs
+          arguments: clean azureFunctionsPackage
 
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
