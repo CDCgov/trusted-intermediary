@@ -16,16 +16,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class DomainsRegistration {
-
-    private static Logger logger = ApplicationContext.getImplementation(Logger.class);
+    private static final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
 
     public static void registerDomains(
             Javalin app, Set<Class<? extends DomainConnector>> domainConnectors) {
 
-        logger.logInfo("Info");
-        logger.logWarning("Warning");
-        logger.logDebug("Debug");
-        logger.logError("Error");
+        LOGGER.logInfo("Info");
+        LOGGER.logWarning("Warning");
+        LOGGER.logDebug("Debug");
+        LOGGER.logError("Error");
 
         var instantiatedDomains =
                 domainConnectors.stream()
@@ -44,7 +43,7 @@ public class DomainsRegistration {
     }
 
     static void registerDomainsHandlers(Javalin app, Set<DomainConnector> domains) {
-        logger.logInfo("Registering: ");
+        LOGGER.logInfo("Registering: ");
         domains.stream()
                 .map(DomainConnector::domainRegistration)
                 .forEach(
@@ -55,7 +54,7 @@ public class DomainsRegistration {
                                                     HandlerType.valueOf(endpoint.verb()),
                                                     endpoint.path(),
                                                     createHandler(handler));
-                                            logger.logInfo(
+                                            LOGGER.logInfo(
                                                     "verb: "
                                                             + endpoint.verb()
                                                             + ", endpoint: "
@@ -77,11 +76,15 @@ public class DomainsRegistration {
 
     static Handler createHandler(Function<DomainRequest, DomainResponse> handler) {
         return (Context ctx) -> {
+            LOGGER.logInfo(ctx.method().name() + " " + ctx.url());
+
             var request = javalinContextToDomainRequest(ctx);
 
             var response = handler.apply(request);
 
             domainResponseFillsInJavalinContext(response, ctx);
+
+            LOGGER.logInfo("Handler complete");
         };
     }
 

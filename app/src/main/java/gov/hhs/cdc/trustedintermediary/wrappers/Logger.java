@@ -7,7 +7,7 @@ public interface Logger {
 
     void logWarning(String warningMessage);
 
-    void logTrace(String traceMessge);
+    void logTrace(String traceMessage);
 
     void logDebug(String debugMessage);
 
