@@ -1,6 +1,12 @@
+# Use Linux-Alpine image
 FROM khipu/openjdk17-alpine
+
+# Create directory and switch to it
 WORKDIR /app
-# ADD .gradle .
-# ADD gradle .
+
+# cache
+#ADD /.gradle .
+#ADD /gradle .
+
 ADD . .
 CMD ["./gradlew", ":app:run"]
