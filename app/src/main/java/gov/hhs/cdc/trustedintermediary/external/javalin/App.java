@@ -11,6 +11,7 @@ public class App {
     public static void main(String[] args) {
         var app = Javalin.create().start(8080);
 
+        app.get("/", ctx -> ctx.result("Welcome to the CDC TI service"));
         app.get("/health", ctx -> ctx.result("Operational"));
 
         Set<Class<? extends DomainConnector>> domainConnectors =
