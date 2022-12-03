@@ -1,7 +1,6 @@
 version: "3.7"
 services:
-  web:
+  router:
     build: .
-    container_name: trusted_intermediary_router
     ports:
       - "8080:8080"
