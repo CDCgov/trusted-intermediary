@@ -24,7 +24,7 @@ jobs:
     - name: Log in to registry
       uses: docker/login-action@v1
       with:
-        registry: 'https://${{ REGISTRY }}/'
+        registry: 'https://${{ env.REGISTRY }}/'
         username: '${{ secrets.STAGING_ACR_USERNAME }}'
         password: '${{ secrets.STAGING_ACR_PASSWORD }}'
 
@@ -32,7 +32,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: '${{ REGISTRY }}/{{ REPO }}:${{ github.sha }}'
+        tags: '${{ env.REGISTRY }}/{{ env.REPO }}:${{ github.sha }}'
         file: ./Dockerfile
 
   deploy:
@@ -47,7 +47,7 @@ jobs:
       id: deploy-to-webapp
       uses: azure/webapps-deploy@v2
       with:
-        app-name: '${{ APP }}'
+        app-name: '${{ env.APP }}'
         slot-name: 'production'
         publish-profile: '${{ secrets.STAGING_PUBLISH_PROFILE }}'
-        images: '${{ REGISTRY }}/${{ REPO }}:${{ github.sha }}'
+        images: '${{ env.REGISTRY }}/${{ env.REPO }}:${{ github.sha }}'
