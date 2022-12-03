@@ -1,5 +1,5 @@
 # Use Linux-Alpine image
-FROM mcr.microsoft.com/openjdk/jdk:17-ubuntu
+FROM openjdk:17-alpine4.14
 
 # Create directory and switch to it
 WORKDIR /app
