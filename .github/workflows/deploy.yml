@@ -32,7 +32,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: '${{ env.REGISTRY }}/{{ env.REPO }}:${{ github.sha }}'
+        tags: '${{ env.REGISTRY }}/${{ env.REPO }}:${{ github.sha }}'
         file: ./Dockerfile
 
   deploy:
