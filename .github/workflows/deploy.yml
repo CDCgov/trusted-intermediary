@@ -1,5 +1,4 @@
 name: 'Container Build & Deploy'
-description: 'Build container and push to Azure Container Registry. Then deploy to Azure function app.'
 
 on:
   push:
