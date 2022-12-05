@@ -1,12 +1,11 @@
 package gov.hhs.cdc.trustedintermediary.external.javalin
 
-import gov.hhs.cdc.trustedintermediary.context.ApplicationContext
+
+import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
-import gov.hhs.cdc.trustedintermediary.wrappers.Logger
-import gov.hhs.cdc.trustedintermediary.wrappers.Slf4jLogger
 import io.javalin.Javalin
 import io.javalin.http.Context
 import io.javalin.http.Handler
@@ -16,6 +15,11 @@ import spock.lang.Specification
 import java.util.function.Function
 
 class DomainsRegistrationTest extends Specification {
+
+    def setup() {
+        TestApplicationContext.init()
+    }
+
     def "convert Javalin Context to DomainRequest correctly"() {
         given:
 
@@ -29,7 +33,6 @@ class DomainsRegistrationTest extends Specification {
         javalinContext.body() >> bodyString
         javalinContext.url() >> urlString
         javalinContext.headerMap() >> headerMap
-        ApplicationContext.register(Logger.class, Slf4jLogger.getLogger()) // Needed since DomainRegistrationTest resets it
 
         when:
         def domainRequest = DomainsRegistration.javalinContextToDomainRequest(javalinContext)
@@ -79,12 +82,14 @@ class DomainsRegistrationTest extends Specification {
 
     def "createHandler successfully stitches things together"() {
         given:
+        //        TestApplicationContext.register(Logger.class, Slf4jLogger.getLogger())
         def handlerCalled = false
         def rawHandler = { request ->
             handlerCalled = true
             return new DomainResponse(418)
         }
         def javalinContext = Mock(Context)
+        javalinContext.method() >> HandlerType.POST
 
         when:
         def javalinHandler = DomainsRegistration.createHandler(rawHandler)
