@@ -82,7 +82,6 @@ class DomainsRegistrationTest extends Specification {
 
     def "createHandler successfully stitches things together"() {
         given:
-        //        TestApplicationContext.register(Logger.class, Slf4jLogger.getLogger())
         def handlerCalled = false
         def rawHandler = { request ->
             handlerCalled = true
