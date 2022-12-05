@@ -1,5 +1,5 @@
 # Use Linux-Alpine image
-FROM openjdk:17-alpine3.14
+FROM amazoncorretto:17-alpine
 
 # Create directory and switch to it
 WORKDIR /app
