@@ -16,6 +16,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class DomainsRegistration {
+
+    // not using @Inject because we are still bootstrapping the application context
     private static final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
 
     public static void registerDomains(
