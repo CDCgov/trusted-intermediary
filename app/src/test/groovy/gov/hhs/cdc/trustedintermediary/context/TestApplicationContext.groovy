@@ -4,7 +4,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.Slf4jLogger
 
 /**
- * This test class resets the Object map from the ApplicationContext so different test cases can start on a clean slate
+ * This test class resets the implementation registration in the ApplicationContext so different test cases can start on a clean slate.
  */
 class TestApplicationContext extends ApplicationContext {
 
