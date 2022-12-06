@@ -34,6 +34,10 @@ public class ApplicationContext {
     }
 
     public static void injectRegisteredImplementations() {
+        injectRegisteredImplementations(false);
+    }
+
+    protected static void injectRegisteredImplementations(boolean skipMissingImplementations) {
         var fields = Reflection.getFieldsAnnotatedWith(Inject.class);
 
         fields.forEach(
@@ -41,8 +45,20 @@ public class ApplicationContext {
                     var fieldType = field.getType();
                     var declaringClass = field.getDeclaringClass();
 
-                    var fieldImplementation = getImplementation(fieldType);
-                    var declaringClassImplementation = getImplementation(declaringClass);
+                    Object fieldImplementation;
+                    Object declaringClassImplementation;
+                    try {
+                        fieldImplementation = getImplementation(fieldType);
+                        declaringClassImplementation = getImplementation(declaringClass);
+                    } catch (IllegalArgumentException exception) {
+                        if (skipMissingImplementations) {
+                            System.err.println(
+                                    "Ignoring failure to get implementations to inject into a field");
+                            return;
+                        }
+
+                        throw exception;
+                    }
 
                     field.trySetAccessible();
 
