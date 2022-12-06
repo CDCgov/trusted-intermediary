@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
@@ -15,8 +16,17 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class DomainsRegistration {
+
+    // not using @Inject because we are still bootstrapping the application context
+    private static final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
+
     public static void registerDomains(
             Javalin app, Set<Class<? extends DomainConnector>> domainConnectors) {
+
+        LOGGER.logInfo("Info");
+        LOGGER.logWarning("Warning");
+        LOGGER.logDebug("Debug");
+        LOGGER.logError("Error");
 
         var instantiatedDomains =
                 domainConnectors.stream()
@@ -33,16 +43,23 @@ public class DomainsRegistration {
     }
 
     static void registerDomainsHandlers(Javalin app, Set<DomainConnector> domains) {
+        LOGGER.logInfo("Registering: ");
         domains.stream()
                 .map(DomainConnector::domainRegistration)
                 .forEach(
                         registrationMap ->
                                 registrationMap.forEach(
-                                        (endpoint, handler) ->
-                                                app.addHandler(
-                                                        HandlerType.valueOf(endpoint.verb()),
-                                                        endpoint.path(),
-                                                        createHandler(handler))));
+                                        (endpoint, handler) -> {
+                                            app.addHandler(
+                                                    HandlerType.valueOf(endpoint.verb()),
+                                                    endpoint.path(),
+                                                    createHandler(handler));
+                                            LOGGER.logInfo(
+                                                    "verb: "
+                                                            + endpoint.verb()
+                                                            + ", endpoint: "
+                                                            + endpoint.path());
+                                        }));
     }
 
     static DomainConnector constructNewDomainConnector(Class<? extends DomainConnector> clazz) {
@@ -59,11 +76,15 @@ public class DomainsRegistration {
 
     static Handler createHandler(Function<DomainRequest, DomainResponse> handler) {
         return (Context ctx) -> {
+            LOGGER.logInfo(ctx.method().name() + " " + ctx.url());
+
             var request = javalinContextToDomainRequest(ctx);
 
             var response = handler.apply(request);
 
             domainResponseFillsInJavalinContext(response, ctx);
+
+            LOGGER.logInfo("Handler complete");
         };
     }
 

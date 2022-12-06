@@ -25,14 +25,15 @@ java {
 
 dependencies {
     implementation 'io.javalin:javalin:5.2.0'
-    implementation 'org.slf4j:slf4j-simple:2.0.5'
     implementation 'org.reflections:reflections:0.10.2'
     implementation 'javax.inject:javax.inject:1'
+    implementation 'org.slf4j:slf4j-api:2.0.5'
+    implementation 'org.slf4j:slf4j-simple:2.0.5' // Can be replaced with logBack, log4j, log4j2, Java Utility Logger
 
     testImplementation 'org.apache.groovy:groovy:4.0.6'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
     testImplementation 'com.openpojo:openpojo:0.9.1'
-    testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.11.1'
+    testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.12.1'
 }
 
 jacoco {
