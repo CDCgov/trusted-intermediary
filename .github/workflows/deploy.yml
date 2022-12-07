@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: cdctistagingcontainerregistry.azurecr.io
-  REPO: trusted-intermediary-web
+  REPO: trusted-intermediary-router
   APP: cdcti-staging-api
 
 jobs:
@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'production'
+      name: 'staging'
       url: '${{ steps.deploy-to-webapp.outputs.webapp-url }}'
 
     steps:
