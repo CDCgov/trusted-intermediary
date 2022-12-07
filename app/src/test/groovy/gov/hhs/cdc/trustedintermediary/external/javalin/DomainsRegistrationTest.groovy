@@ -1,5 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.javalin
 
+
+import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
@@ -13,6 +15,11 @@ import spock.lang.Specification
 import java.util.function.Function
 
 class DomainsRegistrationTest extends Specification {
+
+    def setup() {
+        TestApplicationContext.init()
+    }
+
     def "convert Javalin Context to DomainRequest correctly"() {
         given:
 
@@ -81,6 +88,7 @@ class DomainsRegistrationTest extends Specification {
             return new DomainResponse(418)
         }
         def javalinContext = Mock(Context)
+        javalinContext.method() >> HandlerType.POST
 
         when:
         def javalinHandler = DomainsRegistration.createHandler(rawHandler)

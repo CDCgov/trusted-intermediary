@@ -2,6 +2,8 @@ package gov.hhs.cdc.trustedintermediary.external.javalin;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.Slf4jLogger;
 import io.javalin.Javalin;
 import java.util.Set;
 
@@ -13,6 +15,8 @@ public class App {
 
         app.get("/", ctx -> ctx.result("Welcome to the CDC TI service"));
         app.get("/health", ctx -> ctx.result("Operational"));
+
+        ApplicationContext.register(Logger.class, Slf4jLogger.getLogger());
 
         Set<Class<? extends DomainConnector>> domainConnectors =
                 ApplicationContext.getImplementors(DomainConnector.class);
