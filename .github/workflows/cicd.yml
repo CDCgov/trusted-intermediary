@@ -9,13 +9,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  ci:
-    name: CI
-    uses: ./.github/workflows/ci.yml
+  # ci:
+  #   name: CI
+  #   uses: ./.github/workflows/ci.yml
 
   deployment:
     name: Deploy to Staging
-    needs: ci
+    # needs: ci
     uses: ./.github/workflows/deploy.yml
     with:
       REGISTRY: cdctistagingcontainerregistry.azurecr.io
