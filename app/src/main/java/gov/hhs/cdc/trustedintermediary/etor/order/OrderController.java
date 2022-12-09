@@ -11,6 +11,6 @@ public class OrderController {
     }
 
     public String parseOrder(String requestBody) {
-        return "DogCow sent in a lab order FAILED";
+        return "DogCow sent in a lab order";
     }
 }
