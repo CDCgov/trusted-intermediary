@@ -36,9 +36,9 @@ jobs:
     - name: Log in to registry
       uses: docker/login-action@v1
       with:
-        registry: 'https://${{ env.REGISTRY }}/'
-        username: '${{ secrets.ACR_USERNAME }}'
-        password: '${{ secrets.ACR_PASSWORD }}'
+        REGISTRY: 'https://${{ env.REGISTRY }}/'
+        ACR_USERNAME: '${{ secrets.ACR_USERNAME }}'
+        ACR_PASSWORD: '${{ secrets.ACR_PASSWORD }}'
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v2
