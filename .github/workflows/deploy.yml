@@ -39,9 +39,11 @@ jobs:
     - name: Build JAR
       run: ./gradlew clean :app:shadowJar
 
-    - run: |
-      pwd
-      ls -la ./app/build/libs/
+    - name: Testing env
+      run: |
+        pwd
+        ls -la ./app/build/libs/
+      shell: bash
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
