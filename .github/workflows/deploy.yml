@@ -1,7 +1,7 @@
 name: 'Container Build & Deploy'
 
 on:
-  workflow-call:
+  workflow_call:
     inputs:
       REGISTRY:
         required: true
