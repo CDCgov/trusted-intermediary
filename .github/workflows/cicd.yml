@@ -1,0 +1,28 @@
+name: Continuous Integration and Deployment
+
+on:
+  push:
+    branches:
+      - containerize-project-azure-deploy
+    paths-ignore:
+      - '*.md'
+  workflow_dispatch:
+
+jobs:
+  ci:
+    name: CI
+    uses: ./.github/workflows/ci.yml
+
+  deployment:
+    name: Deploy to Staging
+    needs: ci
+    uses: ./.github/workflows/deploy.yml
+    with:
+      REGISTRY: cdctistagingcontainerregistry.azurecr.io
+      REPO: trusted-intermediary-router
+      APP: cdcti-staging-api
+      ENVIRONMENT: staging
+    secrets:
+      ACR_USERNAME: ${{ secrets.STAGING_ACR_USERNAME }}
+      ACR_PASSWORD: ${{ secrets.STAGING_ACR_PASSWORD }}
+      PUBLISH_PROFILE: ${{ secrets.STAGING_PUBLISH_PROFILE }}

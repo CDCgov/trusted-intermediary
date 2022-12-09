@@ -1,15 +1,24 @@
 name: 'Container Build & Deploy'
 
 on:
-  push:
-    branches:
-      - containerize-project-azure-deploy
-  workflow_dispatch:
-
-env:
-  REGISTRY: cdctistagingcontainerregistry.azurecr.io
-  REPO: trusted-intermediary-router
-  APP: cdcti-staging-api
+  workflow-call:
+    inputs:
+      REGISTRY:
+        required: true
+        type: string
+      REPO:
+        required: true
+        type: string
+      APP:
+        required: true
+        type: string
+    secrets:
+      ACR_USERNAME:
+        required: true
+      ACR_PASSWORD:
+        required: true
+      PUBLISH_PROFILE:
+        required: true
 
 jobs:
   build:
@@ -28,8 +37,8 @@ jobs:
       uses: docker/login-action@v1
       with:
         registry: 'https://${{ env.REGISTRY }}/'
-        username: '${{ secrets.STAGING_ACR_USERNAME }}'
-        password: '${{ secrets.STAGING_ACR_PASSWORD }}'
+        username: '${{ secrets.ACR_USERNAME }}'
+        password: '${{ secrets.ACR_PASSWORD }}'
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v2
@@ -42,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'staging'
+      name: ${{ env.ENVIRONMENT }}
       url: '${{ steps.deploy-to-webapp.outputs.webapp-url }}'
 
     steps:
@@ -52,5 +61,5 @@ jobs:
       with:
         app-name: '${{ env.APP }}'
         slot-name: 'production'
-        publish-profile: '${{ secrets.STAGING_PUBLISH_PROFILE }}'
+        publish-profile: '${{ secrets.PUBLISH_PROFILE }}'
         images: '${{ env.REGISTRY }}/${{ env.REPO }}:${{ github.sha }}'
