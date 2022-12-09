@@ -21,6 +21,7 @@ jobs:
       REGISTRY: cdctistagingcontainerregistry.azurecr.io
       REPO: trusted-intermediary-router
       APP: cdcti-staging-api
+      ENVIRONMENT: staging
     secrets:
       ACR_USERNAME: ${{ secrets.STAGING_ACR_USERNAME }}
       ACR_PASSWORD: ${{ secrets.STAGING_ACR_PASSWORD }}
