@@ -17,7 +17,6 @@ jobs:
     name: Deploy to Staging
     needs: ci
     uses: ./.github/workflows/deploy.yml
-
     with:
       REGISTRY: cdctistagingcontainerregistry.azurecr.io
       REPO: trusted-intermediary-router

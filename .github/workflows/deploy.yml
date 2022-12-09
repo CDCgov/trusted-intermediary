@@ -36,15 +36,15 @@ jobs:
     - name: Log in to registry
       uses: docker/login-action@v1
       with:
-        REGISTRY: 'https://${{ env.REGISTRY }}/'
-        ACR_USERNAME: '${{ secrets.ACR_USERNAME }}'
-        ACR_PASSWORD: '${{ secrets.ACR_PASSWORD }}'
+        registry: 'https://${{ inputs.REGISTRY }}/'
+        username: '${{ secrets.ACR_USERNAME }}'
+        password: '${{ secrets.ACR_PASSWORD }}'
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: '${{ env.REGISTRY }}/${{ env.REPO }}:${{ github.sha }}'
+        tags: '${{ inputs.REGISTRY }}/${{ inputs.REPO }}:${{ github.sha }}'
         file: ./Dockerfile
 
   deploy:
@@ -59,7 +59,7 @@ jobs:
       id: deploy-to-webapp
       uses: azure/webapps-deploy@v2
       with:
-        app-name: '${{ env.APP }}'
+        app-name: '${{ inputs.APP }}'
         slot-name: 'production'
         publish-profile: '${{ secrets.PUBLISH_PROFILE }}'
-        images: '${{ env.REGISTRY }}/${{ env.REPO }}:${{ github.sha }}'
+        images: '${{ inputs.REGISTRY }}/${{ inputs.REPO }}:${{ github.sha }}'
