@@ -2,10 +2,11 @@
 FROM amazoncorretto:17-alpine
 
 ARG JAR_LIB_FILE=./app/build/libs/app-all.jar
+
 # Create directory and switch to it
 WORKDIR /app
 
-# Add project to created folder
+# Add application JAR to created folder
 COPY ${JAR_LIB_FILE} app.jar
 
 # Run the api
