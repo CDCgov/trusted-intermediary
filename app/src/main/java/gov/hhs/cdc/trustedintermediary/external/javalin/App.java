@@ -22,5 +22,7 @@ public class App {
                 ApplicationContext.getImplementors(DomainConnector.class);
 
         DomainsRegistration.registerDomains(app, domainConnectors);
+
+        ApplicationContext.injectRegisteredImplementations();
     }
 }
