@@ -1,4 +1,4 @@
-name: Continuous Integration and Deployment
+name: CI/CD
 
 on:
   push:
@@ -13,8 +13,8 @@ jobs:
     name: CI
     uses: ./.github/workflows/ci.yml
 
-  staging-deployment:
-    name: 'Staging: Container Build & Deploy'
+  staging:
+    name: 'Staging'
     needs: ci
     uses: ./.github/workflows/deploy.yml
     with:
