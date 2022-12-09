@@ -17,9 +17,6 @@ jobs:
     name: Deploy to Staging
     needs: ci
     uses: ./.github/workflows/deploy.yml
-    environment:
-      name: staging
-      url: '${{ needs.deployment.outputs.url }}'
 
     with:
       REGISTRY: cdctistagingcontainerregistry.azurecr.io
