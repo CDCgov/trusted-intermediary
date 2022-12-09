@@ -12,6 +12,9 @@ on:
       APP:
         required: true
         type: string
+      ENVIRONMENT:
+        required: true
+        type: string
     secrets:
       ACR_USERNAME:
         required: true
