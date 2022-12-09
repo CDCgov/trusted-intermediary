@@ -3,7 +3,7 @@ name: CI/CD
 on:
   push:
     branches:
-      - containerize-project-azure-deploy
+      - main
     paths-ignore:
       - '*.md'
   workflow_dispatch:
