@@ -9,8 +9,8 @@ on:
       - main
     paths-ignore:
       - '*.md'
-  workflow_call:
-  
+ workflow_call:
+
 
 jobs:
 
@@ -67,3 +67,8 @@ jobs:
   securityScanAnalyze:
     name: CodeQL Security Scan
     uses: ./.github/workflows/codeql_reusable.yml
+
+  terraform-ci:
+    name: Terraform CI
+    needs: ci
+    uses: ./.github/workflows/terraform-ci.yml
