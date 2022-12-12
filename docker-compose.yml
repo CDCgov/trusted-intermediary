@@ -1,0 +1,7 @@
+version: "3.7"
+services:
+  router:
+    build: .
+    ports:
+      - "8080:8080"
+    platform: linux/amd64

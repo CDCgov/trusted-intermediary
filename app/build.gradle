@@ -11,8 +11,10 @@ plugins {
     id 'application'
     id 'jacoco'
     id 'com.diffplug.spotless' version '6.11.0'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'org.cyclonedx.bom' version '1.7.2'
 }
+
 cyclonedxBom {
 
     // Specified the type of project being built. Defaults to 'library'
@@ -28,6 +30,7 @@ cyclonedxBom {
 
     // Exclude BOM Serial Number
     includeBomSerialNumber = false
+
 }
 
 repositories {
