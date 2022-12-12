@@ -19,6 +19,10 @@ I need ___.
 
 - [ ] Something.
 
+## Research Questions
+
+- [ ] Something.
+
 ## Tasks
 
 - [ ] Something.
