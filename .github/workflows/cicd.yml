@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - terraform
     paths-ignore:
       - '*.md'
   workflow_dispatch:
