@@ -15,13 +15,11 @@ on:
       APP:
         required: true
         type: string
+    secrets:
       ACR_USERNAME:
         required: true
-        type: string
       ACR_PASSWORD:
         required: true
-        type: string
-    secrets:
       AZURE_CREDENTIALS:
         required: true
 
@@ -48,8 +46,8 @@ jobs:
       uses: docker/login-action@v2
       with:
         registry: 'https://${{ inputs.REGISTRY }}/'
-        username: '${{ inputs.ACR_USERNAME }}'
-        password: '${{ inputs.ACR_PASSWORD }}'
+        username: '${{ secrets.ACR_USERNAME }}'
+        password: '${{ secrets.ACR_PASSWORD }}'
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v3
@@ -65,7 +63,7 @@ jobs:
     environment:
       name: '${{ inputs.ENVIRONMENT }}'
       url: '${{ steps.deploy-to-webapp.outputs.webapp-url }}'
-  
+
     steps:
     - name: 'Login via Azure CLI'
       uses: azure/login@v1

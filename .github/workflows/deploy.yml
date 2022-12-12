@@ -35,7 +35,7 @@ jobs:
       REPO: trusted-intermediary-router
       APP: ${{ env.STAGING_APP }}
       REGISTRY: ${{ env.STAGING_ACR_SERVER }}
+    secrets:
       ACR_USERNAME: ${{ env.STAGING_ACR_USERNAME }}
       ACR_PASSWORD: ${{ env.STAGING_ACR_PASSWORD }}
-    secrets:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
