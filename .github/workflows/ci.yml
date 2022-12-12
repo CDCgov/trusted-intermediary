@@ -9,7 +9,7 @@ on:
       - main
     paths-ignore:
       - '*.md'
- workflow_call:
+  workflow_call:
 
 
 jobs:
