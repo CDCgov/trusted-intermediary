@@ -19,7 +19,6 @@ cyclonedxBom {
     projectType = "application"
 
     // Boms destination directory (defaults to build/reports)
-    destination = file("reports/sbom")
 
     // The file name for the generated BOMs (before the file format suffix). Defaults to 'bom'
     outputName = "bom"
