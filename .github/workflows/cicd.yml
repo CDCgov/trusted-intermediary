@@ -14,9 +14,31 @@ jobs:
     name: CI
     uses: ./.github/workflows/ci.yml
 
-  deploy:
-    name: Deploy
+  terraform-deploy:
+    name: 'Terraform Deploy'
     needs: ci
-    uses: ./.github/workflows/deploy.yml
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Terraform Apply
+      run: terraform apply -auto-approve -input=false
+    - name: Export Terraform Output
+      run: |
+        echo "STAGING_REGISTRY=$(terraform output registry)" >> $GITHUB_ENV
+        echo "STAGING_ACR_USERNAME=$(terraform output acr_username)" >> $GITHUB_ENV
+        echo "STAGING_ACR_PASSWORD=$(terraform output acr_password)" >> $GITHUB_ENV
+        echo "STAGING_APP=$(terraform output publish_app)" >> $GITHUB_ENV
+
+  staging-deploy:
+    name: 'Staging Deploy'
+    needs: terraform-deploy
+    uses: ./.github/workflows/deploy_reusable.yml
+    with:
+      ENVIRONMENT: staging
+      REPO: trusted-intermediary-router
+      APP: ${{ env.STAGING_APP }}
+      REGISTRY: ${{ env.STAGING_ACR_SERVER }}
     secrets:
+      ACR_USERNAME: ${{ env.STAGING_ACR_USERNAME }}
+      ACR_PASSWORD: ${{ env.STAGING_ACR_PASSWORD }}
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
