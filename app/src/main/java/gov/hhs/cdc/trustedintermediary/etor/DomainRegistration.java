@@ -30,7 +30,7 @@ public class DomainRegistration implements DomainConnector {
         // TODO request processing
         // TODO response, include message
 
-        var parsedBody = orderController.parseOrder(request.getBody()); // Optional<>?
+        var parsedBody = orderController.parseOrder(request.getBody());
         response.setBody(parsedBody); // param: oderController.constructOrderResponse() : string
 
         return response;
