@@ -19,10 +19,17 @@ jobs:
     needs: ci
     runs-on: ubuntu-latest
 
+    outputs:
+      STAGING_REGISTRY: ${{ steps.export-terraform-output.outputs.STAGING_REGISTRY }}
+      STAGING_APP: ${{ steps.export-terraform-output.outputs.STAGING_APP }}
+      STAGING_ACR_USERNAME: ${{ steps.export-terraform-output.outputs.STAGING_ACR_USERNAME }}
+      STAGING_ACR_PASSWORD: ${{ steps.export-terraform-output.outputs.STAGING_ACR_PASSWORD }}
+
     steps:
     - name: Terraform Apply
       run: terraform apply -auto-approve -input=false
-    - name: Export Terraform Output
+    - id: export-terraform-output
+      name: Export Terraform Output
       run: |
         echo "STAGING_REGISTRY=$(terraform output registry)"
         echo "::set-output name=STAGING_REGISTRY::$STAGING_REGISTRY"
