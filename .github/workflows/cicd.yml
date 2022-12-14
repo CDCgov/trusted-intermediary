@@ -24,10 +24,16 @@ jobs:
       run: terraform apply -auto-approve -input=false
     - name: Export Terraform Output
       run: |
-        echo "STAGING_REGISTRY=$(terraform output registry)" >> $GITHUB_ENV
-        echo "STAGING_ACR_USERNAME=$(terraform output acr_username)" >> $GITHUB_ENV
-        echo "STAGING_ACR_PASSWORD=$(terraform output acr_password)" >> $GITHUB_ENV
-        echo "STAGING_APP=$(terraform output publish_app)" >> $GITHUB_ENV
+        echo "STAGING_REGISTRY=$(terraform output registry)"
+        echo "::set-output name=STAGING_REGISTRY::$STAGING_REGISTRY"
+        echo "STAGING_APP=$(terraform output publish_app)"
+        echo "::set-output name=STAGING_APP::$STAGING_APP"
+        echo "STAGING_ACR_USERNAME=$(terraform output acr_username)"
+        echo "::add-mask::$STAGING_ACR_USERNAME"
+        echo "::set-output name=STAGING_ACR_USERNAME::$STAGING_ACR_USERNAME"
+        echo "STAGING_ACR_PASSWORD=$(terraform output acr_password)"
+        echo "::add-mask::$STAGING_ACR_PASSWORD"
+        echo "::set-output name=STAGING_ACR_PASSWORD::$STAGING_ACR_PASSWORD"
 
   staging-deploy:
     name: 'Staging Deploy'
@@ -36,9 +42,9 @@ jobs:
     with:
       ENVIRONMENT: staging
       REPO: trusted-intermediary-router
-      APP: ${{ env.STAGING_APP }}
-      REGISTRY: ${{ env.STAGING_ACR_SERVER }}
+      APP: ${{ jobs.terraform-deploy.outputs.STAGING_APP }}
+      REGISTRY: ${{ jobs.terraform-deploy.outputs.STAGING_ACR_SERVER }}
     secrets:
-      ACR_USERNAME: ${{ env.STAGING_ACR_USERNAME }}
-      ACR_PASSWORD: ${{ env.STAGING_ACR_PASSWORD }}
-      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      ACR_USERNAME: ${{ jobs.terraform-deploy.outputs.STAGING_ACR_USERNAME }}
+      ACR_PASSWORD: ${{ jobs.terraform-deploy.outputs.STAGING_ACR_PASSWORD }}
+      AZURE_CREDENTIALS: ${{ jobs.terraform-deploy.outputs.AZURE_CREDENTIALS }}
