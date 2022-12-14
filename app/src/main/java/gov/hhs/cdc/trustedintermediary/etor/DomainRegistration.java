@@ -26,9 +26,14 @@ public class DomainRegistration implements DomainConnector {
     DomainResponse handleOrder(DomainRequest request) {
         var response = new DomainResponse(200);
 
+        // TODO request validation
+        // TODO request processing
+        // TODO response, include message
+
         var parsedBody = orderController.parseOrder(request.getBody()); // Optional<>?
-        response.setBody(parsedBody);
+        response.setBody(parsedBody); // param: oderController.constructOrderResponse() : string
 
         return response;
     }
+    // TODO helper function?
 }
