@@ -7,6 +7,9 @@ import gov.hhs.cdc.trustedintermediary.wrappers.JacksonFormatter
 import spock.lang.Specification
 
 import javax.inject.Inject
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 class OrderControllerTest extends Specification {
 
@@ -24,8 +27,16 @@ class OrderControllerTest extends Specification {
         TestApplicationContext.register(Formatter.class, new JacksonFormatter())
         JacksonFormatter jackson = TestApplicationContext.getImplementation(Formatter)
         def orderController = OrderController.getInstance()
-        def expected = ""
+        def orderId = "1234abcd"
+        def destination = "fake lab"
+        LocalDateTime createAt = LocalDateTime.now(ZoneId.of("UTC"))
+        DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm")
+        def formattedDateTime = createAt.format(dateTimeFormat)
 
+        def testing = " $orderId"
+        def expected =
+                "order id: $orderId, destination: $destination, created at: $formattedDateTime"
+        println(expected)
         when:
         def orderMessage = orderController.constructOrderMessage()
 

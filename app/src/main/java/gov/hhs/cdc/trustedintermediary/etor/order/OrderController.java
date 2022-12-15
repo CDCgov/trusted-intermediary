@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.order;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 public class OrderController {
 
@@ -23,6 +24,8 @@ public class OrderController {
         String orderId = "1234abcd";
         String destination = "fake lab";
         LocalDateTime createAt = LocalDateTime.now(ZoneId.of("UTC"));
+        DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm");
+        String formattedDateTime = createAt.format(dateTimeFormat);
 
         String outputMessage =
                 "order id: "
@@ -32,8 +35,8 @@ public class OrderController {
                         + destination
                         + ", "
                         + "created at: "
-                        + createAt;
+                        + formattedDateTime;
 
-        return "";
+        return outputMessage;
     }
 }
