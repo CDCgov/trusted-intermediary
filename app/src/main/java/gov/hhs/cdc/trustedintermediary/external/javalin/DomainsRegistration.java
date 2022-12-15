@@ -16,8 +16,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Registers the available domains to the application context
- * and their specific handlers for the endpoints.
+ * Registers the available domains to the application context and their specific handlers for the
+ * endpoints.
  */
 public class DomainsRegistration {
 
