@@ -15,11 +15,17 @@ import java.time.format.DateTimeFormatter
 class OrderControllerTest extends Specification {
 
     def "parseOrder works"() {
+        ApplicationContext.register(Formatter.class, new JacksonFormatter())
+        ApplicationContext.register(OrderMessage.class, new OrderMessage())
+        ApplicationContext.register(Order.class, new Order(null, "DogCow sent in a lab order", null))
+
         when:
         def parsedOrder = OrderController.getInstance().parseOrder("DogCow")
 
         then:
-        parsedOrder == "DogCow sent in a lab order"
+        parsedOrder == "{\"id\":\"missing id\"," +
+                "\"destination\":\"DogCow sent in a lab order\"," +
+                "\"createdAt\":\"missing timestamp\"}"
     }
 
     def "constructOrderMessage works"() {

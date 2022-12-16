@@ -33,15 +33,15 @@ public class Order {
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.id = (id == null) ? "" : id;
     }
 
     public void setDestination(String destination) {
-        this.destination = destination;
+        this.destination = (destination == null) ? "" : destination;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
-        this.createAt = createdAt.format(this.dateTimeFormat);
+        this.createAt = (createdAt == null) ? "" : createdAt.format(this.dateTimeFormat);
     }
 
     public void setCreateAt(LocalDateTime createdAt, DateTimeFormatter format) {
@@ -57,14 +57,13 @@ public class Order {
     }
 
     public Order generateMessage() {
-        // if the variables are null, add ""
-        if (this.id == null) {
+        if (this.id == null | this.id == "") {
             this.id = "missing id";
         }
-        if (this.destination == null) {
+        if (this.destination == null | this.destination == "") {
             this.destination = "missing destination";
         }
-        if (this.createAt == null) {
+        if (this.createAt == null | this.createAt == "") {
             this.createAt = "missing timestamp";
         }
         this.orderMessage.setDestination(this.destination);

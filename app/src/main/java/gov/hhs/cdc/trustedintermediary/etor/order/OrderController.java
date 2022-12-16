@@ -15,10 +15,10 @@ public class OrderController {
     }
 
     public String parseOrder(String requestBody) {
-        return "DogCow sent in a lab order";
+        Order order = ApplicationContext.getImplementation(Order.class);
+        return constructOrderMessage(order);
     }
 
-    // TODO assemble json message
     public String constructOrderMessage(Order order) {
         Formatter jsonFormatter = ApplicationContext.getImplementation(Formatter.class);
         String outputMessage;
