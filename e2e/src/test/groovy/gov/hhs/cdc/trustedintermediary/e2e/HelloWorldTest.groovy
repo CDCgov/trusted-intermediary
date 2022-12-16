@@ -9,6 +9,8 @@ class HelloWorldTest extends Specification {
         def response = Client.post("/v1/etor/order")
 
         then:
-        response == "DogCow sent in a lab order"
+        response == "{\"id\":\"missing id\"," +
+                "\"destination\":\"missing destination\"," +
+                "\"createdAt\":\"missing timestamp\"}"
     }
 }
