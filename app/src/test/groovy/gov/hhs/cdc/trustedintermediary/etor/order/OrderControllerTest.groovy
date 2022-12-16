@@ -25,6 +25,7 @@ class OrderControllerTest extends Specification {
 
         given:
         TestApplicationContext.register(Formatter.class, new JacksonFormatter())
+        TestApplicationContext.register(Order.class, new Order())
         JacksonFormatter jackson = TestApplicationContext.getImplementation(Formatter)
         def orderController = OrderController.getInstance()
         def orderId = "1234abcd"
