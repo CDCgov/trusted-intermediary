@@ -1,9 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.etor.order;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
 
 public class OrderController {
 
@@ -20,27 +19,17 @@ public class OrderController {
     }
 
     // TODO assemble json message
-    public String constructOrderMessage() {
-        // get information from an order object (will be created in the future)
-        String fakeOrderId = "1234abcd";
-        String fakeDestination = "fake lab";
-        LocalDateTime createAt = LocalDateTime.now(ZoneId.of("UTC"));
-        DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm");
-        String formattedDateTime = createAt.format(dateTimeFormat);
-        Order happyOrder = ApplicationContext.getImplementation(Order.class);
-        happyOrder.setId(fakeOrderId);
-        happyOrder.setDestination(fakeDestination);
-        happyOrder.setCreateAt(createAt, dateTimeFormat);
+    public String constructOrderMessage(Order order) {
+        Formatter jsonFormatter = ApplicationContext.getImplementation(Formatter.class);
+        String outputMessage;
 
-        String outputMessage =
-                "order id: "
-                        + fakeOrderId
-                        + ", "
-                        + "destination: "
-                        + fakeDestination
-                        + ", "
-                        + "created at: "
-                        + formattedDateTime;
+        try {
+            outputMessage =
+                    jsonFormatter.convertToString(order.generateMessage().getOrderMessage());
+        } catch (JsonProcessingException e) {
+            // Logger should catch this error
+            throw new RuntimeException(e);
+        }
 
         return outputMessage;
     }

@@ -1,26 +1,23 @@
 package gov.hhs.cdc.trustedintermediary.etor.order;
 
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import javax.inject.Inject;
 
 public class Order {
     private String id;
     private String destination;
     private String createAt;
-    @Inject private OrderMessage orderMessage;
+    private OrderMessage orderMessage = ApplicationContext.getImplementation(OrderMessage.class);
     private DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm");
 
     public Order() {}
 
     // Ideal for testing
     public Order(String id, String destination, LocalDateTime createdAt) {
-        this.id = id;
-        this.destination = destination;
-        this.createAt = createdAt.format(dateTimeFormat);
-        this.orderMessage.setDestination(this.destination);
-        this.orderMessage.setId(this.id);
-        this.orderMessage.setCreatedAt(this.createAt);
+        setId(id);
+        setDestination(destination);
+        setCreatedAt(createdAt);
     }
 
     public String getId() {
@@ -57,5 +54,22 @@ public class Order {
 
     public void setOrderMessage(OrderMessage orderMessage) {
         this.orderMessage = orderMessage;
+    }
+
+    public Order generateMessage() {
+        // if the variables are null, add ""
+        if (this.id == null) {
+            this.id = "missing id";
+        }
+        if (this.destination == null) {
+            this.destination = "missing destination";
+        }
+        if (this.createAt == null) {
+            this.createAt = "missing timestamp";
+        }
+        this.orderMessage.setDestination(this.destination);
+        this.orderMessage.setId(this.id);
+        this.orderMessage.setCreatedAt(this.createAt);
+        return this;
     }
 }

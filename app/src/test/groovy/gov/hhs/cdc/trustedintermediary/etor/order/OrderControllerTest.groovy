@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.order
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.external.javalin.App
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.JacksonFormatter
 import spock.lang.Specification
@@ -25,7 +26,7 @@ class OrderControllerTest extends Specification {
 
         given:
         TestApplicationContext.register(Formatter.class, new JacksonFormatter())
-        TestApplicationContext.register(Order.class, new Order())
+        TestApplicationContext.register(OrderMessage.class, new OrderMessage())
         JacksonFormatter jackson = TestApplicationContext.getImplementation(Formatter)
         def orderController = OrderController.getInstance()
         def orderId = "1234abcd"
@@ -33,13 +34,18 @@ class OrderControllerTest extends Specification {
         LocalDateTime createAt = LocalDateTime.now(ZoneId.of("UTC"))
         DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm")
         def formattedDateTime = createAt.format(dateTimeFormat)
+        TestApplicationContext.register(Order.class, new Order(orderId, destination, createAt))
+        Order order = ApplicationContext.getImplementation(Order.class)
 
         def testing = " $orderId"
         def expected =
-                "order id: $orderId, destination: $destination, created at: $formattedDateTime"
+                "{\"id\":\"$orderId\"," +
+                "\"destination\":\"$destination\"," +
+                "\"createdAt\":\"$formattedDateTime\"}"
+
         println(expected)
         when:
-        def orderMessage = orderController.constructOrderMessage()
+        def orderMessage = orderController.constructOrderMessage(order)
 
         then:
         expected == orderMessage
