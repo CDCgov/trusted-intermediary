@@ -38,6 +38,10 @@ jobs:
       id: init
       run: terraform init
 
+    - name: Terraform Validate
+      id: validate
+      run: terraform validate -no-color
+
     - name: Terraform Apply
       run: terraform apply -auto-approve -input=false
 
