@@ -9,11 +9,13 @@ on:
       REGISTRY:
         required: true
         type: string
-    secrets:
       REPO:
         required: true
+        type: string
       APP:
         required: true
+        type: string
+    secrets:
       ACR_USERNAME:
         required: true
       ACR_PASSWORD:
