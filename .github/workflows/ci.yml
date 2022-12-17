@@ -65,5 +65,4 @@ jobs:
 
   terraform-ci:
     name: Terraform CI
-    needs: ci
     uses: ./.github/workflows/terraform-ci.yml
