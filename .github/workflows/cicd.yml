@@ -18,6 +18,9 @@ jobs:
     name: 'Terraform Deploy'
     needs: ci
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: operations/app
 
     outputs:
       STAGING_REGISTRY: ${{ steps.export-terraform-output.outputs.STAGING_REGISTRY }}
