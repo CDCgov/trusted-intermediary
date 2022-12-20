@@ -9,10 +9,6 @@ on:
       - '*.md'
   workflow_dispatch:
 
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
   ci:
     name: CI
@@ -22,6 +18,9 @@ jobs:
     name: 'Terraform Deploy'
     needs: ci
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     defaults:
       run:
         working-directory: operations/app
