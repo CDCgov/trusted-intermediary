@@ -20,8 +20,6 @@ on:
         required: true
       ACR_PASSWORD:
         required: true
-      AZURE_CREDENTIALS:
-        required: true
 
 jobs:
   build:
