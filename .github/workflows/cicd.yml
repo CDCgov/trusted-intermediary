@@ -62,16 +62,10 @@ jobs:
     - id: export-terraform-output
       name: Export Terraform Output
       run: |
-        echo "STAGING_REGISTRY=$(terraform output registry)"
-        echo "::set-output name=STAGING_REGISTRY::$STAGING_REGISTRY"
-        echo "STAGING_APP=$(terraform output publish_app)"
-        echo "::set-output name=STAGING_APP::$STAGING_APP"
-        echo "STAGING_ACR_USERNAME=$(terraform output acr_username)"
-        echo "::add-mask::$STAGING_ACR_USERNAME"
-        echo "::set-output name=STAGING_ACR_USERNAME::$STAGING_ACR_USERNAME"
-        echo "STAGING_ACR_PASSWORD=$(terraform output acr_password)"
-        echo "::add-mask::$STAGING_ACR_PASSWORD"
-        echo "::set-output name=STAGING_ACR_PASSWORD::$STAGING_ACR_PASSWORD"
+        echo "STAGING_REGISTRY=$(terraform output registry)" >> $GITHUB_OUTPUT
+        echo "STAGING_APP=$(terraform output publish_app)" >> $GITHUB_OUTPUT
+        echo "STAGING_ACR_USERNAME=$(terraform output acr_username)" >> $GITHUB_OUTPUT
+        echo "STAGING_ACR_PASSWORD=$(terraform output acr_password)" >> $GITHUB_OUTPUT
 
   staging-deploy:
     name: 'Staging Deploy'
@@ -80,8 +74,8 @@ jobs:
     with:
       ENVIRONMENT: staging
       REPO: trusted-intermediary-router
-      APP: ${{ needs.jobs.terraform-deploy.outputs.STAGING_APP }}
-      REGISTRY: ${{ needs.jobs.terraform-deploy.outputs.STAGING_REGISTRY }}
+      APP: ${{ needs.terraform-deploy.outputs.STAGING_APP }}
+      REGISTRY: ${{ needs.terraform-deploy.outputs.STAGING_REGISTRY }}
     secrets:
-      ACR_USERNAME: ${{ needs.jobs.terraform-deploy.outputs.STAGING_ACR_USERNAME }}
-      ACR_PASSWORD: ${{ needs.jobs.terraform-deploy.outputs.STAGING_ACR_PASSWORD }}
+      ACR_USERNAME: ${{ needs.terraform-deploy.outputs.STAGING_ACR_USERNAME }}
+      ACR_PASSWORD: ${{ needs.terraform-deploy.outputs.STAGING_ACR_PASSWORD }}
