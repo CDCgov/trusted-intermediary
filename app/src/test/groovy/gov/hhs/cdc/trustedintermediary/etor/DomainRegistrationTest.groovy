@@ -20,6 +20,9 @@ class DomainRegistrationTest extends Specification {
 
     def "domain registration has endpoints"() {
         given:
+        ApplicationContext.register(Formatter, new JacksonFormatter())
+        ApplicationContext.register(OrderMessage, new OrderMessage())
+        ApplicationContext.register(Order, new Order("56789fghij",null,null,"DogCow"))
         def domainRegistration = new DomainRegistration()
         def specifiedEndpoint = new HttpEndpoint("POST", "/v1/etor/order")
 
@@ -42,7 +45,12 @@ class DomainRegistrationTest extends Specification {
         domainRequest.setHeaders(headers)
         domainRequest.setBody("{\"content\":\"MSH|fake lab\"}")
         def orderController = OrderController.getInstance()
-        def mockParsedBody = "DogCow"
+
+        def mockParsedBody = "{\"id\":\"56789fghij\"," +
+                "\"destination\":\"fake lab\"," +
+                "\"createdAt\":\"missing timestamp\"," +
+                "\"client\":\"fake hospital\"}"
+
         orderController.parseOrder(mockParsedBody)
         TestApplicationContext.register(OrderController,orderController)
         TestApplicationContext.register(DomainRegistration,domainRegistration)

@@ -6,14 +6,6 @@ public class OrderMessage {
     private String createdAt;
     private String client;
 
-    public String getClient() {
-        return client;
-    }
-
-    public void setClient(String client) {
-        this.client = client;
-    }
-
     public OrderMessage() {}
 
     public OrderMessage(String id, String destination, String createdAt, String client) {
@@ -21,6 +13,14 @@ public class OrderMessage {
         setDestination(destination);
         setCreatedAt(createdAt);
         setClient(client);
+    }
+
+    public String getClient() {
+        return client;
+    }
+
+    public void setClient(String client) {
+        this.client = client;
     }
 
     public String getId() {

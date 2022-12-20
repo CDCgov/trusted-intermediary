@@ -78,6 +78,7 @@ public class Order {
     }
 
     public Order generateMessage() {
+        // TODO Logger
         if (this.id == null | this.id == "") {
             this.id = "missing id";
         }
@@ -86,6 +87,9 @@ public class Order {
         }
         if (this.createAt == null | this.createAt == "") {
             this.createAt = "missing timestamp";
+        }
+        if (this.client == null | this.client == "") {
+            this.client = "missing client";
         }
         this.orderMessage.setDestination(this.destination);
         this.orderMessage.setId(this.id);

@@ -11,6 +11,7 @@ class HelloWorldTest extends Specification {
         then:
         response == "{\"id\":\"missing id\"," +
                 "\"destination\":\"missing destination\"," +
-                "\"createdAt\":\"missing timestamp\"}"
+                "\"createdAt\":\"missing timestamp\"," +
+                "\"client\":\"missing client\"}"
     }
 }
