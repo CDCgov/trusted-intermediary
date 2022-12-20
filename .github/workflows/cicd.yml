@@ -81,8 +81,7 @@ jobs:
       ENVIRONMENT: staging
       REPO: trusted-intermediary-router
       APP: ${{ needs.jobs.terraform-deploy.outputs.STAGING_APP }}
-      REGISTRY: ${{ needs.jobs.terraform-deploy.outputs.STAGING_ACR_SERVER }}
+      REGISTRY: ${{ needs.jobs.terraform-deploy.outputs.STAGING_REGISTRY }}
     secrets:
       ACR_USERNAME: ${{ needs.jobs.terraform-deploy.outputs.STAGING_ACR_USERNAME }}
       ACR_PASSWORD: ${{ needs.jobs.terraform-deploy.outputs.STAGING_ACR_PASSWORD }}
-      AZURE_CREDENTIALS: ${{ needs.jobs.terraform-deploy.outputs.AZURE_CREDENTIALS }}
