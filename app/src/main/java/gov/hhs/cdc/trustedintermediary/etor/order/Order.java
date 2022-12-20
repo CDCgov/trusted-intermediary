@@ -8,16 +8,37 @@ public class Order {
     private String id;
     private String destination;
     private String createAt;
+    private String client;
+
+    public String getClient() {
+        return client;
+    }
+
+    public void setClient(String client) {
+        this.client = client;
+    }
+
     private OrderMessage orderMessage = ApplicationContext.getImplementation(OrderMessage.class);
     private DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm");
+
+    private String body;
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
 
     public Order() {}
 
     // Ideal for testing
-    public Order(String id, String destination, LocalDateTime createdAt) {
+    public Order(String id, String destination, LocalDateTime createdAt, String client) {
         setId(id);
         setDestination(destination);
         setCreatedAt(createdAt);
+        setClient(client);
     }
 
     public String getId() {
@@ -69,6 +90,7 @@ public class Order {
         this.orderMessage.setDestination(this.destination);
         this.orderMessage.setId(this.id);
         this.orderMessage.setCreatedAt(this.createAt);
+        this.orderMessage.setClient(this.client);
         return this;
     }
 }

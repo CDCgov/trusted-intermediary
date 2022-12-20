@@ -17,39 +17,37 @@ class OrderControllerTest extends Specification {
     def "parseOrder works"() {
         ApplicationContext.register(Formatter.class, new JacksonFormatter())
         ApplicationContext.register(OrderMessage.class, new OrderMessage())
-        ApplicationContext.register(Order.class, new Order(null, "DogCow sent in a lab order", null))
+        ApplicationContext.register(Order.class, new Order(null, "DogCow sent in a lab order", null, "fake client"))
 
         when:
         def parsedOrder = OrderController.getInstance().parseOrder("DogCow")
 
         then:
-        parsedOrder == "{\"id\":\"missing id\"," +
-                "\"destination\":\"DogCow sent in a lab order\"," +
-                "\"createdAt\":\"missing timestamp\"}"
+        parsedOrder == "DogCow just sent a lab order!"
     }
 
     def "constructOrderMessage works"() {
 
         given:
-        TestApplicationContext.register(Formatter.class, new JacksonFormatter())
-        TestApplicationContext.register(OrderMessage.class, new OrderMessage())
+        TestApplicationContext.register(Formatter, new JacksonFormatter())
+        TestApplicationContext.register(OrderMessage, new OrderMessage())
         JacksonFormatter jackson = TestApplicationContext.getImplementation(Formatter)
-        def orderController = OrderController.getInstance()
         def orderId = "1234abcd"
         def destination = "fake lab"
+        def client = "fake client"
         LocalDateTime createAt = LocalDateTime.now(ZoneId.of("UTC"))
         DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm")
         def formattedDateTime = createAt.format(dateTimeFormat)
-        TestApplicationContext.register(Order.class, new Order(orderId, destination, createAt))
+        TestApplicationContext.register(Order, new Order(orderId, destination, createAt, client))
         Order order = ApplicationContext.getImplementation(Order.class)
+        def orderController = OrderController.getInstance()
 
-        def testing = " $orderId"
         def expected =
                 "{\"id\":\"$orderId\"," +
                 "\"destination\":\"$destination\"," +
-                "\"createdAt\":\"$formattedDateTime\"}"
+                "\"createdAt\":\"$formattedDateTime\"," +
+                "\"client\":\"$client\"}"
 
-        println(expected)
         when:
         def orderMessage = orderController.constructOrderMessage(order)
 

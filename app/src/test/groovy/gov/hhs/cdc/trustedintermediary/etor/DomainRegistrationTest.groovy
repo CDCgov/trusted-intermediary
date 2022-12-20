@@ -1,9 +1,14 @@
 package gov.hhs.cdc.trustedintermediary.etor
 
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
+import gov.hhs.cdc.trustedintermediary.etor.order.Order
 import gov.hhs.cdc.trustedintermediary.etor.order.OrderController
+import gov.hhs.cdc.trustedintermediary.etor.order.OrderMessage
+import gov.hhs.cdc.trustedintermediary.wrappers.Formatter
+import gov.hhs.cdc.trustedintermediary.wrappers.JacksonFormatter
 import spock.lang.Specification
 
 class DomainRegistrationTest extends Specification {
@@ -28,12 +33,18 @@ class DomainRegistrationTest extends Specification {
 
     def "handles an order"() {
         given:
+        ApplicationContext.register(Formatter, new JacksonFormatter())
+        ApplicationContext.register(OrderMessage, new OrderMessage())
+        ApplicationContext.register(Order, new Order("56789fghij",null,null,"DogCow"))
         def domainRegistration = new DomainRegistration()
         def domainRequest = new DomainRequest()
-        def orderControllerMock = Mock(OrderController)
+        def headers = Map.of("Destination", "fake lab", "Client", "fake hospital")
+        domainRequest.setHeaders(headers)
+        domainRequest.setBody("{\"content\":\"MSH|fake lab\"}")
+        def orderController = OrderController.getInstance()
         def mockParsedBody = "DogCow"
-        orderControllerMock.parseOrder(_ as String) >> mockParsedBody
-        TestApplicationContext.register(OrderController,orderControllerMock)
+        orderController.parseOrder(mockParsedBody)
+        TestApplicationContext.register(OrderController,orderController)
         TestApplicationContext.register(DomainRegistration,domainRegistration)
         TestApplicationContext.injectRegisteredImplementations()
 

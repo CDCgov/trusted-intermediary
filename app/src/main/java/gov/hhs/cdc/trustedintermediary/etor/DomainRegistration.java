@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint;
+import gov.hhs.cdc.trustedintermediary.etor.order.Order;
 import gov.hhs.cdc.trustedintermediary.etor.order.OrderController;
 import java.util.Map;
 import java.util.function.Function;
@@ -29,9 +30,17 @@ public class DomainRegistration implements DomainConnector {
         // TODO request validation
         // TODO request processing
         // TODO response, include message
+        var headers = request.getHeaders();
+        var destination = headers.get("Destination");
+        var client = headers.get("Client");
+        var order = ApplicationContext.getImplementation(Order.class);
+        order.setDestination(destination);
+        order.setBody(request.getBody());
+        order.setClient(client);
 
-        var parsedBody = orderController.parseOrder(request.getBody());
-        response.setBody(parsedBody); // param: oderController.constructOrderResponse() : string
+        // var parsedBody = orderController.parseOrder(order.getBody());
+        var orderMessage = orderController.constructOrderMessage(order);
+        response.setBody(orderMessage); // param: oderController.constructOrderResponse() : string
 
         return response;
     }

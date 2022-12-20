@@ -4,13 +4,23 @@ public class OrderMessage {
     private String id;
     private String destination;
     private String createdAt;
+    private String client;
+
+    public String getClient() {
+        return client;
+    }
+
+    public void setClient(String client) {
+        this.client = client;
+    }
 
     public OrderMessage() {}
 
-    public OrderMessage(String id, String destination, String createdAt) {
-        this.id = id;
-        this.destination = destination;
-        this.createdAt = createdAt;
+    public OrderMessage(String id, String destination, String createdAt, String client) {
+        setId(id);
+        setDestination(destination);
+        setCreatedAt(createdAt);
+        setClient(client);
     }
 
     public String getId() {

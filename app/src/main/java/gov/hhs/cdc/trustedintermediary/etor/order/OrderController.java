@@ -7,6 +7,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
 public class OrderController {
 
     private static final OrderController ORDER_CONTROLLER = new OrderController();
+    private Order order = ApplicationContext.getImplementation(Order.class);
 
     private OrderController() {}
 
@@ -15,8 +16,8 @@ public class OrderController {
     }
 
     public String parseOrder(String requestBody) {
-        Order order = ApplicationContext.getImplementation(Order.class);
-        return constructOrderMessage(order);
+        // order.setBody(requestBody);
+        return "DogCow just sent a lab order!";
     }
 
     public String constructOrderMessage(Order order) {
