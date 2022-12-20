@@ -17,7 +17,6 @@ terraform {
 
 # Configure the Microsoft Azure Provider
 provider "azurerm" {
-  use_oidc = true
   features {}
 }
 
