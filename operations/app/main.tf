@@ -21,10 +21,10 @@ provider "azurerm" {
 }
 
 # Create the staging resource group
-resource "azurerm_resource_group" "staging_group" {
-  name     = "cdcti-staging"
-  location = "Central US"
-}
+# resource "azurerm_resource_group" "staging_group" {
+#   name     = "cdcti-staging"
+#   location = "Central US"
+# }
 
 # Create the container registry
 resource "azurerm_container_registry" "staging_registry" {
