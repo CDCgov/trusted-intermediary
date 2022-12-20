@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "=3.0.0"
+      version = "=3.36.0"
     }
   }
 
@@ -72,4 +72,3 @@ output "acr_password" {
 output "publish_app" {
   value = azurerm_linux_web_app.cdcti-staging-api.name
 }
-
