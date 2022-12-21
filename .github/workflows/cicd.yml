@@ -57,7 +57,7 @@ jobs:
       run: terraform validate -no-color
 
     - name: Terraform Apply
-      run: terraform apply -auto-approve -input=false -var="environment=staging"
+      run: terraform apply -auto-approve -input=false
 
     - id: export-terraform-output
       name: Export Terraform Output
