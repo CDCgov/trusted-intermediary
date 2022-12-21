@@ -3,6 +3,9 @@ name: 'Container Build & Deploy'
 on:
   workflow_call:
     inputs:
+      ENVIRONMENT:
+        required: true
+        type: string
       REGISTRY:
         required: true
         type: string
@@ -12,16 +15,18 @@ on:
       APP:
         required: true
         type: string
-      ENVIRONMENT:
-        required: true
-        type: string
     secrets:
       ACR_USERNAME:
         required: true
       ACR_PASSWORD:
         required: true
-      PUBLISH_PROFILE:
+      AZURE_CLIENT_ID:
         required: true
+      AZURE_TENANT_ID:
+        required: true
+      AZURE_SUBSCRIPTION_ID:
+        required: true
+
 
 jobs:
   build:
@@ -45,9 +50,9 @@ jobs:
     - name: Log in to registry
       uses: docker/login-action@v2
       with:
-        registry: 'https://${{ inputs.REGISTRY }}/'
-        username: '${{ secrets.ACR_USERNAME }}'
-        password: '${{ secrets.ACR_PASSWORD }}'
+        registry: ${{ inputs.REGISTRY }}
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v3
@@ -63,13 +68,22 @@ jobs:
     environment:
       name: '${{ inputs.ENVIRONMENT }}'
       url: '${{ steps.deploy-to-webapp.outputs.webapp-url }}'
-  
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
+    - name: 'Login via Azure CLI'
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
     - name: Deploy to Azure Web App
       id: deploy-to-webapp
       uses: azure/webapps-deploy@v2
       with:
         app-name: '${{ inputs.APP }}'
         slot-name: 'production'
-        publish-profile: '${{ secrets.PUBLISH_PROFILE }}'
         images: '${{ inputs.REGISTRY }}/${{ inputs.REPO }}:${{ github.sha }}'
