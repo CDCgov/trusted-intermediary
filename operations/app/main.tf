@@ -41,7 +41,7 @@ resource "azurerm_service_plan" "staging_plan" {
   resource_group_name = azurerm_resource_group.staging_group.name
   location            = azurerm_resource_group.staging_group.location
   os_type             = "Linux"
-  sku_name            = "D1"
+  sku_name            = "B1"
 }
 
 # Create the staging App Service
