@@ -33,7 +33,7 @@ resource "azurerm_linux_web_app" "cdcti-staging-api" {
 
   app_settings = {
     DOCKER_REGISTRY_SERVER_URL      = "https://${azurerm_container_registry.staging_registry.login_server}"
-    DOCKER_REGISTRY_SERVER_USERNAME = "${azurerm_container_registry.staging_registry.admin_username}"
-    DOCKER_REGISTRY_SERVER_PASSWORD = "${azurerm_container_registry.staging_registry.admin_password}"
+    DOCKER_REGISTRY_SERVER_USERNAME = azurerm_container_registry.staging_registry.admin_username
+    DOCKER_REGISTRY_SERVER_PASSWORD = azurerm_container_registry.staging_registry.admin_password
   }
 }
