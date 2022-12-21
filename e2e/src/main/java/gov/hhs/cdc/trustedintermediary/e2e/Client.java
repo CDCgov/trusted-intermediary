@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.e2e;
 import java.io.IOException;
 import org.apache.hc.client5.http.fluent.Request;
 
+/** Mocks a client sending a request to the API * */
 public class Client {
 
     private static final String DEFAULT_PROTOCOL_DOMAIN = "http://localhost:8080";

@@ -9,6 +9,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 
+/**
+ * Registers, retrieves and injects dependencies and will handle retrieving environmental constants
+ * *
+ */
 public class ApplicationContext {
 
     protected static final Map<Class<?>, Object> OBJECT_MAP = new ConcurrentHashMap<>();
