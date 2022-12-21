@@ -19,3 +19,9 @@ terraform {
 provider "azurerm" {
   features {}
 }
+
+module "template" {
+  source = "../../template/"
+
+  environment = "staging"
+}

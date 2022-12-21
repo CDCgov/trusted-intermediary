@@ -28,7 +28,7 @@ jobs:
       contents: read
     defaults:
       run:
-        working-directory: operations/app
+        working-directory: operations/environments/staging
 
 
     outputs:

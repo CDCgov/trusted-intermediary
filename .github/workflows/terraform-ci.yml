@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: operations/app
+        working-directory: operations
 
     steps:
     - name: Checkout
@@ -22,4 +22,4 @@ jobs:
 
     - name: Terraform Format
       id: fmt
-      run: terraform fmt -check
+      run: terraform fmt -recursive -check
