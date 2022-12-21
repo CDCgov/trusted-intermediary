@@ -63,6 +63,19 @@ This will start the API, wait for it to respond, run the end-to-end tests agains
 These tests are located under the `e2e` Gradle sub-project directory.  Like any Gradle project, there are the `main` and `test` directories.
 The `test` directory contains the tests.  The `main` directory contains our custom framework that helps us interact with the API.
 
+### Deploying
+
+#### Initial Azure Configuration
+1. Create resource group: cdcti-terraform 
+2. Create storage account: cdctiterraform (with cdcti-terraform as the resouce group)
+3. Within Azure AD
+    - Create an App Registration: cdcti-github
+    - Within your Subscription, create a Service Account and assign the Contributor role
+    - Add two federated credentials for:
+        - repo:CDCgov/trusted-intermediary:ref:refs/heads/terraform
+        - repo:CDCgov/trusted-intermediary:environment:staging
+
+
 ### Pre-Commit Hooks
 
 We use [`pre-commit`](https://pre-commit.com) to run [some hooks](./.pre-commit-config.yaml) on every commit.  These
