@@ -15,7 +15,7 @@ class EmptyLabOrderRequestTest extends Specification {
   "destination" : "missing destination",
   "createdAt" : "missing timestamp",
   "client" : "missing client",
-  "body" : ""
+  "body" : "missing body"
 }"""
     }
 }

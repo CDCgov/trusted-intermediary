@@ -82,26 +82,22 @@ public class Order {
 
     public Order generateMessage() {
         OrderMessage tempOrderMessage = new OrderMessage();
-        if (this.id == null | this.id == "") {
-            LOGGER.logWarning("Order missing id.");
-            this.id = "missing id";
-        }
-        if (this.destination == null | this.destination == "") {
-            LOGGER.logWarning("Order missing destination.");
-            this.destination = "missing destination";
-        }
-        if (this.createAt == null | this.createAt == "") {
-            LOGGER.logWarning("Order missing timestamp.");
-            this.createAt = "missing timestamp";
-        }
-        if (this.client == null | this.client == "") {
-            LOGGER.logWarning("Order missing client.");
-            this.client = "missing client";
-        }
-        if (this.body == null | this.body == "") {
-            LOGGER.logWarning("Order missing body.");
-            this.body = "missing body";
-        }
+        this.id = (this.id != null && !this.id.isEmpty()) ? this.id : "missing id";
+        this.destination =
+                (this.destination != null && !this.destination.isEmpty())
+                        ? this.destination
+                        : "missing destination";
+
+        this.createAt =
+                (this.createAt != null && !this.createAt.isEmpty())
+                        ? this.createAt
+                        : "missing timestamp";
+
+        this.client =
+                (this.client != null && !this.client.isEmpty()) ? this.client : "missing client";
+
+        this.body = (this.body != null && !this.body.isEmpty()) ? this.body : "missing body";
+
         tempOrderMessage.setDestination(this.destination);
         tempOrderMessage.setId(this.id);
         tempOrderMessage.setCreatedAt(this.createAt);
