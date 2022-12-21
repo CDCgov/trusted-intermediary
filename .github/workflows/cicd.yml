@@ -62,10 +62,10 @@ jobs:
     - id: export-terraform-output
       name: Export Terraform Output
       run: |
-        echo "STAGING_REGISTRY=$(terraform output registry)" >> $GITHUB_OUTPUT
-        echo "STAGING_APP=$(terraform output publish_app)" >> $GITHUB_OUTPUT
-        echo "STAGING_ACR_USERNAME=$(terraform output acr_username)" >> $GITHUB_OUTPUT
-        echo "STAGING_ACR_PASSWORD=$(terraform output acr_password)" >> $GITHUB_OUTPUT
+        echo "STAGING_REGISTRY=$(terraform output --raw registry)" >> $GITHUB_OUTPUT
+        echo "STAGING_APP=$(terraform output --raw publish_app)" >> $GITHUB_OUTPUT
+        echo "STAGING_ACR_USERNAME=$(terraform output --raw acr_username)" >> $GITHUB_OUTPUT
+        echo "STAGING_ACR_PASSWORD=$(terraform output --raw acr_password)" >> $GITHUB_OUTPUT
 
   staging-deploy:
     name: 'Staging Deploy'
