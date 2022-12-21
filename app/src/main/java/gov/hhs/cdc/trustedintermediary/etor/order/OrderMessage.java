@@ -5,14 +5,17 @@ public class OrderMessage {
     private String destination;
     private String createdAt;
     private String client;
+    private String body;
 
     public OrderMessage() {}
 
-    public OrderMessage(String id, String destination, String createdAt, String client) {
+    public OrderMessage(
+            String id, String destination, String createdAt, String client, String body) {
         setId(id);
         setDestination(destination);
         setCreatedAt(createdAt);
         setClient(client);
+        setBody(body);
     }
 
     public String getClient() {
@@ -45,5 +48,13 @@ public class OrderMessage {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
     }
 }

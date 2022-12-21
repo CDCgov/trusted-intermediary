@@ -2,8 +2,6 @@ package gov.hhs.cdc.trustedintermediary.external.javalin;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
-import gov.hhs.cdc.trustedintermediary.etor.order.Order;
-import gov.hhs.cdc.trustedintermediary.etor.order.OrderMessage;
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.JacksonFormatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -34,7 +32,5 @@ public class App {
     private static void registerClasses() {
         ApplicationContext.register(Logger.class, Slf4jLogger.getLogger());
         ApplicationContext.register(Formatter.class, new JacksonFormatter());
-        ApplicationContext.register(OrderMessage.class, new OrderMessage());
-        ApplicationContext.register(Order.class, new Order());
     }
 }

@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.etor.order;
 
-import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -9,6 +8,9 @@ public class Order {
     private String destination;
     private String createAt;
     private String client;
+    private String body;
+    private OrderMessage orderMessage = new OrderMessage();
+    private DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm");
 
     public String getClient() {
         return client;
@@ -17,11 +19,6 @@ public class Order {
     public void setClient(String client) {
         this.client = client;
     }
-
-    private OrderMessage orderMessage = ApplicationContext.getImplementation(OrderMessage.class);
-    private DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm");
-
-    private String body;
 
     public String getBody() {
         return body;
@@ -34,11 +31,13 @@ public class Order {
     public Order() {}
 
     // Ideal for testing
-    public Order(String id, String destination, LocalDateTime createdAt, String client) {
+    public Order(
+            String id, String destination, LocalDateTime createdAt, String client, String body) {
         setId(id);
         setDestination(destination);
         setCreatedAt(createdAt);
         setClient(client);
+        setBody(body);
     }
 
     public String getId() {
@@ -91,10 +90,14 @@ public class Order {
         if (this.client == null | this.client == "") {
             this.client = "missing client";
         }
+        if (this.body == null | this.body == "") {
+            this.body = "missing body";
+        }
         this.orderMessage.setDestination(this.destination);
         this.orderMessage.setId(this.id);
         this.orderMessage.setCreatedAt(this.createAt);
         this.orderMessage.setClient(this.client);
+        this.orderMessage.setBody(this.body);
         return this;
     }
 }

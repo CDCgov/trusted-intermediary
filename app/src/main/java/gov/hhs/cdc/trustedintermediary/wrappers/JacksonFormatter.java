@@ -16,6 +16,6 @@ public class JacksonFormatter implements Formatter {
     @Override
     public String convertToString(Object obj) throws JsonProcessingException {
 
-        return objectMapper.writeValueAsString(obj);
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
     }
 }
