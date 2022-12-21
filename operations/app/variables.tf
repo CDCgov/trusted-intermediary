@@ -1,4 +1,4 @@
 variable "environment" {
-  type = string
+  type     = string
   nullable = false
 }
