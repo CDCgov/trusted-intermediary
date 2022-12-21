@@ -2,7 +2,7 @@ package gov.hhs.cdc.trustedintermediary.e2e
 
 import spock.lang.Specification
 
-class HelloWorldTest extends Specification {
+class EmptyLabOrderRequestTest extends Specification {
 
     def "order message is returned from demo ETOR order endpoint"() {
         when:
