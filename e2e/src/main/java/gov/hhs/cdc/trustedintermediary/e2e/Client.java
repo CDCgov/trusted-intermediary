@@ -7,6 +7,7 @@ import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.message.BasicHeader;
 
+/** Mocks a client sending a request to the API * */
 public class Client {
 
     private static final String DEFAULT_PROTOCOL_DOMAIN = "http://localhost:8080";

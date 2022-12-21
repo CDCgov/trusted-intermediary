@@ -4,8 +4,11 @@
 # Ignore Gradle build output directory
 build
 
-# Ignore VSCode Extension Pack for Java output 
+# Ignore VSCode Extension Pack for Java output
 bin
 
 # Ignore macOS Finder directory config
 .DS_Store
+
+# Ignore python version file
+.python-version

@@ -19,6 +19,10 @@ I need ___.
 
 - [ ] Something.
 
+## Research Questions
+
+- [ ] Something.
+
 ## Tasks
 
 - [ ] Something.
@@ -47,5 +51,5 @@ Add any other context or screenshots about the story here.
 - [ ] API(s) are versioned
 - [ ] Debug logging
 
-### Reseaserch & Discovery
+### Research & Discovery
 - [ ] _TBD_
