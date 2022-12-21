@@ -9,6 +9,8 @@ import gov.hhs.cdc.trustedintermediary.etor.order.OrderController
 import gov.hhs.cdc.trustedintermediary.etor.order.OrderMessage
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.JacksonFormatter
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger
+import gov.hhs.cdc.trustedintermediary.wrappers.Slf4jLogger
 import spock.lang.Specification
 
 import java.time.LocalDateTime
@@ -20,6 +22,7 @@ class DomainRegistrationTest extends Specification {
     def setup() {
         println('Setting up test data...')
         TestApplicationContext.reset()
+        ApplicationContext.register(Logger.class, Slf4jLogger.getLogger())
     }
 
     def "domain registration has endpoints"() {

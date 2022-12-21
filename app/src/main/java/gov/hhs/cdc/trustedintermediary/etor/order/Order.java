@@ -1,5 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.order;
 
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -10,7 +12,9 @@ public class Order {
     private String client;
     private String body;
     private OrderMessage orderMessage = new OrderMessage();
-    private DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm");
+    private final DateTimeFormatter dateTimeFormat =
+            DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm");
+    private final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
 
     public String getClient() {
         return client;
@@ -77,27 +81,33 @@ public class Order {
     }
 
     public Order generateMessage() {
-        // TODO Logger
+        OrderMessage tempOrderMessage = new OrderMessage();
         if (this.id == null | this.id == "") {
+            LOGGER.logWarning("Order missing id.");
             this.id = "missing id";
         }
         if (this.destination == null | this.destination == "") {
+            LOGGER.logWarning("Order missing destination.");
             this.destination = "missing destination";
         }
         if (this.createAt == null | this.createAt == "") {
+            LOGGER.logWarning("Order missing timestamp.");
             this.createAt = "missing timestamp";
         }
         if (this.client == null | this.client == "") {
+            LOGGER.logWarning("Order missing client.");
             this.client = "missing client";
         }
         if (this.body == null | this.body == "") {
+            LOGGER.logWarning("Order missing body.");
             this.body = "missing body";
         }
-        this.orderMessage.setDestination(this.destination);
-        this.orderMessage.setId(this.id);
-        this.orderMessage.setCreatedAt(this.createAt);
-        this.orderMessage.setClient(this.client);
-        this.orderMessage.setBody(this.body);
+        tempOrderMessage.setDestination(this.destination);
+        tempOrderMessage.setId(this.id);
+        tempOrderMessage.setCreatedAt(this.createAt);
+        tempOrderMessage.setClient(this.client);
+        tempOrderMessage.setBody(this.body);
+        setOrderMessage(tempOrderMessage);
         return this;
     }
 }

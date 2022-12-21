@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint;
 import gov.hhs.cdc.trustedintermediary.etor.order.OrderController;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.Map;
 import java.util.function.Function;
 import javax.inject.Inject;
@@ -16,6 +17,7 @@ import javax.inject.Inject;
 public class DomainRegistration implements DomainConnector {
 
     @Inject OrderController orderController;
+    private final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
@@ -27,7 +29,9 @@ public class DomainRegistration implements DomainConnector {
         var response = new DomainResponse(200);
 
         // TODO request validation
+        LOGGER.logInfo("Validating request...");
         // TODO request processing
+        LOGGER.logInfo("Processing request");
         // TODO response, include message
 
         var order = orderController.parseOrder(request);
