@@ -80,7 +80,7 @@ You can quickly validate the install with `locust -V`.
 A *locustfile.py* is required to run the tests and there is currently one located
 in `/operations`
 
-Run the application...
+Run the application, then...
 
 In a terminal, navigate to the directory *locustfile.py* is in and  run
 
