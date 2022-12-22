@@ -82,7 +82,7 @@ in `/operations`
 
 Run the application...
 
-In a terminal, navigate to the directory *locustfile.py* is in and  run
+In a terminal, navigate to the directory *locustfile.py* is in and run
 
 ```shell
 locust
