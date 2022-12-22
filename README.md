@@ -78,7 +78,7 @@ pip3 install locust
 You can quickly validate the install with `locust -V`.
 
 A *locustfile.py* is required to run the tests and there is currently one located
-in `/operations`
+in `/operations`.
 
 Run the application...
 
