@@ -50,7 +50,6 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.6'
     implementation 'org.slf4j:slf4j-simple:2.0.6' // Can be replaced with logBack, log4j, log4j2, Java Utility Logger
     implementation 'com.fasterxml.jackson.core:jackson-core:2.14.1'
-    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.14.1'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.1'
 
     testImplementation 'org.apache.groovy:groovy:4.0.6'
