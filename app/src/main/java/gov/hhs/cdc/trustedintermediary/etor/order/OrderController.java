@@ -14,7 +14,7 @@ public class OrderController {
 
     private static final OrderController ORDER_CONTROLLER = new OrderController();
 
-    private Formatter jsonFormatter = ApplicationContext.getImplementation(Formatter.class);
+    private Formatter formatter = ApplicationContext.getImplementation(Formatter.class);
     private final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
 
     private OrderController() {}
@@ -40,8 +40,7 @@ public class OrderController {
         String outputMessage;
 
         try {
-            outputMessage =
-                    jsonFormatter.convertToString(order.generateMessage().getOrderMessage());
+            outputMessage = formatter.convertToString(order.generateMessage().getOrderMessage());
         } catch (JsonProcessingException e) {
             LOGGER.logError("Error constructing order message", e);
             throw new RuntimeException(e);

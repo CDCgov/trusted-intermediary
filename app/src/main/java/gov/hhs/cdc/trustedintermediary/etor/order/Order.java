@@ -82,22 +82,7 @@ public class Order {
 
     public Order generateMessage() {
         OrderMessage tempOrderMessage = new OrderMessage();
-        this.id = (this.id != null && !this.id.isEmpty()) ? this.id : "missing id";
-        this.destination =
-                (this.destination != null && !this.destination.isEmpty())
-                        ? this.destination
-                        : "missing destination";
-
-        this.createAt =
-                (this.createAt != null && !this.createAt.isEmpty())
-                        ? this.createAt
-                        : "missing timestamp";
-
-        this.client =
-                (this.client != null && !this.client.isEmpty()) ? this.client : "missing client";
-
-        this.body = (this.body != null && !this.body.isEmpty()) ? this.body : "missing body";
-
+        checkAndLogMissingFields();
         tempOrderMessage.setDestination(this.destination);
         tempOrderMessage.setId(this.id);
         tempOrderMessage.setCreatedAt(this.createAt);
@@ -105,5 +90,38 @@ public class Order {
         tempOrderMessage.setBody(this.body);
         setOrderMessage(tempOrderMessage);
         return this;
+    }
+
+    private void checkAndLogMissingFields() {
+        this.id = (this.id != null && !this.id.isEmpty()) ? this.id : "missing id";
+        if (this.id.equals("missing id")) {
+            LOGGER.logWarning("Missing order id");
+        }
+        this.destination =
+                (this.destination != null && !this.destination.isEmpty())
+                        ? this.destination
+                        : "missing destination";
+        if (this.destination.equals("missing destination")) {
+            LOGGER.logWarning("Missing order destination");
+        }
+
+        this.createAt =
+                (this.createAt != null && !this.createAt.isEmpty())
+                        ? this.createAt
+                        : "missing timestamp";
+        if (this.createAt.equals("missing timestamp")) {
+            LOGGER.logWarning("Missing order timestamp");
+        }
+
+        this.client =
+                (this.client != null && !this.client.isEmpty()) ? this.client : "missing client";
+        if (this.client.equals("missing client")) {
+            LOGGER.logWarning("Missing order client");
+        }
+
+        this.body = (this.body != null && !this.body.isEmpty()) ? this.body : "missing body";
+        if (this.body.equals("missing body")) {
+            LOGGER.logWarning("Missing order body");
+        }
     }
 }

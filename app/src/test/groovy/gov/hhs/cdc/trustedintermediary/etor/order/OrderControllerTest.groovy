@@ -6,6 +6,8 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.external.javalin.App
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.JacksonFormatter
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger
+import gov.hhs.cdc.trustedintermediary.wrappers.Slf4jLogger
 import spock.lang.Specification
 
 import java.time.LocalDateTime
@@ -13,6 +15,12 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 class OrderControllerTest extends Specification {
+
+    def setup() {
+        println('Setting up test data...')
+        TestApplicationContext.reset()
+        ApplicationContext.register(Logger.class, Slf4jLogger.getLogger())
+    }
 
     def "parseOrder works"() {
         given:

@@ -17,7 +17,7 @@ import javax.inject.Inject;
 public class DomainRegistration implements DomainConnector {
 
     @Inject OrderController orderController;
-    private final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
+    @Inject private Logger LOGGER;
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
