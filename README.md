@@ -21,6 +21,8 @@ This will run the web API on port 8080.  You can view the API documentation at _
 The additional requirements needed to contribute towards development are...
 
 - [Pre-Commit](https://pre-commit.com).
+- [Locust.io](https://docs.locust.io/en/stable/installation.html)
+- [Python](https://docs.python-guide.org/starting/installation/)
 
 ### Compiling
 
