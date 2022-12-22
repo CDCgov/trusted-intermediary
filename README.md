@@ -90,7 +90,7 @@ locust
 
 The terminal will start a local web interface and you can enter
 the swarm parameters for the test and the local url where the app is running
-(usually http//:localhost:8080)
+(usually http://localhost:8080).
 
 You can also set time limits for the tests under 'Advanced Settings'.
 
