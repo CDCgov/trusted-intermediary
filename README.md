@@ -78,11 +78,11 @@ pip3 install locust
 You can quickly validate the install with `locust -V`.
 
 A *locustfile.py* is required to run the tests and there is currently one located
-in `/operations`
+in `/operations`.
 
 Run the application, then...
 
-In a terminal, navigate to the directory *locustfile.py* is in and  run
+In a terminal, navigate to the directory *locustfile.py* is in and run
 
 ```shell
 locust
@@ -90,7 +90,7 @@ locust
 
 The terminal will start a local web interface and you can enter
 the swarm parameters for the test and the local url where the app is running
-(usually http//:localhost:8080)
+(usually http://localhost:8080).
 
 You can also set time limits for the tests under 'Advanced Settings'.
 
