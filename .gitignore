@@ -12,3 +12,7 @@ bin
 
 # Ignore python version file
 .python-version
+
+# Ignore terraform state (as it is persisted via Azure Storage)
+terraform.tfstate*
+.terraform*

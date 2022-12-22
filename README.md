@@ -23,6 +23,7 @@ The additional requirements needed to contribute towards development are...
 - [Pre-Commit](https://pre-commit.com).
 - [Locust.io](https://docs.locust.io/en/stable/installation.html)
 - [Python](https://docs.python-guide.org/starting/installation/)
+- [Terraform](https://www.terraform.io).
 
 ### Compiling
 
@@ -93,6 +94,28 @@ the swarm parameters for the test and the local url where the app is running
 (usually http://localhost:8080).
 
 You can also set time limits for the tests under 'Advanced Settings'.
+
+### Deploying
+
+#### Initial Azure and GitHub Configuration
+
+There is minimal set-up to do to get Terraform squared away before you can run the Terraform commands in
+a new Azure environment.
+
+1. Create a resource group: `cdcti-terraform`.
+2. Create a storage account: `cdctiterraform` (with `cdcti-terraform` as the resource group).
+3. Within Azure Active Directory...
+   - Create an App Registration: `cdcti-github`
+   - Within your Subscription, create a Service Account and assign the Contributor role
+   - Add two federated credentials for:
+     - `repo:CDCgov/trusted-intermediary:ref:refs/heads/main`
+     - Any other subject required for the GitHub Actions to be trusted.
+4. Add secrets to your GitHub Actions.
+   - `AZURE_TENANT_ID` with the tenant ID from Azure Active Directory.
+   - `AZURE_SUBSCRIPTION_ID` with the ID from the subscription that everything should be deployed into.
+   - `AZURE_CLIENT_ID` with the ID of the App Registration created previously.
+
+
 
 ### Pre-Commit Hooks
 
