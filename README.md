@@ -21,6 +21,8 @@ This will run the web API on port 8080.  You can view the API documentation at _
 The additional requirements needed to contribute towards development are...
 
 - [Pre-Commit](https://pre-commit.com).
+- [Locust.io](https://docs.locust.io/en/stable/installation.html)
+- [Python](https://docs.python-guide.org/starting/installation/)
 - [Terraform](https://www.terraform.io).
 
 ### Compiling
@@ -64,6 +66,35 @@ This will start the API, wait for it to respond, run the end-to-end tests agains
 These tests are located under the `e2e` Gradle sub-project directory.  Like any Gradle project, there are the `main` and `test` directories.
 The `test` directory contains the tests.  The `main` directory contains our custom framework that helps us interact with the API.
 
+#### Load Testing
+
+Load tests are completed with [Locust.io](https://docs.locust.io/en/stable/installation.html). To run load tests:
+
+Install Python (3.7 or later), then...
+
+```shell
+pip3 install locust
+```
+
+You can quickly validate the install with `locust -V`.
+
+A *locustfile.py* is required to run the tests and there is currently one located
+in `/operations`.
+
+Run the application, then...
+
+In a terminal, navigate to the directory *locustfile.py* is in and run
+
+```shell
+locust
+```
+
+The terminal will start a local web interface and you can enter
+the swarm parameters for the test and the local url where the app is running
+(usually http://localhost:8080).
+
+You can also set time limits for the tests under 'Advanced Settings'.
+
 ### Deploying
 
 #### Initial Azure and GitHub Configuration
@@ -83,6 +114,7 @@ a new Azure environment.
    - `AZURE_TENANT_ID` with the tenant ID from Azure Active Directory.
    - `AZURE_SUBSCRIPTION_ID` with the ID from the subscription that everything should be deployed into.
    - `AZURE_CLIENT_ID` with the ID of the App Registration created previously.
+
 
 
 ### Pre-Commit Hooks
