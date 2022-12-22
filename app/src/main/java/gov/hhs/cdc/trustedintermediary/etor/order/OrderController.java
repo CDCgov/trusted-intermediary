@@ -1,9 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.etor.order;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
+import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 
 /**
@@ -41,7 +41,7 @@ public class OrderController {
 
         try {
             outputMessage = formatter.convertToString(order.generateMessage().getOrderMessage());
-        } catch (JsonProcessingException e) {
+        } catch (FormatterProcessingException e) {
             LOGGER.logError("Error constructing order message", e);
             throw new RuntimeException(e);
         }
