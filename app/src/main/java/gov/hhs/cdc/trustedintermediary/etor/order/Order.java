@@ -69,7 +69,7 @@ public class Order {
             timestamp = LocalDateTime.parse(createdAt);
         } catch (DateTimeException e) {
             LOGGER.logWarning("Improper format of createAt");
-            this.createAt = "";
+            throw new DateTimeException("improper format of datatime", e);
         }
 
         this.createAt = (createdAt == null) ? "" : timestamp.format(this.dateTimeFormat);
