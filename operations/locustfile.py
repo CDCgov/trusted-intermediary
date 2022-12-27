@@ -15,9 +15,9 @@ class SampleUser(HttpUser):
     @task
     def latency_get_health(self):
         with self.client.get("/health", catch_response=True) as response:
-            if response.elapsed.total_seconds() < 1:
+            if response.elapsed.total_seconds() < 1.000:
                 response.success()
-            elif response.elapsed.total_seconds() > 1.001:
+            elif response.elapsed.total_seconds() >= 1.000:
                 response.failure("Response took longer than 1000 ms")
 
     @task
