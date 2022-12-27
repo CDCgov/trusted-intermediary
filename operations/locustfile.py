@@ -4,8 +4,8 @@ from locust import HttpUser, task
 
 class SampleUser(HttpUser):
 
-    # Each task gets called randomly, but the number next to task denotes
-    # how many more times that task will get called
+    # Each task gets called randomly, but the number next to '@task' denotes
+    # how many more times that task will get called than other tasks
     @task
     def check_response_health(self):
         with self.client.get("/health", catch_response=True) as response:
