@@ -30,6 +30,7 @@ public class OrderController {
         try {
             order = formatter.convertToObject(request.getBody(), Order.class);
         } catch (FormatterProcessingException e) {
+            LOGGER.logError("Unable to convert request body to order object");
             throw new RuntimeException(e);
         }
         return order;

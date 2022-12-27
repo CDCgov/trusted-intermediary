@@ -68,7 +68,7 @@ public class Order {
         try {
             timestamp = LocalDateTime.parse(createdAt);
         } catch (DateTimeException e) {
-            LOGGER.logWarning("Improper format of createAt");
+            LOGGER.logError("Improper format of createAt");
             throw new DateTimeException("improper format of datatime", e);
         }
 
