@@ -8,22 +8,18 @@ class HappyLabOrderRequestTest extends Specification{
         given:
         var destination = "DogCow lab"
         var client = "Mock Hospital"
-        var body = "lab order"
+        var content = "MSH|lab order"
 
         when:
+
         def response = Client.post(
                 "/v1/etor/order",
-                Map.of("Destination", "DogCow lab", "Client", "Mock Hospital"),
-                "lab order"
+                Map.of("Content-Type", "application/json"),
+                "{\"client\":\"$client\", \"destination\":\"$destination\", \"content\":\"$content\"}"
                 )
-
+        def expected =
+                """\"{\\"id\\":\\"missing id\\",\\"destination\\":\\"$destination\\",\\"createdAt\\":\\"missing timestamp\\",\\"client\\":\\"$client\\",\\"content\\":\\"$content\\"}\""""
         then:
-        response == """{
-  "id" : "missing id",
-  "destination" : "$destination",
-  "createdAt" : "missing timestamp",
-  "client" : "$client",
-  "body" : "$body"
-}"""
+        response == expected
     }
 }

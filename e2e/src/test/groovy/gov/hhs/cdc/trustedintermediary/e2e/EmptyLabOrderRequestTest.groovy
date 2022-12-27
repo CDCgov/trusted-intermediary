@@ -6,16 +6,11 @@ class EmptyLabOrderRequestTest extends Specification {
 
     def "order message is returned from demo ETOR order endpoint"() {
         when:
-        def response = Client.post("/v1/etor/order")
+        def response = Client.post("/v1/etor/order",Map.of(),"""{"client":"missing client"}""")
+        def expected =
+                """\"{\\"id\\":\\"missing id\\",\\"destination\\":\\"missing destination\\",\\"createdAt\\":\\"missing timestamp\\",\\"client\\":\\"missing client\\",\\"content\\":\\"missing content\\"}\""""
 
         then:
-        response ==
-                """{
-  "id" : "missing id",
-  "destination" : "missing destination",
-  "createdAt" : "missing timestamp",
-  "client" : "missing client",
-  "body" : "missing body"
-}"""
+        response == expected
     }
 }

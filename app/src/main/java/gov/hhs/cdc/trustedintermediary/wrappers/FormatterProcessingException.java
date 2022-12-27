@@ -8,4 +8,8 @@ public class FormatterProcessingException extends Exception {
     public FormatterProcessingException(String errorMessage) {
         super(errorMessage);
     }
+
+    public FormatterProcessingException(String errorMessage, Throwable e) {
+        super(errorMessage, e);
+    }
 }

@@ -3,6 +3,8 @@ package gov.hhs.cdc.trustedintermediary.etor.order
 import gov.hhs.cdc.trustedintermediary.PojoTestUtils
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.wrappers.Formatter
+import gov.hhs.cdc.trustedintermediary.wrappers.JacksonFormatter
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.Slf4jLogger
 import spock.lang.Specification
@@ -16,6 +18,7 @@ class OrderMessageTest extends Specification{
         println('Setting up test data...')
         TestApplicationContext.reset()
         ApplicationContext.register(Logger.class, Slf4jLogger.getLogger())
+        ApplicationContext.register(Formatter.class, new JacksonFormatter())
     }
 
     def "test getters and setters"() {
@@ -42,7 +45,7 @@ class OrderMessageTest extends Specification{
         orderMessage.getId() == id
         orderMessage.getDestination() == destination
         orderMessage.getClient() == client
-        orderMessage.getBody() == body
+        orderMessage.getContent() == body
         orderMessage.getCreatedAt() == formattedTimeDate
     }
 }

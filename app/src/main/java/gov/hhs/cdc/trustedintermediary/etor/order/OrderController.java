@@ -25,22 +25,22 @@ public class OrderController {
 
     public Order parseOrder(DomainRequest request) {
         LOGGER.logInfo("Parsing order...");
-        Order order = new Order();
-        var headers = request.getHeaders();
-        var destination = headers.get("Destination");
-        var client = headers.get("Client");
-        var parsedBody = parseBody(request.getBody());
-        order.setDestination(destination);
-        order.setBody(parsedBody);
-        order.setClient(client);
+        Order order;
+
+        try {
+            order = formatter.convertToObject(request.getBody(), Order.class);
+        } catch (FormatterProcessingException e) {
+            throw new RuntimeException(e);
+        }
         return order;
     }
 
     public String constructOrderMessage(Order order) {
         String outputMessage;
+        OrderMessage orderMessage = new OrderMessage(order);
 
         try {
-            outputMessage = formatter.convertToString(order.generateMessage().getOrderMessage());
+            outputMessage = formatter.convertToString(orderMessage.generateMessage());
         } catch (FormatterProcessingException e) {
             LOGGER.logError("Error constructing order message", e);
             throw new RuntimeException(e);
@@ -49,21 +49,8 @@ public class OrderController {
         return outputMessage;
     }
 
-    private String parseBody(String body) {
-        // Method to parse the response body,
-        // it assumes there is only one key/value pair in the body.
-        // This will eventually change depending on the needs.
-        LOGGER.logInfo("Parsing body...");
-        final int bodyValueIndex = 1;
-        if (body.isBlank()) {
-            LOGGER.logWarning("Request body is blank, unable to parse body.");
-            return body;
-        }
-        String[] bodyArr = body.split(":");
-        if (bodyArr.length < 2) {
-            LOGGER.logWarning("Unrecognised structure, unable to parse body");
-            return body;
-        }
-        return bodyArr[bodyValueIndex].substring(1, bodyArr[1].length() - 2);
+    public boolean isBodyValid(String body) {
+
+        return (body.isBlank()) ? false : true;
     }
 }

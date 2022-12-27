@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.order;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -10,11 +11,21 @@ public class Order {
     private String destination;
     private String createAt;
     private String client;
-    private String body;
-    private OrderMessage orderMessage = new OrderMessage();
+    private String content;
     private final DateTimeFormatter dateTimeFormat =
             DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm");
     private final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
+
+    public Order() {}
+
+    // Ideal for testing
+    public Order(String id, String destination, String createdAt, String client, String content) {
+        setId(id);
+        setDestination(destination);
+        setCreatedAt(createdAt);
+        setClient(client);
+        setContent(content);
+    }
 
     public String getClient() {
         return client;
@@ -24,24 +35,12 @@ public class Order {
         this.client = client;
     }
 
-    public String getBody() {
-        return body;
+    public String getContent() {
+        return content;
     }
 
-    public void setBody(String body) {
-        this.body = body;
-    }
-
-    public Order() {}
-
-    // Ideal for testing
-    public Order(
-            String id, String destination, LocalDateTime createdAt, String client, String body) {
-        setId(id);
-        setDestination(destination);
-        setCreatedAt(createdAt);
-        setClient(client);
-        setBody(body);
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public String getId() {
@@ -64,64 +63,20 @@ public class Order {
         this.destination = (destination == null) ? "" : destination;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createAt = (createdAt == null) ? "" : createdAt.format(this.dateTimeFormat);
-    }
-
-    public void setCreateAt(LocalDateTime createdAt, DateTimeFormatter format) {
-        this.createAt = createdAt.format(format);
-    }
-
-    public OrderMessage getOrderMessage() {
-        return orderMessage;
-    }
-
-    public void setOrderMessage(OrderMessage orderMessage) {
-        this.orderMessage = orderMessage;
-    }
-
-    public Order generateMessage() {
-        OrderMessage tempOrderMessage = new OrderMessage();
-        checkAndLogMissingFields();
-        tempOrderMessage.setDestination(this.destination);
-        tempOrderMessage.setId(this.id);
-        tempOrderMessage.setCreatedAt(this.createAt);
-        tempOrderMessage.setClient(this.client);
-        tempOrderMessage.setBody(this.body);
-        setOrderMessage(tempOrderMessage);
-        return this;
-    }
-
-    private void checkAndLogMissingFields() {
-        this.id = (this.id != null && !this.id.isEmpty()) ? this.id : "missing id";
-        if (this.id.equals("missing id")) {
-            LOGGER.logWarning("Missing order id");
-        }
-        this.destination =
-                (this.destination != null && !this.destination.isEmpty())
-                        ? this.destination
-                        : "missing destination";
-        if (this.destination.equals("missing destination")) {
-            LOGGER.logWarning("Missing order destination");
+    public void setCreatedAt(String createdAt) {
+        LocalDateTime timestamp = null;
+        try {
+            timestamp = LocalDateTime.parse(createdAt);
+        } catch (DateTimeException e) {
+            LOGGER.logWarning("Improper format of createAt");
+            this.createAt = "";
         }
 
-        this.createAt =
-                (this.createAt != null && !this.createAt.isEmpty())
-                        ? this.createAt
-                        : "missing timestamp";
-        if (this.createAt.equals("missing timestamp")) {
-            LOGGER.logWarning("Missing order timestamp");
-        }
+        this.createAt = (createdAt == null) ? "" : timestamp.format(this.dateTimeFormat);
+    }
 
-        this.client =
-                (this.client != null && !this.client.isEmpty()) ? this.client : "missing client";
-        if (this.client.equals("missing client")) {
-            LOGGER.logWarning("Missing order client");
-        }
-
-        this.body = (this.body != null && !this.body.isEmpty()) ? this.body : "missing body";
-        if (this.body.equals("missing body")) {
-            LOGGER.logWarning("Missing order body");
-        }
+    public void setCreateAt(String createdAt, DateTimeFormatter format) {
+        LocalDateTime timestamp = LocalDateTime.parse(createdAt);
+        this.createAt = timestamp.format(format);
     }
 }

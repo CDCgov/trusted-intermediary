@@ -44,19 +44,14 @@ class DomainRegistrationTest extends Specification {
         ApplicationContext.register(Formatter, new JacksonFormatter())
         def domainRegistration = new DomainRegistration()
         def domainRequest = new DomainRequest()
-        def headers = Map.of("Destination", "fake lab", "Client", "fake hospital")
+        def headers = Map.of("Content-Type", "application/json")
         domainRequest.setHeaders(headers)
-        domainRequest.setBody("MSH|lab order")
+        def newBody = """{"destination":"fake lab","client":"fake hospital","content":"MSH|lab order"}"""
+        domainRequest.setBody(newBody)
         def orderController = OrderController.getInstance()
 
         def mockParsedBody =
-                """{
-  "id" : "missing id",
-  "destination" : "fake lab",
-  "createdAt" : "missing timestamp",
-  "client" : "fake hospital",
-  "body" : "MSH|lab order"
-}"""
+                """\"{\\"id\\":\\"missing id\\",\\"destination\\":\\"fake lab\\",\\"createdAt\\":\\"missing timestamp\\",\\"client\\":\\"fake hospital\\",\\"content\\":\\"MSH|lab order\\"}\""""
 
         TestApplicationContext.register(OrderController,orderController)
         TestApplicationContext.register(DomainRegistration,domainRegistration)
