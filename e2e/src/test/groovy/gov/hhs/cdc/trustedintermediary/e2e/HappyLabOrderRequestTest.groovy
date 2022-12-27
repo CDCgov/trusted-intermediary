@@ -14,7 +14,7 @@ class HappyLabOrderRequestTest extends Specification{
 
         def response = Client.post(
                 "/v1/etor/order",
-                Map.of("Content-Type", "application/json"),
+                Map.of(),
                 "{\"client\":\"$client\", \"destination\":\"$destination\", \"content\":\"$content\"}"
                 )
         def expected =
