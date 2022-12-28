@@ -45,7 +45,6 @@ public class DomainRegistration implements DomainConnector {
         }
         // TODO response, include message
 
-        LOGGER.logInfo("Generating order message...");
         var orderMessage = generateOrderMessage(order);
         response.setBody(orderMessage);
 
