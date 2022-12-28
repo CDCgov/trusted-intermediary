@@ -14,7 +14,7 @@ public class Order {
     private String content;
     private final DateTimeFormatter dateTimeFormat =
             DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm");
-    private final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
+    private Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
 
     public Order() {}
 

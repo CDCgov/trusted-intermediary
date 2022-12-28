@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.etor.order;
 
-import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
@@ -15,7 +14,7 @@ public class OrderController {
 
     private static final OrderController ORDER_CONTROLLER = new OrderController();
     @Inject private Formatter formatter;
-    private final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
+    @Inject private Logger LOGGER;
 
     private OrderController() {}
 
