@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import javax.inject.Inject;
 
 /**
  * Creates an in-memory representation of an order to be ingested by the system, and return response
@@ -13,8 +14,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 public class OrderController {
 
     private static final OrderController ORDER_CONTROLLER = new OrderController();
-
-    private Formatter formatter = ApplicationContext.getImplementation(Formatter.class);
+    @Inject private Formatter formatter;
     private final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
 
     private OrderController() {}
