@@ -19,6 +19,7 @@ dependencies {
     implementation 'org.apache.httpcomponents.client5:httpclient5-fluent:5.2.1'
     implementation 'org.slf4j:slf4j-api:2.0.6'
     implementation 'org.slf4j:slf4j-simple:2.0.6'
+    implementation project(':app')
 
     testImplementation 'org.apache.groovy:groovy:4.0.7'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'

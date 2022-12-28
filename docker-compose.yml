@@ -4,5 +4,5 @@ services:
     build: .
     ports:
       - "8080:8080" # default api endpoint port
-      -  "5006:5006" # Java debug port
+      -  "5005:5005" # Java debug port
     platform: linux/amd64
