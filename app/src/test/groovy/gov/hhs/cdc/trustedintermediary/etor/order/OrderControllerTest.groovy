@@ -33,7 +33,6 @@ class OrderControllerTest extends Specification {
         order.setClient(client)
         order.setDestination(destination)
         order.setContent(content)
-        def orderMessage = new OrderMessage()
         def request = ApplicationContext.getImplementation(DomainRequest)
         def headers = Map.of("Content-Type", "application/json")
         request.setHeaders(headers)
@@ -60,7 +59,7 @@ class OrderControllerTest extends Specification {
         LocalDateTime createAt = LocalDateTime.now(ZoneId.of("UTC"))
         DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm")
         def formattedDateTime = createAt.format(dateTimeFormat)
-        Order order = new Order(orderId, destination, createAt.toString(), client, content)
+        Order order = new Order(orderId, destination, createAt.format(dateTimeFormat), client, content)
         def orderController = OrderController.getInstance()
 
         def expected = """\"{\\"id\\":\\"1234abcd\\",\\"destination\\":\\"fake lab\\",\\"createdAt\\":\\"$formattedDateTime\\",\\"client\\":\\"fake client\\",\\"content\\":\\"MSH|lab order\\"}\""""

@@ -2,14 +2,15 @@ package gov.hhs.cdc.trustedintermediary.etor.order;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.regex.Pattern;
 
 public class Order {
     private String id;
     private String destination;
-    private String createAt;
+    private String createdAt;
+
     private String client;
     private String content;
     private final DateTimeFormatter dateTimeFormat =
@@ -52,7 +53,7 @@ public class Order {
     }
 
     public String getCreatedAt() {
-        return createAt;
+        return createdAt;
     }
 
     public void setId(String id) {
@@ -64,19 +65,26 @@ public class Order {
     }
 
     public void setCreatedAt(String createdAt) {
-        LocalDateTime timestamp = null;
-        try {
-            timestamp = LocalDateTime.parse(createdAt);
-        } catch (DateTimeException e) {
-            LOGGER.logError("Improper format of createAt");
-            throw new DateTimeException("improper format of datatime", e);
-        }
 
-        this.createAt = (createdAt == null) ? "" : timestamp.format(this.dateTimeFormat);
+        this.createdAt = createdAt;
     }
 
-    public void setCreateAt(String createdAt, DateTimeFormatter format) {
-        LocalDateTime timestamp = LocalDateTime.parse(createdAt);
-        this.createAt = timestamp.format(format);
+    //    public void setCreateAt(LocalDateTime createdAt, DateTimeFormatter format) {
+    //        LocalDateTime timestamp = LocalDateTime.parse(createdAt);
+    //        this.createAt = timestamp.format(format);
+    //    }
+
+    private boolean isValidDateTime(LocalDateTime createdAt) {
+        String dateTimeFormatRegex =
+                "\\b(0[1-9]|1[0-2])(\\s|-){1}([1-9]|[12][0-9]|3[01])(\\s|-){1}(19[0-9][0-9]|20[0-2][0-3])(\\s)([1-9]|1[0-9]|2[01234])(:)(0[0-9]|[1-5][0-9])\\b";
+        String ldtRegex =
+                "\\b(19[0-9][0-9]|20[0-2][0-3])(-)"
+                        + "(0[1-9]|[1-9]|1[0-2])(-)"
+                        + "(0[1-9]|[1-9]|[12][0-9]|3[01])(T)"
+                        + "(0[1-9]|[1-5][0-9])(:)"
+                        + "(0[1-9]|[1-5][0-9])(:)"
+                        + "(0[1-9]|[1-5][0-9])([\\.]\\d+)?\\b";
+        Pattern pattern = Pattern.compile(ldtRegex);
+        return pattern.matcher(createdAt.toString()).matches();
     }
 }

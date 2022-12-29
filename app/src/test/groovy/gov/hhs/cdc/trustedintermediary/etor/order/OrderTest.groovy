@@ -36,11 +36,12 @@ class OrderTest extends Specification{
         def destination = "fake lab"
         def client = "fake hospital"
         def body = "lab order"
-        def createAt = LocalDateTime.now(ZoneId.of("UTC"))
-        def formattedTimeDate = createAt.format(DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm"))
+        def createdAt = LocalDateTime.now(ZoneId.of("UTC"))
+        def dtFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm")
+        def formattedTimeDate = createdAt.format(dtFormatter)
 
         when:
-        def order = new Order(id,destination,createAt.toString(),client,body)
+        def order = new Order(id,destination,formattedTimeDate,client,body)
 
         then:
         order.getId() == id

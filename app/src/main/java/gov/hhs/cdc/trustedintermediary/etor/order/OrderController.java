@@ -1,10 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.etor.order;
 
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import javax.inject.Inject;
 
 /**
  * Creates an in-memory representation of an order to be ingested by the system, and return response
@@ -13,8 +13,8 @@ import javax.inject.Inject;
 public class OrderController {
 
     private static final OrderController ORDER_CONTROLLER = new OrderController();
-    @Inject private Formatter formatter;
-    @Inject private Logger LOGGER;
+    private Formatter formatter = ApplicationContext.getImplementation(Formatter.class);
+    private final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
 
     private OrderController() {}
 
