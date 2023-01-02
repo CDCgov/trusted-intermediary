@@ -4,8 +4,10 @@
  */
 package gov.hhs.cdc.trustedintermediary.context;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -47,70 +49,91 @@ public class ApplicationContext {
     protected static void injectRegisteredImplementations(boolean skipMissingImplementations) {
         var fields = Reflection.getFieldsAnnotatedWith(Inject.class);
 
-        fields.forEach(
-                field -> {
-                    var fieldType = field.getType();
-                    var declaringClass = field.getDeclaringClass();
+        fields.forEach(field -> injectIntoField(field, skipMissingImplementations));
+    }
 
-                    var declaringClassesToTry = new ArrayList<Class<?>>();
-                    declaringClassesToTry.add(declaringClass);
-                    declaringClassesToTry.addAll(Arrays.asList(declaringClass.getInterfaces()));
+    private static void injectIntoField(Field field, boolean skipMissingImplementations) {
+        var fieldType = field.getType();
+        var declaringClass = field.getDeclaringClass();
 
-                    Object fieldImplementation;
-                    try {
-                        fieldImplementation = getImplementation(fieldType);
-                    } catch (IllegalArgumentException exception) {
-                        if (skipMissingImplementations) {
-                            System.err.println(
-                                    "Ignoring failure to get implementations to inject into a field");
-                            return;
-                        }
+        var declaringClassesToTry = new ArrayList<Class<?>>();
+        declaringClassesToTry.add(declaringClass);
+        declaringClassesToTry.addAll(Arrays.asList(declaringClass.getInterfaces()));
 
-                        throw exception;
-                    }
+        Object fieldImplementation = getFieldImplementation(fieldType, skipMissingImplementations);
+        if (fieldImplementation == null) {
+            return;
+        }
 
-                    Object declaringClassImplementation =
-                            declaringClassesToTry.stream()
-                                    .map(
-                                            possibleDeclaringClass -> {
-                                                Object possibleDeclaringClassImplementation;
+        Object declaringClassImplementation =
+                getDeclaringClassImplementation(declaringClassesToTry, skipMissingImplementations);
+        if (declaringClassImplementation == null) {
+            return;
+        }
 
-                                                try {
-                                                    possibleDeclaringClassImplementation =
-                                                            getImplementation(
-                                                                    possibleDeclaringClass);
-                                                } catch (IllegalArgumentException exception) {
-                                                    return null;
-                                                }
+        field.trySetAccessible();
 
-                                                return possibleDeclaringClassImplementation;
-                                            })
-                                    .filter(Objects::nonNull)
-                                    .findFirst()
-                                    .orElse(null);
+        try {
+            field.set(declaringClassImplementation, fieldImplementation);
+        } catch (IllegalAccessException | IllegalArgumentException exception) {
+            throw new IllegalArgumentException(
+                    "Unable to inject " + fieldType + " into " + declaringClass, exception);
+        }
+    }
 
-                    if (declaringClassImplementation == null) {
-                        if (skipMissingImplementations) {
-                            System.err.println(
-                                    "Ignoring failure to get implementations to inject into a field");
-                            return;
-                        }
+    private static Object getFieldImplementation(
+            Class<?> fieldType, boolean skipMissingImplementations) {
+        Object fieldImplementation;
 
-                        throw new IllegalArgumentException(
-                                "Unable to find an implementation for "
-                                        + declaringClass
-                                        + " given the class itself or its implemented interfaces for injection");
-                    }
+        try {
+            fieldImplementation = getImplementation(fieldType);
+        } catch (IllegalArgumentException exception) {
+            if (skipMissingImplementations) {
+                System.err.println(
+                        "Ignoring failure to get implementations to inject into a field");
+                return null;
+            }
 
-                    field.trySetAccessible();
+            throw exception;
+        }
 
-                    try {
-                        field.set(declaringClassImplementation, fieldImplementation);
-                    } catch (IllegalAccessException | IllegalArgumentException exception) {
-                        throw new IllegalArgumentException(
-                                "Unable to inject " + fieldType + " into " + declaringClass,
-                                exception);
-                    }
-                });
+        return fieldImplementation;
+    }
+
+    private static Object getDeclaringClassImplementation(
+            List<Class<?>> declaringClassesToTry, boolean skipMissingImplementations) {
+        Object declaringClassImplementation =
+                declaringClassesToTry.stream()
+                        .map(
+                                possibleDeclaringClass -> {
+                                    Object possibleDeclaringClassImplementation;
+
+                                    try {
+                                        possibleDeclaringClassImplementation =
+                                                getImplementation(possibleDeclaringClass);
+                                    } catch (IllegalArgumentException exception) {
+                                        return null;
+                                    }
+
+                                    return possibleDeclaringClassImplementation;
+                                })
+                        .filter(Objects::nonNull)
+                        .findFirst()
+                        .orElse(null);
+
+        if (declaringClassImplementation == null) {
+            if (skipMissingImplementations) {
+                System.err.println(
+                        "Ignoring failure to get implementations to inject into a field");
+                return null;
+            }
+
+            throw new IllegalArgumentException(
+                    "Unable to find an implementation for "
+                            + declaringClassesToTry.get(0)
+                            + " given the class itself or its implemented interfaces for injection");
+        }
+
+        return declaringClassImplementation;
     }
 }
