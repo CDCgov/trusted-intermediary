@@ -1,12 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.etor.order
 
-import gov.hhs.cdc.trustedintermediary.context.ApplicationContext
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.JacksonFormatter
-import gov.hhs.cdc.trustedintermediary.wrappers.Logger
-import gov.hhs.cdc.trustedintermediary.wrappers.Slf4jLogger
 import spock.lang.Specification
 
 import java.time.LocalDateTime
@@ -16,42 +13,34 @@ import java.time.format.DateTimeFormatter
 class OrderControllerTest extends Specification {
 
     def setup() {
-        println('Setting up test data...')
         TestApplicationContext.reset()
-        ApplicationContext.register(Logger.class, Slf4jLogger.getLogger())
-        ApplicationContext.register(Formatter.class, new JacksonFormatter())
+        TestApplicationContext.init()
+        TestApplicationContext.register(OrderController, OrderController.getInstance())
     }
 
     def "parseOrder works"() {
         given:
-        ApplicationContext.register(Formatter.class, new JacksonFormatter())
-        ApplicationContext.register(DomainRequest.class, new DomainRequest())
-        def destination = "fake lab"
-        def client = "fake hospital"
-        def content = "MSH|lab order"
-        def order = new Order()
-        order.setClient(client)
-        order.setDestination(destination)
-        order.setContent(content)
-        def request = ApplicationContext.getImplementation(DomainRequest)
-        def headers = Map.of("Content-Type", "application/json")
-        request.setHeaders(headers)
-        request.setBody("""{"client":"fake hospital", "destination":"fake lab", "content":"$content"}""")
+        def mockOrderId = "asdf-12341-jkl-7890"
+
+        def formatter = Mock(JacksonFormatter)
+        formatter.convertToObject(_ as String, _ as Class) >> new Order(mockOrderId, "Massachusetts", "2022-12-21T08:34:27Z", "MassGeneral", "NBS panel for Clarus the DogCow")
+
+        def request = new DomainRequest()
+
+        TestApplicationContext.register(Formatter, formatter)
+        TestApplicationContext.injectRegisteredImplementations()
+
         when:
         def parsedOrder = OrderController.getInstance().parseOrder(request)
 
         then:
-        parsedOrder.getId() == order.getId()
-        parsedOrder.getClient() == order.getClient()
-        parsedOrder.getDestination() == order.getDestination()
-        parsedOrder.getContent() == order.getContent()
+        noExceptionThrown()
+        parsedOrder.getId() == mockOrderId
     }
 
     def "constructOrderMessage works"() {
 
         given:
-        TestApplicationContext.register(Formatter, new JacksonFormatter())
-        // TestApplicationContext.register(OrderMessage, new OrderMessage())
         def orderId = "1234abcd"
         def destination = "fake lab"
         def client = "fake client"
