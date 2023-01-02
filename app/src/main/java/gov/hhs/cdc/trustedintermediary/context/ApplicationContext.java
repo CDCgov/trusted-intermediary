@@ -4,7 +4,10 @@
  */
 package gov.hhs.cdc.trustedintermediary.context;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
@@ -49,11 +52,13 @@ public class ApplicationContext {
                     var fieldType = field.getType();
                     var declaringClass = field.getDeclaringClass();
 
+                    var declaringClassesToTry = new ArrayList<Class<?>>();
+                    declaringClassesToTry.add(declaringClass);
+                    declaringClassesToTry.addAll(Arrays.asList(declaringClass.getInterfaces()));
+
                     Object fieldImplementation;
-                    Object declaringClassImplementation;
                     try {
                         fieldImplementation = getImplementation(fieldType);
-                        declaringClassImplementation = getImplementation(declaringClass);
                     } catch (IllegalArgumentException exception) {
                         if (skipMissingImplementations) {
                             System.err.println(
@@ -62,6 +67,39 @@ public class ApplicationContext {
                         }
 
                         throw exception;
+                    }
+
+                    Object declaringClassImplementation =
+                            declaringClassesToTry.stream()
+                                    .map(
+                                            possibleDeclaringClass -> {
+                                                Object possibleDeclaringClassImplementation;
+
+                                                try {
+                                                    possibleDeclaringClassImplementation =
+                                                            getImplementation(
+                                                                    possibleDeclaringClass);
+                                                } catch (IllegalArgumentException exception) {
+                                                    return null;
+                                                }
+
+                                                return possibleDeclaringClassImplementation;
+                                            })
+                                    .filter(Objects::nonNull)
+                                    .findFirst()
+                                    .orElse(null);
+
+                    if (declaringClassImplementation == null) {
+                        if (skipMissingImplementations) {
+                            System.err.println(
+                                    "Ignoring failure to get implementations to inject into a field");
+                            return;
+                        }
+
+                        throw new IllegalArgumentException(
+                                "Unable to find an implementation for "
+                                        + declaringClass
+                                        + " given the class itself or its implemented interfaces for injection");
                     }
 
                     field.trySetAccessible();

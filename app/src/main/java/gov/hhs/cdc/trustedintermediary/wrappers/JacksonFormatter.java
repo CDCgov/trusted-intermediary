@@ -2,7 +2,7 @@ package gov.hhs.cdc.trustedintermediary.wrappers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
+import javax.inject.Inject;
 
 public class JacksonFormatter implements Formatter {
 
@@ -10,7 +10,7 @@ public class JacksonFormatter implements Formatter {
 
     private static final ObjectMapper objectMapper =
             new ObjectMapper(); // Look into objectMapper.configure(Feature.AUTO_CLOSE_SOURCE, true)
-    private final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
+    @Inject Logger logger;
 
     private JacksonFormatter() {}
 
@@ -23,7 +23,7 @@ public class JacksonFormatter implements Formatter {
         try {
             return objectMapper.readValue(input, clazz);
         } catch (JsonProcessingException e) {
-            LOGGER.logError("Jackson's objectMapper failed to convert JSON to object", e);
+            logger.logError("Jackson's objectMapper failed to convert JSON to object", e);
             throw new FormatterProcessingException(
                     "Jackson's objectMapper failed to convert JSON to object", e);
         }
@@ -35,7 +35,7 @@ public class JacksonFormatter implements Formatter {
         try {
             return objectMapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
-            LOGGER.logError("Jackson's objectMapper failed to convert object to JSON", e);
+            logger.logError("Jackson's objectMapper failed to convert object to JSON", e);
             throw new FormatterProcessingException(
                     "Jackson's objectMapper failed to convert object to JSON", e);
         }
