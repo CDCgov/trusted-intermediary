@@ -9,7 +9,7 @@ import java.util.function.Function;
  * <p>To register a new domain with the trusted intermediary, you must... <br>
  * - Create a new class that implements this interface. <br>
  * - Have a constructor that doesn't take any arguments. This can be fulfilled by the default
- * contructor.
+ * constructor.
  *
  * <p>The trusted intermediary will automatically discover all implementers of this interface and
  * call the implemented methods as appropriate.

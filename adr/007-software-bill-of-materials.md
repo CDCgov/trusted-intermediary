@@ -26,7 +26,7 @@ document (that will be generated with each release build) that captures
 all the software components and dependencies, info on those components,
 and hierarchical relationships.
 - CycloneDX plugin for gradle can be automated for use with existing CI/CD pipeline
-- CycloneDX can work with [Anchore/Syft](https://github.com/anchore/syft#supported-ecosystems) for format converison
+- CycloneDX can work with [Anchore/Syft](https://github.com/anchore/syft#supported-ecosystems) for format conversion
 - CycloneDX can work with [Anchore/Grype](https://github.com/anchore/grype#recommended) for vulnerability scanning
 - CycloneDX is an accepted standard for the industry
 
