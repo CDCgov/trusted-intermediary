@@ -20,6 +20,8 @@ public class OrderMessage {
         setCreatedAt(createdAt);
         setClient(client);
         setContent(content);
+
+        checkAndLogMissingFields();
     }
 
     public OrderMessage(@Nonnull Order order) {
@@ -28,6 +30,8 @@ public class OrderMessage {
         setCreatedAt(order.getCreatedAt());
         setClient(order.getClient());
         setContent(order.getContent());
+
+        checkAndLogMissingFields();
     }
 
     public String getClient() {

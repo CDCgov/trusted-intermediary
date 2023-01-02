@@ -18,7 +18,7 @@ import javax.inject.Inject;
 public class DomainRegistration implements DomainConnector {
 
     @Inject OrderController orderController;
-    @Inject private Logger LOGGER;
+    @Inject Logger logger;
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
@@ -28,13 +28,12 @@ public class DomainRegistration implements DomainConnector {
 
     DomainResponse handleOrder(DomainRequest request) {
 
-        LOGGER.logInfo("Parsing request...");
+        logger.logInfo("Parsing request...");
         var order = orderController.parseOrder(request);
 
         OrderMessage orderMessage = new OrderMessage(order);
 
-        LOGGER.logInfo("Constructing response...");
-
+        logger.logInfo("Constructing response...");
         return orderController.constructResponse(orderMessage);
     }
 }

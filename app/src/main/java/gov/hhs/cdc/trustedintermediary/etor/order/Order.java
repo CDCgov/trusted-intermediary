@@ -1,9 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.order;
 
-import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
-import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 
 public class Order {
@@ -13,9 +10,6 @@ public class Order {
 
     private String client;
     private String content;
-    private final DateTimeFormatter dateTimeFormat =
-            DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm");
-    private Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
 
     public Order() {}
 
