@@ -31,6 +31,6 @@ public class App {
 
     private static void registerClasses() {
         ApplicationContext.register(Logger.class, Slf4jLogger.getLogger());
-        ApplicationContext.register(Formatter.class, new JacksonFormatter());
+        ApplicationContext.register(Formatter.class, JacksonFormatter.getInstance());
     }
 }

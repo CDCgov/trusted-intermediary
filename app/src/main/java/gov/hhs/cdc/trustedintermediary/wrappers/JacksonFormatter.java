@@ -6,9 +6,17 @@ import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 
 public class JacksonFormatter implements Formatter {
 
+    private static final JacksonFormatter INSTANCE = new JacksonFormatter();
+
     ObjectMapper objectMapper =
             new ObjectMapper(); // Look into objectMapper.configure(Feature.AUTO_CLOSE_SOURCE, true)
     private final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
+
+    private JacksonFormatter() {}
+
+    public static JacksonFormatter getInstance() {
+        return INSTANCE;
+    }
 
     @Override
     public <T> T convertToObject(String input, Class<T> clazz) throws FormatterProcessingException {
