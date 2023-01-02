@@ -1,10 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.etor.order;
 
-import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import javax.inject.Inject;
 
 /**
  * Creates an in-memory representation of an order to be ingested by the system, and return response
@@ -13,8 +13,8 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 public class OrderController {
 
     private static final OrderController ORDER_CONTROLLER = new OrderController();
-    private Formatter formatter = ApplicationContext.getImplementation(Formatter.class);
-    private final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
+    @Inject Formatter formatter;
+    @Inject Logger logger;
 
     private OrderController() {}
 
@@ -23,13 +23,13 @@ public class OrderController {
     }
 
     public Order parseOrder(DomainRequest request) {
-        LOGGER.logInfo("Parsing order...");
+        logger.logInfo("Parsing order...");
         Order order;
 
         try {
             order = formatter.convertToObject(request.getBody(), Order.class);
         } catch (FormatterProcessingException e) {
-            LOGGER.logError("Unable to convert request body to order object");
+            logger.logError("Unable to convert request body to order object");
             throw new RuntimeException(e);
         }
         return order;
@@ -42,7 +42,7 @@ public class OrderController {
         try {
             outputMessage = formatter.convertToString(orderMessage.generateMessage());
         } catch (FormatterProcessingException e) {
-            LOGGER.logError("Error constructing order message", e);
+            logger.logError("Error constructing order message", e);
             throw new RuntimeException(e);
         }
 
