@@ -66,7 +66,7 @@ class OrderControllerTest extends Specification {
 
 
         when:
-        def orderMessage = orderController.constructOrderMessage(order)
+        def orderMessage = orderController.constructResponse(order)
 
         then:
         expected == orderMessage

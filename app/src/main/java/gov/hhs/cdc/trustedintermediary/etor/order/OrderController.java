@@ -1,9 +1,11 @@
 package gov.hhs.cdc.trustedintermediary.etor.order;
 
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import java.util.Map;
 import javax.inject.Inject;
 
 /**
@@ -32,25 +34,23 @@ public class OrderController {
             logger.logError("Unable to convert request body to order object");
             throw new RuntimeException(e);
         }
+
         return order;
     }
 
-    public String constructOrderMessage(Order order) {
-        String outputMessage;
-        OrderMessage orderMessage = new OrderMessage(order);
+    public DomainResponse constructResponse(OrderMessage orderMessage) {
+        var response = new DomainResponse(200);
 
         try {
-            outputMessage = formatter.convertToString(orderMessage.generateMessage());
+            var responseBody = formatter.convertToString(orderMessage);
+            response.setBody(responseBody);
         } catch (FormatterProcessingException e) {
             logger.logError("Error constructing order message", e);
             throw new RuntimeException(e);
         }
 
-        return outputMessage;
-    }
+        response.setHeaders(Map.of("Content-Type", "application/json"));
 
-    public boolean isBodyValid(String body) {
-
-        return (body.isBlank()) ? false : true;
+        return response;
     }
 }

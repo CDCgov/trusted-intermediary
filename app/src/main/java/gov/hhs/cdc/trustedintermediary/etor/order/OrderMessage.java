@@ -1,10 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.etor.order;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
-import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
-import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import java.awt.*;
+import javax.annotation.Nonnull;
 
 public class OrderMessage {
     private String id;
@@ -12,10 +10,8 @@ public class OrderMessage {
     private String createdAt;
     private String client;
     private String content;
-    private final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
-    private Formatter formatter = ApplicationContext.getImplementation(Formatter.class);
 
-    public OrderMessage() {}
+    private final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
 
     public OrderMessage(
             String id, String destination, String createdAt, String client, String content) {
@@ -26,14 +22,12 @@ public class OrderMessage {
         setContent(content);
     }
 
-    public OrderMessage(Order order) {
-        if (order != null) {
-            setId(order.getId());
-            setDestination(order.getDestination());
-            setCreatedAt(order.getCreatedAt());
-            setClient(order.getClient());
-            setContent(order.getContent());
-        }
+    public OrderMessage(@Nonnull Order order) {
+        setId(order.getId());
+        setDestination(order.getDestination());
+        setCreatedAt(order.getCreatedAt());
+        setClient(order.getClient());
+        setContent(order.getContent());
     }
 
     public String getClient() {
@@ -74,25 +68,6 @@ public class OrderMessage {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public String generateMessage() {
-        OrderMessage tempOrderMessage = new OrderMessage();
-        checkAndLogMissingFields();
-        tempOrderMessage.setDestination(this.destination);
-        tempOrderMessage.setId(this.id);
-        tempOrderMessage.setCreatedAt(this.createdAt);
-        tempOrderMessage.setClient(this.client);
-        tempOrderMessage.setContent(this.content);
-        LOGGER.logInfo("Generating order message...");
-
-        try {
-            return formatter.convertToString(this);
-        } catch (FormatterProcessingException e) {
-            LOGGER.logWarning("Formatter was unable to convert orderMessage object to string");
-
-            throw new RuntimeException(e);
-        }
     }
 
     private void checkAndLogMissingFields() {

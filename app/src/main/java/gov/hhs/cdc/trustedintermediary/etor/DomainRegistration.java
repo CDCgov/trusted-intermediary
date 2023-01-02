@@ -5,8 +5,8 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint;
-import gov.hhs.cdc.trustedintermediary.etor.order.Order;
 import gov.hhs.cdc.trustedintermediary.etor.order.OrderController;
+import gov.hhs.cdc.trustedintermediary.etor.order.OrderMessage;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.Map;
 import java.util.function.Function;
@@ -27,35 +27,14 @@ public class DomainRegistration implements DomainConnector {
     }
 
     DomainResponse handleOrder(DomainRequest request) {
-        var response = new DomainResponse(200);
-        Order order = null;
 
-        // TODO request validation
-        LOGGER.logInfo("Validating request...");
-        var validBody = orderController.isBodyValid(request.getBody());
-        if (!validBody) {
-            response.setStatusCode(400);
-            LOGGER.logWarning("Request body is empty, status code: 400");
-        }
-        // TODO request processing
+        LOGGER.logInfo("Parsing request...");
+        var order = orderController.parseOrder(request);
 
-        if (validBody) {
-            LOGGER.logInfo("Processing request...");
-            order = processRequest(request);
-        }
-        // TODO response, include message
+        OrderMessage orderMessage = new OrderMessage(order);
 
-        var orderMessage = generateOrderMessage(order);
-        response.setBody(orderMessage);
+        LOGGER.logInfo("Constructing response...");
 
-        return response;
-    }
-
-    private String generateOrderMessage(Order order) {
-        return orderController.constructOrderMessage(order);
-    }
-
-    private Order processRequest(DomainRequest request) {
-        return orderController.parseOrder(request);
+        return orderController.constructResponse(orderMessage);
     }
 }
