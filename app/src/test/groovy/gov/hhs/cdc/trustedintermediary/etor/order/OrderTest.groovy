@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-class OrderTest extends Specification{
+class OrderTest extends Specification {
 
     def "test getters and setters"() {
         when:
