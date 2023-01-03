@@ -11,6 +11,9 @@ public class Order {
     private String client;
     private String content;
 
+    // for serialization
+    public Order() {}
+
     // Ideal for testing
     public Order(String id, String destination, String createdAt, String client, String content) {
         setId(id);
