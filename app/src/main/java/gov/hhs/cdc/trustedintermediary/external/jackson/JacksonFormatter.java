@@ -1,7 +1,10 @@
-package gov.hhs.cdc.trustedintermediary.wrappers;
+package gov.hhs.cdc.trustedintermediary.external.jackson;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
+import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import javax.inject.Inject;
 
 public class JacksonFormatter implements Formatter {

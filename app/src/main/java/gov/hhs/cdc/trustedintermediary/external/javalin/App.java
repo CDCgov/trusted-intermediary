@@ -2,8 +2,8 @@ package gov.hhs.cdc.trustedintermediary.external.javalin;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
+import gov.hhs.cdc.trustedintermediary.external.jackson.JacksonFormatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
-import gov.hhs.cdc.trustedintermediary.wrappers.JacksonFormatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.Slf4jLogger;
 import io.javalin.Javalin;

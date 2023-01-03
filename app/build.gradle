@@ -95,7 +95,10 @@ tasks.named('test') {
     useJUnitPlatform()
 
     jacoco {
-        excludes = ['**/javalin/App*']
+        excludes = [
+            '**/javalin/App*',
+            '**/jackson/JacksonFormatter*',
+        ]
     }
 }
 
