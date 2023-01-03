@@ -1,12 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.order
 
 import gov.hhs.cdc.trustedintermediary.PojoTestUtils
-import gov.hhs.cdc.trustedintermediary.context.ApplicationContext
-import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.wrappers.Formatter
-import gov.hhs.cdc.trustedintermediary.external.jackson.JacksonFormatter
-import gov.hhs.cdc.trustedintermediary.wrappers.Logger
-import gov.hhs.cdc.trustedintermediary.external.slf4j.Slf4jLogger
 import spock.lang.Specification
 
 import java.time.LocalDateTime
@@ -14,13 +8,6 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 class OrderTest extends Specification{
-
-    def setup() {
-        println('Setting up test data...')
-        TestApplicationContext.reset()
-        ApplicationContext.register(Logger.class, Slf4jLogger.getLogger())
-        ApplicationContext.register(Formatter.class, new JacksonFormatter())
-    }
 
     def "test getters and setters"() {
         when:
@@ -30,18 +17,29 @@ class OrderTest extends Specification{
         noExceptionThrown()
     }
 
-    def "test constructor"() {
+    def "test default constructor"() {
+        when:
+        def order = new Order()
+
+        then:
+        order.getId() == null
+        order.getDestination() == null
+        order.getClient() == null
+        order.getContent() == null
+        order.getCreatedAt() == null
+    }
+
+    def "test argument constructor"() {
         given:
         def id = "12345werty"
         def destination = "fake lab"
         def client = "fake hospital"
         def body = "lab order"
         def createdAt = LocalDateTime.now(ZoneId.of("UTC"))
-        def dtFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm")
-        def formattedTimeDate = createdAt.format(dtFormatter)
+        def formattedTimeDate = createdAt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
 
         when:
-        def order = new Order(id,destination,formattedTimeDate,client,body)
+        def order = new Order(id, destination, formattedTimeDate, client, body)
 
         then:
         order.getId() == id
