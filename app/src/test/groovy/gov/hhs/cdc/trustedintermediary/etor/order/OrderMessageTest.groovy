@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.order
 
 import gov.hhs.cdc.trustedintermediary.PojoTestUtils
-import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import spock.lang.Specification
 
 import java.time.LocalDateTime
@@ -9,10 +8,6 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 class OrderMessageTest extends Specification{
-    def setup() {
-        TestApplicationContext.reset()
-        TestApplicationContext.init()
-    }
 
     def "test getters and setters"() {
         when:
