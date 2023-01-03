@@ -98,6 +98,7 @@ tasks.named('test') {
         excludes = [
             '**/javalin/App*',
             '**/jackson/JacksonFormatter*',
+            '**/slf4j/Slf4jLogger*',
         ]
     }
 }
