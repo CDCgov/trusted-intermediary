@@ -3,12 +3,9 @@ package gov.hhs.cdc.trustedintermediary.etor.order
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter
+import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException
 import gov.hhs.cdc.trustedintermediary.wrappers.JacksonFormatter
 import spock.lang.Specification
-
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 class OrderControllerTest extends Specification {
 
@@ -24,10 +21,10 @@ class OrderControllerTest extends Specification {
 
         def formatter = Mock(JacksonFormatter)
         formatter.convertToObject(_ as String, _ as Class) >> new Order(mockOrderId, "Massachusetts", "2022-12-21T08:34:27Z", "MassGeneral", "NBS panel for Clarus the DogCow")
+        TestApplicationContext.register(Formatter, formatter)
 
         def request = new DomainRequest()
 
-        TestApplicationContext.register(Formatter, formatter)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -38,26 +35,73 @@ class OrderControllerTest extends Specification {
         parsedOrder.getId() == mockOrderId
     }
 
-    def "constructOrderMessage works"() {
-
+    def "parseOrder fails by the formatter"() {
         given:
-        def orderId = "1234abcd"
-        def destination = "fake lab"
-        def client = "fake client"
-        def content = "MSH|lab order"
-        LocalDateTime createAt = LocalDateTime.now(ZoneId.of("UTC"))
-        DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm")
-        def formattedDateTime = createAt.format(dateTimeFormat)
-        Order order = new Order(orderId, destination, createAt.format(dateTimeFormat), client, content)
-        def orderController = OrderController.getInstance()
+        def formatter = Mock(JacksonFormatter)
+        formatter.convertToObject(_ as String, _ as Class) >> { throw new FormatterProcessingException("unable to format or whatever") }
+        TestApplicationContext.register(Formatter, formatter)
 
-        def expected = """\"{\\"id\\":\\"1234abcd\\",\\"destination\\":\\"fake lab\\",\\"createdAt\\":\\"$formattedDateTime\\",\\"client\\":\\"fake client\\",\\"content\\":\\"MSH|lab order\\"}\""""
+        def request = new DomainRequest()
 
+        TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def orderMessage = orderController.constructResponse(order)
+        OrderController.getInstance().parseOrder(request)
 
         then:
-        expected == orderMessage
+        thrown(RuntimeException)
+    }
+
+    def "constructResponse works"() {
+
+        given:
+        def mockBody = "DogCow goes Moof"
+
+        def formatter = Mock(JacksonFormatter)
+        formatter.convertToString(_ as OrderMessage) >> mockBody
+        TestApplicationContext.register(Formatter, formatter)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def response = OrderController.getInstance().constructResponse(new OrderMessage("asdf-12341-jkl-7890", "Massachusetts", "2022-12-21T08:34:27Z", "MassGeneral", "NBS panel for Clarus the DogCow"))
+
+        then:
+        response.getBody() == mockBody
+        response.getStatusCode() == 200
+        response.getHeaders().get(OrderController.CONTENT_TYPE_LITERAL) == OrderController.APPLICATION_JSON_LITERAL
+    }
+
+    def "parseOrder fails by the formatter"() {
+        given:
+        def formatter = Mock(JacksonFormatter)
+        formatter.convertToObject(_ as String, _ as Class) >> { throw new FormatterProcessingException("unable to format or whatever") }
+        TestApplicationContext.register(Formatter, formatter)
+
+        def request = new DomainRequest()
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        OrderController.getInstance().parseOrder(request)
+
+        then:
+        thrown(RuntimeException)
+    }
+
+    def "constructResponse fails to make the JSON"() {
+
+        given:
+        def formatter = Mock(JacksonFormatter)
+        formatter.convertToString(_ as OrderMessage) >> { throw new FormatterProcessingException("couldn't make the JSON") }
+        TestApplicationContext.register(Formatter, formatter)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        OrderController.getInstance().constructResponse(new OrderMessage("asdf-12341-jkl-7890", "Massachusetts", "2022-12-21T08:34:27Z", "MassGeneral", "NBS panel for Clarus the DogCow"))
+
+        then:
+        thrown(RuntimeException)
     }
 }

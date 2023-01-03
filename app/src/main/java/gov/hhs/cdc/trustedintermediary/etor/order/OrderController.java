@@ -15,8 +15,12 @@ import javax.inject.Inject;
 public class OrderController {
 
     private static final OrderController ORDER_CONTROLLER = new OrderController();
+
     @Inject Formatter formatter;
     @Inject Logger logger;
+
+    static final String CONTENT_TYPE_LITERAL = "Content-Type";
+    static final String APPLICATION_JSON_LITERAL = "application/json";
 
     private OrderController() {}
 
@@ -25,7 +29,7 @@ public class OrderController {
     }
 
     public Order parseOrder(DomainRequest request) {
-        logger.logInfo("Parsing order...");
+        logger.logInfo("Parsing order");
         Order order;
 
         try {
@@ -39,6 +43,7 @@ public class OrderController {
     }
 
     public DomainResponse constructResponse(OrderMessage orderMessage) {
+        logger.logInfo("Constructing the response");
         var response = new DomainResponse(200);
 
         try {
@@ -49,7 +54,7 @@ public class OrderController {
             throw new RuntimeException(e);
         }
 
-        response.setHeaders(Map.of("Content-Type", "application/json"));
+        response.setHeaders(Map.of(CONTENT_TYPE_LITERAL, APPLICATION_JSON_LITERAL));
 
         return response;
     }
