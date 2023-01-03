@@ -7,6 +7,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import javax.inject.Inject;
 
+/** A {@link Formatter} that converts to and from JSON using the Jackson library. */
 public class JacksonFormatter implements Formatter {
 
     private static final JacksonFormatter INSTANCE = new JacksonFormatter();

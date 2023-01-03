@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.order;
 
+/** Represents an ETOR order. */
 public class Order {
     private String id;
     private String destination;

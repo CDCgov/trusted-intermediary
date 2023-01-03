@@ -2,6 +2,10 @@ package gov.hhs.cdc.trustedintermediary.etor.order;
 
 import javax.annotation.Nonnull;
 
+/**
+ * Contains similar information for the order that is sent back to the client as confirmation that
+ * an order was ingested.
+ */
 public class OrderMessage {
 
     private String id;
