@@ -38,7 +38,7 @@ class OrderControllerTest extends Specification {
     def "parseOrder fails by the formatter"() {
         given:
         def formatter = Mock(JacksonFormatter)
-        formatter.convertToObject(_ as String, _ as Class) >> { throw new FormatterProcessingException("unable to format or whatever") }
+        formatter.convertToObject(_ as String, _ as Class) >> { throw new FormatterProcessingException("unable to format or whatever", new Exception()) }
         TestApplicationContext.register(Formatter, formatter)
 
         def request = new DomainRequest()
@@ -75,7 +75,7 @@ class OrderControllerTest extends Specification {
     def "parseOrder fails by the formatter"() {
         given:
         def formatter = Mock(JacksonFormatter)
-        formatter.convertToObject(_ as String, _ as Class) >> { throw new FormatterProcessingException("unable to format or whatever") }
+        formatter.convertToObject(_ as String, _ as Class) >> { throw new FormatterProcessingException("unable to format or whatever", new Exception()) }
         TestApplicationContext.register(Formatter, formatter)
 
         def request = new DomainRequest()
@@ -93,7 +93,7 @@ class OrderControllerTest extends Specification {
 
         given:
         def formatter = Mock(JacksonFormatter)
-        formatter.convertToString(_ as OrderMessage) >> { throw new FormatterProcessingException("couldn't make the JSON") }
+        formatter.convertToString(_ as OrderMessage) >> { throw new FormatterProcessingException("couldn't make the JSON", new Exception()) }
         TestApplicationContext.register(Formatter, formatter)
 
         TestApplicationContext.injectRegisteredImplementations()

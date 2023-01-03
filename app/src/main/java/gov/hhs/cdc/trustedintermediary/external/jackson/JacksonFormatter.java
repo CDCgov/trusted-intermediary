@@ -26,9 +26,9 @@ public class JacksonFormatter implements Formatter {
         try {
             return objectMapper.readValue(input, clazz);
         } catch (JsonProcessingException e) {
-            logger.logError("Jackson's objectMapper failed to convert JSON to object", e);
-            throw new FormatterProcessingException(
-                    "Jackson's objectMapper failed to convert JSON to object", e);
+            String errorMessage = "Jackson's objectMapper failed to convert JSON to object";
+            logger.logError(errorMessage, e);
+            throw new FormatterProcessingException(errorMessage, e);
         }
     }
 
@@ -38,9 +38,9 @@ public class JacksonFormatter implements Formatter {
         try {
             return objectMapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
-            logger.logError("Jackson's objectMapper failed to convert object to JSON", e);
-            throw new FormatterProcessingException(
-                    "Jackson's objectMapper failed to convert object to JSON", e);
+            String errorMessage = "Jackson's objectMapper failed to convert object to JSON";
+            logger.logError(errorMessage, e);
+            throw new FormatterProcessingException(errorMessage, e);
         }
     }
 }
