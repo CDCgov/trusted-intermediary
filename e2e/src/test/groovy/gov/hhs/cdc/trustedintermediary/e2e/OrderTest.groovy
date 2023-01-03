@@ -6,7 +6,7 @@ class OrderTest extends Specification {
 
     def "order message is returned from demo ETOR order endpoint"() {
         given:
-        def expected = """{"id":"an ID","destination":"Massachusetts","createdAt":"2022-12-21T08:34:27Z","client":"MassGeneral","content":"missing content"}"""
+        def expected = """{"id":"an ID","destination":"Massachusetts","createdAt":"2022-12-21T08:34:27Z","client":"MassGeneral","content":null}"""
 
         when:
         def responseBody = Client.post("/v1/etor/order","""{
