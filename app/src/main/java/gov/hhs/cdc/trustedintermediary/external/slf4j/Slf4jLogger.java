@@ -1,5 +1,6 @@
-package gov.hhs.cdc.trustedintermediary.wrappers;
+package gov.hhs.cdc.trustedintermediary.external.slf4j;
 
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import org.slf4j.LoggerFactory;
 
 /**

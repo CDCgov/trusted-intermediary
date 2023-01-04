@@ -3,7 +3,7 @@ set -e
 
 start_api() {
     echo 'Starting API'
-    ./gradlew --no-daemon clean app:run &
+    ./gradlew --no-daemon app:clean app:run &
     export API_PID="${!}"
     echo "API starting at PID ${API_PID}"
 }
@@ -27,7 +27,7 @@ wait_for_api() {
 
 run_tests() {
     echo 'Running the end-to-end tests'
-    ./gradlew --no-daemon clean e2e:test
+    ./gradlew --no-daemon e2e:clean e2e:test
 }
 
 cleanup() {
