@@ -4,7 +4,7 @@ Date: 2022-01-04
 
 ## Decision
 
-We will use the [Docker](https://docs.docker.com/get-started/overview/) for containerization of our application.
+We will use [Docker](https://docs.docker.com/get-started/overview/) for containerization of our application.
 
 ## Status
 
@@ -22,4 +22,4 @@ Docker is an open platform for developing, shipping, and running applications. D
 
 ### Related Issues
 
-- #76
+- [story/76/Containerize application with docker](https://app.zenhub.com/workspaces/cdc-ti-633de70d939f6c00155f3722/issues/gh/cdcgov/trusted-intermediary/76)
