@@ -42,7 +42,7 @@ Once compiled, the built artifact is _TBD_.
 To run the unit tests, execute...
 
 ```shell
-./gradlew clean app:test
+./gradlew app:clean app:test
 ```
 
 #### End-to-end Tests
@@ -52,7 +52,7 @@ End-to-end tests are meant to interact and assert the overall flow of the API is
 To run them, execute...
 
 ```shell
-./gradlew clean e2e:test
+./gradlew e2e:clean e2e:test
 ```
 
 That requires the API to be running already.  To help streamline the execution of this flow, a helper Bash script can be executed...
@@ -68,32 +68,27 @@ The `test` directory contains the tests.  The `main` directory contains our cust
 
 #### Load Testing
 
-Load tests are completed with [Locust.io](https://docs.locust.io/en/stable/installation.html). To run load tests:
-
-Install Python (3.7 or later), then...
-
-```shell
-pip3 install locust
-```
-
-You can quickly validate the install with `locust -V`.
-
-A *locustfile.py* is required to run the tests and there is currently one located
-in `/operations`.
-
-Run the application, then...
-
-In a terminal, navigate to the directory *locustfile.py* is in and run
+Load tests are completed with [Locust.io](https://docs.locust.io/en/stable/installation.html).  Run the load tests by
+running...
 
 ```shell
-locust
+./load-execute.sh
 ```
 
-The terminal will start a local web interface and you can enter
+This will run the API for you, so no need to run it manually.
+
+The `locustfile.py` that specifies the load test is located at
+[`./operations/locustfile.py`](./operations/locustfile.py).
+
+If you want to run the load test in an interactive mode, run...
+
+```shell
+locust -f ./operations/locustfile.py
+```
+
+The terminal will start a local web interface, and you can enter
 the swarm parameters for the test and the local url where the app is running
-(usually http://localhost:8080).
-
-You can also set time limits for the tests under 'Advanced Settings'.
+(usually http://localhost:8080).  You can also set time limits for the tests under 'Advanced Settings'.
 
 ### Deploying
 
