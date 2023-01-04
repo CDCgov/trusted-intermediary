@@ -1,5 +1,5 @@
 import time
-from locust import HttpUser, task
+from locust import HttpUser, task, events
 
 
 class SampleUser(HttpUser):
@@ -9,21 +9,19 @@ class SampleUser(HttpUser):
 
     @task
     def latency_get_health(self):
-        MAX_TIME = 1.000
-        OVER_ONE_SECOND = "Response took longer than 1000 ms"
-        with self.client.get("/health", catch_response=True) as response:
-            if response.elapsed.total_seconds() < MAX_TIME:
-                response.success()
-            elif response.elapsed.total_seconds() >= MAX_TIME:
-                response.failure(OVER_ONE_SECOND)
+        self.client.get("/health")
 
     @task(5)  # this task will get called 5x more than the other
     # this task will get called 5x more than the other
     def latency_post_v1_etor_orders(self):
-        MAX_TIME = 1.000
-        OVER_ONE_SECOND = "Response took longer than 1000 ms"
-        with self.client.post("/v1/etor/order", catch_response=True) as response:
-            if response.elapsed.total_seconds() < MAX_TIME:
-                response.success()
-            elif response.elapsed.total_seconds() >= MAX_TIME:
-                response.failure(OVER_ONE_SECOND)
+        self.client.post("/v1/etor/order")
+
+
+@events.quitting.add_listener
+def assert_latency_stats(environment):
+    if environment.stats.total.fail_ratio > 0.01:
+        print("Test failed due to failure ratio > 1%")
+        environment.process_exit_code = 1
+    elif environment.stats.total.get_response_time_percentile(0.95) > 1000:
+        print("Test failed due to 95th percentile response time > 1000 ms")
+        environment.process_exit_code = 1
