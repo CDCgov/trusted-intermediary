@@ -14,7 +14,12 @@ class SampleUser(HttpUser):
     @task(5)  # this task will get called 5x more than the other
     # this task will get called 5x more than the other
     def latency_post_v1_etor_orders(self):
-        self.client.post("/v1/etor/order")
+        self.client.post("/v1/etor/order", json={
+            "id": "asdf-12341-jkl-7890",
+            "destination": "Massachusetts",
+            "createdAt": "2022-12-21T08:34:27Z",
+            "client": "MassGeneral",
+        })
 
 
 @events.quitting.add_listener
