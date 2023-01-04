@@ -17,6 +17,7 @@ import java.util.function.Function
 class DomainsRegistrationTest extends Specification {
 
     def setup() {
+        TestApplicationContext.reset()
         TestApplicationContext.init()
     }
 

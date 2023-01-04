@@ -1,16 +1,19 @@
 package gov.hhs.cdc.trustedintermediary.etor
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
+import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
+import gov.hhs.cdc.trustedintermediary.etor.order.Order
 import gov.hhs.cdc.trustedintermediary.etor.order.OrderController
+import gov.hhs.cdc.trustedintermediary.etor.order.OrderMessage
 import spock.lang.Specification
 
 class DomainRegistrationTest extends Specification {
 
     def setup() {
-        println('Setting up test data...')
         TestApplicationContext.reset()
+        TestApplicationContext.init()
     }
 
     def "domain registration has endpoints"() {
@@ -26,22 +29,29 @@ class DomainRegistrationTest extends Specification {
         endpoints.get(specifiedEndpoint) != null
     }
 
-    def "handles an order"() {
+    def "stitches the order parsing to the response construction"() {
         given:
         def domainRegistration = new DomainRegistration()
+
+        def mockOrderController = Mock(OrderController)
+
+        def mockOrderId = "asdf-12341-jkl-7890"
+
+        mockOrderController.parseOrder(_ as DomainRequest) >> new Order(mockOrderId, "Massachusetts", "2022-12-21T08:34:27Z", "MassGeneral", "NBS panel for Clarus the DogCow")
+        mockOrderController.constructResponse(_ as OrderMessage) >> new DomainResponse(418)
+
         def domainRequest = new DomainRequest()
-        def orderControllerMock = Mock(OrderController)
-        def mockParsedBody = "DogCow"
-        orderControllerMock.parseOrder(_ as String) >> mockParsedBody
-        TestApplicationContext.register(OrderController,orderControllerMock)
-        TestApplicationContext.register(DomainRegistration,domainRegistration)
+
+        TestApplicationContext.register(DomainRegistration, domainRegistration)
+        TestApplicationContext.register(OrderController, mockOrderController)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
         def response = domainRegistration.handleOrder(domainRequest)
 
         then:
-        response.getStatusCode() < 300
-        response.getBody() == mockParsedBody
+        1 * mockOrderController.constructResponse(_ as OrderMessage) >> { OrderMessage orderMessage ->
+            assert orderMessage.id == mockOrderId
+        }
     }
 }
