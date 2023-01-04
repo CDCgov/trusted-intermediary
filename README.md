@@ -30,7 +30,7 @@ The additional requirements needed to contribute towards development are...
 To compile the application, execute...
 
 ```shell
-./gradlew clean build
+./gradlew shadowJar
 ```
 
 Once compiled, the built artifact is _TBD_.
@@ -104,17 +104,18 @@ a new Azure environment.
 
 1. Create a resource group: `cdcti-terraform`.
 2. Create a storage account: `cdctiterraform` (with `cdcti-terraform` as the resource group).
-3. Within Azure Active Directory...
+3. Within the new storage account, create a Container named "tfstate"
+4. Within Azure Active Directory...
    - Create an App Registration: `cdcti-github`
    - Within your Subscription, create a Service Account and assign the Contributor role
-   - Add two federated credentials for:
-     - `repo:CDCgov/trusted-intermediary:ref:refs/heads/main`
-     - Any other subject required for the GitHub Actions to be trusted.
-4. Add secrets to your GitHub Actions.
+   - Add federated credentials for:
+     - `repo:CDCgov/trusted-intermediary:ref:refs/heads/main` (for terraform apply)
+     - `repo:CDCgov/trusted-intermediary:environment:staging` (for staging webapp deploy)
+     - And presumably other repo paths needed in the future for other environments
+5. Add secrets to your GitHub Actions.
    - `AZURE_TENANT_ID` with the tenant ID from Azure Active Directory.
    - `AZURE_SUBSCRIPTION_ID` with the ID from the subscription that everything should be deployed into.
    - `AZURE_CLIENT_ID` with the ID of the App Registration created previously.
-
 
 
 ### Pre-Commit Hooks
