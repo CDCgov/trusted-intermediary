@@ -22,4 +22,4 @@ Docker is an open platform for developing, shipping, and running applications. D
 
 ### Related Issues
 
-- [story/76/Containerize application with docker](https://app.zenhub.com/workspaces/cdc-ti-633de70d939f6c00155f3722/issues/gh/cdcgov/trusted-intermediary/76)
+- #76
