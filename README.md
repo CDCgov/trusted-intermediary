@@ -30,7 +30,7 @@ The additional requirements needed to contribute towards development are...
 To compile the application, execute...
 
 ```shell
-./gradlew clean build
+./gradlew shadowJar
 ```
 
 Once compiled, the built artifact is _TBD_.
