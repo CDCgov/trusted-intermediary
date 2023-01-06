@@ -2,13 +2,13 @@ name: ZAP
 
 on:
   push:
-    branches: [ story/77/dast/jorg3 ]
+    branches: [ master ]
 
 jobs:
   build:
     runs-on: ubuntu-18.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
       - name: Setup Python 2.7.18
         uses: actions/setup-python@v1
         with:
@@ -19,19 +19,6 @@ jobs:
           pip install requests python-owasp-zap-v2.4
       - name: Get working directory
         run: echo $(PWD)
-
-      - uses: actions/setup-java@v3
-        with:
-          java-version: 17
-          distribution: corretto
-          cache: gradle
-
-      - name: Build JAR
-        run: ./gradlew clean :app:shadowJar
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
       - name: Build Image
         run: docker build -t sample-app .
       - name: Install OWASP ZAP
@@ -64,7 +51,6 @@ jobs:
           time: '20s'
       - name: Run Test Automation with ZAP
         run: |
-          mkdir -p ./script
           cd ./script/
           python zap.py
       - name: "Upload Report"
