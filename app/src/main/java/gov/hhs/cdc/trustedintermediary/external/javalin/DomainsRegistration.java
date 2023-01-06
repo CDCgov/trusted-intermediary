@@ -1,9 +1,11 @@
 package gov.hhs.cdc.trustedintermediary.external.javalin;
 
+import gov.hhs.cdc.trustedintermediary.OpenApi;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
+import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
@@ -40,6 +42,8 @@ public class DomainsRegistration {
         registerDomainsWithApplicationContext(instantiatedDomains);
 
         registerDomainsHandlers(app, instantiatedDomains);
+
+        registerOpenApi(app, Set.of());
     }
 
     static void registerDomainsWithApplicationContext(Set<DomainConnector> domains) {
@@ -64,6 +68,11 @@ public class DomainsRegistration {
                                                             + ", endpoint: "
                                                             + endpoint.path());
                                         }));
+    }
+
+    static void registerOpenApi(Javalin app, Set<HttpEndpoint> endpoints) {
+        Set<String> urls = endpoints.stream().map(HttpEndpoint::path).collect(Collectors.toSet());
+        app.get("/openapi", ctx -> ctx.result(new OpenApi().generateApiDocumentation(urls)));
     }
 
     static DomainConnector constructNewDomainConnector(Class<? extends DomainConnector> clazz) {

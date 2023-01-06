@@ -5,11 +5,11 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
+import java.util.Set;
 
 public class OpenApi {
 
-    public String generateApiDocumentation(List<String> urls) {
+    public String generateApiDocumentation(Set<String> urls) {
         String openApiDocumentation = getBaselineDocumentation();
 
         openApiDocumentation += generatePerEndpointDocumentation(urls);
@@ -36,7 +36,7 @@ public class OpenApi {
         return baselineDocumentation;
     }
 
-    private String generatePerEndpointDocumentation(final List<String> urls) {
+    private String generatePerEndpointDocumentation(final Set<String> urls) {
         return "";
     }
 }
