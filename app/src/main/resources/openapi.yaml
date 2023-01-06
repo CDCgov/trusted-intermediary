@@ -27,7 +27,6 @@ paths:
   /v1/etor/order:
     post:
       summary: forwards an ETOR order to a lab
-      description: ''
       requestBody:
         description: an order
         content:
@@ -49,7 +48,7 @@ components:
       properties:
         id:
           type: string
-          example: "10"
+          example: 10
         destination:
           type: string
           example: Massachusetts
@@ -68,7 +67,7 @@ components:
       properties:
         id:
           type: string
-          example: "10"
+          example: 10
         destination:
           type: string
           example: Massachusetts
