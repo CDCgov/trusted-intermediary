@@ -1,0 +1,26 @@
+openapi: 3.0.3
+info:
+  title: Trusted Intermediary
+  description: A service that intermediates healthcare messages between a specific sender and receiver.
+  contact:
+    email: cdc-ti@flexion.us
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.0.1
+externalDocs:
+  description: Trusted Intermediary Repository
+  url: https://github.com/CDCgov/trusted-intermediary
+paths:
+  /health:
+    get:
+      summary: Returns operational status
+      responses:
+        '200':
+          description: the service is operational
+          content:
+            text/plain:
+              example: Operational
+              schema:
+                type: string
+                format: the string literal "Operational"
