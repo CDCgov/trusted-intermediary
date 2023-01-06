@@ -2,7 +2,7 @@ name: ZAP
 
 on:
   push:
-    branches: [ master ]
+    branches: [ story/77/dast/jorg3 ]
 
 jobs:
   build:
