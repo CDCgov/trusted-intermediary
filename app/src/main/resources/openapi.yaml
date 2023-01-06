@@ -1,16 +1,16 @@
 openapi: 3.0.3
 info:
-  title: Trusted Intermediary - OpenAPI 3.0
-  description: TBD
+  title: Trusted Intermediary
+  description: A service that intermediates healthcare messages between a specific sender and receiver.
   contact:
-    email: enter_our_email@gg.eff
+    email: cdc-ti@flexion.us
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: 0.0.1
 externalDocs:
-  description: Find out more about Trusted Intermediary
-  url: http://what_is_th_link.io
+  description: Trusted Intermediary Repository
+  url: https://github.com/CDCgov/trusted-intermediary
 paths:
   /health:
     get:
