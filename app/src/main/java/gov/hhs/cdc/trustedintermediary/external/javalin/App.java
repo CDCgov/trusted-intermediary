@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.javalin;
 
+import gov.hhs.cdc.trustedintermediary.OpenApi;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.external.jackson.JacksonFormatter;
@@ -7,6 +8,7 @@ import gov.hhs.cdc.trustedintermediary.external.slf4j.Slf4jLogger;
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import io.javalin.Javalin;
+import java.util.List;
 import java.util.Set;
 
 /** Creates the starting point of our API. Handles the registration of the domains. */
@@ -16,6 +18,7 @@ public class App {
         var app = Javalin.create().start(8080);
 
         app.get("/health", ctx -> ctx.result("Operational"));
+        app.get("/openapi", ctx -> ctx.result(new OpenApi().generateApiDocumentation(List.of())));
 
         registerClasses();
         registerDomains(app);
