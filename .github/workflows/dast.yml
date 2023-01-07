@@ -21,5 +21,4 @@ jobs:
       - name: ZAP Scan
         uses: zaproxy/action-full-scan@v0.4.0
         with:
-          run: ./gardlew :app:run
-          target: 'https://localhost:8080/v1/etor/order'
+          target: 'https://www.zaproxy.org'
