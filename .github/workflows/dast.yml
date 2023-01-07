@@ -1,24 +1,25 @@
-          name: ZAP
+name: ZAP
 
-          on:
-            push:
-              branches:
-                - story/77/dast/jorg3
-          jobs:
-            dast-testing:
-              name: dast
-              runs-on: ubuntu-latest
+on:
+  push:
+    branches:
+      - story/77/dast/jorg3
+jobs:
+  dast-testing:
+    name: dast
+    runs-on: ubuntu-latest
 
-              steps:
-                - uses: actions/checkout@v3
+    steps:
+      - uses: actions/checkout@v3
 
-                - uses: actions/setup-java@v3
-                  with:
-                    java-version: 17
-                    distribution: corretto
-                    cache: gradle
-                - name: ZAP Scan
-                  run: ./gradlew :app:run
-                  uses: zaproxy/action-full-scan@v0.4.0
-                  with:
-                    target: 'https://localhost:8080/v1/etor/order'
+      - uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: corretto
+          cache: gradle
+
+      - name: ZAP Scan
+        run: ./gradlew :app:run
+        uses: zaproxy/action-full-scan@v0.4.0
+        with:
+          target: 'https://localhost:8080/v1/etor/order'
