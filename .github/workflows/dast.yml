@@ -19,7 +19,7 @@ jobs:
           cache: gradle
 
       - name: ZAP Scan
-        run: ./gardlew :app:run
         uses: zaproxy/action-full-scan@v0.4.0
         with:
+          run: ./gardlew :app:run
           target: 'https://localhost:8080/v1/etor/order'
