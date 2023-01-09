@@ -12,6 +12,14 @@ jobs:
     runs-on: ubuntu-latest
     name: ZAP API Scan
     steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: corretto
+          cache: gradle
+
       - name: ShadowJar
         run: ./gradlew shadowJar
       - name: run app in container
