@@ -67,7 +67,7 @@ jobs:
         with:
           args: >
             -Dsonar.organization=cdcgov
-            -Dsonar.projectKey=trusted-intermediary
+            -Dsonar.projectKey=CDCgov_trusted-intermediary
 
   securityScanAnalyze:
     name: CodeQL Security Scan
