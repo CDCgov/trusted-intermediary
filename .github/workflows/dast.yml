@@ -22,8 +22,8 @@ jobs:
 
       - name: ShadowJar
         run: ./gradlew shadowJar
-      - name: run app
-        run: ./gradlew :app:run
+      - name: run app in container
+        run: docker compose up --build -d
 
       - name: Run e2e
         run: ./gradlew :e2e:test
