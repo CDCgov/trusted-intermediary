@@ -32,7 +32,7 @@ jobs:
         run: docker pull owasp/zap2docker-weekly
       - name: Run ZAP API Scan
         run: |
-          sudo docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-weekly zap-api-scan.py -t http://localhost:8080/v1/etor/order -f openapi
+          sudo docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-weekly zap-api-scan.py -t http://localhost:8080/v1/etor/order
 #      - name: "Upload Report"
 #        uses: actions/upload-artifact@v1
 #        with:
