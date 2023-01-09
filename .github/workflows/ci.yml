@@ -69,6 +69,7 @@ jobs:
             -Dsonar.organization=cdcgov
             -Dsonar.projectKey=CDCgov_trusted-intermediary
             -Dsonar.pullrequest.base=story-77-sonar
+            -X
 
   securityScanAnalyze:
     name: CodeQL Security Scan
