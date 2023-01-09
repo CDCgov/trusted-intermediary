@@ -24,15 +24,17 @@ jobs:
         run: ./gradlew shadowJar
       - name: run app in container
         run: docker compose up --build -d
-      - name: Checkout code
-        uses: actions/checkout@v2
+
+      - name: Run e2e
+        run: ./gradlew :e2e:test
+
       - name: Log current directory
         run: echo ${pwd}
       - name: Pull ZAP OWASP Image
         run: docker pull owasp/zap2docker-weekly
       - name: Run ZAP API Scan
         run: |
-          sudo docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-weekly zap-api-scan.py -t http://localhost:8080/v1/etor/order
+          sudo docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-weekly zap-api-scan.py -t http://localhost:8080/v1/etor/order -f openapi
 #      - name: "Upload Report"
 #        uses: actions/upload-artifact@v1
 #        with:
