@@ -12,6 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     name: ZAP API Scan
     steps:
+      - name: ShadowJar
+        run: ./gradlew shadowJar
+      - name: run app in container
+        run: docker compose up --build -d
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Log current directory
