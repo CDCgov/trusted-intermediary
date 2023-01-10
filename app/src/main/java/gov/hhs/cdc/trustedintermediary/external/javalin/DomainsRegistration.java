@@ -76,7 +76,12 @@ public class DomainsRegistration {
                         .map(DomainConnector::openApiSpecification)
                         .collect(Collectors.toSet());
         String fullOpenApiSpecification = OPEN_API.generateApiDocumentation(openApiSpecifications);
-        app.get("/openapi", ctx -> ctx.result(fullOpenApiSpecification));
+        app.get(
+                "/openapi",
+                ctx -> {
+                    ctx.header("Content-Type", "application/yaml");
+                    ctx.result(fullOpenApiSpecification);
+                });
     }
 
     static DomainConnector constructNewDomainConnector(Class<? extends DomainConnector> clazz) {
