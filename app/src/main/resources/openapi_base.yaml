@@ -24,3 +24,13 @@ paths:
               schema:
                 type: string
                 format: the string literal "Operational"
+  /openapi:
+    get:
+      summary: Gets this OpenAPI specification
+      responses:
+        '200':
+          description: The OpenAPI specification
+          content:
+            application/yaml:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/schemas/v3.0/schema.yaml'
