@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombiner;
+import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombinerException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -26,7 +27,13 @@ public class OpenApi {
     public String generateApiDocumentation(Set<String> openApiSpecifications) {
         openApiSpecifications.add(getBaselineDocumentation());
 
-        return YAML_COMBINER.combineYaml(openApiSpecifications);
+        try {
+            return YAML_COMBINER.combineYaml(openApiSpecifications);
+        } catch (YamlCombinerException e) {
+            assert false;
+        }
+        assert false;
+        return "";
     }
 
     private String getBaselineDocumentation() {

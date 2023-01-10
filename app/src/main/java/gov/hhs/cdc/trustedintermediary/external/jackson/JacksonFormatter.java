@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
-import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
-import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
-import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombiner;
+import gov.hhs.cdc.trustedintermediary.wrappers.*;
 import java.util.HashMap;
 import java.util.Set;
 import javax.inject.Inject;
@@ -57,23 +54,22 @@ public class JacksonFormatter implements Formatter, YamlCombiner {
     }
 
     @Override
-    public String combineYaml(final Set<String> yamlStrings) {
+    public String combineYaml(final Set<String> yamlStrings) throws YamlCombinerException {
         var mapOfMaps = new HashMap<>();
         var yamlObjectUpdater = YAML_OBJECT_MAPPER.readerForUpdating(mapOfMaps);
 
-        yamlStrings.forEach(
-                yaml -> {
-                    try {
-                        yamlObjectUpdater.readValue(yaml);
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+        for (String yaml : yamlStrings) {
+            try {
+                yamlObjectUpdater.readValue(yaml);
+            } catch (JsonProcessingException e) {
+                throw new YamlCombinerException("Unable to parse the YAML passed in", e);
+            }
+        }
 
         try {
             return YAML_OBJECT_MAPPER.writeValueAsString(mapOfMaps);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new YamlCombinerException("Unable to serialize combined YAML", e);
         }
     }
 }
