@@ -125,6 +125,7 @@ spotless {
 
 sonarqube {
     properties {
+        property "sonar.projectName", "Trusted Intermediary"
         property "sonar.projectKey", "trusted-intermediary"
         property "sonar.organization", "cdcgov"
         property "sonar.host.url", "https://sonarcloud.io"
