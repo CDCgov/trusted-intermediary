@@ -12,18 +12,6 @@ externalDocs:
   description: Trusted Intermediary Repository
   url: https://github.com/CDCgov/trusted-intermediary
 paths:
-  /health:
-    get:
-      summary: Returns operational status
-      responses:
-        '200':
-          description: the service is operational
-          content:
-            text/plain:
-              example: Operational
-              schema:
-                type: string
-                format: the string literal "Operational"
   /v1/etor/order:
     post:
       summary: forwards an ETOR order to a lab

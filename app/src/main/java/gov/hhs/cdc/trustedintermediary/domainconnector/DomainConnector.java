@@ -23,4 +23,6 @@ public interface DomainConnector {
      *     request comes in on the associated endpoint.
      */
     Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration();
+
+    String openApiSpecification();
 }

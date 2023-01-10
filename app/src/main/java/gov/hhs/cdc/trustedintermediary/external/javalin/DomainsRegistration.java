@@ -5,7 +5,6 @@ import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
-import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
@@ -25,6 +24,7 @@ public class DomainsRegistration {
 
     // not using @Inject because we are still bootstrapping the application context
     private static final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
+    private static final OpenApi OPEN_API = ApplicationContext.getImplementation(OpenApi.class);
 
     public static void registerDomains(
             Javalin app, Set<Class<? extends DomainConnector>> domainConnectors) {
@@ -43,7 +43,7 @@ public class DomainsRegistration {
 
         registerDomainsHandlers(app, instantiatedDomains);
 
-        registerOpenApi(app, Set.of());
+        registerOpenApi(app, instantiatedDomains);
     }
 
     static void registerDomainsWithApplicationContext(Set<DomainConnector> domains) {
@@ -70,9 +70,13 @@ public class DomainsRegistration {
                                         }));
     }
 
-    static void registerOpenApi(Javalin app, Set<HttpEndpoint> endpoints) {
-        Set<String> urls = endpoints.stream().map(HttpEndpoint::path).collect(Collectors.toSet());
-        app.get("/openapi", ctx -> ctx.result(new OpenApi().generateApiDocumentation(urls)));
+    static void registerOpenApi(Javalin app, Set<DomainConnector> domains) {
+        Set<String> openApiSpecifications =
+                domains.stream()
+                        .map(DomainConnector::openApiSpecification)
+                        .collect(Collectors.toSet());
+        String fullOpenApiSpecification = OPEN_API.generateApiDocumentation(openApiSpecifications);
+        app.get("/openapi", ctx -> ctx.result(fullOpenApiSpecification));
     }
 
     static DomainConnector constructNewDomainConnector(Class<? extends DomainConnector> clazz) {

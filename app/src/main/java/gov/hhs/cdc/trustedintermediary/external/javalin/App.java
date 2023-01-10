@@ -1,11 +1,13 @@
 package gov.hhs.cdc.trustedintermediary.external.javalin;
 
+import gov.hhs.cdc.trustedintermediary.OpenApi;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.external.jackson.JacksonFormatter;
 import gov.hhs.cdc.trustedintermediary.external.slf4j.Slf4jLogger;
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombiner;
 import io.javalin.Javalin;
 import java.util.Set;
 
@@ -32,5 +34,7 @@ public class App {
     private static void registerClasses() {
         ApplicationContext.register(Logger.class, Slf4jLogger.getLogger());
         ApplicationContext.register(Formatter.class, JacksonFormatter.getInstance());
+        ApplicationContext.register(YamlCombiner.class, JacksonFormatter.getInstance());
+        ApplicationContext.register(OpenApi.class, OpenApi.getInstance());
     }
 }

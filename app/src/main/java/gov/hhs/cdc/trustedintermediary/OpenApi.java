@@ -1,5 +1,7 @@
 package gov.hhs.cdc.trustedintermediary;
 
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
+import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombiner;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -9,12 +11,22 @@ import java.util.Set;
 
 public class OpenApi {
 
-    public String generateApiDocumentation(Set<String> urls) {
-        String openApiDocumentation = getBaselineDocumentation();
+    private static final OpenApi INSTANCE = new OpenApi();
 
-        openApiDocumentation += generatePerEndpointDocumentation(urls);
+    // not using @Inject because we are still bootstrapping the application context
+    private static final YamlCombiner YAML_COMBINER =
+            ApplicationContext.getImplementation(YamlCombiner.class);
 
-        return openApiDocumentation;
+    private OpenApi() {}
+
+    public static OpenApi getInstance() {
+        return INSTANCE;
+    }
+
+    public String generateApiDocumentation(Set<String> openApiSpecifications) {
+        openApiSpecifications.add(getBaselineDocumentation());
+
+        return YAML_COMBINER.combineYaml(openApiSpecifications);
     }
 
     private String getBaselineDocumentation() {
@@ -26,7 +38,7 @@ public class OpenApi {
                             Paths.get(
                                     getClass()
                                             .getClassLoader()
-                                            .getResource("openapi_light.yaml")
+                                            .getResource("openapi_base.yaml")
                                             .toURI()),
                             StandardCharsets.UTF_8);
         } catch (IOException | URISyntaxException e) {
@@ -34,9 +46,5 @@ public class OpenApi {
         }
 
         return baselineDocumentation;
-    }
-
-    private String generatePerEndpointDocumentation(final Set<String> urls) {
-        return "";
     }
 }
