@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.jackson;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -17,7 +18,12 @@ public class JacksonFormatter implements Formatter, YamlCombiner {
     private static final JacksonFormatter INSTANCE = new JacksonFormatter();
 
     private static final ObjectMapper JSON_OBJECT_MAPPER = new ObjectMapper(); // for JSON
-    private static final ObjectMapper YAML_OBJECT_MAPPER = new ObjectMapper(new YAMLFactory());
+    private static final ObjectMapper YAML_OBJECT_MAPPER =
+            new ObjectMapper(
+                    new YAMLFactory()
+                            .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
+                            .disable(YAMLGenerator.Feature.SPLIT_LINES)
+                            .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES));
 
     @Inject Logger logger;
 
