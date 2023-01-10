@@ -35,7 +35,7 @@ public class DomainRegistration implements DomainConnector {
     public String openApiSpecification() {
         try {
             return Files.readString(
-                    Paths.get(getClass().getClassLoader().getResource("etor.yaml").toURI()),
+                    Paths.get(getClass().getClassLoader().getResource("openapi_etor.yaml").toURI()),
                     StandardCharsets.UTF_8);
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
