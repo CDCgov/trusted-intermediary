@@ -148,6 +148,11 @@ class DomainsRegistrationTest extends Specification {
 
             return registration
         }
+
+        @Override
+        String openApiSpecification() {
+            return "DogCow"
+        }
     }
 
     static class Example2DomainConnector implements DomainConnector {
@@ -165,12 +170,22 @@ class DomainsRegistrationTest extends Specification {
 
             return registration
         }
+
+        @Override
+        String openApiSpecification() {
+            return "DogCow"
+        }
     }
 
     static class GoodDomainConnector implements DomainConnector {
         @Override
         Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
             return null
+        }
+
+        @Override
+        String openApiSpecification() {
+            return "DogCow"
         }
     }
 
@@ -180,6 +195,11 @@ class DomainsRegistrationTest extends Specification {
         @Override
         Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
             return null
+        }
+
+        @Override
+        String openApiSpecification() {
+            return "DogCow"
         }
     }
 }
