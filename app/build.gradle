@@ -128,5 +128,6 @@ sonarqube {
         property "sonar.projectKey", "trusted-intermediary"
         property "sonar.organization", "cdcgov"
         property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.coverage.exclusions", test.jacoco.excludes
     }
 }
