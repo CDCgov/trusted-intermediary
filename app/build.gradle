@@ -123,7 +123,7 @@ spotless {
     }
 }
 
-sonarqube {
+sonar {
     properties {
         property "sonar.projectName", "Trusted Intermediary"
         property "sonar.projectKey", "trusted-intermediary"
