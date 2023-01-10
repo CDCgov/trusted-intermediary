@@ -82,6 +82,10 @@ jacocoTestCoverageVerification {
 }
 
 jacocoTestReport {
+    reports {
+        xml.required = true
+    }
+
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
             fileTree(dir: it, excludes: test.jacoco.excludes)
@@ -125,5 +129,6 @@ sonarqube {
         property "sonar.projectKey", "trusted-intermediary"
         property "sonar.organization", "cdcgov"
         property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.coverage.exclusions", test.jacoco.excludes
     }
 }
