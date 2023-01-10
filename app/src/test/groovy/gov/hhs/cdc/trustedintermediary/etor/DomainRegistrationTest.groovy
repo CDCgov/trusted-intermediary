@@ -29,6 +29,19 @@ class DomainRegistrationTest extends Specification {
         endpoints.get(specifiedEndpoint) != null
     }
 
+    def "has an OpenAPI specification"() {
+        given:
+        def domainRegistration = new DomainRegistration()
+
+        when:
+        def openApiSpecification = domainRegistration.openApiSpecification()
+
+        then:
+        noExceptionThrown()
+        !openApiSpecification.isEmpty()
+        openApiSpecification.contains("paths:")
+    }
+
     def "stitches the order parsing to the response construction"() {
         given:
         def domainRegistration = new DomainRegistration()
