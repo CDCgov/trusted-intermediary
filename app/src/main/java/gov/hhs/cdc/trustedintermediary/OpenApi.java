@@ -14,29 +14,28 @@ public class OpenApi {
 
     private static final OpenApi INSTANCE = new OpenApi();
 
-    // not using @Inject because we are still bootstrapping the application context
-    private static final YamlCombiner YAML_COMBINER =
-            ApplicationContext.getImplementation(YamlCombiner.class);
-
     private OpenApi() {}
 
     public static OpenApi getInstance() {
         return INSTANCE;
     }
 
-    public String generateApiDocumentation(Set<String> openApiSpecifications) {
+    public String generateApiDocumentation(final Set<String> openApiSpecifications) {
         openApiSpecifications.add(getBaselineDocumentation());
 
         try {
-            return YAML_COMBINER.combineYaml(openApiSpecifications);
+            // not using @Inject in a field of this class because we are still bootstrapping the
+            // application context
+            // also not using a static field because we need to register different YamlCombiners in
+            // the unit tests
+            return ApplicationContext.getImplementation(YamlCombiner.class)
+                    .combineYaml(openApiSpecifications);
         } catch (YamlCombinerException e) {
-            assert false;
+            throw new RuntimeException(e);
         }
-        assert false;
-        return "";
     }
 
-    private String getBaselineDocumentation() {
+    String getBaselineDocumentation() {
         String baselineDocumentation;
 
         try {
