@@ -77,6 +77,10 @@ public class DomainsRegistration {
                         .map(DomainConnector::openApiSpecification)
                         .collect(Collectors.toSet());
 
+        // not using @Inject in a field of this class because we are still bootstrapping the
+        // application context
+        // also not using a static field because we need to register different YamlCombiners in the
+        // unit tests
         String fullOpenApiSpecification =
                 ApplicationContext.getImplementation(OpenApi.class)
                         .generateApiDocumentation(openApiSpecifications);
