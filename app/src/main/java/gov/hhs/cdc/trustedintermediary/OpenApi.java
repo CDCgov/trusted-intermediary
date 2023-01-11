@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Set;
 
+/** Directs the construction of a full YAML OpenAPI specification */
 public class OpenApi {
 
     private static final OpenApi INSTANCE = new OpenApi();
