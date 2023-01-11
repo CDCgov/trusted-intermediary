@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 /**
  * Registers the available domains to the application context and their specific handlers for the
  * endpoints.
+ *
+ * <p>Also registers the OpenAPI specification(s) for the given domain
  */
 public class DomainsRegistration {
 
