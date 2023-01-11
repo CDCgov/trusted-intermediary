@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Set;
 import javax.inject.Inject;
 
-/** A {@link Formatter} that converts to and from JSON using the Jackson library. */
+/** A wrapper around the Jackson library that implements some helpers. */
 public class Jackson implements Formatter, YamlCombiner {
 
     private static final Jackson INSTANCE = new Jackson();
