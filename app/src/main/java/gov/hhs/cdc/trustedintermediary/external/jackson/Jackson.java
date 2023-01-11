@@ -18,7 +18,7 @@ public class Jackson implements Formatter, YamlCombiner {
 
     private static final Jackson INSTANCE = new Jackson();
 
-    private static final ObjectMapper JSON_OBJECT_MAPPER = new ObjectMapper(); // for JSON
+    private static final ObjectMapper JSON_OBJECT_MAPPER = new ObjectMapper();
     private static final ObjectMapper YAML_OBJECT_MAPPER =
             new ObjectMapper(
                     new YAMLFactory()
