@@ -9,7 +9,7 @@ import gov.hhs.cdc.trustedintermediary.etor.order.OrderController
 import gov.hhs.cdc.trustedintermediary.etor.order.OrderMessage
 import spock.lang.Specification
 
-class DomainRegistrationTest extends Specification {
+class EtorDomainRegistrationTest extends Specification {
 
     def setup() {
         TestApplicationContext.reset()
@@ -18,7 +18,7 @@ class DomainRegistrationTest extends Specification {
 
     def "domain registration has endpoints"() {
         given:
-        def domainRegistration = new DomainRegistration()
+        def domainRegistration = new EtorDomainRegistration()
         def specifiedEndpoint = new HttpEndpoint("POST", "/v1/etor/order")
 
         when:
@@ -31,7 +31,7 @@ class DomainRegistrationTest extends Specification {
 
     def "stitches the order parsing to the response construction"() {
         given:
-        def domainRegistration = new DomainRegistration()
+        def domainRegistration = new EtorDomainRegistration()
 
         def mockOrderController = Mock(OrderController)
 
@@ -42,7 +42,7 @@ class DomainRegistrationTest extends Specification {
 
         def domainRequest = new DomainRequest()
 
-        TestApplicationContext.register(DomainRegistration, domainRegistration)
+        TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
         TestApplicationContext.register(OrderController, mockOrderController)
         TestApplicationContext.injectRegisteredImplementations()
 
