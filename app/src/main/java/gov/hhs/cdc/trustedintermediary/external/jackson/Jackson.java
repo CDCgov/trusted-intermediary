@@ -13,10 +13,10 @@ import java.util.HashMap;
 import java.util.Set;
 import javax.inject.Inject;
 
-/** A {@link Formatter} that converts to and from JSON using the Jackson library. */
-public class JacksonFormatter implements Formatter, YamlCombiner {
+/** A wrapper around the Jackson library that implements some helpers. */
+public class Jackson implements Formatter, YamlCombiner {
 
-    private static final JacksonFormatter INSTANCE = new JacksonFormatter();
+    private static final Jackson INSTANCE = new Jackson();
 
     private static final ObjectMapper JSON_OBJECT_MAPPER = new ObjectMapper(); // for JSON
     private static final ObjectMapper YAML_OBJECT_MAPPER =
@@ -28,9 +28,9 @@ public class JacksonFormatter implements Formatter, YamlCombiner {
 
     @Inject Logger logger;
 
-    private JacksonFormatter() {}
+    private Jackson() {}
 
-    public static JacksonFormatter getInstance() {
+    public static Jackson getInstance() {
         return INSTANCE;
     }
 
