@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.javalin
 
-
+import gov.hhs.cdc.trustedintermediary.OpenApi
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
@@ -19,6 +19,7 @@ class DomainsRegistrationTest extends Specification {
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
+        TestApplicationContext.register(OpenApi, Mock(OpenApi))
     }
 
     def "convert Javalin Context to DomainRequest correctly"() {
@@ -133,6 +134,24 @@ class DomainsRegistrationTest extends Specification {
         expectedNumberOfAddHandlerCalls * javalinApp.addHandler(_ as HandlerType, _ as String, _ as Handler)
     }
 
+    def "an OpenAPI endpoint is registered"() {
+        given:
+        def javalinApp = Mock(Javalin)
+
+        OpenApiCalledDomainConnector.openApiSecificationMethodWasCalled = false
+
+        def domains = Set.of(Example1DomainConnector, Example2DomainConnector, OpenApiCalledDomainConnector)
+
+        when:
+        DomainsRegistration.registerDomains(javalinApp, domains as Set<Class<? extends DomainConnector>>)
+
+        then:
+        OpenApiCalledDomainConnector.openApiSecificationMethodWasCalled == true
+        javalinApp.get(_ as String, _ as Handler) >> { String path, Object lambda ->
+            assert path.contains("openapi")
+        }
+    }
+
     static class Example1DomainConnector implements DomainConnector {
 
         static def endpointCount = 0
@@ -199,6 +218,22 @@ class DomainsRegistrationTest extends Specification {
 
         @Override
         String openApiSpecification() {
+            return "DogCow"
+        }
+    }
+
+    static class OpenApiCalledDomainConnector implements DomainConnector {
+
+        static def openApiSecificationMethodWasCalled = false
+
+        @Override
+        Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
+            return Map.of()
+        }
+
+        @Override
+        String openApiSpecification() {
+            openApiSecificationMethodWasCalled = true
             return "DogCow"
         }
     }

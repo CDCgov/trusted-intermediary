@@ -24,7 +24,8 @@ public class DomainsRegistration {
 
     // not using @Inject because we are still bootstrapping the application context
     private static final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
-    private static final OpenApi OPEN_API = ApplicationContext.getImplementation(OpenApi.class);
+
+    private DomainsRegistration() {}
 
     public static void registerDomains(
             Javalin app, Set<Class<? extends DomainConnector>> domainConnectors) {
@@ -75,7 +76,11 @@ public class DomainsRegistration {
                 domains.stream()
                         .map(DomainConnector::openApiSpecification)
                         .collect(Collectors.toSet());
-        String fullOpenApiSpecification = OPEN_API.generateApiDocumentation(openApiSpecifications);
+
+        String fullOpenApiSpecification =
+                ApplicationContext.getImplementation(OpenApi.class)
+                        .generateApiDocumentation(openApiSpecifications);
+
         app.get(
                 "/openapi",
                 ctx -> {
