@@ -24,5 +24,13 @@ public interface DomainConnector {
      */
     Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration();
 
+    /**
+     * This method assembles all the yaml-formatted specification information and combines it into
+     * one, larger specification to be processed by OpenAPI.
+     *
+     * <p>This includes the plugin endpoints that are not managed by this system
+     *
+     * @return A combined string of OpenAPI specifications in yaml format.
+     */
     String openApiSpecification();
 }
