@@ -20,6 +20,9 @@ class DomainsRegistrationTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(OpenApi, Mock(OpenApi))
+        Example1DomainConnector.endpointCount = 0
+        Example2DomainConnector.endpointCount = 0
+        OpenApiCalledDomainConnector.openApiSecificationMethodWasCalled = false
     }
 
     def "convert Javalin Context to DomainRequest correctly"() {
@@ -134,22 +137,34 @@ class DomainsRegistrationTest extends Specification {
         expectedNumberOfAddHandlerCalls * javalinApp.addHandler(_ as HandlerType, _ as String, _ as Handler)
     }
 
-    def "an OpenAPI endpoint is registered"() {
+    def "an OpenAPI endpoint is registered and it sets it content-type as YAML"() {
         given:
         def javalinApp = Mock(Javalin)
 
-        OpenApiCalledDomainConnector.openApiSecificationMethodWasCalled = false
-
         def domains = Set.of(Example1DomainConnector, Example2DomainConnector, OpenApiCalledDomainConnector)
+
+        String contentType = null
 
         when:
         DomainsRegistration.registerDomains(javalinApp, domains as Set<Class<? extends DomainConnector>>)
 
         then:
         OpenApiCalledDomainConnector.openApiSecificationMethodWasCalled == true
-        javalinApp.get(_ as String, _ as Handler) >> { String path, Object lambda ->
+        javalinApp.get(_ as String, _ as Handler) >> { String path, Handler handler ->
             assert path.contains("openapi")
+
+            def context = Mock(Context)
+
+            context.header(_ as String, _ as String) >> { String key, String value ->
+                if (key.equalsIgnoreCase("Content-Type")) {
+                    contentType = value
+                }
+                return context
+            }
+
+            handler.handle(context)
         }
+        contentType == "application/yaml"
     }
 
     static class Example1DomainConnector implements DomainConnector {
