@@ -103,7 +103,7 @@ tasks.named('test') {
     jacoco {
         excludes = [
             '**/javalin/App*',
-            '**/jackson/JacksonFormatter*',
+            '**/jackson/Jackson*',
             '**/slf4j/Slf4jLogger*',
         ]
     }
