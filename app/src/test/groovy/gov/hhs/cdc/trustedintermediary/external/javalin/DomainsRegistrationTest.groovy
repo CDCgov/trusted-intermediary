@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.javalin
 
-
+import gov.hhs.cdc.trustedintermediary.OpenApi
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
@@ -19,6 +19,10 @@ class DomainsRegistrationTest extends Specification {
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
+        TestApplicationContext.register(OpenApi, Mock(OpenApi))
+        Example1DomainConnector.endpointCount = 0
+        Example2DomainConnector.endpointCount = 0
+        OpenApiCalledDomainConnector.openApiSecificationMethodWasCalled = false
     }
 
     def "convert Javalin Context to DomainRequest correctly"() {
@@ -133,6 +137,37 @@ class DomainsRegistrationTest extends Specification {
         expectedNumberOfAddHandlerCalls * javalinApp.addHandler(_ as HandlerType, _ as String, _ as Handler)
     }
 
+    def "an OpenAPI endpoint is registered and it sets it content-type as YAML"() {
+        given:
+        def javalinApp = Mock(Javalin)
+
+        def domains = Set.of(Example1DomainConnector, Example2DomainConnector, OpenApiCalledDomainConnector)
+
+        String contentType = null
+
+        when:
+        DomainsRegistration.registerDomains(javalinApp, domains as Set<Class<? extends DomainConnector>>)
+
+        then:
+        OpenApiCalledDomainConnector.openApiSecificationMethodWasCalled == true
+        javalinApp.get(_ as String, _ as Handler) >> { String path, Handler handler ->
+            assert path.contains("openapi")
+
+            def context = Mock(Context)
+            context.method() >> HandlerType.GET
+
+            context.header(_ as String, _ as String) >> { String key, String value ->
+                if (key.equalsIgnoreCase("Content-Type")) {
+                    contentType = value
+                }
+                return context
+            }
+
+            handler.handle(context)
+        }
+        contentType == "application/yaml"
+    }
+
     static class Example1DomainConnector implements DomainConnector {
 
         static def endpointCount = 0
@@ -147,6 +182,11 @@ class DomainsRegistrationTest extends Specification {
             }
 
             return registration
+        }
+
+        @Override
+        String openApiSpecification() {
+            return "DogCow"
         }
     }
 
@@ -165,12 +205,22 @@ class DomainsRegistrationTest extends Specification {
 
             return registration
         }
+
+        @Override
+        String openApiSpecification() {
+            return "DogCow"
+        }
     }
 
     static class GoodDomainConnector implements DomainConnector {
         @Override
         Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
             return null
+        }
+
+        @Override
+        String openApiSpecification() {
+            return "DogCow"
         }
     }
 
@@ -180,6 +230,27 @@ class DomainsRegistrationTest extends Specification {
         @Override
         Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
             return null
+        }
+
+        @Override
+        String openApiSpecification() {
+            return "DogCow"
+        }
+    }
+
+    static class OpenApiCalledDomainConnector implements DomainConnector {
+
+        static def openApiSecificationMethodWasCalled = false
+
+        @Override
+        Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
+            return Map.of()
+        }
+
+        @Override
+        String openApiSpecification() {
+            openApiSecificationMethodWasCalled = true
+            return "DogCow"
         }
     }
 }
