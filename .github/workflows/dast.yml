@@ -20,6 +20,9 @@ jobs:
           distribution: corretto
           cache: gradle
 
+      - name: gradle build
+        run: ./gradlew clean :app:build
+
       - name: ShadowJar
         run: ./gradlew shadowJar
 
