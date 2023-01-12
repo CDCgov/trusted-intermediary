@@ -23,4 +23,11 @@ public interface DomainConnector {
      *     request comes in on the associated endpoint.
      */
     Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration();
+
+    /**
+     * An implementation would return the OpenAPI specification in YAML format for this domain
+     *
+     * @return The OpenAPI specifications for just this given domain
+     */
+    String openApiSpecification();
 }
