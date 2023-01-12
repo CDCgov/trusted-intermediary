@@ -20,9 +20,6 @@ jobs:
           distribution: corretto
           cache: gradle
 
-      - name: gradle build
-        run: ./gradlew clean :app:build
-
       - name: ShadowJar
         run: ./gradlew shadowJar
 
@@ -30,7 +27,8 @@ jobs:
         run: docker compose up --build -d
 
       - name: Run e2e
-        run: curl --location --request GET 'http://localhost:8080/v1/etor/openapi'
+        run: ./gradlew :e2e:test
+
       - name: Log current directory
         run: echo ${pwd}
 
