@@ -154,6 +154,7 @@ class DomainsRegistrationTest extends Specification {
             assert path.contains("openapi")
 
             def context = Mock(Context)
+            context.method() >> HandlerType.GET
 
             context.header(_ as String, _ as String) >> { String key, String value ->
                 if (key.equalsIgnoreCase("Content-Type")) {
