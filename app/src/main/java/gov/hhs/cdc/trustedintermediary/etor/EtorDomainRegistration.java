@@ -20,7 +20,7 @@ import javax.inject.Inject;
 /**
  * The domain connector for the ETOR domain. It connects it with the larger trusted intermediary.
  */
-public class DomainRegistration implements DomainConnector {
+public class EtorDomainRegistration implements DomainConnector {
 
     @Inject OrderController orderController;
     @Inject Logger logger;
