@@ -31,7 +31,7 @@ class EtorDomainRegistrationTest extends Specification {
 
     def "has an OpenAPI specification"() {
         given:
-        def domainRegistration = new DomainRegistration()
+        def domainRegistration = new EtorDomainRegistration()
 
         when:
         def openApiSpecification = domainRegistration.openApiSpecification()
