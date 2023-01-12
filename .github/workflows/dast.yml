@@ -27,7 +27,7 @@ jobs:
         run: docker compose up --build -d
 
       - name: Run e2e
-        run: ./gradlew :e2e:test
+        run: ./gradlew :e2e:test --info
 
       - name: Log current directory
         run: echo ${pwd}
