@@ -27,7 +27,7 @@ jobs:
         run: docker compose up --build -d
 
       - name: Run e2e
-        run: curl --location --request GET 'http://localhost:8080/v1/etor/health'
+        run: curl --location --request GET 'http://localhost:8080/v1/etor/openapi'
       - name: Log current directory
         run: echo ${pwd}
 
