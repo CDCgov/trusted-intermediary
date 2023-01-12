@@ -90,6 +90,7 @@ public class DomainsRegistration {
         app.get(
                 "/openapi",
                 ctx -> {
+                    LOGGER.logInfo(ctx.method().name() + " " + ctx.url());
                     ctx.header("Content-Type", "application/yaml");
                     ctx.result(fullOpenApiSpecification);
                 });
