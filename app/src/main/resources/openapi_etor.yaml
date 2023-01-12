@@ -1,0 +1,71 @@
+openapi: 3.0.3
+info:
+  title: Trusted Intermediary
+  description: A service that intermediates healthcare messages between a specific sender and receiver.
+  contact:
+    email: cdc-ti@flexion.us
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.0.1
+externalDocs:
+  description: Trusted Intermediary Repository
+  url: https://github.com/CDCgov/trusted-intermediary
+paths:
+  /v1/etor/order:
+    post:
+      summary: forwards an ETOR order to a lab
+      requestBody:
+        description: an order
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+        required: true
+      responses:
+        '200':
+          description: the order was sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderMessage'
+components:
+  schemas:
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 10
+        destination:
+          type: string
+          example: Massachusetts
+        createdAt:
+          type: string
+          example: 2022-12-21T08:34:27Z
+          format: ISO8601 date and time
+        client:
+          type: string
+          example: MassGeneral
+        content:
+          type: string
+          example: DogCow requests a newborn screening!
+    OrderMessage:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 10
+        destination:
+          type: string
+          example: Massachusetts
+        createdAt:
+          type: string
+          example: 2022-12-21T08:34:27Z
+          format: ISO8601 date and time
+        client:
+          type: string
+          example: MassGeneral
+        content:
+          type: string
+          example: DogCow sent a newborn screening request!

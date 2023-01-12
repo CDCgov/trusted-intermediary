@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.javalin;
 
+import gov.hhs.cdc.trustedintermediary.OpenApi;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
@@ -18,11 +19,15 @@ import java.util.stream.Collectors;
 /**
  * Registers the available domains to the application context and their specific handlers for the
  * endpoints.
+ *
+ * <p>Also registers the OpenAPI specification(s) for the given domain
  */
 public class DomainsRegistration {
 
     // not using @Inject because we are still bootstrapping the application context
     private static final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
+
+    private DomainsRegistration() {}
 
     public static void registerDomains(
             Javalin app, Set<Class<? extends DomainConnector>> domainConnectors) {
@@ -40,6 +45,8 @@ public class DomainsRegistration {
         registerDomainsWithApplicationContext(instantiatedDomains);
 
         registerDomainsHandlers(app, instantiatedDomains);
+
+        registerOpenApi(app, instantiatedDomains);
     }
 
     static void registerDomainsWithApplicationContext(Set<DomainConnector> domains) {
@@ -64,6 +71,29 @@ public class DomainsRegistration {
                                                             + ", endpoint: "
                                                             + endpoint.path());
                                         }));
+    }
+
+    static void registerOpenApi(Javalin app, Set<DomainConnector> domains) {
+        Set<String> openApiSpecifications =
+                domains.stream()
+                        .map(DomainConnector::openApiSpecification)
+                        .collect(Collectors.toSet());
+
+        // not using @Inject in a field of this class because we are still bootstrapping the
+        // application context
+        // also not using a static field because we need to register different YamlCombiners in the
+        // unit tests
+        String fullOpenApiSpecification =
+                ApplicationContext.getImplementation(OpenApi.class)
+                        .generateApiDocumentation(openApiSpecifications);
+
+        app.get(
+                "/openapi",
+                ctx -> {
+                    LOGGER.logInfo(ctx.method().name() + " " + ctx.url());
+                    ctx.header("Content-Type", "application/yaml");
+                    ctx.result(fullOpenApiSpecification);
+                });
     }
 
     static DomainConnector constructNewDomainConnector(Class<? extends DomainConnector> clazz) {
