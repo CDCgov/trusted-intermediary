@@ -9,10 +9,8 @@ import gov.hhs.cdc.trustedintermediary.etor.order.OrderController;
 import gov.hhs.cdc.trustedintermediary.etor.order.OrderMessage;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.function.Function;
 import javax.inject.Inject;
@@ -33,11 +31,10 @@ public class EtorDomainRegistration implements DomainConnector {
 
     @Override
     public String openApiSpecification() {
-        try {
-            return Files.readString(
-                    Paths.get(getClass().getClassLoader().getResource("openapi_etor.yaml").toURI()),
-                    StandardCharsets.UTF_8);
-        } catch (IOException | URISyntaxException e) {
+        try (InputStream openApiStream =
+                getClass().getClassLoader().getResourceAsStream("openapi_etor.yaml")) {
+            return new String(openApiStream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

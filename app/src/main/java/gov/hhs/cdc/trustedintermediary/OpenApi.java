@@ -4,10 +4,8 @@ import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombiner;
 import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombinerException;
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Set;
 
 /** Directs the construction of a full YAML OpenAPI specification */
@@ -37,21 +35,11 @@ public class OpenApi {
     }
 
     String getBaselineDocumentation() {
-        String baselineDocumentation;
-
-        try {
-            baselineDocumentation =
-                    Files.readString(
-                            Paths.get(
-                                    getClass()
-                                            .getClassLoader()
-                                            .getResource("openapi_base.yaml")
-                                            .toURI()),
-                            StandardCharsets.UTF_8);
-        } catch (IOException | URISyntaxException e) {
+        try (InputStream openApiStream =
+                getClass().getClassLoader().getResourceAsStream("openapi_base.yaml")) {
+            return new String(openApiStream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        return baselineDocumentation;
     }
 }
