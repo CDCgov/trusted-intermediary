@@ -8,7 +8,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.Map;
 import javax.inject.Inject;
-import org.hl7.fhir.r4.model.StringType;
+import org.hl7.fhir.r4.model.IdType;
 
 /**
  * Creates an in-memory representation of an order to be ingested by the system, and return response
@@ -44,11 +44,10 @@ public class OrderController {
         FhirContext context = FhirContext.forR4();
         var pather = context.newFhirPath();
         var parser = context.newJsonParser();
-        var terser = context.newTerser();
         var patient = parser.parseResource(request.getBody());
 
-        var answer = pather.evaluateFirst(patient, "resourceType.id", StringType.class);
-        logger.logInfo("answer=" + answer);
+        var answer = pather.evaluateFirst(patient, "id", IdType.class);
+        logger.logInfo("answer=" + answer.get());
 
         return order;
     }
