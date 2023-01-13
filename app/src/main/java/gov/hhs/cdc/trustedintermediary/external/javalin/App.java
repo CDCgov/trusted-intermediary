@@ -27,7 +27,7 @@ public class App {
             // Not using the logger because boostrapping has failed.
             System.err.println(
                     "Exception occurred during bootstrap of Trusted Intermediary!  Exiting!");
-            exception.printStackTrace();
+            exception.printStackTrace(System.out);
             System.exit(1);
         }
     }
