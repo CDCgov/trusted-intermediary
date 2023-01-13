@@ -31,7 +31,6 @@ jobs:
 
       - name: Log current directory
         run: echo ${pwd}
-
       - name: Pull ZAP OWASP Image
         run: docker pull owasp/zap2docker-weekly
 
