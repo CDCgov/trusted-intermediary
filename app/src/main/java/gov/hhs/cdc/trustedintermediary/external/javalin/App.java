@@ -25,7 +25,7 @@ public class App {
             ApplicationContext.injectRegisteredImplementations();
         } catch (Exception exception) {
             // Not using the logger because boostrapping has failed.
-            System.err.println(
+            System.out.println(
                     "Exception occurred during bootstrap of Trusted Intermediary!  Exiting!");
             exception.printStackTrace(System.out);
             System.exit(1);
