@@ -17,11 +17,18 @@ public class App {
     public static void main(String[] args) {
         var app = Javalin.create().start(8080);
 
-        app.get("/health", ctx -> ctx.result("Operational"));
+        try {
+            app.get("/health", ctx -> ctx.result("Operational"));
 
-        registerClasses();
-        registerDomains(app);
-        ApplicationContext.injectRegisteredImplementations();
+            registerClasses();
+            registerDomains(app);
+            ApplicationContext.injectRegisteredImplementations();
+        } catch (Exception exception) {
+            System.err.println(
+                    "Exception occurred during bootstrap of Trusted Intermediary!  Exiting!");
+            exception.printStackTrace();
+            System.exit(1);
+        }
     }
 
     private static void registerDomains(Javalin app) {
