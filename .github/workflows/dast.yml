@@ -47,4 +47,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: zap-scan-report
-          path: /zap/wrk/api-scan-report.html
+          path: api-scan-report.html
