@@ -8,8 +8,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.Map;
 import javax.inject.Inject;
-import org.hl7.fhir.r4.model.IdType;
-import org.hl7.fhir.r4.model.StringType;
+import org.hl7.fhir.r4.model.*;
 
 /**
  * Creates an in-memory representation of an order to be ingested by the system, and return response
@@ -49,8 +48,26 @@ public class OrderController {
 
         var requestId = pather.evaluateFirst(patient, "id", IdType.class);
         var patientId = pather.evaluateFirst(patient, "identifier.value", StringType.class);
+        var firstName =
+                pather.evaluateFirst(
+                        patient, "name.where(use='official').given.first()", StringType.class);
+        var lastName =
+                pather.evaluateFirst(
+                        patient, "name.where(use='official').family", StringType.class);
+        var sex = pather.evaluateFirst(patient, "gender", Enumeration.class);
+        var birthDateTime =
+                pather.evaluateFirst(
+                        patient,
+                        "birthDate.extension.where(url='http://hl7.org/fhir/StructureDefinition/patient-birthTime').value",
+                        DateTimeType.class);
+        var birthOrder = pather.evaluateFirst(patient, "multipleBirth", IntegerType.class);
         logger.logInfo("requestId=" + requestId.get());
         logger.logInfo("patientId=" + patientId.get());
+        logger.logInfo("firstName=" + firstName.get());
+        logger.logInfo("lastName=" + lastName.get());
+        logger.logInfo("sex=" + sex.get().getCode());
+        logger.logInfo("birthDateTime=" + birthDateTime.get());
+        logger.logInfo("birthOrder=" + birthOrder.get());
 
         return order;
     }
