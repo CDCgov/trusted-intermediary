@@ -22,7 +22,7 @@ class OrderTest extends Specification {
         def order = new Order()
 
         then:
-        order.getId() == null
+        order.getRequestId() == null
         order.getDestination() == null
         order.getClient() == null
         order.getContent() == null
@@ -42,7 +42,7 @@ class OrderTest extends Specification {
         def order = new Order(id, destination, formattedTimeDate, client, body)
 
         then:
-        order.getId() == id
+        order.getRequestId() == id
         order.getDestination() == destination
         order.getClient() == client
         order.getContent() == body

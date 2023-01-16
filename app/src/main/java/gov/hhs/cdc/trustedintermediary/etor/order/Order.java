@@ -1,63 +1,89 @@
 package gov.hhs.cdc.trustedintermediary.etor.order;
 
+import java.time.ZonedDateTime;
+
 /** Represents an ETOR order. */
 public class Order {
-    private String id;
-    private String destination;
-    private String createdAt;
+    private String requestId;
+    private String patientId;
+    private String firstName;
+    private String lastName;
+    private String sex;
+    private ZonedDateTime birthDateTime;
+    private Integer birthOrder;
 
-    private String client;
-    private String content;
+    public Order(
+            String requestId,
+            String patientId,
+            String firstName,
+            String lastName,
+            String sex,
+            ZonedDateTime birthDateTime,
+            Integer birthOrder) {
+        this.requestId = requestId;
+        this.patientId = patientId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.sex = sex;
+        this.birthDateTime = birthDateTime;
+        this.birthOrder = birthOrder;
+    }
 
-    // for serialization
     public Order() {}
 
-    // Ideal for testing
-    public Order(String id, String destination, String createdAt, String client, String content) {
-        setId(id);
-        setDestination(destination);
-        setCreatedAt(createdAt);
-        setClient(client);
-        setContent(content);
+    public String getRequestId() {
+        return requestId;
     }
 
-    public String getClient() {
-        return client;
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
 
-    public void setClient(String client) {
-        this.client = client;
+    public String getPatientId() {
+        return patientId;
     }
 
-    public String getContent() {
-        return content;
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public String getId() {
-        return id;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public String getDestination() {
-        return destination;
+    public String getLastName() {
+        return lastName;
     }
 
-    public String getCreatedAt() {
-        return createdAt;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
-    public void setId(String id) {
-        this.id = (id == null) ? "" : id;
+    public String getSex() {
+        return sex;
     }
 
-    public void setDestination(String destination) {
-        this.destination = (destination == null) ? "" : destination;
+    public void setSex(String sex) {
+        this.sex = sex;
     }
 
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
+    public ZonedDateTime getBirthDateTime() {
+        return birthDateTime;
+    }
+
+    public void setBirthDateTime(ZonedDateTime birthDateTime) {
+        this.birthDateTime = birthDateTime;
+    }
+
+    public Integer getBirthOrder() {
+        return birthOrder;
+    }
+
+    public void setBirthOrder(Integer birthOrder) {
+        this.birthOrder = birthOrder;
     }
 }

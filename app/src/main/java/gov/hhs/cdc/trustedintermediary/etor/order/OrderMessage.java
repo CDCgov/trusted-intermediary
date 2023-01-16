@@ -24,11 +24,11 @@ public class OrderMessage {
     }
 
     public OrderMessage(@Nonnull Order order) {
-        setId(order.getId());
-        setDestination(order.getDestination());
-        setCreatedAt(order.getCreatedAt());
-        setClient(order.getClient());
-        setContent(order.getContent());
+        setId(order.getRequestId());
+        setDestination(order.getFirstName());
+        setCreatedAt(order.getLastName());
+        setClient(order.getSex());
+        setContent(order.getPatientId());
     }
 
     public String getClient() {

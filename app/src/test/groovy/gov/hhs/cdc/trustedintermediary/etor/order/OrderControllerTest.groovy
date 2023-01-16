@@ -32,7 +32,7 @@ class OrderControllerTest extends Specification {
 
         then:
         noExceptionThrown()
-        parsedOrder.getId() == mockOrderId
+        parsedOrder.getRequestId() == mockOrderId
     }
 
     def "parseOrder fails by the formatter"() {

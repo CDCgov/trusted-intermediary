@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import java.time.ZonedDateTime;
 import java.util.Map;
 import javax.inject.Inject;
 import org.hl7.fhir.r4.model.*;
@@ -32,7 +33,6 @@ public class OrderController {
 
     public Order parseOrder(DomainRequest request) {
         logger.logInfo("Parsing order");
-        Order order = new Order();
 
         //        try {
         //            order = formatter.convertToObject(request.getBody(), Order.class);
@@ -61,15 +61,24 @@ public class OrderController {
                         "birthDate.extension.where(url='http://hl7.org/fhir/StructureDefinition/patient-birthTime').value",
                         DateTimeType.class);
         var birthOrder = pather.evaluateFirst(patient, "multipleBirth", IntegerType.class);
-        logger.logInfo("requestId=" + requestId.get());
-        logger.logInfo("patientId=" + patientId.get());
-        logger.logInfo("firstName=" + firstName.get());
-        logger.logInfo("lastName=" + lastName.get());
+        logger.logInfo("requestId=" + requestId.get().getValue());
+        logger.logInfo("patientId=" + patientId.get().getValue());
+        logger.logInfo("firstName=" + firstName.get().getValue());
+        logger.logInfo("lastName=" + lastName.get().getValue());
         logger.logInfo("sex=" + sex.get().getCode());
-        logger.logInfo("birthDateTime=" + birthDateTime.get());
-        logger.logInfo("birthOrder=" + birthOrder.get());
+        logger.logInfo("birthDateTime=" + birthDateTime.get().getValueAsString());
+        logger.logInfo("birthOrder=" + birthOrder.get().getValue());
 
-        return order;
+        return new Order(
+                requestId.orElse(new IdType()).getValue(),
+                patientId.orElse(new StringType()).getValue(),
+                "",
+                "",
+                "",
+                ZonedDateTime.now(),
+                1);
+
+        //        return new Order();
     }
 
     public DomainResponse constructResponse(OrderMessage orderMessage) {
