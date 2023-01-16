@@ -9,6 +9,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.Map;
 import javax.inject.Inject;
 import org.hl7.fhir.r4.model.IdType;
+import org.hl7.fhir.r4.model.StringType;
 
 /**
  * Creates an in-memory representation of an order to be ingested by the system, and return response
@@ -46,8 +47,10 @@ public class OrderController {
         var parser = context.newJsonParser();
         var patient = parser.parseResource(request.getBody());
 
-        var answer = pather.evaluateFirst(patient, "id", IdType.class);
-        logger.logInfo("answer=" + answer.get());
+        var requestId = pather.evaluateFirst(patient, "id", IdType.class);
+        var patientId = pather.evaluateFirst(patient, "identifier.first().value", StringType.class);
+        logger.logInfo("requestId=" + requestId.get());
+        logger.logInfo("patientId=" + patientId.get());
 
         return order;
     }
