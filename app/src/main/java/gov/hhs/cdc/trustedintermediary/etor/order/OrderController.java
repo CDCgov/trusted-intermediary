@@ -48,7 +48,7 @@ public class OrderController {
         var patient = parser.parseResource(request.getBody());
 
         var requestId = pather.evaluateFirst(patient, "id", IdType.class);
-        var patientId = pather.evaluateFirst(patient, "identifier.first().value", StringType.class);
+        var patientId = pather.evaluateFirst(patient, "identifier.value", StringType.class);
         logger.logInfo("requestId=" + requestId.get());
         logger.logInfo("patientId=" + patientId.get());
 
