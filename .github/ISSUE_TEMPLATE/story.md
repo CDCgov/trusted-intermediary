@@ -10,10 +10,10 @@ assignees: ''
 # Story
 As a _, so that _, I need _.
 
-### Pre-conditions
+## Pre-conditions
 - [ ] *Assumptions of prior or future work that's out of scope for this story*
 
-### Acceptance Criteria
+## Acceptance Criteria
 - [ ] *Required outcomes of the story*
 
 ## Tasks
