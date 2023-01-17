@@ -7,11 +7,11 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-class OrderTest extends Specification {
+class PatientDemographicsTest extends Specification {
 
     def "test getters and setters"() {
         when:
-        PojoTestUtils.validateGettersAndSetters(Order.class)
+        PojoTestUtils.validateGettersAndSetters(PatientDemographics.class)
 
         then:
         noExceptionThrown()
@@ -19,7 +19,7 @@ class OrderTest extends Specification {
 
     def "test default constructor"() {
         when:
-        def order = new Order()
+        def order = new PatientDemographics()
 
         then:
         order.getRequestId() == null
@@ -39,7 +39,7 @@ class OrderTest extends Specification {
         def formattedTimeDate = createdAt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
 
         when:
-        def order = new Order(id, destination, formattedTimeDate, client, body)
+        def order = new PatientDemographics(id, destination, formattedTimeDate, client, body)
 
         then:
         order.getRequestId() == id

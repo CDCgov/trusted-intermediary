@@ -9,7 +9,12 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import javax.inject.Inject;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.DateTimeType;
+import org.hl7.fhir.r4.model.Enumeration;
+import org.hl7.fhir.r4.model.IdType;
+import org.hl7.fhir.r4.model.IntegerType;
+import org.hl7.fhir.r4.model.PrimitiveType;
+import org.hl7.fhir.r4.model.StringType;
 
 /**
  * Creates an in-memory representation of an order to be ingested by the system, and return response
@@ -31,7 +36,7 @@ public class OrderController {
         return ORDER_CONTROLLER;
     }
 
-    public Order parseOrder(DomainRequest request) {
+    public PatientDemographics parseOrder(DomainRequest request) {
         logger.logInfo("Parsing order");
 
         FhirContext context = FhirContext.forR4();
@@ -55,18 +60,8 @@ public class OrderController {
                         DateTimeType.class);
         var birthOrderOptional = pather.evaluateFirst(patient, "multipleBirth", IntegerType.class);
 
-        //        logger.logInfo("requestIdOptional=" + requestIdOptional.map(real ->
-        // real.getValue()).orElse(null));
-        //        logger.logInfo("patientIdOptional=" + patientIdOptional.get().getValue());
-        //        logger.logInfo("firstNameOptional=" + firstNameOptional.get().getValue());
-        //        logger.logInfo("lastNameOptional=" + lastNameOptional.get().getValue());
-        //        logger.logInfo("sexOptional=" + sexOptional.get().getCode());
-        //        logger.logInfo("birthDateTimeOptional=" +
-        // birthDateTimeOptional.get().getValueAsString());
-        //        logger.logInfo("birthOrderOptional=" + birthOrderOptional.get().getValue());
-
         var order =
-                new Order(
+                new PatientDemographics(
                         requestIdOptional.map(IdType::getValue).orElse(null),
                         patientIdOptional.map(StringType::getValue).orElse(null),
                         firstNameOptional.map(StringType::getValue).orElse(null),

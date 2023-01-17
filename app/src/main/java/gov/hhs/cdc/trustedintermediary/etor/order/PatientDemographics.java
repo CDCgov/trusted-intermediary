@@ -4,7 +4,7 @@ import java.time.ZonedDateTime;
 import java.util.StringJoiner;
 
 /** Represents an ETOR order. */
-public class Order {
+public class PatientDemographics {
     private String requestId;
     private String patientId;
     private String firstName;
@@ -13,7 +13,7 @@ public class Order {
     private ZonedDateTime birthDateTime;
     private Integer birthOrder;
 
-    public Order(
+    public PatientDemographics(
             String requestId,
             String patientId,
             String firstName,
@@ -30,7 +30,7 @@ public class Order {
         this.birthOrder = birthOrder;
     }
 
-    public Order() {}
+    public PatientDemographics() {}
 
     public String getRequestId() {
         return requestId;
@@ -90,7 +90,7 @@ public class Order {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", Order.class.getSimpleName() + "[", "]")
+        return new StringJoiner(", ", PatientDemographics.class.getSimpleName() + "[", "]")
                 .add("requestId='" + requestId + "'")
                 .add("patientId='" + patientId + "'")
                 .add("firstName='" + firstName + "'")

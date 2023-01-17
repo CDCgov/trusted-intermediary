@@ -26,7 +26,7 @@ class OrderMessageTest extends Specification{
         def createAt = LocalDateTime.now(ZoneId.of("UTC"))
         def formattedTimeDate = createAt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
 
-        def order = new Order(id, destination, formattedTimeDate, client, body)
+        def order = new PatientDemographics(id, destination, formattedTimeDate, client, body)
 
         when:
         def orderMessage = new OrderMessage(order)
