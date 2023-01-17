@@ -3,9 +3,7 @@ package gov.hhs.cdc.trustedintermediary.etor.demographics
 import gov.hhs.cdc.trustedintermediary.PojoTestUtils
 import spock.lang.Specification
 
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
+import java.time.ZonedDateTime
 
 class PatientDemographicsTest extends Specification {
 
@@ -23,29 +21,34 @@ class PatientDemographicsTest extends Specification {
 
         then:
         order.getRequestId() == null
-        order.getDestination() == null
-        order.getClient() == null
-        order.getContent() == null
-        order.getCreatedAt() == null
+        order.getPatientId() == null
+        order.getFirstName() == null
+        order.getLastName() == null
+        order.getSex() == null
+        order.getBirthDateTime() == null
+        order.getBirthOrder() == null
     }
 
     def "test argument constructor"() {
         given:
-        def id = "12345werty"
-        def destination = "fake lab"
-        def client = "fake hospital"
-        def body = "lab order"
-        def createdAt = LocalDateTime.now(ZoneId.of("UTC"))
-        def formattedTimeDate = createdAt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+        def requestId = "12345werty"
+        def patientId = "fake lab"
+        def firstName = "fake hospital"
+        def lastName = "lab order"
+        def sex = "male"
+        def birthDateTime = ZonedDateTime.now()
+        def birthOrder = 1
 
         when:
-        def order = new PatientDemographics(id, destination, formattedTimeDate, client, body)
+        def demographics = new PatientDemographics(requestId, patientId, firstName, lastName, sex, birthDateTime, birthOrder)
 
         then:
-        order.getRequestId() == id
-        order.getDestination() == destination
-        order.getClient() == client
-        order.getContent() == body
-        order.getCreatedAt() == formattedTimeDate
+        demographics.getRequestId() == requestId
+        demographics.getPatientId() == patientId
+        demographics.getFirstName() == firstName
+        demographics.getLastName() == lastName
+        demographics.getSex() == sex
+        demographics.getBirthDateTime() == birthDateTime
+        demographics.getBirthOrder() == birthOrder
     }
 }
