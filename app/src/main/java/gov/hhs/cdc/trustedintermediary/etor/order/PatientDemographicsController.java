@@ -20,9 +20,10 @@ import org.hl7.fhir.r4.model.StringType;
  * Creates an in-memory representation of an order to be ingested by the system, and return response
  * information back to the client.
  */
-public class OrderController {
+public class PatientDemographicsController {
 
-    private static final OrderController ORDER_CONTROLLER = new OrderController();
+    private static final PatientDemographicsController PATIENT_DEMOGRAPHICS_CONTROLLER =
+            new PatientDemographicsController();
 
     @Inject Formatter formatter;
     @Inject Logger logger;
@@ -30,10 +31,10 @@ public class OrderController {
     static final String CONTENT_TYPE_LITERAL = "Content-Type";
     static final String APPLICATION_JSON_LITERAL = "application/json";
 
-    private OrderController() {}
+    private PatientDemographicsController() {}
 
-    public static OrderController getInstance() {
-        return ORDER_CONTROLLER;
+    public static PatientDemographicsController getInstance() {
+        return PATIENT_DEMOGRAPHICS_CONTROLLER;
     }
 
     public PatientDemographics parseOrder(DomainRequest request) {

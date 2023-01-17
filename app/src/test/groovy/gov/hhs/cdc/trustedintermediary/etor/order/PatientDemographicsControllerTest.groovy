@@ -7,12 +7,12 @@ import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import spock.lang.Specification
 
-class OrderControllerTest extends Specification {
+class PatientDemographicsControllerTest extends Specification {
 
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
-        TestApplicationContext.register(OrderController, OrderController.getInstance())
+        TestApplicationContext.register(PatientDemographicsController, PatientDemographicsController.getInstance())
     }
 
     def "parseOrder works"() {
@@ -28,7 +28,7 @@ class OrderControllerTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def parsedOrder = OrderController.getInstance().parseOrder(request)
+        def parsedOrder = PatientDemographicsController.getInstance().parseOrder(request)
 
         then:
         noExceptionThrown()
@@ -46,7 +46,7 @@ class OrderControllerTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        OrderController.getInstance().parseOrder(request)
+        PatientDemographicsController.getInstance().parseOrder(request)
 
         then:
         thrown(RuntimeException)
@@ -64,12 +64,12 @@ class OrderControllerTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def response = OrderController.getInstance().constructResponse(new OrderMessage("asdf-12341-jkl-7890", "Massachusetts", "2022-12-21T08:34:27Z", "MassGeneral", "NBS panel for Clarus the DogCow"))
+        def response = PatientDemographicsController.getInstance().constructResponse(new OrderMessage("asdf-12341-jkl-7890", "Massachusetts", "2022-12-21T08:34:27Z", "MassGeneral", "NBS panel for Clarus the DogCow"))
 
         then:
         response.getBody() == mockBody
         response.getStatusCode() == 200
-        response.getHeaders().get(OrderController.CONTENT_TYPE_LITERAL) == OrderController.APPLICATION_JSON_LITERAL
+        response.getHeaders().get(PatientDemographicsController.CONTENT_TYPE_LITERAL) == PatientDemographicsController.APPLICATION_JSON_LITERAL
     }
 
     def "parseOrder fails by the formatter"() {
@@ -83,7 +83,7 @@ class OrderControllerTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        OrderController.getInstance().parseOrder(request)
+        PatientDemographicsController.getInstance().parseOrder(request)
 
         then:
         thrown(RuntimeException)
@@ -99,7 +99,7 @@ class OrderControllerTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        OrderController.getInstance().constructResponse(new OrderMessage("asdf-12341-jkl-7890", "Massachusetts", "2022-12-21T08:34:27Z", "MassGeneral", "NBS panel for Clarus the DogCow"))
+        PatientDemographicsController.getInstance().constructResponse(new OrderMessage("asdf-12341-jkl-7890", "Massachusetts", "2022-12-21T08:34:27Z", "MassGeneral", "NBS panel for Clarus the DogCow"))
 
         then:
         thrown(RuntimeException)

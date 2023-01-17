@@ -5,7 +5,7 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
 import gov.hhs.cdc.trustedintermediary.etor.order.PatientDemographics
-import gov.hhs.cdc.trustedintermediary.etor.order.OrderController
+import gov.hhs.cdc.trustedintermediary.etor.order.PatientDemographicsController
 import gov.hhs.cdc.trustedintermediary.etor.order.OrderMessage
 import spock.lang.Specification
 
@@ -46,7 +46,7 @@ class EtorDomainRegistrationTest extends Specification {
         given:
         def domainRegistration = new EtorDomainRegistration()
 
-        def mockOrderController = Mock(OrderController)
+        def mockOrderController = Mock(PatientDemographicsController)
 
         def mockOrderId = "asdf-12341-jkl-7890"
 
@@ -56,7 +56,7 @@ class EtorDomainRegistrationTest extends Specification {
         def domainRequest = new DomainRequest()
 
         TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
-        TestApplicationContext.register(OrderController, mockOrderController)
+        TestApplicationContext.register(PatientDemographicsController, mockOrderController)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
