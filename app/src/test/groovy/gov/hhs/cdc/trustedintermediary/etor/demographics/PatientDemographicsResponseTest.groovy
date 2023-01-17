@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.etor.order
+package gov.hhs.cdc.trustedintermediary.etor.demographics
 
 import gov.hhs.cdc.trustedintermediary.PojoTestUtils
 import spock.lang.Specification

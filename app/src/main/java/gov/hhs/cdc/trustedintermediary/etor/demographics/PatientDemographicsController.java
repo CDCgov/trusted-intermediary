@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.etor.order;
+package gov.hhs.cdc.trustedintermediary.etor.demographics;
 
 import ca.uhn.fhir.context.FhirContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;

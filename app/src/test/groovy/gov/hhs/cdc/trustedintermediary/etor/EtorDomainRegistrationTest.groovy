@@ -4,9 +4,9 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
-import gov.hhs.cdc.trustedintermediary.etor.order.PatientDemographics
-import gov.hhs.cdc.trustedintermediary.etor.order.PatientDemographicsController
-import gov.hhs.cdc.trustedintermediary.etor.order.PatientDemographicsResponse
+import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographics
+import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController
+import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse
 import spock.lang.Specification
 
 class EtorDomainRegistrationTest extends Specification {
