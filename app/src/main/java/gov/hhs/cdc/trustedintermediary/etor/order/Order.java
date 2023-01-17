@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.order;
 
 import java.time.ZonedDateTime;
+import java.util.StringJoiner;
 
 /** Represents an ETOR order. */
 public class Order {
@@ -85,5 +86,18 @@ public class Order {
 
     public void setBirthOrder(Integer birthOrder) {
         this.birthOrder = birthOrder;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", Order.class.getSimpleName() + "[", "]")
+                .add("requestId='" + requestId + "'")
+                .add("patientId='" + patientId + "'")
+                .add("firstName='" + firstName + "'")
+                .add("lastName='" + lastName + "'")
+                .add("sex='" + sex + "'")
+                .add("birthDateTime=" + birthDateTime)
+                .add("birthOrder=" + birthOrder)
+                .toString();
     }
 }
