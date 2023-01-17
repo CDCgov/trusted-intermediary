@@ -28,7 +28,7 @@ class PatientDemographicsControllerTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def parsedOrder = PatientDemographicsController.getInstance().parseOrder(request)
+        def parsedOrder = PatientDemographicsController.getInstance().parseDemographics(request)
 
         then:
         noExceptionThrown()
@@ -46,7 +46,7 @@ class PatientDemographicsControllerTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PatientDemographicsController.getInstance().parseOrder(request)
+        PatientDemographicsController.getInstance().parseDemographics(request)
 
         then:
         thrown(RuntimeException)
@@ -83,7 +83,7 @@ class PatientDemographicsControllerTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PatientDemographicsController.getInstance().parseOrder(request)
+        PatientDemographicsController.getInstance().parseDemographics(request)
 
         then:
         thrown(RuntimeException)

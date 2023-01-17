@@ -43,7 +43,7 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleOrder(DomainRequest request) {
 
         logger.logInfo("Parsing request...");
-        var order = patientDemographicsController.parseOrder(request);
+        var order = patientDemographicsController.parseDemographics(request);
 
         OrderMessage orderMessage = new OrderMessage(order);
 

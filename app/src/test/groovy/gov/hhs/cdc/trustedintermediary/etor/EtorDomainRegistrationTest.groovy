@@ -50,7 +50,7 @@ class EtorDomainRegistrationTest extends Specification {
 
         def mockOrderId = "asdf-12341-jkl-7890"
 
-        mockOrderController.parseOrder(_ as DomainRequest) >> new PatientDemographics(mockOrderId, "Massachusetts", "2022-12-21T08:34:27Z", "MassGeneral", "NBS panel for Clarus the DogCow")
+        mockOrderController.parseDemographics(_ as DomainRequest) >> new PatientDemographics(mockOrderId, "Massachusetts", "2022-12-21T08:34:27Z", "MassGeneral", "NBS panel for Clarus the DogCow")
         mockOrderController.constructResponse(_ as OrderMessage) >> new DomainResponse(418)
 
         def domainRequest = new DomainRequest()

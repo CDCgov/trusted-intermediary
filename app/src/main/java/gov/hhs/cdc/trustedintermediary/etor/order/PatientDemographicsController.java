@@ -37,8 +37,8 @@ public class PatientDemographicsController {
         return PATIENT_DEMOGRAPHICS_CONTROLLER;
     }
 
-    public PatientDemographics parseOrder(DomainRequest request) {
-        logger.logInfo("Parsing order");
+    public PatientDemographics parseDemographics(DomainRequest request) {
+        logger.logInfo("Parsing patient demographics");
 
         FhirContext context = FhirContext.forR4();
         var pather = context.newFhirPath();
@@ -61,24 +61,16 @@ public class PatientDemographicsController {
                         DateTimeType.class);
         var birthOrderOptional = pather.evaluateFirst(patient, "multipleBirth", IntegerType.class);
 
-        var order =
-                new PatientDemographics(
-                        requestIdOptional.map(IdType::getValue).orElse(null),
-                        patientIdOptional.map(StringType::getValue).orElse(null),
-                        firstNameOptional.map(StringType::getValue).orElse(null),
-                        lastNameOptional.map(StringType::getValue).orElse(null),
-                        sexOptional.map(Enumeration::getCode).orElse(null),
-                        birthDateTimeOptional
-                                .map(
-                                        birthDateTime ->
-                                                ZonedDateTime.parse(
-                                                        birthDateTime.getValueAsString()))
-                                .orElse(null),
-                        birthOrderOptional.map(PrimitiveType::getValue).orElse(null));
-
-        logger.logInfo("order=" + order);
-
-        return order;
+        return new PatientDemographics(
+                requestIdOptional.map(IdType::getValue).orElse(null),
+                patientIdOptional.map(StringType::getValue).orElse(null),
+                firstNameOptional.map(StringType::getValue).orElse(null),
+                lastNameOptional.map(StringType::getValue).orElse(null),
+                sexOptional.map(Enumeration::getCode).orElse(null),
+                birthDateTimeOptional
+                        .map(birthDateTime -> ZonedDateTime.parse(birthDateTime.getValueAsString()))
+                        .orElse(null),
+                birthOrderOptional.map(PrimitiveType::getValue).orElse(null));
     }
 
     public DomainResponse constructResponse(OrderMessage orderMessage) {
