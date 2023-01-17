@@ -73,12 +73,13 @@ public class PatientDemographicsController {
                 birthOrderOptional.map(PrimitiveType::getValue).orElse(null));
     }
 
-    public DomainResponse constructResponse(OrderMessage orderMessage) {
+    public DomainResponse constructResponse(
+            PatientDemographicsResponse patientDemographicsResponse) {
         logger.logInfo("Constructing the response");
         var response = new DomainResponse(200);
 
         try {
-            var responseBody = formatter.convertToString(orderMessage);
+            var responseBody = formatter.convertToString(patientDemographicsResponse);
             response.setBody(responseBody);
         } catch (FormatterProcessingException e) {
             logger.logError("Error constructing order message", e);

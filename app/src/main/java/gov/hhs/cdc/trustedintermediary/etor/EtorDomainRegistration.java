@@ -5,8 +5,8 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint;
-import gov.hhs.cdc.trustedintermediary.etor.order.OrderMessage;
 import gov.hhs.cdc.trustedintermediary.etor.order.PatientDemographicsController;
+import gov.hhs.cdc.trustedintermediary.etor.order.PatientDemographicsResponse;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,9 +45,10 @@ public class EtorDomainRegistration implements DomainConnector {
         logger.logInfo("Parsing request...");
         var order = patientDemographicsController.parseDemographics(request);
 
-        OrderMessage orderMessage = new OrderMessage(order);
+        PatientDemographicsResponse patientDemographicsResponse =
+                new PatientDemographicsResponse(order);
 
         logger.logInfo("Constructing response...");
-        return patientDemographicsController.constructResponse(orderMessage);
+        return patientDemographicsController.constructResponse(patientDemographicsResponse);
     }
 }

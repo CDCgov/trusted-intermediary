@@ -6,7 +6,7 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
 import gov.hhs.cdc.trustedintermediary.etor.order.PatientDemographics
 import gov.hhs.cdc.trustedintermediary.etor.order.PatientDemographicsController
-import gov.hhs.cdc.trustedintermediary.etor.order.OrderMessage
+import gov.hhs.cdc.trustedintermediary.etor.order.PatientDemographicsResponse
 import spock.lang.Specification
 
 class EtorDomainRegistrationTest extends Specification {
@@ -51,7 +51,7 @@ class EtorDomainRegistrationTest extends Specification {
         def mockOrderId = "asdf-12341-jkl-7890"
 
         mockOrderController.parseDemographics(_ as DomainRequest) >> new PatientDemographics(mockOrderId, "Massachusetts", "2022-12-21T08:34:27Z", "MassGeneral", "NBS panel for Clarus the DogCow")
-        mockOrderController.constructResponse(_ as OrderMessage) >> new DomainResponse(418)
+        mockOrderController.constructResponse(_ as PatientDemographicsResponse) >> new DomainResponse(418)
 
         def domainRequest = new DomainRequest()
 
@@ -63,7 +63,7 @@ class EtorDomainRegistrationTest extends Specification {
         def response = domainRegistration.handleOrder(domainRequest)
 
         then:
-        1 * mockOrderController.constructResponse(_ as OrderMessage) >> { OrderMessage orderMessage ->
+        1 * mockOrderController.constructResponse(_ as PatientDemographicsResponse) >> { PatientDemographicsResponse orderMessage ->
             assert orderMessage.id == mockOrderId
         }
     }

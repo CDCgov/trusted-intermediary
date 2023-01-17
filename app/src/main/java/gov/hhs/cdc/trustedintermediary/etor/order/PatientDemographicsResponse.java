@@ -6,7 +6,7 @@ import javax.annotation.Nonnull;
  * Contains similar information for the order that is sent back to the client as confirmation that
  * an order was ingested.
  */
-public class OrderMessage {
+public class PatientDemographicsResponse {
 
     private String id;
     private String destination;
@@ -14,7 +14,7 @@ public class OrderMessage {
     private String client;
     private String content;
 
-    public OrderMessage(
+    public PatientDemographicsResponse(
             String id, String destination, String createdAt, String client, String content) {
         setId(id);
         setDestination(destination);
@@ -23,7 +23,7 @@ public class OrderMessage {
         setContent(content);
     }
 
-    public OrderMessage(@Nonnull PatientDemographics patientDemographics) {
+    public PatientDemographicsResponse(@Nonnull PatientDemographics patientDemographics) {
         setId(patientDemographics.getRequestId());
         setDestination(patientDemographics.getFirstName());
         setCreatedAt(patientDemographics.getLastName());

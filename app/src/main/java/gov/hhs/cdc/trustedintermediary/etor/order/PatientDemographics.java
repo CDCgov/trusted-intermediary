@@ -3,7 +3,7 @@ package gov.hhs.cdc.trustedintermediary.etor.order;
 import java.time.ZonedDateTime;
 import java.util.StringJoiner;
 
-/** Represents an ETOR order. */
+/** Contains demographic data for a patient. */
 public class PatientDemographics {
     private String requestId;
     private String patientId;

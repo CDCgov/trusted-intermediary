@@ -58,13 +58,13 @@ class PatientDemographicsControllerTest extends Specification {
         def mockBody = "DogCow goes Moof"
 
         def formatter = Mock(Jackson)
-        formatter.convertToString(_ as OrderMessage) >> mockBody
+        formatter.convertToString(_ as PatientDemographicsResponse) >> mockBody
         TestApplicationContext.register(Formatter, formatter)
 
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def response = PatientDemographicsController.getInstance().constructResponse(new OrderMessage("asdf-12341-jkl-7890", "Massachusetts", "2022-12-21T08:34:27Z", "MassGeneral", "NBS panel for Clarus the DogCow"))
+        def response = PatientDemographicsController.getInstance().constructResponse(new PatientDemographicsResponse("asdf-12341-jkl-7890", "Massachusetts", "2022-12-21T08:34:27Z", "MassGeneral", "NBS panel for Clarus the DogCow"))
 
         then:
         response.getBody() == mockBody
@@ -93,13 +93,13 @@ class PatientDemographicsControllerTest extends Specification {
 
         given:
         def formatter = Mock(Jackson)
-        formatter.convertToString(_ as OrderMessage) >> { throw new FormatterProcessingException("couldn't make the JSON", new Exception()) }
+        formatter.convertToString(_ as PatientDemographicsResponse) >> { throw new FormatterProcessingException("couldn't make the JSON", new Exception()) }
         TestApplicationContext.register(Formatter, formatter)
 
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PatientDemographicsController.getInstance().constructResponse(new OrderMessage("asdf-12341-jkl-7890", "Massachusetts", "2022-12-21T08:34:27Z", "MassGeneral", "NBS panel for Clarus the DogCow"))
+        PatientDemographicsController.getInstance().constructResponse(new PatientDemographicsResponse("asdf-12341-jkl-7890", "Massachusetts", "2022-12-21T08:34:27Z", "MassGeneral", "NBS panel for Clarus the DogCow"))
 
         then:
         thrown(RuntimeException)
