@@ -34,51 +34,55 @@ public class OrderController {
     public Order parseOrder(DomainRequest request) {
         logger.logInfo("Parsing order");
 
-        //        try {
-        //            order = formatter.convertToObject(request.getBody(), Order.class);
-        //        } catch (FormatterProcessingException e) {
-        //            logger.logError("Unable to convert request body to order object");
-        //            throw new RuntimeException(e);
-        //        }
-
         FhirContext context = FhirContext.forR4();
         var pather = context.newFhirPath();
         var parser = context.newJsonParser();
         var patient = parser.parseResource(request.getBody());
 
-        var requestId = pather.evaluateFirst(patient, "id", IdType.class);
-        var patientId = pather.evaluateFirst(patient, "identifier.value", StringType.class);
-        var firstName =
+        var requestIdOptional = pather.evaluateFirst(patient, "id", IdType.class);
+        var patientIdOptional = pather.evaluateFirst(patient, "identifier.value", StringType.class);
+        var firstNameOptional =
                 pather.evaluateFirst(
                         patient, "name.where(use='official').given.first()", StringType.class);
-        var lastName =
+        var lastNameOptional =
                 pather.evaluateFirst(
                         patient, "name.where(use='official').family", StringType.class);
-        var sex = pather.evaluateFirst(patient, "gender", Enumeration.class);
-        var birthDateTime =
+        var sexOptional = pather.evaluateFirst(patient, "gender", Enumeration.class);
+        var birthDateTimeOptional =
                 pather.evaluateFirst(
                         patient,
                         "birthDate.extension.where(url='http://hl7.org/fhir/StructureDefinition/patient-birthTime').value",
                         DateTimeType.class);
-        var birthOrder = pather.evaluateFirst(patient, "multipleBirth", IntegerType.class);
-        logger.logInfo("requestId=" + requestId.get().getValue());
-        logger.logInfo("patientId=" + patientId.get().getValue());
-        logger.logInfo("firstName=" + firstName.get().getValue());
-        logger.logInfo("lastName=" + lastName.get().getValue());
-        logger.logInfo("sex=" + sex.get().getCode());
-        logger.logInfo("birthDateTime=" + birthDateTime.get().getValueAsString());
-        logger.logInfo("birthOrder=" + birthOrder.get().getValue());
+        var birthOrderOptional = pather.evaluateFirst(patient, "multipleBirth", IntegerType.class);
 
-        return new Order(
-                requestId.orElse(new IdType()).getValue(),
-                patientId.orElse(new StringType()).getValue(),
-                "",
-                "",
-                "",
-                ZonedDateTime.now(),
-                1);
+        //        logger.logInfo("requestIdOptional=" + requestIdOptional.map(real ->
+        // real.getValue()).orElse(null));
+        //        logger.logInfo("patientIdOptional=" + patientIdOptional.get().getValue());
+        //        logger.logInfo("firstNameOptional=" + firstNameOptional.get().getValue());
+        //        logger.logInfo("lastNameOptional=" + lastNameOptional.get().getValue());
+        //        logger.logInfo("sexOptional=" + sexOptional.get().getCode());
+        //        logger.logInfo("birthDateTimeOptional=" +
+        // birthDateTimeOptional.get().getValueAsString());
+        //        logger.logInfo("birthOrderOptional=" + birthOrderOptional.get().getValue());
 
-        //        return new Order();
+        var order =
+                new Order(
+                        requestIdOptional.map(IdType::getValue).orElse(null),
+                        patientIdOptional.map(StringType::getValue).orElse(null),
+                        firstNameOptional.map(StringType::getValue).orElse(null),
+                        lastNameOptional.map(StringType::getValue).orElse(null),
+                        sexOptional.map(Enumeration::getCode).orElse(null),
+                        birthDateTimeOptional
+                                .map(
+                                        birthDateTime ->
+                                                ZonedDateTime.parse(
+                                                        birthDateTime.getValueAsString()))
+                                .orElse(null),
+                        birthOrderOptional.map(PrimitiveType::getValue).orElse(null));
+
+        logger.logInfo("order=" + order);
+
+        return order;
     }
 
     public DomainResponse constructResponse(OrderMessage orderMessage) {
