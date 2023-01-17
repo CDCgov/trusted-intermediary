@@ -27,7 +27,7 @@ public class EtorDomainRegistration implements DomainConnector {
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
         ApplicationContext.register(
                 PatientDemographicsController.class, PatientDemographicsController.getInstance());
-        return Map.of(new HttpEndpoint("POST", "/v1/etor/order"), this::handleOrder);
+        return Map.of(new HttpEndpoint("POST", "/v1/etor/demographics"), this::handleOrder);
     }
 
     @Override
