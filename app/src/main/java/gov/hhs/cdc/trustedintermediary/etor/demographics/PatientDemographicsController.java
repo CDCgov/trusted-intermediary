@@ -17,8 +17,8 @@ import org.hl7.fhir.r4.model.PrimitiveType;
 import org.hl7.fhir.r4.model.StringType;
 
 /**
- * Creates an in-memory representation of an order to be ingested by the system, and return response
- * information back to the client.
+ * Creates an in-memory representation of patient demographics to be ingested by the system, and
+ * return response information back to the client.
  */
 public class PatientDemographicsController {
 
@@ -82,7 +82,7 @@ public class PatientDemographicsController {
             var responseBody = formatter.convertToString(patientDemographicsResponse);
             response.setBody(responseBody);
         } catch (FormatterProcessingException e) {
-            logger.logError("Error constructing order message", e);
+            logger.logError("Error constructing demographics response", e);
             throw new RuntimeException(e);
         }
 
