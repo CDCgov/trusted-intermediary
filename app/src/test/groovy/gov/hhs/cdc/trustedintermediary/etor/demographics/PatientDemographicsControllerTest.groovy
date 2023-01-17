@@ -15,7 +15,7 @@ class PatientDemographicsControllerTest extends Specification {
         TestApplicationContext.register(PatientDemographicsController, PatientDemographicsController.getInstance())
     }
 
-    def "parseOrder works"() {
+    def "parseDemographics works"() {
         given:
         def mockOrderId = "asdf-12341-jkl-7890"
 
@@ -35,7 +35,7 @@ class PatientDemographicsControllerTest extends Specification {
         parsedOrder.getRequestId() == mockOrderId
     }
 
-    def "parseOrder fails by the formatter"() {
+    def "parseDemographics fails by the formatter"() {
         given:
         def formatter = Mock(Jackson)
         formatter.convertToObject(_ as String, _ as Class) >> { throw new FormatterProcessingException("unable to format or whatever", new Exception()) }
@@ -70,23 +70,6 @@ class PatientDemographicsControllerTest extends Specification {
         response.getBody() == mockBody
         response.getStatusCode() == 200
         response.getHeaders().get(PatientDemographicsController.CONTENT_TYPE_LITERAL) == PatientDemographicsController.APPLICATION_JSON_LITERAL
-    }
-
-    def "parseOrder fails by the formatter"() {
-        given:
-        def formatter = Mock(Jackson)
-        formatter.convertToObject(_ as String, _ as Class) >> { throw new FormatterProcessingException("unable to format or whatever", new Exception()) }
-        TestApplicationContext.register(Formatter, formatter)
-
-        def request = new DomainRequest()
-
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        PatientDemographicsController.getInstance().parseDemographics(request)
-
-        then:
-        thrown(RuntimeException)
     }
 
     def "constructResponse fails to make the JSON"() {
