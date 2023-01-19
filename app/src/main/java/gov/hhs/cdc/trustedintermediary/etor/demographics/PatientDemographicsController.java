@@ -1,10 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.etor.demographics;
 
-import ca.uhn.fhir.context.FhirContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
+import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.time.ZonedDateTime;
 import java.util.Map;
@@ -13,6 +13,7 @@ import org.hl7.fhir.r4.model.DateTimeType;
 import org.hl7.fhir.r4.model.Enumeration;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.IntegerType;
+import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.PrimitiveType;
 import org.hl7.fhir.r4.model.StringType;
 
@@ -25,6 +26,7 @@ public class PatientDemographicsController {
     private static final PatientDemographicsController PATIENT_DEMOGRAPHICS_CONTROLLER =
             new PatientDemographicsController();
 
+    @Inject HapiFhir fhir;
     @Inject Formatter formatter;
     @Inject Logger logger;
 
@@ -40,26 +42,25 @@ public class PatientDemographicsController {
     public PatientDemographics parseDemographics(DomainRequest request) {
         logger.logInfo("Parsing patient demographics");
 
-        FhirContext context = FhirContext.forR4();
-        var pather = context.newFhirPath();
-        var parser = context.newJsonParser();
-        var patient = parser.parseResource(request.getBody());
+        var patient = fhir.parseResource(request.getBody(), Patient.class);
 
-        var requestIdOptional = pather.evaluateFirst(patient, "id", IdType.class);
-        var patientIdOptional = pather.evaluateFirst(patient, "identifier.value", StringType.class);
+        var requestIdOptional = fhir.fhirPathEvaluateFirst(patient, "id", IdType.class);
+        var patientIdOptional =
+                fhir.fhirPathEvaluateFirst(patient, "identifier.value", StringType.class);
         var firstNameOptional =
-                pather.evaluateFirst(
+                fhir.fhirPathEvaluateFirst(
                         patient, "name.where(use='official').given.first()", StringType.class);
         var lastNameOptional =
-                pather.evaluateFirst(
+                fhir.fhirPathEvaluateFirst(
                         patient, "name.where(use='official').family", StringType.class);
-        var sexOptional = pather.evaluateFirst(patient, "gender", Enumeration.class);
+        var sexOptional = fhir.fhirPathEvaluateFirst(patient, "gender", Enumeration.class);
         var birthDateTimeOptional =
-                pather.evaluateFirst(
+                fhir.fhirPathEvaluateFirst(
                         patient,
                         "birthDate.extension.where(url='http://hl7.org/fhir/StructureDefinition/patient-birthTime').value",
                         DateTimeType.class);
-        var birthOrderOptional = pather.evaluateFirst(patient, "multipleBirth", IntegerType.class);
+        var birthOrderOptional =
+                fhir.fhirPathEvaluateFirst(patient, "multipleBirth", IntegerType.class);
 
         return new PatientDemographics(
                 requestIdOptional.map(IdType::getValue).orElse(null),
