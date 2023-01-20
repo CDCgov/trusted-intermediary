@@ -20,7 +20,7 @@ class PatientDemographicsControllerTest extends Specification {
         def mockOrderId = "asdf-12341-jkl-7890"
 
         def formatter = Mock(Jackson)
-        formatter.convertToObject(_ as String, _ as Class) >> new PatientDemographics(mockOrderId, "Massachusetts", "2022-12-21T08:34:27Z", "MassGeneral", "NBS panel for Clarus the DogCow")
+        //        formatter.convertToObject(_ as String, _ as Class) >> new PatientDemographics(mockOrderId, "Massachusetts", "2022-12-21T08:34:27Z", "MassGeneral", "NBS panel for Clarus the DogCow")
         TestApplicationContext.register(Formatter, formatter)
 
         def request = new DomainRequest()
@@ -64,7 +64,7 @@ class PatientDemographicsControllerTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def response = PatientDemographicsController.getInstance().constructResponse(new PatientDemographicsResponse("asdf-12341-jkl-7890", "Massachusetts", "2022-12-21T08:34:27Z", "MassGeneral", "NBS panel for Clarus the DogCow"))
+        def response = PatientDemographicsController.getInstance().constructResponse(new PatientDemographicsResponse("asdf-12341-jkl-7890"))
 
         then:
         response.getBody() == mockBody
