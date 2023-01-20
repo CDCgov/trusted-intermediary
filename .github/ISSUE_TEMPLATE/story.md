@@ -8,32 +8,25 @@ assignees: ''
 ---
 
 # Story
+As a _, so that _, I need _.
 
-## Sentence
-
-As a ___,
-in order to ___,
-I need ___.
+## Pre-conditions
+- [ ] *Assumptions of prior or future work that's out of scope for this story*
 
 ## Acceptance Criteria
-
-- [ ] Something.
-
-## Research Questions
-
-- [ ] Something.
+- [ ] *Required outcomes of the story*
 
 ## Tasks
 
-- [ ] Something.
+### Research
+- [ ] *Research work needed to complete the story*
+- [ ] Foundational: *High-level research that will support this and future efforts*
 
-## Additional Context
-
-Add any other context or screenshots about the story here.
+###  Engineering
+- [ ] *Engineering work needed to complete the story*
+- [ ] Foundational: *Technical runway work to support this and future efforts*
 
 ## Definition of Done
-
-### Engineering
 - [ ] Threat model updated
 - [ ] Code refactored for clarity and no design/technical debt
 - [ ] Adhere to separation of concerns; code is not tightly coupled, especially to 3rd party dependencies.
@@ -51,5 +44,11 @@ Add any other context or screenshots about the story here.
 - [ ] API(s) are versioned
 - [ ] Debug logging
 
-### Research & Discovery
-- [ ] _TBD_
+## Research Questions 
+- *Optional: Any initial questions for research*
+
+## Decisions
+- *Optional: Any decisions we've made while working on this story*
+
+## Notes
+- *Optional: Any reference material or thoughts we may need for later reference*
