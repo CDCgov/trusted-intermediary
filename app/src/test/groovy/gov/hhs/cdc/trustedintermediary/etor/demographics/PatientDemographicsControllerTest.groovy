@@ -31,7 +31,7 @@ class PatientDemographicsControllerTest extends Specification {
         def mockBirthDate = "2022-12-21T08:34:27Z"
         def mockBirthNumber = 1
 
-        def fhir = Mock(HapiFhirImplementation)
+        def fhir = Mock(HapiFhir)
 
         fhir.parseResource(_ as String, _ as Class) >> new Patient()
 
@@ -62,21 +62,84 @@ class PatientDemographicsControllerTest extends Specification {
         patientDemographics.getBirthOrder() == mockBirthNumber
     }
 
-    def "parseDemographics fails by the formatter"() {
+    def "parseDemographics puts null into the patient demographics"() {
         given:
-        def formatter = Mock(Jackson)
-        formatter.convertToObject(_ as String, _ as Class) >> { throw new FormatterProcessingException("unable to format or whatever", new Exception()) }
-        TestApplicationContext.register(Formatter, formatter)
+        def fhir = Mock(HapiFhir)
+
+        fhir.parseResource(_ as String, _ as Class) >> new Patient()
+
+        fhir.fhirPathEvaluateFirst(_ as IBase, "id", IdType) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, "identifier.value", StringType) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, "name.where(use='official').given.first()", StringType) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, "name.where(use='official').family", StringType) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, "gender", Enumeration) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, "birthDate.extension.where(url='http://hl7.org/fhir/StructureDefinition/patient-birthTime').value", DateTimeType) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, "multipleBirth", IntegerType) >> Optional.empty()
+
+        TestApplicationContext.register(HapiFhir, fhir)
 
         def request = new DomainRequest()
 
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PatientDemographicsController.getInstance().parseDemographics(request)
+        def patientDemographics = PatientDemographicsController.getInstance().parseDemographics(request)
 
         then:
-        thrown(RuntimeException)
+        patientDemographics.getRequestId() == null
+        patientDemographics.getPatientId() == null
+        patientDemographics.getFirstName() == null
+        patientDemographics.getLastName() == null
+        patientDemographics.getSex() == null
+        patientDemographics.getBirthDateTime() == null
+        patientDemographics.getBirthOrder() == null
+    }
+
+    def "the FHIR paths are correct"() {
+        given:
+        def mockRequestId = "asdf-12341-jkl-7890"
+        def mockPatientId = "patientId"
+        def mockFirstName = "Clarus"
+        def mockLastName = "DogCow"
+        def mockSex = Enumerations.AdministrativeGender.UNKNOWN.toCode()
+        def mockBirthDate = "2022-12-21T08:34:27Z"
+        def mockBirthNumber = 1
+
+        def fhir = Mock(HapiFhir)
+
+        def patient = new Patient()
+        patient.setId(mockRequestId)
+        patient.setIdentifier(List.of(new Identifier().setValue(mockPatientId), new Identifier().setValue("something else")))
+        patient.setName(List.of(new HumanName().setUse(HumanName.NameUse.OFFICIAL).setFamily(mockLastName).setGiven(List.of(new StringType(mockFirstName), new StringType("Apple")))))
+        patient.setGender(Enumerations.AdministrativeGender.fromCode(mockSex))
+        def birthDateTime = new DateType(mockBirthDate.substring(0, mockBirthDate.indexOf("T")))
+        birthDateTime.addExtension("http://hl7.org/fhir/StructureDefinition/patient-birthTime", new DateTimeType(mockBirthDate))
+        patient.setBirthDateElement(birthDateTime)
+        patient.setMultipleBirth(new IntegerType(mockBirthNumber))
+
+        fhir.parseResource(_ as String, _ as Class) >> patient
+
+        fhir.fhirPathEvaluateFirst(_ as IBase, _ as String, _ as Class) >> { IBase fhirResource, String path, Class clazz ->
+            return HapiFhirImplementation.getInstance().fhirPathEvaluateFirst(fhirResource, path, clazz)
+        }
+
+        TestApplicationContext.register(HapiFhir, fhir)
+
+        def request = new DomainRequest()
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def patientDemographics = PatientDemographicsController.getInstance().parseDemographics(request)
+
+        then:
+        patientDemographics.getRequestId() == mockRequestId
+        patientDemographics.getPatientId() == mockPatientId
+        patientDemographics.getFirstName() == mockFirstName
+        patientDemographics.getLastName() == mockLastName
+        patientDemographics.getSex() == mockSex
+        patientDemographics.getBirthDateTime() == ZonedDateTime.parse(mockBirthDate)
+        patientDemographics.getBirthOrder() == mockBirthNumber
     }
 
     def "constructResponse works"() {
