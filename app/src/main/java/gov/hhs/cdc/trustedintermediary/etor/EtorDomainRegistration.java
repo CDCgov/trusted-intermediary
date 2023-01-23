@@ -23,16 +23,19 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject OrderController orderController;
     @Inject Logger logger;
 
+    private Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domains =
+            Map.of(new HttpEndpoint("POST", "/v1/etor/order"), this::handleOrder);
+
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
         ApplicationContext.register(OrderController.class, OrderController.getInstance());
-        return Map.of(new HttpEndpoint("POST", "/v1/etor/order"), this::handleOrder);
+        return domains;
     }
 
     @Override
     public String openApiSpecification() {
         try (InputStream openApiStream =
-                getClass().getClassLoader().getResourceAsStream("openapi_etor.yaml")) {
+                getClass().getClassLoader().getResourceAsStream("openapi_base.yaml")) {
             return new String(openApiStream.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new RuntimeException(e);

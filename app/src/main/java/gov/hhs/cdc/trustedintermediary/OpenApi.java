@@ -21,6 +21,7 @@ public class OpenApi {
 
     public String generateApiDocumentation(final Set<String> openApiSpecifications) {
         openApiSpecifications.add(getBaselineDocumentation());
+        openApiSpecifications.add(getEtorDocumentation());
 
         try {
             // not using @Inject in a field of this class because we are still bootstrapping the
@@ -37,6 +38,15 @@ public class OpenApi {
     String getBaselineDocumentation() {
         try (InputStream openApiStream =
                 getClass().getClassLoader().getResourceAsStream("openapi_base.yaml")) {
+            return new String(openApiStream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    String getEtorDocumentation() {
+        try (InputStream openApiStream =
+                getClass().getClassLoader().getResourceAsStream("openapi_etor.yaml")) {
             return new String(openApiStream.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new RuntimeException(e);
