@@ -66,7 +66,7 @@ class EtorDomainRegistrationTest extends Specification {
 
         then:
         1 * mockDemographicsController.constructResponse(_ as PatientDemographicsResponse) >> { PatientDemographicsResponse demographicsResponse ->
-            assert demographicsResponse.id == mockRequestId
+            assert demographicsResponse.fhirResourceId == mockRequestId
         }
     }
 }

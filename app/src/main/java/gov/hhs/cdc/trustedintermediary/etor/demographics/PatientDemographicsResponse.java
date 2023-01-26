@@ -1,76 +1,35 @@
 package gov.hhs.cdc.trustedintermediary.etor.demographics;
 
-import java.time.ZonedDateTime;
 import javax.annotation.Nonnull;
 
 /** Contains an ID that is reflected from the patient demographic data. */
 public class PatientDemographicsResponse {
 
-    private String id;
-    private String firstName;
-    private String lastName;
-    private String sex;
-    private ZonedDateTime birthDateTime;
-    private Integer birthOrder;
+    private String fhirResourceId;
+    private String patientId;
 
     public PatientDemographicsResponse(String id) {
-        setId(id);
+        setFhirResourceId(id);
     }
 
     public PatientDemographicsResponse(@Nonnull PatientDemographics patientDemographics) {
-        setId(patientDemographics.getRequestId());
-        setFirstName(patientDemographics.getFirstName());
-        setLastName(patientDemographics.getLastName());
-        setSex(patientDemographics.getSex());
-        //        setBirthDateTime(patientDemographics.getBirthDateTime());
-        setBirthOrder(patientDemographics.getBirthOrder());
+        setFhirResourceId(patientDemographics.getRequestId());
+        setPatientId(patientDemographics.getPatientId());
     }
 
-    public String getId() {
-        return id;
+    public String getFhirResourceId() {
+        return fhirResourceId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setFhirResourceId(String fhirResourceId) {
+        this.fhirResourceId = fhirResourceId;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getPatientId() {
+        return patientId;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getSex() {
-        return sex;
-    }
-
-    public void setSex(String sex) {
-        this.sex = sex;
-    }
-
-    public ZonedDateTime getBirthDateTime() {
-        return birthDateTime;
-    }
-
-    public void setBirthDateTime(ZonedDateTime birthDateTime) {
-        this.birthDateTime = birthDateTime;
-    }
-
-    public Integer getBirthOrder() {
-        return birthOrder;
-    }
-
-    public void setBirthOrder(Integer birthOrder) {
-        this.birthOrder = birthOrder;
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
     }
 }
