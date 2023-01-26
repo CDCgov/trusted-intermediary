@@ -9,12 +9,11 @@ set -e
 echo "API health check..."
 
 CONTAINER_NAME="trusted-intermediary-router-1"
-CONTAINER_PASSED="Container is running: passed"
-CONTAINER_FAILED="Container is running: failed!"
-API_HEALTH_CHECK_PASSED="API health check: passed"
-API_HEALTH_CHECK_FAILED="API health check: failed!"
+CONTAINER_PASSED="PASSED: Container is running"
+CONTAINER_FAILED="FAILED: Container is running"
+API_HEALTH_CHECK_PASSED="PASSED: API health check"
+API_HEALTH_CHECK_FAILED="FAILED: API health check"
 
-echo "Checking if container is running..."
 if docker ps --format '{{.Names}}' | grep -Eq "^${CONTAINER_NAME}\$"; then
   echo $CONTAINER_PASSED
 else
@@ -25,8 +24,6 @@ fi
 
 URL="http://$(ip -f inet -o addr show docker0 | awk '{print $4}' | cut -d '/' -f 1):8080/health"
 HTTP_CODE=$(curl -s -o /dev/null -L -w '%{http_code}\n' $URL)
-
-echo "checking API health endpoint..."
 
 if [[ "$HTTP_CODE" -ne 200 ]]; then
   echo $API_HEALTH_CHECK_FAILED
