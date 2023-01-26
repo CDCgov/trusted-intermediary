@@ -49,7 +49,7 @@ health_check() {
         echo "status Code: $HTTP_CODE"
       else
         echo "$API_HEALTH_CHECK_PASSED"
-        echo "Status code: $HTTP_CODE"
+        echo "Status Code: $HTTP_CODE"
         exit 0
       fi
 }
