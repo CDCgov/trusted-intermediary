@@ -35,6 +35,9 @@ jobs:
       - name: Create docker network
         run: docker network create zapnet
 
+      - name: Check API Health
+        run: ./health-check.sh
+
       - name: Run ZAP API Scan
         run: |
           sudo docker run --net zapnet -v $(pwd):/zap/wrk/:rw --user root -t owasp/zap2docker-weekly zap-api-scan.py -t http://$(ip -f inet -o addr show docker0 | awk '{print $4}' | cut -d '/' -f 1):8080/v1/etor/openapi -f openapi -r api-scan-report.html
