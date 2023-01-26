@@ -14,22 +14,46 @@ CONTAINER_FAILED="FAILED: Container is running"
 API_HEALTH_CHECK_PASSED="PASSED: API health check"
 API_HEALTH_CHECK_FAILED="FAILED: API health check"
 
-if docker ps --format '{{.Names}}' | grep -Eq "^${CONTAINER_NAME}\$"; then
-  echo $CONTAINER_PASSED
-else
-  echo $CONTAINER_FAILED
-  echo $API_HEALTH_CHECK_FAILED
-  exit 1
-fi
+is_container_running() {
+  if docker ps --format '{{.Names}}' | grep -Eq "^${CONTAINER_NAME}\$"; then
+    echo "$CONTAINER_PASSED"
+  else
+    echo "$CONTAINER_FAILED"
+    echo "$API_HEALTH_CHECK_FAILED"
+    exit 1
+  fi
+}
 
-URL="http://$(ip -f inet -o addr show docker0 | awk '{print $4}' | cut -d '/' -f 1):8080/health"
-HTTP_CODE=$(curl -s -o /dev/null -L -w '%{http_code}\n' $URL)
+wait() {
+  sleep 5
+}
 
-if [[ "$HTTP_CODE" -ne 200 ]]; then
-  echo $API_HEALTH_CHECK_FAILED
-  echo "status code: $HTTP_CODE"
-else
-  echo $API_HEALTH_CHECK_PASSED
-  echo "Status code: $HTTP_CODE"
-  exit 0
-fi
+health_check() {
+    attempts=0
+    max_attempts=25
+    URL="http://$(ip -f inet -o addr show docker0 | awk '{print $4}' | cut -d '/' -f 1):8080/health"
+    HTTP_CODE=0
+
+    until HTTP_CODE=$(curl -s -o /dev/null -L -w '%{http_code}\n' $URL); do
+        if [[ "${attempts}" -eq "${max_attempts}" ]];then
+            echo 'Done waiting for API to respond'
+            exit 1
+        fi
+        ((attempts=attempt+1))
+        echo 'Waiting for API to respond'
+        wait
+    done
+
+      if [[ "$HTTP_CODE" -ne 200 ]]; then
+        echo "$API_HEALTH_CHECK_FAILED"
+        echo "status code: $HTTP_CODE"
+      else
+        echo "$API_HEALTH_CHECK_PASSED"
+        echo "Status code: $HTTP_CODE"
+        exit 0
+      fi
+}
+
+# main
+is_container_running
+health_check
