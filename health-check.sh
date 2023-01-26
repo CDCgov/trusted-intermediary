@@ -9,10 +9,10 @@ set -e
 echo "API Health Check..."
 
 CONTAINER_NAME="trusted-intermediary-router-1"
-CONTAINER_PASSED="PASSED: Container is Running"
-CONTAINER_FAILED="FAILED: Container is Running"
-API_HEALTH_CHECK_PASSED="PASSED: API Health Check"
-API_HEALTH_CHECK_FAILED="FAILED: API Health Check"
+CONTAINER_PASSED="PASS: Container is Running"
+CONTAINER_FAILED="FAIL: Container is Running"
+API_HEALTH_CHECK_PASSED="PASS: API Health Check"
+API_HEALTH_CHECK_FAILED="FAIL: API Health Check"
 
 is_container_running() {
   if docker ps --format '{{.Names}}' | grep -Eq "^${CONTAINER_NAME}\$"; then
@@ -36,7 +36,7 @@ health_check() {
 
     until HTTP_CODE=$(curl -s -o /dev/null -L -w '%{http_code}\n' $URL); do
         if [[ "${attempts}" -eq "${max_attempts}" ]];then
-            echo 'FAILED: API to Respond'
+            echo 'FAIL: API to Respond'
             exit 1
         fi
         ((attempts=attempt+1))
