@@ -39,7 +39,7 @@ health_check() {
             echo 'FAIL: API to Respond'
             exit 1
         fi
-        ((attempts=attempt+1))
+        ((attempts=attempts+1))
         echo 'Waiting for API to respond...'
         wait
     done
