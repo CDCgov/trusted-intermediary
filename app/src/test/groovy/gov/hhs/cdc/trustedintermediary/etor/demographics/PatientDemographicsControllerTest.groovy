@@ -53,7 +53,7 @@ class PatientDemographicsControllerTest extends Specification {
         def patientDemographics = PatientDemographicsController.getInstance().parseDemographics(request)
 
         then:
-        patientDemographics.getRequestId() == mockRequestId
+        patientDemographics.getFhirResourceId() == mockRequestId
         patientDemographics.getPatientId() == mockPatientId
         patientDemographics.getFirstName() == mockFirstName
         patientDemographics.getLastName() == mockLastName
@@ -86,7 +86,7 @@ class PatientDemographicsControllerTest extends Specification {
         def patientDemographics = PatientDemographicsController.getInstance().parseDemographics(request)
 
         then:
-        patientDemographics.getRequestId() == null
+        patientDemographics.getFhirResourceId() == null
         patientDemographics.getPatientId() == null
         patientDemographics.getFirstName() == null
         patientDemographics.getLastName() == null
@@ -133,7 +133,7 @@ class PatientDemographicsControllerTest extends Specification {
         def patientDemographics = PatientDemographicsController.getInstance().parseDemographics(request)
 
         then:
-        patientDemographics.getRequestId() == mockRequestId
+        patientDemographics.getFhirResourceId() == mockRequestId
         patientDemographics.getPatientId() == mockPatientId
         patientDemographics.getFirstName() == mockFirstName
         patientDemographics.getLastName() == mockLastName

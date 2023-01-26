@@ -14,7 +14,7 @@ public class PatientDemographicsResponse {
     }
 
     public PatientDemographicsResponse(@Nonnull PatientDemographics patientDemographics) {
-        setFhirResourceId(patientDemographics.getRequestId());
+        setFhirResourceId(patientDemographics.getFhirResourceId());
         setPatientId(patientDemographics.getPatientId());
     }
 

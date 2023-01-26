@@ -5,7 +5,7 @@ import java.util.StringJoiner;
 
 /** Contains demographic data for a patient. */
 public class PatientDemographics {
-    private String requestId;
+    private String fhirResourceId;
     private String patientId;
     private String firstName;
     private String lastName;
@@ -14,14 +14,14 @@ public class PatientDemographics {
     private Integer birthOrder;
 
     public PatientDemographics(
-            String requestId,
+            String fhirResourceId,
             String patientId,
             String firstName,
             String lastName,
             String sex,
             ZonedDateTime birthDateTime,
             Integer birthOrder) {
-        this.requestId = requestId;
+        this.fhirResourceId = fhirResourceId;
         this.patientId = patientId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -32,12 +32,12 @@ public class PatientDemographics {
 
     public PatientDemographics() {}
 
-    public String getRequestId() {
-        return requestId;
+    public String getFhirResourceId() {
+        return fhirResourceId;
     }
 
-    public void setRequestId(String requestId) {
-        this.requestId = requestId;
+    public void setFhirResourceId(String fhirResourceId) {
+        this.fhirResourceId = fhirResourceId;
     }
 
     public String getPatientId() {
@@ -91,7 +91,7 @@ public class PatientDemographics {
     @Override
     public String toString() {
         return new StringJoiner(", ", PatientDemographics.class.getSimpleName() + "[", "]")
-                .add("requestId='" + requestId + "'")
+                .add("fhirResourceId='" + fhirResourceId + "'")
                 .add("patientId='" + patientId + "'")
                 .add("firstName='" + firstName + "'")
                 .add("lastName='" + lastName + "'")

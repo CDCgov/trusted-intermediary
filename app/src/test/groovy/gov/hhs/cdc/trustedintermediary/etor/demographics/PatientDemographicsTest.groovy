@@ -20,7 +20,7 @@ class PatientDemographicsTest extends Specification {
         def order = new PatientDemographics()
 
         then:
-        order.getRequestId() == null
+        order.getFhirResourceId() == null
         order.getPatientId() == null
         order.getFirstName() == null
         order.getLastName() == null
@@ -31,7 +31,7 @@ class PatientDemographicsTest extends Specification {
 
     def "test argument constructor"() {
         given:
-        def requestId = "12345werty"
+        def fhirResourceId = "12345werty"
         def patientId = "fake lab"
         def firstName = "fake hospital"
         def lastName = "lab order"
@@ -40,10 +40,10 @@ class PatientDemographicsTest extends Specification {
         def birthOrder = 1
 
         when:
-        def demographics = new PatientDemographics(requestId, patientId, firstName, lastName, sex, birthDateTime, birthOrder)
+        def demographics = new PatientDemographics(fhirResourceId, patientId, firstName, lastName, sex, birthDateTime, birthOrder)
 
         then:
-        demographics.getRequestId() == requestId
+        demographics.getFhirResourceId() == fhirResourceId
         demographics.getPatientId() == patientId
         demographics.getFirstName() == firstName
         demographics.getLastName() == lastName

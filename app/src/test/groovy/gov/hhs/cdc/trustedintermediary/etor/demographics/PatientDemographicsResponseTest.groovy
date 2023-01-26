@@ -19,7 +19,7 @@ class PatientDemographicsResponseTest extends Specification {
         def patientId = "fthgyu687"
 
         def demographics = new PatientDemographics()
-        demographics.setRequestId(resourceId)
+        demographics.setFhirResourceId(resourceId)
         demographics.setPatientId(patientId)
 
         when:

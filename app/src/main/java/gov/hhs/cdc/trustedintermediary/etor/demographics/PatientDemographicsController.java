@@ -44,7 +44,7 @@ public class PatientDemographicsController {
 
         var patient = fhir.parseResource(request.getBody(), Patient.class);
 
-        var requestIdOptional = fhir.fhirPathEvaluateFirst(patient, "id", IdType.class);
+        var fhirResourceIdOptional = fhir.fhirPathEvaluateFirst(patient, "id", IdType.class);
         var patientIdOptional =
                 fhir.fhirPathEvaluateFirst(patient, "identifier.value", StringType.class);
         var firstNameOptional =
@@ -63,7 +63,7 @@ public class PatientDemographicsController {
                 fhir.fhirPathEvaluateFirst(patient, "multipleBirth", IntegerType.class);
 
         return new PatientDemographics(
-                requestIdOptional.map(IdType::getValue).orElse(null),
+                fhirResourceIdOptional.map(IdType::getValue).orElse(null),
                 patientIdOptional.map(StringType::getValue).orElse(null),
                 firstNameOptional.map(StringType::getValue).orElse(null),
                 lastNameOptional.map(StringType::getValue).orElse(null),
