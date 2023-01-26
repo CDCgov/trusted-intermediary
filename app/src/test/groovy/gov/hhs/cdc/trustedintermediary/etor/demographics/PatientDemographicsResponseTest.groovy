@@ -32,12 +32,14 @@ class PatientDemographicsResponseTest extends Specification {
 
     def "test argument constructor"() {
         given:
-        def id = "67890asdfg"
+        def resourceId = "67890asdfg"
+        def patientId = "fthgyu687"
 
         when:
-        def response = new PatientDemographicsResponse(id)
+        def response = new PatientDemographicsResponse(resourceId, patientId)
 
         then:
-        response.getFhirResourceId() == id
+        response.getFhirResourceId() == resourceId
+        response.getPatientId() == patientId
     }
 }

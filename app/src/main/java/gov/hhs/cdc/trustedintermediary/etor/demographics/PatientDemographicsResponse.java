@@ -8,8 +8,9 @@ public class PatientDemographicsResponse {
     private String fhirResourceId;
     private String patientId;
 
-    public PatientDemographicsResponse(String id) {
-        setFhirResourceId(id);
+    PatientDemographicsResponse(String fhirResourceId, String patientId) {
+        setFhirResourceId(fhirResourceId);
+        setPatientId(patientId);
     }
 
     public PatientDemographicsResponse(@Nonnull PatientDemographics patientDemographics) {

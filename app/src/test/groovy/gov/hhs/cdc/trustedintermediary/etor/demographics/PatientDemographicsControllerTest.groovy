@@ -154,7 +154,7 @@ class PatientDemographicsControllerTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def response = PatientDemographicsController.getInstance().constructResponse(new PatientDemographicsResponse("asdf-12341-jkl-7890"))
+        def response = PatientDemographicsController.getInstance().constructResponse(new PatientDemographicsResponse("asdf-12341-jkl-7890", "blkjh-7685"))
 
         then:
         response.getBody() == mockBody
