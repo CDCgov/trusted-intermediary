@@ -4,12 +4,7 @@ import spock.lang.Specification
 
 class DemographicsTest extends Specification {
 
-    def "a demographics response is returned from the ETOR demographics endpoint"() {
-        given:
-        def expected = """{"id":"Patient/infant-twin-1","firstName":"Jaina","lastName":"Solo","sex":"female","birthDateTime":null,"birthOrder":1}"""
-
-        when:
-        def responseBody = Client.post("/v1/etor/demographics","""{
+    def newbornPatient = """{
           "resourceType": "Patient",
           "id": "infant-twin-1",
           "text": {
@@ -32,18 +27,12 @@ class DemographicsTest extends Specification {
                   }
                 ]
               },
-              "system": "http://coruscanthealth.org/main-hospital/patient-identifier"
-            },
-            {
-              "system": "http://new-republic.gov/galactic-citizen-identifier"
-            },
-            {
-              "system": "http://new-republic.gov/galactic-citizen-identifier",
-              "value": "test2"
+              "system": "http://coruscanthealth.org/main-hospital/patient-identifier",
+              "value": "MRN7465737865"
             },
             {
               "system": "http://new-republic.gov/galactic-citizen-identifier",
-              "value": "test3"
+              "value": "7465737865"
             }
           ],
           "name": [
@@ -103,7 +92,14 @@ class DemographicsTest extends Specification {
               ]
             }
           ]
-        }""")
+        }"""
+
+    def "a demographics response is returned from the ETOR demographics endpoint"() {
+        given:
+        def expected = """{"fhirResourceId":"Patient/infant-twin-1","patientId":"MRN7465737865"}"""
+
+        when:
+        def responseBody = Client.post("/v1/etor/demographics", newbornPatient)
 
         then:
         responseBody == expected
@@ -112,13 +108,8 @@ class DemographicsTest extends Specification {
     def "bad response given for poorly formatted JSON"() {
 
         when:
-        def responseBody = Client.post("/v1/etor/demographics","""{
-                "id": "an ID",
-                "destination": "Massachusetts",
-                "createdAt": "2022-12-21T08:34:27Z",
-                "client": "MassGeneral"
-            """)
-        //notice the missing end } above
+        def responseBody = Client.post("/v1/etor/demographics", newbornPatient.substring(1))
+        //removed beginning '{' to make this JSON invalid
 
         then:
         responseBody == "Server Error"
