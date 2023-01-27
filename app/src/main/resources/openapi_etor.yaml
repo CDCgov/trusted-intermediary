@@ -14,58 +14,29 @@ externalDocs:
 paths:
   /v1/etor/demographics:
     post:
-      summary: forwards an ETOR order to a lab
+      summary: forwards demographic information to a lab
       requestBody:
-        description: an order
+        description: a FHIR patient resource
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Order'
+              $ref: 'https://github.com/LinuxForHealth/FHIR/blob/main/fhir-openapi/src/main/webapp/META-INF/openapi.json?raw=true#/components/schemas/Patient'
         required: true
       responses:
         '200':
-          description: the order was sent successfully
+          description: the demographics were sent successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrderMessage'
+                $ref: '#/components/schemas/PatientDemographicsResponse'
 components:
   schemas:
-    Order:
+    PatientDemographicsResponse:
       type: object
       properties:
-        id:
+        fhirResourceId:
           type: string
-          example: 10
-        destination:
+          example: Patient/infant-twin-1
+        patientId:
           type: string
-          example: Massachusetts
-        createdAt:
-          type: string
-          example: 2022-12-21T08:34:27Z
-          format: ISO8601 date and time
-        client:
-          type: string
-          example: MassGeneral
-        content:
-          type: string
-          example: DogCow requests a newborn screening!
-    OrderMessage:
-      type: object
-      properties:
-        id:
-          type: string
-          example: 10
-        destination:
-          type: string
-          example: Massachusetts
-        createdAt:
-          type: string
-          example: 2022-12-21T08:34:27Z
-          format: ISO8601 date and time
-        client:
-          type: string
-          example: MassGeneral
-        content:
-          type: string
-          example: DogCow sent a newborn screening request!
+          example: MRN7465737865
