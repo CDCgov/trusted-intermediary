@@ -18,7 +18,7 @@ start_api() {
 
 wait_for_api() {
     attempt_counter=0
-    max_attempts=5
+    max_attempts=20
 
     until curl --output /dev/null --silent --head --fail http://localhost:8080/health; do
         if [ "${attempt_counter}" -eq "${max_attempts}" ];then
