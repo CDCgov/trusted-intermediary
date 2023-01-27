@@ -2,8 +2,9 @@ name: ZAP
 
 on:
   push:
-    branches: [ story/77/dast/jorg3 ]
-
+    branches:
+      - main
+  pull_request:
   workflow_dispatch:
 
 
