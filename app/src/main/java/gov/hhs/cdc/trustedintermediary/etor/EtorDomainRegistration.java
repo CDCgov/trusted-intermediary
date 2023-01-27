@@ -23,13 +23,13 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject OrderController orderController;
     @Inject Logger logger;
 
-    private Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domains =
+    private Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
             Map.of(new HttpEndpoint("POST", "/v1/etor/order"), this::handleOrder);
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
         ApplicationContext.register(OrderController.class, OrderController.getInstance());
-        return domains;
+        return endpoints;
     }
 
     @Override
