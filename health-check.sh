@@ -8,7 +8,6 @@ set -e
 
 echo "API Health Check..."
 
-CONTAINER_NAME="trusted-intermediary-router-1"
 API_HEALTH_CHECK_PASSED="PASS: API Health Check"
 API_HEALTH_CHECK_FAILED="FAIL: API Health Check"
 
@@ -34,7 +33,7 @@ health_check() {
 
       if [[ "$HTTP_CODE" -ne 200 ]]; then
         echo "$API_HEALTH_CHECK_FAILED"
-        echo "status Code: $HTTP_CODE"
+        echo "Status Code: $HTTP_CODE"
       else
         echo "$API_HEALTH_CHECK_PASSED"
         echo "Status Code: $HTTP_CODE"
