@@ -2,15 +2,18 @@
 set -e
 
 start_api() {
+  DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  SUB_DIR="app/build/libs"
+  JAR_NAME="app-all.jar"
     echo 'Starting API'
-    ./gradlew --no-daemon app:clean app:run &
+    java -jar "${DIR}"/"${SUB_DIR}"/"${JAR_NAME}" > /dev/null &
     export API_PID="${!}"
     echo "API starting at PID ${API_PID}"
 }
 
 wait_for_api() {
     attempt_counter=0
-    max_attempts=36
+    max_attempts=5
 
     until curl --output /dev/null --silent --head --fail http://localhost:8080/health; do
         if [ "${attempt_counter}" -eq "${max_attempts}" ];then
