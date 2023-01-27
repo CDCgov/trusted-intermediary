@@ -51,4 +51,27 @@ class PatientDemographicsTest extends Specification {
         demographics.getBirthDateTime() == birthDateTime
         demographics.getBirthOrder() == birthOrder
     }
+
+    def "test toString"() {
+        given:
+        def fhirResourceId = "12345werty"
+        def patientId = "fake lab"
+        def firstName = "fake hospital"
+        def lastName = "lab order"
+        def sex = "male"
+        def birthDateTime = ZonedDateTime.now()
+        def birthOrder = 1
+
+        when:
+        def demographicsString = new PatientDemographics(fhirResourceId, patientId, firstName, lastName, sex, birthDateTime, birthOrder).toString()
+
+        then:
+        demographicsString.contains(fhirResourceId)
+        demographicsString.contains(patientId)
+        demographicsString.contains(firstName)
+        demographicsString.contains(lastName)
+        demographicsString.contains(sex)
+        demographicsString.contains(birthDateTime.toString())
+        demographicsString.contains(birthOrder.toString())
+    }
 }
