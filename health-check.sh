@@ -9,20 +9,8 @@ set -e
 echo "API Health Check..."
 
 CONTAINER_NAME="trusted-intermediary-router-1"
-CONTAINER_PASSED="PASS: Container is Running"
-CONTAINER_FAILED="FAIL: Container is Running"
 API_HEALTH_CHECK_PASSED="PASS: API Health Check"
 API_HEALTH_CHECK_FAILED="FAIL: API Health Check"
-
-is_container_running() {
-  if docker ps --format '{{.Names}}' | grep -Eq "^${CONTAINER_NAME}\$"; then
-    echo "$CONTAINER_PASSED"
-  else
-    echo "$CONTAINER_FAILED"
-    echo "$API_HEALTH_CHECK_FAILED"
-    exit 1
-  fi
-}
 
 wait() {
   sleep 5
@@ -55,5 +43,4 @@ health_check() {
 }
 
 # main
-is_container_running
 health_check
