@@ -3,7 +3,7 @@ set -e
 
 shadowJar() {
   echo "Running shadowJar..."
-  ./gradlew shadowJar
+  ./gradlew --no-daemon :app:clean shadowJar
 }
 
 start_api() {
