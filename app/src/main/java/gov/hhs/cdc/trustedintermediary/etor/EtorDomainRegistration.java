@@ -33,7 +33,7 @@ public class EtorDomainRegistration implements DomainConnector {
     }
 
     @Override
-    public String openApiSpecification() { // comment
+    public String openApiSpecification() {
         try (InputStream openApiStream =
                 getClass().getClassLoader().getResourceAsStream("openapi_etor.yaml")) {
             return new String(openApiStream.readAllBytes(), StandardCharsets.UTF_8);
