@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 set -e
 
+shadowJar() {
+  echo "Running shadowJar..."
+  ./gradlew shadowJar
+}
+
 start_api() {
-  DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-  SUB_DIR="app/build/libs"
-  JAR_NAME="app-all.jar"
+    DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    SUB_DIR="app/build/libs"
+    JAR_NAME="app-all.jar"
     echo 'Starting API'
     java -jar "${DIR}"/"${SUB_DIR}"/"${JAR_NAME}" > /dev/null &
     export API_PID="${!}"
@@ -39,6 +44,7 @@ cleanup() {
 }
 
 trap cleanup EXIT  # Run the cleanup function on exit
+shadowJar
 start_api
 wait_for_api
 run_tests
