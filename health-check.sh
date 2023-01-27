@@ -18,7 +18,7 @@ wait() {
 
 health_check() {
     attempts=0
-    max_attempts=25
+    max_attempts=10
     URL="http://$(ip -f inet -o addr show docker0 | awk '{print $4}' | cut -d '/' -f 1):8080/health"
     HTTP_CODE=0
 
