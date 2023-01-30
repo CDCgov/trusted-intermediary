@@ -21,7 +21,7 @@ class PatientDemographicsControllerTest extends Specification {
         TestApplicationContext.register(PatientDemographicsController, PatientDemographicsController.getInstance())
     }
 
-    def "parseDemographics works"() {
+    def "parseDemographics extracts the optional and correctly interprets the value"() {
         given:
         def mockRequestId = "asdf-12341-jkl-7890"
         def mockPatientId = "patientId"
