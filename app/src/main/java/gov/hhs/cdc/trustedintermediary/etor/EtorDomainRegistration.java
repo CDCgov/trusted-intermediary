@@ -23,7 +23,7 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject PatientDemographicsController patientDemographicsController;
     @Inject Logger logger;
 
-    private Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
+    private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
             Map.of(new HttpEndpoint("POST", "/v1/etor/demographics"), this::handleOrder);
 
     @Override
