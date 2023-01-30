@@ -1,0 +1,49 @@
+name: ZAP
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: ZAP API Scan
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: corretto
+          cache: gradle
+
+      - name: ShadowJar
+        run: ./gradlew clean shadowJar
+
+      - name: Run App in Container
+        run: docker compose up --build -d
+
+      - name: Check API Health
+        run: ./health-check.sh
+
+      - name: Pull ZAP OWASP Image
+        run: docker pull owasp/zap2docker-weekly
+
+      - name: Create docker network
+        run: docker network create zapnet
+
+      - name: Run ZAP API Scan
+        run: |
+          sudo docker run --net zapnet -v $(pwd):/zap/wrk/:rw --user root -t owasp/zap2docker-weekly zap-api-scan.py -t http://$(ip -f inet -o addr show docker0 | awk '{print $4}' | cut -d '/' -f 1):8080/v1/etor/openapi -f openapi -r api-scan-report.html
+
+      - name: Upload Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: zap-scan-report
+          path: api-scan-report.html
