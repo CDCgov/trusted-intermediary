@@ -5,6 +5,8 @@ on:
     branches:
       - main
   pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 
@@ -22,7 +24,7 @@ jobs:
           cache: gradle
 
       - name: ShadowJar
-        run: ./gradlew shadowJar
+        run: ./gradlew clean shadowJar
 
       - name: Run App in Container
         run: docker compose up --build -d

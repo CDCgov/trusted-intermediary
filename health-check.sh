@@ -34,6 +34,7 @@ health_check() {
       if [[ "$HTTP_CODE" -ne 200 ]]; then
         echo "$API_HEALTH_CHECK_FAILED"
         echo "Status Code: $HTTP_CODE"
+        exit 1
       else
         echo "$API_HEALTH_CHECK_PASSED"
         echo "Status Code: $HTTP_CODE"
