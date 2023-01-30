@@ -25,7 +25,7 @@ public class PatientDemographicsController {
 
     private static final PatientDemographicsController PATIENT_DEMOGRAPHICS_CONTROLLER =
             new PatientDemographicsController();
-    private static final String PATIENT_IN_BUNDLE_FHIR_PATH = "entry.resource.ofType(Patient).";
+    static final String PATIENT_IN_BUNDLE_FHIR_PATH = "entry.resource.ofType(Patient).";
     static final String CONTENT_TYPE_LITERAL = "Content-Type";
     static final String APPLICATION_JSON_LITERAL = "application/json";
 
