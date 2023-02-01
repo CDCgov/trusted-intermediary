@@ -17,17 +17,17 @@ class PatientDemographicsTest extends Specification {
 
     def "test default constructor"() {
         when:
-        def order = new PatientDemographics()
+        def demographics = new PatientDemographics()
 
         then:
-        order.getFhirResourceId() == null
-        order.getPatientId() == null
-        order.getFirstName() == null
-        order.getLastName() == null
-        order.getSex() == null
-        order.getBirthDateTime() == null
-        order.getBirthOrder() == null
-        order.getRace() == null
+        demographics.getFhirResourceId() == null
+        demographics.getPatientId() == null
+        demographics.getFirstName() == null
+        demographics.getLastName() == null
+        demographics.getSex() == null
+        demographics.getBirthDateTime() == null
+        demographics.getBirthOrder() == null
+        demographics.getRace() == null
     }
 
     def "test argument constructor"() {
