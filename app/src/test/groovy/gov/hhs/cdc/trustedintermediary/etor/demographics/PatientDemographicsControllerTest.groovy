@@ -122,6 +122,9 @@ class PatientDemographicsControllerTest extends Specification {
         birthDateTime.addExtension("http://hl7.org/fhir/StructureDefinition/patient-birthTime", new DateTimeType(mockBirthDate))
         patient.setBirthDateElement(birthDateTime)
         patient.setMultipleBirth(new IntegerType(mockBirthNumber))
+        def raceExtension = new Extension("http://hl7.org/fhir/us/core/StructureDefinition/us-core-race")
+        raceExtension.addExtension(new Extension("text", new StringType("Asian")))
+        patient.addExtension(raceExtension)
 
         def bundle = new Bundle()
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(patient))
