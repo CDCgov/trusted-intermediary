@@ -42,38 +42,40 @@ public class PatientDemographicsController {
     public PatientDemographics parseDemographics(DomainRequest request) {
         logger.logInfo("Parsing patient demographics");
 
-        var patient = fhir.parseResource(request.getBody(), Bundle.class);
+        var fhirBundle = fhir.parseResource(request.getBody(), Bundle.class);
 
         var fhirResourceIdOptional =
                 fhir.fhirPathEvaluateFirst(
-                        patient, PATIENT_IN_BUNDLE_FHIR_PATH + "id", IdType.class);
+                        fhirBundle, PATIENT_IN_BUNDLE_FHIR_PATH + "id", IdType.class);
         var patientIdOptional =
                 fhir.fhirPathEvaluateFirst(
-                        patient,
+                        fhirBundle,
                         PATIENT_IN_BUNDLE_FHIR_PATH + "identifier.value",
                         StringType.class);
         var firstNameOptional =
                 fhir.fhirPathEvaluateFirst(
-                        patient,
+                        fhirBundle,
                         PATIENT_IN_BUNDLE_FHIR_PATH + "name.where(use='official').given.first()",
                         StringType.class);
         var lastNameOptional =
                 fhir.fhirPathEvaluateFirst(
-                        patient,
+                        fhirBundle,
                         PATIENT_IN_BUNDLE_FHIR_PATH + "name.where(use='official').family",
                         StringType.class);
         var sexOptional =
                 fhir.fhirPathEvaluateFirst(
-                        patient, PATIENT_IN_BUNDLE_FHIR_PATH + "gender", Enumeration.class);
+                        fhirBundle, PATIENT_IN_BUNDLE_FHIR_PATH + "gender", Enumeration.class);
         var birthDateTimeOptional =
                 fhir.fhirPathEvaluateFirst(
-                        patient,
+                        fhirBundle,
                         PATIENT_IN_BUNDLE_FHIR_PATH
                                 + "birthDate.extension.where(url='http://hl7.org/fhir/StructureDefinition/patient-birthTime').value",
                         DateTimeType.class);
         var birthOrderOptional =
                 fhir.fhirPathEvaluateFirst(
-                        patient, PATIENT_IN_BUNDLE_FHIR_PATH + "multipleBirth", IntegerType.class);
+                        fhirBundle,
+                        PATIENT_IN_BUNDLE_FHIR_PATH + "multipleBirth",
+                        IntegerType.class);
 
         return new PatientDemographics(
                 fhirResourceIdOptional.map(IdType::getValue).orElse(null),
