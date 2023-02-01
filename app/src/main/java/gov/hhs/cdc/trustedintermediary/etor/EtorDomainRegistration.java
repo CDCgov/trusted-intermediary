@@ -5,8 +5,8 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint;
-import gov.hhs.cdc.trustedintermediary.etor.order.OrderController;
-import gov.hhs.cdc.trustedintermediary.etor.order.OrderMessage;
+import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
+import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,15 +20,16 @@ import javax.inject.Inject;
  */
 public class EtorDomainRegistration implements DomainConnector {
 
-    @Inject OrderController orderController;
+    @Inject PatientDemographicsController patientDemographicsController;
     @Inject Logger logger;
 
-    private Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
-            Map.of(new HttpEndpoint("POST", "/v1/etor/order"), this::handleOrder);
+    private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
+            Map.of(new HttpEndpoint("POST", "/v1/etor/demographics"), this::handleOrder);
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
-        ApplicationContext.register(OrderController.class, OrderController.getInstance());
+        ApplicationContext.register(
+                PatientDemographicsController.class, PatientDemographicsController.getInstance());
         return endpoints;
     }
 
@@ -45,11 +46,12 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleOrder(DomainRequest request) {
 
         logger.logInfo("Parsing request...");
-        var order = orderController.parseOrder(request);
+        var order = patientDemographicsController.parseDemographics(request);
 
-        OrderMessage orderMessage = new OrderMessage(order);
+        PatientDemographicsResponse patientDemographicsResponse =
+                new PatientDemographicsResponse(order);
 
         logger.logInfo("Constructing response...");
-        return orderController.constructResponse(orderMessage);
+        return patientDemographicsController.constructResponse(patientDemographicsResponse);
     }
 }

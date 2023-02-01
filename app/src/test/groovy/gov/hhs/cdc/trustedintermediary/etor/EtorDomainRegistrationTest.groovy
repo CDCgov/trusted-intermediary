@@ -4,10 +4,12 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
-import gov.hhs.cdc.trustedintermediary.etor.order.Order
-import gov.hhs.cdc.trustedintermediary.etor.order.OrderController
-import gov.hhs.cdc.trustedintermediary.etor.order.OrderMessage
+import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographics
+import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController
+import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse
 import spock.lang.Specification
+
+import java.time.ZonedDateTime
 
 class EtorDomainRegistrationTest extends Specification {
 
@@ -19,7 +21,7 @@ class EtorDomainRegistrationTest extends Specification {
     def "domain registration has endpoints"() {
         given:
         def domainRegistration = new EtorDomainRegistration()
-        def specifiedEndpoint = new HttpEndpoint("POST", "/v1/etor/order")
+        def specifiedEndpoint = new HttpEndpoint("POST", "/v1/etor/demographics")
 
         when:
         def endpoints = domainRegistration.domainRegistration()
@@ -42,29 +44,29 @@ class EtorDomainRegistrationTest extends Specification {
         openApiSpecification.contains("paths:")
     }
 
-    def "stitches the order parsing to the response construction"() {
+    def "stitches the demographics parsing to the response construction"() {
         given:
         def domainRegistration = new EtorDomainRegistration()
 
-        def mockOrderController = Mock(OrderController)
+        def mockDemographicsController = Mock(PatientDemographicsController)
 
-        def mockOrderId = "asdf-12341-jkl-7890"
+        def mockRequestId = "asdf-12341-jkl-7890"
 
-        mockOrderController.parseOrder(_ as DomainRequest) >> new Order(mockOrderId, "Massachusetts", "2022-12-21T08:34:27Z", "MassGeneral", "NBS panel for Clarus the DogCow")
-        mockOrderController.constructResponse(_ as OrderMessage) >> new DomainResponse(418)
+        mockDemographicsController.parseDemographics(_ as DomainRequest) >> new PatientDemographics(mockRequestId, "a patient ID", "George", "Washington", "male", ZonedDateTime.now(), 1)
+        mockDemographicsController.constructResponse(_ as PatientDemographicsResponse) >> new DomainResponse(418)
 
         def domainRequest = new DomainRequest()
 
         TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
-        TestApplicationContext.register(OrderController, mockOrderController)
+        TestApplicationContext.register(PatientDemographicsController, mockDemographicsController)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
         def response = domainRegistration.handleOrder(domainRequest)
 
         then:
-        1 * mockOrderController.constructResponse(_ as OrderMessage) >> { OrderMessage orderMessage ->
-            assert orderMessage.id == mockOrderId
+        1 * mockDemographicsController.constructResponse(_ as PatientDemographicsResponse) >> { PatientDemographicsResponse demographicsResponse ->
+            assert demographicsResponse.fhirResourceId == mockRequestId
         }
     }
 }
