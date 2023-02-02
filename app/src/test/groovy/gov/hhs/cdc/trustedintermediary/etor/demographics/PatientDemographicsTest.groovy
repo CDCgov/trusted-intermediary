@@ -27,6 +27,7 @@ class PatientDemographicsTest extends Specification {
         demographics.getSex() == null
         demographics.getBirthDateTime() == null
         demographics.getBirthOrder() == null
+        demographics.getRace() == null
     }
 
     def "test argument constructor"() {
@@ -38,9 +39,10 @@ class PatientDemographicsTest extends Specification {
         def sex = "male"
         def birthDateTime = ZonedDateTime.now()
         def birthOrder = 1
+        def race = "Asian"
 
         when:
-        def demographics = new PatientDemographics(fhirResourceId, patientId, firstName, lastName, sex, birthDateTime, birthOrder)
+        def demographics = new PatientDemographics(fhirResourceId, patientId, firstName, lastName, sex, birthDateTime, birthOrder, race)
 
         then:
         demographics.getFhirResourceId() == fhirResourceId
@@ -50,6 +52,7 @@ class PatientDemographicsTest extends Specification {
         demographics.getSex() == sex
         demographics.getBirthDateTime() == birthDateTime
         demographics.getBirthOrder() == birthOrder
+        demographics.getRace() == race
     }
 
     def "test toString"() {
@@ -61,9 +64,10 @@ class PatientDemographicsTest extends Specification {
         def sex = "male"
         def birthDateTime = ZonedDateTime.now()
         def birthOrder = 1
+        def race = "Asian"
 
         when:
-        def demographicsString = new PatientDemographics(fhirResourceId, patientId, firstName, lastName, sex, birthDateTime, birthOrder).toString()
+        def demographicsString = new PatientDemographics(fhirResourceId, patientId, firstName, lastName, sex, birthDateTime, birthOrder, race).toString()
 
         then:
         demographicsString.contains(fhirResourceId)
@@ -73,5 +77,6 @@ class PatientDemographicsTest extends Specification {
         demographicsString.contains(sex)
         demographicsString.contains(birthDateTime.toString())
         demographicsString.contains(birthOrder.toString())
+        demographicsString.contains(race)
     }
 }

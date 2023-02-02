@@ -12,6 +12,7 @@ public class PatientDemographics {
     private String sex;
     private ZonedDateTime birthDateTime;
     private Integer birthOrder;
+    private String race;
 
     public PatientDemographics(
             String fhirResourceId,
@@ -20,7 +21,8 @@ public class PatientDemographics {
             String lastName,
             String sex,
             ZonedDateTime birthDateTime,
-            Integer birthOrder) {
+            Integer birthOrder,
+            String race) {
         this.fhirResourceId = fhirResourceId;
         this.patientId = patientId;
         this.firstName = firstName;
@@ -28,6 +30,7 @@ public class PatientDemographics {
         this.sex = sex;
         this.birthDateTime = birthDateTime;
         this.birthOrder = birthOrder;
+        this.race = race;
     }
 
     public PatientDemographics() {}
@@ -88,6 +91,14 @@ public class PatientDemographics {
         this.birthOrder = birthOrder;
     }
 
+    public String getRace() {
+        return race;
+    }
+
+    public void setRace(final String race) {
+        this.race = race;
+    }
+
     @Override
     public String toString() {
         return new StringJoiner(", ", PatientDemographics.class.getSimpleName() + "[", "]")
@@ -98,6 +109,7 @@ public class PatientDemographics {
                 .add("sex='" + sex + "'")
                 .add("birthDateTime=" + birthDateTime)
                 .add("birthOrder=" + birthOrder)
+                .add("race='" + race + "'")
                 .toString();
     }
 }

@@ -30,6 +30,7 @@ class PatientDemographicsControllerTest extends Specification {
         def mockSex = Enumerations.AdministrativeGender.UNKNOWN.toCode()
         def mockBirthDate = "2022-12-21T08:34:27Z"
         def mockBirthNumber = 1
+        def mockRace = "Asian"
 
         def fhir = Mock(HapiFhir)
 
@@ -42,6 +43,7 @@ class PatientDemographicsControllerTest extends Specification {
         fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "gender", Enumeration) >> Optional.of(new Enumeration<>(new Enumerations.AdministrativeGenderEnumFactory(), Enumerations.AdministrativeGender.fromCode(mockSex)))
         fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "birthDate.extension.where(url='http://hl7.org/fhir/StructureDefinition/patient-birthTime').value", DateTimeType) >> Optional.of(new DateTimeType(mockBirthDate))
         fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "multipleBirth", IntegerType) >> Optional.of(new IntegerType(mockBirthNumber))
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "extension.where(url='http://hl7.org/fhir/us/core/StructureDefinition/us-core-race').extension.where(url='text').value", StringType) >> Optional.of(new StringType(mockRace))
 
         TestApplicationContext.register(HapiFhir, fhir)
 
@@ -60,6 +62,7 @@ class PatientDemographicsControllerTest extends Specification {
         patientDemographics.getSex() == mockSex
         patientDemographics.getBirthDateTime() == ZonedDateTime.parse(mockBirthDate)
         patientDemographics.getBirthOrder() == mockBirthNumber
+        patientDemographics.getRace() == mockRace
     }
 
     def "parseDemographics puts null into the patient demographics"() {
@@ -75,6 +78,7 @@ class PatientDemographicsControllerTest extends Specification {
         fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "gender", Enumeration) >> Optional.empty()
         fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "birthDate.extension.where(url='http://hl7.org/fhir/StructureDefinition/patient-birthTime').value", DateTimeType) >> Optional.empty()
         fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "multipleBirth", IntegerType) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "extension.where(url='http://hl7.org/fhir/us/core/StructureDefinition/us-core-race').extension.where(url='text').value", StringType) >> Optional.empty()
 
         TestApplicationContext.register(HapiFhir, fhir)
 
@@ -93,6 +97,7 @@ class PatientDemographicsControllerTest extends Specification {
         patientDemographics.getSex() == null
         patientDemographics.getBirthDateTime() == null
         patientDemographics.getBirthOrder() == null
+        patientDemographics.getRace() == null
     }
 
     def "the FHIR paths are correct"() {
@@ -104,6 +109,7 @@ class PatientDemographicsControllerTest extends Specification {
         def mockSex = Enumerations.AdministrativeGender.UNKNOWN.toCode()
         def mockBirthDate = "2022-12-21T08:34:27Z"
         def mockBirthNumber = 1
+        def mockRace = "Asian"
 
         def fhir = Mock(HapiFhir)
 
@@ -116,6 +122,9 @@ class PatientDemographicsControllerTest extends Specification {
         birthDateTime.addExtension("http://hl7.org/fhir/StructureDefinition/patient-birthTime", new DateTimeType(mockBirthDate))
         patient.setBirthDateElement(birthDateTime)
         patient.setMultipleBirth(new IntegerType(mockBirthNumber))
+        def raceExtension = new Extension("http://hl7.org/fhir/us/core/StructureDefinition/us-core-race")
+        raceExtension.addExtension(new Extension("text", new StringType("Asian")))
+        patient.addExtension(raceExtension)
 
         def bundle = new Bundle()
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(patient))
@@ -144,6 +153,7 @@ class PatientDemographicsControllerTest extends Specification {
         patientDemographics.getSex() == mockSex
         patientDemographics.getBirthDateTime() == ZonedDateTime.parse(mockBirthDate)
         patientDemographics.getBirthOrder() == mockBirthNumber
+        patientDemographics.getRace() == mockRace
     }
 
     def "constructResponse works"() {

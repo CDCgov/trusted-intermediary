@@ -14,7 +14,6 @@ import org.hl7.fhir.r4.model.DateTimeType;
 import org.hl7.fhir.r4.model.Enumeration;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.IntegerType;
-import org.hl7.fhir.r4.model.PrimitiveType;
 import org.hl7.fhir.r4.model.StringType;
 
 /**
@@ -76,6 +75,12 @@ public class PatientDemographicsController {
                         fhirBundle,
                         PATIENT_IN_BUNDLE_FHIR_PATH + "multipleBirth",
                         IntegerType.class);
+        var raceOptional =
+                fhir.fhirPathEvaluateFirst(
+                        fhirBundle,
+                        PATIENT_IN_BUNDLE_FHIR_PATH
+                                + "extension.where(url='http://hl7.org/fhir/us/core/StructureDefinition/us-core-race').extension.where(url='text').value",
+                        StringType.class);
 
         return new PatientDemographics(
                 fhirResourceIdOptional.map(IdType::getValue).orElse(null),
@@ -86,7 +91,8 @@ public class PatientDemographicsController {
                 birthDateTimeOptional
                         .map(birthDateTime -> ZonedDateTime.parse(birthDateTime.getValueAsString()))
                         .orElse(null),
-                birthOrderOptional.map(PrimitiveType::getValue).orElse(null));
+                birthOrderOptional.map(IntegerType::getValue).orElse(null),
+                raceOptional.map(StringType::getValue).orElse(null));
     }
 
     public DomainResponse constructResponse(
