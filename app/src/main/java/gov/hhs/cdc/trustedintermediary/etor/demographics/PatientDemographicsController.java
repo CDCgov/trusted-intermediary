@@ -87,7 +87,7 @@ public class PatientDemographicsController {
                 fhir.fhirPathEvaluateFirst(
                         fhirBundle,
                         PATIENT_IN_BUNDLE_FHIR_PATH
-                                + "contact.where(relationship.where(coding.where(code='72705000' or code='N' or code='MTH').exists()).exists()).name.family",
+                                + "contact.where(relationship.where(coding.where(system='http://terminology.hl7.org/CodeSystem/v2-0131' and code='N' or system='http://terminology.hl7.org/CodeSystem/v3-RoleCode' and code='MTH' or system='http://snomed.info/sct' and code='72705000' or system='http://terminology.hl7.org/CodeSystem/v3-RoleCode' and code='FTH' or system='http://snomed.info/sct' and code='66839005').exists()).exists()).name.family",
                         StringType.class);
 
         // logging to check value
