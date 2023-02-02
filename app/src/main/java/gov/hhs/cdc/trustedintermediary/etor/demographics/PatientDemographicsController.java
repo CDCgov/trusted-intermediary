@@ -9,12 +9,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import javax.inject.Inject;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.DateTimeType;
-import org.hl7.fhir.r4.model.Enumeration;
-import org.hl7.fhir.r4.model.IdType;
-import org.hl7.fhir.r4.model.IntegerType;
-import org.hl7.fhir.r4.model.StringType;
+import org.hl7.fhir.r4.model.*;
 
 /**
  * Creates an in-memory representation of patient demographics to be ingested by the system, and
@@ -82,6 +77,18 @@ public class PatientDemographicsController {
                                 + "extension.where(url='http://hl7.org/fhir/us/core/StructureDefinition/us-core-race').extension.where(url='text').value",
                         StringType.class);
 
+        var nextOfKinOptional =
+                // currently only checks for Mother codes
+                fhir.fhirPathEvaluateFirst(
+                        fhirBundle,
+                        PATIENT_IN_BUNDLE_FHIR_PATH
+                                + "contact.where(relationship.coding.code='72705000').name.family",
+                        StringType.class);
+        // "contact.relationship.coding.where(code='72705000').code"
+        // contact.where(relationship.coding.code='72705000').name.family
+        // logging to check value
+        logger.logInfo("Next of Kin =" + nextOfKinOptional);
+
         return new PatientDemographics(
                 fhirResourceIdOptional.map(IdType::getValue).orElse(null),
                 patientIdOptional.map(StringType::getValue).orElse(null),
@@ -92,7 +99,8 @@ public class PatientDemographicsController {
                         .map(birthDateTime -> ZonedDateTime.parse(birthDateTime.getValueAsString()))
                         .orElse(null),
                 birthOrderOptional.map(IntegerType::getValue).orElse(null),
-                raceOptional.map(StringType::getValue).orElse(null));
+                raceOptional.map(StringType::getValue).orElse(null),
+                nextOfKinOptional.map(StringType::getValue).orElse(null));
     }
 
     public DomainResponse constructResponse(
