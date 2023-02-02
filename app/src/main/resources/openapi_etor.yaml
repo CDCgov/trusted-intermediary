@@ -16,11 +16,11 @@ paths:
     post:
       summary: forwards demographic information to a lab
       requestBody:
-        description: a FHIR patient resource
+        description: a FHIR patient resource wrapped in a FHIR Bundle
         content:
           application/json:
             schema:
-              $ref: 'https://github.com/LinuxForHealth/FHIR/blob/main/fhir-openapi/src/main/webapp/META-INF/openapi.json?raw=true#/components/schemas/Patient'
+              $ref: 'https://github.com/LinuxForHealth/FHIR/blob/main/fhir-openapi/src/main/webapp/META-INF/openapi.json?raw=true#/components/schemas/Bundle'
         required: true
       responses:
         '200':

@@ -21,7 +21,7 @@ class PatientDemographicsControllerTest extends Specification {
         TestApplicationContext.register(PatientDemographicsController, PatientDemographicsController.getInstance())
     }
 
-    def "parseDemographics works"() {
+    def "parseDemographics extracts the optional and correctly interprets the value"() {
         given:
         def mockRequestId = "asdf-12341-jkl-7890"
         def mockPatientId = "patientId"
@@ -33,15 +33,15 @@ class PatientDemographicsControllerTest extends Specification {
 
         def fhir = Mock(HapiFhir)
 
-        fhir.parseResource(_ as String, _ as Class) >> new Patient()
+        fhir.parseResource(_ as String, _ as Class) >> new Bundle()
 
-        fhir.fhirPathEvaluateFirst(_ as IBase, "id", IdType) >> Optional.of(new IdType(mockRequestId))
-        fhir.fhirPathEvaluateFirst(_ as IBase, "identifier.value", StringType) >> Optional.of(new StringType(mockPatientId))
-        fhir.fhirPathEvaluateFirst(_ as IBase, "name.where(use='official').given.first()", StringType) >> Optional.of(new StringType(mockFirstName))
-        fhir.fhirPathEvaluateFirst(_ as IBase, "name.where(use='official').family", StringType) >> Optional.of(new StringType(mockLastName))
-        fhir.fhirPathEvaluateFirst(_ as IBase, "gender", Enumeration) >> Optional.of(new Enumeration<>(new Enumerations.AdministrativeGenderEnumFactory(), Enumerations.AdministrativeGender.fromCode(mockSex)))
-        fhir.fhirPathEvaluateFirst(_ as IBase, "birthDate.extension.where(url='http://hl7.org/fhir/StructureDefinition/patient-birthTime').value", DateTimeType) >> Optional.of(new DateTimeType(mockBirthDate))
-        fhir.fhirPathEvaluateFirst(_ as IBase, "multipleBirth", IntegerType) >> Optional.of(new IntegerType(mockBirthNumber))
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "id", IdType) >> Optional.of(new IdType(mockRequestId))
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "identifier.value", StringType) >> Optional.of(new StringType(mockPatientId))
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "name.where(use='official').given.first()", StringType) >> Optional.of(new StringType(mockFirstName))
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "name.where(use='official').family", StringType) >> Optional.of(new StringType(mockLastName))
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "gender", Enumeration) >> Optional.of(new Enumeration<>(new Enumerations.AdministrativeGenderEnumFactory(), Enumerations.AdministrativeGender.fromCode(mockSex)))
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "birthDate.extension.where(url='http://hl7.org/fhir/StructureDefinition/patient-birthTime').value", DateTimeType) >> Optional.of(new DateTimeType(mockBirthDate))
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "multipleBirth", IntegerType) >> Optional.of(new IntegerType(mockBirthNumber))
 
         TestApplicationContext.register(HapiFhir, fhir)
 
@@ -66,15 +66,15 @@ class PatientDemographicsControllerTest extends Specification {
         given:
         def fhir = Mock(HapiFhir)
 
-        fhir.parseResource(_ as String, _ as Class) >> new Patient()
+        fhir.parseResource(_ as String, _ as Class) >> new Bundle()
 
-        fhir.fhirPathEvaluateFirst(_ as IBase, "id", IdType) >> Optional.empty()
-        fhir.fhirPathEvaluateFirst(_ as IBase, "identifier.value", StringType) >> Optional.empty()
-        fhir.fhirPathEvaluateFirst(_ as IBase, "name.where(use='official').given.first()", StringType) >> Optional.empty()
-        fhir.fhirPathEvaluateFirst(_ as IBase, "name.where(use='official').family", StringType) >> Optional.empty()
-        fhir.fhirPathEvaluateFirst(_ as IBase, "gender", Enumeration) >> Optional.empty()
-        fhir.fhirPathEvaluateFirst(_ as IBase, "birthDate.extension.where(url='http://hl7.org/fhir/StructureDefinition/patient-birthTime').value", DateTimeType) >> Optional.empty()
-        fhir.fhirPathEvaluateFirst(_ as IBase, "multipleBirth", IntegerType) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "id", IdType) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "identifier.value", StringType) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "name.where(use='official').given.first()", StringType) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "name.where(use='official').family", StringType) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "gender", Enumeration) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "birthDate.extension.where(url='http://hl7.org/fhir/StructureDefinition/patient-birthTime').value", DateTimeType) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "multipleBirth", IntegerType) >> Optional.empty()
 
         TestApplicationContext.register(HapiFhir, fhir)
 
@@ -117,9 +117,13 @@ class PatientDemographicsControllerTest extends Specification {
         patient.setBirthDateElement(birthDateTime)
         patient.setMultipleBirth(new IntegerType(mockBirthNumber))
 
-        fhir.parseResource(_ as String, _ as Class) >> patient
+        def bundle = new Bundle()
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(patient))
+
+        fhir.parseResource(_ as String, _ as Class) >> bundle
 
         fhir.fhirPathEvaluateFirst(_ as IBase, _ as String, _ as Class) >> { IBase fhirResource, String path, Class clazz ->
+            //call the actual HapiFhir implementation to ensure our FHIR paths are correct
             return HapiFhirImplementation.getInstance().fhirPathEvaluateFirst(fhirResource, path, clazz)
         }
 
