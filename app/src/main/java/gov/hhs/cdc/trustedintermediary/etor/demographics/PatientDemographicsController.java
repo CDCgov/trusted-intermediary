@@ -9,7 +9,12 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import javax.inject.Inject;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.DateTimeType;
+import org.hl7.fhir.r4.model.Enumeration;
+import org.hl7.fhir.r4.model.IdType;
+import org.hl7.fhir.r4.model.IntegerType;
+import org.hl7.fhir.r4.model.StringType;
 
 /**
  * Creates an in-memory representation of patient demographics to be ingested by the system, and
@@ -82,12 +87,11 @@ public class PatientDemographicsController {
                 fhir.fhirPathEvaluateFirst(
                         fhirBundle,
                         PATIENT_IN_BUNDLE_FHIR_PATH
-                                + "contact.where(relationship.coding.code='72705000').name.family",
+                                + "contact.where(relationship.where(coding.where(code='72705000' or code='N' or code='MTH').exists()).exists()).name.family",
                         StringType.class);
-        // "contact.relationship.coding.where(code='72705000').code"
-        // contact.where(relationship.coding.code='72705000').name.family
+
         // logging to check value
-        logger.logInfo("Next of Kin =" + nextOfKinOptional);
+        logger.logInfo("Next of Kin = " + nextOfKinOptional);
 
         return new PatientDemographics(
                 fhirResourceIdOptional.map(IdType::getValue).orElse(null),
