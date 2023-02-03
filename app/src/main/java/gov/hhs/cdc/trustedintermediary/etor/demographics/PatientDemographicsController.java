@@ -27,12 +27,20 @@ public class PatientDemographicsController {
     static final String PATIENT_IN_BUNDLE_FHIR_PATH = "entry.resource.ofType(Patient).";
     static final String CONTENT_TYPE_LITERAL = "Content-Type";
     static final String APPLICATION_JSON_LITERAL = "application/json";
-    static final String IS_NEXT_OF_KIN =
+    private static final String IS_NEXT_OF_KIN =
             "(system='http://terminology.hl7.org/CodeSystem/v2-0131' and code='N')";
-    static final String IS_MOTHER =
+    private static final String IS_MOTHER =
             "(system='http://terminology.hl7.org/CodeSystem/v3-RoleCode' and code='MTH' or system='http://snomed.info/sct' and code='72705000')";
-    static final String IS_FATHER =
+    private static final String IS_FATHER =
             "(system='http://terminology.hl7.org/CodeSystem/v3-RoleCode' and code='FTH' or system='http://snomed.info/sct' and code='66839005')";
+    static final String NEXT_OF_KIN_FHIR_PATH =
+            "contact.where(relationship.where(coding.where("
+                    + IS_NEXT_OF_KIN
+                    + " or "
+                    + IS_MOTHER
+                    + " or "
+                    + IS_FATHER
+                    + ").exists()).exists()).";
 
     @Inject HapiFhir fhir;
     @Inject Formatter formatter;
@@ -88,21 +96,9 @@ public class PatientDemographicsController {
                                 + "extension.where(url='http://hl7.org/fhir/us/core/StructureDefinition/us-core-race').extension.where(url='text').value",
                         StringType.class);
 
-        var nextOfKinOptional =
-                fhir.fhirPathEvaluateFirst(
-                        fhirBundle,
-                        PATIENT_IN_BUNDLE_FHIR_PATH
-                                + "contact.where(relationship.where(coding.where("
-                                + IS_NEXT_OF_KIN
-                                + " or "
-                                + IS_MOTHER
-                                + " or "
-                                + IS_FATHER
-                                + ").exists()).exists()).name.family",
-                        StringType.class);
-
+        var nextOfKin = parseOutNextOfKin(fhirBundle);
         // logging to check value
-        logger.logInfo("Next of Kin = " + nextOfKinOptional);
+        logger.logInfo("Next of Kin = " + nextOfKin);
 
         return new PatientDemographics(
                 fhirResourceIdOptional.map(IdType::getValue).orElse(null),
@@ -115,7 +111,7 @@ public class PatientDemographicsController {
                         .orElse(null),
                 birthOrderOptional.map(IntegerType::getValue).orElse(null),
                 raceOptional.map(StringType::getValue).orElse(null),
-                nextOfKinOptional.map(StringType::getValue).orElse(null));
+                nextOfKin);
     }
 
     public DomainResponse constructResponse(
@@ -134,5 +130,30 @@ public class PatientDemographicsController {
         response.setHeaders(Map.of(CONTENT_TYPE_LITERAL, APPLICATION_JSON_LITERAL));
 
         return response;
+    }
+
+    private NextOfKin parseOutNextOfKin(final Bundle fhirBundle) {
+        var firstNameOptional =
+                fhir.fhirPathEvaluateFirst(
+                        fhirBundle,
+                        PATIENT_IN_BUNDLE_FHIR_PATH + NEXT_OF_KIN_FHIR_PATH + "name.given.first()",
+                        StringType.class);
+        var lastNameOptional =
+                fhir.fhirPathEvaluateFirst(
+                        fhirBundle,
+                        PATIENT_IN_BUNDLE_FHIR_PATH + NEXT_OF_KIN_FHIR_PATH + "name.family",
+                        StringType.class);
+        var phoneNumberOptional =
+                fhir.fhirPathEvaluateFirst(
+                        fhirBundle,
+                        PATIENT_IN_BUNDLE_FHIR_PATH
+                                + NEXT_OF_KIN_FHIR_PATH
+                                + "telecom.where(system='phone').value",
+                        StringType.class);
+
+        return new NextOfKin(
+                firstNameOptional.map(StringType::getValue).orElse(null),
+                lastNameOptional.map(StringType::getValue).orElse(null),
+                phoneNumberOptional.map(StringType::getValue).orElse(null));
     }
 }
