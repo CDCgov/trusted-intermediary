@@ -71,14 +71,14 @@ class PatientDemographicsControllerTest extends Specification {
 
         fhir.parseResource(_ as String, _ as Class) >> new Bundle()
 
-        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "id", IdType) >> Optional.empty()
-        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "identifier.value", StringType) >> Optional.empty()
-        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "name.where(use='official').given.first()", StringType) >> Optional.empty()
-        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "name.where(use='official').family", StringType) >> Optional.empty()
-        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "gender", Enumeration) >> Optional.empty()
-        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "birthDate.extension.where(url='http://hl7.org/fhir/StructureDefinition/patient-birthTime').value", DateTimeType) >> Optional.empty()
-        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "multipleBirth", IntegerType) >> Optional.empty()
-        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "extension.where(url='http://hl7.org/fhir/us/core/StructureDefinition/us-core-race').extension.where(url='text').value", StringType) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.RESOURCE_ID_FHIR_PATH, IdType) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_ID_FHIR_PATH, StringType) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_FIRST_NAME_FHIR_PATH, StringType) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_LAST_NAME_FHIR_PATH, StringType) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_SEX_FHIR_PATH, Enumeration) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_BIRTH_DATE_TIME_FHIR_PATH, DateTimeType) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_BIRTH_ORDER_FHIR_PATH, IntegerType) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_RACE_FHIR_PATH, StringType) >> Optional.empty()
 
         TestApplicationContext.register(HapiFhir, fhir)
 
