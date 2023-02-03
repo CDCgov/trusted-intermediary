@@ -13,7 +13,7 @@ public class PatientDemographics {
     private ZonedDateTime birthDateTime;
     private Integer birthOrder;
     private String race;
-    private String nextOfKin;
+    private NextOfKin nextOfKin;
 
     public PatientDemographics(
             String fhirResourceId,
@@ -24,7 +24,7 @@ public class PatientDemographics {
             ZonedDateTime birthDateTime,
             Integer birthOrder,
             String race,
-            String nextOfKin) {
+            NextOfKin nextOfKin) {
         this.fhirResourceId = fhirResourceId;
         this.patientId = patientId;
         this.firstName = firstName;
@@ -100,6 +100,14 @@ public class PatientDemographics {
 
     public void setRace(final String race) {
         this.race = race;
+    }
+
+    public NextOfKin getNextOfKin() {
+        return nextOfKin;
+    }
+
+    public void setNextOfKin(final NextOfKin nextOfKin) {
+        this.nextOfKin = nextOfKin;
     }
 
     @Override
