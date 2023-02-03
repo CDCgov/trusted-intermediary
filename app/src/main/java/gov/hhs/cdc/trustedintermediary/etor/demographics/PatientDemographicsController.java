@@ -49,7 +49,8 @@ public class PatientDemographicsController {
         var patientIdOptional =
                 fhir.fhirPathEvaluateFirst(
                         fhirBundle,
-                        PATIENT_IN_BUNDLE_FHIR_PATH + "identifier.value",
+                        PATIENT_IN_BUNDLE_FHIR_PATH
+                                + "identifier.where(type.coding.system='http://terminology.hl7.org/CodeSystem/v2-0203' and type.coding.code='MR').value",
                         StringType.class);
         var firstNameOptional =
                 fhir.fhirPathEvaluateFirst(
