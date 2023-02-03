@@ -27,6 +27,12 @@ public class PatientDemographicsController {
     static final String PATIENT_IN_BUNDLE_FHIR_PATH = "entry.resource.ofType(Patient).";
     static final String CONTENT_TYPE_LITERAL = "Content-Type";
     static final String APPLICATION_JSON_LITERAL = "application/json";
+    static final String IS_NEXT_OF_KIN =
+            "(system='http://terminology.hl7.org/CodeSystem/v2-0131' and code='N')";
+    static final String IS_MOTHER =
+            "(system='http://terminology.hl7.org/CodeSystem/v3-RoleCode' and code='MTH' or system='http://snomed.info/sct' and code='72705000')";
+    static final String IS_FATHER =
+            "(system='http://terminology.hl7.org/CodeSystem/v3-RoleCode' and code='FTH' or system='http://snomed.info/sct' and code='66839005')";
 
     @Inject HapiFhir fhir;
     @Inject Formatter formatter;
@@ -87,7 +93,13 @@ public class PatientDemographicsController {
                 fhir.fhirPathEvaluateFirst(
                         fhirBundle,
                         PATIENT_IN_BUNDLE_FHIR_PATH
-                                + "contact.where(relationship.where(coding.where(system='http://terminology.hl7.org/CodeSystem/v2-0131' and code='N' or system='http://terminology.hl7.org/CodeSystem/v3-RoleCode' and code='MTH' or system='http://snomed.info/sct' and code='72705000' or system='http://terminology.hl7.org/CodeSystem/v3-RoleCode' and code='FTH' or system='http://snomed.info/sct' and code='66839005').exists()).exists()).name.family",
+                                + "contact.where(relationship.where(coding.where("
+                                + IS_NEXT_OF_KIN
+                                + " or "
+                                + IS_MOTHER
+                                + " or "
+                                + IS_FATHER
+                                + ").exists()).exists()).name.family",
                         StringType.class);
 
         // logging to check value
