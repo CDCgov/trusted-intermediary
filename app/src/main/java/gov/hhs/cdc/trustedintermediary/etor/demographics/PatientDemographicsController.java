@@ -27,6 +27,23 @@ public class PatientDemographicsController {
     static final String PATIENT_IN_BUNDLE_FHIR_PATH = "entry.resource.ofType(Patient).";
     static final String CONTENT_TYPE_LITERAL = "Content-Type";
     static final String APPLICATION_JSON_LITERAL = "application/json";
+    static final String PATIENT_ID_FHIR_PATH =
+            PATIENT_IN_BUNDLE_FHIR_PATH
+                    + "identifier.where(type.coding.system='http://terminology.hl7.org/CodeSystem/v2-0203' and type.coding.code='MR').value";
+    static final String RESOURCE_ID_FHIR_PATH = PATIENT_IN_BUNDLE_FHIR_PATH + "id";
+    static final String PATIENT_FIRST_NAME_FHIR_PATH =
+            PATIENT_IN_BUNDLE_FHIR_PATH + "name.where(use='official').given.first()";
+    static final String PATIENT_LAST_NAME_FHIR_PATH =
+            PATIENT_IN_BUNDLE_FHIR_PATH + "name.where(use='official').family";
+    static final String PATIENT_SEX_FHIR_PATH = PATIENT_IN_BUNDLE_FHIR_PATH + "gender";
+    static final String PATIENT_BIRTH_DATE_TIME_FHIR_PATH =
+            PATIENT_IN_BUNDLE_FHIR_PATH
+                    + "birthDate.extension.where(url='http://hl7.org/fhir/StructureDefinition/patient-birthTime').value";
+    static final String PATIENT_BIRTH_ORDER_FHIR_PATH =
+            PATIENT_IN_BUNDLE_FHIR_PATH + "multipleBirth";
+    static final String PATIENT_RACE_FHIR_PATH =
+            PATIENT_IN_BUNDLE_FHIR_PATH
+                    + "extension.where(url='http://hl7.org/fhir/us/core/StructureDefinition/us-core-race').extension.where(url='text').value";
 
     @Inject HapiFhir fhir;
     @Inject Formatter formatter;
@@ -44,44 +61,25 @@ public class PatientDemographicsController {
         var fhirBundle = fhir.parseResource(request.getBody(), Bundle.class);
 
         var fhirResourceIdOptional =
-                fhir.fhirPathEvaluateFirst(
-                        fhirBundle, PATIENT_IN_BUNDLE_FHIR_PATH + "id", IdType.class);
+                fhir.fhirPathEvaluateFirst(fhirBundle, RESOURCE_ID_FHIR_PATH, IdType.class);
         var patientIdOptional =
-                fhir.fhirPathEvaluateFirst(
-                        fhirBundle,
-                        PATIENT_IN_BUNDLE_FHIR_PATH
-                                + "identifier.where(type.coding.system='http://terminology.hl7.org/CodeSystem/v2-0203' and type.coding.code='MR').value",
-                        StringType.class);
+                fhir.fhirPathEvaluateFirst(fhirBundle, PATIENT_ID_FHIR_PATH, StringType.class);
         var firstNameOptional =
                 fhir.fhirPathEvaluateFirst(
-                        fhirBundle,
-                        PATIENT_IN_BUNDLE_FHIR_PATH + "name.where(use='official').given.first()",
-                        StringType.class);
+                        fhirBundle, PATIENT_FIRST_NAME_FHIR_PATH, StringType.class);
         var lastNameOptional =
                 fhir.fhirPathEvaluateFirst(
-                        fhirBundle,
-                        PATIENT_IN_BUNDLE_FHIR_PATH + "name.where(use='official').family",
-                        StringType.class);
+                        fhirBundle, PATIENT_LAST_NAME_FHIR_PATH, StringType.class);
         var sexOptional =
-                fhir.fhirPathEvaluateFirst(
-                        fhirBundle, PATIENT_IN_BUNDLE_FHIR_PATH + "gender", Enumeration.class);
+                fhir.fhirPathEvaluateFirst(fhirBundle, PATIENT_SEX_FHIR_PATH, Enumeration.class);
         var birthDateTimeOptional =
                 fhir.fhirPathEvaluateFirst(
-                        fhirBundle,
-                        PATIENT_IN_BUNDLE_FHIR_PATH
-                                + "birthDate.extension.where(url='http://hl7.org/fhir/StructureDefinition/patient-birthTime').value",
-                        DateTimeType.class);
+                        fhirBundle, PATIENT_BIRTH_DATE_TIME_FHIR_PATH, DateTimeType.class);
         var birthOrderOptional =
                 fhir.fhirPathEvaluateFirst(
-                        fhirBundle,
-                        PATIENT_IN_BUNDLE_FHIR_PATH + "multipleBirth",
-                        IntegerType.class);
+                        fhirBundle, PATIENT_BIRTH_ORDER_FHIR_PATH, IntegerType.class);
         var raceOptional =
-                fhir.fhirPathEvaluateFirst(
-                        fhirBundle,
-                        PATIENT_IN_BUNDLE_FHIR_PATH
-                                + "extension.where(url='http://hl7.org/fhir/us/core/StructureDefinition/us-core-race').extension.where(url='text').value",
-                        StringType.class);
+                fhir.fhirPathEvaluateFirst(fhirBundle, PATIENT_RACE_FHIR_PATH, StringType.class);
 
         return new PatientDemographics(
                 fhirResourceIdOptional.map(IdType::getValue).orElse(null),

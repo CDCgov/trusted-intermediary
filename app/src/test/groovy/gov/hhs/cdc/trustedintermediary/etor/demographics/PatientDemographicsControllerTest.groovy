@@ -36,14 +36,14 @@ class PatientDemographicsControllerTest extends Specification {
 
         fhir.parseResource(_ as String, _ as Class) >> new Bundle()
 
-        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "id", IdType) >> Optional.of(new IdType(mockRequestId))
-        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "identifier.value", StringType) >> Optional.of(new StringType(mockPatientId))
-        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "name.where(use='official').given.first()", StringType) >> Optional.of(new StringType(mockFirstName))
-        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "name.where(use='official').family", StringType) >> Optional.of(new StringType(mockLastName))
-        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "gender", Enumeration) >> Optional.of(new Enumeration<>(new Enumerations.AdministrativeGenderEnumFactory(), Enumerations.AdministrativeGender.fromCode(mockSex)))
-        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "birthDate.extension.where(url='http://hl7.org/fhir/StructureDefinition/patient-birthTime').value", DateTimeType) >> Optional.of(new DateTimeType(mockBirthDate))
-        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "multipleBirth", IntegerType) >> Optional.of(new IntegerType(mockBirthNumber))
-        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_IN_BUNDLE_FHIR_PATH + "extension.where(url='http://hl7.org/fhir/us/core/StructureDefinition/us-core-race').extension.where(url='text').value", StringType) >> Optional.of(new StringType(mockRace))
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.RESOURCE_ID_FHIR_PATH, IdType) >> Optional.of(new IdType(mockRequestId))
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_ID_FHIR_PATH, StringType) >> Optional.of(new StringType(mockPatientId))
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_FIRST_NAME_FHIR_PATH, StringType) >> Optional.of(new StringType(mockFirstName))
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_LAST_NAME_FHIR_PATH, StringType) >> Optional.of(new StringType(mockLastName))
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_SEX_FHIR_PATH, Enumeration) >> Optional.of(new Enumeration<>(new Enumerations.AdministrativeGenderEnumFactory(), Enumerations.AdministrativeGender.fromCode(mockSex)))
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_BIRTH_DATE_TIME_FHIR_PATH, DateTimeType) >> Optional.of(new DateTimeType(mockBirthDate))
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_BIRTH_ORDER_FHIR_PATH, IntegerType) >> Optional.of(new IntegerType(mockBirthNumber))
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_RACE_FHIR_PATH, StringType) >> Optional.of(new StringType(mockRace))
 
         TestApplicationContext.register(HapiFhir, fhir)
 
