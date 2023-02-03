@@ -89,7 +89,6 @@ public class PatientDemographicsController {
                         StringType.class);
 
         var nextOfKinOptional =
-                // currently only checks for Mother codes
                 fhir.fhirPathEvaluateFirst(
                         fhirBundle,
                         PATIENT_IN_BUNDLE_FHIR_PATH
