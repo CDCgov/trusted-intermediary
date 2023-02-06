@@ -1,0 +1,10 @@
+# syntax=docker/dockerfile:1
+FROM alpine:3.17.1
+RUN apk update && apk add bash curl openjdk17 ruby-dev ruby-bundler ruby-jekyll npm git msttcorefonts-installer fontconfig
+RUN update-ms-fonts
+RUN cp /usr/lib/ruby/gems/3.1.0/gems/jekyll-4.3.1/exe/jekyll /usr/bin
+RUN npm install -g fsh-sushi
+COPY . trusted-intermediary/
+#RUN git clone https://github.com/CDCgov/trusted-intermediary.git
+RUN ./trusted-intermediary/_updatePublisher.sh
+#CMD ./trusted-intermediary/_genonce.sh

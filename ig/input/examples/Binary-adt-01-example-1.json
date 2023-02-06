@@ -1,0 +1,46 @@
+{
+    "resourceType": "ADT01",
+    "id": "adt-01-example-1",
+    "MSH": {
+        "segmentType": "MSH",
+        "delimeters": "^~\\&",
+        "sendingApplication": "ADT1",
+        "sendingFacility": "GOOD HEALTH HOSPITAL",
+        "receivingApplication": "GHH LAB, INC.",
+        "receivingFacility": "GOOD HEALTH HOSPITAL",
+        "messageDateTime": 198808181126,
+        "security": "SECURITY",
+        "messageType": "ADT^A01^ADT_A01",
+        "messageControlId": "MSG00001",
+        "processingId": "P",
+        "versionId": 2.8
+    },
+    "EVN": {
+        "segmentType": "EVN",
+        "eventTypeCode": "A01",
+        "eventDateTime": 200708181123
+    },
+    "PID": {
+        "segmentType": "PID",
+        "setId": 1,
+        "patientId": "",
+        "patientIdList": "PATID1234^5^M11^ADT1^MR^GOOD HEALTH HOSPITAL~123456789^^^USSSA^SS",
+        "alternatePatientId": "",
+        "patientName": "EVERYMAN^ADAM^A^III",
+        "mothersMaidenName": "",
+        "birthDateTime": 19610615,
+        "administrativeSex": "M",
+        "patientAlias": "",
+        "race": "C",
+        "patientAddress": "2222 HOME STREET^^GREENSBORO^NC^27401-1020",
+        "countyCode": "GL",
+        "homePhone": "(555) 555-2004",
+        "businessPhone": "(555) 555-2004",
+        "primaryLanguage": "",
+        "maritalStatus": "S",
+        "religion": "",
+        "patientAccountNumber": 444333333,
+        "ssn": "987654^NC"
+    },
+    "messageString": "MSH|^~\\&|ADT1|GOOD HEALTH HOSPITAL|GHH LAB, INC.|GOOD HEALTH HOSPITAL|198808181126|SECURITY|ADT^A01^ADT_A01|MSG00001|P|2.8||\\nEVN|A01|200708181123||\\nPID|1||PATID1234^5^M11^ADT1^MR^GOOD HEALTH HOSPITAL~123456789^^^USSSA^SS||EVERYMAN^ADAM^A^III||19610615|M||C|2222 HOME STREET^^GREENSBORO^NC^27401-1020|GL|(555) 555-2004|(555)555-2004||S||PATID12345001^2^M10^ADT1^AN^A|444333333|987654^NC|"
+}
