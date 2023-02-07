@@ -1,6 +1,6 @@
 # 11. OWASP ZAP Dynamic Application Security Testing
 
-Date: 2023-01-06
+Date: 2023-02-06
 
 ## Decision
 
