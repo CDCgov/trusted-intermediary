@@ -131,7 +131,9 @@ class PatientDemographicsControllerTest extends Specification {
 
         def patient = new Patient()
         patient.setId(mockFhirResourceId)
-        patient.setIdentifier(List.of(new Identifier().setValue("something else"), new Identifier().setValue(mockPatientId).setType(new CodeableConcept().addCoding(new Coding().setSystem("http://terminology.hl7.org/CodeSystem/v2-0203").setCode("MR")))))
+        def patientIdentifier = new Identifier().setValue("something else")
+        def patientIdentifierMrn = new Identifier().setValue(mockPatientId).setType(new CodeableConcept().addCoding(new Coding().setSystem("http://terminology.hl7.org/CodeSystem/v2-0203").setCode("MR")))
+        patient.setIdentifier(List.of(patientIdentifier, patientIdentifierMrn))
         patient.setName(List.of(new HumanName().setUse(HumanName.NameUse.OFFICIAL).setFamily(mockLastName).setGiven(List.of(new StringType(mockFirstName), new StringType("Apple")))))
         patient.setGender(Enumerations.AdministrativeGender.fromCode(mockSex))
         def birthDateTime = new DateType(mockBirthDate.substring(0, mockBirthDate.indexOf("T")))
