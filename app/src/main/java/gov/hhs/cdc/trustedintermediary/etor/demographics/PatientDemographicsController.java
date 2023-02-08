@@ -50,7 +50,7 @@ public class PatientDemographicsController {
             "(system='http://terminology.hl7.org/CodeSystem/v3-RoleCode' and code='MTH' or system='http://snomed.info/sct' and code='72705000')";
     private static final String IS_FATHER =
             "(system='http://terminology.hl7.org/CodeSystem/v3-RoleCode' and code='FTH' or system='http://snomed.info/sct' and code='66839005')";
-    static final String NEXT_OF_KIN_FHIR_PATH =
+    private static final String NEXT_OF_KIN_FHIR_PATH =
             "contact.where(relationship.where(coding.where("
                     + IS_NEXT_OF_KIN
                     + " or "
@@ -58,6 +58,15 @@ public class PatientDemographicsController {
                     + " or "
                     + IS_FATHER
                     + ").exists()).exists()).";
+
+    static final String PATIENT_NEXT_OF_KIN_FIRST_NAME_FHIR_PATH =
+            PATIENT_IN_BUNDLE_FHIR_PATH + NEXT_OF_KIN_FHIR_PATH + "name.given.first()";
+    static final String PATIENT_NEXT_OF_KIN_LAST_NAME_FHIR_PATH =
+            PATIENT_IN_BUNDLE_FHIR_PATH + NEXT_OF_KIN_FHIR_PATH + "name.family";
+    static final String PATIENT_NEXT_OF_KIN_PHONE_NUMBER_FHIR_PATH =
+            PATIENT_IN_BUNDLE_FHIR_PATH
+                    + NEXT_OF_KIN_FHIR_PATH
+                    + "telecom.where(system='phone').value";
 
     @Inject HapiFhir fhir;
     @Inject Formatter formatter;
@@ -134,21 +143,13 @@ public class PatientDemographicsController {
     private NextOfKin parseOutNextOfKin(final Bundle fhirBundle) {
         var firstNameOptional =
                 fhir.fhirPathEvaluateFirst(
-                        fhirBundle,
-                        PATIENT_IN_BUNDLE_FHIR_PATH + NEXT_OF_KIN_FHIR_PATH + "name.given.first()",
-                        StringType.class);
+                        fhirBundle, PATIENT_NEXT_OF_KIN_FIRST_NAME_FHIR_PATH, StringType.class);
         var lastNameOptional =
                 fhir.fhirPathEvaluateFirst(
-                        fhirBundle,
-                        PATIENT_IN_BUNDLE_FHIR_PATH + NEXT_OF_KIN_FHIR_PATH + "name.family",
-                        StringType.class);
+                        fhirBundle, PATIENT_NEXT_OF_KIN_LAST_NAME_FHIR_PATH, StringType.class);
         var phoneNumberOptional =
                 fhir.fhirPathEvaluateFirst(
-                        fhirBundle,
-                        PATIENT_IN_BUNDLE_FHIR_PATH
-                                + NEXT_OF_KIN_FHIR_PATH
-                                + "telecom.where(system='phone').value",
-                        StringType.class);
+                        fhirBundle, PATIENT_NEXT_OF_KIN_PHONE_NUMBER_FHIR_PATH, StringType.class);
 
         return new NextOfKin(
                 firstNameOptional.map(StringType::getValue).orElse(null),
