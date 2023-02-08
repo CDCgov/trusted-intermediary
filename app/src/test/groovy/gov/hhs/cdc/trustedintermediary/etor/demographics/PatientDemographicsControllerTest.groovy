@@ -141,7 +141,7 @@ class PatientDemographicsControllerTest extends Specification {
         patient.setBirthDateElement(birthDateTime)
         patient.setMultipleBirth(new IntegerType(mockBirthNumber))
         def raceExtension = new Extension("http://hl7.org/fhir/us/core/StructureDefinition/us-core-race")
-        raceExtension.addExtension(new Extension("text", new StringType("Asian")))
+        raceExtension.addExtension(new Extension("text", new StringType(mockRace)))
         patient.addExtension(raceExtension)
         def nextOfKinRelationship = List.of(new CodeableConcept().addCoding(new Coding().setSystem("http://snomed.info/sct").setCode("72705000")))
         def nextOfKinName = new HumanName().setFamily(mockNextOfKinFamilyName).addGiven(mockNextOfKinGivenName)
