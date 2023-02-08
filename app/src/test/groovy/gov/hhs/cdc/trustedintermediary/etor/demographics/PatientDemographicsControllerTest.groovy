@@ -102,7 +102,7 @@ class PatientDemographicsControllerTest extends Specification {
 
     def "the FHIR paths are correct"() {
         given:
-        def mockRequestId = "asdf-12341-jkl-7890"
+        def mockFhirResourceId = "asdf-12341-jkl-7890"
         def mockPatientId = "patientId"
         def mockFirstName = "Clarus"
         def mockLastName = "DogCow"
@@ -114,8 +114,8 @@ class PatientDemographicsControllerTest extends Specification {
         def fhir = Mock(HapiFhir)
 
         def patient = new Patient()
-        patient.setId(mockRequestId)
-        patient.setIdentifier(List.of(new Identifier().setValue(mockPatientId), new Identifier().setValue("something else")))
+        patient.setId(mockFhirResourceId)
+        patient.setIdentifier(List.of(new Identifier().setValue("something else"), new Identifier().setValue(mockPatientId).setType(new CodeableConcept().addCoding(new Coding().setSystem("http://terminology.hl7.org/CodeSystem/v2-0203").setCode("MR")))))
         patient.setName(List.of(new HumanName().setUse(HumanName.NameUse.OFFICIAL).setFamily(mockLastName).setGiven(List.of(new StringType(mockFirstName), new StringType("Apple")))))
         patient.setGender(Enumerations.AdministrativeGender.fromCode(mockSex))
         def birthDateTime = new DateType(mockBirthDate.substring(0, mockBirthDate.indexOf("T")))
@@ -146,7 +146,7 @@ class PatientDemographicsControllerTest extends Specification {
         def patientDemographics = PatientDemographicsController.getInstance().parseDemographics(request)
 
         then:
-        patientDemographics.getFhirResourceId() == mockRequestId
+        patientDemographics.getFhirResourceId() == mockFhirResourceId
         patientDemographics.getPatientId() == mockPatientId
         patientDemographics.getFirstName() == mockFirstName
         patientDemographics.getLastName() == mockLastName
