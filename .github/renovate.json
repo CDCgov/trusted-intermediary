@@ -18,5 +18,10 @@
         "groupName": "patch dependencies",
         "groupSlug": "all-patch",
         "stabilityDays": 0
-    }
+    },
+    "packageRules": [{
+            "matchPackageNames": ["ca.uhn.hapi.fhir:org.hl7.fhir.utilities"],
+            "allowedVersions": "!/5\\.6\\.881/"
+        }
+    ]
 }
