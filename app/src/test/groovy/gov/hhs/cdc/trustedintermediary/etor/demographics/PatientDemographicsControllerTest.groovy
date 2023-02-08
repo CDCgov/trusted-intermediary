@@ -31,6 +31,7 @@ class PatientDemographicsControllerTest extends Specification {
         def mockBirthDate = "2022-12-21T08:34:27Z"
         def mockBirthNumber = 1
         def mockRace = "Asian"
+        def mockNextOfKin = new NextOfKin("Jaina", "Solo", "555-555-5555")
 
         def fhir = Mock(HapiFhir)
 
@@ -44,6 +45,9 @@ class PatientDemographicsControllerTest extends Specification {
         fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_BIRTH_DATE_TIME_FHIR_PATH, DateTimeType) >> Optional.of(new DateTimeType(mockBirthDate))
         fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_BIRTH_ORDER_FHIR_PATH, IntegerType) >> Optional.of(new IntegerType(mockBirthNumber))
         fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_RACE_FHIR_PATH, StringType) >> Optional.of(new StringType(mockRace))
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_NEXT_OF_KIN_FIRST_NAME_FHIR_PATH, StringType) >> Optional.of(new StringType(mockNextOfKin.firstName))
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_NEXT_OF_KIN_LAST_NAME_FHIR_PATH, StringType) >> Optional.of(new StringType(mockNextOfKin.lastName))
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_NEXT_OF_KIN_PHONE_NUMBER_FHIR_PATH, StringType) >> Optional.of(new StringType(mockNextOfKin.phoneNumber))
 
         TestApplicationContext.register(HapiFhir, fhir)
 
@@ -63,6 +67,9 @@ class PatientDemographicsControllerTest extends Specification {
         patientDemographics.getBirthDateTime() == ZonedDateTime.parse(mockBirthDate)
         patientDemographics.getBirthOrder() == mockBirthNumber
         patientDemographics.getRace() == mockRace
+        patientDemographics.getNextOfKin().firstName == mockNextOfKin.firstName
+        patientDemographics.getNextOfKin().lastName == mockNextOfKin.lastName
+        patientDemographics.getNextOfKin().phoneNumber == mockNextOfKin.phoneNumber
     }
 
     def "parseDemographics puts null into the patient demographics"() {
