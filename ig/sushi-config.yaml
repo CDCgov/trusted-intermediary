@@ -25,11 +25,7 @@ publisher:
 # use cases, the value can be an object with keys for id, uri, and version.
 #
 dependencies:
-  hl7.fhir.us.core: 6.0.0-ballot
-#   hl7.fhir.us.mcode:
-#     id: mcode
-#     uri: http://hl7.org/fhir/us/mcode/ImplementationGuide/hl7.fhir.us.mcode
-#     version: 1.0.0
+  hl7.fhir.us.core: 5.0.1
 #
 #
 # The pages property corresponds to IG.definition.page. SUSHI can

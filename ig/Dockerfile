@@ -5,6 +5,4 @@ RUN update-ms-fonts
 RUN cp /usr/lib/ruby/gems/3.1.0/gems/jekyll-4.3.1/exe/jekyll /usr/bin
 RUN npm install -g fsh-sushi
 COPY . trusted-intermediary/
-#RUN git clone https://github.com/CDCgov/trusted-intermediary.git
 RUN ./trusted-intermediary/_updatePublisher.sh
-#CMD ./trusted-intermediary/_genonce.sh

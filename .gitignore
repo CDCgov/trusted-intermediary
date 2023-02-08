@@ -9,6 +9,7 @@ bin
 
 # Ignore macOS Finder directory config
 .DS_Store
+Thumbs.db
 
 # Ignore python version file
 .python-version
@@ -16,3 +17,10 @@ bin
 # Ignore terraform state (as it is persisted via Azure Storage)
 terraform.tfstate*
 .terraform*
+
+# Ignore generated directories that are part of the HL7 IG tooling process
+ig/fsh-generated
+ig/input-cache
+ig/output
+ig/temp
+ig/template

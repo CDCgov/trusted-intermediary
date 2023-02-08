@@ -16,17 +16,17 @@ To be written
 
 ## Generate Implementation Guide
 
-- In a terminal, navigate to this `ig` directory
-- run `./_updatePublisher.sh` in order to ensure you are using the most recent publisher release
-- run `./_genonce.sh` to generate the Implementation Guide
-- In a browser you can open up the `ig/output/index.html` file that was generated as this is the home page for the Implementation Guide
+1. In a terminal, navigate to this `ig` directory
+1. run `./_updatePublisher.sh` in order to ensure you are using the most recent publisher release
+1. run `./_genonce.sh` to generate the Implementation Guide
+1. In a browser you can open up the `ig/output/index.html` file that was generated as this is the home page for the Implementation Guide
 
 ## Using Docker
 
 A Dockerfile is provided that can be used to generate the Implementation Guide.
 
-- In a terminal, navigate to this `ig` directory
-- run `docker build -t ig-test .` to build the docker container
-- run `docker run -i -t ig-test bash` to run the container and use an interactive `bash` shell inside the container
-- The container already has updated tools when you built it
-- run `./_genonce.sh` inside the container to build the Implementation Guide as usual
+1. In a terminal, navigate to this `ig` directory
+1. run `docker build -t ig-test .` to build the docker container
+1. run `docker run -it ig-test bash` to run the container and use an interactive `bash` shell inside the container
+1. The container already has updated tools when you built it
+1. run `./_genonce.sh` inside the container to build the Implementation Guide as usual
