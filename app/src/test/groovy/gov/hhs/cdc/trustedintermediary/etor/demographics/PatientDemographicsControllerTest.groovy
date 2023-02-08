@@ -123,6 +123,9 @@ class PatientDemographicsControllerTest extends Specification {
         def mockBirthDate = "2022-12-21T08:34:27Z"
         def mockBirthNumber = 1
         def mockRace = "Asian"
+        def mockNextOfKinFamilyName = "Zelda"
+        def mockNextOfKinGivenName = "Link"
+        def mockNextOfKinPhone = "555-555-1234"
 
         def fhir = Mock(HapiFhir)
 
@@ -138,6 +141,10 @@ class PatientDemographicsControllerTest extends Specification {
         def raceExtension = new Extension("http://hl7.org/fhir/us/core/StructureDefinition/us-core-race")
         raceExtension.addExtension(new Extension("text", new StringType("Asian")))
         patient.addExtension(raceExtension)
+        def nextOfKinRelationship = List.of(new CodeableConcept().addCoding(new Coding().setSystem("http://snomed.info/sct").setCode("72705000")))
+        def nextOfKinName = new HumanName().setFamily(mockNextOfKinFamilyName).addGiven(mockNextOfKinGivenName)
+        def nextOfKinTelecom = List.of(new ContactPoint().setSystem(ContactPoint.ContactPointSystem.PHONE).setValue(mockNextOfKinPhone))
+        patient.setContact(List.of(new Patient.ContactComponent().setRelationship(nextOfKinRelationship).setName(nextOfKinName).setTelecom(nextOfKinTelecom)))
 
         def bundle = new Bundle()
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(patient))
@@ -167,6 +174,9 @@ class PatientDemographicsControllerTest extends Specification {
         patientDemographics.getBirthDateTime() == ZonedDateTime.parse(mockBirthDate)
         patientDemographics.getBirthOrder() == mockBirthNumber
         patientDemographics.getRace() == mockRace
+        patientDemographics.getNextOfKin().firstName == mockNextOfKinGivenName
+        patientDemographics.getNextOfKin().lastName == mockNextOfKinFamilyName
+        patientDemographics.getNextOfKin().phoneNumber == mockNextOfKinPhone
     }
 
     def "constructResponse works"() {
