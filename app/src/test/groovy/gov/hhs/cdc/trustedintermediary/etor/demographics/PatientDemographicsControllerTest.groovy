@@ -86,6 +86,9 @@ class PatientDemographicsControllerTest extends Specification {
         fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_BIRTH_DATE_TIME_FHIR_PATH, DateTimeType) >> Optional.empty()
         fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_BIRTH_ORDER_FHIR_PATH, IntegerType) >> Optional.empty()
         fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_RACE_FHIR_PATH, StringType) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_NEXT_OF_KIN_FIRST_NAME_FHIR_PATH, StringType) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_NEXT_OF_KIN_LAST_NAME_FHIR_PATH, StringType) >> Optional.empty()
+        fhir.fhirPathEvaluateFirst(_ as IBase, PatientDemographicsController.PATIENT_NEXT_OF_KIN_PHONE_NUMBER_FHIR_PATH, StringType) >> Optional.empty()
 
         TestApplicationContext.register(HapiFhir, fhir)
 
@@ -105,6 +108,9 @@ class PatientDemographicsControllerTest extends Specification {
         patientDemographics.getBirthDateTime() == null
         patientDemographics.getBirthOrder() == null
         patientDemographics.getRace() == null
+        patientDemographics.getNextOfKin().firstName == null
+        patientDemographics.getNextOfKin().lastName == null
+        patientDemographics.getNextOfKin().phoneNumber == null
     }
 
     def "the FHIR paths are correct"() {
