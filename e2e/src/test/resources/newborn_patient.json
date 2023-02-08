@@ -36,6 +36,10 @@
         ],
         "identifier": [
           {
+            "system": "http://new-republic.gov/galactic-citizen-identifier",
+            "value": "7465737865"
+          },
+          {
             "type": {
               "coding": [
                 {
@@ -46,10 +50,6 @@
             },
             "system": "http://coruscanthealth.org/main-hospital/patient-identifier",
             "value": "MRN7465737865"
-          },
-          {
-            "system": "http://new-republic.gov/galactic-citizen-identifier",
-            "value": "7465737865"
           }
         ],
         "name": [
