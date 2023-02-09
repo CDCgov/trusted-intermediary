@@ -123,33 +123,13 @@ class PatientDemographicsControllerTest extends Specification {
         def mockBirthDate = "2022-12-21T08:34:27Z"
         def mockBirthNumber = 1
         def mockRace = "Asian"
-        def mockNextOfKinFamilyName = "Zelda"
-        def mockNextOfKinGivenName = "Link"
+        def mockNextOfKinFirstName = "Link"
+        def mockNextOfKinLastName = "Zelda"
         def mockNextOfKinPhone = "555-555-1234"
 
         def fhir = Mock(HapiFhir)
 
-        def patient = new Patient()
-        patient.setId(mockFhirResourceId)
-        def patientIdentifier = new Identifier().setValue("something else")
-        def patientIdentifierMrn = new Identifier().setValue(mockPatientId).setType(new CodeableConcept().addCoding(new Coding().setSystem("http://terminology.hl7.org/CodeSystem/v2-0203").setCode("MR")))
-        patient.setIdentifier(List.of(patientIdentifier, patientIdentifierMrn))
-        patient.setName(List.of(new HumanName().setUse(HumanName.NameUse.OFFICIAL).setFamily(mockLastName).setGiven(List.of(new StringType(mockFirstName), new StringType("Apple")))))
-        patient.setGender(Enumerations.AdministrativeGender.fromCode(mockSex))
-        def birthDateTime = new DateType(mockBirthDate.substring(0, mockBirthDate.indexOf("T")))
-        birthDateTime.addExtension("http://hl7.org/fhir/StructureDefinition/patient-birthTime", new DateTimeType(mockBirthDate))
-        patient.setBirthDateElement(birthDateTime)
-        patient.setMultipleBirth(new IntegerType(mockBirthNumber))
-        def raceExtension = new Extension("http://hl7.org/fhir/us/core/StructureDefinition/us-core-race")
-        raceExtension.addExtension(new Extension("text", new StringType(mockRace)))
-        patient.addExtension(raceExtension)
-        def nextOfKinRelationship = List.of(new CodeableConcept().addCoding(new Coding().setSystem("http://snomed.info/sct").setCode("72705000")))
-        def nextOfKinName = new HumanName().setFamily(mockNextOfKinFamilyName).addGiven(mockNextOfKinGivenName)
-        def nextOfKinTelecom = List.of(new ContactPoint().setSystem(ContactPoint.ContactPointSystem.PHONE).setValue(mockNextOfKinPhone))
-        patient.setContact(List.of(new Patient.ContactComponent().setRelationship(nextOfKinRelationship).setName(nextOfKinName).setTelecom(nextOfKinTelecom)))
-
-        def bundle = new Bundle()
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(patient))
+        def bundle = constructTestFhirBundle(mockFhirResourceId, mockPatientId, mockFirstName, mockLastName, mockSex, mockBirthDate, mockBirthNumber, mockRace, mockNextOfKinFirstName, mockNextOfKinLastName, mockNextOfKinPhone)
 
         fhir.parseResource(_ as String, _ as Class) >> bundle
 
@@ -176,8 +156,8 @@ class PatientDemographicsControllerTest extends Specification {
         patientDemographics.getBirthDateTime() == ZonedDateTime.parse(mockBirthDate)
         patientDemographics.getBirthOrder() == mockBirthNumber
         patientDemographics.getRace() == mockRace
-        patientDemographics.getNextOfKin().firstName == mockNextOfKinGivenName
-        patientDemographics.getNextOfKin().lastName == mockNextOfKinFamilyName
+        patientDemographics.getNextOfKin().firstName == mockNextOfKinFirstName
+        patientDemographics.getNextOfKin().lastName == mockNextOfKinLastName
         patientDemographics.getNextOfKin().phoneNumber == mockNextOfKinPhone
     }
 
@@ -215,5 +195,32 @@ class PatientDemographicsControllerTest extends Specification {
 
         then:
         thrown(RuntimeException)
+    }
+
+    Bundle constructTestFhirBundle(String mockFhirResourceId, String mockPatientId, String mockFirstName, String mockLastName, String mockSex, String mockBirthDate, int mockBirthNumber, String mockRace, String mockNextOfKinFirstName, String mockNextOfKinLastName, String mockNextOfKinPhone) {
+
+        def patient = new Patient()
+        patient.setId(mockFhirResourceId)
+        def patientIdentifier = new Identifier().setValue("something else")
+        def patientIdentifierMrn = new Identifier().setValue(mockPatientId).setType(new CodeableConcept().addCoding(new Coding().setSystem("http://terminology.hl7.org/CodeSystem/v2-0203").setCode("MR")))
+        patient.setIdentifier(List.of(patientIdentifier, patientIdentifierMrn))
+        patient.setName(List.of(new HumanName().setUse(HumanName.NameUse.OFFICIAL).setFamily(mockLastName).setGiven(List.of(new StringType(mockFirstName), new StringType("Apple")))))
+        patient.setGender(Enumerations.AdministrativeGender.fromCode(mockSex))
+        def birthDateTime = new DateType(mockBirthDate.substring(0, mockBirthDate.indexOf("T")))
+        birthDateTime.addExtension("http://hl7.org/fhir/StructureDefinition/patient-birthTime", new DateTimeType(mockBirthDate))
+        patient.setBirthDateElement(birthDateTime)
+        patient.setMultipleBirth(new IntegerType(mockBirthNumber))
+        def raceExtension = new Extension("http://hl7.org/fhir/us/core/StructureDefinition/us-core-race")
+        raceExtension.addExtension(new Extension("text", new StringType(mockRace)))
+        patient.addExtension(raceExtension)
+        def nextOfKinRelationship = List.of(new CodeableConcept().addCoding(new Coding().setSystem("http://snomed.info/sct").setCode("72705000")))
+        def nextOfKinName = new HumanName().setFamily(mockNextOfKinLastName).addGiven(mockNextOfKinFirstName)
+        def nextOfKinTelecom = List.of(new ContactPoint().setSystem(ContactPoint.ContactPointSystem.PHONE).setValue(mockNextOfKinPhone))
+        patient.setContact(List.of(new Patient.ContactComponent().setRelationship(nextOfKinRelationship).setName(nextOfKinName).setTelecom(nextOfKinTelecom)))
+
+        def bundle = new Bundle()
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(patient))
+
+        return bundle
     }
 }
