@@ -57,7 +57,7 @@ public class PatientDemographicsController {
                     + IS_MOTHER
                     + ").exists()).exists()) | contact.where(relationship.where(coding.where("
                     + IS_FATHER
-                    + ").exists()).exists())).";
+                    + ").exists()).exists())).first().";
 
     static final String PATIENT_NEXT_OF_KIN_FIRST_NAME_FHIR_PATH =
             PATIENT_IN_BUNDLE_FHIR_PATH + NEXT_OF_KIN_FHIR_PATH + "name.given.first()";
