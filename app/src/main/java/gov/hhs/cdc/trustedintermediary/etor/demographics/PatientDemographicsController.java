@@ -51,13 +51,13 @@ public class PatientDemographicsController {
     private static final String IS_FATHER =
             "(system='http://terminology.hl7.org/CodeSystem/v3-RoleCode' and code='FTH' or system='http://snomed.info/sct' and code='66839005')";
     private static final String NEXT_OF_KIN_FHIR_PATH =
-            "contact.where(relationship.where(coding.where("
+            "(contact.where(relationship.where(coding.where("
                     + IS_NEXT_OF_KIN
-                    + " or "
+                    + ").exists()).exists()) | contact.where(relationship.where(coding.where("
                     + IS_MOTHER
-                    + " or "
+                    + ").exists()).exists()) | contact.where(relationship.where(coding.where("
                     + IS_FATHER
-                    + ").exists()).exists()).";
+                    + ").exists()).exists())).";
 
     static final String PATIENT_NEXT_OF_KIN_FIRST_NAME_FHIR_PATH =
             PATIENT_IN_BUNDLE_FHIR_PATH + NEXT_OF_KIN_FHIR_PATH + "name.given.first()";
