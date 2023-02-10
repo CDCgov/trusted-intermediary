@@ -13,6 +13,7 @@ public class PatientDemographics {
     private ZonedDateTime birthDateTime;
     private Integer birthOrder;
     private String race;
+    private NextOfKin nextOfKin;
 
     public PatientDemographics(
             String fhirResourceId,
@@ -22,7 +23,8 @@ public class PatientDemographics {
             String sex,
             ZonedDateTime birthDateTime,
             Integer birthOrder,
-            String race) {
+            String race,
+            NextOfKin nextOfKin) {
         this.fhirResourceId = fhirResourceId;
         this.patientId = patientId;
         this.firstName = firstName;
@@ -31,6 +33,7 @@ public class PatientDemographics {
         this.birthDateTime = birthDateTime;
         this.birthOrder = birthOrder;
         this.race = race;
+        this.nextOfKin = nextOfKin;
     }
 
     public PatientDemographics() {}
@@ -99,6 +102,14 @@ public class PatientDemographics {
         this.race = race;
     }
 
+    public NextOfKin getNextOfKin() {
+        return nextOfKin;
+    }
+
+    public void setNextOfKin(final NextOfKin nextOfKin) {
+        this.nextOfKin = nextOfKin;
+    }
+
     @Override
     public String toString() {
         return new StringJoiner(", ", PatientDemographics.class.getSimpleName() + "[", "]")
@@ -110,6 +121,7 @@ public class PatientDemographics {
                 .add("birthDateTime=" + birthDateTime)
                 .add("birthOrder=" + birthOrder)
                 .add("race='" + race + "'")
+                .add("nextOfKin=" + nextOfKin)
                 .toString();
     }
 }

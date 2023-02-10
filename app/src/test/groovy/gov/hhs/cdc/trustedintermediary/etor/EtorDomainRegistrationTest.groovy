@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
+import gov.hhs.cdc.trustedintermediary.etor.demographics.NextOfKin
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographics
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse
@@ -52,7 +53,7 @@ class EtorDomainRegistrationTest extends Specification {
 
         def mockRequestId = "asdf-12341-jkl-7890"
 
-        mockDemographicsController.parseDemographics(_ as DomainRequest) >> new PatientDemographics(mockRequestId, "a patient ID", "George", "Washington", "male", ZonedDateTime.now(), 1, "Asian")
+        mockDemographicsController.parseDemographics(_ as DomainRequest) >> new PatientDemographics(mockRequestId, "a patient ID", "George", "Washington", "male", ZonedDateTime.now(), 1, "Asian", new NextOfKin("King", "George", "555-867-5309"))
         mockDemographicsController.constructResponse(_ as PatientDemographicsResponse) >> new DomainResponse(418)
 
         def domainRequest = new DomainRequest()

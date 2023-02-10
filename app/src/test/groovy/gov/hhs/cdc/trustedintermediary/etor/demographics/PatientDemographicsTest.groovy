@@ -40,9 +40,10 @@ class PatientDemographicsTest extends Specification {
         def birthDateTime = ZonedDateTime.now()
         def birthOrder = 1
         def race = "Asian"
+        def nextOfKin = new NextOfKin("Jaina", "Solo", "555-555-5555")
 
         when:
-        def demographics = new PatientDemographics(fhirResourceId, patientId, firstName, lastName, sex, birthDateTime, birthOrder, race)
+        def demographics = new PatientDemographics(fhirResourceId, patientId, firstName, lastName, sex, birthDateTime, birthOrder, race, nextOfKin)
 
         then:
         demographics.getFhirResourceId() == fhirResourceId
@@ -53,6 +54,7 @@ class PatientDemographicsTest extends Specification {
         demographics.getBirthDateTime() == birthDateTime
         demographics.getBirthOrder() == birthOrder
         demographics.getRace() == race
+        demographics.getNextOfKin() == nextOfKin
     }
 
     def "test toString"() {
@@ -65,9 +67,10 @@ class PatientDemographicsTest extends Specification {
         def birthDateTime = ZonedDateTime.now()
         def birthOrder = 1
         def race = "Asian"
+        def nextOfKin = new NextOfKin("Jaina", "Solo", "555-555-5555")
 
         when:
-        def demographicsString = new PatientDemographics(fhirResourceId, patientId, firstName, lastName, sex, birthDateTime, birthOrder, race).toString()
+        def demographicsString = new PatientDemographics(fhirResourceId, patientId, firstName, lastName, sex, birthDateTime, birthOrder, race, nextOfKin).toString()
 
         then:
         demographicsString.contains(fhirResourceId)
@@ -78,5 +81,6 @@ class PatientDemographicsTest extends Specification {
         demographicsString.contains(birthDateTime.toString())
         demographicsString.contains(birthOrder.toString())
         demographicsString.contains(race)
+        demographicsString.contains(nextOfKin.toString())
     }
 }
