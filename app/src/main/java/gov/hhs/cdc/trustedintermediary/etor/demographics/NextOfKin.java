@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.demographics;
 
 import java.util.StringJoiner;
 
+/** Contains information about a next of kin relationship. */
 public class NextOfKin {
     private String firstName;
     private String lastName;
