@@ -133,10 +133,7 @@ class PatientDemographicsControllerTest extends Specification {
 
         fhir.parseResource(_ as String, _ as Class) >> bundle
 
-        fhir.fhirPathEvaluateFirst(_ as IBase, _ as String, _ as Class) >> { IBase fhirResource, String path, Class clazz ->
-            //call the actual HapiFhir implementation to ensure our FHIR paths are correct
-            return HapiFhirImplementation.getInstance().fhirPathEvaluateFirst(fhirResource, path, clazz)
-        }
+        mockFhirToCallRealFhirPathImplementation(fhir)
 
         TestApplicationContext.register(HapiFhir, fhir)
 
@@ -161,7 +158,7 @@ class PatientDemographicsControllerTest extends Specification {
         patientDemographics.getNextOfKin().phoneNumber == mockNextOfKinPhone
     }
 
-    def "the FHIR paths extract next of kin before mother"() {
+    def "the FHIR paths extract next of kin contact before mother for next of kin"() {
         given:
         def mockNextOfKinFirstName = "Link"
         def mockNextOfKinLastName = "Zelda"
@@ -178,10 +175,7 @@ class PatientDemographicsControllerTest extends Specification {
 
         fhir.parseResource(_ as String, _ as Class) >> bundle
 
-        fhir.fhirPathEvaluateFirst(_ as IBase, _ as String, _ as Class) >> { IBase fhirResource, String path, Class clazz ->
-            //call the actual HapiFhir implementation to ensure our FHIR paths are correct
-            return HapiFhirImplementation.getInstance().fhirPathEvaluateFirst(fhirResource, path, clazz)
-        }
+        mockFhirToCallRealFhirPathImplementation(fhir)
 
         TestApplicationContext.register(HapiFhir, fhir)
 
@@ -196,6 +190,40 @@ class PatientDemographicsControllerTest extends Specification {
         patientDemographics.getNextOfKin().firstName == mockNextOfKinFirstName
         patientDemographics.getNextOfKin().lastName == mockNextOfKinLastName
         patientDemographics.getNextOfKin().phoneNumber == mockNextOfKinPhone
+    }
+
+    def "the FHIR paths extract mother contact before father for next of kin"() {
+        given:
+        def mockMotherFirstName = "Link"
+        def mockMotherLastName = "Zelda"
+        def mockMotherPhone = "555-867-5309"
+
+        def bundle = constructTestFhirBundle("asdf-12341-jkl-7890", "patientId", "Clarus", "DogCow", Enumerations.AdministrativeGender.UNKNOWN.toCode(), "2022-12-21T08:34:27Z", 1, "Asian", "Darth", "Vader", "555-sta-wars")
+        Patient patient = bundle.getEntry().get(0).getResource() as Patient
+        def father = constructTestFhirPatientContact("Darth", "Vader", "555-123-4567", "http://terminology.hl7.org/CodeSystem/v3-RoleCode", "FTH")
+        def mother = constructTestFhirPatientContact(mockMotherFirstName, mockMotherLastName, mockMotherPhone, "http://terminology.hl7.org/CodeSystem/v3-RoleCode", "MTH")
+        patient.getContact().add(father)
+        patient.getContact().add(mother)
+
+        def fhir = Mock(HapiFhir)
+
+        fhir.parseResource(_ as String, _ as Class) >> bundle
+
+        mockFhirToCallRealFhirPathImplementation(fhir)
+
+        TestApplicationContext.register(HapiFhir, fhir)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        def request = new DomainRequest()
+
+        when:
+        def patientDemographics = PatientDemographicsController.getInstance().parseDemographics(request)
+
+        then:
+        patientDemographics.getNextOfKin().firstName == mockMotherFirstName
+        patientDemographics.getNextOfKin().lastName == mockMotherLastName
+        patientDemographics.getNextOfKin().phoneNumber == mockMotherPhone
     }
 
     def "constructResponse works"() {
@@ -276,5 +304,12 @@ class PatientDemographicsControllerTest extends Specification {
         ]
 
         return new Patient.ContactComponent().setRelationship(nextOfKinRelationship).setName(nextOfKinName).setTelecom(nextOfKinTelecom)
+    }
+
+    def mockFhirToCallRealFhirPathImplementation(HapiFhir fhir) {
+        fhir.fhirPathEvaluateFirst(_ as IBase, _ as String, _ as Class) >> { IBase fhirResource, String path, Class clazz ->
+            //call the actual HapiFhir implementation to ensure our FHIR paths are correct
+            return HapiFhirImplementation.getInstance().fhirPathEvaluateFirst(fhirResource, path, clazz)
+        }
     }
 }
