@@ -1,5 +1,8 @@
 from locust import HttpUser, task, events
 
+# read the sample request body for the demographics endpoint
+with open("e2e/src/test/resources/newborn_patient.json", "r") as requestBodyFile:
+    requestBody = requestBodyFile.read()
 
 class SampleUser(HttpUser):
 
@@ -12,12 +15,7 @@ class SampleUser(HttpUser):
 
     @task(5)  # this task will get called 5x more than the other
     def post_v1_etor_orders(self):
-        self.client.post("/v1/etor/demographics", json={
-            "id": "asdf-12341-jkl-7890",
-            "destination": "Massachusetts",
-            "createdAt": "2022-12-21T08:34:27Z",
-            "client": "MassGeneral",
-        })
+        self.client.post("/v1/etor/demographics", data=requestBody)
 
 
 @events.quitting.add_listener
