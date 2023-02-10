@@ -105,8 +105,6 @@ public class PatientDemographicsController {
                 fhir.fhirPathEvaluateFirst(fhirBundle, PATIENT_RACE_FHIR_PATH, StringType.class);
 
         var nextOfKin = parseOutNextOfKin(fhirBundle);
-        // logging to check value
-        logger.logInfo("Next of Kin = " + nextOfKin);
 
         return new PatientDemographics(
                 fhirResourceIdOptional.map(IdType::getValue).orElse(null),
