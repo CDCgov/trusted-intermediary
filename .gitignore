@@ -24,3 +24,5 @@ ig/input-cache
 ig/output
 ig/temp
 ig/template
+
+__pycache__
