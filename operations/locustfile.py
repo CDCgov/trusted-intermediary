@@ -1,8 +1,20 @@
 from locust import HttpUser, task, events
+from locust.runners import MasterRunner
 
-# read the sample request body for the demographics endpoint
-with open("e2e/src/test/resources/newborn_patient.json", "r") as requestBodyFile:
-    requestBody = requestBodyFile.read()
+
+request_body = None
+
+
+@events.test_start.add_listener
+def test_start(environment):
+    global request_body
+    if isinstance(environment.runner, MasterRunner):
+        # in a distributed run, the master does not typically need any test data
+        return
+    # read the sample request body for the demographics endpoint
+    with open("e2e/src/test/resources/newborn_patient.json", "r") as request_body_file:
+        request_body = request_body_file.read()
+
 
 class SampleUser(HttpUser):
 
@@ -15,7 +27,7 @@ class SampleUser(HttpUser):
 
     @task(5)  # this task will get called 5x more than the other
     def post_v1_etor_orders(self):
-        self.client.post("/v1/etor/demographics", data=requestBody)
+        self.client.post("/v1/etor/demographics", data=request_body)
 
 
 @events.quitting.add_listener
