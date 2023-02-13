@@ -19,6 +19,6 @@ Add a title and description here
 
 - [ ] What tasks need to be done to fulfill the completion criteria?
 
-### Other notes
+## Other Notes
 
 - Any other notes to help clarify this task for the team
