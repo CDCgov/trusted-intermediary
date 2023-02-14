@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint;
+import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendLabOrderUsecase;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
@@ -35,6 +36,8 @@ public class EtorDomainRegistration implements DomainConnector {
 
         ApplicationContext.register(
                 PatientDemographicsController.class, PatientDemographicsController.getInstance());
+        ApplicationContext.register(
+                ConvertAndSendLabOrderUsecase.class, ConvertAndSendLabOrderUsecase.getInstance());
         ApplicationContext.register(LabOrderConverter.class, HapiLabOrderConverter.getInstance());
         ApplicationContext.register(LabOrderSender.class, LocalFileLabOrderSender.getInstance());
 
