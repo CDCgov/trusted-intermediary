@@ -26,6 +26,7 @@ import javax.inject.Inject;
 public class EtorDomainRegistration implements DomainConnector {
 
     @Inject PatientDemographicsController patientDemographicsController;
+    @Inject ConvertAndSendLabOrderUsecase convertAndSendLabOrderUsecase;
     @Inject Logger logger;
 
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
@@ -57,10 +58,12 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleOrder(DomainRequest request) {
 
         logger.logInfo("Parsing request...");
-        var order = patientDemographicsController.parseDemographics(request);
+        var demographics = patientDemographicsController.parseDemographics(request);
+
+        convertAndSendLabOrderUsecase.convertAndSend(demographics);
 
         PatientDemographicsResponse patientDemographicsResponse =
-                new PatientDemographicsResponse(order);
+                new PatientDemographicsResponse(demographics);
 
         logger.logInfo("Constructing response...");
         return patientDemographicsController.constructResponse(patientDemographicsResponse);
