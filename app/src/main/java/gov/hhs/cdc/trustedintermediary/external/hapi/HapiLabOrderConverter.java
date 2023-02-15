@@ -5,6 +5,10 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographics;
 import org.hl7.fhir.r4.model.Bundle;
 
+/**
+ * Converts {@link PatientDemographics} to a Hapi-specific FHIR lab order ({@link HapiLabOrder} or
+ * {@link LabOrder<Bundle>}).
+ */
 public class HapiLabOrderConverter implements LabOrderConverter {
     private static final HapiLabOrderConverter INSTANCE = new HapiLabOrderConverter();
 

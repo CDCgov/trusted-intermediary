@@ -2,6 +2,10 @@ package gov.hhs.cdc.trustedintermediary.etor.demographics;
 
 import javax.inject.Inject;
 
+/**
+ * The overall logic that handles receiving patient demographics, converting it to a lab order, and
+ * sending it on its way.
+ */
 public class ConvertAndSendLabOrderUsecase {
 
     private static final ConvertAndSendLabOrderUsecase INSTANCE =

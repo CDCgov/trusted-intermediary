@@ -3,10 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.localfile;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender;
 
-/*
-   Accepts a LabOrder and writes it to a local file.
-*/
-
+/** Accepts a {@link LabOrder} and writes it to a local file. */
 public class LocalFileLabOrderSender implements LabOrderSender {
     private static final LocalFileLabOrderSender INSTANCE = new LocalFileLabOrderSender();
 

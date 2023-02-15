@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.hl7.fhir.instance.model.api.IBase;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
+/** Concrete implementation that calls the Hapi FHIR library. */
 public class HapiFhirImplementation implements HapiFhir {
 
     private static final HapiFhirImplementation INSTANCE = new HapiFhirImplementation();
