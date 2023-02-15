@@ -1,9 +1,9 @@
-package gov.hhs.cdc.trustedintermediary.external.reportstream
+package gov.hhs.cdc.trustedintermediary.external.localfile
 
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder
 import spock.lang.Specification
 
-class ReportStreamLabOrderSenderTest extends Specification{
+class LocalFileLabOrderSenderTest extends Specification{
 
 
     def "send order works"() {
@@ -19,7 +19,7 @@ class ReportStreamLabOrderSenderTest extends Specification{
 
         when:
 
-        ReportStreamLabOrderSender.getInstance().sendOrder(mockOrder)
+        LocalFileLabOrderSender.getInstance().sendOrder(mockOrder)
 
         then:
 
