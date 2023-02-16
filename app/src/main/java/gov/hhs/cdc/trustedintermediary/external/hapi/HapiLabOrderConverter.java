@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.hapi;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographics;
+import java.time.Instant;
 import java.util.Date;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CodeableConcept;
@@ -16,7 +17,7 @@ import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.IntegerType;
 import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ServiceRequest;
 import org.hl7.fhir.r4.model.StringType;
 
 /**
@@ -36,13 +37,16 @@ public class HapiLabOrderConverter implements LabOrderConverter {
     public LabOrder<Bundle> convertToOrder(final PatientDemographics demographics) {
         var labOrder = new Bundle();
 
-        labOrder.addEntry(
-                new Bundle.BundleEntryComponent().setResource(createPatientResource(demographics)));
+        var patient = createPatientResource(demographics);
+        var serviceRequest = createServiceRequest(patient);
+
+        labOrder.addEntry(new Bundle.BundleEntryComponent().setResource(patient));
+        labOrder.addEntry(new Bundle.BundleEntryComponent().setResource(serviceRequest));
 
         return new HapiLabOrder(labOrder);
     }
 
-    private Resource createPatientResource(final PatientDemographics demographics) {
+    private Patient createPatientResource(final PatientDemographics demographics) {
         var patient = new Patient();
 
         patient.setId(demographics.getFhirResourceId());
@@ -102,5 +106,25 @@ public class HapiLabOrderConverter implements LabOrderConverter {
                         .addTelecom(nextOfKinTelecom));
 
         return patient;
+    }
+
+    private ServiceRequest createServiceRequest(final Patient patient) {
+        var serviceRequest = new ServiceRequest();
+
+        serviceRequest.setId("123456789");
+
+        serviceRequest.setStatus(ServiceRequest.ServiceRequestStatus.ACTIVE);
+
+        serviceRequest.setIntent(ServiceRequest.ServiceRequestIntent.ORDER);
+
+        serviceRequest.setCode(
+                new CodeableConcept(
+                        new Coding("http://loinc.org", "54089-8", "Newborn Screening Panel")));
+
+        serviceRequest.setSubjectTarget(patient);
+
+        serviceRequest.setOccurrence(new DateTimeType(Date.from(Instant.now())));
+
+        return serviceRequest;
     }
 }
