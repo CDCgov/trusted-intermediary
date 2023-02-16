@@ -5,8 +5,13 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint;
+import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendLabOrderUsecase;
+import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderConverter;
+import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiLabOrderConverter;
+import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileLabOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +26,7 @@ import javax.inject.Inject;
 public class EtorDomainRegistration implements DomainConnector {
 
     @Inject PatientDemographicsController patientDemographicsController;
+    @Inject ConvertAndSendLabOrderUsecase convertAndSendLabOrderUsecase;
     @Inject Logger logger;
 
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
@@ -28,8 +34,14 @@ public class EtorDomainRegistration implements DomainConnector {
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
+
         ApplicationContext.register(
                 PatientDemographicsController.class, PatientDemographicsController.getInstance());
+        ApplicationContext.register(
+                ConvertAndSendLabOrderUsecase.class, ConvertAndSendLabOrderUsecase.getInstance());
+        ApplicationContext.register(LabOrderConverter.class, HapiLabOrderConverter.getInstance());
+        ApplicationContext.register(LabOrderSender.class, LocalFileLabOrderSender.getInstance());
+
         return endpoints;
     }
 
@@ -46,10 +58,12 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleOrder(DomainRequest request) {
 
         logger.logInfo("Parsing request...");
-        var order = patientDemographicsController.parseDemographics(request);
+        var demographics = patientDemographicsController.parseDemographics(request);
+
+        convertAndSendLabOrderUsecase.convertAndSend(demographics);
 
         PatientDemographicsResponse patientDemographicsResponse =
-                new PatientDemographicsResponse(order);
+                new PatientDemographicsResponse(demographics);
 
         logger.logInfo("Constructing response...");
         return patientDemographicsController.constructResponse(patientDemographicsResponse);

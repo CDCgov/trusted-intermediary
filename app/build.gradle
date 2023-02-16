@@ -118,6 +118,7 @@ tasks.named('test') {
             '**/javalin/App*',
             '**/jackson/Jackson*',
             '**/slf4j/Slf4jLogger*',
+            '**/hapi/HapiFhirImplementation*'
         ]
     }
 }
