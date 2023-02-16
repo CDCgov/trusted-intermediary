@@ -4,36 +4,38 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.NextOfKin
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographics
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.ServiceRequest
 import spock.lang.Specification
 
 import java.time.ZonedDateTime
 
 class HapiLabOrderConverterTest extends Specification {
+
+    def fhirResourceId = "fhir123id"
+    def patientId = "patient123id"
+    def firstName = "John"
+    def lastName = "Doe"
+    def sex = "male"
+    def birthDateTime = ZonedDateTime.now()
+    def birthOrder = 1
+    def race = "Asian"
+    def nextOfKinFirstName = "Jaina"
+    def nextOfKinLastName = "Solo"
+    def nextOfKinPhoneNumber = "555-555-5555"
+    def nextOfKin = new NextOfKin(nextOfKinFirstName, nextOfKinLastName, nextOfKinPhoneNumber)
+    def demographics = new PatientDemographics(
+    fhirResourceId,
+    patientId,
+    firstName,
+    lastName,
+    sex,
+    birthDateTime,
+    birthOrder,
+    race,
+    nextOfKin
+    )
+
     def "the demographics correctly constructs a patient in the lab order"() {
-        given:
-        def fhirResourceId = "fhir123id"
-        def patientId = "patient123id"
-        def firstName = "John"
-        def lastName = "Doe"
-        def sex = "male"
-        def birthDateTime = ZonedDateTime.now()
-        def birthOrder = 1
-        def race = "Asian"
-        def nextOfKinFirstName = "Jaina"
-        def nextOfKinLastName = "Solo"
-        def nextOfKinPhoneNumber = "555-555-5555"
-        def nextOfKin = new NextOfKin(nextOfKinFirstName, nextOfKinLastName, nextOfKinPhoneNumber)
-        def demographics = new PatientDemographics(
-                fhirResourceId,
-                patientId,
-                firstName,
-                lastName,
-                sex,
-                birthDateTime,
-                birthOrder,
-                race,
-                nextOfKin
-                )
 
         when:
         def labOrderBundle = HapiLabOrderConverter.getInstance().convertToOrder(demographics).getUnderlyingOrder()
@@ -52,5 +54,18 @@ class HapiLabOrderConverterTest extends Specification {
         patient.getContactFirstRep().getName().getFamily() == nextOfKinLastName
         patient.getContactFirstRep().getName().getGiven().get(0).getValue() == nextOfKinFirstName
         patient.getContactFirstRep().getTelecomFirstRep().getValue() == nextOfKinPhoneNumber
+    }
+
+    def "the demographics correctly constructs a service request in the lab order"() {
+
+        when:
+        def labOrderBundle = HapiLabOrderConverter.getInstance().convertToOrder(demographics).getUnderlyingOrder()
+
+        then:
+        def serviceRequest = labOrderBundle.getEntry().get(1).getResource() as ServiceRequest
+
+        !serviceRequest.getId().isEmpty()
+        serviceRequest.getCode().getCodingFirstRep().getCode() == "54089-8"
+        serviceRequest.getSubjectTarget() == labOrderBundle.getEntry().get(0).getResource()
     }
 }
