@@ -6,12 +6,14 @@ public class ReportStreamConnection implements ClientConnection {
 
     private ReportStreamConnection() {}
 
-    private static ReportStreamConnection INSTANCE = new ReportStreamConnection();
+    private static final ReportStreamConnection INSTANCE = new ReportStreamConnection();
 
     public static ReportStreamConnection getInstance() {
         return INSTANCE;
     }
 
     @Override
-    public void sendRequestBody(String json) {}
+    public void sendRequestBody(String json) {
+        // TODO logic
+    }
 }
