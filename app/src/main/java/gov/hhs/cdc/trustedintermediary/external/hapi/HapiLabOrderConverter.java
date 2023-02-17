@@ -17,6 +17,7 @@ import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.IntegerType;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.ServiceRequest;
 import org.hl7.fhir.r4.model.StringType;
 
@@ -121,7 +122,7 @@ public class HapiLabOrderConverter implements LabOrderConverter {
                 new CodeableConcept(
                         new Coding("http://loinc.org", "54089-8", "Newborn Screening Panel")));
 
-        serviceRequest.setSubjectTarget(patient);
+        serviceRequest.setSubject(new Reference(patient));
 
         serviceRequest.setOccurrence(new DateTimeType(Date.from(Instant.now())));
 
