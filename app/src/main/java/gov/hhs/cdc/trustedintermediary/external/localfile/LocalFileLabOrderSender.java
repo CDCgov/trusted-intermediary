@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import javax.inject.Inject;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 
 /** Accepts a {@link LabOrder} and writes it to a local file. */
 public class LocalFileLabOrderSender implements LabOrderSender {
@@ -25,7 +24,7 @@ public class LocalFileLabOrderSender implements LabOrderSender {
     @Override
     public void sendOrder(final LabOrder<?> order) {
 
-        String serialized = fhir.encodeResourceToJson((IBaseResource) order.getUnderlyingOrder());
+        String serialized = fhir.encodeResourceToJson(order.getUnderlyingOrder());
 
         String fileName = "../examples/localfilelaborder.json";
 

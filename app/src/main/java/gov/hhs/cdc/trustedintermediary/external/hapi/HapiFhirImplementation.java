@@ -36,7 +36,7 @@ public class HapiFhirImplementation implements HapiFhir {
     }
 
     @Override
-    public String encodeResourceToJson(IBaseResource resource) {
-        return PARSER.encodeResourceToString(resource);
+    public String encodeResourceToJson(Object resource) {
+        return PARSER.encodeResourceToString((IBaseResource) resource);
     }
 }
