@@ -1,18 +1,20 @@
 package gov.hhs.cdc.trustedintermediary.external.localfile;
 
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.parser.IParser;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender;
+import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import javax.inject.Inject;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 /** Accepts a {@link LabOrder} and writes it to a local file. */
 public class LocalFileLabOrderSender implements LabOrderSender {
     private static final LocalFileLabOrderSender INSTANCE = new LocalFileLabOrderSender();
+
+    @Inject HapiFhir fhir;
 
     public static LocalFileLabOrderSender getInstance() {
         return INSTANCE;
@@ -23,13 +25,7 @@ public class LocalFileLabOrderSender implements LabOrderSender {
     @Override
     public void sendOrder(final LabOrder<?> order) {
 
-        FhirContext ctx = FhirContext.forR4();
-
-        IParser parser = ctx.newJsonParser();
-
-        String serialized =
-                parser.encodeResourceToString((IBaseResource) order.getUnderlyingOrder());
-        System.out.println(serialized);
+        String serialized = fhir.encodeResourceToJson((IBaseResource) order.getUnderlyingOrder());
 
         String fileName = "../examples/localfilelaborder.json";
 

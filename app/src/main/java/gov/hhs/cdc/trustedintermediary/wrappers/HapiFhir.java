@@ -9,4 +9,6 @@ public interface HapiFhir {
             IBase fhirResource, String fhirPath, Class<T> clazz);
 
     <T extends IBaseResource> T parseResource(String fhirResource, Class<T> clazz);
+
+    String encodeResourceToJson(IBaseResource resource);
 }
