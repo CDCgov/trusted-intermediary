@@ -40,4 +40,14 @@ class LocalFileLabOrderSenderTest extends Specification{
 
         noExceptionThrown()
     }
+
+    //    def mockHapiFhirEncodeResourceToJson (HapiFhir fhir) {
+    //        fhir.encodeResourceToJson(new LabOrder() {
+    //            @Override
+    //                Bundle getUnderlyingOrder() {
+    //                    return new Bundle()
+    //                }
+    //        })
+    //    }
+
 }
