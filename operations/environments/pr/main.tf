@@ -22,5 +22,5 @@ provider "azurerm" {
 module "template" {
   source = "../../template/"
 
-  environment = "pr-${var.pr_number}"
+  environment = "pr${var.pr_number}"
 }
