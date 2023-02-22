@@ -12,7 +12,7 @@ import javax.inject.Inject;
 /** Accepts a {@link LabOrder} and writes it to a local file. */
 public class LocalFileLabOrderSender implements LabOrderSender {
 
-    static final String LOCAL_FILE_PATH = "../examples/localfilelaborder.json";
+    static final String LOCAL_FILE_NAME = "localfilelaborder.json";
     private static final LocalFileLabOrderSender INSTANCE = new LocalFileLabOrderSender();
 
     @Inject HapiFhir fhir;
@@ -29,7 +29,7 @@ public class LocalFileLabOrderSender implements LabOrderSender {
         String serialized = fhir.encodeResourceToJson(order.getUnderlyingOrder());
 
         try {
-            Files.writeString(Paths.get(LOCAL_FILE_PATH), serialized, StandardCharsets.UTF_8);
+            Files.writeString(Paths.get(LOCAL_FILE_NAME), serialized, StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
