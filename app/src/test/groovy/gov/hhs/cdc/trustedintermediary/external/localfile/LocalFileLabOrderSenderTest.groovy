@@ -2,52 +2,44 @@ package gov.hhs.cdc.trustedintermediary.external.localfile
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender
-import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
-import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
+
+import java.nio.file.Files
+import java.nio.file.Paths
 
 class LocalFileLabOrderSenderTest extends Specification{
 
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
-        // TestApplicationContext.register(HapiFhir, HapiFhirImplementation.getInstance())
         TestApplicationContext.register(LocalFileLabOrderSender, LocalFileLabOrderSender.getInstance())
-        // TestApplicationContext.injectRegisteredImplementations()
     }
 
     def "send order works"() {
 
         given:
         def fhir = Mock(HapiFhir)
-        LabOrder<?> mockOrder = new LabOrder<Bundle>() {
+
+        def testStringOrder = "Some String"
+        fhir.encodeResourceToJson(_ as String) >> testStringOrder
+
+        LabOrder<?> mockOrder = new LabOrder<String>() {
 
                     @Override
-                    Bundle getUnderlyingOrder() {
-                        return new Bundle()
+                    String getUnderlyingOrder() {
+                        return "Mock String Order"
                     }
                 }
 
-        TestApplicationContext.register(HapiFhir, HapiFhirImplementation.getInstance())
+        TestApplicationContext.register(HapiFhir, fhir)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
         LocalFileLabOrderSender.getInstance().sendOrder(mockOrder)
 
         then:
-
+        Files.readString(Paths.get("../examples/localfilelaborder.json")) == testStringOrder
         noExceptionThrown()
     }
-
-    //    def mockHapiFhirEncodeResourceToJson (HapiFhir fhir) {
-    //        fhir.encodeResourceToJson(new LabOrder() {
-    //            @Override
-    //                Bundle getUnderlyingOrder() {
-    //                    return new Bundle()
-    //                }
-    //        })
-    //    }
-
 }
