@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 import gov.hhs.cdc.trustedintermediary.etor.demographics.NextOfKin
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographics
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ServiceRequest
 import spock.lang.Specification
@@ -34,6 +35,19 @@ class HapiLabOrderConverterTest extends Specification {
     race,
     nextOfKin
     )
+
+    def "the demographics correctly constructs a message header in the lab order"() {
+
+        when:
+        def labOrderBundle = HapiLabOrderConverter.getInstance().convertToOrder(demographics).getUnderlyingOrder()
+
+        then:
+        def messageHeader = labOrderBundle.getEntry().get(0).getResource() as MessageHeader
+
+        !messageHeader.getId().isEmpty()
+        messageHeader.getEventCoding().getSystem() == "http://terminology.hl7.org/CodeSystem/v2-0003"
+        messageHeader.getEventCoding().getCode() == "O21"
+    }
 
     def "the demographics correctly constructs a patient in the lab order"() {
 
