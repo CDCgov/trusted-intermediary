@@ -39,7 +39,6 @@ class LocalFileLabOrderSenderTest extends Specification{
         LocalFileLabOrderSender.getInstance().sendOrder(mockOrder)
 
         then:
-        Files.readString(Paths.get("../examples/localfilelaborder.json")) == testStringOrder
-        noExceptionThrown()
+        Files.readString(Paths.get(LocalFileLabOrderSender.LOCAL_FILE_PATH)) == testStringOrder
     }
 }
