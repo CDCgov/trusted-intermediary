@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographics;
 import java.time.Instant;
 import java.util.Date;
+import java.util.UUID;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
@@ -38,7 +39,7 @@ public class HapiLabOrderConverter implements LabOrderConverter {
     @Override
     public LabOrder<Bundle> convertToOrder(final PatientDemographics demographics) {
         var labOrder = new Bundle();
-        labOrder.setId("as23479824357234879df");
+        labOrder.setId(UUID.randomUUID().toString());
         labOrder.setType(Bundle.BundleType.MESSAGE);
         labOrder.setTimestamp(Date.from(Instant.now()));
 
@@ -56,7 +57,7 @@ public class HapiLabOrderConverter implements LabOrderConverter {
     private MessageHeader createMessageHeader() {
         var messageHeader = new MessageHeader();
 
-        messageHeader.setId("adljasdljasgjlasfjlg");
+        messageHeader.setId(UUID.randomUUID().toString());
         messageHeader.setEvent(
                 new Coding(
                         "http://terminology.hl7.org/CodeSystem/v2-0003",
@@ -131,7 +132,7 @@ public class HapiLabOrderConverter implements LabOrderConverter {
     private ServiceRequest createServiceRequest(final Patient patient) {
         var serviceRequest = new ServiceRequest();
 
-        serviceRequest.setId("123456789");
+        serviceRequest.setId(UUID.randomUUID().toString());
 
         serviceRequest.setStatus(ServiceRequest.ServiceRequestStatus.ACTIVE);
 
