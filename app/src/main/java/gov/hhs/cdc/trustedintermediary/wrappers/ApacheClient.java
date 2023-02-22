@@ -12,7 +12,7 @@ public class ApacheClient implements HttpClient {
 
     private ApacheClient() {}
 
-    public ApacheClient getInstance() {
+    public static ApacheClient getInstance() {
         return INSTANCE;
     }
 
