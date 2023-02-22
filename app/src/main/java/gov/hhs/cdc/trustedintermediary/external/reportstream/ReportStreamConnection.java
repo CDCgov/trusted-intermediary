@@ -4,6 +4,8 @@ import gov.hhs.cdc.trustedintermediary.wrappers.ClientConnection;
 
 public class ReportStreamConnection implements ClientConnection {
 
+    private String token;
+
     private ReportStreamConnection() {}
 
     private static final ReportStreamConnection INSTANCE = new ReportStreamConnection();
@@ -15,5 +17,10 @@ public class ReportStreamConnection implements ClientConnection {
     @Override
     public void sendRequestBody(String json) {
         // TODO logic
+    }
+
+    public ReportStreamConnection setToken(String token) {
+        this.token = token;
+        return this;
     }
 }
