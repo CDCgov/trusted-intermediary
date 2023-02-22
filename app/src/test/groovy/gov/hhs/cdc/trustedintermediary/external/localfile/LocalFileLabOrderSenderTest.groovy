@@ -41,4 +41,30 @@ class LocalFileLabOrderSenderTest extends Specification{
         then:
         Files.readString(Paths.get(LocalFileLabOrderSender.LOCAL_FILE_NAME)) == testStringOrder
     }
+
+    def "throws an exception when FHIR encoding does not work"() {
+
+        given:
+        def fhir = Mock(HapiFhir)
+        def nullException = new NullPointerException()
+        fhir.encodeResourceToJson(_ as String) >> {String argument -> throw nullException}
+
+        LabOrder<?> mockOrder = new LabOrder<String>() {
+
+                    @Override
+                    String getUnderlyingOrder() {
+                        return " Second Mock String Order"
+                    }
+                }
+
+        TestApplicationContext.register(HapiFhir, fhir)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        LocalFileLabOrderSender.getInstance().sendOrder(mockOrder)
+
+        then:
+        def exception = thrown(RuntimeException)
+        exception.getCause() == nullException
+    }
 }

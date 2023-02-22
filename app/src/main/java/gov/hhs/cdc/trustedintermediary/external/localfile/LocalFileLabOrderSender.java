@@ -3,7 +3,6 @@ package gov.hhs.cdc.trustedintermediary.external.localfile;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -26,11 +25,10 @@ public class LocalFileLabOrderSender implements LabOrderSender {
     @Override
     public void sendOrder(final LabOrder<?> order) {
 
-        String serialized = fhir.encodeResourceToJson(order.getUnderlyingOrder());
-
         try {
+            String serialized = fhir.encodeResourceToJson(order.getUnderlyingOrder());
             Files.writeString(Paths.get(LOCAL_FILE_NAME), serialized, StandardCharsets.UTF_8);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
