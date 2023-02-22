@@ -1,7 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.reportstream;
 
-import gov.hhs.cdc.trustedintermediary.wrappers.ApacheClient;
 import gov.hhs.cdc.trustedintermediary.wrappers.ClientConnection;
+import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import java.io.IOException;
 import javax.inject.Inject;
 
@@ -9,7 +9,7 @@ public class ReportStreamConnection implements ClientConnection {
 
     private String token;
     private final String URI = "http://reportstream.endpoint";
-    @Inject private ApacheClient client;
+    @Inject private HttpClient client;
 
     private ReportStreamConnection() {}
 

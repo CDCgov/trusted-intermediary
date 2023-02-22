@@ -31,6 +31,7 @@ public class ApacheClient implements HttpClient {
         return token;
     }
 
+    @Override
     public ApacheClient setToken(String token) {
         this.token = token;
         return this;
