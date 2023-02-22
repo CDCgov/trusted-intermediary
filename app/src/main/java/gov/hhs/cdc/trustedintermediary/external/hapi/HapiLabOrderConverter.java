@@ -16,6 +16,7 @@ import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.IntegerType;
+import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.ServiceRequest;
@@ -37,14 +38,32 @@ public class HapiLabOrderConverter implements LabOrderConverter {
     @Override
     public LabOrder<Bundle> convertToOrder(final PatientDemographics demographics) {
         var labOrder = new Bundle();
+        labOrder.setId("as23479824357234879df");
+        labOrder.setType(Bundle.BundleType.MESSAGE);
+        labOrder.setTimestamp(Date.from(Instant.now()));
 
         var patient = createPatientResource(demographics);
         var serviceRequest = createServiceRequest(patient);
+        var messageHeader = createMessageHeader();
 
+        labOrder.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader));
         labOrder.addEntry(new Bundle.BundleEntryComponent().setResource(patient));
         labOrder.addEntry(new Bundle.BundleEntryComponent().setResource(serviceRequest));
 
         return new HapiLabOrder(labOrder);
+    }
+
+    private MessageHeader createMessageHeader() {
+        var messageHeader = new MessageHeader();
+
+        messageHeader.setId("adljasdljasgjlasfjlg");
+        messageHeader.setEvent(
+                new Coding(
+                        "http://terminology.hl7.org/CodeSystem/v2-0003",
+                        "O21",
+                        "OML - Laboratory order"));
+
+        return messageHeader;
     }
 
     private Patient createPatientResource(final PatientDemographics demographics) {
