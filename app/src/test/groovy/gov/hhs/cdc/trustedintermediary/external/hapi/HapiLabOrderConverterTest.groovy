@@ -41,7 +41,7 @@ class HapiLabOrderConverterTest extends Specification {
         def labOrderBundle = HapiLabOrderConverter.getInstance().convertToOrder(demographics).getUnderlyingOrder()
 
         then:
-        def patient = labOrderBundle.getEntry().get(0).getResource() as Patient
+        def patient = labOrderBundle.getEntry().get(1).getResource() as Patient
 
         patient.getId() == fhirResourceId
         patient.getIdentifierFirstRep().getValue() == patientId
@@ -62,7 +62,7 @@ class HapiLabOrderConverterTest extends Specification {
         def labOrderBundle = HapiLabOrderConverter.getInstance().convertToOrder(demographics).getUnderlyingOrder()
 
         then:
-        def serviceRequest = labOrderBundle.getEntry().get(1).getResource() as ServiceRequest
+        def serviceRequest = labOrderBundle.getEntry().get(2).getResource() as ServiceRequest
 
         !serviceRequest.getId().isEmpty()
         serviceRequest.getCode().getCodingFirstRep().getCode() == "54089-8"
