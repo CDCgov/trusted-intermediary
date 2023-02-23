@@ -21,6 +21,11 @@ on:
         required: true
       AZURE_SUBSCRIPTION_ID:
         required: true
+    outputs:
+      REGISTRY: ${{ jobs.terraform-deploy.outputs.REGISTRY }}
+      APP: ${{ jobs.terraform-deploy.outputs.APP }}
+      ACR_USERNAME: ${{ jobs.terraform-deploy.outputs.ACR_USERNAME }}
+      ACR_PASSWORD: ${{ jobs.terraform-deploy.outputs.ACR_PASSWORD }}
 
 jobs:
   terraform-deploy:
