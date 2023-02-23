@@ -26,7 +26,7 @@ jobs:
 
 
   terraform-deploy:
-    name: Terraform Deploy
+    name: PR Infrastructure Deploy
     needs: paths-filter
     uses: ./.github/workflows/terraform-deploy_reusable.yml
     if: needs.paths-filter.outputs.operations == 'true'
@@ -40,7 +40,7 @@ jobs:
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
   pr-deploy:
-    name: PR Deploy
+    name: PR Application Deploy
     needs:
       - terraform-deploy
       - paths-filter
