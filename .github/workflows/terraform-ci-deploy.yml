@@ -4,8 +4,6 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - 'operations/**'
   workflow_dispatch:
 
 jobs:
@@ -24,7 +22,7 @@ jobs:
         with:
           filters: |
             operations:
-              - 'adr/**'
+              - 'operations/**'
 
 
   terraform-deploy:
