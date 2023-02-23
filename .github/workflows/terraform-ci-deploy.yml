@@ -13,7 +13,7 @@ jobs:
   paths-filter:
     runs-on: ubuntu-latest
     outputs:
-      operation_change: ${{ steps.filter.outputs.operations }}
+      operations: ${{ steps.filter.outputs.operations }}
 
     steps:
 
