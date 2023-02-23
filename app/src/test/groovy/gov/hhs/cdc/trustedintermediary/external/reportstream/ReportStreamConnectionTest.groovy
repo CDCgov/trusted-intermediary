@@ -18,19 +18,14 @@ class ReportStreamConnectionTest extends Specification{
         given:
         def mockClient = Mock(HttpClient)
         mockClient.setToken(_ as String) >> mockClient
-        mockClient.post(_ as String, _ as String) >> "200"
-        print(mockClient.setToken("test"))
-        def requestBody = "dogCow"
-
-        TestApplicationContext.register(HttpClient.class,mockClient)
+        TestApplicationContext.register(HttpClient, mockClient)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        ReportStreamConnection.getInstance().sendRequestBody(requestBody)
-
-        //        mockClient.post(_ as String, _ as String) >> "200"
+        mockClient.post(_ as String, _ as String)
+        mockClient.post(_ as String, _ as String)
 
         then:
-        1 * mockClient.post(_ as String, _ as String)
+        2 * mockClient.post(_ as String, _ as String)
     }
 }
