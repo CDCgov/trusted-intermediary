@@ -22,8 +22,8 @@ class ReportStreamConnectionTest extends Specification{
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        mockClient.post(_ as String, _ as String)
-        mockClient.post(_ as String, _ as String)
+        TestApplicationContext.getImplementation(ClientConnection).sendRequestBody("message_1")
+        TestApplicationContext.getImplementation(ClientConnection).sendRequestBody("message_2")
 
         then:
         2 * mockClient.post(_ as String, _ as String)

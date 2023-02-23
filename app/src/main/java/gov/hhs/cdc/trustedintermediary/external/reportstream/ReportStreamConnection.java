@@ -7,7 +7,7 @@ import javax.inject.Inject;
 
 public class ReportStreamConnection implements ClientConnection {
 
-    private String token;
+    private String token = "";
     private final String URI = "http://reportstream.endpoint";
     @Inject private HttpClient client;
 
