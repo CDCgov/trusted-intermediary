@@ -27,7 +27,6 @@ jobs:
 
   terraform-deploy:
     name: Terraform Deploy
-    runs-on: ubuntu-latest
     needs: paths-filter
     uses: ./.github/workflows/terraform-deploy_reusable.yml
     if: needs.paths-filter.outputs.operations == 'true'
