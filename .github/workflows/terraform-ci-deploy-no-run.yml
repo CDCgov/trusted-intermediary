@@ -1,0 +1,23 @@
+name: Terraform CI Deploy to pass the required check when there aren't changes
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - 'operations/**'
+  workflow_dispatch:
+
+jobs:
+
+  terraform-deploy:
+    name: Terraform Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo 'No build required'
+
+  pr-deploy:
+    name: PR Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo 'No deploy required'

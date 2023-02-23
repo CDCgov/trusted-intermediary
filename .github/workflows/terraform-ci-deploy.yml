@@ -11,7 +11,7 @@ on:
 jobs:
 
   terraform-deploy:
-    name: 'Terraform Deploy'
+    name: Terraform Deploy
     runs-on: ubuntu-latest
     env:
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
@@ -55,7 +55,7 @@ jobs:
         echo "ACR_PASSWORD=$(terraform output -raw acr_password)" >> $GITHUB_OUTPUT
 
   pr-deploy:
-    name: 'PR Deploy'
+    name: PR Deploy
     needs: terraform-deploy
     uses: ./.github/workflows/deploy_reusable.yml
     with:
@@ -71,7 +71,7 @@ jobs:
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
   destroy-environment:
-    name: 'Destroy PR Environment'
+    name: Destroy PR Environment
     needs: pr-deploy
     if: always()
     runs-on: ubuntu-latest
