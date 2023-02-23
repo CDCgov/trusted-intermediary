@@ -34,4 +34,9 @@ public class HapiFhirImplementation implements HapiFhir {
             final String fhirResource, final Class<T> clazz) {
         return PARSER.parseResource(clazz, fhirResource);
     }
+
+    @Override
+    public String encodeResourceToJson(Object resource) {
+        return PARSER.encodeResourceToString((IBaseResource) resource);
+    }
 }
