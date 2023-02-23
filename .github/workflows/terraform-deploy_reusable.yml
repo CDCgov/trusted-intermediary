@@ -22,10 +22,18 @@ on:
       AZURE_SUBSCRIPTION_ID:
         required: true
     outputs:
-      REGISTRY: ${{ jobs.terraform-deploy.outputs.REGISTRY }}
-      APP: ${{ jobs.terraform-deploy.outputs.APP }}
-      ACR_USERNAME: ${{ jobs.terraform-deploy.outputs.ACR_USERNAME }}
-      ACR_PASSWORD: ${{ jobs.terraform-deploy.outputs.ACR_PASSWORD }}
+      REGISTRY:
+        description: The container registry
+        value: ${{ jobs.terraform-deploy.outputs.REGISTRY }}
+      APP:
+        description: The web application's name
+        value: ${{ jobs.terraform-deploy.outputs.APP }}
+      ACR_USERNAME:
+        description: The username to login to the container registry
+        value: ${{ jobs.terraform-deploy.outputs.ACR_USERNAME }}
+      ACR_PASSWORD:
+        description: The password to login to the container registry
+        value: ${{ jobs.terraform-deploy.outputs.ACR_PASSWORD }}
 
 jobs:
   terraform-deploy:
