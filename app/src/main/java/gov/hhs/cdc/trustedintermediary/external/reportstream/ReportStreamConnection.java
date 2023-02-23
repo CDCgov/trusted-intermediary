@@ -33,4 +33,6 @@ public class ReportStreamConnection implements ClientConnection {
         this.token = token;
         return this;
     }
+
+    public void requestToken() {}
 }

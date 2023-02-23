@@ -17,6 +17,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     @Override
     public void sendOrder(final LabOrder<?> order) {
         // String json = FHIR.stringify(order.getUnderlyingOrder())
+        // reportStream.requestBearerToke()
         // reportStream.sendRequestBody(json)
     }
 }
