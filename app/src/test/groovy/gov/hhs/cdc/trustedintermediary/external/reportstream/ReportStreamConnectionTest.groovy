@@ -28,4 +28,7 @@ class ReportStreamConnectionTest extends Specification{
         then:
         2 * mockClient.post(_ as String, _ as String)
     }
+
+    def "requestToken works"() {
+    }
 }
