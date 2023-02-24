@@ -22,6 +22,7 @@ import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.ServiceRequest;
 import org.hl7.fhir.r4.model.StringType;
+import org.hl7.fhir.r4.model.UrlType;
 
 /**
  * Converts {@link PatientDemographics} to a Hapi-specific FHIR lab order ({@link HapiLabOrder} or
@@ -63,6 +64,10 @@ public class HapiLabOrderConverter implements LabOrderConverter {
                         "http://terminology.hl7.org/CodeSystem/v2-0003",
                         "O21",
                         "OML - Laboratory order"));
+        messageHeader.setSource(
+                new MessageHeader.MessageSourceComponent(
+                                new UrlType("https://reportstream.cdc.gov/"))
+                        .setName("CDC Trusted Intermediary"));
 
         return messageHeader;
     }

@@ -47,6 +47,8 @@ class HapiLabOrderConverterTest extends Specification {
         !messageHeader.getId().isEmpty()
         messageHeader.getEventCoding().getSystem() == "http://terminology.hl7.org/CodeSystem/v2-0003"
         messageHeader.getEventCoding().getCode() == "O21"
+        messageHeader.getSource().getName() == "CDC Trusted Intermediary"
+        messageHeader.getSource().getEndpoint() == "https://reportstream.cdc.gov/"
     }
 
     def "the demographics correctly constructs a patient in the lab order"() {
