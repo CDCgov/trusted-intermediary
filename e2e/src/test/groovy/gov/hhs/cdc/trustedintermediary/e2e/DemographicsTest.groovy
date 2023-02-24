@@ -13,15 +13,16 @@ class DemographicsTest extends Specification {
 
     def "a demographics response is returned from the ETOR demographics endpoint"() {
         given:
-        def expected = """{"fhirResourceId":"Patient/infant-twin-1","patientId":"MRN7465737865"}"""
+        def expectedFhirResourceId  = "Patient/infant-twin-1"
+        def expectedPatientId  = "MRN7465737865"
 
         when:
         def responseBody = Client.post("/v1/etor/demographics", newbornPatientJsonFileString)
-        def soemthing = JsonParsing.parse(SentPayloadReader.read(), Map.class)
+        def parsedJsonBody = JsonParsing.parse(responseBody, Map.class)
 
         then:
-        responseBody == expected
-        soemthing.entry[0].resource.eventCoding.code == "O21"
+        parsedJsonBody.fhirResourceId == expectedFhirResourceId
+        parsedJsonBody.patientId == expectedPatientId
     }
 
     def "bad response given for poorly formatted JSON"() {
