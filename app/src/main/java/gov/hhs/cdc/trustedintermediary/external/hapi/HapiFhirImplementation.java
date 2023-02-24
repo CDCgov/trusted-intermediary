@@ -15,7 +15,6 @@ public class HapiFhirImplementation implements HapiFhir {
 
     private static final FhirContext CONTEXT = FhirContext.forR4();
     private static final IFhirPath PATHER = CONTEXT.newFhirPath();
-    private static final IParser PARSER = CONTEXT.newJsonParser();
 
     private HapiFhirImplementation() {}
 
@@ -32,11 +31,13 @@ public class HapiFhirImplementation implements HapiFhir {
     @Override
     public <T extends IBaseResource> T parseResource(
             final String fhirResource, final Class<T> clazz) {
-        return PARSER.parseResource(clazz, fhirResource);
+        IParser resourceParser = CONTEXT.newJsonParser();
+        return resourceParser.parseResource(clazz, fhirResource);
     }
 
     @Override
     public String encodeResourceToJson(Object resource) {
-        return PARSER.encodeResourceToString((IBaseResource) resource);
+        IParser encodeResourceParser = CONTEXT.newJsonParser();
+        return encodeResourceParser.encodeResourceToString((IBaseResource) resource);
     }
 }
