@@ -34,5 +34,27 @@ public class ReportStreamConnection implements ClientConnection {
         return this;
     }
 
-    public void requestToken() {}
+    public String requestToken() {
+        // GET request
+        // If successful, verify it's coming from RS
+        return null;
+    }
+
+    //    public void foo() {
+    //        byte[] key = requestToken().getBytes();
+    //
+    //        String jwt = Jwts.builder().setIssuer("RS")
+    //                .setSubject("user/blahblah")
+    //                .setExpiration(expirationDate)
+    //                .put("scope", "self RS/waters")
+    //                .SignWith(SignatureAlgorithm.HS256,key)
+    //                .compact();
+    //    }
+    //
+    //    public boolean boo(Jws jwt) {
+    //
+    //        Jws jwtclaims = Jwts.parser().setSigningKey(key).parseClaimsJws(jwt);
+    //
+    //        return false;
+    //    }
 }

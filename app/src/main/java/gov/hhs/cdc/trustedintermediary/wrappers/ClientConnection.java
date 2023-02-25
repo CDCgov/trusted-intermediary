@@ -4,5 +4,5 @@ public interface ClientConnection {
 
     void sendRequestBody(String json);
 
-    void requestToken();
+    String requestToken();
 }
