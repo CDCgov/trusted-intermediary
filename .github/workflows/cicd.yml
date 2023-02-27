@@ -15,62 +15,28 @@ jobs:
     secrets: inherit
 
   terraform-deploy:
-    name: 'Terraform Deploy'
+    name: Staging Infrastructure Deploy
     needs: ci
-    runs-on: ubuntu-latest
-    env:
-      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      ARM_USE_OIDC: true
-    permissions:
-      id-token: write
-      contents: read
-    defaults:
-      run:
-        working-directory: operations/environments/staging
-
-    outputs:
-      STAGING_REGISTRY: ${{ steps.export-terraform-output.outputs.STAGING_REGISTRY }}
-      STAGING_APP: ${{ steps.export-terraform-output.outputs.STAGING_APP }}
-      STAGING_ACR_USERNAME: ${{ steps.export-terraform-output.outputs.STAGING_ACR_USERNAME }}
-      STAGING_ACR_PASSWORD: ${{ steps.export-terraform-output.outputs.STAGING_ACR_PASSWORD }}
-
-    steps:
-
-    - uses: actions/checkout@v3
-
-    - name: Terraform Init
-      id: init
-      run: terraform init
-
-    - name: Terraform Validate
-      id: validate
-      run: terraform validate -no-color
-
-    - name: Terraform Apply
-      run: terraform apply -auto-approve -input=false
-
-    - id: export-terraform-output
-      name: Export Terraform Output
-      run: |
-        echo "STAGING_REGISTRY=$(terraform output -raw registry)" >> $GITHUB_OUTPUT
-        echo "STAGING_APP=$(terraform output -raw publish_app)" >> $GITHUB_OUTPUT
-        echo "STAGING_ACR_USERNAME=$(terraform output -raw acr_username)" >> $GITHUB_OUTPUT
-        echo "STAGING_ACR_PASSWORD=$(terraform output -raw acr_password)" >> $GITHUB_OUTPUT
+    uses: ./.github/workflows/terraform-deploy_reusable.yml
+    with:
+      TERRAFORM_DIRECTORY: operations/environments/staging
+    secrets:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
   staging-deploy:
-    name: 'Staging Deploy'
+    name: Staging Application Deploy
     needs: terraform-deploy
     uses: ./.github/workflows/deploy_reusable.yml
     with:
       ENVIRONMENT: staging
       REPO: trusted-intermediary-router
-      APP: ${{ needs.terraform-deploy.outputs.STAGING_APP }}
-      REGISTRY: ${{ needs.terraform-deploy.outputs.STAGING_REGISTRY }}
+      APP: ${{ needs.terraform-deploy.outputs.APP }}
+      REGISTRY: ${{ needs.terraform-deploy.outputs.REGISTRY }}
     secrets:
-      ACR_USERNAME: ${{ needs.terraform-deploy.outputs.STAGING_ACR_USERNAME }}
-      ACR_PASSWORD: ${{ needs.terraform-deploy.outputs.STAGING_ACR_PASSWORD }}
+      ACR_USERNAME: ${{ needs.terraform-deploy.outputs.ACR_USERNAME }}
+      ACR_PASSWORD: ${{ needs.terraform-deploy.outputs.ACR_PASSWORD }}
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
