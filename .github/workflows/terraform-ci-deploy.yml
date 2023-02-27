@@ -1,0 +1,89 @@
+name: Terraform CI Deploy
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+
+  paths-filter:
+    runs-on: ubuntu-latest
+    outputs:
+      operations: ${{ steps.filter.outputs.operations }}
+
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            operations:
+              - 'operations/**'
+
+
+  terraform-deploy:
+    name: PR Infrastructure Deploy
+    needs: paths-filter
+    uses: ./.github/workflows/terraform-deploy_reusable.yml
+    if: needs.paths-filter.outputs.operations == 'true'
+    with:
+      TERRAFORM_DIRECTORY: operations/environments/pr
+      TERRAFORM_INIT_PARAMETERS: -backend-config="key=pr_${{ github.event.number }}.tfstate"
+      TERRAFORM_APPLY_PARAMETERS: -var="pr_number=${{ github.event.number }}"
+    secrets:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+  pr-deploy:
+    name: PR Application Deploy
+    needs:
+      - terraform-deploy
+      - paths-filter
+    uses: ./.github/workflows/deploy_reusable.yml
+    if: needs.paths-filter.outputs.operations == 'true'
+    with:
+      ENVIRONMENT: pr
+      REPO: trusted-intermediary-router
+      APP: ${{ needs.terraform-deploy.outputs.APP }}
+      REGISTRY: ${{ needs.terraform-deploy.outputs.REGISTRY }}
+    secrets:
+      ACR_USERNAME: ${{ needs.terraform-deploy.outputs.ACR_USERNAME }}
+      ACR_PASSWORD: ${{ needs.terraform-deploy.outputs.ACR_PASSWORD }}
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+  destroy-environment:
+    name: Destroy PR Environment
+    needs:
+      - pr-deploy
+      - paths-filter
+    if: needs.paths-filter.outputs.operations == 'true' && always()
+    runs-on: ubuntu-latest
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_USE_OIDC: true
+    permissions:
+      id-token: write
+      contents: read
+    defaults:
+      run:
+        working-directory: operations/environments/pr
+
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - name: Terraform Init
+        id: init
+        run: terraform init -backend-config="key=pr_${{ github.event.number }}.tfstate"
+
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve -input=false -var="pr_number=${{ github.event.number }}"
