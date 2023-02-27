@@ -11,7 +11,6 @@ terraform {
     resource_group_name  = "cdcti-terraform"
     storage_account_name = "cdctiterraform"
     container_name       = "tfstate"
-    key                  = "staging.terraform.tfstate"
   }
 }
 
@@ -23,5 +22,5 @@ provider "azurerm" {
 module "template" {
   source = "../../template/"
 
-  environment = "staging"
+  environment = "pr${var.pr_number}"
 }
