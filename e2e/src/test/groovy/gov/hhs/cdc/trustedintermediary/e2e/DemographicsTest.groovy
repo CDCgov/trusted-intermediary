@@ -34,4 +34,14 @@ class DemographicsTest extends Specification {
         then:
         responseBody == "Server Error"
     }
+
+    //    def "payload file check"() {
+    //
+    //        when:
+    //        def responseBody = Client.post("/v1/etor/demographics", newbornPatientJsonFileString)
+    //        def sentPayload = SentPayloadReader.read()
+    //
+    //        then:
+    //        sentPayload == "DogCow"
+    //    }
 }
