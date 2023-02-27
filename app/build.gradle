@@ -11,7 +11,7 @@ plugins {
     id 'application'
     id 'jacoco'
     id 'com.diffplug.spotless' version '6.11.0'
-    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'com.github.johnrengelman.shadow' version '8.0.0'
     id 'org.cyclonedx.bom' version '1.7.4'
     id 'org.sonarqube' version '4.0.0.2929'
 }
@@ -62,11 +62,11 @@ dependencies {
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.2'
 
     //fhir
-    implementation 'ca.uhn.hapi.fhir:hapi-fhir-base:6.2.5'
-    implementation 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.2.5'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-base:6.4.0'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.4.0'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-caching-caffeine:6.4.0'
     implementation 'org.fhir:ucum:1.0.3'
-    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.4'
-    implementation 'ca.uhn.hapi.fhir:org.hl7.fhir.utilities:5.6.98'
+    implementation 'ca.uhn.hapi.fhir:org.hl7.fhir.utilities:5.6.99'
 
     testImplementation 'org.apache.groovy:groovy:4.0.9'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
