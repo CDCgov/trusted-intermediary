@@ -19,7 +19,7 @@ repos:
       hooks:
       -   id: detect-secrets
           args: ['--baseline', '.secrets.baseline']
-          exclude: mock_credentials
+          exclude: (mock_credentials|.+\/JjwtEngine.java)
 
   - repo: local
     hooks:

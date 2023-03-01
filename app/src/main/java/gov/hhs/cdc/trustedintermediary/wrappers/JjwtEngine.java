@@ -91,13 +91,13 @@ public class JjwtEngine implements AuthEngine {
     private RSAPrivateKey readPrivateKey(@NotNull String pemKey)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
         String privatePemKey =
-                pemKey.replace("-----BEGIN PRIVATE KEY-----", "") // pragma: allowlist secret
+                pemKey.replace("-----BEGIN PRIVATE KEY-----", "")
                         .replaceAll(System.lineSeparator(), "")
                         .replace("-----END PRIVATE KEY-----", "");
         byte[] encode = Base64.getDecoder().decode(privatePemKey);
 
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encode);
-        return (RSAPrivateKey) keyFactory.generatePrivate(keySpec); // testing comment
+        return (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
     }
 }
