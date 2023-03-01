@@ -17,16 +17,16 @@ class ReportStreamConnectionTest extends Specification{
     def "sendRequestBody works"() {
         given:
         def mockClient = Mock(HttpClient)
-        mockClient.setToken(_ as String) >> mockClient
+        mockClient.post(_ as String, _ as String, _ as String) >> "200"
         TestApplicationContext.register(HttpClient, mockClient)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        TestApplicationContext.getImplementation(ClientConnection).sendRequestBody("message_1")
-        TestApplicationContext.getImplementation(ClientConnection).sendRequestBody("message_2")
+        TestApplicationContext.getImplementation(ClientConnection).sendRequestBody("message_1", "fake token")
+        TestApplicationContext.getImplementation(ClientConnection).sendRequestBody("message_2", "fake token")
 
         then:
-        2 * mockClient.post(_ as String, _ as String)
+        2 * mockClient.post(_ as String, _ as String, _ as String)
     }
 
     def "requestToken works"() {

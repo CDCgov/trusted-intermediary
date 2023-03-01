@@ -12,6 +12,8 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsCont
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiLabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileLabOrderSender;
+import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamConnection;
+import gov.hhs.cdc.trustedintermediary.wrappers.ClientConnection;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,6 +37,7 @@ public class EtorDomainRegistration implements DomainConnector {
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
 
+        ApplicationContext.register(ClientConnection.class, ReportStreamConnection.getInstance());
         ApplicationContext.register(
                 PatientDemographicsController.class, PatientDemographicsController.getInstance());
         ApplicationContext.register(

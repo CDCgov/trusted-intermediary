@@ -6,6 +6,8 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender;
 /** Accepts a {@link LabOrder} and sends it to ReportStream. */
 public class ReportStreamLabOrderSender implements LabOrderSender {
 
+    // @Inject ReportStreamConnection reportStream;
+
     private static final ReportStreamLabOrderSender INSTANCE = new ReportStreamLabOrderSender();
 
     public static ReportStreamLabOrderSender getInstance() {

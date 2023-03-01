@@ -45,5 +45,6 @@ public class App {
         ApplicationContext.register(YamlCombiner.class, Jackson.getInstance());
         ApplicationContext.register(OpenApi.class, OpenApi.getInstance());
         ApplicationContext.register(HttpClient.class, ApacheClient.getInstance());
+        ApplicationContext.register(AuthEngine.class, JjwtEngine.getInstance());
     }
 }
