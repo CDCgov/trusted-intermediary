@@ -8,8 +8,8 @@ import javax.inject.Inject;
 
 public class ReportStreamConnection implements ClientConnection {
 
-    private String token = "";
-    private final String URI = "http://reportstream.endpoint";
+    private String trustedIntermediaryPrivatePemKey = "ENVIRONMENT_SECRET";
+    private final String URL = "http://reportstream.endpoint";
     @Inject private HttpClient client;
     @Inject private AuthEngine jwt;
 
@@ -22,25 +22,27 @@ public class ReportStreamConnection implements ClientConnection {
     }
 
     @Override
-    public void sendRequestBody(String json) {
+    public void sendRequestBody(String json, String bearerToken) {
         String res;
         try {
-            res = client.setToken(this.token).post(URI, json); // what to do with response?
+            res = client.post(URL, json, bearerToken); // what to do with response?
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            // TODO exception handling
         }
     }
 
-    public ReportStreamConnection setToken(String token) {
-        this.token = token;
-        return this;
-    }
-
     public String requestToken() {
-        // pass the key as a string: String key = new String(Files.readAllBytes(file.toPath()),
-        // Charset.defaultCharset());
-        // generate our jwt
-        // GET request
-        return null;
+        // pass the key as a string: String key = new String(Files.readAllBytes(file.toPath()) for
+        // local
+        String senderToken = null;
+        String token = "";
+        try {
+            senderToken = jwt.generateSenderToken("sender", "baseUrl", "pemKey", "keyId", 300);
+
+            token = client.requestToken("reportStream.com/api-aut-endpoint", "body", senderToken);
+        } catch (Exception e) {
+            // TODO exception handling
+        }
+        return token;
     }
 }

@@ -7,7 +7,7 @@ public interface AuthEngine {
     String generateSenderToken(
             @NotNull String sender,
             @NotNull String baseUrl,
-            @NotNull String key,
+            @NotNull String pemKey,
             @NotNull String keyId,
             int expirationSecondsfromNow)
             throws Exception;

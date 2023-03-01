@@ -8,7 +8,6 @@ import org.apache.hc.core5.http.io.entity.StringEntity;
 public class ApacheClient implements HttpClient {
 
     private static final ApacheClient INSTANCE = new ApacheClient();
-    private String token;
 
     private ApacheClient() {}
 
@@ -17,23 +16,24 @@ public class ApacheClient implements HttpClient {
     }
 
     @Override
-    public String post(String uri, String body) throws IOException {
+    public String post(String url, String body, String bearerToken) throws IOException {
 
-        return Request.post(uri)
-                .setHeader("Authorization", "Bearer" + token)
+        return Request.post(url)
+                .setHeader("Authorization", "Bearer" + bearerToken)
                 .setHeader(HttpHeaders.CONTENT_TYPE, "application/json")
                 .body(new StringEntity(body))
                 .execute()
                 .toString();
     }
 
-    public String getToken() {
-        return token;
-    }
+    public String requestToken(String url, String body, String token) throws IOException {
 
-    @Override
-    public ApacheClient setToken(String token) {
-        this.token = token;
-        return this;
+        // I think we need to include the client name in the header and probably the access scope
+
+        return Request.get(url)
+                .setHeader("Authorization", "Bearer" + token)
+                .body(new StringEntity(body)) // Don't know if we need a body
+                .execute()
+                .toString();
     }
 }
