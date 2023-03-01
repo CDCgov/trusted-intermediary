@@ -10,4 +10,15 @@ resource "azurerm_key_vault" "key_storage" {
   purge_protection_enabled = false
 }
 
+resource "azurerm_key_vault_secret" "report_stream_sender_private_key" {
+  name  = "report-stream-sender-private-key-${var.environment}"
+  value = "dogcow"
+
+  key_vault_id = azurerm_key_vault.key_storage.id
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
 data "azurerm_client_config" "current" {}
