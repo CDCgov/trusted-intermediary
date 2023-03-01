@@ -91,12 +91,8 @@ public class JjwtEngine implements AuthEngine {
     private RSAPrivateKey readPrivateKey(@NotNull String pemKey)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
         String privatePemKey =
-                pemKey.replace("-----", "")
-                        .replace("BEGIN ", "")
-                        .replace("PRIVATE ", "")
-                        .replace("KEY", "")
+                pemKey.replace("-----BEGIN PRIVATE KEY-----", "") // pragma: allowlist secret
                         .replaceAll(System.lineSeparator(), "")
-                        .replace("END ", "")
                         .replace("-----END PRIVATE KEY-----", "");
         byte[] encode = Base64.getDecoder().decode(privatePemKey);
 
