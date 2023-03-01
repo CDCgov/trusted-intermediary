@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.reportstream;
 
+import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.ClientConnection;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import java.io.IOException;
@@ -10,6 +11,7 @@ public class ReportStreamConnection implements ClientConnection {
     private String token = "";
     private final String URI = "http://reportstream.endpoint";
     @Inject private HttpClient client;
+    @Inject private AuthEngine jwt;
 
     private ReportStreamConnection() {}
 
@@ -35,26 +37,10 @@ public class ReportStreamConnection implements ClientConnection {
     }
 
     public String requestToken() {
+        // pass the key as a string: String key = new String(Files.readAllBytes(file.toPath()),
+        // Charset.defaultCharset());
+        // generate our jwt
         // GET request
-        // If successful, verify it's coming from RS
         return null;
     }
-
-    //    public void foo() {
-    //        byte[] key = requestToken().getBytes();
-    //
-    //        String jwt = Jwts.builder().setIssuer("RS")
-    //                .setSubject("user/blahblah")
-    //                .setExpiration(expirationDate)
-    //                .put("scope", "self RS/waters")
-    //                .SignWith(SignatureAlgorithm.HS256,key)
-    //                .compact();
-    //    }
-    //
-    //    public boolean boo(Jws jwt) {
-    //
-    //        Jws jwtclaims = Jwts.parser().setSigningKey(key).parseClaimsJws(jwt);
-    //
-    //        return false;
-    //    }
 }

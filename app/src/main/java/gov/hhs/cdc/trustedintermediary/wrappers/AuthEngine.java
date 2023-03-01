@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.wrappers;
 
-import java.security.PrivateKey;
 import org.jetbrains.annotations.NotNull;
 
 public interface AuthEngine {
@@ -8,9 +7,11 @@ public interface AuthEngine {
     String generateSenderToken(
             @NotNull String sender,
             @NotNull String baseUrl,
-            @NotNull PrivateKey privateKey,
+            @NotNull String key,
             @NotNull String keyId,
-            int expirationSecondsfromNow);
+            int expirationSecondsfromNow)
+            throws Exception;
 
-    boolean isValidToken();
+    @NotNull
+    boolean isValidToken(@NotNull String token, @NotNull String key);
 }
