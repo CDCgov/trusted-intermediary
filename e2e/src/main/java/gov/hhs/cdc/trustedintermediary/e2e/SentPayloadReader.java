@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.e2e;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,20 +11,26 @@ public class SentPayloadReader {
      */
 
     public static String read() throws IOException {
-        Path payloadFile = null;
-        try {
-            payloadFile = findFilePayload();
-        } catch (Exception e) {
-            throw new FileNotFoundException("File not found");
-        }
+        Path payloadFile = findFilePayload();
 
         return Files.readString(payloadFile);
     }
 
     public static Path findFilePayload() {
+
+        Path expectedFilePath = Path.of("..", "app", "localfilelaborder.json");
         // TODO
         // ways to check if a file exists, and return that path
+        Boolean doesFileExist = Files.exists(expectedFilePath);
+
+        if (!doesFileExist) {
+            //            expectedFilePath.getRoot().toString()
+            expectedFilePath = Path.of("..", "localfilelaborder.json");
+            doesFileExist = Files.exists(expectedFilePath);
+        }
+
         // throw an exception if not found (done by line 16)
-        return Path.of("..", "app", "localfilelaborder.json");
+
+        return expectedFilePath;
     }
 }

@@ -38,11 +38,14 @@ class DemographicsTest extends Specification {
     def "payload file check"() {
 
         when:
-        Client.post("/v1/etor/demographics", newbornPatientJsonFileString)
+        def responseBody = Client.post("/v1/etor/demographics", newbornPatientJsonFileString)
         def sentPayload = SentPayloadReader.read()
-        def expectedString = Files.readString(Paths.get("src/test/resources/localfilelabordertest.json"))
+        def parsedResponseBody = JsonParsing.parse(responseBody, Map.class)
+
+        def parsedPayload = JsonParsing.parse(sentPayload, Map.class)
+        def lookForResource = parsedPayload.entry
 
         then:
-        sentPayload != null
+        parsedPayload.entry[0].resource.resourceType != "Patient"
     }
 }
