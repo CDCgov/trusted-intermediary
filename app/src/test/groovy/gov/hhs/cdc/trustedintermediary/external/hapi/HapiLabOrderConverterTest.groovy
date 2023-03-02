@@ -82,6 +82,7 @@ class HapiLabOrderConverterTest extends Specification {
 
         !serviceRequest.getId().isEmpty()
         serviceRequest.getCode().getCodingFirstRep().getCode() == "54089-8"
+        serviceRequest.getCategoryFirstRep().getCodingFirstRep().getCode() == "108252007"
         serviceRequest.getSubject().getResource() == labOrderBundle.getEntry().get(1).getResource()
     }
 }

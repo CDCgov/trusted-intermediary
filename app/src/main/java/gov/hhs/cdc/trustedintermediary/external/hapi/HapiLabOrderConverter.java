@@ -147,6 +147,10 @@ public class HapiLabOrderConverter implements LabOrderConverter {
                 new CodeableConcept(
                         new Coding("http://loinc.org", "54089-8", "Newborn Screening Panel")));
 
+        serviceRequest.addCategory(
+                new CodeableConcept(
+                        new Coding("http://snomed.info/sct", "108252007", "Laboratory procedure")));
+
         serviceRequest.setSubject(new Reference(patient));
 
         serviceRequest.setOccurrence(new DateTimeType(Date.from(Instant.now())));
