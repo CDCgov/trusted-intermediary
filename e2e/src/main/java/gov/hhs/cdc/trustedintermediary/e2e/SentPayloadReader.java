@@ -24,7 +24,6 @@ public class SentPayloadReader {
         Boolean doesFileExist = Files.exists(expectedFilePath);
 
         if (!doesFileExist) {
-            //            expectedFilePath.getRoot().toString()
             expectedFilePath = Path.of("..", "localfilelaborder.json");
             doesFileExist = Files.exists(expectedFilePath);
         }

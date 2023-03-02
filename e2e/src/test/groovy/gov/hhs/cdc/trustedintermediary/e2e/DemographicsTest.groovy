@@ -46,6 +46,10 @@ class DemographicsTest extends Specification {
         def lookForResource = parsedPayload.entry
 
         then:
-        parsedPayload.entry[0].resource.resourceType != "Patient"
+
+        parsedPayload.entry[0].resource.resourceType == "MessageHeader"
+        parsedPayload.entry[1].resource.resourceType == "Patient"
+        parsedPayload.entry[1].resource.id == "infant-twin-1"
+        parsedPayload.entry[1].resource.identifier[0].value == parsedResponseBody.patientId
     }
 }
