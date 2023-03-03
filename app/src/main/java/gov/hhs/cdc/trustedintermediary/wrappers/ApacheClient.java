@@ -4,6 +4,7 @@ import java.io.IOException;
 import org.apache.hc.client5.http.fluent.Request;
 import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.jetbrains.annotations.NotNull;
 
 public class ApacheClient implements HttpClient {
 
@@ -16,7 +17,8 @@ public class ApacheClient implements HttpClient {
     }
 
     @Override
-    public String post(String url, String body, String bearerToken) throws IOException {
+    public String post(@NotNull String url, @NotNull String body, @NotNull String bearerToken)
+            throws IOException {
 
         return Request.post(url)
                 .setHeader("Authorization", "Bearer" + bearerToken)
@@ -26,7 +28,8 @@ public class ApacheClient implements HttpClient {
                 .toString();
     }
 
-    public String requestToken(String url, String body, String token) throws IOException {
+    public String requestToken(@NotNull String url, @NotNull String body, @NotNull String token)
+            throws IOException {
 
         // I think we need to include the client name in the header and probably the access scope
 

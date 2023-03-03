@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.ClientConnection;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import java.io.IOException;
 import javax.inject.Inject;
+import org.jetbrains.annotations.NotNull;
 
 public class ReportStreamConnection implements ClientConnection {
 
@@ -22,7 +23,7 @@ public class ReportStreamConnection implements ClientConnection {
     }
 
     @Override
-    public void sendRequestBody(String json, String bearerToken) {
+    public void sendRequestBody(@NotNull String json, @NotNull String bearerToken) {
         String res;
         try {
             res = client.post(URL, json, bearerToken); // what to do with response?
@@ -39,7 +40,7 @@ public class ReportStreamConnection implements ClientConnection {
         try {
             senderToken = jwt.generateSenderToken("sender", "baseUrl", "pemKey", "keyId", 300);
 
-            token = client.requestToken("reportStream.com/api-aut-endpoint", "body", senderToken);
+            token = client.requestToken("rs endpoint", "body", senderToken);
         } catch (Exception e) {
             // TODO exception handling
         }
