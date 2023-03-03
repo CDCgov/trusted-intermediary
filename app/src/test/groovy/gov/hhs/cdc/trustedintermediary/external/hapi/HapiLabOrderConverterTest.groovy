@@ -47,6 +47,8 @@ class HapiLabOrderConverterTest extends Specification {
         !messageHeader.getId().isEmpty()
         messageHeader.getEventCoding().getSystem() == "http://terminology.hl7.org/CodeSystem/v2-0003"
         messageHeader.getEventCoding().getCode() == "O21"
+        messageHeader.getSource().getName() == "CDC Trusted Intermediary"
+        messageHeader.getSource().getEndpoint() == "https://reportstream.cdc.gov/"
     }
 
     def "the demographics correctly constructs a patient in the lab order"() {
@@ -80,6 +82,7 @@ class HapiLabOrderConverterTest extends Specification {
 
         !serviceRequest.getId().isEmpty()
         serviceRequest.getCode().getCodingFirstRep().getCode() == "54089-8"
+        serviceRequest.getCategoryFirstRep().getCodingFirstRep().getCode() == "108252007"
         serviceRequest.getSubject().getResource() == labOrderBundle.getEntry().get(1).getResource()
     }
 }
