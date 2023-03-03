@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "3.45.0"
     }
+    azuread = {
+      source  = "hashicorp/azuread"
+      version = "2.36.0"
+    }
   }
 
   # Use a remote Terraform state in Azure Storage
@@ -17,6 +21,10 @@ terraform {
 # Configure the Microsoft Azure Provider
 provider "azurerm" {
   features {}
+}
+
+provider "azuread" {
+
 }
 
 module "template" {
