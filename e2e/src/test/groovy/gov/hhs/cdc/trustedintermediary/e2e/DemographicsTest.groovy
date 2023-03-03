@@ -42,17 +42,17 @@ class DemographicsTest extends Specification {
         def sentPayload = SentPayloadReader.read()
         def parsedResponseBody = JsonParsing.parse(responseBody, Map.class)
 
-        def parsedPayload = JsonParsing.parse(sentPayload, Map.class)
+        def parsedSentPayload = JsonParsing.parse(sentPayload, Map.class)
 
         then:
 
-        parsedPayload.entry[0].resource.resourceType == "MessageHeader"
-        parsedPayload.entry[2].resource.resourceType == "ServiceRequest"
+        parsedSentPayload.entry[0].resource.resourceType == "MessageHeader"
+        parsedSentPayload.entry[2].resource.resourceType == "ServiceRequest"
 
-        parsedPayload.entry[1].resource.resourceType == "Patient"
-        parsedPayload.entry[1].resource.id == "infant-twin-1"
+        parsedSentPayload.entry[1].resource.resourceType == "Patient"
+        parsedSentPayload.entry[1].resource.id == "infant-twin-1"
 
-        parsedPayload.entry[1].resource.identifier[0].value == parsedResponseBody.patientId
-        parsedPayload.entry[1].resource.resourceType + "/" + parsedPayload.entry[1].resource.id == parsedResponseBody.fhirResourceId
+        parsedSentPayload.entry[1].resource.identifier[0].value == parsedResponseBody.patientId
+        parsedSentPayload.entry[1].resource.resourceType + "/" + parsedSentPayload.entry[1].resource.id == parsedResponseBody.fhirResourceId
     }
 }
