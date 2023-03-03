@@ -32,6 +32,7 @@ resource "azurerm_key_vault_secret" "report_stream_sender_private_key" {
   lifecycle {
     ignore_changes = [value]
   }
+  depends_on = [azurerm_key_vault_access_policy.allow_github_deployer] //wait for the permission that allows our deployer to write the secret
 }
 
 data "azurerm_client_config" "current" {}
