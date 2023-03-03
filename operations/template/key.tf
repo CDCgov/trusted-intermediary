@@ -8,18 +8,6 @@ resource "azurerm_key_vault" "key_storage" {
   tenant_id = data.azurerm_client_config.current.tenant_id
 
   purge_protection_enabled = false
-
-  access_policy {
-    tenant_id = data.azurerm_client_config.current.tenant_id
-    object_id = "d59c2c86-de5e-41b7-a752-0869a73f5a60"
-
-    secret_permissions = [
-      "Set",
-      "Get",
-      "Delete",
-      "Purge",
-    ]
-  }
 }
 
 resource "azurerm_key_vault_access_policy" "allow_github_deployer" {
