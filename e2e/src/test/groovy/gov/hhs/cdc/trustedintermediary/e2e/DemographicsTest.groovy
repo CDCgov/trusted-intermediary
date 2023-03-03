@@ -53,7 +53,6 @@ class DemographicsTest extends Specification {
         parsedPayload.entry[1].resource.id == "infant-twin-1"
 
         parsedPayload.entry[1].resource.identifier[0].value == parsedResponseBody.patientId
-        parsedPayload.entry[1].resource.resourceType + "/"
-        + parsedPayload.entry[1].resource.id == parsedResponseBody.fhirResourceId
+        parsedPayload.entry[1].resource.resourceType + "/" + parsedPayload.entry[1].resource.id == parsedResponseBody.fhirResourceId
     }
 }
