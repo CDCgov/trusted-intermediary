@@ -23,6 +23,17 @@ resource "azurerm_key_vault_access_policy" "allow_github_deployer" {
   ]
 }
 
+resource "azurerm_key_vault_access_policy" "allow_api_read" {
+  key_vault_id = azurerm_key_vault.key_storage.id
+  tenant_id = data.azurerm_client_config.current.tenant_id
+  object_id = azurerm_linux_web_app.api.identity.0.principal_id
+
+  secret_permissions = [
+    "List",
+    "Get",
+  ]
+}
+
 resource "azurerm_key_vault_secret" "report_stream_sender_private_key" {
   name  = "report-stream-sender-private-key-${var.environment}"
   value = "dogcow"
