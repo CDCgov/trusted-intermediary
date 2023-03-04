@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.reportstream;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.ClientConnection;
+import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import java.io.IOException;
 import javax.inject.Inject;
@@ -13,6 +14,7 @@ public class ReportStreamConnection implements ClientConnection {
     private final String URL = "http://reportstream.endpoint";
     @Inject private HttpClient client;
     @Inject private AuthEngine jwt;
+    @Inject private Formatter jackson;
 
     private ReportStreamConnection() {}
 
@@ -33,17 +35,20 @@ public class ReportStreamConnection implements ClientConnection {
     }
 
     public String requestToken() {
-        // pass the key as a string: String key = new String(Files.readAllBytes(file.toPath()) for
-        // local
         String senderToken = null;
         String token = "";
         try {
             senderToken = jwt.generateSenderToken("sender", "baseUrl", "pemKey", "keyId", 300);
-
-            token = client.requestToken("rs endpoint", "body", senderToken);
+            String rsResponse = client.requestToken("rs endpoint", "body", senderToken);
+            token = extractToken(rsResponse);
         } catch (Exception e) {
             // TODO exception handling
         }
         return token;
+    }
+
+    protected String extractToken(String responseBody) {
+        String key = "access_token";
+        return jackson.exgtractValueFromString(responseBody, key);
     }
 }

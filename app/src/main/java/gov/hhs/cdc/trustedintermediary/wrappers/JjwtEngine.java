@@ -27,20 +27,20 @@ public class JjwtEngine implements AuthEngine {
     @Override
     @NotNull
     public String generateSenderToken(
-            @NotNull String sender,
+            @NotNull String sender, // flexion.etor-service-sender
             @NotNull String baseUrl,
             @NotNull String pemKey,
-            @NotNull String keyId,
+            @NotNull String keyId, // flexion.etor-service-sender
             int expirationSecondsfromNow)
             throws InvalidKeySpecException, NoSuchAlgorithmException {
 
         JwtBuilder jwsObj =
                 Jwts.builder()
-                        .setHeaderParam("kid", keyId)
+                        .setHeaderParam("kid", keyId) // flexion.etor-service-sender
                         .setHeaderParam("typ", "JWT")
-                        .setIssuer(sender)
-                        .setSubject(sender)
-                        .setAudience(baseUrl)
+                        .setIssuer(sender) // flexion.etor-service-sender
+                        .setSubject(sender) // flexion.etor-service-sender
+                        .setAudience(baseUrl) // "https://staging.prime.cdc.gov/api/token"
                         .setExpiration(
                                 new Date(
                                         System.currentTimeMillis()

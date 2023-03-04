@@ -20,6 +20,7 @@ public class ApacheClient implements HttpClient {
     public String post(@NotNull String url, @NotNull String body, @NotNull String bearerToken)
             throws IOException {
 
+        // header: Content-Type
         return Request.post(url)
                 .setHeader("Authorization", "Bearer" + bearerToken)
                 .setHeader(HttpHeaders.CONTENT_TYPE, "application/json")
