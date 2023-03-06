@@ -35,7 +35,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: ${{ inputs.SKIP }}
+    if: ${{ !inputs.SKIP }}
 
     steps:
     - uses: actions/checkout@v3
@@ -70,7 +70,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
-    if: ${{ inputs.SKIP }}
+    if: ${{ !inputs.SKIP }}
     environment:
       name: ${{ inputs.ENVIRONMENT }}
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}

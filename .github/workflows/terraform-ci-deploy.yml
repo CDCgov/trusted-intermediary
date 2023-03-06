@@ -33,7 +33,7 @@ jobs:
       TERRAFORM_DIRECTORY: operations/environments/pr
       TERRAFORM_INIT_PARAMETERS: -backend-config="key=pr_${{ github.event.number }}.tfstate"
       TERRAFORM_APPLY_PARAMETERS: -var="pr_number=${{ github.event.number }}"
-      SKIP: ${{ needs.paths-filter.outputs.operations == 'true' }}
+      SKIP: ${{ needs.paths-filter.outputs.operations != 'true' }}
     secrets:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
@@ -50,7 +50,7 @@ jobs:
       REPO: trusted-intermediary-router
       APP: ${{ needs.terraform-deploy.outputs.APP }}
       REGISTRY: ${{ needs.terraform-deploy.outputs.REGISTRY }}
-      SKIP: ${{ needs.paths-filter.outputs.operations == 'true' }}
+      SKIP: ${{ needs.paths-filter.outputs.operations != 'true' }}
     secrets:
       ACR_USERNAME: ${{ needs.terraform-deploy.outputs.ACR_USERNAME }}
       ACR_PASSWORD: ${{ needs.terraform-deploy.outputs.ACR_PASSWORD }}
