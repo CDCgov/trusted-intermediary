@@ -23,6 +23,7 @@ public class ApacheClient implements HttpClient {
         // header: Content-Type
         return Request.post(url)
                 .setHeader("Authorization", "Bearer" + bearerToken)
+                .setHeader("Content-Type", "application/x-www-form-urlencoded")
                 .setHeader(HttpHeaders.CONTENT_TYPE, "application/json")
                 .body(new StringEntity(body))
                 .execute()

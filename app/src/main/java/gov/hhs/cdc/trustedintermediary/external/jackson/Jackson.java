@@ -78,7 +78,8 @@ public class Jackson implements Formatter, YamlCombiner {
         }
     }
 
-    public String exgtractValueFromString(String inputString, String key) {
+    @Override
+    public String extractValueFromString(String inputString, String key) {
         String value = null;
         JsonNode node;
 

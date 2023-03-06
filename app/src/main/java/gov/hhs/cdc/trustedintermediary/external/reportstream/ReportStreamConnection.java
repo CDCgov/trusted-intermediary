@@ -37,8 +37,10 @@ public class ReportStreamConnection implements ClientConnection {
     public String requestToken() {
         String senderToken = null;
         String token = "";
+        String body;
         try {
             senderToken = jwt.generateSenderToken("sender", "baseUrl", "pemKey", "keyId", 300);
+            body = composeRequestBody(senderToken);
             String rsResponse = client.requestToken("rs endpoint", "body", senderToken);
             token = extractToken(rsResponse);
         } catch (Exception e) {
@@ -49,6 +51,11 @@ public class ReportStreamConnection implements ClientConnection {
 
     protected String extractToken(String responseBody) {
         String key = "access_token";
-        return jackson.exgtractValueFromString(responseBody, key);
+        String value = jackson.extractValueFromString(responseBody, key);
+        return value;
+    }
+
+    protected String composeRequestBody(String senderToken) {
+        return null;
     }
 }

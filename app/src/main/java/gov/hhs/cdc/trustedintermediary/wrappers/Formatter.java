@@ -10,5 +10,5 @@ public interface Formatter {
 
     String convertToString(Object obj) throws FormatterProcessingException;
 
-    String exgtractValueFromString(String inputString, String key);
+    String extractValueFromString(String inputString, String key);
 }
