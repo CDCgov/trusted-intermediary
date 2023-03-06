@@ -21,7 +21,8 @@ public class ApacheClient implements HttpClient {
             throws IOException {
         return Request.post(url)
                 .setHeader("Authorization", "Bearer" + bearerToken)
-                .setHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                .setHeader("client", "flexion")
+                .setHeader(HttpHeaders.CONTENT_TYPE, "application/hl7-v2") // params for headers?
                 .body(new StringEntity(body))
                 .execute()
                 .toString();
