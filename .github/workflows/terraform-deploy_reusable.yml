@@ -14,6 +14,10 @@ on:
         type: string
         required: false
         default: ""
+      SKIP:
+        type: boolean
+        required: false
+        default: false
     secrets:
       AZURE_CLIENT_ID:
         required: true
@@ -39,6 +43,7 @@ jobs:
   terraform-deploy:
     name: Terraform Deploy
     runs-on: ubuntu-latest
+    if: ${{ inputs.SKIP }}
     env:
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}

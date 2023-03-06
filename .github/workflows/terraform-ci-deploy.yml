@@ -29,11 +29,11 @@ jobs:
     name: PR Infrastructure Deploy
     needs: paths-filter
     uses: ./.github/workflows/terraform-deploy_reusable.yml
-    if: needs.paths-filter.outputs.operations == 'true'
     with:
       TERRAFORM_DIRECTORY: operations/environments/pr
       TERRAFORM_INIT_PARAMETERS: -backend-config="key=pr_${{ github.event.number }}.tfstate"
       TERRAFORM_APPLY_PARAMETERS: -var="pr_number=${{ github.event.number }}"
+      SKIP: ${{ needs.paths-filter.outputs.operations == 'true' }}
     secrets:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
@@ -45,12 +45,12 @@ jobs:
       - terraform-deploy
       - paths-filter
     uses: ./.github/workflows/deploy_reusable.yml
-    if: needs.paths-filter.outputs.operations == 'true'
     with:
       ENVIRONMENT: pr
       REPO: trusted-intermediary-router
       APP: ${{ needs.terraform-deploy.outputs.APP }}
       REGISTRY: ${{ needs.terraform-deploy.outputs.REGISTRY }}
+      SKIP: ${{ needs.paths-filter.outputs.operations == 'true' }}
     secrets:
       ACR_USERNAME: ${{ needs.terraform-deploy.outputs.ACR_USERNAME }}
       ACR_PASSWORD: ${{ needs.terraform-deploy.outputs.ACR_PASSWORD }}
