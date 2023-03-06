@@ -19,25 +19,21 @@ public class ApacheClient implements HttpClient {
     @Override
     public String post(@NotNull String url, @NotNull String body, @NotNull String bearerToken)
             throws IOException {
-
-        // header: Content-Type
         return Request.post(url)
                 .setHeader("Authorization", "Bearer" + bearerToken)
-                .setHeader("Content-Type", "application/x-www-form-urlencoded")
                 .setHeader(HttpHeaders.CONTENT_TYPE, "application/json")
                 .body(new StringEntity(body))
                 .execute()
                 .toString();
     }
 
-    public String requestToken(@NotNull String url, @NotNull String body, @NotNull String token)
-            throws IOException {
-
-        // I think we need to include the client name in the header and probably the access scope
-
+    public String requestToken(@NotNull String url, @NotNull String body) throws IOException {
         return Request.get(url)
-                .setHeader("Authorization", "Bearer" + token)
-                .body(new StringEntity(body)) // Don't know if we need a body
+                .setHeader(
+                        "Content-Type",
+                        "application/x-www-form-urlencoded") // should a Map<String,String> be
+                // passed as a param?
+                .body(new StringEntity(body))
                 .execute()
                 .toString();
     }

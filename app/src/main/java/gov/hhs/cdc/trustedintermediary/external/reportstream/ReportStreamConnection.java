@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 public class ReportStreamConnection implements ClientConnection {
 
     private String trustedIntermediaryPrivatePemKey = "ENVIRONMENT_SECRET";
-    private final String URL = "http://reportstream.endpoint";
+    private final String STAGING = "https://staging.prime.cdc.gov/api/token";
     @Inject private HttpClient client;
     @Inject private AuthEngine jwt;
     @Inject private Formatter jackson;
@@ -28,7 +28,7 @@ public class ReportStreamConnection implements ClientConnection {
     public void sendRequestBody(@NotNull String json, @NotNull String bearerToken) {
         String res;
         try {
-            res = client.post(URL, json, bearerToken); // what to do with response?
+            res = client.post(this.STAGING, json, bearerToken); // what to do with response?
         } catch (IOException e) {
             // TODO exception handling
         }
@@ -41,7 +41,7 @@ public class ReportStreamConnection implements ClientConnection {
         try {
             senderToken = jwt.generateSenderToken("sender", "baseUrl", "pemKey", "keyId", 300);
             body = composeRequestBody(senderToken);
-            String rsResponse = client.requestToken("rs endpoint", "body", senderToken);
+            String rsResponse = client.requestToken(this.STAGING, body);
             token = extractToken(rsResponse);
         } catch (Exception e) {
             // TODO exception handling
@@ -56,6 +56,16 @@ public class ReportStreamConnection implements ClientConnection {
     }
 
     protected String composeRequestBody(String senderToken) {
-        return "fail";
+        String scope = "flexion.*.report";
+        String grant_type = "client_credentials";
+        String client_assertion_type = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
+        return "scope="
+                + scope
+                + "&grant_type="
+                + grant_type
+                + "&client_assertion_type="
+                + client_assertion_type
+                + "&client_assertion="
+                + senderToken;
     }
 }

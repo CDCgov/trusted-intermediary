@@ -5,5 +5,5 @@ import java.io.IOException;
 public interface HttpClient {
     String post(String path, String body, String bearertoken) throws IOException;
 
-    String requestToken(String url, String body, String token) throws IOException;
+    String requestToken(String url, String body) throws IOException;
 }
