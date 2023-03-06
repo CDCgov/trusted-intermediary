@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.jackson;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
@@ -76,19 +75,5 @@ public class Jackson implements Formatter, YamlCombiner {
         } catch (JsonProcessingException e) {
             throw new YamlCombinerException("Unable to serialize combined YAML", e);
         }
-    }
-
-    @Override
-    public String extractValueFromString(String inputString, String key) {
-        String value = null;
-        JsonNode node;
-
-        try {
-            node = JSON_OBJECT_MAPPER.readTree(inputString);
-            value = node.get(key).asText();
-        } catch (JsonProcessingException e) {
-            // TODO exception handling
-        }
-        return value;
     }
 }

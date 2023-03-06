@@ -32,8 +32,7 @@ public class ApacheClient implements HttpClient {
         return Request.get(url)
                 .setHeader(
                         "Content-Type",
-                        "application/x-www-form-urlencoded") // should a Map<String,String> be
-                // passed as a param?
+                        "application/x-www-form-urlencoded") // Map param for header?
                 .body(new StringEntity(body))
                 .execute()
                 .toString();

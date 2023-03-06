@@ -9,6 +9,4 @@ public interface Formatter {
     <T> T convertToObject(String input, Class<T> clazz) throws FormatterProcessingException;
 
     String convertToString(Object obj) throws FormatterProcessingException;
-
-    String extractValueFromString(String inputString, String key);
 }

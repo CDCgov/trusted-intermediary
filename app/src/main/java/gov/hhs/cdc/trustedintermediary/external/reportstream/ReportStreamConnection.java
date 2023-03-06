@@ -1,10 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.external.reportstream;
 
-import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
-import gov.hhs.cdc.trustedintermediary.wrappers.ClientConnection;
-import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
-import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
+import gov.hhs.cdc.trustedintermediary.wrappers.*;
 import java.io.IOException;
+import java.util.Map;
 import javax.inject.Inject;
 import org.jetbrains.annotations.NotNull;
 
@@ -51,8 +49,13 @@ public class ReportStreamConnection implements ClientConnection {
 
     protected String extractToken(String responseBody) {
         String key = "access_token";
-        String value = jackson.extractValueFromString(responseBody, key);
-        return value;
+        Map<String, String> value = null;
+        try {
+            value = jackson.convertToObject(responseBody, Map.class);
+        } catch (FormatterProcessingException e) {
+            // TODO exception handling
+        }
+        return value.get(key);
     }
 
     protected String composeRequestBody(String senderToken) {
