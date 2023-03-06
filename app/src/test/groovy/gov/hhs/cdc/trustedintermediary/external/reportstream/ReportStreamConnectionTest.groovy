@@ -63,4 +63,14 @@ class ReportStreamConnectionTest extends Specification{
         then:
         actual == expected
     }
+
+    def "composeRequestBody works"() {
+        given:
+        def reportStreamConnection = ReportStreamConnection.getInstance()
+        def expected = "scope=flexion.*.report&grant_type=client_credentials&client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer&client_assertion=rsFakeToken"
+        when:
+        def actual = reportStreamConnection.composeRequestBody("rsFakeToken")
+        then:
+        actual == "fail"
+    }
 }

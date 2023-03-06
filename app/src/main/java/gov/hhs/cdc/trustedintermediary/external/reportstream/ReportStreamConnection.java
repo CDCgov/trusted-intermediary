@@ -56,6 +56,6 @@ public class ReportStreamConnection implements ClientConnection {
     }
 
     protected String composeRequestBody(String senderToken) {
-        return null;
+        return "fail";
     }
 }
