@@ -1,0 +1,11 @@
+name: Terraform Deploy
+
+on:
+  workflow_call:
+
+jobs:
+  terraform-deploy:
+    name: Terraform Deploy
+    runs-on: ubuntu-latest
+
+    steps:
