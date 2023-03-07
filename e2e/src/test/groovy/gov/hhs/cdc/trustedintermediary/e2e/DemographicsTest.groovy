@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.e2e
 
+
 import spock.lang.Specification
 
 import java.nio.charset.StandardCharsets
@@ -12,13 +13,16 @@ class DemographicsTest extends Specification {
 
     def "a demographics response is returned from the ETOR demographics endpoint"() {
         given:
-        def expected = """{"fhirResourceId":"Patient/infant-twin-1","patientId":"MRN7465737865"}"""
+        def expectedFhirResourceId  = "Patient/infant-twin-1"
+        def expectedPatientId  = "MRN7465737865"
 
         when:
         def responseBody = Client.post("/v1/etor/demographics", newbornPatientJsonFileString)
+        def parsedJsonBody = JsonParsing.parse(responseBody, Map.class)
 
         then:
-        responseBody == expected
+        parsedJsonBody.fhirResourceId == expectedFhirResourceId
+        parsedJsonBody.patientId == expectedPatientId
     }
 
     def "bad response given for poorly formatted JSON"() {
@@ -29,5 +33,26 @@ class DemographicsTest extends Specification {
 
         then:
         responseBody == "Server Error"
+    }
+
+    def "payload file check"() {
+
+        when:
+        def responseBody = Client.post("/v1/etor/demographics", newbornPatientJsonFileString)
+        def sentPayload = SentPayloadReader.read()
+        def parsedResponseBody = JsonParsing.parse(responseBody, Map.class)
+
+        def parsedSentPayload = JsonParsing.parse(sentPayload, Map.class)
+
+        then:
+
+        parsedSentPayload.entry[0].resource.resourceType == "MessageHeader"
+        parsedSentPayload.entry[2].resource.resourceType == "ServiceRequest"
+
+        parsedSentPayload.entry[1].resource.resourceType == "Patient"
+        parsedSentPayload.entry[1].resource.id == "infant-twin-1"
+
+        parsedSentPayload.entry[1].resource.identifier[0].value == parsedResponseBody.patientId
+        parsedSentPayload.entry[1].resource.resourceType + "/" + parsedSentPayload.entry[1].resource.id == parsedResponseBody.fhirResourceId
     }
 }
