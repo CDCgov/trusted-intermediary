@@ -27,10 +27,10 @@ public class JjwtEngine implements AuthEngine {
     @Override
     @NotNull
     public String generateSenderToken(
-            @NotNull String sender, // flexion.etor-service-sender
+            @NotNull String sender,
             @NotNull String baseUrl,
             @NotNull String pemKey,
-            @NotNull String keyId, // flexion.etor-service-sender
+            @NotNull String keyId,
             int expirationSecondsfromNow)
             throws InvalidKeySpecException, NoSuchAlgorithmException {
 

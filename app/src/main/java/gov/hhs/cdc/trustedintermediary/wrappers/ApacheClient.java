@@ -25,9 +25,6 @@ public class ApacheClient implements HttpClient {
         Header[] headers = convertMapToHeader(headerMap);
 
         return Request.post(url)
-                // .setHeader("Authorization", "Bearer" + bearerToken)
-                // .setHeader("client", "flexion")
-                // .setHeader(HttpHeaders.CONTENT_TYPE, "application/hl7-v2") // params for headers?
                 .setHeaders(headers)
                 .body(new StringEntity(body))
                 .execute()
@@ -39,8 +36,6 @@ public class ApacheClient implements HttpClient {
             throws IOException {
         Header[] headers = convertMapToHeader(headerMap);
         return Request.get(url)
-                // .setHeader("Content-Type", "application/x-www-form-urlencoded") // Map param for
-                // header?
                 .setHeaders(headers)
                 .body(new StringEntity(body))
                 .execute()
@@ -53,8 +48,10 @@ public class ApacheClient implements HttpClient {
         int index = 0;
 
         if (headerMap.isEmpty()) {
-            headers = new Header[0];
-            return headers;
+            return new Header[0];
+        }
+        if (headerMap == null) {
+            return new Header[0];
         }
 
         headers = new Header[headerMap.size()];

@@ -9,7 +9,8 @@ import org.jetbrains.annotations.NotNull;
 public class ReportStreamConnection implements ClientConnection {
 
     private String trustedIntermediaryPrivatePemKey = "ENVIRONMENT_SECRET";
-    private final String STAGING = "https://staging.prime.cdc.gov/api/token";
+    private final String STAGING = "https://staging.prime.cdc.gov/api/waters";
+    private final String STAGING_AUTH = "https://staging.prime.cdc.gov/api/token";
     @Inject private HttpClient client;
     @Inject private AuthEngine jwt;
     @Inject private Formatter jackson;
@@ -41,11 +42,13 @@ public class ReportStreamConnection implements ClientConnection {
         String senderToken = null;
         String token = "";
         String body;
+        String sender = "flexion.etor-service-sender";
+        String keyId = "flexion.etor-service-sender";
         Map<String, String> headers = Map.of("Content-Type", "application/x-www-form-urlencoded");
         try {
-            senderToken = jwt.generateSenderToken("sender", "baseUrl", "pemKey", "keyId", 300);
+            senderToken = jwt.generateSenderToken(sender, this.STAGING_AUTH, "pemKey", keyId, 300);
             body = composeRequestBody(senderToken);
-            String rsResponse = client.requestToken(this.STAGING, headers, body);
+            String rsResponse = client.requestToken(this.STAGING_AUTH, headers, body);
             token = extractToken(rsResponse);
         } catch (Exception e) {
             // TODO exception handling
