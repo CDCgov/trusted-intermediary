@@ -1,9 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.wrappers;
 
 import java.io.IOException;
+import java.util.Map;
 
 public interface HttpClient {
-    String post(String path, String body, String bearertoken) throws IOException;
+    String post(String path, Map<String, String> headerMap, String body) throws IOException;
 
-    String requestToken(String url, String body) throws IOException;
+    String requestToken(String url, Map<String, String> headerMap, String body) throws IOException;
 }

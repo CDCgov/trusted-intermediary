@@ -29,7 +29,7 @@ class ReportStreamConnectionTest extends Specification{
         TestApplicationContext.getImplementation(ClientConnection).sendRequestBody("message_2", "fake token")
 
         then:
-        2 * mockClient.post(_ as String, _ as String, _ as String) >> "200"
+        2 * mockClient.post(_ as String, _ as Map<String,String>, _ as String) >> "200"
     }
 
     def "requestToken works"() {
@@ -46,7 +46,7 @@ class ReportStreamConnectionTest extends Specification{
         def actual = ReportStreamConnection.getInstance().requestToken()
         then:
         1 * mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "sender fake token"
-        1 * mockClient.requestToken(_ as String, _ as String) >> """{"access_token":"rs fake token", "token_type":"bearer"}"""
+        1 * mockClient.requestToken(_ as String, _ as Map<String,String>, _ as String) >> """{"access_token":"rs fake token", "token_type":"bearer"}"""
         actual == expected
     }
 

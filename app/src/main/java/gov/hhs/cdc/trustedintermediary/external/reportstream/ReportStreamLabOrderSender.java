@@ -20,7 +20,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     public void sendOrder(final LabOrder<?> order) {
         // String json = FHIR.stringify(order.getUnderlyingOrder())
         // decide if the environment is in prod or local
-        // String bearerToken = reportStream.requestBearerToken()
+        // String bearerToken = reportStream.requestToken()
         // reportStream.sendRequestBody(url, json, bearerToken)
     }
 }

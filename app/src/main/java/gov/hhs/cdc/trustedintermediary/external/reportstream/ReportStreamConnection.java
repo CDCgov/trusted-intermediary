@@ -25,8 +25,13 @@ public class ReportStreamConnection implements ClientConnection {
     @Override
     public void sendRequestBody(@NotNull String json, @NotNull String bearerToken) {
         String res;
+        Map<String, String> headers =
+                Map.of(
+                        "Authorization", "Bearer" + bearerToken,
+                        "client", "flexion",
+                        "Content-Type", "application/hl7-v2");
         try {
-            res = client.post(this.STAGING, json, bearerToken); // what to do with response?
+            res = client.post(this.STAGING, headers, json); // what to do with response?
         } catch (IOException e) {
             // TODO exception handling
         }
@@ -36,10 +41,11 @@ public class ReportStreamConnection implements ClientConnection {
         String senderToken = null;
         String token = "";
         String body;
+        Map<String, String> headers = Map.of("Content-Type", "application/x-www-form-urlencoded");
         try {
             senderToken = jwt.generateSenderToken("sender", "baseUrl", "pemKey", "keyId", 300);
             body = composeRequestBody(senderToken);
-            String rsResponse = client.requestToken(this.STAGING, body);
+            String rsResponse = client.requestToken(this.STAGING, headers, body);
             token = extractToken(rsResponse);
         } catch (Exception e) {
             // TODO exception handling
