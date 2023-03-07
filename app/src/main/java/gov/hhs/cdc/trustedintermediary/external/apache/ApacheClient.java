@@ -1,5 +1,6 @@
-package gov.hhs.cdc.trustedintermediary.wrappers;
+package gov.hhs.cdc.trustedintermediary.external.apache;
 
+import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import java.io.IOException;
 import java.util.Map;
 import org.apache.hc.client5.http.fluent.Request;

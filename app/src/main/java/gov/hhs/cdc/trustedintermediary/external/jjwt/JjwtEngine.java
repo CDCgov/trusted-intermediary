@@ -1,5 +1,6 @@
-package gov.hhs.cdc.trustedintermediary.wrappers;
+package gov.hhs.cdc.trustedintermediary.external.jjwt;
 
+import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import io.jsonwebtoken.*;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
