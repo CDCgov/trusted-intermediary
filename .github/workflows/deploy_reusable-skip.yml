@@ -1,3 +1,6 @@
+# Used when a PR doesn't have any changes that require the PR deploy.
+# The jobs' keys/names must align with the `deploy_reusable.yml` jobs' keys/names.
+
 name: 'Container Build & Deploy'
 
 on:

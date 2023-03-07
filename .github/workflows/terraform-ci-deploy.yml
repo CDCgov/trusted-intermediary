@@ -40,11 +40,12 @@ jobs:
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
 
-  terraform-deploy-skip:
+  terraform-deploy-skip:  # runs when the PR doesn't have any changes that require the PR deploy; this ensures we get the appropriate required PR checks
     name: PR Infrastructure Deploy
     needs: paths-filter
     uses: ./.github/workflows/terraform-deploy_reusable-skip.yml
     if: needs.paths-filter.outputs.operations != 'true'
+
 
   pr-deploy:
     name: PR Application Deploy
@@ -65,12 +66,14 @@ jobs:
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-  pr-deploy-skip:
+
+  pr-deploy-skip:  # runs when the PR doesn't have any changes that require the PR deploy; this ensures we get the appropriate required PR checks
     name: PR Application Deploy
     needs:
       - paths-filter
     uses: ./.github/workflows/deploy_reusable-skip.yml
     if: needs.paths-filter.outputs.operations != 'true'
+
 
   destroy-environment:
     name: Destroy PR Environment

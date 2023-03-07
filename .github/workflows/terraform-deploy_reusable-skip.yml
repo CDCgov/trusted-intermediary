@@ -1,3 +1,6 @@
+# Used when a PR doesn't have any changes that require the PR deploy.
+# The job's keys/names must align with the `terraform-deploy_reusable.yml` job's keys/names.
+
 name: Terraform Deploy
 
 on:
