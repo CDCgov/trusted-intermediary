@@ -52,9 +52,8 @@ public class ApacheClient implements HttpClient {
         Header[] headers;
         int index = 0;
 
-        if (headerMap.isEmpty() | headerMap == null) {
+        if (headerMap.isEmpty()) {
             headers = new Header[0];
-            headers[0] = new BasicHeader("", "");
             return headers;
         }
 
