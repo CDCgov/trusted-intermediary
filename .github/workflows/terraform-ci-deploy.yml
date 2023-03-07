@@ -41,7 +41,7 @@ jobs:
 
 
   terraform-deploy-skip:  # runs when the PR doesn't have any changes that require the PR deploy; this ensures we get the appropriate required PR checks
-    name: PR Infrastructure Deploy
+    name: PR Infrastructure Deploy  # this name must match the above `terraform-deploy` job's name
     needs: paths-filter
     uses: ./.github/workflows/terraform-deploy_reusable-skip.yml
     if: needs.paths-filter.outputs.operations != 'true'
@@ -68,7 +68,7 @@ jobs:
 
 
   pr-deploy-skip:  # runs when the PR doesn't have any changes that require the PR deploy; this ensures we get the appropriate required PR checks
-    name: PR Application Deploy
+    name: PR Application Deploy  # this name must match the above `pr-deploy` job's name
     needs:
       - paths-filter
     uses: ./.github/workflows/deploy_reusable-skip.yml
