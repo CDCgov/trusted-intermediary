@@ -68,7 +68,6 @@ jobs:
   pr-deploy-skip:
     name: PR Application Deploy
     needs:
-      - terraform-deploy-skip
       - paths-filter
     uses: ./.github/workflows/deploy_reusable-skip.yml
     if: needs.paths-filter.outputs.operations != 'true'
