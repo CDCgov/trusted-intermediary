@@ -12,7 +12,7 @@ public class SentPayloadReader {
         return Files.readString(payloadFile);
     }
 
-    public static Path findFilePayload() {
+    private static Path findFilePayload() {
 
         Path expectedFilePath = Path.of("..", "app", "localfilelaborder.json");
 
