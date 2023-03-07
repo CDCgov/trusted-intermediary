@@ -1,0 +1,20 @@
+# Used when a PR doesn't have any changes that require the PR deploy.
+# The jobs' keys/names must align with the `deploy_reusable.yml` jobs' keys/names.
+
+name: 'Container Build & Deploy'
+
+on:
+  workflow_call:
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo 'Nothing'
+
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo 'Nothing'
