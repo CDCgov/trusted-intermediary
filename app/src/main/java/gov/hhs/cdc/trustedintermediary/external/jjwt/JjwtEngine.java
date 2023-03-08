@@ -19,7 +19,6 @@ public class JjwtEngine implements AuthEngine {
     private static final JjwtEngine INSTANCE = new JjwtEngine();
 
     private JjwtEngine() {}
-    ;
 
     public static JjwtEngine getInstance() {
         return INSTANCE;
@@ -32,47 +31,24 @@ public class JjwtEngine implements AuthEngine {
             @NotNull String baseUrl,
             @NotNull String pemKey,
             @NotNull String keyId,
-            int expirationSecondsfromNow)
+            int expirationSecondsFromNow)
             throws InvalidKeySpecException, NoSuchAlgorithmException {
 
         JwtBuilder jwsObj =
                 Jwts.builder()
-                        .setHeaderParam("kid", keyId) // flexion.etor-service-sender
+                        .setHeaderParam("kid", keyId)
                         .setHeaderParam("typ", "JWT")
-                        .setIssuer(sender) // flexion.etor-service-sender
-                        .setSubject(sender) // flexion.etor-service-sender
-                        .setAudience(baseUrl) // "https://staging.prime.cdc.gov/api/token"
+                        .setIssuer(sender)
+                        .setSubject(sender)
+                        .setAudience(baseUrl)
                         .setExpiration(
                                 new Date(
                                         System.currentTimeMillis()
-                                                + (long) (expirationSecondsfromNow * 1000)))
-                        .setId(String.valueOf(UUID.randomUUID()))
+                                                + (long) (expirationSecondsFromNow * 1000L)))
+                        .setId(UUID.randomUUID().toString())
                         .signWith(readPrivateKey(pemKey));
 
         return jwsObj.compact();
-    }
-
-    @Override
-    @NotNull
-    public boolean isValidToken(@NotNull String token, @NotNull String key) {
-
-        // Use the publicKey if a privateKey was used to sign the jwt.
-        // Use the same secretKey if a secretKey was used to sign the jwt.
-        try {
-            Jws jwtClaims =
-                    Jwts.parserBuilder()
-                            .setSigningKey(readPublicKey(key))
-                            .build()
-                            .parseClaimsJws(token);
-            return true;
-        } catch (JwtException e) {
-            // TODO exception handling, invalid token!
-        } catch (InvalidKeySpecException e) {
-            throw new RuntimeException(e); // reading key didn't work
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e); // reading key didn't work
-        }
-        return false;
     }
 
     private RSAPublicKey readPublicKey(@NotNull String pemKey)

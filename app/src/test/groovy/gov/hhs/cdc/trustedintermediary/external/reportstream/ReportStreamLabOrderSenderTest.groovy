@@ -7,6 +7,7 @@ import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.external.slf4j.Slf4jLogger
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter
+import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import spock.lang.Specification
@@ -81,6 +82,16 @@ class ReportStreamLabOrderSenderTest extends Specification{
     def "send order works"() {
 
         given:
+        def expected = "rs fake token"
+        def mockAuthEngine = Mock(AuthEngine)
+        def mockClient = Mock(HttpClient)
+        def mockFhir = Mock(HapiFhir)
+        TestApplicationContext.register(AuthEngine, mockAuthEngine)
+        TestApplicationContext.register(HttpClient, mockClient)
+        TestApplicationContext.register(HapiFhir,mockFhir)
+        TestApplicationContext.register(Logger, Slf4jLogger.getLogger())
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
         LabOrder<?> mockOrder = new LabOrder<String>() {
 
                     @Override
@@ -90,11 +101,10 @@ class ReportStreamLabOrderSenderTest extends Specification{
                 }
 
         when:
-
+        mockFhir.encodeResourceToJson(_ as String) >> "Mock order"
         ReportStreamLabOrderSender.getInstance().sendOrder(mockOrder)
 
         then:
-
         noExceptionThrown()
     }
 }

@@ -32,7 +32,7 @@ public class ApacheClient implements HttpClient {
                 .toString();
     }
 
-    public String requestToken(
+    public String get(
             @NotNull String url, @NotNull Map<String, String> headerMap, @NotNull String body)
             throws IOException {
         Header[] headers = convertMapToHeader(headerMap);

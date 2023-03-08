@@ -11,7 +11,4 @@ public interface AuthEngine {
             @NotNull String keyId,
             int expirationSecondsfromNow)
             throws Exception;
-
-    @NotNull
-    boolean isValidToken(@NotNull String token, @NotNull String key);
 }

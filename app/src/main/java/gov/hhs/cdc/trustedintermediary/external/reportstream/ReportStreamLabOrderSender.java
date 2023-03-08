@@ -57,7 +57,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         try {
             senderToken = jwt.generateSenderToken(sender, this.STAGING_AUTH, "pemKey", keyId, 300);
             body = composeRequestBody(senderToken);
-            String rsResponse = client.requestToken(this.STAGING_AUTH, headers, body);
+            String rsResponse = client.get(this.STAGING_AUTH, headers, body);
             // TODO response handling when it fails?
             token = extractToken(rsResponse);
         } catch (Exception e) {
