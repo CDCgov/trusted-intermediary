@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.reportstream
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.external.apache.ApacheClient
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.external.slf4j.Slf4jLogger
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine

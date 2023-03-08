@@ -43,15 +43,12 @@ public class ApacheClient implements HttpClient {
                 .toString();
     }
 
-    protected Header[] convertMapToHeader(Map<String, String> headerMap) {
+    public Header[] convertMapToHeader(Map<String, String> headerMap) {
 
         Header[] headers;
         int index = 0;
 
-        if (headerMap.isEmpty()) {
-            return new Header[0];
-        }
-        if (headerMap == null) {
+        if (headerMap == null || headerMap.isEmpty()) {
             return new Header[0];
         }
 
