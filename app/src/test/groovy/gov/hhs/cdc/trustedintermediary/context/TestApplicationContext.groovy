@@ -15,6 +15,7 @@ class TestApplicationContext extends ApplicationContext {
 
     def static reset() {
         OBJECT_MAP.clear()
+        IMPLEMENTATIONS.clear()
     }
 
     def static injectRegisteredImplementations() {
