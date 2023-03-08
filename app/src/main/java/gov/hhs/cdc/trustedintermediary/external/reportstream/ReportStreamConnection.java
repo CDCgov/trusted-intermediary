@@ -24,7 +24,7 @@ public class ReportStreamConnection implements ClientConnection {
     }
 
     @Override
-    public void sendRequestBody(@NotNull String json, @NotNull String bearerToken) {
+    public void sendRequestBody(@NotNull String json, @NotNull String bearerToken) { // url param?
         String res;
         Map<String, String> headers =
                 Map.of(
@@ -49,6 +49,7 @@ public class ReportStreamConnection implements ClientConnection {
             senderToken = jwt.generateSenderToken(sender, this.STAGING_AUTH, "pemKey", keyId, 300);
             body = composeRequestBody(senderToken);
             String rsResponse = client.requestToken(this.STAGING_AUTH, headers, body);
+            // TODO response handling when it fails?
             token = extractToken(rsResponse);
         } catch (Exception e) {
             // TODO exception handling
