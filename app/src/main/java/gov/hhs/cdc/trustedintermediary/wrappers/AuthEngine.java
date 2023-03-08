@@ -9,6 +9,6 @@ public interface AuthEngine {
             @NotNull String baseUrl,
             @NotNull String pemKey,
             @NotNull String keyId,
-            int expirationSecondsfromNow)
+            int expirationSecondsFromNow)
             throws Exception;
 }
