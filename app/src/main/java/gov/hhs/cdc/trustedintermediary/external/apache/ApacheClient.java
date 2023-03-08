@@ -45,17 +45,8 @@ public class ApacheClient implements HttpClient {
 
     public Header[] convertMapToHeader(Map<String, String> headerMap) {
 
-        Header[] headers;
-        int index = 0;
-
-        if (headerMap == null || headerMap.isEmpty()) {
-            return new Header[0];
-        }
-
-        headers = new Header[headerMap.size()];
-        for (var entry : headerMap.entrySet()) {
-            headers[index++] = new BasicHeader(entry.getKey(), entry.getValue());
-        }
-        return headers;
+        return headerMap.entrySet().stream()
+                .map(entry -> new BasicHeader(entry.getKey(), entry.getValue()))
+                .toArray(Header[]::new);
     }
 }
