@@ -33,7 +33,8 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         sendRequestBody(json, bearerToken);
     }
 
-    public String sendRequestBody(@NotNull String json, @NotNull String bearerToken) { // url param?
+    protected String sendRequestBody(
+            @NotNull String json, @NotNull String bearerToken) { // url param?
         String res = "";
         Map<String, String> headers =
                 Map.of(

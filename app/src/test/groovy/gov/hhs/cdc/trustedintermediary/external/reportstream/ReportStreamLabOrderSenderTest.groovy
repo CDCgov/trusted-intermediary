@@ -12,7 +12,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import spock.lang.Specification
 
-class ReportStreamLabOrderSenderTest extends Specification{
+class ReportStreamLabOrderSenderTest extends Specification {
 
     def setup() {
         TestApplicationContext.reset()
@@ -54,7 +54,6 @@ class ReportStreamLabOrderSenderTest extends Specification{
 
     def "extractToken works"() {
         given:
-        TestApplicationContext.register(Logger,Slf4jLogger.getLogger())
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
         def reportStreamLabOrderSender = ReportStreamLabOrderSender.getInstance()
@@ -69,12 +68,13 @@ class ReportStreamLabOrderSenderTest extends Specification{
     def "composeRequestBody works"() {
         given:
         def reportStreamLabOrderSender = ReportStreamLabOrderSender.getInstance()
+        def fakeToken = "rsFakeToken"
         def expected = "scope=flexion.*.report" +
                 "&grant_type=client_credentials" +
                 "&client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer" +
-                "&client_assertion=rsFakeToken"
+                "&client_assertion=${fakeToken}"
         when:
-        def actual = reportStreamLabOrderSender.composeRequestBody("rsFakeToken")
+        def actual = reportStreamLabOrderSender.composeRequestBody(fakeToken)
         then:
         actual == expected
     }
@@ -82,16 +82,15 @@ class ReportStreamLabOrderSenderTest extends Specification{
     def "send order works"() {
 
         given:
-        def expected = "rs fake token"
         def mockAuthEngine = Mock(AuthEngine)
         def mockClient = Mock(HttpClient)
         def mockFhir = Mock(HapiFhir)
         TestApplicationContext.register(AuthEngine, mockAuthEngine)
         TestApplicationContext.register(HttpClient, mockClient)
         TestApplicationContext.register(HapiFhir,mockFhir)
-        TestApplicationContext.register(Logger, Slf4jLogger.getLogger())
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
+        mockFhir.encodeResourceToJson(_ as String) >> "Mock order"
         LabOrder<?> mockOrder = new LabOrder<String>() {
 
                     @Override
@@ -101,7 +100,6 @@ class ReportStreamLabOrderSenderTest extends Specification{
                 }
 
         when:
-        mockFhir.encodeResourceToJson(_ as String) >> "Mock order"
         ReportStreamLabOrderSender.getInstance().sendOrder(mockOrder)
 
         then:
