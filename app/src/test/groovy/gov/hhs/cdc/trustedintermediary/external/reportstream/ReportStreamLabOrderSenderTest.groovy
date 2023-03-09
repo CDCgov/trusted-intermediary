@@ -27,8 +27,8 @@ class ReportStreamLabOrderSenderTest extends Specification{
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        TestApplicationContext.getImplementation(LabOrderSender).sendRequestBody("message_1", "fake token")
-        TestApplicationContext.getImplementation(LabOrderSender).sendRequestBody("message_2", "fake token")
+        ReportStreamLabOrderSender.getInstance().sendRequestBody("message_1", "fake token")
+        ReportStreamLabOrderSender.getInstance().sendRequestBody("message_2", "fake token")
 
         then:
         2 * mockClient.post(_ as String, _ as Map<String,String>, _ as String) >> "200"
@@ -48,7 +48,7 @@ class ReportStreamLabOrderSenderTest extends Specification{
         def actual = ReportStreamLabOrderSender.getInstance().requestToken()
         then:
         1 * mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "sender fake token"
-        1 * mockClient.requestToken(_ as String, _ as Map<String,String>, _ as String) >> """{"access_token":"rs fake token", "token_type":"bearer"}"""
+        1 * mockClient.post(_ as String, _ as Map<String,String>, _ as String) >> """{"access_token":"rs fake token", "token_type":"bearer"}"""
         actual == expected
     }
 

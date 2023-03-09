@@ -33,8 +33,8 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         sendRequestBody(json, bearerToken);
     }
 
-    public void sendRequestBody(@NotNull String json, @NotNull String bearerToken) { // url param?
-        String res;
+    public String sendRequestBody(@NotNull String json, @NotNull String bearerToken) { // url param?
+        String res = "";
         Map<String, String> headers =
                 Map.of(
                         "Authorization", "Bearer" + bearerToken,
@@ -45,6 +45,8 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         } catch (IOException e) {
             // TODO exception handling
         }
+
+        return res;
     }
 
     protected String requestToken() {
@@ -57,7 +59,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         try {
             senderToken = jwt.generateSenderToken(sender, this.STAGING_AUTH, "pemKey", keyId, 300);
             body = composeRequestBody(senderToken);
-            String rsResponse = client.get(this.STAGING_AUTH, headers, body);
+            String rsResponse = client.post(this.STAGING_AUTH, headers, body);
             // TODO response handling when it fails?
             token = extractToken(rsResponse);
         } catch (Exception e) {
