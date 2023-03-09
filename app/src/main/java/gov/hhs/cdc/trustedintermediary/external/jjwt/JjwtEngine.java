@@ -42,7 +42,7 @@ public class JjwtEngine implements AuthEngine {
                         .setExpiration(
                                 new Date(
                                         System.currentTimeMillis()
-                                                + (long) (expirationSecondsFromNow * 1000L)))
+                                                + (expirationSecondsFromNow * 1000L)))
                         .setId(UUID.randomUUID().toString())
                         .signWith(readPrivateKey(pemKey));
 
