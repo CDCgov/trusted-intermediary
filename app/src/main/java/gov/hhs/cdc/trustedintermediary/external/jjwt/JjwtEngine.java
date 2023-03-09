@@ -5,10 +5,8 @@ import io.jsonwebtoken.*;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Date;
 import java.util.UUID;
@@ -49,20 +47,6 @@ public class JjwtEngine implements AuthEngine {
                         .signWith(readPrivateKey(pemKey));
 
         return jwsObj.compact();
-    }
-
-    private RSAPublicKey readPublicKey(@NotNull String pemKey)
-            throws InvalidKeySpecException, NoSuchAlgorithmException {
-        String publicPemKey =
-                pemKey.replace("-----BEGIN PUBLIC KEY-----", "")
-                        .replaceAll(System.lineSeparator(), "")
-                        .replace("-----END PUBLIC KEY-----", "");
-
-        byte[] encoded = Base64.getDecoder().decode(publicPemKey);
-
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
-        return (RSAPublicKey) keyFactory.generatePublic(keySpec);
     }
 
     private RSAPrivateKey readPrivateKey(@NotNull String pemKey)
