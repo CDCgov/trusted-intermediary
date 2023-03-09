@@ -41,7 +41,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
                         "client", "flexion",
                         "Content-Type", "application/hl7-v2");
         try {
-            res = client.post(this.STAGING, headers, json); // what to do with response?
+            res = client.post(this.STAGING, headers, json);
         } catch (IOException e) {
             // TODO exception handling
         }
