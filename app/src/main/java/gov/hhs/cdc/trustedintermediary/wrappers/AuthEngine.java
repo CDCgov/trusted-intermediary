@@ -10,5 +10,5 @@ public interface AuthEngine {
             @NotNull String pemKey,
             @NotNull String keyId,
             int expirationSecondsFromNow)
-            throws Exception;
+            throws Exception; // TODO dedicated exception instead of generic
 }
