@@ -139,20 +139,20 @@ public class ApplicationContext {
         return declaringClassImplementation;
     }
 
-    public static String getProperty() {
-        Map<String, String> stringMap = System.getenv();
+    public static String envVar() {
+        //        Map<String, String> stringMap = System.getenv();
         String testString = System.getenv("PATH");
-        //        stringMap.entrySet().forEach(System.out::println);
+        //                stringMap.entrySet().forEach(System.out::println);
         String property = null;
         if (testString.toLowerCase().contains("user")) {
             property = "LOCAL";
         }
-        System.out.println(testString);
+        //        System.out.println(testString);
         return property;
     }
 
     public static String getEnvironmentStatus() {
-        environmentStatus = getProperty();
+        environmentStatus = envVar();
         return environmentStatus;
     }
 

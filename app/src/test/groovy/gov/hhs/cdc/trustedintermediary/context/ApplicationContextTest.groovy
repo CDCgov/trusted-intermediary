@@ -34,7 +34,7 @@ class ApplicationContextTest extends Specification {
         injectedValue == aFieldValue
     }
 
-    def "returns a property"() {
+    def "returns an environmental status"() {
         given:
         def injectedValue = "DogCow"
         def injectionInstantiation = new InjectionDeclaringClass()
@@ -43,12 +43,10 @@ class ApplicationContextTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def aFieldValue = injectionInstantiation.getAField()
-
-        def aString = ApplicationContext.getProperty()
+        def environmentStatus = ApplicationContext.envVar()
 
         then:
-        aString == "LOCAL"
+        environmentStatus == "LOCAL"
     }
 
     class InjectionDeclaringClass {
