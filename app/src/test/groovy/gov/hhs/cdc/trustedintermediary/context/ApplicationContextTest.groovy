@@ -35,18 +35,12 @@ class ApplicationContextTest extends Specification {
     }
 
     def "returns an environmental status"() {
-        given:
-        def injectedValue = "DogCow"
-        def injectionInstantiation = new InjectionDeclaringClass()
-        TestApplicationContext.register(String, injectedValue)
-        TestApplicationContext.register(InjectionDeclaringClass, injectionInstantiation)
-        TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def environmentStatus = ApplicationContext.environmentalContext()
+        def environmentStatus = ApplicationContext.getEnvironment()
 
         then:
-        environmentStatus == "LOCAL" || "STAG"
+        environmentStatus == "local"
     }
 
     class InjectionDeclaringClass {
