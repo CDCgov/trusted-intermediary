@@ -52,7 +52,7 @@ public class JjwtEngine implements AuthEngine {
         return jwsObj.compact();
     }
 
-    private RSAPrivateKey readPrivateKey(@NotNull String pemKey)
+    protected RSAPrivateKey readPrivateKey(@NotNull String pemKey)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
         String privatePemKey =
                 pemKey.replace("-----BEGIN PRIVATE KEY-----", "")

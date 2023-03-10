@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.*;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
 import org.jetbrains.annotations.NotNull;
@@ -71,7 +72,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     }
 
     protected String extractToken(String responseBody) {
-        Map<String, String> value = null;
+        Map<String, String> value = new HashMap<>();
         try {
             value = jackson.convertToObject(responseBody, Map.class);
         } catch (FormatterProcessingException e) {
