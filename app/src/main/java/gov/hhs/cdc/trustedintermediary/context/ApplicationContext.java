@@ -148,11 +148,11 @@ public class ApplicationContext {
         String envVarAsAString = System.getenv("PATH");
         String property = null;
         if (envVarAsAString.toLowerCase().contains("app")) {
-            property = "LOCAL"; // "LOCAL"
+            property = "LOCAL"; // "LOCAL?"
         } else if (envVarAsAString.toLowerCase().contains("runner")) {
-            property = "LOCAL"; // "STAG"
+            property = "STAG"; // "STAG?"
         } else {
-            property = "LOCAL"; // "PROD?"
+            property = "PROD"; // "PROD?"
         }
         // 'property' is set to always return "LOCAL" until env variables
         // are discovered for "STAG" and "PROD"
