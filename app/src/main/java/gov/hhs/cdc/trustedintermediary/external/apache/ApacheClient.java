@@ -39,7 +39,7 @@ public class ApacheClient implements HttpClient {
 
     protected Header[] convertMapToHeader(Map<String, String> headerMap) {
 
-        if (headerMap == null || headerMap.isEmpty()) {
+        if (headerMap == null) {
             return new Header[0];
         }
 
