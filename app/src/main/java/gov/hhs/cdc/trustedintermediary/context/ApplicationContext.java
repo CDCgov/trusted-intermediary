@@ -22,6 +22,8 @@ public class ApplicationContext {
 
     protected static final Map<Class<?>, Object> OBJECT_MAP = new ConcurrentHashMap<>();
 
+    static String environmentStatus;
+
     protected ApplicationContext() {}
 
     public static void register(Class<?> clazz, Object implementation) {
@@ -135,5 +137,26 @@ public class ApplicationContext {
         }
 
         return declaringClassImplementation;
+    }
+
+    public static String getProperty() {
+        Map<String, String> stringMap = System.getenv();
+        String testString = System.getenv("PATH");
+        //        stringMap.entrySet().forEach(System.out::println);
+        String property = null;
+        if (testString.toLowerCase().contains("user")) {
+            property = "LOCAL";
+        }
+        System.out.println(testString);
+        return property;
+    }
+
+    public static String getEnvironmentStatus() {
+        environmentStatus = getProperty();
+        return environmentStatus;
+    }
+
+    public static void setEnvironmentStatus(String environmentStatus) {
+        ApplicationContext.environmentStatus = environmentStatus;
     }
 }

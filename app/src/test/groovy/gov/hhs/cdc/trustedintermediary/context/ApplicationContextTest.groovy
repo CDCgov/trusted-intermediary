@@ -34,6 +34,23 @@ class ApplicationContextTest extends Specification {
         injectedValue == aFieldValue
     }
 
+    def "returns a property"() {
+        given:
+        def injectedValue = "DogCow"
+        def injectionInstantiation = new InjectionDeclaringClass()
+        TestApplicationContext.register(String, injectedValue)
+        TestApplicationContext.register(InjectionDeclaringClass, injectionInstantiation)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def aFieldValue = injectionInstantiation.getAField()
+
+        def aString = ApplicationContext.getProperty()
+
+        then:
+        aString == "LOCAL"
+    }
+
     class InjectionDeclaringClass {
         @Inject
         private String aField
