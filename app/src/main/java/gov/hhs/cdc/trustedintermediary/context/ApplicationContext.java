@@ -140,14 +140,15 @@ public class ApplicationContext {
     }
 
     public static String environmentalContext() {
-        Map<String, String> stringMap = System.getenv();
+        //        Map<String, String> stringMap = System.getenv();
         String testString = System.getenv("PATH");
-        stringMap.entrySet().forEach(System.out::println);
+        //        stringMap.entrySet().forEach(System.out::println);
         String property = null;
         if (testString.toLowerCase().contains("user")) {
             property = "LOCAL";
+        } else if (testString.toLowerCase().contains("runner")) {
+            property = "STAG";
         }
-        //        System.out.println(testString);
         return property;
     }
 

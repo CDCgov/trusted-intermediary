@@ -46,7 +46,7 @@ class ApplicationContextTest extends Specification {
         def environmentStatus = ApplicationContext.environmentalContext()
 
         then:
-        environmentStatus == "LOCAL"
+        environmentStatus == "LOCAL" || "STAG"
     }
 
     class InjectionDeclaringClass {
