@@ -24,7 +24,9 @@ public class ApplicationContext {
 
     static String environmentStatus;
 
-    protected ApplicationContext() {}
+    protected ApplicationContext() {
+        environmentStatus = getEnvironmentStatus();
+    }
 
     public static void register(Class<?> clazz, Object implementation) {
         OBJECT_MAP.put(clazz, implementation);
@@ -147,6 +149,8 @@ public class ApplicationContext {
         if (testString.toLowerCase().contains("user")) {
             property = "LOCAL";
         } else if (testString.toLowerCase().contains("runner")) {
+            property = "LOCAL";
+        } else {
             property = "STAG";
         }
         return property;

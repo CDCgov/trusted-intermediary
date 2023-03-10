@@ -41,6 +41,7 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(
                 ConvertAndSendLabOrderUsecase.class, ConvertAndSendLabOrderUsecase.getInstance());
         ApplicationContext.register(LabOrderConverter.class, HapiLabOrderConverter.getInstance());
+
         if (ApplicationContext.getEnvironmentStatus().equalsIgnoreCase("LOCAL")) {
             ApplicationContext.register(
                     LabOrderSender.class, LocalFileLabOrderSender.getInstance());
