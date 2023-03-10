@@ -34,6 +34,15 @@ class ApplicationContextTest extends Specification {
         injectedValue == aFieldValue
     }
 
+    def "returns an environmental status"() {
+
+        when:
+        def environmentStatus = ApplicationContext.getEnvironment()
+
+        then:
+        environmentStatus == "local"
+    }
+
     class InjectionDeclaringClass {
         @Inject
         private String aField
