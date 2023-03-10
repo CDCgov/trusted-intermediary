@@ -22,7 +22,7 @@ public class ApplicationContext {
 
     protected static final Map<Class<?>, Object> OBJECT_MAP = new ConcurrentHashMap<>();
 
-    static String environmentStatus;
+    static String environmentStatus = getEnvironmentStatus();
 
     protected ApplicationContext() {}
 
@@ -140,20 +140,26 @@ public class ApplicationContext {
     }
 
     public static String environmentalContext() {
+        //        // Testing to see what .getenv returns in different environments
         //        Map<String, String> stringMap = System.getenv();
-        String testString = System.getenv("PATH");
         //        stringMap.entrySet().forEach(System.out::println);
+
+        // Decided to differentiate env status based on differences in the PATH(s)
+        String envVarAsAString = System.getenv("PATH");
         String property = null;
-        if (testString.toLowerCase().contains("user")) {
-            property = "LOCAL";
-        } else if (testString.toLowerCase().contains("runner")) {
-            property = "LOCAL";
+        if (envVarAsAString.toLowerCase().contains("app")) {
+            property = "LOCAL"; // "LOCAL"
+        } else if (envVarAsAString.toLowerCase().contains("runner")) {
+            property = "LOCAL"; // "STAG"
         } else {
-            property = "STAG";
+            property = "LOCAL"; // "PROD?"
         }
+        // 'property' is set to always return "LOCAL" until env variables
+        // are discovered for "STAG" and "PROD"
         return property;
     }
 
+    // not sure if needed
     public static String getEnvironmentStatus() {
         environmentStatus = environmentalContext();
         return environmentStatus;
