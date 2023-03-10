@@ -47,7 +47,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         def actual = ReportStreamLabOrderSender.getInstance().requestToken()
         then:
         1 * mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "sender fake token"
-        1 * mockClient.post(_ as String, _ as Map<String,String>, _ as String) >> """{"access_token":"rs fake token", "token_type":"bearer"}"""
+        1 * mockClient.post(_ as String, _ as Map<String,String>, _ as String) >> """{"access_token":${expected}", "token_type":"bearer"}"""
         actual == expected
     }
 
