@@ -41,7 +41,6 @@ class ReportStreamLabOrderSenderTest extends Specification {
         def mockClient = Mock(HttpClient)
         TestApplicationContext.register(AuthEngine, mockAuthEngine)
         TestApplicationContext.register(HttpClient, mockClient)
-        TestApplicationContext.register(Logger, Slf4jLogger.getLogger())
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
         when:
