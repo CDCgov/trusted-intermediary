@@ -4,12 +4,10 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
-import gov.hhs.cdc.trustedintermediary.external.slf4j.Slf4jLogger
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient
-import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import spock.lang.Specification
 
 class ReportStreamLabOrderSenderTest extends Specification {
@@ -47,7 +45,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         def actual = ReportStreamLabOrderSender.getInstance().requestToken()
         then:
         1 * mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "sender fake token"
-        1 * mockClient.post(_ as String, _ as Map<String,String>, _ as String) >> """{"access_token":${expected}", "token_type":"bearer"}"""
+        1 * mockClient.post(_ as String, _ as Map<String,String>, _ as String) >> """{"access_token":"${expected}", "token_type":"bearer"}"""
         actual == expected
     }
 
@@ -57,7 +55,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
         def reportStreamLabOrderSender = ReportStreamLabOrderSender.getInstance()
         def expected = "IaMAfaKEt0keNN"
-        def responseBody = """{"foo":"foo value", "access_token":${expected}", "boo":"boo value"}"""
+        def responseBody = """{"foo":"foo value", "access_token":"${expected}", "boo":"boo value"}"""
         when:
         def actual = reportStreamLabOrderSender.extractToken(responseBody)
         then:
