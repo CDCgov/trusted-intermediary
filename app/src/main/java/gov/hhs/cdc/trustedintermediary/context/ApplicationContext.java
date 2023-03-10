@@ -22,8 +22,6 @@ public class ApplicationContext {
 
     protected static final Map<Class<?>, Object> OBJECT_MAP = new ConcurrentHashMap<>();
 
-    static String environmentStatus = getEnvironmentStatus();
-
     protected ApplicationContext() {}
 
     public static void register(Class<?> clazz, Object implementation) {
@@ -139,33 +137,15 @@ public class ApplicationContext {
         return declaringClassImplementation;
     }
 
-    public static String environmentalContext() {
-        //        // Testing to see what .getenv returns in different environments
-        //        Map<String, String> stringMap = System.getenv();
-        //        stringMap.entrySet().forEach(System.out::println);
+    public static String getProperty(String key) {
+        return System.getenv(key);
+    }
 
-        // Decided to differentiate env status based on differences in the PATH(s)
-        String envVarAsAString = System.getenv("PATH");
-        String property = null;
-        if (envVarAsAString.toLowerCase().contains("app")) {
-            property = "LOCAL"; // "LOCAL?"
-        } else if (envVarAsAString.toLowerCase().contains("runner")) {
-            property = "STAG"; // "STAG?"
-        } else {
-            property = "PROD"; // "PROD?"
+    public static String getEnvironment() {
+        String environment = getProperty("ENV");
+        if (environment == null || environment.isEmpty()) {
+            return "local";
         }
-        // 'property' is set to always return "LOCAL" until env variables
-        // are discovered for "STAG" and "PROD"
-        return property;
-    }
-
-    // not sure if needed
-    public static String getEnvironmentStatus() {
-        environmentStatus = environmentalContext();
-        return environmentStatus;
-    }
-
-    public static void setEnvironmentStatus(String environmentStatus) {
-        ApplicationContext.environmentStatus = environmentStatus;
+        return environment;
     }
 }

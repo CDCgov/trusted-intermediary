@@ -42,10 +42,7 @@ public class EtorDomainRegistration implements DomainConnector {
                 ConvertAndSendLabOrderUsecase.class, ConvertAndSendLabOrderUsecase.getInstance());
         ApplicationContext.register(LabOrderConverter.class, HapiLabOrderConverter.getInstance());
 
-        // Changed logic soother e2e tests would not break
-        if (ApplicationContext.getEnvironmentStatus().equalsIgnoreCase("LOCAL")
-                || ApplicationContext.getEnvironmentStatus().equalsIgnoreCase("STAG")
-                || ApplicationContext.getEnvironmentStatus().equalsIgnoreCase("PROD")) {
+        if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
             ApplicationContext.register(
                     LabOrderSender.class, LocalFileLabOrderSender.getInstance());
         } else {
