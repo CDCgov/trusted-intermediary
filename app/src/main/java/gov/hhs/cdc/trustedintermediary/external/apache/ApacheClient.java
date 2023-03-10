@@ -1,8 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.external.apache;
 /**
  * This class implements Httpclient and is a "humble object" for the Apache Client 5 library. Using
- * Apache Client 5 Fluent facade, we are able to perform CRUD operations such as POST and GET, in a
- * generic way.
+ * Apache Client 5 Fluent facade, we are able to perform CRUD operations such as POST, in a generic
+ * way.
  */
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import java.io.IOException;
@@ -30,19 +30,6 @@ public class ApacheClient implements HttpClient {
         Header[] headers = convertMapToHeader(headerMap);
 
         return Request.post(url)
-                .setHeaders(headers)
-                .body(new StringEntity(body))
-                .execute()
-                .returnResponse()
-                .toString();
-    }
-
-    @Override
-    public String get(
-            @NotNull String url, @NotNull Map<String, String> headerMap, @NotNull String body)
-            throws IOException {
-        Header[] headers = convertMapToHeader(headerMap);
-        return Request.get(url)
                 .setHeaders(headers)
                 .body(new StringEntity(body))
                 .execute()
