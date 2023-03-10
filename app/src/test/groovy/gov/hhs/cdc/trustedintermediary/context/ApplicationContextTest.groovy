@@ -43,7 +43,7 @@ class ApplicationContextTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def environmentStatus = ApplicationContext.envVar()
+        def environmentStatus = ApplicationContext.environmentalContext()
 
         then:
         environmentStatus == "LOCAL"

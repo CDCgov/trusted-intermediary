@@ -139,10 +139,10 @@ public class ApplicationContext {
         return declaringClassImplementation;
     }
 
-    public static String envVar() {
-        //        Map<String, String> stringMap = System.getenv();
+    public static String environmentalContext() {
+        Map<String, String> stringMap = System.getenv();
         String testString = System.getenv("PATH");
-        //                stringMap.entrySet().forEach(System.out::println);
+        stringMap.entrySet().forEach(System.out::println);
         String property = null;
         if (testString.toLowerCase().contains("user")) {
             property = "LOCAL";
@@ -152,7 +152,7 @@ public class ApplicationContext {
     }
 
     public static String getEnvironmentStatus() {
-        environmentStatus = envVar();
+        environmentStatus = environmentalContext();
         return environmentStatus;
     }
 
