@@ -1,5 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.external.jjwt;
-
+/**
+ * This class implements the AuthEngine and is a humble object for the Jjwt library. It's main
+ * purpose is to deal with all jwt related transactions such as creating a jwt (json web token).
+ */
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import io.jsonwebtoken.*;
 import java.security.KeyFactory;

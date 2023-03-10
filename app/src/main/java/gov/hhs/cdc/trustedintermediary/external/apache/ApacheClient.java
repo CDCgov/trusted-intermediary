@@ -1,5 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.external.apache;
-
+/**
+ * This class implements Httpclient and is a "humble object" for the Apache Client 5 library. Using
+ * Apache Client 5 Fluent facade, we are able to perform CRUD operations such as POST and GET, in a
+ * generic way.
+ */
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import java.io.IOException;
 import java.util.Map;
