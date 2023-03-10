@@ -24,9 +24,7 @@ public class ApplicationContext {
 
     static String environmentStatus;
 
-    protected ApplicationContext() {
-        environmentStatus = getEnvironmentStatus();
-    }
+    protected ApplicationContext() {}
 
     public static void register(Class<?> clazz, Object implementation) {
         OBJECT_MAP.put(clazz, implementation);
