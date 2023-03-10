@@ -38,7 +38,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         String res = "";
         Map<String, String> headers =
                 Map.of(
-                        "Authorization", "Bearer" + bearerToken,
+                        "Authorization", "Bearer " + bearerToken,
                         "client", "flexion",
                         "Content-Type", "application/hl7-v2");
         try {
