@@ -71,14 +71,13 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     }
 
     protected String extractToken(String responseBody) {
-        String key = "access_token";
         Map<String, String> value = null;
         try {
             value = jackson.convertToObject(responseBody, Map.class);
         } catch (FormatterProcessingException e) {
             // TODO exception handling
         }
-        return value.get(key);
+        return value.get("access_token");
     }
 
     protected String composeRequestBody(String senderToken) {

@@ -57,7 +57,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
         def reportStreamLabOrderSender = ReportStreamLabOrderSender.getInstance()
         def expected = "IaMAfaKEt0keNN"
-        def responseBody = """{"foo":"foo value", "access_token":"IaMAfaKEt0keNN", "boo":"boo value"}"""
+        def responseBody = """{"foo":"foo value", "access_token":${expected}", "boo":"boo value"}"""
         when:
         def actual = reportStreamLabOrderSender.extractToken(responseBody)
         then:
