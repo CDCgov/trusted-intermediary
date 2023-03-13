@@ -7,6 +7,7 @@ package gov.hhs.cdc.trustedintermediary.context;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -21,11 +22,13 @@ import javax.inject.Inject;
 public class ApplicationContext {
 
     protected static final Map<Class<?>, Object> OBJECT_MAP = new ConcurrentHashMap<>();
+    protected static final Set<Object> IMPLEMENTATIONS = new HashSet<>();
 
     protected ApplicationContext() {}
 
     public static void register(Class<?> clazz, Object implementation) {
         OBJECT_MAP.put(clazz, implementation);
+        IMPLEMENTATIONS.add(implementation.getClass());
     }
 
     public static <T> T getImplementation(Class<T> clazz) {
@@ -55,6 +58,12 @@ public class ApplicationContext {
     private static void injectIntoField(Field field, boolean skipMissingImplementations) {
         var fieldType = field.getType();
         var declaringClass = field.getDeclaringClass();
+
+        if (!IMPLEMENTATIONS.contains(declaringClass)) {
+            // this field is in a class that isn't even registered in the app context, so there's no
+            // need to try to inject
+            return;
+        }
 
         var declaringClassesToTry = new ArrayList<Class<?>>();
         declaringClassesToTry.add(declaringClass);

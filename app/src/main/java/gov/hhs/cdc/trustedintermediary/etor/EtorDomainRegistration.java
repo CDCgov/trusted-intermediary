@@ -35,7 +35,6 @@ public class EtorDomainRegistration implements DomainConnector {
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
-
         ApplicationContext.register(
                 PatientDemographicsController.class, PatientDemographicsController.getInstance());
         ApplicationContext.register(

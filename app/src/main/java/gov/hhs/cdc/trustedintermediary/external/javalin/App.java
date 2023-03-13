@@ -3,11 +3,15 @@ package gov.hhs.cdc.trustedintermediary.external.javalin;
 import gov.hhs.cdc.trustedintermediary.OpenApi;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
+import gov.hhs.cdc.trustedintermediary.external.apache.ApacheClient;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation;
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson;
+import gov.hhs.cdc.trustedintermediary.external.jjwt.JjwtEngine;
 import gov.hhs.cdc.trustedintermediary.external.slf4j.Slf4jLogger;
+import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
+import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombiner;
 import io.javalin.Javalin;
@@ -47,5 +51,7 @@ public class App {
         ApplicationContext.register(HapiFhir.class, HapiFhirImplementation.getInstance());
         ApplicationContext.register(YamlCombiner.class, Jackson.getInstance());
         ApplicationContext.register(OpenApi.class, OpenApi.getInstance());
+        ApplicationContext.register(HttpClient.class, ApacheClient.getInstance());
+        ApplicationContext.register(AuthEngine.class, JjwtEngine.getInstance());
     }
 }
