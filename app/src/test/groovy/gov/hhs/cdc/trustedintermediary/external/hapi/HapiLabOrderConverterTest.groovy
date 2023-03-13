@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 
 import gov.hhs.cdc.trustedintermediary.etor.demographics.NextOfKin
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographics
+import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Patient
@@ -35,6 +36,17 @@ class HapiLabOrderConverterTest extends Specification {
     race,
     nextOfKin
     )
+
+    def "the demographics correctly constructs the overall bundle in the lab order"() {
+
+        when:
+        def labOrderBundle = HapiLabOrderConverter.getInstance().convertToOrder(demographics).getUnderlyingOrder()
+
+        then:
+        !labOrderBundle.getId().isEmpty()
+        labOrderBundle.getId() == labOrderBundle.getIdentifier().getValue()
+        labOrderBundle.getType() == Bundle.BundleType.MESSAGE
+    }
 
     def "the demographics correctly constructs a message header in the lab order"() {
 

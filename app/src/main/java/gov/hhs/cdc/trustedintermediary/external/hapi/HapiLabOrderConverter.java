@@ -40,7 +40,9 @@ public class HapiLabOrderConverter implements LabOrderConverter {
     @Override
     public LabOrder<Bundle> convertToOrder(final PatientDemographics demographics) {
         var labOrder = new Bundle();
-        labOrder.setId(UUID.randomUUID().toString());
+        var labOrderId = UUID.randomUUID().toString();
+        labOrder.setId(labOrderId);
+        labOrder.setIdentifier(new Identifier().setValue(labOrderId));
         labOrder.setType(Bundle.BundleType.MESSAGE);
         labOrder.setTimestamp(Date.from(Instant.now()));
 
