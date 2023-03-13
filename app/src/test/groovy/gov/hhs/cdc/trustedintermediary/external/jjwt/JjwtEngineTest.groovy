@@ -19,8 +19,10 @@ class JjwtEngineTest extends Specification {
                 Files.readAllBytes(
                 Path.of("..", "mock_credentials", "my-rsa-local-private-key.pem")
                 ))
+
         when:
         def actual = JjwtEngine.getInstance().readPrivateKey(key)
+
         then:
         actual.toString() == expected
     }
