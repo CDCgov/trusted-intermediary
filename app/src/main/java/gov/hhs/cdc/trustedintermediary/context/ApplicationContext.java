@@ -145,4 +145,16 @@ public class ApplicationContext {
 
         return declaringClassImplementation;
     }
+
+    public static String getProperty(String key) {
+        return System.getenv(key);
+    }
+
+    public static String getEnvironment() {
+        String environment = getProperty("ENV");
+        if (environment == null || environment.isEmpty()) {
+            return "local";
+        }
+        return environment;
+    }
 }
