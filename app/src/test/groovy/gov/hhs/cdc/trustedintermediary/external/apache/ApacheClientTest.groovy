@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.external.apache
 
-import org.apache.hc.core5.http.Header
 import org.apache.hc.core5.http.message.BasicHeader
 import spock.lang.Specification
 
