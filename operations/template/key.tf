@@ -1,5 +1,5 @@
 resource "azurerm_key_vault" "key_storage" {
-  name = "key-vault-${var.environment}"
+  name = "ti-key-vault-${var.environment}"
 
   resource_group_name = azurerm_resource_group.group.name
   location            = azurerm_resource_group.group.location
