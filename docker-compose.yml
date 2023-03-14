@@ -2,6 +2,8 @@ version: "3.7"
 services:
   router:
     build: .
+    environment:
+      REPORT_STREAM_URL_PREFIX: http://localhost:7071
     ports:
       - "8080:8080" # default api endpoint port
       - "5005:5005" # Java debug port
