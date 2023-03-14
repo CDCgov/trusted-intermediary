@@ -4,7 +4,8 @@ locals {
     staging = "staging"
     prod = ""
   }
-  rs_domain_prefix = "${local.environment_to_rs_environment_prefix_mapping[var.environment]}${length(local.environment_to_rs_environment_prefix_mapping[var.environment]) == 0 ? "" : "."}"
+  selected_rs_environment_prefix = lookup(local.environment_to_rs_environment_prefix_mapping, var.environment, "staging")
+  rs_domain_prefix = "${local.selected_rs_environment_prefix}${length(local.selected_rs_environment_prefix) == 0 ? "" : "."}"
 }
 
 # Create the staging resource group
