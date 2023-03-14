@@ -17,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 public class ReportStreamLabOrderSender implements LabOrderSender {
 
     private static final ReportStreamLabOrderSender INSTANCE = new ReportStreamLabOrderSender();
-    private static final String TRUSTED_INTERMEDIARY_PRIVATE_PEM_KEY = "ENVIRONMENT_SECRET";
     private static final String STAGING = "https://staging.prime.cdc.gov/api/waters";
     private static final String STAGING_AUTH = "https://staging.prime.cdc.gov/api/token";
     @Inject private HttpClient client;
