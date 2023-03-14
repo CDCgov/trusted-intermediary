@@ -2,7 +2,11 @@ package gov.hhs.cdc.trustedintermediary.external.reportstream;
 
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender;
-import gov.hhs.cdc.trustedintermediary.wrappers.*;
+import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
+import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
+import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
+import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
+import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,9 +17,9 @@ import org.jetbrains.annotations.NotNull;
 public class ReportStreamLabOrderSender implements LabOrderSender {
 
     private static final ReportStreamLabOrderSender INSTANCE = new ReportStreamLabOrderSender();
-    private String trustedIntermediaryPrivatePemKey = "ENVIRONMENT_SECRET";
-    private final String STAGING = "https://staging.prime.cdc.gov/api/waters";
-    private final String STAGING_AUTH = "https://staging.prime.cdc.gov/api/token";
+    private static final String TRUSTED_INTERMEDIARY_PRIVATE_PEM_KEY = "ENVIRONMENT_SECRET";
+    private static final String STAGING = "https://staging.prime.cdc.gov/api/waters";
+    private static final String STAGING_AUTH = "https://staging.prime.cdc.gov/api/token";
     @Inject private HttpClient client;
     @Inject private AuthEngine jwt;
     @Inject private Formatter jackson;
@@ -83,14 +87,14 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
 
     protected String composeRequestBody(String senderToken) {
         String scope = "flexion.*.report";
-        String grant_type = "client_credentials";
-        String client_assertion_type = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
+        String grantType = "client_credentials";
+        String clientAssertionType = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
         return "scope="
                 + scope
                 + "&grant_type="
-                + grant_type
+                + grantType
                 + "&client_assertion_type="
-                + client_assertion_type
+                + clientAssertionType
                 + "&client_assertion="
                 + senderToken;
     }
