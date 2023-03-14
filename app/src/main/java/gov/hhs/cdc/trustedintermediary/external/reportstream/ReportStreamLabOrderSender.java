@@ -46,7 +46,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
                         "client", "flexion",
                         "Content-Type", "application/hl7-v2");
         try {
-            res = client.post(this.STAGING, headers, json);
+            res = client.post(STAGING, headers, json);
         } catch (IOException e) {
             // TODO exception handling
         }
@@ -62,9 +62,9 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         String keyId = "flexion.etor-service-sender";
         Map<String, String> headers = Map.of("Content-Type", "application/x-www-form-urlencoded");
         try {
-            senderToken = jwt.generateSenderToken(sender, this.STAGING_AUTH, "pemKey", keyId, 300);
+            senderToken = jwt.generateSenderToken(sender, STAGING_AUTH, "pemKey", keyId, 300);
             body = composeRequestBody(senderToken);
-            String rsResponse = client.post(this.STAGING_AUTH, headers, body);
+            String rsResponse = client.post(STAGING_AUTH, headers, body);
             // TODO response handling for good structure of response, else it will fail to extract
             // the key
             token = extractToken(rsResponse);
