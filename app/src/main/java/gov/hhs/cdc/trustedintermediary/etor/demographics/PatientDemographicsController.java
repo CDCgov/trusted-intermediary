@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.demographics;
 
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiDemographics;
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
@@ -153,5 +154,28 @@ public class PatientDemographicsController {
                 firstNameOptional.map(StringType::getValue).orElse(null),
                 lastNameOptional.map(StringType::getValue).orElse(null),
                 phoneNumberOptional.map(StringType::getValue).orElse(null));
+    }
+
+    public Demographics<?> parseDemographics2(DomainRequest request) {
+        var fhirBundle = fhir.parseResource(request.getBody(), Bundle.class);
+        return new HapiDemographics(fhirBundle);
+    }
+
+    public DomainResponse constructResponse2(
+            PatientDemographicsResponse patientDemographicsResponse) {
+        logger.logInfo("Constructing the response");
+        var response = new DomainResponse(200);
+
+        try {
+            var responseBody = formatter.convertToString(patientDemographicsResponse);
+            response.setBody(responseBody);
+        } catch (FormatterProcessingException e) {
+            logger.logError("Error constructing demographics response", e);
+            throw new RuntimeException(e);
+        }
+
+        response.setHeaders(Map.of(CONTENT_TYPE_LITERAL, APPLICATION_JSON_LITERAL));
+
+        return response;
     }
 }

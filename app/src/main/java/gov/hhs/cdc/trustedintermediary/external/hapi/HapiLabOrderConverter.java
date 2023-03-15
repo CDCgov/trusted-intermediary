@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
+import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographics;
@@ -20,6 +21,7 @@ import org.hl7.fhir.r4.model.IntegerType;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.ServiceRequest;
 import org.hl7.fhir.r4.model.StringType;
 import org.hl7.fhir.r4.model.UrlType;
@@ -55,6 +57,30 @@ public class HapiLabOrderConverter implements LabOrderConverter {
         labOrder.addEntry(new Bundle.BundleEntryComponent().setResource(serviceRequest));
 
         return new HapiLabOrder(labOrder);
+    }
+
+    @Override
+    public LabOrder<?> convertToOrder2(final Demographics<?> demographics) {
+        var hapiDemographics = (HapiDemographics) demographics;
+        var demographicsBundle = hapiDemographics.getUnderlyingDemographics();
+
+        var patient =
+                demographicsBundle.getEntry().stream()
+                        .map(Bundle.BundleEntryComponent::getResource)
+                        .filter(resource -> resource.getResourceType().equals(ResourceType.Patient))
+                        .map(resource -> ((Patient) resource))
+                        .findFirst()
+                        .orElse(null);
+
+        var serviceRequest = createServiceRequest(patient);
+        var messageHeader = createMessageHeader();
+
+        demographicsBundle
+                .getEntry()
+                .add(0, new Bundle.BundleEntryComponent().setResource(messageHeader));
+        demographicsBundle.addEntry(new Bundle.BundleEntryComponent().setResource(serviceRequest));
+
+        return new HapiLabOrder(demographicsBundle);
     }
 
     private MessageHeader createMessageHeader() {

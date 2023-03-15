@@ -18,6 +18,11 @@ public class PatientDemographicsResponse {
         setPatientId(patientDemographics.getPatientId());
     }
 
+    public PatientDemographicsResponse(Demographics<?> demographics) {
+        setFhirResourceId(demographics.getFhirResourceId());
+        setPatientId(demographics.getPatientId());
+    }
+
     public String getFhirResourceId() {
         return fhirResourceId;
     }
