@@ -21,13 +21,8 @@ public class ConvertAndSendLabOrderUsecase {
 
     private ConvertAndSendLabOrderUsecase() {}
 
-    public void convertAndSend(PatientDemographics demographics) {
+    public void convertAndSend(Demographics<?> demographics) {
         LabOrder<?> labOrder = converter.convertToOrder(demographics);
-        sender.sendOrder(labOrder);
-    }
-
-    public void convertAndSend2(Demographics<?> demographics) {
-        LabOrder<?> labOrder = converter.convertToOrder2(demographics);
         sender.sendOrder(labOrder);
     }
 }

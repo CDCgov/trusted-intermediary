@@ -66,13 +66,11 @@ public class EtorDomainRegistration implements DomainConnector {
 
         logger.logInfo("Parsing request...");
         var demographics = patientDemographicsController.parseDemographics(request);
-        var demographics2 = patientDemographicsController.parseDemographics2(request);
 
-        //        convertAndSendLabOrderUsecase.convertAndSend(demographics);
-        convertAndSendLabOrderUsecase.convertAndSend2(demographics2);
+        convertAndSendLabOrderUsecase.convertAndSend(demographics);
 
         PatientDemographicsResponse patientDemographicsResponse =
-                new PatientDemographicsResponse(demographics2);
+                new PatientDemographicsResponse(demographics);
 
         logger.logInfo("Constructing response...");
         return patientDemographicsController.constructResponse(patientDemographicsResponse);
