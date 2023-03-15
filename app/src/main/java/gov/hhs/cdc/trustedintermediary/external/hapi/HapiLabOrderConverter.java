@@ -3,7 +3,6 @@ package gov.hhs.cdc.trustedintermediary.external.hapi;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderConverter;
-import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographics;
 import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
@@ -19,8 +18,8 @@ import org.hl7.fhir.r4.model.ServiceRequest;
 import org.hl7.fhir.r4.model.UrlType;
 
 /**
- * Converts {@link PatientDemographics} to a Hapi-specific FHIR lab order ({@link HapiLabOrder} or
- * {@link LabOrder<Bundle>}).
+ * Converts {@link Demographics} to a Hapi-specific FHIR lab order ({@link HapiLabOrder} or {@link
+ * LabOrder<Bundle>}).
  */
 public class HapiLabOrderConverter implements LabOrderConverter {
     private static final HapiLabOrderConverter INSTANCE = new HapiLabOrderConverter();
