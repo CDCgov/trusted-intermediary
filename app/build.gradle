@@ -77,6 +77,9 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
+    // azure sdk
+    implementation 'com.azure:azure-security-keyvault-secrets:4.5.4'
+
     testImplementation 'org.apache.groovy:groovy:4.0.10'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
     testImplementation 'com.openpojo:openpojo:0.9.1'

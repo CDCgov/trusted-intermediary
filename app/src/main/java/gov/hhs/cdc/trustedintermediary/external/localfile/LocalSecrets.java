@@ -4,6 +4,9 @@ package gov.hhs.cdc.trustedintermediary.external.localfile;
  * local environment
  */
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class LocalSecrets implements Secrets {
 
@@ -16,7 +19,22 @@ public class LocalSecrets implements Secrets {
     }
 
     @Override
-    public String getKey() {
-        return null;
+    public String getKey() { // What key, sender: TI, client or receiver:TI, client?
+
+        String key = "";
+
+        try {
+            key =
+                    new String(
+                            Files.readAllBytes(
+                                    Path.of(
+                                            "..",
+                                            "mock_credentials",
+                                            "my-rsa-local-private-key.pem")));
+        } catch (IOException e) {
+            // TODO exception handling
+        }
+
+        return key;
     }
 }
