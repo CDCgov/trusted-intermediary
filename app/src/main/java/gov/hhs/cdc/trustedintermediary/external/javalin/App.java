@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.OpenApi;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.external.apache.ApacheClient;
+import gov.hhs.cdc.trustedintermediary.external.azure.AzurekeyVault;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation;
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson;
 import gov.hhs.cdc.trustedintermediary.external.jjwt.JjwtEngine;
@@ -12,6 +13,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
+import gov.hhs.cdc.trustedintermediary.wrappers.KeyVault;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombiner;
 import io.javalin.Javalin;
@@ -53,5 +55,6 @@ public class App {
         ApplicationContext.register(OpenApi.class, OpenApi.getInstance());
         ApplicationContext.register(HttpClient.class, ApacheClient.getInstance());
         ApplicationContext.register(AuthEngine.class, JjwtEngine.getInstance());
+        ApplicationContext.register(KeyVault.class, AzurekeyVault.getInstance());
     }
 }

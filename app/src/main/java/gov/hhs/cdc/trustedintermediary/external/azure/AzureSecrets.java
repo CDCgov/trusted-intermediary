@@ -1,14 +1,19 @@
 package gov.hhs.cdc.trustedintermediary.external.azure;
+
+import gov.hhs.cdc.trustedintermediary.wrappers.KeyVault;
+import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
+import javax.inject.Inject;
+
 /**
  * This Class implements the Secret interface, and it is used to retrieve azure environment secrets.
  */
-import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
-
 public class AzureSecrets implements Secrets {
 
     private static final AzureSecrets INSTANCE = new AzureSecrets();
 
     private AzureSecrets() {}
+
+    @Inject private static final KeyVault keyVault;
 
     public static AzureSecrets getInstance() {
         return INSTANCE;
@@ -16,6 +21,7 @@ public class AzureSecrets implements Secrets {
 
     @Override
     public String getKey() {
-        return null;
+
+        return keyVault.getKey("senderKey");
     }
 }
