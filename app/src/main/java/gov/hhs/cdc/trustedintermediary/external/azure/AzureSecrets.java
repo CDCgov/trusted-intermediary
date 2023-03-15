@@ -13,7 +13,7 @@ public class AzureSecrets implements Secrets {
 
     private AzureSecrets() {}
 
-    @Inject private static final KeyVault keyVault;
+    @Inject private KeyVault keyVault;
 
     public static AzureSecrets getInstance() {
         return INSTANCE;
