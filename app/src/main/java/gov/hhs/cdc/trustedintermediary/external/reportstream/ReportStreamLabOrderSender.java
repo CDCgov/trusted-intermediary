@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.reportstream;
 
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
@@ -17,8 +18,12 @@ import org.jetbrains.annotations.NotNull;
 public class ReportStreamLabOrderSender implements LabOrderSender {
 
     private static final ReportStreamLabOrderSender INSTANCE = new ReportStreamLabOrderSender();
-    private static final String STAGING = "https://staging.prime.cdc.gov/api/waters";
-    private static final String STAGING_AUTH = "https://staging.prime.cdc.gov/api/token";
+
+    private static final String WATERS_API_URL =
+            ApplicationContext.getProperty("REPORT_STREAM_URL_PREFIX") + "/api/waters";
+    private static final String AUTH_API_URL =
+            ApplicationContext.getProperty("REPORT_STREAM_URL_PREFIX") + "/api/token";
+
     @Inject private HttpClient client;
     @Inject private AuthEngine jwt;
     @Inject private Formatter jackson;
@@ -46,7 +51,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
                         "client", "flexion",
                         "Content-Type", "application/hl7-v2");
         try {
-            res = client.post(STAGING, headers, json);
+            res = client.post(WATERS_API_URL, headers, json);
         } catch (IOException e) {
             // TODO exception handling
         }
@@ -62,9 +67,9 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         String keyId = "flexion.etor-service-sender";
         Map<String, String> headers = Map.of("Content-Type", "application/x-www-form-urlencoded");
         try {
-            senderToken = jwt.generateSenderToken(sender, STAGING_AUTH, "pemKey", keyId, 300);
+            senderToken = jwt.generateSenderToken(sender, AUTH_API_URL, "pemKey", keyId, 300);
             body = composeRequestBody(senderToken);
-            String rsResponse = client.post(STAGING_AUTH, headers, body);
+            String rsResponse = client.post(AUTH_API_URL, headers, body);
             // TODO response handling for good structure of response, else it will fail to extract
             // the key
             token = extractToken(rsResponse);
