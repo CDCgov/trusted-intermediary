@@ -8,6 +8,7 @@ class LocalSecretsTest extends Specification {
         given:
         when:
         def secrets = LocalSecrets.getInstance().getKey()
+
         then:
         noExceptionThrown()
     }
