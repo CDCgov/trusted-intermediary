@@ -80,7 +80,7 @@ dependencies {
     testImplementation 'org.apache.groovy:groovy:4.0.10'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
     testImplementation 'com.openpojo:openpojo:0.9.1'
-    testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.14'
+    testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.14.1'
 }
 
 jacoco {
