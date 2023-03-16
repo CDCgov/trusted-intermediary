@@ -1,12 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi
 
+import gov.hhs.cdc.trustedintermediary.DemographicsMock
 import gov.hhs.cdc.trustedintermediary.etor.demographics.NextOfKin
-import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographics
-import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.DateTimeType
-import org.hl7.fhir.r4.model.MessageHeader
-import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.ServiceRequest
+import org.hl7.fhir.r4.model.*
 import spock.lang.Specification
 
 import java.time.ZonedDateTime
@@ -25,17 +21,20 @@ class HapiLabOrderConverterTest extends Specification {
     def nextOfKinLastName = "Solo"
     def nextOfKinPhoneNumber = "555-555-5555"
     def nextOfKin = new NextOfKin(nextOfKinFirstName, nextOfKinLastName, nextOfKinPhoneNumber)
-    def demographics = new PatientDemographics(
-    fhirResourceId,
-    patientId,
-    firstName,
-    lastName,
-    sex,
-    birthDateTime,
-    birthOrder,
-    race,
-    nextOfKin
-    )
+    //    def demographics = new PatientDemographics(
+    //    fhirResourceId,
+    //    patientId,
+    //    firstName,
+    //    lastName,
+    //    sex,
+    //    birthDateTime,
+    //    birthOrder,
+    //    race,
+    //    nextOfKin
+    //    )
+
+    def demographicsBundle = new Bundle().addEntry(new Bundle.BundleEntryComponent().setResource(new Patient()))
+    def demographics = new DemographicsMock("fhirResourceId", "patientId", demographics)
 
     def "the demographics correctly constructs the overall bundle in the lab order"() {
 

@@ -31,7 +31,7 @@ public class HapiLabOrderConverter implements LabOrderConverter {
     private HapiLabOrderConverter() {}
 
     @Override
-    public LabOrder<?> convertToOrder(final Demographics<?> demographics) {
+    public HapiLabOrder convertToOrder(final Demographics<?> demographics) {
         var hapiDemographics = (HapiDemographics) demographics;
         var demographicsBundle = hapiDemographics.getUnderlyingDemographics();
 

@@ -3,20 +3,22 @@ package gov.hhs.cdc.trustedintermediary
 
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics
 
-class DemographicsMock implements Demographics<String> {
+class DemographicsMock<T> implements Demographics<T> {
 
     private String fhirResourceId
     private String patientId
+    private T underlyingDemographics
 
 
-    DemographicsMock(String fhirResourceId, String patientId) {
+    DemographicsMock(String fhirResourceId, String patientId, T underlyingDemographics) {
         this.fhirResourceId = fhirResourceId
         this.patientId = patientId
+        this.underlyingDemographics = underlyingDemographics
     }
 
     @Override
-    String getUnderlyingDemographics() {
-        return "Underlying Demographics"
+    T getUnderlyingDemographics() {
+        return underlyingDemographics
     }
 
     @Override
