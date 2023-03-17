@@ -66,11 +66,10 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         String senderToken = null;
         String token = "";
         String body;
-        String sender = CLIENT_NAME;
-        String keyId = CLIENT_NAME;
         Map<String, String> headers = Map.of("Content-Type", "application/x-www-form-urlencoded");
         try {
-            senderToken = jwt.generateSenderToken(sender, AUTH_API_URL, "pemKey", keyId, 300);
+            senderToken =
+                    jwt.generateSenderToken(CLIENT_NAME, AUTH_API_URL, "pemKey", CLIENT_NAME, 300);
             body = composeRequestBody(senderToken);
             String rsResponse = client.post(AUTH_API_URL, headers, body);
             // TODO response handling for good structure of response, else it will fail to extract
