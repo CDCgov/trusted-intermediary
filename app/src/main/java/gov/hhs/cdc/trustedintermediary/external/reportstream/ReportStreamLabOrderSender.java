@@ -23,6 +23,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
             ApplicationContext.getProperty("REPORT_STREAM_URL_PREFIX") + "/api/waters";
     private static final String AUTH_API_URL =
             ApplicationContext.getProperty("REPORT_STREAM_URL_PREFIX") + "/api/token";
+    private static final String CLIENT = "flexion.etor-service-sender";
 
     @Inject private HttpClient client;
     @Inject private AuthEngine jwt;
@@ -46,9 +47,12 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         String res = "";
         Map<String, String> headers =
                 Map.of(
-                        "Authorization", "Bearer " + bearerToken,
-                        "client", "flexion.etor-service-sender",
-                        "Content-Type", "application/fhir+ndjson");
+                        "Authorization",
+                        "Bearer " + bearerToken,
+                        "client",
+                        CLIENT,
+                        "Content-Type",
+                        "application/fhir+ndjson");
         try {
             res = client.post(WATERS_API_URL, headers, json);
         } catch (IOException e) {
