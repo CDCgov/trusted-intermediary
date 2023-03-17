@@ -35,7 +35,6 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     @Inject private HapiFhir fhir;
 
     public static ReportStreamLabOrderSender getInstance() {
-        System.out.println("RS_DOMAIN_NAME=" + RS_DOMAIN_NAME);
         return INSTANCE;
     }
 
