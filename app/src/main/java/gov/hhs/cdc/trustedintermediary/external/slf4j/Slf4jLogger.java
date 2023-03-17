@@ -22,42 +22,42 @@ public class Slf4jLogger implements Logger {
 
     private Slf4jLogger() {}
 
+    public static Slf4jLogger getLogger() {
+        return new Slf4jLogger();
+    }
+
     @Override
     public void logInfo(String infoMessage) {
-        LOGGER.info(ANSI_GREEN + infoMessage + ANSI_RESET);
+        LOGGER.atInfo().log(() -> ANSI_GREEN + infoMessage + ANSI_RESET);
     }
 
     @Override
     public void logWarning(String warningMessage) {
-        LOGGER.warn(ANSI_YELLOW + warningMessage + ANSI_RESET);
+        LOGGER.atWarn().log(() -> ANSI_YELLOW + warningMessage + ANSI_RESET);
     }
 
     @Override
     public void logTrace(String traceMessage) {
-        LOGGER.trace(ANSI_PURPLE + traceMessage + ANSI_RESET);
+        LOGGER.atTrace().log(() -> ANSI_PURPLE + traceMessage + ANSI_RESET);
     }
 
     @Override
     public void logDebug(String debugMessage) {
-        LOGGER.debug(ANSI_CYAN + debugMessage + ANSI_RESET);
+        LOGGER.atDebug().log(() -> ANSI_CYAN + debugMessage + ANSI_RESET);
     }
 
     @Override
     public void logError(String errorMessage) {
-        LOGGER.error(ANSI_RED + errorMessage + ANSI_RESET);
+        LOGGER.atError().log(() -> ANSI_RED + errorMessage + ANSI_RESET);
     }
 
     @Override
     public void logDebug(String debugMessage, Throwable e) {
-        LOGGER.debug(ANSI_CYAN + debugMessage + ANSI_RESET, e);
+        LOGGER.atDebug().setMessage(() -> ANSI_CYAN + debugMessage + ANSI_RESET).setCause(e).log();
     }
 
     @Override
     public void logError(String errorMessage, Throwable e) {
-        LOGGER.error(ANSI_RED + errorMessage + ANSI_RESET, e);
-    }
-
-    public static Slf4jLogger getLogger() {
-        return new Slf4jLogger();
+        LOGGER.atError().setMessage(() -> ANSI_RED + errorMessage + ANSI_RESET).setCause(e).log();
     }
 }
