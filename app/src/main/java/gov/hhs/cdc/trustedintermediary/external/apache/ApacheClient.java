@@ -34,8 +34,8 @@ public class ApacheClient implements HttpClient {
                 .setHeaders(headers)
                 .body(new StringEntity(body))
                 .execute()
-                .returnResponse()
-                .toString();
+                .returnContent()
+                .asString();
     }
 
     protected Header[] convertMapToHeader(Map<String, String> headerMap) {
