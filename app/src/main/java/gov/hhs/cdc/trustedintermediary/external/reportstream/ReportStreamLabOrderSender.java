@@ -19,10 +19,14 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
 
     private static final ReportStreamLabOrderSender INSTANCE = new ReportStreamLabOrderSender();
 
-    private static final String WATERS_API_URL =
+    private static final String RS_WATERS_API_URL =
             ApplicationContext.getProperty("REPORT_STREAM_URL_PREFIX") + "/api/waters";
-    private static final String AUTH_API_URL =
+    private static final String RS_AUTH_API_URL =
             ApplicationContext.getProperty("REPORT_STREAM_URL_PREFIX") + "/api/token";
+    private static final String RS_DOMAIN_NAME =
+            ApplicationContext.getProperty("REPORT_STREAM_URL_PREFIX")
+                    .replace("https://", "")
+                    .replace("http://", "");
     private static final String CLIENT_NAME = "flexion.etor-service-sender";
 
     @Inject private HttpClient client;
@@ -31,6 +35,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     @Inject private HapiFhir fhir;
 
     public static ReportStreamLabOrderSender getInstance() {
+        System.out.println("RS_DOMAIN_NAME=" + RS_DOMAIN_NAME);
         return INSTANCE;
     }
 
@@ -54,7 +59,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
                         "Content-Type",
                         "application/fhir+ndjson");
         try {
-            res = client.post(WATERS_API_URL, headers, json);
+            res = client.post(RS_WATERS_API_URL, headers, json);
         } catch (IOException e) {
             // TODO exception handling
         }
@@ -69,9 +74,10 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         Map<String, String> headers = Map.of("Content-Type", "application/x-www-form-urlencoded");
         try {
             senderToken =
-                    jwt.generateSenderToken(CLIENT_NAME, AUTH_API_URL, "pemKey", CLIENT_NAME, 300);
+                    jwt.generateSenderToken(
+                            CLIENT_NAME, RS_DOMAIN_NAME, "pemKey", CLIENT_NAME, 300);
             body = composeRequestBody(senderToken);
-            String rsResponse = client.post(AUTH_API_URL, headers, body);
+            String rsResponse = client.post(RS_AUTH_API_URL, headers, body);
             // TODO response handling for good structure of response, else it will fail to extract
             // the key
             token = extractToken(rsResponse);
