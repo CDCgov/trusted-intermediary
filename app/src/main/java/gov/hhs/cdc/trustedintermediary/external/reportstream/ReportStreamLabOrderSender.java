@@ -23,7 +23,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
             ApplicationContext.getProperty("REPORT_STREAM_URL_PREFIX") + "/api/waters";
     private static final String AUTH_API_URL =
             ApplicationContext.getProperty("REPORT_STREAM_URL_PREFIX") + "/api/token";
-    private static final String CLIENT = "flexion.etor-service-sender";
+    private static final String CLIENT_NAME = "flexion.etor-service-sender";
 
     @Inject private HttpClient client;
     @Inject private AuthEngine jwt;
@@ -50,7 +50,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
                         "Authorization",
                         "Bearer " + bearerToken,
                         "client",
-                        CLIENT,
+                        CLIENT_NAME,
                         "Content-Type",
                         "application/fhir+ndjson");
         try {
@@ -66,8 +66,8 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         String senderToken = null;
         String token = "";
         String body;
-        String sender = "flexion.etor-service-sender";
-        String keyId = "flexion.etor-service-sender";
+        String sender = CLIENT_NAME;
+        String keyId = CLIENT_NAME;
         Map<String, String> headers = Map.of("Content-Type", "application/x-www-form-urlencoded");
         try {
             senderToken = jwt.generateSenderToken(sender, AUTH_API_URL, "pemKey", keyId, 300);
