@@ -47,7 +47,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         Map<String, String> headers =
                 Map.of(
                         "Authorization", "Bearer " + bearerToken,
-                        "client", "flexion",
+                        "client", "flexion.etor-service-sender",
                         "Content-Type", "application/fhir+ndjson");
         try {
             res = client.post(WATERS_API_URL, headers, json);
@@ -68,8 +68,6 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         try {
             senderToken = jwt.generateSenderToken(sender, AUTH_API_URL, "pemKey", keyId, 300);
             body = composeRequestBody(senderToken);
-            System.out.println("composed body: " + body);
-            System.out.println("headers: " + headers.toString());
             String rsResponse = client.post(AUTH_API_URL, headers, body);
             // TODO response handling for good structure of response, else it will fail to extract
             // the key
