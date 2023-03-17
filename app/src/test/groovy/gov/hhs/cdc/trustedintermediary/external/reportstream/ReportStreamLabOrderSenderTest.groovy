@@ -3,7 +3,10 @@ package gov.hhs.cdc.trustedintermediary.external.reportstream
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender
+import gov.hhs.cdc.trustedintermediary.external.apache.ApacheClient
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
+import gov.hhs.cdc.trustedintermediary.external.jjwt.JjwtEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
