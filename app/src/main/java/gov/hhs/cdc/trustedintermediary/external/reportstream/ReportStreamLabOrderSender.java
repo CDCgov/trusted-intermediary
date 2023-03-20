@@ -11,6 +11,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import javax.inject.Inject;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,9 +25,9 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     private static final String RS_AUTH_API_URL =
             ApplicationContext.getProperty("REPORT_STREAM_URL_PREFIX") + "/api/token";
     private static final String RS_DOMAIN_NAME =
-            ApplicationContext.getProperty("REPORT_STREAM_URL_PREFIX")
-                    .replace("https://", "")
-                    .replace("http://", "");
+            Optional.ofNullable(ApplicationContext.getProperty("REPORT_STREAM_URL_PREFIX"))
+                    .map(urlPrefix -> urlPrefix.replace("https://", "").replace("http://", ""))
+                    .orElse("");
     private static final String CLIENT_NAME = "flexion.etor-service-sender";
 
     @Inject private HttpClient client;
