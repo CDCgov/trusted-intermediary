@@ -20,14 +20,16 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
 
     private static final ReportStreamLabOrderSender INSTANCE = new ReportStreamLabOrderSender();
 
+    private static final String RS_URL_PREFIX_PROPERTY = "REPORT_STREAM_URL_PREFIX";
     private static final String RS_WATERS_API_URL =
-            ApplicationContext.getProperty("REPORT_STREAM_URL_PREFIX") + "/api/waters";
+            ApplicationContext.getProperty(RS_URL_PREFIX_PROPERTY) + "/api/waters";
     private static final String RS_AUTH_API_URL =
-            ApplicationContext.getProperty("REPORT_STREAM_URL_PREFIX") + "/api/token";
+            ApplicationContext.getProperty(RS_URL_PREFIX_PROPERTY) + "/api/token";
     private static final String RS_DOMAIN_NAME =
-            Optional.ofNullable(ApplicationContext.getProperty("REPORT_STREAM_URL_PREFIX"))
+            Optional.ofNullable(ApplicationContext.getProperty(RS_URL_PREFIX_PROPERTY))
                     .map(urlPrefix -> urlPrefix.replace("https://", "").replace("http://", ""))
                     .orElse("");
+
     private static final String CLIENT_NAME = "flexion.etor-service-sender";
 
     @Inject private HttpClient client;
