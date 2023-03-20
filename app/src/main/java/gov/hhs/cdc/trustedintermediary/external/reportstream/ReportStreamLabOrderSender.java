@@ -11,8 +11,8 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import org.jetbrains.annotations.NotNull;
 
 /** Accepts a {@link LabOrder} and sends it to ReportStream. */
 public class ReportStreamLabOrderSender implements LabOrderSender {
@@ -43,7 +43,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         sendRequestBody(json, bearerToken);
     }
 
-    protected String sendRequestBody(@NotNull String json, @NotNull String bearerToken) {
+    protected String sendRequestBody(@Nonnull String json, @Nonnull String bearerToken) {
         String res = "";
         Map<String, String> headers =
                 Map.of(
