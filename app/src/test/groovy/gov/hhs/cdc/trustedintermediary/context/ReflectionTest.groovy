@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.context
 
-import org.jetbrains.annotations.NotNull
+
 import spock.lang.Specification
 
 class ReflectionTest extends Specification {
@@ -14,7 +14,7 @@ class ReflectionTest extends Specification {
 
     static class DogCow implements Comparable {
         @Override
-        int compareTo(@NotNull final Object o) {
+        int compareTo(final Object o) {
             return 0
         }
     }
