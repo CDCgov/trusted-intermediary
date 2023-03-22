@@ -33,6 +33,7 @@ public class LocalFileLabOrderSender implements LabOrderSender {
             String serialized = fhir.encodeResourceToJson(order.getUnderlyingOrder());
             Files.writeString(fileLocation, serialized, StandardCharsets.UTF_8);
         } catch (Exception e) {
+            logger.logError("Error writing the lab order", e);
             throw new RuntimeException(e);
         }
     }

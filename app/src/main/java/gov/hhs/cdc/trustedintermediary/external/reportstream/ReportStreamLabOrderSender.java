@@ -69,6 +69,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         try {
             res = client.post(RS_WATERS_API_URL, headers, json);
         } catch (IOException e) {
+            logger.logError("Error POSTing the payload to ReportStream", e);
             // TODO exception handling
         }
 
@@ -92,6 +93,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
             // the key
             token = extractToken(rsResponse);
         } catch (Exception e) {
+            logger.logError("Error getting the API token from ReportStream", e);
             // TODO exception handling
         }
         return token;
@@ -102,6 +104,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         try {
             value = jackson.convertToObject(responseBody, Map.class);
         } catch (FormatterProcessingException e) {
+            logger.logError("Error parsing the ReportStream auth token response body", e);
             // TODO exception handling
         }
         return value.get("access_token");
