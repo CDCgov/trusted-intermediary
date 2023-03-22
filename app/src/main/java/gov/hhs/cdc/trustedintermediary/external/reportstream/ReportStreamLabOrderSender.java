@@ -11,18 +11,25 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import org.jetbrains.annotations.NotNull;
 
 /** Accepts a {@link LabOrder} and sends it to ReportStream. */
 public class ReportStreamLabOrderSender implements LabOrderSender {
 
     private static final ReportStreamLabOrderSender INSTANCE = new ReportStreamLabOrderSender();
 
-    private static final String WATERS_API_URL =
-            ApplicationContext.getProperty("REPORT_STREAM_URL_PREFIX") + "/api/waters";
-    private static final String AUTH_API_URL =
-            ApplicationContext.getProperty("REPORT_STREAM_URL_PREFIX") + "/api/token";
+    private static final String RS_URL_PREFIX_PROPERTY = "REPORT_STREAM_URL_PREFIX";
+    private static final String RS_WATERS_API_URL =
+            ApplicationContext.getProperty(RS_URL_PREFIX_PROPERTY) + "/api/waters";
+    private static final String RS_AUTH_API_URL =
+            ApplicationContext.getProperty(RS_URL_PREFIX_PROPERTY) + "/api/token";
+    private static final String RS_DOMAIN_NAME =
+            Optional.ofNullable(ApplicationContext.getProperty(RS_URL_PREFIX_PROPERTY))
+                    .map(urlPrefix -> urlPrefix.replace("https://", "").replace("http://", ""))
+                    .orElse("");
+
     private static final String CLIENT_NAME = "flexion.etor-service-sender";
 
     @Inject private HttpClient client;
@@ -43,7 +50,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         sendRequestBody(json, bearerToken);
     }
 
-    protected String sendRequestBody(@NotNull String json, @NotNull String bearerToken) {
+    protected String sendRequestBody(@Nonnull String json, @Nonnull String bearerToken) {
         String res = "";
         Map<String, String> headers =
                 Map.of(
@@ -54,7 +61,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
                         "Content-Type",
                         "application/fhir+ndjson");
         try {
-            res = client.post(WATERS_API_URL, headers, json);
+            res = client.post(RS_WATERS_API_URL, headers, json);
         } catch (IOException e) {
             // TODO exception handling
         }
@@ -69,9 +76,10 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         Map<String, String> headers = Map.of("Content-Type", "application/x-www-form-urlencoded");
         try {
             senderToken =
-                    jwt.generateSenderToken(CLIENT_NAME, AUTH_API_URL, "pemKey", CLIENT_NAME, 300);
+                    jwt.generateSenderToken(
+                            CLIENT_NAME, RS_DOMAIN_NAME, "pemKey", CLIENT_NAME, 300);
             body = composeRequestBody(senderToken);
-            String rsResponse = client.post(AUTH_API_URL, headers, body);
+            String rsResponse = client.post(RS_AUTH_API_URL, headers, body);
             // TODO response handling for good structure of response, else it will fail to extract
             // the key
             token = extractToken(rsResponse);
