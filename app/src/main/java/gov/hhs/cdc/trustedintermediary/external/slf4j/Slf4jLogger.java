@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.slf4j;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import java.util.Arrays;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -27,8 +28,12 @@ public class Slf4jLogger implements Logger {
     }
 
     @Override
-    public void logInfo(String infoMessage) {
-        LOGGER.atInfo().log(() -> ANSI_GREEN + infoMessage + ANSI_RESET);
+    public void logInfo(String infoMessage, Object... parameters) {
+        var logBuilder = LOGGER.atInfo().setMessage(() -> ANSI_GREEN + infoMessage + ANSI_RESET);
+
+        Arrays.stream(parameters).forEachOrdered(logBuilder::addArgument);
+
+        logBuilder.log();
     }
 
     @Override
