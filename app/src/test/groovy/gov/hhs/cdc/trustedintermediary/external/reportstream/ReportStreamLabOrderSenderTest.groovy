@@ -32,7 +32,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         2 * mockClient.post(_ as String, _ as Map<String,String>, _ as String) >> "200"
     }
 
-    def "sendRequestBody fails"() {
+    def "sendRequestBody fails from an IOException from the client"() {
         given:
         def mockClient = Mock(HttpClient)
         mockClient.post(_ as String, _ as Map<String,String>, _ as String) >> { throw new IOException("oops") }
@@ -68,12 +68,43 @@ class ReportStreamLabOrderSenderTest extends Specification {
         given:
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
+
         def expected = "IaMAfaKEt0keNN"
         def responseBody = """{"foo":"foo value", "access_token":"${expected}", "boo":"boo value"}"""
+
         when:
         def actual = ReportStreamLabOrderSender.getInstance().extractToken(responseBody)
+
         then:
         actual == expected
+    }
+
+    def "extractToken fails from not getting a String in the access_token"() {
+        given:
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+
+        def responseBody = """{"foo":"foo value", "access_token":3, "boo":"boo value"}"""
+
+        when:
+        ReportStreamLabOrderSender.getInstance().extractToken(responseBody)
+
+        then:
+        noExceptionThrown()  //This test to be updated whenever the actual code's TODO is addressed for the exception handling
+    }
+
+    def "extractToken fails from not getting valid JSON from the auth token endpoint"() {
+        given:
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+
+        def responseBody = """{"foo":"foo value", "access_token":"""
+
+        when:
+        ReportStreamLabOrderSender.getInstance().extractToken(responseBody)
+
+        then:
+        noExceptionThrown()  //This test to be updated whenever the actual code's TODO is addressed for the exception handling
     }
 
     def "composeRequestBody works"() {

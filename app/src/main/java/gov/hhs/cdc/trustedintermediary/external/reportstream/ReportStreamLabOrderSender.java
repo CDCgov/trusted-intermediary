@@ -10,7 +10,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nonnull;
@@ -100,14 +99,15 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     }
 
     protected String extractToken(String responseBody) {
-        Map<String, String> value = new HashMap<>();
+        Map<String, String> value;
         try {
             value = jackson.convertToObject(responseBody, Map.class);
-        } catch (FormatterProcessingException e) {
+            return value.get("access_token");
+        } catch (FormatterProcessingException | ClassCastException e) {
             logger.logError("Error parsing the ReportStream auth token response body", e);
             // TODO exception handling
         }
-        return value.get("access_token");
+        return "";
     }
 
     protected String composeRequestBody(String senderToken) {
