@@ -3,9 +3,11 @@ package gov.hhs.cdc.trustedintermediary.external.hapi;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographics;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
+import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
@@ -31,6 +33,8 @@ import org.hl7.fhir.r4.model.UrlType;
 public class HapiLabOrderConverter implements LabOrderConverter {
     private static final HapiLabOrderConverter INSTANCE = new HapiLabOrderConverter();
 
+    @Inject Logger logger;
+
     public static HapiLabOrderConverter getInstance() {
         return INSTANCE;
     }
@@ -39,6 +43,8 @@ public class HapiLabOrderConverter implements LabOrderConverter {
 
     @Override
     public LabOrder<Bundle> convertToOrder(final PatientDemographics demographics) {
+        logger.logInfo("Converting demographics to order");
+
         var labOrder = new Bundle();
         var labOrderId = UUID.randomUUID().toString();
         labOrder.setId(labOrderId);
@@ -58,6 +64,8 @@ public class HapiLabOrderConverter implements LabOrderConverter {
     }
 
     private MessageHeader createMessageHeader() {
+        logger.logInfo("Creating new MessageHeader");
+
         var messageHeader = new MessageHeader();
 
         messageHeader.setId(UUID.randomUUID().toString());
@@ -75,6 +83,8 @@ public class HapiLabOrderConverter implements LabOrderConverter {
     }
 
     private Patient createPatientResource(final PatientDemographics demographics) {
+        logger.logInfo("Creating new Patient");
+
         var patient = new Patient();
 
         patient.setId(demographics.getFhirResourceId());
@@ -137,6 +147,8 @@ public class HapiLabOrderConverter implements LabOrderConverter {
     }
 
     private ServiceRequest createServiceRequest(final Patient patient) {
+        logger.logInfo("Creating new ServiceRequest");
+
         var serviceRequest = new ServiceRequest();
 
         serviceRequest.setId(UUID.randomUUID().toString());
