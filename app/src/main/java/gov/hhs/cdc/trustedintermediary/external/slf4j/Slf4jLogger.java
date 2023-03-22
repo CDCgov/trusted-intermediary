@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Slf4jLogger implements Logger {
 
+    private static final Slf4jLogger INSTANCE = new Slf4jLogger();
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger("tilogger");
 
     // ANSI escape code
@@ -24,7 +25,7 @@ public class Slf4jLogger implements Logger {
     private Slf4jLogger() {}
 
     public static Slf4jLogger getLogger() {
-        return new Slf4jLogger();
+        return INSTANCE;
     }
 
     @Override
