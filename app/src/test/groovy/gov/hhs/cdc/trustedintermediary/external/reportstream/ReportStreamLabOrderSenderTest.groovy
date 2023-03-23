@@ -32,6 +32,21 @@ class ReportStreamLabOrderSenderTest extends Specification {
         2 * mockClient.post(_ as String, _ as Map<String,String>, _ as String) >> "200"
     }
 
+    def "sendRequestBody fails from an IOException from the client"() {
+        given:
+        def mockClient = Mock(HttpClient)
+        mockClient.post(_ as String, _ as Map<String,String>, _ as String) >> { throw new IOException("oops") }
+        TestApplicationContext.register(HttpClient, mockClient)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        ReportStreamLabOrderSender.getInstance().sendRequestBody("message_1", "fake token")
+        ReportStreamLabOrderSender.getInstance().sendRequestBody("message_2", "fake token")
+
+        then:
+        noExceptionThrown()  //This test to be updated whenever the actual code's TODO is addressed for the exception handling
+    }
+
     def "requestToken works"() {
         given:
         def expected = "rs fake token"
@@ -53,13 +68,43 @@ class ReportStreamLabOrderSenderTest extends Specification {
         given:
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
-        def reportStreamLabOrderSender = ReportStreamLabOrderSender.getInstance()
+
         def expected = "IaMAfaKEt0keNN"
         def responseBody = """{"foo":"foo value", "access_token":"${expected}", "boo":"boo value"}"""
+
         when:
-        def actual = reportStreamLabOrderSender.extractToken(responseBody)
+        def actual = ReportStreamLabOrderSender.getInstance().extractToken(responseBody)
+
         then:
         actual == expected
+    }
+
+    def "extractToken fails from not getting a String in the access_token"() {
+        given:
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+
+        def responseBody = """{"foo":"foo value", "access_token":3, "boo":"boo value"}"""
+
+        when:
+        ReportStreamLabOrderSender.getInstance().extractToken(responseBody)
+
+        then:
+        noExceptionThrown()  //This test to be updated whenever the actual code's TODO is addressed for the exception handling
+    }
+
+    def "extractToken fails from not getting valid JSON from the auth token endpoint"() {
+        given:
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+
+        def responseBody = """{"foo":"foo value", "access_token":"""
+
+        when:
+        ReportStreamLabOrderSender.getInstance().extractToken(responseBody)
+
+        then:
+        noExceptionThrown()  //This test to be updated whenever the actual code's TODO is addressed for the exception handling
     }
 
     def "composeRequestBody works"() {
@@ -82,10 +127,11 @@ class ReportStreamLabOrderSenderTest extends Specification {
         def mockAuthEngine = Mock(AuthEngine)
         def mockClient = Mock(HttpClient)
         def mockFhir = Mock(HapiFhir)
+        def mockFormatter = Mock(Formatter)
         TestApplicationContext.register(AuthEngine, mockAuthEngine)
         TestApplicationContext.register(HttpClient, mockClient)
-        TestApplicationContext.register(HapiFhir,mockFhir)
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.register(HapiFhir, mockFhir)
+        TestApplicationContext.register(Formatter, mockFormatter)
         TestApplicationContext.injectRegisteredImplementations()
         mockFhir.encodeResourceToJson(_ as String) >> "Mock order"
         LabOrder<?> mockOrder = new LabOrder<String>() {

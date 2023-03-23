@@ -8,8 +8,8 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nonnull;
@@ -36,6 +36,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     @Inject private AuthEngine jwt;
     @Inject private Formatter jackson;
     @Inject private HapiFhir fhir;
+    @Inject private Logger logger;
 
     public static ReportStreamLabOrderSender getInstance() {
         return INSTANCE;
@@ -45,12 +46,16 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
 
     @Override
     public void sendOrder(final LabOrder<?> order) {
+        logger.logInfo("Sending the order to ReportStream at {}", RS_DOMAIN_NAME);
+
         String json = fhir.encodeResourceToJson(order.getUnderlyingOrder());
         String bearerToken = requestToken();
         sendRequestBody(json, bearerToken);
     }
 
     protected String sendRequestBody(@Nonnull String json, @Nonnull String bearerToken) {
+        logger.logInfo("Sending to payload to ReportStream");
+
         String res = "";
         Map<String, String> headers =
                 Map.of(
@@ -63,6 +68,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         try {
             res = client.post(RS_WATERS_API_URL, headers, json);
         } catch (IOException e) {
+            logger.logError("Error POSTing the payload to ReportStream", e);
             // TODO exception handling
         }
 
@@ -70,6 +76,8 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     }
 
     protected String requestToken() {
+        logger.logInfo("Requesting token from ReportStream");
+
         String senderToken = null;
         String token = "";
         String body;
@@ -84,19 +92,22 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
             // the key
             token = extractToken(rsResponse);
         } catch (Exception e) {
+            logger.logError("Error getting the API token from ReportStream", e);
             // TODO exception handling
         }
         return token;
     }
 
     protected String extractToken(String responseBody) {
-        Map<String, String> value = new HashMap<>();
+        Map<String, String> value;
         try {
             value = jackson.convertToObject(responseBody, Map.class);
-        } catch (FormatterProcessingException e) {
+            return value.get("access_token");
+        } catch (FormatterProcessingException | ClassCastException e) {
+            logger.logError("Error parsing the ReportStream auth token response body", e);
             // TODO exception handling
         }
-        return value.get("access_token");
+        return "";
     }
 
     protected String composeRequestBody(String senderToken) {
