@@ -167,7 +167,7 @@ public class HapiLabOrderConverter implements LabOrderConverter {
 
         serviceRequest.setSubject(new Reference(patient));
 
-        serviceRequest.setOccurrence(new DateTimeType(Date.from(Instant.now())));
+        serviceRequest.setAuthoredOn(Date.from(Instant.now()));
 
         return serviceRequest;
     }
