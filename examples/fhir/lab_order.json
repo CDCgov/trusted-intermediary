@@ -11,6 +11,15 @@
       "resource": {
         "resourceType": "MessageHeader",
         "id": "3b5e0ea5-f204-4cb1-8027-7adf07d8065b",
+        "meta": {
+          "tag": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v2-0103",
+              "code": "P",
+              "display": "Production"
+            }
+          ]
+        },
         "eventCoding": {
           "system": "http://terminology.hl7.org/CodeSystem/v2-0003",
           "code": "O21",
@@ -19,6 +28,23 @@
         "source": {
           "name": "CDC Trusted Intermediary",
           "endpoint": "https://reportstream.cdc.gov/"
+        }
+      }
+    },
+    {
+      "fullUrl": "Provenance/cd2e9813-d9cd-4cb9-bf05-7dcdb6b5fe10",
+      "resource": {
+        "resourceType": "Provenance",
+        "id": "cd2e9813-d9cd-4cb9-bf05-7dcdb6b5fe10",
+        "recorded": "2023-03-02T21:30:42.888+00:00",
+        "activity": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v2-0003",
+              "code": "O21",
+              "display": "OML - Laboratory order"
+            }
+          ]
         }
       }
     },
