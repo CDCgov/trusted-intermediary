@@ -1,10 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.external.jjwt;
-/**
- * This class implements the AuthEngine and is a "humble object" for the Jjwt library. It's main
- * purpose is to deal with all jwt related transactions such as creating a jwt (json web token).
- */
+
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
@@ -13,8 +11,12 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 import java.util.Date;
 import java.util.UUID;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
+/**
+ * This class implements the AuthEngine and is a "humble object" for the Jjwt library. It's main
+ * purpose is to deal with all jwt related transactions such as creating a jwt (json web token).
+ */
 public class JjwtEngine implements AuthEngine {
 
     private static final JjwtEngine INSTANCE = new JjwtEngine();
@@ -26,12 +28,12 @@ public class JjwtEngine implements AuthEngine {
     }
 
     @Override
-    @NotNull
+    @Nonnull
     public String generateSenderToken(
-            @NotNull String sender,
-            @NotNull String baseUrl,
-            @NotNull String pemKey,
-            @NotNull String keyId,
+            @Nonnull String sender,
+            @Nonnull String baseUrl,
+            @Nonnull String pemKey,
+            @Nonnull String keyId,
             int expirationSecondsFromNow)
             throws InvalidKeySpecException, NoSuchAlgorithmException {
 
@@ -52,7 +54,7 @@ public class JjwtEngine implements AuthEngine {
         return jwsObj.compact();
     }
 
-    protected RSAPrivateKey readPrivateKey(@NotNull String pemKey)
+    protected RSAPrivateKey readPrivateKey(@Nonnull String pemKey)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
         String privatePemKey =
                 pemKey.replace("-----BEGIN PRIVATE KEY-----", "")

@@ -1,5 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi
 
+import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderConverter
 import gov.hhs.cdc.trustedintermediary.etor.demographics.NextOfKin
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographics
 import org.hl7.fhir.r4.model.Bundle
@@ -36,6 +38,13 @@ class HapiLabOrderConverterTest extends Specification {
     race,
     nextOfKin
     )
+
+    def setup() {
+        TestApplicationContext.reset()
+        TestApplicationContext.init()
+        TestApplicationContext.register(LabOrderConverter, HapiLabOrderConverter.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+    }
 
     def "the demographics correctly constructs the overall bundle in the lab order"() {
 
@@ -96,5 +105,6 @@ class HapiLabOrderConverterTest extends Specification {
         serviceRequest.getCode().getCodingFirstRep().getCode() == "54089-8"
         serviceRequest.getCategoryFirstRep().getCodingFirstRep().getCode() == "108252007"
         serviceRequest.getSubject().getResource() == labOrderBundle.getEntry().get(1).getResource()
+        serviceRequest.getAuthoredOn() != null
     }
 }
