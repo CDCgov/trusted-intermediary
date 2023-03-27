@@ -3,13 +3,14 @@ package gov.hhs.cdc.trustedintermediary.external.hapi;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderConverter;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
+import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.DateTimeType;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
@@ -24,6 +25,8 @@ import org.hl7.fhir.r4.model.UrlType;
 public class HapiLabOrderConverter implements LabOrderConverter {
     private static final HapiLabOrderConverter INSTANCE = new HapiLabOrderConverter();
 
+    @Inject Logger logger;
+
     public static HapiLabOrderConverter getInstance() {
         return INSTANCE;
     }
@@ -32,6 +35,8 @@ public class HapiLabOrderConverter implements LabOrderConverter {
 
     @Override
     public HapiLabOrder convertToOrder(final Demographics<?> demographics) {
+        logger.logInfo("Converting demographics to order");
+
         var hapiDemographics = (HapiDemographics) demographics;
         var demographicsBundle = hapiDemographics.getUnderlyingDemographics();
 
@@ -55,6 +60,8 @@ public class HapiLabOrderConverter implements LabOrderConverter {
     }
 
     private MessageHeader createMessageHeader() {
+        logger.logInfo("Creating new MessageHeader");
+
         var messageHeader = new MessageHeader();
 
         messageHeader.setId(UUID.randomUUID().toString());
@@ -72,6 +79,8 @@ public class HapiLabOrderConverter implements LabOrderConverter {
     }
 
     private ServiceRequest createServiceRequest(final Patient patient) {
+        logger.logInfo("Creating new ServiceRequest");
+
         var serviceRequest = new ServiceRequest();
 
         serviceRequest.setId(UUID.randomUUID().toString());
@@ -90,7 +99,7 @@ public class HapiLabOrderConverter implements LabOrderConverter {
 
         serviceRequest.setSubject(new Reference(patient));
 
-        serviceRequest.setOccurrence(new DateTimeType(Date.from(Instant.now())));
+        serviceRequest.setAuthoredOn(Date.from(Instant.now()));
 
         return serviceRequest;
     }

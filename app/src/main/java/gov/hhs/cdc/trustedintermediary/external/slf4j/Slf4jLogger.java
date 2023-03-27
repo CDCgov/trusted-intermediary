@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.slf4j;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import java.util.Arrays;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Slf4jLogger implements Logger {
 
+    private static final Slf4jLogger INSTANCE = new Slf4jLogger();
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger("tilogger");
 
     // ANSI escape code
@@ -23,12 +25,16 @@ public class Slf4jLogger implements Logger {
     private Slf4jLogger() {}
 
     public static Slf4jLogger getLogger() {
-        return new Slf4jLogger();
+        return INSTANCE;
     }
 
     @Override
-    public void logInfo(String infoMessage) {
-        LOGGER.atInfo().log(() -> ANSI_GREEN + infoMessage + ANSI_RESET);
+    public void logInfo(String infoMessage, Object... parameters) {
+        var logBuilder = LOGGER.atInfo().setMessage(() -> ANSI_GREEN + infoMessage + ANSI_RESET);
+
+        Arrays.stream(parameters).forEachOrdered(logBuilder::addArgument);
+
+        logBuilder.log();
     }
 
     @Override
