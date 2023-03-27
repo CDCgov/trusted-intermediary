@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
@@ -39,6 +40,22 @@ public class HapiLabOrderConverter implements LabOrderConverter {
 
         var hapiDemographics = (HapiDemographics) demographics;
         var demographicsBundle = hapiDemographics.getUnderlyingDemographics();
+
+        var labOrderId = UUID.randomUUID().toString();
+        if (!demographicsBundle.hasId()) {
+            demographicsBundle.setId(labOrderId);
+        }
+
+        if (!demographicsBundle.hasIdentifier()) {
+            demographicsBundle.setIdentifier(new Identifier().setValue(labOrderId));
+        }
+
+        if (!demographicsBundle.hasTimestamp()) {
+            demographicsBundle.setTimestamp(Date.from(Instant.now()));
+        }
+
+        demographicsBundle.setType(
+                Bundle.BundleType.MESSAGE); // it always needs to be a message, so no if statement
 
         var patient =
                 demographicsBundle.getEntry().stream()
