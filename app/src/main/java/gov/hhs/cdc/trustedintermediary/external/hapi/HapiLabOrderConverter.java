@@ -45,18 +45,18 @@ public class HapiLabOrderConverter implements LabOrderConverter {
     @Override
     public LabOrder<Bundle> convertToOrder(final PatientDemographics demographics) {
         logger.logInfo("Converting demographics to order");
-
+        var orderDateTime = Date.from(Instant.now());
         var labOrder = new Bundle();
         var labOrderId = UUID.randomUUID().toString();
         labOrder.setId(labOrderId);
         labOrder.setIdentifier(new Identifier().setValue(labOrderId));
         labOrder.setType(Bundle.BundleType.MESSAGE);
-        labOrder.setTimestamp(Date.from(Instant.now()));
+        labOrder.setTimestamp(orderDateTime);
 
         var patient = createPatientResource(demographics);
-        var serviceRequest = createServiceRequest(patient);
+        var serviceRequest = createServiceRequest(patient, orderDateTime);
         var messageHeader = createMessageHeader();
-        var provenance = createProvenanceResource();
+        var provenance = createProvenanceResource(orderDateTime);
 
         labOrder.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader));
         labOrder.addEntry(new Bundle.BundleEntryComponent().setResource(patient));
@@ -149,7 +149,7 @@ public class HapiLabOrderConverter implements LabOrderConverter {
         return patient;
     }
 
-    private ServiceRequest createServiceRequest(final Patient patient) {
+    private ServiceRequest createServiceRequest(final Patient patient, Date orderDate) {
         logger.logInfo("Creating new ServiceRequest");
 
         var serviceRequest = new ServiceRequest();
@@ -170,17 +170,17 @@ public class HapiLabOrderConverter implements LabOrderConverter {
 
         serviceRequest.setSubject(new Reference(patient));
 
-        serviceRequest.setAuthoredOn(Date.from(Instant.now()));
+        serviceRequest.setAuthoredOn(orderDate);
 
         return serviceRequest;
     }
 
-    private Provenance createProvenanceResource() {
+    private Provenance createProvenanceResource(Date orderDate) {
         logger.logInfo("Creating new Provenance");
         var provenance = new Provenance();
 
         provenance.setId(UUID.randomUUID().toString());
-        provenance.setRecorded(Date.from(Instant.now()));
+        provenance.setRecorded(orderDate);
         provenance.setActivity(
                 new CodeableConcept(
                         new Coding(
