@@ -9,6 +9,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
@@ -37,6 +38,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     @Inject private Formatter jackson;
     @Inject private HapiFhir fhir;
     @Inject private Logger logger;
+    @Inject private Secrets secrets;
 
     public static ReportStreamLabOrderSender getInstance() {
         return INSTANCE;

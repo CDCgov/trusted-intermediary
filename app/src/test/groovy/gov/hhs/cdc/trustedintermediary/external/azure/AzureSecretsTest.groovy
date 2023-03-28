@@ -2,7 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.azure
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.wrappers.KeyVault
+
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
 import spock.lang.Specification
 

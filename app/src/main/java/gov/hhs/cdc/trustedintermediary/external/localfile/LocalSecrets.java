@@ -19,7 +19,8 @@ public class LocalSecrets implements Secrets {
     }
 
     @Override
-    public String getKey() { // What key, sender: TI, client or receiver:TI, client?
+    public String getKey(
+            String secretName) { // What key, sender: TI, client or receiver:TI, client?
 
         String key = "";
 
@@ -27,10 +28,7 @@ public class LocalSecrets implements Secrets {
             key =
                     new String(
                             Files.readAllBytes(
-                                    Path.of(
-                                            "..",
-                                            "mock_credentials",
-                                            "my-rsa-local-private-key.pem")));
+                                    Path.of("..", "mock_credentials", secretName + ".pem")));
         } catch (IOException e) {
             // TODO exception handling
         }
