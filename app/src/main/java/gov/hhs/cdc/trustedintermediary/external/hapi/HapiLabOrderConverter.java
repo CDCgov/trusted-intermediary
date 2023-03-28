@@ -176,7 +176,7 @@ public class HapiLabOrderConverter implements LabOrderConverter {
     }
 
     private Provenance createProvenanceResource() {
-
+        logger.logInfo("Creating new Provenance");
         var provenance = new Provenance();
 
         provenance.setId(UUID.randomUUID().toString());
