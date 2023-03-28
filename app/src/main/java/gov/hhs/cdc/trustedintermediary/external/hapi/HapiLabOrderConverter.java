@@ -21,6 +21,7 @@ import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.IntegerType;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Provenance;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.ServiceRequest;
 import org.hl7.fhir.r4.model.StringType;
@@ -55,10 +56,12 @@ public class HapiLabOrderConverter implements LabOrderConverter {
         var patient = createPatientResource(demographics);
         var serviceRequest = createServiceRequest(patient);
         var messageHeader = createMessageHeader();
+        var provenance = createProvenanceResource();
 
         labOrder.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader));
         labOrder.addEntry(new Bundle.BundleEntryComponent().setResource(patient));
         labOrder.addEntry(new Bundle.BundleEntryComponent().setResource(serviceRequest));
+        labOrder.addEntry(new Bundle.BundleEntryComponent().setResource(provenance));
 
         return new HapiLabOrder(labOrder);
     }
@@ -170,5 +173,21 @@ public class HapiLabOrderConverter implements LabOrderConverter {
         serviceRequest.setAuthoredOn(Date.from(Instant.now()));
 
         return serviceRequest;
+    }
+
+    private Provenance createProvenanceResource() {
+
+        var provenance = new Provenance();
+
+        provenance.setId(UUID.randomUUID().toString());
+        provenance.setRecorded(Date.from(Instant.now()));
+        provenance.setActivity(
+                new CodeableConcept(
+                        new Coding(
+                                "http://terminology.hl7.org/CodeSystem/v2-0003",
+                                "021",
+                                "OML - Laboratory order")));
+
+        return provenance;
     }
 }
