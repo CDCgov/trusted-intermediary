@@ -56,7 +56,6 @@ public class App {
         ApplicationContext.register(OpenApi.class, OpenApi.getInstance());
         ApplicationContext.register(HttpClient.class, ApacheClient.getInstance());
         ApplicationContext.register(AuthEngine.class, JjwtEngine.getInstance());
-        // TODO if/else to add Secret implementation
         ApplicationContext.register(
                 Secrets.class,
                 ApplicationContext.getEnvironment().equalsIgnoreCase("local")
