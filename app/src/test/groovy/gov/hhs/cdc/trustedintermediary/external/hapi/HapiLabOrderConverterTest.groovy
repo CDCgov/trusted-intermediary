@@ -3,7 +3,6 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 import gov.hhs.cdc.trustedintermediary.DemographicsMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderConverter
-import gov.hhs.cdc.trustedintermediary.etor.demographics.NextOfKin
 import java.time.ZonedDateTime
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DateTimeType
@@ -25,7 +24,7 @@ class HapiLabOrderConverterTest extends Specification {
     def nextOfKinFirstName = "Jaina"
     def nextOfKinLastName = "Solo"
     def nextOfKinPhoneNumber = "555-555-5555"
-    def nextOfKin = new NextOfKin(nextOfKinFirstName, nextOfKinLastName, nextOfKinPhoneNumber)
+    //    def nextOfKin = new NextOfKin(nextOfKinFirstName, nextOfKinLastName, nextOfKinPhoneNumber)
     //    def demographics = new PatientDemographics(
     //    fhirResourceId,
     //    patientId,
