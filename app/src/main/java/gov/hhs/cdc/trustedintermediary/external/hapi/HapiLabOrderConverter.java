@@ -38,7 +38,7 @@ public class HapiLabOrderConverter implements LabOrderConverter {
     public HapiLabOrder convertToOrder(final Demographics<?> demographics) {
         logger.logInfo("Converting demographics to order");
 
-        var hapiDemographics = (HapiDemographics) demographics;
+        var hapiDemographics = (Demographics<Bundle>) demographics;
         var demographicsBundle = hapiDemographics.getUnderlyingDemographics();
 
         var overallId = UUID.randomUUID().toString();

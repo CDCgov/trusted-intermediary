@@ -38,7 +38,7 @@ class HapiLabOrderConverterTest extends Specification {
     //    )
 
     def demographicsBundle = new Bundle().addEntry(new Bundle.BundleEntryComponent().setResource(new Patient()))
-    def demographics = new DemographicsMock("fhirResourceId", "patientId", demographics)
+    def demographics = new DemographicsMock("fhirResourceId", "patientId", demographicsBundle)
 
     def setup() {
         TestApplicationContext.reset()
