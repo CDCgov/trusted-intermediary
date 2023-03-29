@@ -4,10 +4,13 @@ import gov.hhs.cdc.trustedintermediary.DemographicsMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderConverter
 import gov.hhs.cdc.trustedintermediary.etor.demographics.NextOfKin
-import org.hl7.fhir.r4.model.*
-import spock.lang.Specification
-
 import java.time.ZonedDateTime
+import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.MessageHeader
+import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.ServiceRequest
+import spock.lang.Specification
 
 class HapiLabOrderConverterTest extends Specification {
 

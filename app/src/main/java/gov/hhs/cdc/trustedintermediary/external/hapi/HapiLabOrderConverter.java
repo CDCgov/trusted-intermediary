@@ -41,13 +41,13 @@ public class HapiLabOrderConverter implements LabOrderConverter {
         var hapiDemographics = (HapiDemographics) demographics;
         var demographicsBundle = hapiDemographics.getUnderlyingDemographics();
 
-        var labOrderId = UUID.randomUUID().toString();
+        var overallId = UUID.randomUUID().toString();
         if (!demographicsBundle.hasId()) {
-            demographicsBundle.setId(labOrderId);
+            demographicsBundle.setId(overallId);
         }
 
         if (!demographicsBundle.hasIdentifier()) {
-            demographicsBundle.setIdentifier(new Identifier().setValue(labOrderId));
+            demographicsBundle.setIdentifier(new Identifier().setValue(overallId));
         }
 
         if (!demographicsBundle.hasTimestamp()) {
