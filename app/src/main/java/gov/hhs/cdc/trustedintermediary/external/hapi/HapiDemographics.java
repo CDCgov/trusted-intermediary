@@ -4,7 +4,6 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.ResourceType;
 
 /**
  * A concrete implementation of a {@link Demographics} that uses the Hapi FHIR bundle as its
@@ -30,10 +29,7 @@ public class HapiDemographics implements Demographics<Bundle> {
 
     @Override
     public String getPatientId() {
-        return innerDemographics.getEntry().stream()
-                .map(Bundle.BundleEntryComponent::getResource)
-                .filter(resource -> resource.getResourceType().equals(ResourceType.Patient))
-                .map(resource -> ((Patient) resource))
+        return HapiHelper.resourcesInBundle(innerDemographics, Patient.class)
                 .flatMap(patient -> patient.getIdentifier().stream())
                 .filter(
                         identifier ->

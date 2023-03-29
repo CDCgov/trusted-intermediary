@@ -15,7 +15,6 @@ import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
-import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.ServiceRequest;
 import org.hl7.fhir.r4.model.UrlType;
 
@@ -58,10 +57,7 @@ public class HapiLabOrderConverter implements LabOrderConverter {
                 Bundle.BundleType.MESSAGE); // it always needs to be a message, so no if statement
 
         var patient =
-                demographicsBundle.getEntry().stream()
-                        .map(Bundle.BundleEntryComponent::getResource)
-                        .filter(resource -> resource.getResourceType().equals(ResourceType.Patient))
-                        .map(resource -> ((Patient) resource))
+                HapiHelper.resourcesInBundle(demographicsBundle, Patient.class)
                         .findFirst()
                         .orElse(null);
 
