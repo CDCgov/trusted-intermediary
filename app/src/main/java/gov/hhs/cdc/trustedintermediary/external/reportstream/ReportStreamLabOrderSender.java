@@ -87,7 +87,11 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         try {
             senderToken =
                     jwt.generateSenderToken(
-                            CLIENT_NAME, RS_DOMAIN_NAME, "pemKey", CLIENT_NAME, 300);
+                            CLIENT_NAME,
+                            RS_DOMAIN_NAME,
+                            secrets.getKey("AZURE_KEY_NAME"),
+                            CLIENT_NAME,
+                            300);
             body = composeRequestBody(senderToken);
             String rsResponse = client.post(RS_AUTH_API_URL, headers, body);
             // TODO response handling for good structure of response, else it will fail to extract

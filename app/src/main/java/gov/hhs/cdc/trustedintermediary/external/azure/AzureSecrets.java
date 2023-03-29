@@ -5,7 +5,9 @@ import com.azure.security.keyvault.secrets.SecretClient;
 import com.azure.security.keyvault.secrets.SecretClientBuilder;
 import com.azure.security.keyvault.secrets.models.KeyVaultSecret;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
+import javax.inject.Inject;
 
 /**
  * This Class implements the Secret interface, and it is a "humble object" that uses the "Azure
@@ -27,6 +29,7 @@ public class AzureSecrets implements Secrets {
                     .buildClient();
 
     private static final AzureSecrets INSTANCE = new AzureSecrets();
+    @Inject private Logger logger;
 
     private AzureSecrets() {}
 
@@ -37,6 +40,7 @@ public class AzureSecrets implements Secrets {
     @Override
     public String getKey(String secretName) {
 
+        logger.logInfo("Acquiring Azure key...");
         KeyVaultSecret storedSecret = secretClient.getSecret(secretName);
         return storedSecret.getValue();
     }
