@@ -5,26 +5,12 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographics;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import javax.inject.Inject;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.ContactPoint;
-import org.hl7.fhir.r4.model.DateTimeType;
-import org.hl7.fhir.r4.model.DateType;
-import org.hl7.fhir.r4.model.Enumerations;
-import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.HumanName;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.IntegerType;
-import org.hl7.fhir.r4.model.MessageHeader;
-import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.Reference;
-import org.hl7.fhir.r4.model.ServiceRequest;
-import org.hl7.fhir.r4.model.StringType;
-import org.hl7.fhir.r4.model.UrlType;
+import org.hl7.fhir.r4.model.*;
 
 /**
  * Converts {@link PatientDemographics} to a Hapi-specific FHIR lab order ({@link HapiLabOrder} or
@@ -69,6 +55,10 @@ public class HapiLabOrderConverter implements LabOrderConverter {
         var messageHeader = new MessageHeader();
 
         messageHeader.setId(UUID.randomUUID().toString());
+        List<Coding> codingList = new ArrayList<>();
+        codingList.add(
+                0, new Coding("http://terminology.hl7.org/CodeSystem/v2-0103", "P", "Production"));
+        messageHeader.setMeta(new Meta().setTag(codingList));
         messageHeader.setEvent(
                 new Coding(
                         "http://terminology.hl7.org/CodeSystem/v2-0003",
