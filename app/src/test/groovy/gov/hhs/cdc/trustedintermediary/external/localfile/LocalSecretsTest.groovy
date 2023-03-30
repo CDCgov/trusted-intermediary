@@ -21,7 +21,6 @@ class LocalSecretsTest extends Specification {
 
     def "getKey works"() {
         given:
-        TestApplicationContext.register(Logger.class, Slf4jLogger.getLogger())
         TestApplicationContext.injectRegisteredImplementations()
 
         def expected = new String(Files.readAllBytes(
