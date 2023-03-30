@@ -119,7 +119,7 @@ class HapiLabOrderConverterTest extends Specification {
     def "the order datetime should match for bundle, service request, and provenance resources"(){
 
         when:
-        def labOrderBundle = HapiLabOrderConverter.getInstance().convertToOrder(demographics).getUnderlyingOrder()
+        def labOrderBundle = HapiLabOrderConverter.getInstance().convertToOrder(mockDemographics).getUnderlyingOrder()
         def bundleDateTime = labOrderBundle.getTimestamp()
         def serviceRequest = labOrderBundle.getEntry().get(2).getResource() as ServiceRequest
         def provenance = labOrderBundle.getEntry().get(3).getResource() as Provenance
