@@ -79,9 +79,7 @@ public class HapiLabOrderConverter implements LabOrderConverter {
 
         messageHeader.setId(UUID.randomUUID().toString());
 
-
         messageHeader.setEvent(omlLabOrderCoding);
-
 
         messageHeader.setMeta(
                 new Meta()
