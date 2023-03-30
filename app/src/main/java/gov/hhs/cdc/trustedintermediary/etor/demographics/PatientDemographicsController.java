@@ -33,7 +33,7 @@ public class PatientDemographicsController {
     }
 
     public Demographics<?> parseDemographics(DomainRequest request) {
-        logger.logInfo("Parsing the demographics");
+        logger.logInfo("Parsing patient demographics");
         var fhirBundle = fhir.parseResource(request.getBody(), Bundle.class);
         return new HapiDemographics(fhirBundle);
     }
