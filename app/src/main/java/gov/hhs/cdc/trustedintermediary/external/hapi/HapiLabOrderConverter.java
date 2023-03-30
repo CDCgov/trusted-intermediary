@@ -48,6 +48,11 @@ public class HapiLabOrderConverter implements LabOrderConverter {
         var orderDateTime = Date.from(Instant.now());
         var labOrder = new Bundle();
         var labOrderId = UUID.randomUUID().toString();
+        var omlLabOrderCoding =
+                new Coding(
+                        "http://terminology.hl7.org/CodeSystem/v2-0003",
+                        "O21",
+                        "OML - Laboratory order");
         labOrder.setId(labOrderId);
         labOrder.setIdentifier(new Identifier().setValue(labOrderId));
         labOrder.setType(Bundle.BundleType.MESSAGE);
@@ -55,8 +60,8 @@ public class HapiLabOrderConverter implements LabOrderConverter {
 
         var patient = createPatientResource(demographics);
         var serviceRequest = createServiceRequest(patient, orderDateTime);
-        var messageHeader = createMessageHeader();
-        var provenance = createProvenanceResource(orderDateTime);
+        var messageHeader = createMessageHeader(omlLabOrderCoding);
+        var provenance = createProvenanceResource(orderDateTime, omlLabOrderCoding);
 
         labOrder.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader));
         labOrder.addEntry(new Bundle.BundleEntryComponent().setResource(patient));
@@ -66,17 +71,13 @@ public class HapiLabOrderConverter implements LabOrderConverter {
         return new HapiLabOrder(labOrder);
     }
 
-    private MessageHeader createMessageHeader() {
+    private MessageHeader createMessageHeader(Coding omlLabOrderCoding) {
         logger.logInfo("Creating new MessageHeader");
 
         var messageHeader = new MessageHeader();
 
         messageHeader.setId(UUID.randomUUID().toString());
-        messageHeader.setEvent(
-                new Coding(
-                        "http://terminology.hl7.org/CodeSystem/v2-0003",
-                        "O21",
-                        "OML - Laboratory order"));
+        messageHeader.setEvent(omlLabOrderCoding);
         messageHeader.setSource(
                 new MessageHeader.MessageSourceComponent(
                                 new UrlType("https://reportstream.cdc.gov/"))
@@ -175,18 +176,13 @@ public class HapiLabOrderConverter implements LabOrderConverter {
         return serviceRequest;
     }
 
-    private Provenance createProvenanceResource(Date orderDate) {
+    private Provenance createProvenanceResource(Date orderDate, Coding omlLabOrderCoding) {
         logger.logInfo("Creating new Provenance");
         var provenance = new Provenance();
 
         provenance.setId(UUID.randomUUID().toString());
         provenance.setRecorded(orderDate);
-        provenance.setActivity(
-                new CodeableConcept(
-                        new Coding(
-                                "http://terminology.hl7.org/CodeSystem/v2-0003",
-                                "021",
-                                "OML - Laboratory order")));
+        provenance.setActivity(new CodeableConcept(omlLabOrderCoding));
 
         return provenance;
     }
