@@ -47,6 +47,7 @@ resource "azurerm_linux_web_app" "api" {
     DOCKER_REGISTRY_SERVER_PASSWORD = azurerm_container_registry.registry.admin_password
     ENV                             = var.environment
     REPORT_STREAM_URL_PREFIX        = "https://${local.rs_domain_prefix}prime.cdc.gov"
+    KEY_VAULT_NAME                  = azurerm_key_vault.key_storage.name
 
   }
 

@@ -1,8 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.external.localfile;
-/**
- * This Class implements the Secret interface, and it's purpose is to retrieve secrets from our
- * local environment
- */
+
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import java.io.IOException;
@@ -10,6 +7,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.inject.Inject;
 
+/**
+ * This Class implements the Secret interface, and it's purpose is to retrieve secrets from our
+ * local environment
+ */
 public class LocalSecrets implements Secrets {
 
     private static final LocalSecrets INSTANCE = new LocalSecrets();

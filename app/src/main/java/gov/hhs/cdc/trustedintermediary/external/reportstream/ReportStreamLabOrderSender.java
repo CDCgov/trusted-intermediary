@@ -84,12 +84,14 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         String token = "";
         String body;
         Map<String, String> headers = Map.of("Content-Type", "application/x-www-form-urlencoded");
+        var senderPrivateKey =
+                "report-stream-sender-private-key-" + ApplicationContext.getEnvironment();
         try {
             senderToken =
                     jwt.generateSenderToken(
                             CLIENT_NAME,
                             RS_DOMAIN_NAME,
-                            secrets.getKey("AZURE_KEY_NAME"),
+                            secrets.getKey(senderPrivateKey),
                             CLIENT_NAME,
                             300);
             body = composeRequestBody(senderToken);
