@@ -13,7 +13,9 @@ import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
+import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Provenance;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.ServiceRequest;
 import org.hl7.fhir.r4.model.UrlType;
@@ -49,8 +51,9 @@ public class HapiLabOrderConverter implements LabOrderConverter {
             demographicsBundle.setIdentifier(new Identifier().setValue(overallId));
         }
 
+        var orderDateTime = Date.from(Instant.now());
         if (!demographicsBundle.hasTimestamp()) {
-            demographicsBundle.setTimestamp(Date.from(Instant.now()));
+            demographicsBundle.setTimestamp(orderDateTime);
         }
 
         demographicsBundle.setType(
@@ -60,29 +63,42 @@ public class HapiLabOrderConverter implements LabOrderConverter {
                 HapiHelper.resourcesInBundle(demographicsBundle, Patient.class)
                         .findFirst()
                         .orElse(null);
+        var omlLabOrderCoding =
+                new Coding(
+                        "http://terminology.hl7.org/CodeSystem/v2-0003",
+                        "O21",
+                        "OML - Laboratory order");
 
-        var serviceRequest = createServiceRequest(patient);
-        var messageHeader = createMessageHeader();
+        var serviceRequest = createServiceRequest(patient, orderDateTime);
+        var messageHeader = createMessageHeader(omlLabOrderCoding);
+        var provenance = createProvenanceResource(orderDateTime, omlLabOrderCoding);
 
         demographicsBundle
                 .getEntry()
                 .add(0, new Bundle.BundleEntryComponent().setResource(messageHeader));
         demographicsBundle.addEntry(new Bundle.BundleEntryComponent().setResource(serviceRequest));
+        demographicsBundle.addEntry(new Bundle.BundleEntryComponent().setResource(provenance));
 
         return new HapiLabOrder(demographicsBundle);
     }
 
-    private MessageHeader createMessageHeader() {
+    private MessageHeader createMessageHeader(Coding omlLabOrderCoding) {
         logger.logInfo("Creating new MessageHeader");
 
         var messageHeader = new MessageHeader();
 
         messageHeader.setId(UUID.randomUUID().toString());
-        messageHeader.setEvent(
-                new Coding(
-                        "http://terminology.hl7.org/CodeSystem/v2-0003",
-                        "O21",
-                        "OML - Laboratory order"));
+
+        messageHeader.setEvent(omlLabOrderCoding);
+
+        messageHeader.setMeta(
+                new Meta()
+                        .addTag(
+                                new Coding(
+                                        "http://terminology.hl7.org/CodeSystem/v2-0103",
+                                        "P",
+                                        "Production")));
+
         messageHeader.setSource(
                 new MessageHeader.MessageSourceComponent(
                                 new UrlType("https://reportstream.cdc.gov/"))
@@ -91,7 +107,7 @@ public class HapiLabOrderConverter implements LabOrderConverter {
         return messageHeader;
     }
 
-    private ServiceRequest createServiceRequest(final Patient patient) {
+    private ServiceRequest createServiceRequest(final Patient patient, final Date orderDateTime) {
         logger.logInfo("Creating new ServiceRequest");
 
         var serviceRequest = new ServiceRequest();
@@ -112,8 +128,19 @@ public class HapiLabOrderConverter implements LabOrderConverter {
 
         serviceRequest.setSubject(new Reference(patient));
 
-        serviceRequest.setAuthoredOn(Date.from(Instant.now()));
+        serviceRequest.setAuthoredOn(orderDateTime);
 
         return serviceRequest;
+    }
+
+    private Provenance createProvenanceResource(Date orderDate, Coding omlLabOrderCoding) {
+        logger.logInfo("Creating new Provenance");
+        var provenance = new Provenance();
+
+        provenance.setId(UUID.randomUUID().toString());
+        provenance.setRecorded(orderDate);
+        provenance.setActivity(new CodeableConcept(omlLabOrderCoding));
+
+        return provenance;
     }
 }
