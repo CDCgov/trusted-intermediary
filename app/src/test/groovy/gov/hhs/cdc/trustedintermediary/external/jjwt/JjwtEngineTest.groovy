@@ -17,7 +17,7 @@ class JjwtEngineTest extends Specification {
 
         def key = new String(
                 Files.readAllBytes(
-                Path.of("..", "mock_credentials", "my-rsa-local-private-key.pem")
+                Path.of("..", "mock_credentials", "report-stream-sender-private-key-local.pem")
                 ))
 
         when:
