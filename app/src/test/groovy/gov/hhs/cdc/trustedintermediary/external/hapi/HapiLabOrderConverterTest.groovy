@@ -8,6 +8,7 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Provenance
 import org.hl7.fhir.r4.model.ServiceRequest
 import spock.lang.Specification
 
@@ -66,6 +67,9 @@ class HapiLabOrderConverterTest extends Specification {
         def messageHeader = labOrderBundle.getEntry().get(0).getResource() as MessageHeader
 
         !messageHeader.getId().isEmpty()
+        messageHeader.getMeta().getTag().system[0] == "http://terminology.hl7.org/CodeSystem/v2-0103"
+        messageHeader.getMeta().getTag().code[0] == "P"
+        messageHeader.getMeta().getTag().display[0] == "Production"
         messageHeader.getEventCoding().getSystem() == "http://terminology.hl7.org/CodeSystem/v2-0003"
         messageHeader.getEventCoding().getCode() == "O21"
         messageHeader.getSource().getName() == "CDC Trusted Intermediary"
@@ -106,5 +110,22 @@ class HapiLabOrderConverterTest extends Specification {
         serviceRequest.getCategoryFirstRep().getCodingFirstRep().getCode() == "108252007"
         serviceRequest.getSubject().getResource() == labOrderBundle.getEntry().get(1).getResource()
         serviceRequest.getAuthoredOn() != null
+    }
+
+    def "the order datetime should match for bundle, service request, and provenance resources"(){
+
+        when:
+        def labOrderBundle = HapiLabOrderConverter.getInstance().convertToOrder(demographics).getUnderlyingOrder()
+        def bundleDateTime = labOrderBundle.getTimestamp()
+        def serviceRequest = labOrderBundle.getEntry().get(2).getResource() as ServiceRequest
+        def provenance = labOrderBundle.getEntry().get(3).getResource() as Provenance
+
+        then:
+        def serviceRequestDateTime = serviceRequest.getAuthoredOn()
+        def provenanceDateTime = provenance.getRecorded()
+
+        bundleDateTime == serviceRequestDateTime
+        bundleDateTime == provenanceDateTime
+        serviceRequestDateTime == provenanceDateTime
     }
 }
