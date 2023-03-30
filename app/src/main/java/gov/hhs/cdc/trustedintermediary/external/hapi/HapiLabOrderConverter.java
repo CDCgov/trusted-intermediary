@@ -5,9 +5,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographics;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 import javax.inject.Inject;
 import org.hl7.fhir.r4.model.*;
@@ -55,10 +53,13 @@ public class HapiLabOrderConverter implements LabOrderConverter {
         var messageHeader = new MessageHeader();
 
         messageHeader.setId(UUID.randomUUID().toString());
-        List<Coding> codingList = new ArrayList<>();
-        codingList.add(
-                0, new Coding("http://terminology.hl7.org/CodeSystem/v2-0103", "P", "Production"));
-        messageHeader.setMeta(new Meta().setTag(codingList));
+        messageHeader.setMeta(
+                new Meta()
+                        .addTag(
+                                new Coding(
+                                        "http://terminology.hl7.org/CodeSystem/v2-0103",
+                                        "P",
+                                        "Production")));
         messageHeader.setEvent(
                 new Coding(
                         "http://terminology.hl7.org/CodeSystem/v2-0003",
