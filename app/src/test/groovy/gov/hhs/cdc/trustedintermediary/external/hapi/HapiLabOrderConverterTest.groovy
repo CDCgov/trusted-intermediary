@@ -67,6 +67,9 @@ class HapiLabOrderConverterTest extends Specification {
         def messageHeader = labOrderBundle.getEntry().get(0).getResource() as MessageHeader
 
         !messageHeader.getId().isEmpty()
+        messageHeader.getMeta().getTag().system[0] == "http://terminology.hl7.org/CodeSystem/v2-0103"
+        messageHeader.getMeta().getTag().code[0] == "P"
+        messageHeader.getMeta().getTag().display[0] == "Production"
         messageHeader.getEventCoding().getSystem() == "http://terminology.hl7.org/CodeSystem/v2-0003"
         messageHeader.getEventCoding().getCode() == "O21"
         messageHeader.getSource().getName() == "CDC Trusted Intermediary"
