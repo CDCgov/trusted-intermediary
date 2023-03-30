@@ -133,7 +133,8 @@ tasks.named('test') {
             '**/slf4j/Slf4jLogger*',
             '**/hapi/HapiFhirImplementation*',
             '**/jjwt/JjwtEngine*',
-            '**/apache/ApacheClient*'
+            '**/apache/ApacheClient*',
+            '**/azure/AzureSecrets*'
         ]
     }
 }
