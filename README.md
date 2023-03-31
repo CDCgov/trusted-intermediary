@@ -33,7 +33,7 @@ To compile the application, execute...
 ./gradlew shadowJar
 ```
 
-Once compiled, the built artifact is _TBD_.
+Once compiled, the built artifact is `/app/build/libs/app-all.jar`.
 
 ### Testing
 
@@ -112,6 +112,32 @@ a new Azure environment.
    - `AZURE_SUBSCRIPTION_ID` with the ID from the subscription that everything should be deployed into.
    - `AZURE_CLIENT_ID` with the ID of the App Registration created previously.
 
+#### Dev Environment Deployment
+
+The Dev environment is meant to be the Wild West.  Meaning anyone can push to it to test something, and there is no
+requirement that only good builds be pushed to it.  Use the Dev environment if you want to test something in a deployed
+environment.
+
+To deploy to the Dev environment...
+1. Check with the team that no one is already using it.
+2. [Find the `dev` branch](https://github.com/CDCgov/trusted-intermediary/branches/all?query=dev) and delete it in
+   GitHub.
+3. Delete your local `dev` branch if needed.
+   ```shell
+   git branch -D dev
+   ```
+4. From the branch you want to test, create a new `dev` branch.
+   ```shell
+   git checkout -b dev
+   ```
+5. Push the branch to GitHub.
+   ```shell
+   git push --set-upstream origin dev
+   ```
+
+Then the [deploy](https://github.com/CDCgov/trusted-intermediary/actions/workflows/dev-deploy.yml) will run.  Remember
+that you now have the `dev` branch checked out locally.  If you make subsequent code changes, you will make them on the `dev`
+branch instead of your original branch.
 
 ### Pre-Commit Hooks
 
