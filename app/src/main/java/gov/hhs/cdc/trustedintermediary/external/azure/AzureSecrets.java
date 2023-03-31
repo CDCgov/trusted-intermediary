@@ -11,7 +11,7 @@ import javax.inject.Inject;
 
 /**
  * This Class implements the Secret interface, and it is a "humble object" that uses the "Azure
- * Security Key Vault" and "Azure Identity" dependencies. and it is used to retrieve azure
+ * Security Key Vault" and "Azure Identity" dependencies; and it is used to retrieve azure
  * environment secrets along-side Azure keys from the Azure key vault.
  */
 public class AzureSecrets implements Secrets {
