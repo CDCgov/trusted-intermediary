@@ -9,7 +9,7 @@ on:
 jobs:
 
   terraform-deploy:
-    name: Staging Infrastructure Deploy
+    name: Dev Infrastructure Deploy
     uses: ./.github/workflows/terraform-deploy_reusable.yml
     with:
       TERRAFORM_DIRECTORY: operations/environments/dev
@@ -18,8 +18,8 @@ jobs:
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-  staging-deploy:
-    name: Staging Application Deploy
+  dev-deploy:
+    name: Dev Application Deploy
     needs: terraform-deploy
     uses: ./.github/workflows/deploy_reusable.yml
     with:
