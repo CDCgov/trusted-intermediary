@@ -26,6 +26,7 @@ class LocalSecretsTest extends Specification {
         def expected = new String(Files.readAllBytes(
                 Path.of("..", "mock_credentials", "report-stream-sender-private-key-local.pem")
                 ))
+
         when:
         def actual = LocalSecrets.getInstance().getKey("report-stream-sender-private-key-local")
 
