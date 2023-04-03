@@ -1,5 +1,5 @@
 resource "azurerm_log_analytics_workspace" "logs_workspace" {
-  name                = "ti-logs-${var.environment}"
+  name = "ti-logs-${var.environment}"
 
   resource_group_name = azurerm_resource_group.group.name
   location            = azurerm_resource_group.group.location
