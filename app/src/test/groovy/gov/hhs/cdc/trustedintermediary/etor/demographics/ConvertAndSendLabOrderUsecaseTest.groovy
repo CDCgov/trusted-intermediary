@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.demographics
 
+import gov.hhs.cdc.trustedintermediary.DemographicsMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import spock.lang.Specification
 
@@ -27,13 +28,13 @@ class ConvertAndSendLabOrderUsecaseTest extends Specification {
         TestApplicationContext.register(LabOrderSender, mockSender)
         TestApplicationContext.injectRegisteredImplementations()
 
-        def demographics = new PatientDemographics()
+        def demographics = new DemographicsMock(null, null, null)
 
         when:
         ConvertAndSendLabOrderUsecase.getInstance().convertAndSend(demographics)
 
         then:
-        1 * mockConverter.convertToOrder(_ as PatientDemographics) >> mockOrder
+        1 * mockConverter.convertToOrder(_ as Demographics) >> mockOrder
         1 * mockSender.sendOrder(mockOrder)
     }
 }
