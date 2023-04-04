@@ -1,7 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.etor.demographics;
 
-import javax.annotation.Nonnull;
-
 /** Contains an ID that is reflected from the patient demographic data. */
 public class PatientDemographicsResponse {
 
@@ -13,9 +11,9 @@ public class PatientDemographicsResponse {
         setPatientId(patientId);
     }
 
-    public PatientDemographicsResponse(@Nonnull PatientDemographics patientDemographics) {
-        setFhirResourceId(patientDemographics.getFhirResourceId());
-        setPatientId(patientDemographics.getPatientId());
+    public PatientDemographicsResponse(Demographics<?> demographics) {
+        setFhirResourceId(demographics.getFhirResourceId());
+        setPatientId(demographics.getPatientId());
     }
 
     public String getFhirResourceId() {
