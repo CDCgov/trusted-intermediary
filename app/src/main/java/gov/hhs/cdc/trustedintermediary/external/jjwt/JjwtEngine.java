@@ -44,7 +44,7 @@ public class JjwtEngine implements AuthEngine {
             privateKey = readPrivateKey(pemKey);
         } catch (NoSuchAlgorithmException e) {
             throw new TokenGenerationException("The private key algorithm isn't supported", e);
-        } catch (InvalidKeySpecException e) {
+        } catch (Exception e) {
             throw new TokenGenerationException("The private key wasn't formatted correctly", e);
         }
 
