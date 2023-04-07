@@ -28,7 +28,7 @@ class LocalSecretsTest extends Specification {
         actual == expected
     }
 
-    def "getKey fails with an unknown secret"() {
+    def "getKey fails with a non-existing secret"() {
         when:
         LocalSecrets.getInstance().getKey("secret that doesn't exist")
 
