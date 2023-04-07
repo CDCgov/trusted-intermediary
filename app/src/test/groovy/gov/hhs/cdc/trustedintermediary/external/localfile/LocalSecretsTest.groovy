@@ -1,15 +1,11 @@
 package gov.hhs.cdc.trustedintermediary.external.localfile
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender
-import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamLabOrderSender
-import gov.hhs.cdc.trustedintermediary.external.slf4j.Slf4jLogger
-import gov.hhs.cdc.trustedintermediary.wrappers.Logger
+import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
-import spock.lang.Specification
-
 import java.nio.file.Files
 import java.nio.file.Path
+import spock.lang.Specification
 
 class LocalSecretsTest extends Specification {
 
@@ -17,21 +13,26 @@ class LocalSecretsTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(Secrets.class, LocalSecrets.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
     }
 
     def "getKey works"() {
         given:
-        TestApplicationContext.injectRegisteredImplementations()
-
-        def expected = new String(Files.readAllBytes(
-                Path.of("..", "mock_credentials", "report-stream-sender-private-key-local.pem")
-                ))
+        def secretName = "report-stream-sender-private-key-local"  //pragma: allowlist secret
+        def expected = Files.readString(Path.of("..", "mock_credentials", secretName + ".pem"))
 
         when:
-        def actual = LocalSecrets.getInstance().getKey("report-stream-sender-private-key-local")
+        def actual = LocalSecrets.getInstance().getKey(secretName)
 
         then:
-        noExceptionThrown()
         actual == expected
+    }
+
+    def "getKey fails with an unknown secret"() {
+        when:
+        LocalSecrets.getInstance().getKey("secret that doesn't exist")
+
+        then:
+        thrown(SecretRetrievalException)
     }
 }
