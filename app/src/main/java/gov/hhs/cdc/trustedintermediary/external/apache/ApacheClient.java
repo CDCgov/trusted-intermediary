@@ -37,7 +37,8 @@ public class ApacheClient implements HttpClient {
                     .returnContent()
                     .asString();
         } catch (IOException e) {
-            throw new HttpClientException("Error occurred while making HTTP request to " + url, e);
+            throw new HttpClientException(
+                    "Error occurred while making HTTP request to [" + url + "]", e);
         }
     }
 
