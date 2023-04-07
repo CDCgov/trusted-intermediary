@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.apache;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
+import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException;
 import java.io.IOException;
 import java.util.Map;
 import org.apache.hc.client5.http.fluent.Request;
@@ -24,15 +25,20 @@ public class ApacheClient implements HttpClient {
     }
 
     @Override
-    public String post(String url, Map<String, String> headerMap, String body) throws IOException {
+    public String post(String url, Map<String, String> headerMap, String body)
+            throws HttpClientException {
         Header[] headers = convertMapToHeader(headerMap);
 
-        return Request.post(url)
-                .setHeaders(headers)
-                .body(new StringEntity(body))
-                .execute()
-                .returnContent()
-                .asString();
+        try {
+            return Request.post(url)
+                    .setHeaders(headers)
+                    .body(new StringEntity(body))
+                    .execute()
+                    .returnContent()
+                    .asString();
+        } catch (IOException e) {
+            throw new HttpClientException("Error occurred while making HTTP request to " + url, e);
+        }
     }
 
     protected Header[] convertMapToHeader(Map<String, String> headerMap) {
