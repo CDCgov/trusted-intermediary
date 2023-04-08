@@ -8,6 +8,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient
+import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
 import spock.lang.Specification
 
@@ -45,7 +46,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         ReportStreamLabOrderSender.getInstance().sendRequestBody("message_2", "fake token")
 
         then:
-        noExceptionThrown()  //This test to be updated whenever the actual code's TODO is addressed for the exception handling
+        thrown(Exception)  //This test to be updated whenever the actual code's TODO is addressed for the exception handling
     }
 
     def "requestToken works"() {
