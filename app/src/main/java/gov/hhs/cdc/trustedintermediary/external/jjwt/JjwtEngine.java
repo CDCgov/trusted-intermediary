@@ -1,7 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.external.jjwt;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
+import gov.hhs.cdc.trustedintermediary.wrappers.TokenGenerationException;
 import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -35,23 +37,38 @@ public class JjwtEngine implements AuthEngine {
             @Nonnull String pemKey,
             @Nonnull String keyId,
             int expirationSecondsFromNow)
-            throws InvalidKeySpecException, NoSuchAlgorithmException {
+            throws TokenGenerationException {
 
-        JwtBuilder jwsObj =
-                Jwts.builder()
-                        .setHeaderParam("kid", keyId)
-                        .setHeaderParam("typ", "JWT")
-                        .setIssuer(sender)
-                        .setSubject(sender)
-                        .setAudience(baseUrl)
-                        .setExpiration(
-                                new Date(
-                                        System.currentTimeMillis()
-                                                + (expirationSecondsFromNow * 1000L)))
-                        .setId(UUID.randomUUID().toString())
-                        .signWith(readPrivateKey(pemKey));
+        RSAPrivateKey privateKey;
+        try {
+            privateKey = readPrivateKey(pemKey);
+        } catch (NoSuchAlgorithmException e) {
+            throw new TokenGenerationException("The private key algorithm isn't supported", e);
+        } catch (Exception e) {
+            throw new TokenGenerationException("The private key wasn't formatted correctly", e);
+        }
 
-        return jwsObj.compact();
+        JwtBuilder jwsObj = null;
+        try {
+            jwsObj =
+                    Jwts.builder()
+                            .setHeaderParam("kid", keyId)
+                            .setHeaderParam("typ", "JWT")
+                            .setIssuer(sender)
+                            .setSubject(sender)
+                            .setAudience(baseUrl)
+                            .setExpiration(
+                                    new Date(
+                                            System.currentTimeMillis()
+                                                    + (expirationSecondsFromNow * 1000L)))
+                            .setId(UUID.randomUUID().toString())
+                            .signWith(privateKey);
+
+            return jwsObj.compact();
+        } catch (JwtException exception) {
+            throw new TokenGenerationException(
+                    "Jjwt was unable to create or sign the JWT", exception);
+        }
     }
 
     protected RSAPrivateKey readPrivateKey(@Nonnull String pemKey)
