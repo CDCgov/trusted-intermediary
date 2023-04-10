@@ -79,7 +79,7 @@ dependencies {
 
     // azure sdk
     implementation 'com.azure:azure-security-keyvault-secrets:4.6.0'
-    implementation 'com.azure:azure-identity:1.8.1'
+    implementation 'com.azure:azure-identity:1.8.2'
     implementation 'net.minidev:json-smart:2.4.10'  //override due to a transitive dependency CVE in com.azure:azure-identity:1.8.1
 
     testImplementation 'org.apache.groovy:groovy:4.0.11'
