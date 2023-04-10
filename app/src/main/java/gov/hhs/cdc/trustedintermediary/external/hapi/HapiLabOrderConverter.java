@@ -1,8 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
+import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderConverter;
-import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographics;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.time.Instant;
 import java.util.Date;
@@ -11,26 +11,18 @@ import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.ContactPoint;
-import org.hl7.fhir.r4.model.DateTimeType;
-import org.hl7.fhir.r4.model.DateType;
-import org.hl7.fhir.r4.model.Enumerations;
-import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.IntegerType;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Provenance;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.ServiceRequest;
-import org.hl7.fhir.r4.model.StringType;
 import org.hl7.fhir.r4.model.UrlType;
 
 /**
- * Converts {@link PatientDemographics} to a Hapi-specific FHIR lab order ({@link HapiLabOrder} or
- * {@link LabOrder<Bundle>}).
+ * Converts {@link Demographics} to a Hapi-specific FHIR lab order ({@link HapiLabOrder} or {@link
+ * LabOrder<Bundle>}).
  */
 public class HapiLabOrderConverter implements LabOrderConverter {
     private static final HapiLabOrderConverter INSTANCE = new HapiLabOrderConverter();
@@ -44,32 +36,50 @@ public class HapiLabOrderConverter implements LabOrderConverter {
     private HapiLabOrderConverter() {}
 
     @Override
-    public LabOrder<Bundle> convertToOrder(final PatientDemographics demographics) {
+    public HapiLabOrder convertToOrder(final Demographics<?> demographics) {
         logger.logInfo("Converting demographics to order");
+
+        var hapiDemographics = (Demographics<Bundle>) demographics;
+        var demographicsBundle = hapiDemographics.getUnderlyingDemographics();
+
+        var overallId = UUID.randomUUID().toString();
+        if (!demographicsBundle.hasId()) {
+            demographicsBundle.setId(overallId);
+        }
+
+        if (!demographicsBundle.hasIdentifier()) {
+            demographicsBundle.setIdentifier(new Identifier().setValue(overallId));
+        }
+
         var orderDateTime = Date.from(Instant.now());
-        var labOrder = new Bundle();
-        var labOrderId = UUID.randomUUID().toString();
+        if (!demographicsBundle.hasTimestamp()) {
+            demographicsBundle.setTimestamp(orderDateTime);
+        }
+
+        demographicsBundle.setType(
+                Bundle.BundleType.MESSAGE); // it always needs to be a message, so no if statement
+
+        var patient =
+                HapiHelper.resourcesInBundle(demographicsBundle, Patient.class)
+                        .findFirst()
+                        .orElse(null);
         var omlLabOrderCoding =
                 new Coding(
                         "http://terminology.hl7.org/CodeSystem/v2-0003",
                         "O21",
                         "OML - Laboratory order");
-        labOrder.setId(labOrderId);
-        labOrder.setIdentifier(new Identifier().setValue(labOrderId));
-        labOrder.setType(Bundle.BundleType.MESSAGE);
-        labOrder.setTimestamp(orderDateTime);
 
-        var patient = createPatientResource(demographics);
         var serviceRequest = createServiceRequest(patient, orderDateTime);
         var messageHeader = createMessageHeader(omlLabOrderCoding);
         var provenance = createProvenanceResource(orderDateTime, omlLabOrderCoding);
 
-        labOrder.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader));
-        labOrder.addEntry(new Bundle.BundleEntryComponent().setResource(patient));
-        labOrder.addEntry(new Bundle.BundleEntryComponent().setResource(serviceRequest));
-        labOrder.addEntry(new Bundle.BundleEntryComponent().setResource(provenance));
+        demographicsBundle
+                .getEntry()
+                .add(0, new Bundle.BundleEntryComponent().setResource(messageHeader));
+        demographicsBundle.addEntry(new Bundle.BundleEntryComponent().setResource(serviceRequest));
+        demographicsBundle.addEntry(new Bundle.BundleEntryComponent().setResource(provenance));
 
-        return new HapiLabOrder(labOrder);
+        return new HapiLabOrder(demographicsBundle);
     }
 
     private MessageHeader createMessageHeader(Coding omlLabOrderCoding) {
@@ -89,12 +99,6 @@ public class HapiLabOrderConverter implements LabOrderConverter {
                                         "P",
                                         "Production")));
 
-        messageHeader.setEvent(
-                new Coding(
-                        "http://terminology.hl7.org/CodeSystem/v2-0003",
-                        "O21",
-                        "OML - Laboratory order"));
-
         messageHeader.setSource(
                 new MessageHeader.MessageSourceComponent(
                                 new UrlType("https://reportstream.cdc.gov/"))
@@ -103,71 +107,7 @@ public class HapiLabOrderConverter implements LabOrderConverter {
         return messageHeader;
     }
 
-    private Patient createPatientResource(final PatientDemographics demographics) {
-        logger.logInfo("Creating new Patient");
-
-        var patient = new Patient();
-
-        patient.setId(demographics.getFhirResourceId());
-        patient.addIdentifier(
-                new Identifier()
-                        .setType(
-                                new CodeableConcept(
-                                        new Coding(
-                                                "http://terminology.hl7.org/CodeSystem/v2-0203",
-                                                "MR",
-                                                "Medical Record Number")))
-                        .setValue(demographics.getPatientId()));
-
-        patient.addName(
-                new HumanName()
-                        .setFamily(demographics.getLastName())
-                        .addGiven(demographics.getFirstName())
-                        .setUse(HumanName.NameUse.OFFICIAL));
-
-        patient.setGender(Enumerations.AdministrativeGender.fromCode(demographics.getSex()));
-
-        // birth date and time
-        var birthDate = new DateType(Date.from(demographics.getBirthDateTime().toInstant()));
-        birthDate.addExtension(
-                "http://hl7.org/fhir/StructureDefinition/patient-birthTime",
-                new DateTimeType(Date.from(demographics.getBirthDateTime().toInstant())));
-        patient.setBirthDateElement(birthDate);
-
-        patient.setMultipleBirth(new IntegerType(demographics.getBirthOrder()));
-
-        // race
-        var raceExtension =
-                new Extension()
-                        .setUrl("http://hl7.org/fhir/us/core/StructureDefinition/us-core-race");
-        raceExtension.addExtension("text", new StringType(demographics.getRace()));
-        patient.addExtension(raceExtension);
-
-        // next of kin
-        var nextOfKinRelationship =
-                new CodeableConcept(
-                        new Coding(
-                                "http://terminology.hl7.org/CodeSystem/v2-0131",
-                                "N",
-                                "Next of kin"));
-        var nextOfKinName =
-                new HumanName()
-                        .setFamily(demographics.getNextOfKin().getLastName())
-                        .addGiven(demographics.getNextOfKin().getFirstName());
-        var nextOfKinTelecom =
-                new ContactPoint()
-                        .setSystem(ContactPoint.ContactPointSystem.PHONE)
-                        .setValue(demographics.getNextOfKin().getPhoneNumber());
-        patient.addContact(
-                new Patient.ContactComponent()
-                        .addRelationship(nextOfKinRelationship)
-                        .setName(nextOfKinName)
-                        .addTelecom(nextOfKinTelecom));
-
-        return patient;
-    }
-
-    private ServiceRequest createServiceRequest(final Patient patient, Date orderDate) {
+    private ServiceRequest createServiceRequest(final Patient patient, final Date orderDateTime) {
         logger.logInfo("Creating new ServiceRequest");
 
         var serviceRequest = new ServiceRequest();
@@ -188,7 +128,7 @@ public class HapiLabOrderConverter implements LabOrderConverter {
 
         serviceRequest.setSubject(new Reference(patient));
 
-        serviceRequest.setAuthoredOn(orderDate);
+        serviceRequest.setAuthoredOn(orderDateTime);
 
         return serviceRequest;
     }

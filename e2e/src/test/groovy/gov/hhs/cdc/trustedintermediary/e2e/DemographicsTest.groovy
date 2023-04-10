@@ -13,7 +13,7 @@ class DemographicsTest extends Specification {
 
     def "a demographics response is returned from the ETOR demographics endpoint"() {
         given:
-        def expectedFhirResourceId  = "Patient/infant-twin-1"
+        def expectedFhirResourceId  = "Bundle/bundle-with-patient"
         def expectedPatientId  = "MRN7465737865"
 
         when:
@@ -52,7 +52,7 @@ class DemographicsTest extends Specification {
         parsedSentPayload.entry[1].resource.resourceType == "Patient"
         parsedSentPayload.entry[1].resource.id == "infant-twin-1"
 
-        parsedSentPayload.entry[1].resource.identifier[0].value == parsedResponseBody.patientId
-        parsedSentPayload.entry[1].resource.resourceType + "/" + parsedSentPayload.entry[1].resource.id == parsedResponseBody.fhirResourceId
+        parsedSentPayload.entry[1].resource.identifier[1].value == parsedResponseBody.patientId  //the second (index 1) identifier so happens to be the MRN
+        parsedSentPayload.resourceType + "/" + parsedSentPayload.id == parsedResponseBody.fhirResourceId
     }
 }

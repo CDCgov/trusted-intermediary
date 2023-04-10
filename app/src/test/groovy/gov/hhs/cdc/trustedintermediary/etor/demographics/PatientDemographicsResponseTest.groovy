@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.demographics
 
+import gov.hhs.cdc.trustedintermediary.DemographicsMock
 import gov.hhs.cdc.trustedintermediary.PojoTestUtils
 import spock.lang.Specification
 
@@ -18,9 +19,7 @@ class PatientDemographicsResponseTest extends Specification {
         def resourceId = "67890asdfg"
         def patientId = "fthgyu687"
 
-        def demographics = new PatientDemographics()
-        demographics.setFhirResourceId(resourceId)
-        demographics.setPatientId(patientId)
+        def demographics = new DemographicsMock(resourceId, patientId, null)
 
         when:
         def response = new PatientDemographicsResponse(demographics)

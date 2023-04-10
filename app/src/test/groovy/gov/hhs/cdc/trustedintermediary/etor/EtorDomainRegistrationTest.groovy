@@ -1,17 +1,15 @@
 package gov.hhs.cdc.trustedintermediary.etor
 
+import gov.hhs.cdc.trustedintermediary.DemographicsMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
 import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendLabOrderUsecase
-import gov.hhs.cdc.trustedintermediary.etor.demographics.NextOfKin
-import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographics
+import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse
 import spock.lang.Specification
-
-import java.time.ZonedDateTime
 
 class EtorDomainRegistrationTest extends Specification {
 
@@ -54,7 +52,7 @@ class EtorDomainRegistrationTest extends Specification {
 
         def mockRequestId = "asdf-12341-jkl-7890"
 
-        mockDemographicsController.parseDemographics(_ as DomainRequest) >> new PatientDemographics(mockRequestId, "a patient ID", "George", "Washington", "male", ZonedDateTime.now(), 1, "Asian", new NextOfKin("King", "George", "555-867-5309"))
+        mockDemographicsController.parseDemographics(_ as DomainRequest) >> new DemographicsMock(mockRequestId, "a patient ID", "demographics")
         mockDemographicsController.constructResponse(_ as PatientDemographicsResponse) >> new DomainResponse(418)
 
         def mockUsecase = Mock(ConvertAndSendLabOrderUsecase)
@@ -73,6 +71,6 @@ class EtorDomainRegistrationTest extends Specification {
         1 * mockDemographicsController.constructResponse(_ as PatientDemographicsResponse) >> { PatientDemographicsResponse demographicsResponse ->
             assert demographicsResponse.fhirResourceId == mockRequestId
         }
-        1 * mockUsecase.convertAndSend(_ as PatientDemographics)
+        1 * mockUsecase.convertAndSend(_ as Demographics)
     }
 }
