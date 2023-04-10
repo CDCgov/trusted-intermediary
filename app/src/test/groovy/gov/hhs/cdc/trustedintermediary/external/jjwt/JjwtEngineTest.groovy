@@ -1,9 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.external.jjwt
 
-import spock.lang.Specification
-
+import gov.hhs.cdc.trustedintermediary.wrappers.TokenGenerationException
+import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
+import spock.lang.Specification
 
 class JjwtEngineTest extends Specification {
 
@@ -24,5 +25,38 @@ class JjwtEngineTest extends Specification {
 
         then:
         actual.toString() == expected
+    }
+
+    def "generateSenderToken blows up because the key isn't Base64"() {
+        given:
+        def key = "DogCow is not actually an Base64 encoded"
+
+        when:
+        JjwtEngine.getInstance().generateSenderToken("sender", "baseUrl", key, "keyId", 300)
+
+        then:
+        thrown(TokenGenerationException)
+    }
+
+    def "generateSenderToken blows up because the key isn't valid RSA"() {
+        given:
+        def key = Base64.getEncoder().encodeToString("DogCow is not actually an RSA key".getBytes(StandardCharsets.UTF_8))
+
+        when:
+        JjwtEngine.getInstance().generateSenderToken("sender", "baseUrl", key, "keyId", 300)
+
+        then:
+        thrown(TokenGenerationException)
+    }
+
+    def "generateSenderToken blows up because Jjwt doesn't like something"() {
+        given:
+        def key = Files.readString(Path.of("..", "mock_credentials", "weak-rsa-key.pem"))
+
+        when:
+        JjwtEngine.getInstance().generateSenderToken("sender", "baseUrl", key, "keyId", 300)
+
+        then:
+        thrown(TokenGenerationException)
     }
 }
