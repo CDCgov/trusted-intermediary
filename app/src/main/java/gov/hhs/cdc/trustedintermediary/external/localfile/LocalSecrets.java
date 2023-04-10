@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.localfile;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,19 +25,17 @@ public class LocalSecrets implements Secrets {
     }
 
     @Override
-    public String getKey(String secretName) {
+    public String getKey(String secretName) throws SecretRetrievalException {
 
         logger.logInfo("Acquiring local key...");
         String key = "";
 
         try {
-            key =
-                    new String(
-                            Files.readAllBytes(
-                                    Path.of("..", "mock_credentials", secretName + ".pem")));
+            key = Files.readString(Path.of("..", "mock_credentials", secretName + ".pem"));
         } catch (IOException e) {
-            // TODO exception handling
-            logger.logError("Error getting local key", e);
+            var message = "Error getting local key";
+            logger.logError(message, e);
+            throw new SecretRetrievalException(message, e);
         }
 
         return key;

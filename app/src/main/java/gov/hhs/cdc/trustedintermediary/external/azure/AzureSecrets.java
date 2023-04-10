@@ -1,11 +1,13 @@
 package gov.hhs.cdc.trustedintermediary.external.azure;
 
+import com.azure.core.exception.AzureException;
 import com.azure.identity.DefaultAzureCredentialBuilder;
 import com.azure.security.keyvault.secrets.SecretClient;
 import com.azure.security.keyvault.secrets.SecretClientBuilder;
 import com.azure.security.keyvault.secrets.models.KeyVaultSecret;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import javax.inject.Inject;
 
@@ -38,10 +40,15 @@ public class AzureSecrets implements Secrets {
     }
 
     @Override
-    public String getKey(String secretName) {
+    public String getKey(String secretName) throws SecretRetrievalException {
 
         logger.logInfo("Acquiring Azure key...");
-        KeyVaultSecret storedSecret = secretClient.getSecret(secretName);
-        return storedSecret.getValue();
+        try {
+            KeyVaultSecret storedSecret = secretClient.getSecret(secretName);
+            return storedSecret.getValue();
+        } catch (AzureException exception) {
+            throw new SecretRetrievalException(
+                    "Not able to retrieve secret " + secretName + " from Azure", exception);
+        }
     }
 }
