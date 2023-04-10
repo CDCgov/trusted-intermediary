@@ -8,6 +8,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient
+import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
 import spock.lang.Specification
 
 class ReportStreamLabOrderSenderTest extends Specification {
@@ -52,11 +53,14 @@ class ReportStreamLabOrderSenderTest extends Specification {
         def expected = "rs fake token"
         def mockAuthEngine = Mock(AuthEngine)
         def mockClient = Mock(HttpClient)
+        def mockSecrets = Mock(Secrets)
         TestApplicationContext.register(AuthEngine, mockAuthEngine)
         TestApplicationContext.register(HttpClient, mockClient)
         TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.register(Secrets, mockSecrets)
         TestApplicationContext.injectRegisteredImplementations()
         when:
+        mockSecrets.getKey(_ as String) >> "Fake Azure Key"
         def actual = ReportStreamLabOrderSender.getInstance().requestToken()
         then:
         1 * mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "sender fake token"

@@ -9,6 +9,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
@@ -37,6 +38,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     @Inject private Formatter jackson;
     @Inject private HapiFhir fhir;
     @Inject private Logger logger;
+    @Inject private Secrets secrets;
 
     public static ReportStreamLabOrderSender getInstance() {
         return INSTANCE;
@@ -82,10 +84,16 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         String token = "";
         String body;
         Map<String, String> headers = Map.of("Content-Type", "application/x-www-form-urlencoded");
+        var senderPrivateKey =
+                "report-stream-sender-private-key-" + ApplicationContext.getEnvironment();
         try {
             senderToken =
                     jwt.generateSenderToken(
-                            CLIENT_NAME, RS_DOMAIN_NAME, "pemKey", CLIENT_NAME, 300);
+                            CLIENT_NAME,
+                            RS_DOMAIN_NAME,
+                            secrets.getKey(senderPrivateKey),
+                            CLIENT_NAME,
+                            300);
             body = composeRequestBody(senderToken);
             String rsResponse = client.post(RS_AUTH_API_URL, headers, body);
             // TODO response handling for good structure of response, else it will fail to extract
