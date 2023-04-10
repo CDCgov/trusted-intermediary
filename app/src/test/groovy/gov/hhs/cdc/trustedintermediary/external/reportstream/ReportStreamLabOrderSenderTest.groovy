@@ -45,7 +45,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         ReportStreamLabOrderSender.getInstance().sendRequestBody("message_2", "fake token")
 
         then:
-        noExceptionThrown()  //This test to be updated whenever the actual code's TODO is addressed for the exception handling
+        thrown(Exception)  //This test to be updated whenever the actual code's TODO is addressed for the exception handling
     }
 
     def "requestToken works"() {
