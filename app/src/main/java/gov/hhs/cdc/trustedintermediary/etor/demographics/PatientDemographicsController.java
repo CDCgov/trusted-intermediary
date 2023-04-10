@@ -55,4 +55,19 @@ public class PatientDemographicsController {
 
         return response;
     }
+
+    public DomainResponse constructResponse(int httpStatus, Exception exception) {
+        var domainResponse = new DomainResponse(httpStatus);
+
+        try {
+            var responseBody = formatter.convertToString(Map.of("error", exception.getMessage()));
+            domainResponse.setBody(responseBody);
+        } catch (FormatterProcessingException e) {
+            logger.logError("Error constructing demographics response", e);
+            throw new RuntimeException(e);
+        }
+        domainResponse.setHeaders(Map.of(CONTENT_TYPE_LITERAL, APPLICATION_JSON_LITERAL));
+
+        return domainResponse;
+    }
 }

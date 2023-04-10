@@ -21,7 +21,7 @@ public class ConvertAndSendLabOrderUsecase {
 
     private ConvertAndSendLabOrderUsecase() {}
 
-    public void convertAndSend(Demographics<?> demographics) {
+    public void convertAndSend(Demographics<?> demographics) throws UnableToSendLabOrderException {
         LabOrder<?> labOrder = converter.convertToOrder(demographics);
         sender.sendOrder(labOrder);
     }
