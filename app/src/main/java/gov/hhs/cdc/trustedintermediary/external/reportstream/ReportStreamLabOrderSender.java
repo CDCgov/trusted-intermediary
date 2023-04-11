@@ -97,8 +97,6 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
                             300);
             body = composeRequestBody(senderToken);
             String rsResponse = client.post(RS_AUTH_API_URL, headers, body);
-            // TODO response handling for good structure of response, else it will fail to extract
-            // the key
             token = extractToken(rsResponse);
         } catch (Exception e) {
             throw new UnableToSendLabOrderException(
