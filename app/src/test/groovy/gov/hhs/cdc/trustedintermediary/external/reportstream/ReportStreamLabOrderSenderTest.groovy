@@ -3,13 +3,18 @@ package gov.hhs.cdc.trustedintermediary.external.reportstream
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender
+import gov.hhs.cdc.trustedintermediary.external.azure.AzureSecrets
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
+import gov.hhs.cdc.trustedintermediary.external.localfile.LocalSecrets
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
 import spock.lang.Specification
+
+import java.nio.file.Files
+import java.nio.file.Path
 
 class ReportStreamLabOrderSenderTest extends Specification {
 
@@ -151,5 +156,27 @@ class ReportStreamLabOrderSenderTest extends Specification {
 
         then:
         noExceptionThrown()
+    }
+
+    def "is azure key cached" (){
+        given:
+
+        def mockAuthEngine = Mock(AuthEngine)
+        def mockClient = Mock(HttpClient)
+        def mockSecrets = Mock(Secrets)
+        TestApplicationContext.register(AuthEngine, mockAuthEngine)
+        TestApplicationContext.register(HttpClient, mockClient)
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.register(Secrets, mockSecrets)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        def secretName = "report-stream-sender-private-key-local"  //pragma: allowlist secret
+        def expected = Files.readString(Path.of("..", "mock_credentials", secretName + ".pem"))
+
+        when:
+        def actual = AzureSecrets.getInstance().getKey(secretName)
+
+        then:
+        actual != null
     }
 }
