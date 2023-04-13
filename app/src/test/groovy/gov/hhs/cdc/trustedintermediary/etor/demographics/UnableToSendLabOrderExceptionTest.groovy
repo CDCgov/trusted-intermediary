@@ -3,7 +3,7 @@ package gov.hhs.cdc.trustedintermediary.etor.demographics
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException
 import spock.lang.Specification
 
-class UnabletoSendLabOrderExceptionTest extends Specification {
+class UnableToSendLabOrderExceptionTest extends Specification {
     def "contructor works"() {
 
         given:
