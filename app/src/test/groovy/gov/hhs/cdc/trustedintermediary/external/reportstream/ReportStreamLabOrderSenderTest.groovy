@@ -168,6 +168,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         TestApplicationContext.register(HttpClient, mockClient)
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.register(Secrets, mockSecrets)
+        TestApplicationContext.register(Secrets.class, AzureSecrets.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         def secretName = "report-stream-sender-private-key-local"  //pragma: allowlist secret

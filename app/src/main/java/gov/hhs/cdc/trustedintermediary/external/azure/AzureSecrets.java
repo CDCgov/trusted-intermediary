@@ -51,4 +51,14 @@ public class AzureSecrets implements Secrets {
                     "Not able to retrieve secret " + secretName + " from Azure", exception);
         }
     }
+
+    //    public String checkKeyCache () {
+    //        // TODO - if cache is null, then return getKey, else return cache
+    //        String env = ApplicationContext.getEnvironment();
+    //        Map<String,String> kevCacheMap = new Map.of("production", "pkey", "staging", "skey");
+    //        String key = kevCacheMap.get(env);
+    //        // TODO - if key is blank then call getKey
+    //        return key.isBlank() ? getKey(secretName) : storedSecret.getValue;
+    //    }
+
 }
