@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.reportstream
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender
+import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter
@@ -10,6 +11,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
 import spock.lang.Specification
+import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException
 
 class ReportStreamLabOrderSenderTest extends Specification {
 
@@ -85,30 +87,43 @@ class ReportStreamLabOrderSenderTest extends Specification {
 
     def "extractToken fails from not getting a String in the access_token"() {
         given:
+        def clientMock = Mock(HttpClient)
         TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.register(HttpClient, clientMock)
+        TestApplicationContext.register(Secrets, Mock(Secrets))
+        TestApplicationContext.register(AuthEngine, Mock(AuthEngine))
         TestApplicationContext.injectRegisteredImplementations()
 
         def responseBody = """{"foo":"foo value", "access_token":3, "boo":"boo value"}"""
+        clientMock.post(_ as String, _ as Map, _ as String) >> responseBody
 
         when:
-        ReportStreamLabOrderSender.getInstance().extractToken(responseBody)
+        ReportStreamLabOrderSender.getInstance().requestToken()
 
         then:
-        noExceptionThrown()  //This test to be updated whenever the actual code's TODO is addressed for the exception handling
+        def exception = thrown(UnableToSendLabOrderException)
+        exception.getCause().getClass() == ClassCastException
     }
 
     def "extractToken fails from not getting valid JSON from the auth token endpoint"() {
         given:
+        def clientMock = Mock(HttpClient)
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.register(HttpClient, clientMock)
+        TestApplicationContext.register(Secrets, Mock(Secrets))
+        TestApplicationContext.register(AuthEngine, Mock(AuthEngine))
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         def responseBody = """{"foo":"foo value", "access_token":"""
+        clientMock.post(_ as String, _ as Map, _ as String) >> responseBody
 
         when:
-        ReportStreamLabOrderSender.getInstance().extractToken(responseBody)
+        ReportStreamLabOrderSender.getInstance().requestToken()
 
         then:
-        noExceptionThrown()  //This test to be updated whenever the actual code's TODO is addressed for the exception handling
+        def exception = thrown(UnableToSendLabOrderException)
+        exception.getCause().getClass() == FormatterProcessingException
     }
 
     def "composeRequestBody works"() {
@@ -129,9 +144,13 @@ class ReportStreamLabOrderSenderTest extends Specification {
 
         given:
         def mockAuthEngine = Mock(AuthEngine)
+        def mockSecrets = Mock(Secrets)
         def mockClient = Mock(HttpClient)
         def mockFhir = Mock(HapiFhir)
         def mockFormatter = Mock(Formatter)
+        mockClient.post(_ as String, _ as Map, _ as String) >> "something"
+        mockFormatter.convertToObject(_ as String, _ as Class) >> Map.of("access_token", "fake-token")
+        TestApplicationContext.register(Secrets, mockSecrets)
         TestApplicationContext.register(AuthEngine, mockAuthEngine)
         TestApplicationContext.register(HttpClient, mockClient)
         TestApplicationContext.register(HapiFhir, mockFhir)

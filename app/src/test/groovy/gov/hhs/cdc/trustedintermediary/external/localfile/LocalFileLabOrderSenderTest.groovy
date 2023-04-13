@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.localfile
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder
+import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import spock.lang.Specification
 
@@ -64,7 +65,7 @@ class LocalFileLabOrderSenderTest extends Specification{
         LocalFileLabOrderSender.getInstance().sendOrder(mockOrder)
 
         then:
-        def exception = thrown(RuntimeException)
+        def exception = thrown(UnableToSendLabOrderException)
         exception.getCause() == nullException
     }
 }
