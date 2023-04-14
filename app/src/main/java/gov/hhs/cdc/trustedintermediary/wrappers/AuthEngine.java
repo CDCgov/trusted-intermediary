@@ -1,5 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.wrappers;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import javax.annotation.Nonnull;
 
 /**
@@ -15,4 +17,7 @@ public interface AuthEngine {
             @Nonnull String keyId,
             int expirationSecondsFromNow)
             throws TokenGenerationException;
+
+    boolean isExpiredToken(String token, String secret)
+            throws InvalidKeySpecException, NoSuchAlgorithmException;
 }

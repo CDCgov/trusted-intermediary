@@ -2,14 +2,17 @@ package gov.hhs.cdc.trustedintermediary.external.jjwt;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.TokenGenerationException;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Date;
 import java.util.UUID;
@@ -82,5 +85,27 @@ public class JjwtEngine implements AuthEngine {
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encode);
         return (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
+    }
+
+    protected RSAPublicKey readPublicKey(@Nonnull String pemKey)
+            throws InvalidKeySpecException, NoSuchAlgorithmException {
+        String publicPemKey =
+                pemKey.replace("-----BEGIN PUBLIC KEY-----", "")
+                        .replaceAll(System.lineSeparator(), "")
+                        .replace("-----END PUBLIC KEY-----", "");
+        byte[] encoded = Base64.getDecoder().decode(publicPemKey);
+
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
+        return (RSAPublicKey) keyFactory.generatePublic(keySpec);
+    }
+
+    @Override
+    public boolean isExpiredToken(String jwt, String secret)
+            throws InvalidKeySpecException, NoSuchAlgorithmException {
+        RSAPublicKey key = readPublicKey(secret);
+        Claims claims = Jwts.parser().setSigningKey(key.toString()).parseClaimsJws(jwt).getBody();
+        Date expirationDate = claims.getExpiration();
+        return expirationDate.before(new Date(expirationDate.getTime() + 300000));
     }
 }

@@ -11,7 +11,10 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nonnull;
@@ -34,6 +37,16 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
 
     private static final String CLIENT_NAME = "flexion.etor-service-sender";
 
+    private String rsTokenCache;
+
+    protected synchronized String getRsTokeCache() {
+        return rsTokenCache;
+    }
+
+    protected synchronized void setRsTokenCache(String token) {
+        this.rsTokenCache = token;
+    }
+
     @Inject private HttpClient client;
     @Inject private AuthEngine jwt;
     @Inject private Formatter jackson;
@@ -48,12 +61,33 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     private ReportStreamLabOrderSender() {}
 
     @Override
-    public void sendOrder(final LabOrder<?> order) throws UnableToSendLabOrderException {
+    public void sendOrder(final LabOrder<?> order)
+            throws UnableToSendLabOrderException, SecretRetrievalException, InvalidKeySpecException,
+                    NoSuchAlgorithmException {
         logger.logInfo("Sending the order to ReportStream at {}", RS_DOMAIN_NAME);
 
         String json = fhir.encodeResourceToJson(order.getUnderlyingOrder());
-        String bearerToken = requestToken();
+        String bearerToken = getRsToken();
         sendRequestBody(json, bearerToken);
+    }
+
+    protected String getRsToken()
+            throws UnableToSendLabOrderException, SecretRetrievalException, InvalidKeySpecException,
+                    NoSuchAlgorithmException {
+        if (getRsTokeCache() != null && isValidToken()) {
+            return getRsTokeCache();
+        }
+
+        String token = requestToken();
+        setRsTokenCache(token);
+
+        return token;
+    }
+
+    protected boolean isValidToken()
+            throws SecretRetrievalException, InvalidKeySpecException, NoSuchAlgorithmException {
+        String token = getRsTokeCache();
+        return jwt.isExpiredToken(token, secrets.getKey("RS key"));
     }
 
     protected String sendRequestBody(@Nonnull String json, @Nonnull String bearerToken)
