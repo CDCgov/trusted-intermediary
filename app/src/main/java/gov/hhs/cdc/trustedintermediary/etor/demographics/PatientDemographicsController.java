@@ -8,6 +8,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.Map;
+import java.util.Optional;
 import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
 
@@ -60,7 +61,10 @@ public class PatientDemographicsController {
         var domainResponse = new DomainResponse(httpStatus);
 
         try {
-            var responseBody = formatter.convertToString(Map.of("error", exception.getMessage()));
+            var stringMessage =
+                    Optional.ofNullable(exception.getMessage())
+                            .orElse(exception.getClass().toString());
+            var responseBody = formatter.convertToString(Map.of("error", stringMessage));
             domainResponse.setBody(responseBody);
         } catch (FormatterProcessingException e) {
             logger.logError("Error constructing an error response", e);
