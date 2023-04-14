@@ -87,7 +87,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     protected boolean isValidToken()
             throws SecretRetrievalException, InvalidKeySpecException, NoSuchAlgorithmException {
         String token = getRsTokeCache();
-        return jwt.isExpiredToken(token, secrets.getKey("RS key"));
+        return !jwt.isExpiredToken(token, secrets.getKey("RS key"));
     }
 
     protected String sendRequestBody(@Nonnull String json, @Nonnull String bearerToken)
