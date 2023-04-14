@@ -36,7 +36,7 @@ class PatientDemographicsControllerTest extends Specification {
         patientDemographics.getUnderlyingDemographics() == mockBundle
     }
 
-    def "constructResponse works"() {
+    def "demographics constructResponse works"() {
 
         given:
         def mockBody = "DogCow goes Moof"
@@ -56,7 +56,7 @@ class PatientDemographicsControllerTest extends Specification {
         response.getHeaders().get(PatientDemographicsController.CONTENT_TYPE_LITERAL) == PatientDemographicsController.APPLICATION_JSON_LITERAL
     }
 
-    def "constructResponse fails to make the JSON"() {
+    def "demographics constructResponse fails to make the JSON"() {
 
         given:
         def formatter = Mock(Jackson)
@@ -66,9 +66,9 @@ class PatientDemographicsControllerTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PatientDemographicsController.getInstance().constructResponse(new PatientDemographicsResponse("asdf-12341-jkl-7890", "asdf1234"))
+        def response = PatientDemographicsController.getInstance().constructResponse(new PatientDemographicsResponse("asdf-12341-jkl-7890", "asdf1234"))
 
         then:
-        thrown(RuntimeException)
+        response.statusCode == 500
     }
 }
