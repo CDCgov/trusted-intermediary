@@ -158,26 +158,34 @@ class ReportStreamLabOrderSenderTest extends Specification {
         noExceptionThrown()
     }
 
-    def "is azure key cached" (){
+    def "retrieveAzureKey works when cache is empty" () {
         given:
 
-        def mockAuthEngine = Mock(AuthEngine)
-        def mockClient = Mock(HttpClient)
-        def mockSecrets = Mock(Secrets)
-        TestApplicationContext.register(AuthEngine, mockAuthEngine)
-        TestApplicationContext.register(HttpClient, mockClient)
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.register(Secrets, mockSecrets)
-        TestApplicationContext.register(Secrets.class, AzureSecrets.getInstance())
+        def mockSecret = Mock(Secrets)
+        def expected = "New Fake Azure Key"
+        mockSecret.getKey(_ as String) >> expected
+        TestApplicationContext.register(Secrets, mockSecret)
         TestApplicationContext.injectRegisteredImplementations()
-
-        def secretName = "report-stream-sender-private-key-local"  //pragma: allowlist secret
-        def expected = Files.readString(Path.of("..", "mock_credentials", secretName + ".pem"))
+        def labOrderSender = ReportStreamLabOrderSender.getInstance()
 
         when:
-        def actual = AzureSecrets.getInstance().getKey(secretName)
+        def actual = labOrderSender.retrieveAzureKey("senderPrivateKey")
 
         then:
-        actual != null
+        expected == actual
+        expected == labOrderSender.getAzureKeyCache()
+    }
+
+    def "retrieveAzureKey works when cache is not" () {
+        given:
+        def expected = "existing fake azure key"
+        def labOrderSender = ReportStreamLabOrderSender.getInstance()
+
+        when:
+        labOrderSender.setAzureKeyCache(expected)
+        def actual = labOrderSender.retrieveAzureKey("senderPrivateKey")
+
+        then:
+        expected == actual
     }
 }
