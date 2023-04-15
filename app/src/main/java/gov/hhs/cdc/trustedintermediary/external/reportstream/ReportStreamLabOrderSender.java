@@ -9,6 +9,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import java.io.IOException;
 import java.util.Map;
@@ -32,6 +33,16 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
                     .orElse("");
 
     private static final String CLIENT_NAME = "flexion.etor-service-sender";
+
+    private String azureKeyCache;
+
+    public String getAzureKeyCache() {
+        return azureKeyCache;
+    }
+
+    public void setAzureKeyCache(String azureKeyCache) {
+        this.azureKeyCache = azureKeyCache;
+    }
 
     @Inject private HttpClient client;
     @Inject private AuthEngine jwt;
@@ -90,7 +101,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
                     jwt.generateSenderToken(
                             CLIENT_NAME,
                             RS_DOMAIN_NAME,
-                            secrets.getKey(senderPrivateKey),
+                            retrieveAzureKey(senderPrivateKey),
                             CLIENT_NAME,
                             300);
             body = composeRequestBody(senderToken);
@@ -102,6 +113,17 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
             logger.logError("Error getting the API token from ReportStream", e);
         }
         return token;
+    }
+
+    protected String retrieveAzureKey(String senderPrivateKey) throws SecretRetrievalException {
+        String key;
+        if (getAzureKeyCache() != null) {
+            return getAzureKeyCache();
+        }
+
+        key = secrets.getKey(senderPrivateKey);
+        setAzureKeyCache(key);
+        return key;
     }
 
     protected String extractToken(String responseBody) {
