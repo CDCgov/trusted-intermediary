@@ -167,7 +167,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         TestApplicationContext.register(Secrets, mockSecret)
         TestApplicationContext.injectRegisteredImplementations()
         def labOrderSender = ReportStreamLabOrderSender.getInstance()
-
+        labOrderSender.azureKeyCache = null // TODO - azureKeyCache needs to be emptied from prior test
         when:
         def actual = labOrderSender.retrieveAzureKey("senderPrivateKey")
 
@@ -176,7 +176,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         expected == labOrderSender.getAzureKeyCache()
     }
 
-    def "retrieveAzureKey works when cache is not" () {
+    def "retrieveAzureKey works when cache is not empty" () {
         given:
         def expected = "existing fake azure key"
         def labOrderSender = ReportStreamLabOrderSender.getInstance()
