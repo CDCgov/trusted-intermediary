@@ -3,18 +3,13 @@ package gov.hhs.cdc.trustedintermediary.external.reportstream
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender
-import gov.hhs.cdc.trustedintermediary.external.azure.AzureSecrets
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
-import gov.hhs.cdc.trustedintermediary.external.localfile.LocalSecrets
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
 import spock.lang.Specification
-
-import java.nio.file.Files
-import java.nio.file.Path
 
 class ReportStreamLabOrderSenderTest extends Specification {
 
@@ -167,13 +162,13 @@ class ReportStreamLabOrderSenderTest extends Specification {
         TestApplicationContext.register(Secrets, mockSecret)
         TestApplicationContext.injectRegisteredImplementations()
         def labOrderSender = ReportStreamLabOrderSender.getInstance()
-        labOrderSender.azureKeyCache = null // TODO - azureKeyCache needs to be emptied from prior test
+        labOrderSender.cachedAzureKey = null // TODO - azureKeyCache needs to be emptied from prior test
         when:
         def actual = labOrderSender.retrieveAzureKey("senderPrivateKey")
 
         then:
         expected == actual
-        expected == labOrderSender.getAzureKeyCache()
+        expected == labOrderSender.getCachedAzureKey()
     }
 
     def "retrieveAzureKey works when cache is not empty" () {
@@ -182,7 +177,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         def labOrderSender = ReportStreamLabOrderSender.getInstance()
 
         when:
-        labOrderSender.setAzureKeyCache(expected)
+        labOrderSender.setCachedAzureKey(expected)
         def actual = labOrderSender.retrieveAzureKey("senderPrivateKey")
 
         then:

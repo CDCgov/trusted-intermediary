@@ -34,14 +34,14 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
 
     private static final String CLIENT_NAME = "flexion.etor-service-sender";
 
-    private String azureKeyCache;
+    private String cachedAzureKey;
 
-    public String getAzureKeyCache() {
-        return azureKeyCache;
+    public String getCachedAzureKey() {
+        return cachedAzureKey;
     }
 
-    public void setAzureKeyCache(String azureKeyCache) {
-        this.azureKeyCache = azureKeyCache;
+    public void setCachedAzureKey(String cachedAzureKey) {
+        this.cachedAzureKey = cachedAzureKey;
     }
 
     @Inject private HttpClient client;
@@ -117,12 +117,12 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
 
     protected String retrieveAzureKey(String senderPrivateKey) throws SecretRetrievalException {
         String key;
-        if (getAzureKeyCache() != null) {
-            return getAzureKeyCache();
+        if (getCachedAzureKey() != null) {
+            return getCachedAzureKey();
         }
 
         key = secrets.getKey(senderPrivateKey);
-        setAzureKeyCache(key);
+        setCachedAzureKey(key);
         return key;
     }
 
