@@ -36,11 +36,11 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
 
     private String cachedAzureKey;
 
-    public String getCachedAzureKey() {
+    protected synchronized String getCachedAzureKey() {
         return cachedAzureKey;
     }
 
-    public void setCachedAzureKey(String cachedAzureKey) {
+    protected synchronized void setCachedAzureKey(String cachedAzureKey) {
         this.cachedAzureKey = cachedAzureKey;
     }
 
