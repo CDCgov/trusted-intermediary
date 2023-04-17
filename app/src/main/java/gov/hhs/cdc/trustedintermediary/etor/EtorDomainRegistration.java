@@ -10,6 +10,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
+import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiLabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileLabOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamLabOrderSender;
@@ -66,7 +67,12 @@ public class EtorDomainRegistration implements DomainConnector {
 
         var demographics = patientDemographicsController.parseDemographics(request);
 
-        convertAndSendLabOrderUsecase.convertAndSend(demographics);
+        try {
+            convertAndSendLabOrderUsecase.convertAndSend(demographics);
+        } catch (UnableToSendLabOrderException e) {
+            logger.logError("Unable to send lab order", e);
+            return patientDemographicsController.constructResponse(400, e);
+        }
 
         PatientDemographicsResponse patientDemographicsResponse =
                 new PatientDemographicsResponse(demographics);

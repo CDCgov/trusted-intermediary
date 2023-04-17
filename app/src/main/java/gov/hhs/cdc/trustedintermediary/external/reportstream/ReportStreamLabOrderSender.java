@@ -3,15 +3,16 @@ package gov.hhs.cdc.trustedintermediary.external.reportstream;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender;
+import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException;
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
+import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
-import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nonnull;
@@ -58,7 +59,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     private ReportStreamLabOrderSender() {}
 
     @Override
-    public void sendOrder(final LabOrder<?> order) {
+    public void sendOrder(final LabOrder<?> order) throws UnableToSendLabOrderException {
         logger.logInfo("Sending the order to ReportStream at {}", RS_DOMAIN_NAME);
 
         String json = fhir.encodeResourceToJson(order.getUnderlyingOrder());
@@ -66,7 +67,8 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         sendRequestBody(json, bearerToken);
     }
 
-    protected String sendRequestBody(@Nonnull String json, @Nonnull String bearerToken) {
+    protected String sendRequestBody(@Nonnull String json, @Nonnull String bearerToken)
+            throws UnableToSendLabOrderException {
         logger.logInfo("Sending to payload to ReportStream");
 
         String res = "";
@@ -80,14 +82,14 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
                         "application/fhir+ndjson");
         try {
             res = client.post(RS_WATERS_API_URL, headers, json);
-        } catch (IOException e) {
-            logger.logError("Error POSTing the payload to ReportStream", e);
+        } catch (HttpClientException e) {
+            throw new UnableToSendLabOrderException("Error POSTing the payload to ReportStream", e);
         }
 
         return res;
     }
 
-    protected String requestToken() {
+    protected String requestToken() throws UnableToSendLabOrderException {
         logger.logInfo("Requesting token from ReportStream");
 
         String senderToken = null;
@@ -106,11 +108,10 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
                             300);
             body = composeRequestBody(senderToken);
             String rsResponse = client.post(RS_AUTH_API_URL, headers, body);
-            // TODO response handling for good structure of response, else it will fail to extract
-            // the key
             token = extractToken(rsResponse);
         } catch (Exception e) {
-            logger.logError("Error getting the API token from ReportStream", e);
+            throw new UnableToSendLabOrderException(
+                    "Error getting the API token from ReportStream", e);
         }
         return token;
     }
@@ -126,16 +127,12 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         return key;
     }
 
-    protected String extractToken(String responseBody) {
+    protected String extractToken(String responseBody) throws FormatterProcessingException {
+
         Map<String, String> value;
-        try {
-            value = jackson.convertToObject(responseBody, Map.class);
-            return value.get("access_token");
-        } catch (FormatterProcessingException | ClassCastException e) {
-            logger.logError("Error parsing the ReportStream auth token response body", e);
-            // TODO exception handling
-        }
-        return "";
+
+        value = jackson.convertToObject(responseBody, Map.class);
+        return value.get("access_token");
     }
 
     protected String composeRequestBody(String senderToken) {
