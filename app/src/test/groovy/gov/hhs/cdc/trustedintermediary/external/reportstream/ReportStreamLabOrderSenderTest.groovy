@@ -172,7 +172,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         noExceptionThrown()
     }
 
-    def "azureCachedKey getter and setter works" () {
+    def "cachedAzureKey getter and setter works" () {
         given:
         def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
         def expected = "a fake azure key"
@@ -185,7 +185,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         expected == actual
     }
 
-    def "azureCachedKey synchronization lock is working" () {
+    def "cachedAzureKey synchronization lock is working" () {
         given:
         def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
         def threadCount = 15
