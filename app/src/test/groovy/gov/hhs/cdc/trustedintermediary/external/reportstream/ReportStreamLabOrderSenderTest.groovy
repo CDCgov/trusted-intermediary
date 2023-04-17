@@ -171,4 +171,11 @@ class ReportStreamLabOrderSenderTest extends Specification {
         then:
         noExceptionThrown()
     }
+
+    def "live test"() {
+        given:
+        when:
+        then:
+        1==1
+    }
 }

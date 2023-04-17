@@ -39,7 +39,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
 
     private String rsTokenCache;
 
-    protected synchronized String getRsTokeCache() {
+    protected synchronized String getRsTokenCache() {
         return rsTokenCache;
     }
 
@@ -74,8 +74,8 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     protected String getRsToken()
             throws UnableToSendLabOrderException, SecretRetrievalException, InvalidKeySpecException,
                     NoSuchAlgorithmException {
-        if (getRsTokeCache() != null && isValidToken()) {
-            return getRsTokeCache();
+        if (getRsTokenCache() != null && isValidToken()) {
+            return getRsTokenCache();
         }
 
         String token = requestToken();
@@ -86,7 +86,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
 
     protected boolean isValidToken()
             throws SecretRetrievalException, InvalidKeySpecException, NoSuchAlgorithmException {
-        String token = getRsTokeCache();
+        String token = getRsTokenCache();
         return !jwt.isExpiredToken(token, secrets.getKey("RS key"));
     }
 

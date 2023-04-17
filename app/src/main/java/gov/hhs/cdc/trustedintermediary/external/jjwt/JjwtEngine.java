@@ -104,8 +104,13 @@ public class JjwtEngine implements AuthEngine {
     public boolean isExpiredToken(String jwt, String secret)
             throws InvalidKeySpecException, NoSuchAlgorithmException {
         RSAPublicKey key = readPublicKey(secret);
-        Claims claims = Jwts.parser().setSigningKey(key.toString()).parseClaimsJws(jwt).getBody();
+        Claims claims = Jwts.parserBuilder().build().parseClaimsJws(jwt).getBody();
         Date expirationDate = claims.getExpiration();
+        System.out.println("**************************");
+        System.out.println("");
+        System.out.println("Expiration Date: " + expirationDate);
+        System.out.println("");
+        System.out.println("**************************");
         return expirationDate.before(new Date(expirationDate.getTime() + 300000));
     }
 }
