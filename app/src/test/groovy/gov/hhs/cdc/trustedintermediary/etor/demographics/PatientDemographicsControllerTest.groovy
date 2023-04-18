@@ -36,7 +36,7 @@ class PatientDemographicsControllerTest extends Specification {
         patientDemographics.getUnderlyingDemographics() == mockBundle
     }
 
-    def "constructResponse works"() {
+    def "demographics constructResponse works"() {
 
         given:
         def mockBody = "DogCow goes Moof"
@@ -56,7 +56,7 @@ class PatientDemographicsControllerTest extends Specification {
         response.getHeaders().get(PatientDemographicsController.CONTENT_TYPE_LITERAL) == PatientDemographicsController.APPLICATION_JSON_LITERAL
     }
 
-    def "constructResponse fails to make the JSON"() {
+    def "demographics constructResponse fails to make the JSON"() {
 
         given:
         def formatter = Mock(Jackson)
@@ -66,9 +66,71 @@ class PatientDemographicsControllerTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PatientDemographicsController.getInstance().constructResponse(new PatientDemographicsResponse("asdf-12341-jkl-7890", "asdf1234"))
+        def response = PatientDemographicsController.getInstance().constructResponse(new PatientDemographicsResponse("asdf-12341-jkl-7890", "asdf1234"))
 
         then:
-        thrown(RuntimeException)
+        response.statusCode == 500
+    }
+
+    def "failed constructResponse works"() {
+
+        given:
+        def mockBody = "DogCow goes Moof"
+        def mockResponseStatus = 404
+
+        def formatter = Mock(Jackson)
+        formatter.convertToString(_ as Map) >> mockBody
+        TestApplicationContext.register(Formatter, formatter)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def response = PatientDemographicsController.getInstance().constructResponse(mockResponseStatus, new Exception("dogcow"))
+
+        then:
+        response.getBody() == mockBody
+        response.getStatusCode() == mockResponseStatus
+        response.getHeaders().get(PatientDemographicsController.CONTENT_TYPE_LITERAL) == PatientDemographicsController.APPLICATION_JSON_LITERAL
+    }
+
+    def "failed constructResponse fails to make the JSON"() {
+
+        given:
+        def formatter = Mock(Jackson)
+        formatter.convertToString(_ as Map) >> { throw new FormatterProcessingException("couldn't make the JSON", new Exception()) }
+        TestApplicationContext.register(Formatter, formatter)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def response = PatientDemographicsController.getInstance().constructResponse(404, new Exception("dogcow"))
+
+        then:
+        response.statusCode == 500
+    }
+
+    def "failed constructResponse uses a different error message if there isn't a message in the Exception"() {
+
+        given:
+        def mockBody = "DogCow goes Moof"
+        def mockResponseStatus = 404
+        def mockException = new NullPointerException()
+
+        def formatter = Mock(Jackson)
+        1 * formatter.convertToString(_ as Map) >> { Map error ->
+            assert error.get("error") == mockException.getClass().toString()
+            return mockBody
+        }
+        TestApplicationContext.register(Formatter, formatter)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def response = PatientDemographicsController.getInstance().constructResponse(mockResponseStatus, mockException)
+
+        then:
+        response.getBody() == mockBody
+        response.getStatusCode() == mockResponseStatus
+        response.getHeaders().get(PatientDemographicsController.CONTENT_TYPE_LITERAL) == PatientDemographicsController.APPLICATION_JSON_LITERAL
     }
 }
