@@ -172,27 +172,27 @@ class ReportStreamLabOrderSenderTest extends Specification {
         noExceptionThrown()
     }
 
-    def "cachedAzureKey getter and setter works" () {
+    def "cachedPrivateKey getter and setter works" () {
         given:
         def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
         def expected = "a fake azure key"
 
         when:
-        rsLabOrderSender.setCachedAzureKey(expected)
-        def actual = rsLabOrderSender.getCachedAzureKey()
+        rsLabOrderSender.setCachedPrivateKey(expected)
+        def actual = rsLabOrderSender.getCachedPrivateKey()
 
         then:
         expected == actual
     }
 
-    def "cachedAzureKey synchronization lock is working" () {
+    def "cachedPrivateKey synchronization lock is working" () {
         given:
         def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
         def threadCount = 15
         def threads = (1..threadCount).collect { index ->
             new Thread( {
-                rsLabOrderSender.setCachedAzureKey("${index}")
-                def result = rsLabOrderSender.getCachedAzureKey()
+                rsLabOrderSender.setCachedPrivateKey("${index}")
+                def result = rsLabOrderSender.getCachedPrivateKey()
                 assert result =="${index}"
             })
         }
@@ -205,7 +205,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         noExceptionThrown()
     }
 
-    def "retrieveAzureKey works when cache is empty" () {
+    def "retrievePrivateKey works when cache is empty" () {
         given:
 
         def mockSecret = Mock(Secrets)
@@ -214,23 +214,23 @@ class ReportStreamLabOrderSenderTest extends Specification {
         TestApplicationContext.register(Secrets, mockSecret)
         TestApplicationContext.injectRegisteredImplementations()
         def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
-        rsLabOrderSender.cachedAzureKey = null // TODO - azureKeyCache needs to be emptied from prior test
+        rsLabOrderSender.cachedPrivateKey = null
         when:
-        def actual = rsLabOrderSender.retrieveAzureKey("senderPrivateKey")
+        def actual = rsLabOrderSender.retrievePrivateKey()
 
         then:
         expected == actual
-        expected == rsLabOrderSender.getCachedAzureKey()
+        expected == rsLabOrderSender.getCachedPrivateKey()
     }
 
-    def "retrieveAzureKey works when cache is not empty" () {
+    def "retrievePrivateKey works when cache is not empty" () {
         given:
         def expected = "existing fake azure key"
         def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
 
         when:
-        rsLabOrderSender.setCachedAzureKey(expected)
-        def actual = rsLabOrderSender.retrieveAzureKey("senderPrivateKey")
+        rsLabOrderSender.setCachedPrivateKey(expected)
+        def actual = rsLabOrderSender.retrievePrivateKey()
 
         then:
         expected == actual
