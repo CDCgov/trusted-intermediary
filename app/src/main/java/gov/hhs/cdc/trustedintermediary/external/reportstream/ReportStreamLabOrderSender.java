@@ -117,9 +117,9 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     }
 
     protected String retrieveAzureKey(String senderPrivateKey) throws SecretRetrievalException {
-        String key;
-        if (getCachedAzureKey() != null) {
-            return getCachedAzureKey();
+        String key = getCachedAzureKey();
+        if (key != null) {
+            return key;
         }
 
         key = secrets.getKey(senderPrivateKey);
