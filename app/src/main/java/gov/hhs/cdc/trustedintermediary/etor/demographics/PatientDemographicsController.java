@@ -8,6 +8,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.Map;
+import java.util.Optional;
 import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
 
@@ -47,8 +48,8 @@ public class PatientDemographicsController {
             var responseBody = formatter.convertToString(patientDemographicsResponse);
             response.setBody(responseBody);
         } catch (FormatterProcessingException e) {
-            logger.logError("Error constructing demographics response", e);
-            throw new RuntimeException(e);
+            logger.logError("Error constructing an OK demographics response", e);
+            return constructGenericInternalServerErrorResponse();
         }
 
         response.setHeaders(Map.of(CONTENT_TYPE_LITERAL, APPLICATION_JSON_LITERAL));
@@ -60,14 +61,24 @@ public class PatientDemographicsController {
         var domainResponse = new DomainResponse(httpStatus);
 
         try {
-            var responseBody = formatter.convertToString(Map.of("error", exception.getMessage()));
+            var stringMessage =
+                    Optional.ofNullable(exception.getMessage())
+                            .orElse(exception.getClass().toString());
+            var responseBody = formatter.convertToString(Map.of("error", stringMessage));
             domainResponse.setBody(responseBody);
         } catch (FormatterProcessingException e) {
-            logger.logError("Error constructing demographics response", e);
-            throw new RuntimeException(e);
+            logger.logError("Error constructing an error response", e);
+            return constructGenericInternalServerErrorResponse();
         }
+
         domainResponse.setHeaders(Map.of(CONTENT_TYPE_LITERAL, APPLICATION_JSON_LITERAL));
 
+        return domainResponse;
+    }
+
+    private DomainResponse constructGenericInternalServerErrorResponse() {
+        var domainResponse = new DomainResponse(500);
+        domainResponse.setBody("An internal server error occurred");
         return domainResponse;
     }
 }
