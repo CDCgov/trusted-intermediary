@@ -4,7 +4,9 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender
 import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException
+import gov.hhs.cdc.trustedintermediary.external.apache.ApacheClient
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
+import gov.hhs.cdc.trustedintermediary.external.jjwt.JjwtEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
@@ -12,6 +14,10 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
 import spock.lang.Specification
 import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException
+
+import java.awt.TextArea
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 class ReportStreamLabOrderSenderTest extends Specification {
 
@@ -172,10 +178,19 @@ class ReportStreamLabOrderSenderTest extends Specification {
         noExceptionThrown()
     }
 
-    def "live test"() {
+    def "ensure jwt that expires 15 seconds from now is valid"() {
         given:
+        def mockAuthEngine = Mock(AuthEngine)
+        TestApplicationContext.register(AuthEngine, mockAuthEngine)
+        mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(20, ChronoUnit.SECONDS)
+        TestApplicationContext.register(LabOrderSender, ReportStreamLabOrderSender.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+        ReportStreamLabOrderSender.getInstance().setRsTokenCache("our token from rs")
+
         when:
+        def isValid = ReportStreamLabOrderSender.getInstance().isValidToken()
+
         then:
-        1==1
+        isValid
     }
 }

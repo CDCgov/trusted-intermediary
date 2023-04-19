@@ -9,10 +9,10 @@ import io.jsonwebtoken.Jwts;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Base64;
 import java.util.Date;
 import java.util.UUID;
@@ -87,30 +87,21 @@ public class JjwtEngine implements AuthEngine {
         return (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
     }
 
-    protected RSAPublicKey readPublicKey(@Nonnull String pemKey)
-            throws InvalidKeySpecException, NoSuchAlgorithmException {
-        String publicPemKey =
-                pemKey.replace("-----BEGIN PUBLIC KEY-----", "")
-                        .replaceAll(System.lineSeparator(), "")
-                        .replace("-----END PUBLIC KEY-----", "");
-        byte[] encoded = Base64.getDecoder().decode(publicPemKey);
-
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
-        return (RSAPublicKey) keyFactory.generatePublic(keySpec);
-    }
-
     @Override
-    public boolean isExpiredToken(String jwt, String secret)
-            throws InvalidKeySpecException, NoSuchAlgorithmException {
-        RSAPublicKey key = readPublicKey(secret);
-        Claims claims = Jwts.parserBuilder().build().parseClaimsJws(jwt).getBody();
+    public LocalDateTime getExpirationDate(String jwt) {
+
+        var tokenOnly = jwt.substring(0, jwt.lastIndexOf('.') + 1);
+        Claims claims = Jwts.parserBuilder().build().parseClaimsJwt(tokenOnly).getBody();
         Date expirationDate = claims.getExpiration();
         System.out.println("**************************");
         System.out.println("");
-        System.out.println("Expiration Date: " + expirationDate);
+        System.out.println(
+                "Expiration Date: "
+                        + LocalDateTime.ofInstant(
+                                expirationDate.toInstant(), ZoneId.systemDefault()));
         System.out.println("");
         System.out.println("**************************");
-        return expirationDate.before(new Date(expirationDate.getTime() + 300000));
+
+        return LocalDateTime.ofInstant(expirationDate.toInstant(), ZoneId.systemDefault());
     }
 }

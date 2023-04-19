@@ -15,6 +15,8 @@ import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nonnull;
@@ -40,7 +42,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     private String rsTokenCache;
 
     protected synchronized String getRsTokenCache() {
-        return rsTokenCache;
+        return this.rsTokenCache;
     }
 
     protected synchronized void setRsTokenCache(String token) {
@@ -84,10 +86,11 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         return token;
     }
 
-    protected boolean isValidToken()
-            throws SecretRetrievalException, InvalidKeySpecException, NoSuchAlgorithmException {
+    protected boolean isValidToken() throws InvalidKeySpecException, NoSuchAlgorithmException {
         String token = getRsTokenCache();
-        return !jwt.isExpiredToken(token, secrets.getKey("RS key"));
+        LocalDateTime expirationDate = jwt.getExpirationDate(token);
+
+        return LocalDateTime.now().isBefore(expirationDate.minus(15, ChronoUnit.SECONDS));
     }
 
     protected String sendRequestBody(@Nonnull String json, @Nonnull String bearerToken)
