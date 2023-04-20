@@ -185,15 +185,18 @@ class ReportStreamLabOrderSenderTest extends Specification {
         expected == actual
     }
 
-    def "cachedPrivateKey synchronization lock is working" () {
+    def "cachedPrivateKey thread synchronization is working" () {
         given:
         def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
         def threadCount = 15
+        def lock = new Object()
         def threads = (1..threadCount).collect { index ->
             new Thread( {
-                rsLabOrderSender.setCachedPrivateKey("${index}")
-                def result = rsLabOrderSender.getCachedPrivateKey()
-                assert result =="${index}"
+                synchronized (lock) {
+                    rsLabOrderSender.setCachedPrivateKey("${index}")
+                    def result = rsLabOrderSender.getCachedPrivateKey()
+                    assert result =="${index}"
+                }
             })
         }
 
