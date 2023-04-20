@@ -6,12 +6,8 @@ Date: 2022-12-07
 
 In the context of generating a secure modern application,
 facing the need to monitor application dependencies and generate a
-reliable SBOM,
-
-we decided to use the [CycloneDX Gradle Plugin](https://github.com/CycloneDX/cyclonedx-gradle-plugin#usage)
-and against the use of Anchore/Syft or Snyk FOSSID
-
-for SBOM generation at release of a version build,
+reliable SBOM, we decided to use the [CycloneDX Gradle Plugin](https://github.com/CycloneDX/cyclonedx-gradle-plugin#usage)
+and against the use of Anchore/Syft or Snyk FOSSID for SBOM generation at release of a version build,
 accepting that an SBOM needs to be generated during the CI/CD process
 
 
