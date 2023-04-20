@@ -74,7 +74,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     }
 
     protected String getRsToken()
-            throws UnableToSendLabOrderException, SecretRetrievalException, InvalidKeySpecException,
+            throws UnableToSendLabOrderException, InvalidKeySpecException,
                     NoSuchAlgorithmException {
         if (getRsTokenCache() != null && isValidToken()) {
             return getRsTokenCache();

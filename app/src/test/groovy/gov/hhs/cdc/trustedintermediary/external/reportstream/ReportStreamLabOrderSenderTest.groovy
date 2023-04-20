@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender
 import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException
 import gov.hhs.cdc.trustedintermediary.external.apache.ApacheClient
+import gov.hhs.cdc.trustedintermediary.external.azure.AzureSecrets
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.external.jjwt.JjwtEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
@@ -16,6 +17,7 @@ import spock.lang.Specification
 import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException
 
 import java.awt.TextArea
+import java.awt.datatransfer.StringSelection
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
@@ -192,5 +194,44 @@ class ReportStreamLabOrderSenderTest extends Specification {
 
         then:
         isValid
+    }
+
+    def "getRsToken gets call multiple times"() {
+        given:
+        def mockAuthEngine = Mock(AuthEngine)
+        def mockClient = Mock(HttpClient)
+        def mockSecrets = Mock(Secrets)
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.register(Secrets, mockSecrets)
+        TestApplicationContext.register(AuthEngine, mockAuthEngine)
+        TestApplicationContext.register(HttpClient,mockClient)
+        mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(20, ChronoUnit.SECONDS)
+        TestApplicationContext.register(LabOrderSender, ReportStreamLabOrderSender.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+        ReportStreamLabOrderSender.getInstance().setRsTokenCache("our token from rs")
+
+        def responseBody = """{"foo":"foo value", "access_token":"initial_fake_token", "boo":"boo value"}"""
+        mockClient.post(_ as String, _ as Map<String,String>, _ as String) >> responseBody
+        mockSecrets.getKey(_ as String) >> "fake secret"
+
+        def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
+        def threadCount = 50
+        def lock = new Object()
+        def threads = (1..threadCount).collect { index ->
+            new Thread( {
+                synchronized (lock) {
+                    ReportStreamLabOrderSender.getInstance().setRsTokenCache("${index}")
+                    def result = rsLabOrderSender.getRsToken()
+                    println("thread: " + index + ": " + result)
+                    assert result =="${index}"
+                }
+            })
+        }
+        when:
+        threads*.start()
+        threads*.join()
+        println("----")
+        then:
+        noExceptionThrown()
     }
 }
