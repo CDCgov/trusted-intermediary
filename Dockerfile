@@ -1,5 +1,5 @@
 # Use Linux-Alpine image
-FROM amazoncorretto:17.0.6-alpine
+FROM amazoncorretto:17.0.7-alpine
 
 ARG JAR_LIB_FILE=./app/build/libs/app-all.jar
 
