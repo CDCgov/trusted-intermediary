@@ -204,6 +204,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
         def threadCount = 100
         def expected = "lock is working"
+        def lock = new Object()
         def actual = "lock is not working"
 
         def threads = (1..threadCount).collect { index ->
@@ -215,7 +216,10 @@ class ReportStreamLabOrderSenderTest extends Specification {
 
                 // at least one thread will hit the lock
                 if (value != "Thread-${index}") {
-                    actual = "lock is working"
+                    synchronized (lock) {
+                        actual = "lock is working"
+                    }
+
                 }
             })
         }
