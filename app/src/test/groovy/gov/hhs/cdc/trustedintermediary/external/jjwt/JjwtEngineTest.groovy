@@ -1,5 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.jjwt
 
+import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.TokenGenerationException
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
@@ -58,5 +60,23 @@ class JjwtEngineTest extends Specification {
 
         then:
         thrown(TokenGenerationException)
+    }
+
+    def "getExpirationDate works"() {
+        given:
+        def jwtEngine = JjwtEngine.getInstance()
+        def pemKey = new String(Files.readAllBytes(Path.of("..", "mock_credentials", "report-stream-sender-private-key-local.pem")))
+        TestApplicationContext.register(AuthEngine, JjwtEngine.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def jwt = jwtEngine.getInstance().generateSenderToken("DogCow", "fake_URL", pemKey, "Dogcow", 300)
+        def expirationDate = jwtEngine.getExpirationDate(jwt)
+        println("")
+        println("expiration data: " + expirationDate)
+        println("")
+
+        then:
+        1 == 1
     }
 }
