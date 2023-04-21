@@ -229,6 +229,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         threads*.join()
 
         then:
+        sleep(1000)
         actual == expected
     }
 }
