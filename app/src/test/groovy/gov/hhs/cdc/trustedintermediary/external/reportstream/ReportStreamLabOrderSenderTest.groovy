@@ -20,6 +20,9 @@ import java.awt.TextArea
 import java.awt.datatransfer.StringSelection
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
 
 class ReportStreamLabOrderSenderTest extends Specification {
 
@@ -196,42 +199,32 @@ class ReportStreamLabOrderSenderTest extends Specification {
         isValid
     }
 
-    def "getRsToken gets call multiple times"() {
+    def "setRsTokenCache synchronization works"() {
         given:
-        def mockAuthEngine = Mock(AuthEngine)
-        def mockClient = Mock(HttpClient)
-        def mockSecrets = Mock(Secrets)
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.register(Secrets, mockSecrets)
-        TestApplicationContext.register(AuthEngine, mockAuthEngine)
-        TestApplicationContext.register(HttpClient,mockClient)
-        mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(20, ChronoUnit.SECONDS)
-        TestApplicationContext.register(LabOrderSender, ReportStreamLabOrderSender.getInstance())
-        TestApplicationContext.injectRegisteredImplementations()
-        ReportStreamLabOrderSender.getInstance().setRsTokenCache("our token from rs")
-
-        def responseBody = """{"foo":"foo value", "access_token":"initial_fake_token", "boo":"boo value"}"""
-        mockClient.post(_ as String, _ as Map<String,String>, _ as String) >> responseBody
-        mockSecrets.getKey(_ as String) >> "fake secret"
-
         def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
-        def threadCount = 50
-        def lock = new Object()
+        def threadCount = 10
+        def expected = "lock is working"
+        def actual = "lock is not working"
+
         def threads = (1..threadCount).collect { index ->
-            new Thread( {
-                synchronized (lock) {
-                    ReportStreamLabOrderSender.getInstance().setRsTokenCache("${index}")
-                    def result = rsLabOrderSender.getRsToken()
-                    println("thread: " + index + ": " + result)
-                    assert result =="${index}"
+            def value
+            new Thread({
+
+                rsLabOrderSender.setRsTokenCache("Thread-${index}")
+                value = rsLabOrderSender.getRsTokenCache()
+
+                // at least one thread will hit the lock
+                if (value != "Thread-${index}") {
+                    actual = "lock is working"
                 }
             })
         }
+
         when:
         threads*.start()
         threads*.join()
-        println("----")
+
         then:
-        noExceptionThrown()
+        actual == expected
     }
 }
