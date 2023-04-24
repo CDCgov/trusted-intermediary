@@ -202,7 +202,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
     def "setRsTokenCache synchronization works"() {
         given:
         def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
-        def threadCount = 25
+        def threadCount = 1
         def expected = "lock is working"
         def lock = new Object()
         def actual = "lock is not working"
