@@ -199,6 +199,8 @@ class ReportStreamLabOrderSenderTest extends Specification {
         isValid
     }
 
+    // TODO in valid token unit test
+
     def "cache getter and setter works, no synchronization"() {
         given:
         def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()

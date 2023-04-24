@@ -77,10 +77,13 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     protected String getRsToken()
             throws UnableToSendLabOrderException, InvalidKeySpecException,
                     NoSuchAlgorithmException {
+        logger.logInfo("getting Report Stream token...");
         if (getRsTokenCache() != null && isValidToken()) {
+            logger.logDebug("valid cache token");
             return getRsTokenCache();
         }
 
+        logger.logDebug("invalid cache token, requesting a new one...");
         String token = requestToken();
         setRsTokenCache(token);
 

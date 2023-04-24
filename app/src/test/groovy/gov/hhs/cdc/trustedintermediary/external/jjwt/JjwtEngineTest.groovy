@@ -8,6 +8,10 @@ import java.nio.file.Files
 import java.nio.file.Path
 import spock.lang.Specification
 
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.temporal.ChronoUnit
+
 class JjwtEngineTest extends Specification {
 
     def "readPrivateaKey works"() {
@@ -68,15 +72,16 @@ class JjwtEngineTest extends Specification {
         def pemKey = new String(Files.readAllBytes(Path.of("..", "mock_credentials", "report-stream-sender-private-key-local.pem")))
         TestApplicationContext.register(AuthEngine, JjwtEngine.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
+        def date = new Date(
+                System.currentTimeMillis()
+                + (300 * 1000L))
+        def expected = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS)
 
         when:
         def jwt = jwtEngine.getInstance().generateSenderToken("DogCow", "fake_URL", pemKey, "Dogcow", 300)
-        def expirationDate = jwtEngine.getExpirationDate(jwt)
-        println("")
-        println("expiration data: " + expirationDate)
-        println("")
+        def actual = jwtEngine.getExpirationDate(jwt)
 
         then:
-        1 == 1
+        actual == expected
     }
 }

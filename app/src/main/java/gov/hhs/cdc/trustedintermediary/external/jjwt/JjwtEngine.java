@@ -93,14 +93,6 @@ public class JjwtEngine implements AuthEngine {
         var tokenOnly = jwt.substring(0, jwt.lastIndexOf('.') + 1);
         Claims claims = Jwts.parserBuilder().build().parseClaimsJwt(tokenOnly).getBody();
         Date expirationDate = claims.getExpiration();
-        System.out.println("**************************");
-        System.out.println("");
-        System.out.println(
-                "Expiration Date: "
-                        + LocalDateTime.ofInstant(
-                                expirationDate.toInstant(), ZoneId.systemDefault()));
-        System.out.println("");
-        System.out.println("**************************");
 
         return LocalDateTime.ofInstant(expirationDate.toInstant(), ZoneId.systemDefault());
     }
