@@ -43,13 +43,13 @@ class ReportStreamLabOrderSenderTest extends Specification {
         ReportStreamLabOrderSender.getInstance().sendRequestBody("message_2", "fake token")
 
         then:
-        2 * mockClient.post(_ as String, _ as Map<String,String>, _ as String) >> "200"
+        2 * mockClient.post(_ as String, _ as Map<String, String>, _ as String) >> "200"
     }
 
     def "sendRequestBody fails from an IOException from the client"() {
         given:
         def mockClient = Mock(HttpClient)
-        mockClient.post(_ as String, _ as Map<String,String>, _ as String) >> { throw new IOException("oops") }
+        mockClient.post(_ as String, _ as Map<String, String>, _ as String) >> { throw new IOException("oops") }
         TestApplicationContext.register(HttpClient, mockClient)
         TestApplicationContext.injectRegisteredImplementations()
 
@@ -77,7 +77,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         def actual = ReportStreamLabOrderSender.getInstance().requestToken()
         then:
         1 * mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "sender fake token"
-        1 * mockClient.post(_ as String, _ as Map<String,String>, _ as String) >> """{"access_token":"${expected}", "token_type":"bearer"}"""
+        1 * mockClient.post(_ as String, _ as Map<String, String>, _ as String) >> """{"access_token":"${expected}", "token_type":"bearer"}"""
         actual == expected
     }
 
@@ -199,44 +199,33 @@ class ReportStreamLabOrderSenderTest extends Specification {
         isValid
     }
 
-    def "setRsTokenCache synchronization works"() {
+    def "cache getter and setter works, no synchronization"() {
         given:
         def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
-        def threadCount = 1
+        def threadCount = 10
         def expected = "lock is working"
         def lock = new Object()
         def actual = "lock is not working"
 
         def threads = (1..threadCount).collect { index ->
             def value
-            //            new Thread({
-            //
-            //                rsLabOrderSender.setRsTokenCache("Thread-${index}")
-            //                value = rsLabOrderSender.getRsTokenCache()
-            //
-            //                // at least one thread will hit the lock
-            //                if (value != "Thread-${index}") {
-            //                    actual = "once"
-            //                    synchronized (lock) {
-            //                        actual = "lock is working"
-            //                    }
-            //
-            //                }
-            //            })
-            actual = "once"
+            new Thread({
+                synchronized (lock) {
+                    rsLabOrderSender.setRsTokenCache("Thread-${index}")
+                    value = rsLabOrderSender.getRsTokenCache()
+                    println("value: " + value + ", " + "thread: " + rsLabOrderSender.getRsTokenCache())
+                    assert value == "Thread-${index}"
+                }
+            })
         }
 
-        def thread = new Thread({
-            println("*******************************Testing that this thread fires!!!************************")
-        })
-        thread.start()
-
         when:
-        println("")
-        //        threads*.start()
-        //        threads*.join()
+        threads*.start()
+        threads*.join()
 
         then:
-        actual == "once"
+        noExceptionThrown()
     }
+
+    // TODO cache getter and "setter" needs test for synchronization
 }
