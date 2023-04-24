@@ -226,13 +226,17 @@ class ReportStreamLabOrderSenderTest extends Specification {
             actual = "once"
         }
 
+        def thread = new Thread({
+            println("*******************************Testing that this thread fires!!!************************")
+        })
+        thread.start()
+
         when:
         println("")
         //        threads*.start()
         //        threads*.join()
 
         then:
-        sleep(1000)
         actual == "once"
     }
 }
