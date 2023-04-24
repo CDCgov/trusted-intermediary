@@ -230,4 +230,8 @@ class ReportStreamLabOrderSenderTest extends Specification {
     }
 
     // TODO cache getter and "setter" needs test for synchronization
+
+    // TODO sendRequestBody bombs out unit test, UnableToSendLabOrderException
+
+    // TODO unit tests for getRsToken method, pass and fail
 }
