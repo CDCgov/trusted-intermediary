@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
@@ -40,14 +39,14 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
 
     private static final String CLIENT_NAME = "flexion.etor-service-sender";
 
-    private final AtomicReference<String> rsTokenCache = new AtomicReference<>();
+    private String rsTokenCache;
 
     protected synchronized String getRsTokenCache() {
-        return this.rsTokenCache.get();
+        return this.rsTokenCache;
     }
 
     protected synchronized void setRsTokenCache(String token) {
-        this.rsTokenCache.set(token);
+        this.rsTokenCache = token;
     }
 
     @Inject private HttpClient client;
