@@ -194,8 +194,6 @@ class ReportStreamLabOrderSenderTest extends Specification {
         isValid
     }
 
-    // TODO in valid token unit test
-
     def "cache getter and setter works, no synchronization"() {
         given:
         def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
@@ -226,7 +224,6 @@ class ReportStreamLabOrderSenderTest extends Specification {
 
     // TODO cache getter and "setter" needs test for synchronization
 
-    // TODO sendRequestBody bombs out unit test, UnableToSendLabOrderException
     def "sendRequestBody bombs out due to http exception"() {
         given:
         def labOrderSender = ReportStreamLabOrderSender.getInstance()
@@ -248,4 +245,18 @@ class ReportStreamLabOrderSenderTest extends Specification {
     }
 
     // TODO unit tests for getRsToken method, pass and fail
+
+    def "getRsToken happy path"() {
+        given:
+        when:
+        then:
+        1==0
+    }
+
+    def "getRsToken fails"() {
+        given:
+        when:
+        then:
+        1==0
+    }
 }
