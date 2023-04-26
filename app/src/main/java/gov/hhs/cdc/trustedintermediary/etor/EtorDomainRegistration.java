@@ -79,10 +79,6 @@ public class EtorDomainRegistration implements DomainConnector {
             logger.logError("Unable to send lab order", e);
             return patientDemographicsController.constructResponse(400, e);
         }
-        //        catch (SecretRetrievalException | InvalidKeySpecException |
-        // NoSuchAlgorithmException e) {
-        //            throw new RuntimeException(e);
-        //        }
 
         PatientDemographicsResponse patientDemographicsResponse =
                 new PatientDemographicsResponse(demographics);
