@@ -11,6 +11,40 @@ import spock.lang.Specification
 
 class Slf4jLoggerTest extends Specification {
 
+    def "getLoggingEventBuilder returns TRACE level builder test"() {
+        given:
+        TestApplicationContext.injectRegisteredImplementations()
+        def logger = Slf4jLogger.getLogger()
+        def expectedLevel = Level.TRACE
+        def expectedMessage = "Trace message"
+
+        when:
+        def logEventBuilder = logger.getLoggingEventBuilder(Logger.Level.TRACE, expectedMessage)
+        def actualLevel = logEventBuilder["loggingEvent"]["level"]
+        def actualMessage = logEventBuilder["loggingEvent"]["message"]
+
+        then:
+        actualLevel == expectedLevel
+        actualMessage.toString().contains(expectedMessage.toString())
+    }
+
+    def "getLoggingEventBuilder returns DEBUG level builder test"() {
+        given:
+        TestApplicationContext.injectRegisteredImplementations()
+        def logger = Slf4jLogger.getLogger()
+        def expectedLevel = Level.DEBUG
+        def expectedMessage = "Debug message"
+
+        when:
+        def logEventBuilder = logger.getLoggingEventBuilder(Logger.Level.DEBUG, expectedMessage)
+        def actualLevel = logEventBuilder["loggingEvent"]["level"]
+        def actualMessage = logEventBuilder["loggingEvent"]["message"]
+
+        then:
+        actualLevel == expectedLevel
+        actualMessage.toString().contains(expectedMessage.toString())
+    }
+
     def "getLoggingEventBuilder returns INFO level builder test"() {
         given:
         TestApplicationContext.injectRegisteredImplementations()
