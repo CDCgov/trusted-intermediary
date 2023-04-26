@@ -80,7 +80,7 @@ public class Slf4jLogger implements Logger {
         getLoggingEventBuilder(Level.FATAL, fatalMessage).setCause(e).log();
     }
 
-    private LoggingEventBuilder getLoggingEventBuilder(Level level, String message) {
+    protected LoggingEventBuilder getLoggingEventBuilder(Level level, String message) {
         return switch (level) {
             case TRACE -> LOGGER.atTrace().setMessage(() -> ANSI_PURPLE + message + ANSI_RESET);
             case DEBUG -> LOGGER.atDebug().setMessage(() -> ANSI_CYAN + message + ANSI_RESET);
