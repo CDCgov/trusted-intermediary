@@ -5,24 +5,18 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender
 import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException
 import gov.hhs.cdc.trustedintermediary.external.apache.ApacheClient
-import gov.hhs.cdc.trustedintermediary.external.azure.AzureSecrets
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
-import gov.hhs.cdc.trustedintermediary.external.jjwt.JjwtEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient
+import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
 import spock.lang.Specification
 import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException
 
-import java.awt.TextArea
-import java.awt.datatransfer.StringSelection
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicInteger
 
 class ReportStreamLabOrderSenderTest extends Specification {
 
@@ -58,7 +52,8 @@ class ReportStreamLabOrderSenderTest extends Specification {
         ReportStreamLabOrderSender.getInstance().sendRequestBody("message_2", "fake token")
 
         then:
-        thrown(Exception)  //This test to be updated whenever the actual code's TODO is addressed for the exception handling
+        def exception = thrown(Exception)
+        exception.getCause().getClass() == IOException
     }
 
     def "requestToken works"() {
@@ -232,6 +227,25 @@ class ReportStreamLabOrderSenderTest extends Specification {
     // TODO cache getter and "setter" needs test for synchronization
 
     // TODO sendRequestBody bombs out unit test, UnableToSendLabOrderException
+    def "sendRequestBody bombs out due to http exception"() {
+        given:
+        def labOrderSender = ReportStreamLabOrderSender.getInstance()
+        def mockClient = Mock(HttpClient)
+        TestApplicationContext.register(HttpClient, mockClient)
+        TestApplicationContext.register(LabOrderSender, labOrderSender)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        mockClient.post(_ as String, _ as Map<String,String>, _ as String) >> {
+            throw new HttpClientException("404",new IOException())
+        }
+
+        when:
+        labOrderSender.sendRequestBody("json", "bearerToken")
+
+        then:
+        def exception = thrown(UnableToSendLabOrderException)
+        exception.getCause().getClass() == HttpClientException
+    }
 
     // TODO unit tests for getRsToken method, pass and fail
 }
