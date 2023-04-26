@@ -185,7 +185,8 @@ class ReportStreamLabOrderSenderTest extends Specification {
         expected == actual
     }
 
-    def "cachedPrivateKey thread synchronization is working" () {
+    def "cachedPrivateKey thread synchronization" () {
+        // TODO - Pending race-condition clarification
         given:
         def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
         def threadCount = 15
