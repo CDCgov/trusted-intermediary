@@ -77,7 +77,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         logger.logInfo("Sending the order to ReportStream at {}", RS_DOMAIN_NAME);
 
         String json = fhir.encodeResourceToJson(order.getUnderlyingOrder());
-        String bearerToken = null;
+        String bearerToken;
         bearerToken = getRsToken();
         sendRequestBody(json, bearerToken);
     }
