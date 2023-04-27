@@ -78,23 +78,21 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
 
         String json = fhir.encodeResourceToJson(order.getUnderlyingOrder());
         String bearerToken = null;
-        try {
-            bearerToken = getRsToken();
-        } catch (InvalidKeySpecException e) {
-            throw new UnableToSendLabOrderException("Error: invalid key spec", e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new UnableToSendLabOrderException("Error: bad key algorithm", e);
-        }
+        bearerToken = getRsToken();
         sendRequestBody(json, bearerToken);
     }
 
-    protected String getRsToken()
-            throws UnableToSendLabOrderException, InvalidKeySpecException,
-                    NoSuchAlgorithmException {
+    protected String getRsToken() throws UnableToSendLabOrderException {
         logger.logInfo("getting Report Stream token...");
-        if (getRsTokenCache() != null && isValidToken()) {
-            logger.logDebug("valid cache token");
-            return getRsTokenCache();
+        try {
+            if (getRsTokenCache() != null && isValidToken()) {
+                logger.logDebug("valid cache token");
+                return getRsTokenCache();
+            }
+        } catch (InvalidKeySpecException e) {
+            throw new UnableToSendLabOrderException("Error: invalid key spec", e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new UnableToSendLabOrderException("Error: invalid key algorithm", e);
         }
 
         logger.logDebug("requesting a new token...");
