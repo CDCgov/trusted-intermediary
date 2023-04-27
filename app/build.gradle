@@ -57,9 +57,9 @@ dependencies {
     implementation 'org.slf4j:slf4j-simple:2.0.7' // Can be replaced with logBack, log4j, log4j2, Java Utility Logger
 
     //jackson
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.14.2'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.2'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.15.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.0'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.0'
 
     //fhir
     implementation 'ca.uhn.hapi.fhir:hapi-fhir-base:6.4.4'
