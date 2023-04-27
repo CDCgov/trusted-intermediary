@@ -1,8 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.etor.demographics;
 
-import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import javax.inject.Inject;
 
 /**
@@ -24,9 +21,7 @@ public class ConvertAndSendLabOrderUsecase {
 
     private ConvertAndSendLabOrderUsecase() {}
 
-    public void convertAndSend(Demographics<?> demographics)
-            throws UnableToSendLabOrderException, SecretRetrievalException, InvalidKeySpecException,
-                    NoSuchAlgorithmException {
+    public void convertAndSend(Demographics<?> demographics) throws UnableToSendLabOrderException {
         LabOrder<?> labOrder = converter.convertToOrder(demographics);
         sender.sendOrder(labOrder);
     }

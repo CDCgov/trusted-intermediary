@@ -11,7 +11,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -63,13 +62,18 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     private ReportStreamLabOrderSender() {}
 
     @Override
-    public void sendOrder(final LabOrder<?> order)
-            throws UnableToSendLabOrderException, SecretRetrievalException, InvalidKeySpecException,
-                    NoSuchAlgorithmException {
+    public void sendOrder(final LabOrder<?> order) throws UnableToSendLabOrderException {
         logger.logInfo("Sending the order to ReportStream at {}", RS_DOMAIN_NAME);
 
         String json = fhir.encodeResourceToJson(order.getUnderlyingOrder());
-        String bearerToken = getRsToken();
+        String bearerToken = null;
+        try {
+            bearerToken = getRsToken();
+        } catch (InvalidKeySpecException e) {
+            throw new UnableToSendLabOrderException("Error: invalid key spec", e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new UnableToSendLabOrderException("Error: bad key algorithm", e);
+        }
         sendRequestBody(json, bearerToken);
     }
 
