@@ -7,6 +7,12 @@ build
 # Ignore VSCode Extension Pack for Java output
 bin
 
+# Ignore VSCode settings files
+.vscode
+
+# Ignore JetBrains settings files
+.idea
+
 # Ignore macOS Finder directory config
 .DS_Store
 Thumbs.db
