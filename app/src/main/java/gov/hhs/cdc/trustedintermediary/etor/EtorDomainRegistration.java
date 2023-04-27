@@ -15,12 +15,9 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiLabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileLabOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamLabOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.Map;
 import java.util.function.Function;
 import javax.inject.Inject;
@@ -72,10 +69,7 @@ public class EtorDomainRegistration implements DomainConnector {
 
         try {
             convertAndSendLabOrderUsecase.convertAndSend(demographics);
-        } catch (UnableToSendLabOrderException
-                | SecretRetrievalException
-                | InvalidKeySpecException
-                | NoSuchAlgorithmException e) {
+        } catch (UnableToSendLabOrderException e) {
             logger.logError("Unable to send lab order", e);
             return patientDemographicsController.constructResponse(400, e);
         }

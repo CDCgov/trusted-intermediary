@@ -11,6 +11,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -46,6 +47,16 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
 
     protected synchronized void setRsTokenCache(String token) {
         this.rsTokenCache = token;
+    }
+
+    private String cachedPrivateKey;
+
+    protected synchronized String getCachedPrivateKey() {
+        return cachedPrivateKey;
+    }
+
+    protected synchronized void setCachedPrivateKey(String cachedPrivateKey) {
+        this.cachedPrivateKey = cachedPrivateKey;
     }
 
     @Inject private HttpClient client;
@@ -130,16 +141,10 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         String token = "";
         String body;
         Map<String, String> headers = Map.of("Content-Type", "application/x-www-form-urlencoded");
-        var senderPrivateKey =
-                "report-stream-sender-private-key-" + ApplicationContext.getEnvironment();
         try {
             senderToken =
                     jwt.generateSenderToken(
-                            CLIENT_NAME,
-                            RS_DOMAIN_NAME,
-                            secrets.getKey(senderPrivateKey),
-                            CLIENT_NAME,
-                            300);
+                            CLIENT_NAME, RS_DOMAIN_NAME, retrievePrivateKey(), CLIENT_NAME, 300);
             body = composeRequestBody(senderToken);
             String rsResponse = client.post(RS_AUTH_API_URL, headers, body);
             token = extractToken(rsResponse);
@@ -150,7 +155,21 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         return token;
     }
 
+    protected String retrievePrivateKey() throws SecretRetrievalException {
+        var senderPrivateKey =
+                "report-stream-sender-private-key-" + ApplicationContext.getEnvironment();
+        String key = getCachedPrivateKey();
+        if (key != null) {
+            return key;
+        }
+
+        key = secrets.getKey(senderPrivateKey);
+        setCachedPrivateKey(key);
+        return key;
+    }
+
     protected String extractToken(String responseBody) throws FormatterProcessingException {
+
         Map<String, String> value;
 
         value = jackson.convertToObject(responseBody, Map.class);
