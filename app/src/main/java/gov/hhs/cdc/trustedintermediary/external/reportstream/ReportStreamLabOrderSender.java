@@ -82,8 +82,9 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
             return getRsTokenCache();
         }
 
-        logger.logDebug("invalid cache token, requesting a new one...");
+        logger.logDebug("requesting a new token...");
         String token = requestToken();
+        logger.logDebug("token request successful");
         setRsTokenCache(token);
 
         return token;
