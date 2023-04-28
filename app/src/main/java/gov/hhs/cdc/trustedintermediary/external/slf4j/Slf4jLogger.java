@@ -3,6 +3,9 @@ package gov.hhs.cdc.trustedintermediary.external.slf4j;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.Arrays;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
+import org.slf4j.spi.LoggingEventBuilder;
 
 /**
  * Humble object interface for logging. This class was created in order to take away the 3rd party
@@ -29,8 +32,23 @@ public class Slf4jLogger implements Logger {
     }
 
     @Override
+    public void logTrace(String traceMessage) {
+        getLoggingEventBuilder(Level.TRACE, traceMessage).log();
+    }
+
+    @Override
+    public void logDebug(String debugMessage) {
+        getLoggingEventBuilder(Level.DEBUG, debugMessage).log();
+    }
+
+    @Override
+    public void logDebug(String debugMessage, Throwable e) {
+        getLoggingEventBuilder(Level.DEBUG, debugMessage).setCause(e).log();
+    }
+
+    @Override
     public void logInfo(String infoMessage, Object... parameters) {
-        var logBuilder = LOGGER.atInfo().setMessage(() -> ANSI_GREEN + infoMessage + ANSI_RESET);
+        var logBuilder = getLoggingEventBuilder(Level.INFO, infoMessage);
 
         Arrays.stream(parameters).forEachOrdered(logBuilder::addArgument);
 
@@ -39,31 +57,42 @@ public class Slf4jLogger implements Logger {
 
     @Override
     public void logWarning(String warningMessage) {
-        LOGGER.atWarn().log(() -> ANSI_YELLOW + warningMessage + ANSI_RESET);
-    }
-
-    @Override
-    public void logTrace(String traceMessage) {
-        LOGGER.atTrace().log(() -> ANSI_PURPLE + traceMessage + ANSI_RESET);
-    }
-
-    @Override
-    public void logDebug(String debugMessage) {
-        LOGGER.atDebug().log(() -> ANSI_CYAN + debugMessage + ANSI_RESET);
+        getLoggingEventBuilder(Level.WARN, warningMessage).log();
     }
 
     @Override
     public void logError(String errorMessage) {
-        LOGGER.atError().log(() -> ANSI_RED + errorMessage + ANSI_RESET);
-    }
-
-    @Override
-    public void logDebug(String debugMessage, Throwable e) {
-        LOGGER.atDebug().setMessage(() -> ANSI_CYAN + debugMessage + ANSI_RESET).setCause(e).log();
+        getLoggingEventBuilder(Level.ERROR, errorMessage).log();
     }
 
     @Override
     public void logError(String errorMessage, Throwable e) {
-        LOGGER.atError().setMessage(() -> ANSI_RED + errorMessage + ANSI_RESET).setCause(e).log();
+        getLoggingEventBuilder(Level.ERROR, errorMessage).setCause(e).log();
+    }
+
+    @Override
+    public void logFatal(String fatalMessage) {
+        getLoggingEventBuilder(Level.FATAL, fatalMessage).log();
+    }
+
+    @Override
+    public void logFatal(String fatalMessage, Throwable e) {
+        getLoggingEventBuilder(Level.FATAL, fatalMessage).setCause(e).log();
+    }
+
+    protected LoggingEventBuilder getLoggingEventBuilder(Level level, String message) {
+        return switch (level) {
+            case TRACE -> LOGGER.atTrace().setMessage(() -> ANSI_PURPLE + message + ANSI_RESET);
+            case DEBUG -> LOGGER.atDebug().setMessage(() -> ANSI_CYAN + message + ANSI_RESET);
+            case INFO -> LOGGER.atInfo().setMessage(() -> ANSI_GREEN + message + ANSI_RESET);
+            case WARN -> LOGGER.atWarn().setMessage(() -> ANSI_YELLOW + message + ANSI_RESET);
+            case ERROR -> LOGGER.atError().setMessage(() -> ANSI_RED + message + ANSI_RESET);
+            case FATAL -> {
+                Marker fatal = MarkerFactory.getMarker("FATAL");
+                yield LOGGER.atError()
+                        .addMarker(fatal)
+                        .setMessage(() -> ANSI_RED + message + ANSI_RESET);
+            }
+        };
     }
 }
