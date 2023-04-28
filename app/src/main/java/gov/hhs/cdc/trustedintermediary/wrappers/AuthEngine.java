@@ -1,7 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.wrappers;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
 import javax.annotation.Nonnull;
 
@@ -19,6 +17,5 @@ public interface AuthEngine {
             int expirationSecondsFromNow)
             throws TokenGenerationException;
 
-    LocalDateTime getExpirationDate(String token)
-            throws InvalidKeySpecException, NoSuchAlgorithmException;
+    LocalDateTime getExpirationDate(String token);
 }

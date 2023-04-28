@@ -13,8 +13,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
@@ -84,15 +82,9 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
 
     protected String getRsToken() throws UnableToSendLabOrderException {
         logger.logInfo("getting Report Stream token...");
-        try {
-            if (getRsTokenCache() != null && isValidToken()) {
-                logger.logDebug("valid cache token");
-                return getRsTokenCache();
-            }
-        } catch (InvalidKeySpecException e) {
-            throw new UnableToSendLabOrderException("Error: invalid key spec", e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new UnableToSendLabOrderException("Error: invalid key algorithm", e);
+        if (getRsTokenCache() != null && isValidToken()) {
+            logger.logDebug("valid cache token");
+            return getRsTokenCache();
         }
 
         logger.logDebug("requesting a new token...");
@@ -103,7 +95,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         return token;
     }
 
-    protected boolean isValidToken() throws InvalidKeySpecException, NoSuchAlgorithmException {
+    protected boolean isValidToken() {
         String token = getRsTokenCache();
         LocalDateTime expirationDate = jwt.getExpirationDate(token);
 
