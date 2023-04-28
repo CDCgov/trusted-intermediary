@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.wrappers;
 
+import java.time.LocalDateTime;
 import javax.annotation.Nonnull;
 
 /**
@@ -15,4 +16,6 @@ public interface AuthEngine {
             @Nonnull String keyId,
             int expirationSecondsFromNow)
             throws TokenGenerationException;
+
+    LocalDateTime getExpirationDate(String token);
 }

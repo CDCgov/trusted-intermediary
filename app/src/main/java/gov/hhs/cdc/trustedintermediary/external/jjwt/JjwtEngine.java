@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.jjwt;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.TokenGenerationException;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -10,6 +11,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Base64;
 import java.util.Date;
 import java.util.UUID;
@@ -82,5 +85,15 @@ public class JjwtEngine implements AuthEngine {
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encode);
         return (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
+    }
+
+    @Override
+    public LocalDateTime getExpirationDate(String jwt) {
+
+        var tokenOnly = jwt.substring(0, jwt.lastIndexOf('.') + 1);
+        Claims claims = Jwts.parserBuilder().build().parseClaimsJwt(tokenOnly).getBody();
+        Date expirationDate = claims.getExpiration();
+
+        return LocalDateTime.ofInstant(expirationDate.toInstant(), ZoneId.systemDefault());
     }
 }

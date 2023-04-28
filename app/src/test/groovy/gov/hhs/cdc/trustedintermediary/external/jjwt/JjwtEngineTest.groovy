@@ -1,10 +1,16 @@
 package gov.hhs.cdc.trustedintermediary.external.jjwt
 
+import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.TokenGenerationException
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import spock.lang.Specification
+
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 
 class JjwtEngineTest extends Specification {
 
@@ -58,5 +64,24 @@ class JjwtEngineTest extends Specification {
 
         then:
         thrown(TokenGenerationException)
+    }
+
+    def "getExpirationDate works"() {
+        given:
+        def jwtEngine = JjwtEngine.getInstance()
+        def pemKey = new String(Files.readAllBytes(Path.of("..", "mock_credentials", "report-stream-sender-private-key-local.pem")))
+        TestApplicationContext.register(AuthEngine, JjwtEngine.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+        def date = new Date(
+                System.currentTimeMillis()
+                + (300 * 1000L))
+        def expected = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS)
+
+        when:
+        def jwt = jwtEngine.getInstance().generateSenderToken("DogCow", "fake_URL", pemKey, "Dogcow", 300)
+        def actual = jwtEngine.getExpirationDate(jwt)
+
+        then:
+        actual == expected
     }
 }

@@ -1,7 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.external.apache
 
-import gov.hhs.cdc.trustedintermediary.context.ApplicationContext
-import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException
 import org.apache.hc.core5.http.message.BasicHeader
 import spock.lang.Specification

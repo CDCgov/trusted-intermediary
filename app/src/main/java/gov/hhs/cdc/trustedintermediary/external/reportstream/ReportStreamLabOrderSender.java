@@ -13,6 +13,8 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nonnull;
@@ -34,6 +36,16 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
                     .orElse("");
 
     private static final String CLIENT_NAME = "flexion.etor-service-sender";
+
+    private String rsTokenCache;
+
+    protected synchronized String getRsTokenCache() {
+        return this.rsTokenCache;
+    }
+
+    protected synchronized void setRsTokenCache(String token) {
+        this.rsTokenCache = token;
+    }
 
     private String cachedPrivateKey;
 
@@ -63,8 +75,30 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         logger.logInfo("Sending the order to ReportStream at {}", RS_DOMAIN_NAME);
 
         String json = fhir.encodeResourceToJson(order.getUnderlyingOrder());
-        String bearerToken = requestToken();
+        String bearerToken = getRsToken();
         sendRequestBody(json, bearerToken);
+    }
+
+    protected String getRsToken() throws UnableToSendLabOrderException {
+        logger.logInfo("getting Report Stream token...");
+        if (getRsTokenCache() != null && isValidToken()) {
+            logger.logDebug("valid cache token");
+            return getRsTokenCache();
+        }
+
+        logger.logDebug("requesting a new token...");
+        String token = requestToken();
+        logger.logDebug("token request successful");
+        setRsTokenCache(token);
+
+        return token;
+    }
+
+    protected boolean isValidToken() {
+        String token = getRsTokenCache();
+        LocalDateTime expirationDate = jwt.getExpirationDate(token);
+
+        return LocalDateTime.now().isBefore(expirationDate.minus(15, ChronoUnit.SECONDS));
     }
 
     protected String sendRequestBody(@Nonnull String json, @Nonnull String bearerToken)
