@@ -79,7 +79,7 @@ dependencies {
 
     // azure sdk
     implementation 'com.azure:azure-security-keyvault-secrets:4.6.1'
-    implementation 'com.azure:azure-identity:1.8.2'
+    implementation 'com.azure:azure-identity:1.8.3'
 
     testImplementation 'org.apache.groovy:groovy:4.0.11'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
