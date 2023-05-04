@@ -10,6 +10,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.Date;
 import java.util.UUID;
@@ -95,7 +96,9 @@ public class JjwtEngine implements AuthEngine {
         } catch (ExpiredJwtException e) {
             // TODO logging, include whole class
             long minutes = 10;
-            return LocalDateTime.now(ZoneId.systemDefault()).minusMinutes(minutes);
+            return LocalDateTime.now(ZoneId.systemDefault())
+                    .minusMinutes(minutes)
+                    .truncatedTo(ChronoUnit.SECONDS);
         }
     }
 }
