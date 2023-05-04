@@ -66,7 +66,7 @@ class JjwtEngineTest extends Specification {
         thrown(TokenGenerationException)
     }
 
-    def "getExpirationDate works"() {
+    def "getExpirationDate works happy path"() {
         given:
         def jwtEngine = JjwtEngine.getInstance()
         def pemKey = new String(Files.readAllBytes(Path.of("..", "mock_credentials", "report-stream-sender-private-key-local.pem")))
@@ -83,5 +83,24 @@ class JjwtEngineTest extends Specification {
 
         then:
         actual == expected
+    }
+
+    def "getExpirationDate works bad path"() {
+        given:
+        def fileName = "report-stream-expired-token"
+        def expiredToken = new String(Files.readAllBytes(Path.of("..", "mock_credentials", fileName + ".jwt")))
+        def jwtEngine = JjwtEngine.getInstance()
+        TestApplicationContext.register(AuthEngine, JjwtEngine.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def minutes = 10L
+        def actual = jwtEngine.getExpirationDate(expiredToken)
+        def expected = LocalDateTime.now(ZoneId.systemDefault()).minusMinutes(minutes).truncatedTo(ChronoUnit.MINUTES)
+
+        then:
+        // actual should be LocalDateTime.now() - 10 minutes when the jwt has expired
+        // ChronoUnit.MINUTES to expand the range or it has a potential of failing when seconds change.
+        actual.truncatedTo(ChronoUnit.MINUTES) == expected
     }
 }
