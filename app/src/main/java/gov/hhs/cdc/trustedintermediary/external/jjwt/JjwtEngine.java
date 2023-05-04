@@ -2,10 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.jjwt;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.TokenGenerationException;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtBuilder;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
@@ -91,9 +88,14 @@ public class JjwtEngine implements AuthEngine {
     public LocalDateTime getExpirationDate(String jwt) {
 
         var tokenOnly = jwt.substring(0, jwt.lastIndexOf('.') + 1);
-        Claims claims = Jwts.parserBuilder().build().parseClaimsJwt(tokenOnly).getBody();
-        Date expirationDate = claims.getExpiration();
-
-        return LocalDateTime.ofInstant(expirationDate.toInstant(), ZoneId.systemDefault());
+        try {
+            Claims claims = Jwts.parserBuilder().build().parseClaimsJwt(tokenOnly).getBody();
+            Date expirationDate = claims.getExpiration();
+            return LocalDateTime.ofInstant(expirationDate.toInstant(), ZoneId.systemDefault());
+        } catch (ExpiredJwtException e) {
+            // TODO logging, include whole class
+            long minutes = 10;
+            return LocalDateTime.now(ZoneId.systemDefault()).minusMinutes(minutes);
+        }
     }
 }
