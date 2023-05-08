@@ -1,4 +1,4 @@
-name: ZAP
+name: METRICS
 
 on:
   push:
