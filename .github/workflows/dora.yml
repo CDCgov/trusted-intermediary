@@ -28,8 +28,8 @@ jobs:
 
       - name: Run DORA Requirements
         env:
-          GITHUB_USERNAME: JohnNKing
-          GITHUB_PASSWORD: ${{ secrets.DORA_METRICS_ACCESS_TOKEN_JOHNNKING }}
+          GITHUB_USER: JohnNKing
+          GITHUB_TOKEN: ${{ secrets.DORA_METRICS_ACCESS_TOKEN_JOHNNKING }}
         run: ./dora-requirements.sh
 
       - name: Upload Report
