@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  dora:
     name: DORA Metrics
     runs-on: ubuntu-latest
     steps:
