@@ -40,4 +40,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: deployments
-          path: deployments.csv
+          path: devops-deployment-metrics/deployments.csv
