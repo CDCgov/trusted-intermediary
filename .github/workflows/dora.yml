@@ -1,4 +1,4 @@
-name: METRICS
+name: Metrics
 
 on:
   schedule:
