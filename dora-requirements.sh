@@ -10,7 +10,7 @@ sudo apt install python3.9
 curl -sSL https://install.python-poetry.org | python3 -
 
 # Clone repo
-git clone https://github.com/flexion/devops-deployment-metrics.git
+git clone https://github.com/basiliskus/devops-deployment-metrics.git
 cd devops-deployment-metrics
 
 # Install project dependencies
