@@ -26,14 +26,17 @@ jobs:
           distribution: corretto
           cache: gradle
 
-      - name: Run DORA Requirements
+      - name: Setup DORA metrics application
+        run: ./dora-metrics-setup.sh
+
+      - name: Run DORA metrics application
         env:
           GITHUB_USERNAME: JohnNKing
           GITHUB_PASSWORD: ${{ secrets.DORA_METRICS_ACCESS_TOKEN_JOHNNKING }}
-        run: ./dora-metrics-setup.sh
+        run: poetry run devops-deployment-metrics -c config.toml
 
       - name: Upload Report
         uses: actions/upload-artifact@v3
         with:
-          name: dora-metrics
-          path: dora-metrics.csv
+          name: deployments
+          path: deployments.csv
