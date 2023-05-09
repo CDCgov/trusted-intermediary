@@ -30,7 +30,7 @@ jobs:
         env:
           GITHUB_USERNAME: JohnNKing
           GITHUB_PASSWORD: ${{ secrets.DORA_METRICS_ACCESS_TOKEN_JOHNNKING }}
-        run: ./dora-requirements.sh
+        run: ./dora-metrics-setup.sh
 
       - name: Upload Report
         uses: actions/upload-artifact@v3
