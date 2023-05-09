@@ -33,6 +33,7 @@ jobs:
         env:
           GITHUB_USERNAME: JohnNKing
           GITHUB_PASSWORD: ${{ secrets.DORA_METRICS_ACCESS_TOKEN_JOHNNKING }}
+        working-directory: devops-deployment-metrics
         run: poetry run devops-deployment-metrics -c config.toml
 
       - name: Upload Report
