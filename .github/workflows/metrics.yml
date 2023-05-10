@@ -43,4 +43,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: dora-metrics
-          path: devops-deployment-metrics/*.csv
+          path: devops-deployment-metrics/data/*.csv
