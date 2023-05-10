@@ -6,3 +6,4 @@ RUN cp /usr/lib/ruby/gems/3.1.0/gems/jekyll-4.3.1/exe/jekyll /usr/bin
 RUN npm install -g fsh-sushi
 COPY . trusted-intermediary/
 RUN ./trusted-intermediary/_updatePublisher.sh
+RUN ./trusted-intermediary/_genOnce.sh

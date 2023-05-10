@@ -32,6 +32,7 @@ jobs:
     with:
       ENVIRONMENT: staging
       REPO: trusted-intermediary-router
+      REPO_DOCS: trusted-intermediary-docs
       APP: ${{ needs.terraform-deploy.outputs.APP }}
       REGISTRY: ${{ needs.terraform-deploy.outputs.REGISTRY }}
     secrets:
