@@ -1,0 +1,46 @@
+name: Metrics
+
+on:
+  schedule:
+    - cron: '0 12 * * 1'
+  workflow_dispatch:
+
+jobs:
+  dora:
+    name: DORA Metrics
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Checkout devops-deployment-metrics code
+        uses: actions/checkout@v3
+        with:
+          repository: basiliskus/devops-deployment-metrics
+          path: devops-deployment-metrics
+
+      - name: Install dependencies
+        working-directory: devops-deployment-metrics
+        run: poetry install
+
+      - name: Set up config file
+        working-directory: devops-deployment-metrics
+        run: sed -e '14,18d' -e 's/my_github_owner/CDCgov/' -e 's/my_github_repository/trusted-intermediary/' -e 's/12345678/42635194/' sample-config.toml > config.toml
+
+      - name: Run DORA metrics application
+        working-directory: devops-deployment-metrics
+        env:
+          GITHUB_USERNAME: JohnNKing
+          GITHUB_PASSWORD: ${{ secrets.DORA_METRICS_ACCESS_TOKEN_JOHNNKING }}
+        run: poetry run devops-deployment-metrics -c config.toml
+
+      - name: Upload output metric files
+        uses: actions/upload-artifact@v3
+        with:
+          name: dora-metrics
+          path: devops-deployment-metrics/data/*.csv
