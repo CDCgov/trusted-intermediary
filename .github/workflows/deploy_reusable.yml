@@ -73,6 +73,12 @@ jobs:
         file: ./ig/Dockerfile
         context: ./ig
 
+    - name: run the documentation container
+      uses: addnab/docker-run-action@v3
+      with:
+        image: '${{ inputs.REGISTRY }}/${{ inputs.REPO_DOCS }}:${{ github.sha }}'
+        run: ./trusted-intermediary/_updatePublisher.sh && ./trusted-intermediary/_genonce.sh
+
     - name: Extract generated documentation from the image
       id: extract
       uses: shrink/actions-docker-extract@v2
