@@ -76,6 +76,9 @@ jobs:
     - name: run the documentation container
       uses: addnab/docker-run-action@v3
       with:
+        registry: ${{ inputs.REGISTRY }}
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
         image: '${{ inputs.REGISTRY }}/${{ inputs.REPO_DOCS }}:${{ github.sha }}'
         run: ./trusted-intermediary/_updatePublisher.sh && ./trusted-intermediary/_genonce.sh
 
