@@ -58,7 +58,7 @@ resource "azurerm_linux_web_app" "api" {
 
 resource "azurerm_storage_account" "docs" {
   name                     = "cdcti${var.environment}docs"
-  resource_group_name = azurerm_resource_group.group.name
+  resource_group_name      = azurerm_resource_group.group.name
 
   location                 = azurerm_resource_group.group.location
   account_tier             = "Standard"
