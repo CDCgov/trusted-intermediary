@@ -6,8 +6,8 @@
 id: cdc.gov.ti.ig
 canonical: http://cdc.gov/reportstream/trustedintermediary
 name: CDCTrustedIntermediaryIG
-# title: Example Title
-# description: Example Implementation Guide for getting started with SUSHI
+title: CDC ReportStream Trusted Intermediary Documentation
+description: Implementation Guide and other documentation for the CDC ReportStream Trusted Intermediary
 status: draft # draft | active | retired | unknown
 version: 0.1.0
 fhirVersion: 4.0.1 # https://www.hl7.org/fhir/valueset-FHIR-version.html
@@ -25,7 +25,7 @@ publisher:
 # use cases, the value can be an object with keys for id, uri, and version.
 #
 dependencies:
-  hl7.fhir.us.core: 5.0.1
+  hl7.fhir.us.core: 6.0.0
 #
 #
 # The pages property corresponds to IG.definition.page. SUSHI can
@@ -41,7 +41,7 @@ dependencies:
 #
 pages:
   index.md:
-    title: IG Home
+    title: Documentation Home
   guidance.md:
     title: General Guidance
   etor-nbs.md:
@@ -52,6 +52,14 @@ pages:
     title: Internal Interfaces
   example-overview.md:
     title: Example Overview
+  onboarding.md:
+    title: Onboarding to the Intermediary
+  connecting.md:
+    title: Connecting to the Intermediary
+  external.md:
+    title: Information for Sending to and Receiving from the Intermediary
+  internal.md:
+    title: Information About the Internals of the Intermediary
 
 
 #   implementation.xml:
@@ -87,12 +95,20 @@ menu:
 
   Table of Contents: toc.html
 
+  Onboarding: onboarding.html
+
+  Connecting: connecting.html
+
   Use Cases:
     General Guidance: guidance.html
     ETOR - Newborn Screening: etor-nbs.html
 
-  Specification:
+  External:
+    External Interfaces Overview:  external.html
     External Interfaces: external-interfaces.html
+
+  Internal:
+    Internal Interfaces Overview:  internal.html
     Internal Interfaces: internal-interfaces.html
 
   Examples:

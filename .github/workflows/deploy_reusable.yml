@@ -12,6 +12,9 @@ on:
       REPO:
         required: true
         type: string
+      REPO_DOCS:
+        required: true
+        type: string
       APP:
         required: true
         type: string
@@ -62,6 +65,14 @@ jobs:
         file: ./Dockerfile
         context: .
 
+    - name: Build and push documentation container image to registry
+      uses: docker/build-push-action@v4
+      with:
+        push: true
+        tags: '${{ inputs.REGISTRY }}/${{ inputs.REPO_DOCS }}:${{ github.sha }}'
+        file: ./ig/Dockerfile
+        context: ./ig
+
   deploy:
     runs-on: ubuntu-latest
     needs: build
@@ -87,3 +98,23 @@ jobs:
         app-name: ${{ inputs.APP }}
         slot-name: production
         images: '${{ inputs.REGISTRY }}/${{ inputs.REPO }}:${{ github.sha }}'
+
+    - name: Log in to registry
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ inputs.REGISTRY }}
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+
+    - name: Extract generated documentation from the documentation image
+      id: extract
+      uses: shrink/actions-docker-extract@v2
+      with:
+        image: '${{ inputs.REGISTRY }}/${{ inputs.REPO_DOCS }}:${{ github.sha }}'
+        path: /trusted-intermediary/output/.
+
+    - name: Upload docs to blob storage
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+            az storage blob upload-batch --account-name cdctistagingdocs --auth-mode key -d '$web' -s ${{ steps.extract.outputs.destination }}

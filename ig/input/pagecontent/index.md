@@ -1,13 +1,12 @@
-# CDCTrustedIntermediaryIG
+### Overview
 
-## Overview
+This implementation guide and documentation describes the use of the CDC ReportStream Trusted Intermediary system.  Included information includes:
 
-This implementation guide describes the use of the CDC Trusted Intermediary system.  Included are:
+- [Onboarding to the Intermediary](onboarding.html)
+- [Connecting to the Intermediary](connecting.html)
+- [General Guidance](guidance.html)
+- [Information for Sending to and Receiving from the Intermediary](external.html)
+- [Information About the Internals of the Intermediary](internal.html)
+- [Examples](example-overview.html)
 
-- Expectations of use
-- Canonical data representation within the Trusted Intermediary system
-- Supported workflows
-- Expected system inputs in different formats
-- Output formats generated
-
-The CDC Trusted Intermediary system is an extension of the ReportStream ecosystem that provides specific workflow data exchange between health care providers and public health entities.
+The CDC ReportStream Trusted Intermediary system is an extension of the ReportStream ecosystem that provides specific workflow data exchange between health care providers and public health entities.
