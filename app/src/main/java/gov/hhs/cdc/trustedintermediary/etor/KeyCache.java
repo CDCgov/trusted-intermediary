@@ -1,18 +1,18 @@
-package gov.hhs.cdc.trustedintermediary.external;
+package gov.hhs.cdc.trustedintermediary.etor;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class keyCache {
+public class KeyCache {
 
     private Map<String, String> keys;
 
-    private keyCache() {
+    private KeyCache() {
         keys = new HashMap<>();
     }
 
-    public keyCache getInstance() {
-        return new keyCache();
+    public static KeyCache getInstance() {
+        return new KeyCache();
     }
 
     void put(String key, String value) {
