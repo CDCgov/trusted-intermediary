@@ -1,0 +1,8 @@
+- name: report-stream
+  description: Report Stream
+  senders:
+    - name: default
+      topic: etor
+      customerStatus: active
+      format: FHIR
+  receivers:
