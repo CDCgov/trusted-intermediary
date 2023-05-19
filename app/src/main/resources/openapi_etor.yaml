@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Trusted Intermediary
+  title: Trusted Intermediary ETOR
   description: A service that intermediates healthcare messages between a specific sender and receiver.
   contact:
     email: cdc-ti@flexion.us

@@ -1,0 +1,39 @@
+openapi: 3.0.3
+info:
+  title: Trusted Intermediary Auth
+  description: Provides authentication for the Trusted Intermediary service
+  contact:
+    email: cdc-ti@flexion.us
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.0.1
+externalDocs:
+  description: Trusted Intermediary Repository
+  url: https://github.com/CDCgov/trusted-intermediary
+paths:
+  /auth:
+    post:
+      summary: Provides a short-lived token when a valid user signed JWT is provided
+      requestBody:
+        jwt: the user signed JWT
+        content:
+          application/jwt:
+            schema:
+              type: string
+        required: true
+      responses:
+        '200':
+          description: the JWT is valid and an access token is returned
+          content:
+            application/jwt:
+            schema:
+              type: string
+components:
+  schemas:
+    TODOAuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: TODO
