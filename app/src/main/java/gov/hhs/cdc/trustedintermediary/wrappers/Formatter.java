@@ -6,7 +6,9 @@ package gov.hhs.cdc.trustedintermediary.wrappers;
  */
 public interface Formatter {
 
-    <T> T convertToObject(String input, Class<T> clazz) throws FormatterProcessingException;
+    <T> T convertJsonToObject(String input, Class<T> clazz) throws FormatterProcessingException;
+
+    <T> T convertYamlToObject(String input, Class<T> clazz) throws FormatterProcessingException;
 
     String convertToString(Object obj) throws FormatterProcessingException;
 }

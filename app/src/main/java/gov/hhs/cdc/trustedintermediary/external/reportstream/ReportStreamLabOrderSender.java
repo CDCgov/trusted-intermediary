@@ -161,7 +161,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
 
         Map<String, String> value;
 
-        value = jackson.convertToObject(responseBody, Map.class);
+        value = jackson.convertJsonToObject(responseBody, Map.class);
         return value.get("access_token");
     }
 

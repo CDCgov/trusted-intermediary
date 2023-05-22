@@ -34,15 +34,25 @@ public class Jackson implements Formatter, YamlCombiner {
         return INSTANCE;
     }
 
-    @Override
-    public <T> T convertToObject(String input, Class<T> clazz) throws FormatterProcessingException {
+    private <T> T convertToObject(ObjectMapper mapper, String input, Class<T> clazz)
+            throws FormatterProcessingException {
         try {
-            return JSON_OBJECT_MAPPER.readValue(input, clazz);
+            return mapper.readValue(input, clazz);
         } catch (JsonProcessingException e) {
-            String errorMessage = "Jackson's objectMapper failed to convert JSON to object";
+            String errorMessage = "Jackson's objectMapper failed to convert data to object";
             logger.logError(errorMessage, e);
             throw new FormatterProcessingException(errorMessage, e);
         }
+    }
+
+    public <T> T convertJsonToObject(String input, Class<T> clazz)
+            throws FormatterProcessingException {
+        return convertToObject(JSON_OBJECT_MAPPER, input, clazz);
+    }
+
+    public <T> T convertYamlToObject(String input, Class<T> clazz)
+            throws FormatterProcessingException {
+        return convertToObject(YAML_OBJECT_MAPPER, input, clazz);
     }
 
     @Override
