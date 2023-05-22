@@ -45,11 +45,13 @@ public class Jackson implements Formatter, YamlCombiner {
         }
     }
 
+    @Override
     public <T> T convertJsonToObject(String input, Class<T> clazz)
             throws FormatterProcessingException {
         return convertToObject(JSON_OBJECT_MAPPER, input, clazz);
     }
 
+    @Override
     public <T> T convertYamlToObject(String input, Class<T> clazz)
             throws FormatterProcessingException {
         return convertToObject(YAML_OBJECT_MAPPER, input, clazz);
