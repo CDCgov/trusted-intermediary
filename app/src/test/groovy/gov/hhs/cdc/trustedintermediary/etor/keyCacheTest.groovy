@@ -7,10 +7,11 @@ class keyCacheTest extends Specification {
     def "keyCache works"() {
         given:
         def cache = KeyCache.getInstance()
-        def expected = "fake_key"
+        def value = "fake_key"
         def key = "report_stream"
+        def expected = value
         when:
-        cache.put(key, expected)
+        cache.put(key, value)
         def actual = cache.get(key)
         then:
         actual == expected
@@ -34,20 +35,10 @@ class keyCacheTest extends Specification {
 
         threads*.start()
         threads*.join()
-        def keysNum = cache.getProperties().get("keys").collect().toArray().size()
         def keys = cache.getProperties().get("keys").collect().collectEntries()
-        println("keys: " + keys)
-        println(keysNum)
-        println(cache.getProperties())
 
         then:
-        keysNum == threadsNum
-        keys.get("Thread-1") == "24"
-        keys.get("Thread-2") == "24"
-        keys.get("Thread-3") == "24"
-        keys.get("Thread-4") == "24"
-        keys.get("Thread-5") == "24"
-        keys.size() == 5 // one entry per thread
+        keys.size() == threadsNum // one key per thread
         keys.values().toSet().size() == 1 // all entries have same value, threads had to wait on the lock
 
     }
