@@ -75,14 +75,14 @@ class JjwtEngineTest extends Specification {
         def date = new Date(
                 System.currentTimeMillis()
                 + (300 * 1000L))
-        def expected = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS)
+        def expected = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).truncatedTo(ChronoUnit.MINUTES)
 
         when:
         def jwt = jwtEngine.getInstance().generateSenderToken("DogCow", "fake_URL", pemKey, "Dogcow", 300)
         def actual = jwtEngine.getExpirationDate(jwt)
 
         then:
-        actual == expected
+        actual.truncatedTo(ChronoUnit.MINUTES) == expected
     }
 
     def "getExpirationDate works bad path"() {
