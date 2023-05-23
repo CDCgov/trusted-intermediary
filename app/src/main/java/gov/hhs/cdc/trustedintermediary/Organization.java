@@ -35,7 +35,8 @@ class Sender {
         CSV,
         HL7,
         FHIR,
-        HL7_BATCH;
+        HL7_BATCH,
+        TEST;
     }
 
     enum CustomerStatus {
@@ -45,7 +46,8 @@ class Sender {
     }
 
     enum Topic {
-        ETOR;
+        ETOR,
+        TEST;
     }
 
     public String getName() {
