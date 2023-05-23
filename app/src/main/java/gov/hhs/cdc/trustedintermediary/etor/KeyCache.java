@@ -21,7 +21,7 @@ public class KeyCache {
         return new KeyCache();
     }
 
-    void put(String key, String value) {
+    public void put(String key, String value) {
         keys.put(key, value);
     }
 

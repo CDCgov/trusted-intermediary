@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.reportstream
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.KeyCache
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender
 import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException
@@ -61,10 +62,12 @@ class ReportStreamLabOrderSenderTest extends Specification {
         def mockAuthEngine = Mock(AuthEngine)
         def mockClient = Mock(HttpClient)
         def mockSecrets = Mock(Secrets)
+        def mockCache = Mock(KeyCache)
         TestApplicationContext.register(AuthEngine, mockAuthEngine)
         TestApplicationContext.register(HttpClient, mockClient)
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.register(Secrets, mockSecrets)
+        TestApplicationContext.register(KeyCache, mockCache)
         TestApplicationContext.injectRegisteredImplementations()
         when:
         mockSecrets.getKey(_ as String) >> "Fake Azure Key"
@@ -93,10 +96,12 @@ class ReportStreamLabOrderSenderTest extends Specification {
     def "extractToken fails from not getting a String in the access_token"() {
         given:
         def mockClient = Mock(HttpClient)
+        def mockCache = Mock(KeyCache)
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.register(HttpClient, mockClient)
         TestApplicationContext.register(Secrets, Mock(Secrets))
         TestApplicationContext.register(AuthEngine, Mock(AuthEngine))
+        TestApplicationContext.register(KeyCache, mockCache)
         TestApplicationContext.injectRegisteredImplementations()
 
         def responseBody = """{"foo":"foo value", "access_token":3, "boo":"boo value"}"""
@@ -153,6 +158,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         def mockClient = Mock(HttpClient)
         def mockFhir = Mock(HapiFhir)
         def mockFormatter = Mock(Formatter)
+        def mockCache = Mock(KeyCache)
         mockClient.post(_ as String, _ as Map, _ as String) >> "something"
         mockFormatter.convertToObject(_ as String, _ as Class) >> Map.of("access_token", "fake-token")
         TestApplicationContext.register(Secrets, mockSecrets)
@@ -160,6 +166,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         TestApplicationContext.register(HttpClient, mockClient)
         TestApplicationContext.register(HapiFhir, mockFhir)
         TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.register(KeyCache, mockCache)
         TestApplicationContext.injectRegisteredImplementations()
         mockFhir.encodeResourceToJson(_ as String) >> "Mock order"
         LabOrder<?> mockOrder = new LabOrder<String>() {
@@ -216,29 +223,35 @@ class ReportStreamLabOrderSenderTest extends Specification {
 
     def "retrievePrivateKey works when cache is empty" () {
         given:
-
         def mockSecret = Mock(Secrets)
         def expected = "New Fake Azure Key"
+        def cache = KeyCache.getInstance()
+        def key = "report-stream-sender-private-key-local"
         mockSecret.getKey(_ as String) >> expected
         TestApplicationContext.register(Secrets, mockSecret)
+        TestApplicationContext.register(KeyCache, cache)
         TestApplicationContext.injectRegisteredImplementations()
         def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
-        rsLabOrderSender.cachedPrivateKey = null
         when:
         def actual = rsLabOrderSender.retrievePrivateKey()
 
         then:
-        expected == actual
-        expected == rsLabOrderSender.getCachedPrivateKey()
+        actual == expected
+        cache.get(key) == expected
     }
 
     def "retrievePrivateKey works when cache is not empty" () {
         given:
+        def cache = KeyCache.getInstance()
+        def key = "report-stream-sender-private-key-local"
         def expected = "existing fake azure key"
+        TestApplicationContext.register(KeyCache, cache)
+        TestApplicationContext.injectRegisteredImplementations()
         def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
 
         when:
-        rsLabOrderSender.setCachedPrivateKey(expected)
+        cache.put(key, expected)
+        // rsLabOrderSender.setCachedPrivateKey(expected)
         def actual = rsLabOrderSender.retrievePrivateKey()
 
         then:
@@ -261,31 +274,17 @@ class ReportStreamLabOrderSenderTest extends Specification {
         isValid
     }
 
-    def "cache getter and setter works, no synchronization"() {
+    def "rsTokencache getter and setter works, no synchronization"() {
         given:
         def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
-        def threadCount = 10
-        def expected = "lock is working"
-        def lock = new Object()
-        def actual = "lock is not working"
-
-        def threads = (1..threadCount).collect { index ->
-            def value
-            new Thread({
-                synchronized (lock) {
-                    rsLabOrderSender.setRsTokenCache("Thread-${index}")
-                    value = rsLabOrderSender.getRsTokenCache()
-                    assert value == "Thread-${index}"
-                }
-            })
-        }
+        def expected = "fake token"
 
         when:
-        threads*.start()
-        threads*.join()
+        rsLabOrderSender.setRsTokenCache(expected)
+        def actual = rsLabOrderSender.getRsTokenCache()
 
         then:
-        noExceptionThrown()
+        actual == expected
     }
 
     // TODO cache getter and "setter" needs test for synchronization

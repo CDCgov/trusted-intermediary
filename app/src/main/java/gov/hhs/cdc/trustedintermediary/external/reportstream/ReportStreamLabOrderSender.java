@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.reportstream;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
+import gov.hhs.cdc.trustedintermediary.etor.KeyCache;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException;
@@ -63,6 +64,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     @Inject private HapiFhir fhir;
     @Inject private Logger logger;
     @Inject private Secrets secrets;
+    @Inject private KeyCache cache;
 
     public static ReportStreamLabOrderSender getInstance() {
         return INSTANCE;
@@ -147,13 +149,13 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     protected String retrievePrivateKey() throws SecretRetrievalException {
         var senderPrivateKey =
                 "report-stream-sender-private-key-" + ApplicationContext.getEnvironment();
-        String key = getCachedPrivateKey();
+        String key = this.cache.get(senderPrivateKey);
         if (key != null) {
             return key;
         }
 
         key = secrets.getKey(senderPrivateKey);
-        setCachedPrivateKey(key);
+        this.cache.put(senderPrivateKey, key);
         return key;
     }
 
