@@ -1,15 +1,13 @@
-# Internal Interfaces
-
-## Overview
+### Overview
 
 This is where we add information about the internal interfaces: FHIR formats.  Links to other pages.
 
-## Newborn Screening
+#### Newborn Screening
 
-### Input
+##### Input
 
 [NBSPatient](StructureDefinition-NBSPatient.html) - Demographic data input as a Patient resource
 
-### Output
+##### Output
 
 Nothing yet
