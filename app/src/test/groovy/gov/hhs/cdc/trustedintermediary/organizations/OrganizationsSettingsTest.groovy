@@ -2,8 +2,6 @@ package gov.hhs.cdc.trustedintermediary.organizations
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
-import gov.hhs.cdc.trustedintermediary.organizations.Organization
-import gov.hhs.cdc.trustedintermediary.organizations.OrganizationsSettings
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter
 import spock.lang.Specification
 
