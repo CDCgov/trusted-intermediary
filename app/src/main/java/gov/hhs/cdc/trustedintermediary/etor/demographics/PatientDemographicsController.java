@@ -45,7 +45,7 @@ public class PatientDemographicsController {
         var response = new DomainResponse(200);
 
         try {
-            var responseBody = formatter.convertToString(patientDemographicsResponse);
+            var responseBody = formatter.convertToJsonString(patientDemographicsResponse);
             response.setBody(responseBody);
         } catch (FormatterProcessingException e) {
             logger.logError("Error constructing an OK demographics response", e);
@@ -64,7 +64,7 @@ public class PatientDemographicsController {
             var stringMessage =
                     Optional.ofNullable(exception.getMessage())
                             .orElse(exception.getClass().toString());
-            var responseBody = formatter.convertToString(Map.of("error", stringMessage));
+            var responseBody = formatter.convertToJsonString(Map.of("error", stringMessage));
             domainResponse.setBody(responseBody);
         } catch (FormatterProcessingException e) {
             logger.logError("Error constructing an error response", e);

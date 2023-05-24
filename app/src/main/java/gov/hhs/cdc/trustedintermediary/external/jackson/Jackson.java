@@ -58,7 +58,7 @@ public class Jackson implements Formatter, YamlCombiner {
     }
 
     @Override
-    public String convertToString(Object obj) throws FormatterProcessingException {
+    public String convertToJsonString(Object obj) throws FormatterProcessingException {
 
         try {
             return JSON_OBJECT_MAPPER.writeValueAsString(obj);
