@@ -6,7 +6,7 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.external.apache.ApacheClient;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureSecrets;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation;
-import gov.hhs.cdc.trustedintermediary.external.in_memory.KeyCache;
+import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache;
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson;
 import gov.hhs.cdc.trustedintermediary.external.jjwt.JjwtEngine;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalSecrets;

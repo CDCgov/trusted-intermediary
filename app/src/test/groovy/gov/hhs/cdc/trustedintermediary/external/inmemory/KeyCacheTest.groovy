@@ -1,9 +1,9 @@
-package gov.hhs.cdc.trustedintermediary.external.in_memory
+package gov.hhs.cdc.trustedintermediary.external.inmemory
 
-import gov.hhs.cdc.trustedintermediary.external.in_memory.KeyCache
+
 import spock.lang.Specification
 
-class keyCacheTest extends Specification {
+class KeyCacheTest extends Specification {
 
     def "keyCache works"() {
         given:
