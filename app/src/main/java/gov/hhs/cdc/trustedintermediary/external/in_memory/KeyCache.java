@@ -1,10 +1,11 @@
-package gov.hhs.cdc.trustedintermediary.etor;
+package gov.hhs.cdc.trustedintermediary.external.in_memory;
 
+import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /** Stores keys from Azure to optimize performance. */
-public class KeyCache {
+public class KeyCache implements Cache {
 
     private Map<String, String> keys;
 
