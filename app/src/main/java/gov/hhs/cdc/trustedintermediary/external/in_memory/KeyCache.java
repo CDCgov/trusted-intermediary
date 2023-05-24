@@ -21,10 +21,12 @@ public class KeyCache implements Cache {
         return new KeyCache();
     }
 
+    @Override
     public void put(String key, String value) {
         keys.put(key, value);
     }
 
+    @Override
     public String get(String key) {
         return keys.get(key);
     }
