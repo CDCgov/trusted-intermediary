@@ -19,6 +19,7 @@ import javax.inject.Inject;
 public class AuthDomainRegistration implements DomainConnector {
 
     @Inject AuthController authController;
+    @Inject RequestSessionTokenUsecase requestSessionTokenUsecase;
     @Inject Logger logger;
 
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
@@ -27,7 +28,8 @@ public class AuthDomainRegistration implements DomainConnector {
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
         ApplicationContext.register(AuthController.class, AuthController.getInstance());
-
+        ApplicationContext.register(
+                RequestSessionTokenUsecase.class, RequestSessionTokenUsecase.getInstance());
         return endpoints;
     }
 
@@ -42,10 +44,16 @@ public class AuthDomainRegistration implements DomainConnector {
     }
 
     DomainResponse handleAuth(DomainRequest request) {
-        var accessToken = authController.login(request.getBody());
-        var response = new DomainResponse(200);
-        response.setBody(accessToken);
 
-        return response;
+        var authRequest = authController.parseAuthRequest(request);
+
+        // try {
+        var token = requestSessionTokenUsecase.getToken(authRequest);
+        // } catch (? e) {
+        //     logger.logError("Authentication failed", e);
+        //     return authController.constructResponse(400, e);
+        // }
+
+        return authController.constructResponse(token);
     }
 }
