@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.external.in_memory;
+package gov.hhs.cdc.trustedintermediary.external.inmemory;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
 import java.util.Map;

@@ -1,6 +1,6 @@
-package gov.hhs.cdc.trustedintermediary.external.in_memory
+package gov.hhs.cdc.trustedintermediary.external.inmemory
 
-import gov.hhs.cdc.trustedintermediary.external.in_memory.KeyCache
+
 import spock.lang.Specification
 
 class keyCacheTest extends Specification {
