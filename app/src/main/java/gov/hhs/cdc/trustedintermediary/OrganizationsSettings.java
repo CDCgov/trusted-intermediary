@@ -10,19 +10,19 @@ import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
 
-public class OrganizationsLoader {
+public class OrganizationsSettings {
 
-    private static final OrganizationsLoader INSTANCE = new OrganizationsLoader();
+    private static final OrganizationsSettings INSTANCE = new OrganizationsSettings();
 
     private List<Organization> organizations;
 
     @Inject private Formatter formatter;
 
-    public static OrganizationsLoader getInstance() {
+    public static OrganizationsSettings getInstance() {
         return INSTANCE;
     }
 
-    private OrganizationsLoader() {}
+    private OrganizationsSettings() {}
 
     public List<Organization> getOrganizations() {
         return organizations;
@@ -32,19 +32,8 @@ public class OrganizationsLoader {
             throws IOException, FormatterProcessingException {
         String organizationsFileString = Files.readString(Paths.get(filePath));
         this.organizations =
-                formatter.convertToObject(
+                formatter.convertYamlToObject(
                         organizationsFileString, new TypeReference<List<Organization>>() {});
-    }
-
-    public Optional<Sender> findSender(String name) {
-        for (Organization organization : organizations) {
-            for (Sender sender : organization.getSenders()) {
-                if (sender.getName().equals(name)) {
-                    return Optional.of(sender);
-                }
-            }
-        }
-        return Optional.empty();
     }
 
     public Optional<Organization> findOrganization(String name) {
