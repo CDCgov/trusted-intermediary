@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.etor;
+package gov.hhs.cdc.trustedintermediary.external.in_memory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

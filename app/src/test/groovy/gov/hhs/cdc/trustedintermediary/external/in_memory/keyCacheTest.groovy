@@ -1,5 +1,6 @@
-package gov.hhs.cdc.trustedintermediary.etor
+package gov.hhs.cdc.trustedintermediary.external.in_memory
 
+import gov.hhs.cdc.trustedintermediary.external.in_memory.KeyCache
 import spock.lang.Specification
 
 class keyCacheTest extends Specification {

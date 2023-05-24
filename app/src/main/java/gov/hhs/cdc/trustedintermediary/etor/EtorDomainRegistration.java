@@ -12,6 +12,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsCont
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiLabOrderConverter;
+import gov.hhs.cdc.trustedintermediary.external.in_memory.KeyCache;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileLabOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamLabOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
