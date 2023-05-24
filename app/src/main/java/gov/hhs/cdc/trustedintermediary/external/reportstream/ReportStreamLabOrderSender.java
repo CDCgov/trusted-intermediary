@@ -1,11 +1,11 @@
 package gov.hhs.cdc.trustedintermediary.external.reportstream;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
-import gov.hhs.cdc.trustedintermediary.etor.KeyCache;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException;
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
+import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
@@ -64,7 +64,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     @Inject private HapiFhir fhir;
     @Inject private Logger logger;
     @Inject private Secrets secrets;
-    @Inject private KeyCache cache;
+    @Inject private Cache keyCache;
 
     public static ReportStreamLabOrderSender getInstance() {
         return INSTANCE;
@@ -149,13 +149,13 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     protected String retrievePrivateKey() throws SecretRetrievalException {
         var senderPrivateKey =
                 "report-stream-sender-private-key-" + ApplicationContext.getEnvironment();
-        String key = this.cache.get(senderPrivateKey);
+        String key = this.keyCache.get(senderPrivateKey);
         if (key != null) {
             return key;
         }
 
         key = secrets.getKey(senderPrivateKey);
-        this.cache.put(senderPrivateKey, key);
+        this.keyCache.put(senderPrivateKey, key);
         return key;
     }
 

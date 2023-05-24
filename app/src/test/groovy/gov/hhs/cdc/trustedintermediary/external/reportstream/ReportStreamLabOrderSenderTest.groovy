@@ -1,12 +1,13 @@
 package gov.hhs.cdc.trustedintermediary.external.reportstream
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.KeyCache
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender
 import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException
+import gov.hhs.cdc.trustedintermediary.external.in_memory.KeyCache
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
+import gov.hhs.cdc.trustedintermediary.wrappers.Cache
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient
@@ -62,12 +63,12 @@ class ReportStreamLabOrderSenderTest extends Specification {
         def mockAuthEngine = Mock(AuthEngine)
         def mockClient = Mock(HttpClient)
         def mockSecrets = Mock(Secrets)
-        def mockCache = Mock(KeyCache)
+        def mockCache = Mock(Cache)
         TestApplicationContext.register(AuthEngine, mockAuthEngine)
         TestApplicationContext.register(HttpClient, mockClient)
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.register(Secrets, mockSecrets)
-        TestApplicationContext.register(KeyCache, mockCache)
+        TestApplicationContext.register(Cache, mockCache)
         TestApplicationContext.injectRegisteredImplementations()
         when:
         mockSecrets.getKey(_ as String) >> "Fake Azure Key"
@@ -96,12 +97,12 @@ class ReportStreamLabOrderSenderTest extends Specification {
     def "extractToken fails from not getting a String in the access_token"() {
         given:
         def mockClient = Mock(HttpClient)
-        def mockCache = Mock(KeyCache)
+        def mockCache = Mock(Cache)
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.register(HttpClient, mockClient)
         TestApplicationContext.register(Secrets, Mock(Secrets))
         TestApplicationContext.register(AuthEngine, Mock(AuthEngine))
-        TestApplicationContext.register(KeyCache, mockCache)
+        TestApplicationContext.register(Cache, mockCache)
         TestApplicationContext.injectRegisteredImplementations()
 
         def responseBody = """{"foo":"foo value", "access_token":3, "boo":"boo value"}"""
@@ -158,7 +159,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         def mockClient = Mock(HttpClient)
         def mockFhir = Mock(HapiFhir)
         def mockFormatter = Mock(Formatter)
-        def mockCache = Mock(KeyCache)
+        def mockCache = Mock(Cache)
         mockClient.post(_ as String, _ as Map, _ as String) >> "something"
         mockFormatter.convertToObject(_ as String, _ as Class) >> Map.of("access_token", "fake-token")
         TestApplicationContext.register(Secrets, mockSecrets)
@@ -166,7 +167,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         TestApplicationContext.register(HttpClient, mockClient)
         TestApplicationContext.register(HapiFhir, mockFhir)
         TestApplicationContext.register(Formatter, mockFormatter)
-        TestApplicationContext.register(KeyCache, mockCache)
+        TestApplicationContext.register(Cache, mockCache)
         TestApplicationContext.injectRegisteredImplementations()
         mockFhir.encodeResourceToJson(_ as String) >> "Mock order"
         LabOrder<?> mockOrder = new LabOrder<String>() {
@@ -225,11 +226,11 @@ class ReportStreamLabOrderSenderTest extends Specification {
         given:
         def mockSecret = Mock(Secrets)
         def expected = "New Fake Azure Key"
-        def cache = KeyCache.getInstance()
+        def keyCache = KeyCache.getInstance()
         def key = "report-stream-sender-private-key-local"
         mockSecret.getKey(_ as String) >> expected
         TestApplicationContext.register(Secrets, mockSecret)
-        TestApplicationContext.register(KeyCache, cache)
+        TestApplicationContext.register(Cache, keyCache)
         TestApplicationContext.injectRegisteredImplementations()
         def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
         when:
@@ -237,20 +238,20 @@ class ReportStreamLabOrderSenderTest extends Specification {
 
         then:
         actual == expected
-        cache.get(key) == expected
+        keyCache.get(key) == expected
     }
 
     def "retrievePrivateKey works when cache is not empty" () {
         given:
-        def cache = KeyCache.getInstance()
+        def keyCache = KeyCache.getInstance()
         def key = "report-stream-sender-private-key-local"
         def expected = "existing fake azure key"
-        TestApplicationContext.register(KeyCache, cache)
+        TestApplicationContext.register(Cache, keyCache)
         TestApplicationContext.injectRegisteredImplementations()
         def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
 
         when:
-        cache.put(key, expected)
+        keyCache.put(key, expected)
         // rsLabOrderSender.setCachedPrivateKey(expected)
         def actual = rsLabOrderSender.retrievePrivateKey()
 
