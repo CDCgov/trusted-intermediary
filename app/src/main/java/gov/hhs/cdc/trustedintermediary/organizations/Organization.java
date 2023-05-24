@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary;
+package gov.hhs.cdc.trustedintermediary.organizations;
 
 public class Organization {
     private String name;
