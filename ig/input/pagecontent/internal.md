@@ -1,7 +1,5 @@
-# Internal Interfaces
-
-## Overview
+### Overview
 
 This is where we add some high level information about the internal interfaces to the intermediary.  Include links to specific pages.
 
-- internal-interfaces.html
+- [Internal Interfaces](internal-interfaces.html)
