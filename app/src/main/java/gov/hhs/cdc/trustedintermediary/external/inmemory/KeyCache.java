@@ -4,7 +4,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** Stores keys from Azure to optimize performance. */
+/** This class implements the Cache interface, it uses a map for caching keys. */
 public class KeyCache implements Cache {
 
     private Map<String, String> keys;

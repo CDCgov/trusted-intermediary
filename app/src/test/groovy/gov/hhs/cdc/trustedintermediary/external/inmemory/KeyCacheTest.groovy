@@ -3,7 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.inmemory
 
 import spock.lang.Specification
 
-class keyCacheTest extends Specification {
+class KeyCacheTest extends Specification {
 
     def "keyCache works"() {
         given:
