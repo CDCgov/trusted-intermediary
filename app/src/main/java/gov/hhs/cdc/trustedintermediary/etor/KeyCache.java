@@ -9,10 +9,9 @@ public class KeyCache {
     private Map<String, String> keys;
 
     private KeyCache() {
-        // ConcurrentHashMap<>() over Collections.synchronizedMap() due to performance. Synchronized
-        // map, locks the
-        // whole object when reading or writing. Concurrent hashmap locks happen at the bucket
-        // level, leaving the read
+        // ConcurrentHashMap<>() over Collections.synchronizedMap() due to performance.
+        // Synchronized map locks the whole object when reading or writing.
+        // Concurrent hashmap locks happen at the bucket level, leaving the read
         // function unlocked when writing.
         keys = new ConcurrentHashMap<>();
     }
@@ -21,7 +20,7 @@ public class KeyCache {
         return new KeyCache();
     }
 
-    void put(String key, String value) {
+    public void put(String key, String value) {
         keys.put(key, value);
     }
 
