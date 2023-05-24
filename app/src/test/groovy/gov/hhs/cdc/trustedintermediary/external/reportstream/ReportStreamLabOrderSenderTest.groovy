@@ -154,7 +154,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         def mockFhir = Mock(HapiFhir)
         def mockFormatter = Mock(Formatter)
         mockClient.post(_ as String, _ as Map, _ as String) >> "something"
-        mockFormatter.convertToObject(_ as String, _ as Class) >> Map.of("access_token", "fake-token")
+        mockFormatter.convertJsonToObject(_ as String, _ as Class) >> Map.of("access_token", "fake-token")
         TestApplicationContext.register(Secrets, mockSecrets)
         TestApplicationContext.register(AuthEngine, mockAuthEngine)
         TestApplicationContext.register(HttpClient, mockClient)
@@ -327,7 +327,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
 
         mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(10, ChronoUnit.SECONDS)
         mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "fake token"
-        mockFormatter.convertToObject(_ as String, _ as Class) >> Map.of("access_token", "fake token")
+        mockFormatter.convertJsonToObject(_ as String, _ as Class) >> Map.of("access_token", "fake token")
         def responseBody = """{"foo":"foo value", "access_token":fake token, "boo":"boo value"}"""
         mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
 
@@ -355,7 +355,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
 
         mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "fake token"
         mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(10, ChronoUnit.SECONDS)
-        mockFormatter.convertToObject(_ as String, _ as Class) >> Map.of("access_token", "fake token")
+        mockFormatter.convertJsonToObject(_ as String, _ as Class) >> Map.of("access_token", "fake token")
         def responseBody = """{"foo":"foo value", "access_token":fake token, "boo":"boo value"}"""
         mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
         labOrderSender.setRsTokenCache("Invalid Token")
@@ -384,7 +384,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
 
         mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "fake token"
         mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(25, ChronoUnit.SECONDS)
-        mockFormatter.convertToObject(_ as String, _ as Class) >> Map.of("access_token", "fake token")
+        mockFormatter.convertJsonToObject(_ as String, _ as Class) >> Map.of("access_token", "fake token")
         def responseBody = """{"foo":"foo value", "access_token":fake token, "boo":"boo value"}"""
         mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
         labOrderSender.setRsTokenCache("valid Token")
