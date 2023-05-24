@@ -252,7 +252,6 @@ class ReportStreamLabOrderSenderTest extends Specification {
 
         when:
         keyCache.put(key, expected)
-        // rsLabOrderSender.setCachedPrivateKey(expected)
         def actual = rsLabOrderSender.retrievePrivateKey()
 
         then:
