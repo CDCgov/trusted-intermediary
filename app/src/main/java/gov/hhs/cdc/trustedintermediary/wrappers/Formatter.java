@@ -2,11 +2,13 @@ package gov.hhs.cdc.trustedintermediary.wrappers;
 
 /**
  * Signifies something that can convert objects to {@link String}s and {@link String}s back to
- * objects. It makes no assumption as to what the string format is.
+ * objects.
  */
 public interface Formatter {
 
-    <T> T convertToObject(String input, Class<T> clazz) throws FormatterProcessingException;
+    <T> T convertJsonToObject(String input, Class<T> clazz) throws FormatterProcessingException;
 
-    String convertToString(Object obj) throws FormatterProcessingException;
+    <T> T convertYamlToObject(String input, Class<T> clazz) throws FormatterProcessingException;
+
+    String convertToJsonString(Object obj) throws FormatterProcessingException;
 }

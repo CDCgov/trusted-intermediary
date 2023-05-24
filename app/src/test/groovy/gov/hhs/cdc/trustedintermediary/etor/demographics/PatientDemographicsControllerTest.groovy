@@ -42,7 +42,7 @@ class PatientDemographicsControllerTest extends Specification {
         def mockBody = "DogCow goes Moof"
 
         def formatter = Mock(Jackson)
-        formatter.convertToString(_ as PatientDemographicsResponse) >> mockBody
+        formatter.convertToJsonString(_ as PatientDemographicsResponse) >> mockBody
         TestApplicationContext.register(Formatter, formatter)
 
         TestApplicationContext.injectRegisteredImplementations()
@@ -60,7 +60,7 @@ class PatientDemographicsControllerTest extends Specification {
 
         given:
         def formatter = Mock(Jackson)
-        formatter.convertToString(_ as PatientDemographicsResponse) >> { throw new FormatterProcessingException("couldn't make the JSON", new Exception()) }
+        formatter.convertToJsonString(_ as PatientDemographicsResponse) >> { throw new FormatterProcessingException("couldn't make the JSON", new Exception()) }
         TestApplicationContext.register(Formatter, formatter)
 
         TestApplicationContext.injectRegisteredImplementations()
@@ -79,7 +79,7 @@ class PatientDemographicsControllerTest extends Specification {
         def mockResponseStatus = 404
 
         def formatter = Mock(Jackson)
-        formatter.convertToString(_ as Map) >> mockBody
+        formatter.convertToJsonString(_ as Map) >> mockBody
         TestApplicationContext.register(Formatter, formatter)
 
         TestApplicationContext.injectRegisteredImplementations()
@@ -97,7 +97,7 @@ class PatientDemographicsControllerTest extends Specification {
 
         given:
         def formatter = Mock(Jackson)
-        formatter.convertToString(_ as Map) >> { throw new FormatterProcessingException("couldn't make the JSON", new Exception()) }
+        formatter.convertToJsonString(_ as Map) >> { throw new FormatterProcessingException("couldn't make the JSON", new Exception()) }
         TestApplicationContext.register(Formatter, formatter)
 
         TestApplicationContext.injectRegisteredImplementations()
@@ -117,7 +117,7 @@ class PatientDemographicsControllerTest extends Specification {
         def mockException = new NullPointerException()
 
         def formatter = Mock(Jackson)
-        1 * formatter.convertToString(_ as Map) >> { Map error ->
+        1 * formatter.convertToJsonString(_ as Map) >> { Map error ->
             assert error.get("error") == mockException.getClass().toString()
             return mockBody
         }
