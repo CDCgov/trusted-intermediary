@@ -7,6 +7,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.TypeReference;
 import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombiner;
 import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombinerException;
 import java.util.HashMap;
@@ -49,6 +50,21 @@ public class Jackson implements Formatter, YamlCombiner {
     public <T> T convertJsonToObject(String input, Class<T> clazz)
             throws FormatterProcessingException {
         return convertToObject(JSON_OBJECT_MAPPER, input, clazz);
+    }
+
+    @Override
+    public <T> T convertJsonToObject(String input, TypeReference<T> typeReference)
+            throws FormatterProcessingException {
+
+        var jacksonTypeReference = new com.fasterxml.jackson.core.type.TypeReference<T>() {};
+
+        try {
+            return JSON_OBJECT_MAPPER.readValue(input, jacksonTypeReference);
+        } catch (JsonProcessingException e) {
+            String errorMessage = "Jackson's objectMapper failed to convert data to object";
+            logger.logError(errorMessage, e);
+            throw new FormatterProcessingException(errorMessage, e);
+        }
     }
 
     @Override

@@ -13,6 +13,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
+import gov.hhs.cdc.trustedintermediary.wrappers.TypeReference;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
@@ -158,10 +159,9 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     }
 
     protected String extractToken(String responseBody) throws FormatterProcessingException {
-
-        Map<String, String> value;
-
-        value = formatter.convertJsonToObject(responseBody, Map.class);
+        var value =
+                formatter.convertJsonToObject(
+                        responseBody, new TypeReference<Map<String, String>>() {});
         return value.get("access_token");
     }
 
