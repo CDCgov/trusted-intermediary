@@ -90,7 +90,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         actual == expected
     }
 
-    def "extractToken fails from not getting a String in the access_token"() {
+    def "extractToken works when access_token is a number"() {
         given:
         def mockClient = Mock(HttpClient)
         TestApplicationContext.register(Formatter, Jackson.getInstance())
@@ -99,15 +99,14 @@ class ReportStreamLabOrderSenderTest extends Specification {
         TestApplicationContext.register(AuthEngine, Mock(AuthEngine))
         TestApplicationContext.injectRegisteredImplementations()
 
-        def responseBody = """{"foo":"foo value", "access_token":3, "boo":"boo value"}"""
+        def responseBody = """{"foo":"foo value", "access_token": 3, "boo":"boo value"}"""
         mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
 
         when:
-        ReportStreamLabOrderSender.getInstance().requestToken()
+        def actual = ReportStreamLabOrderSender.getInstance().requestToken()
 
         then:
-        def exception = thrown(UnableToSendLabOrderException)
-        exception.getCause().getClass() == ClassCastException
+        actual == "3"
     }
 
     def "extractToken fails from not getting valid JSON from the auth token endpoint"() {

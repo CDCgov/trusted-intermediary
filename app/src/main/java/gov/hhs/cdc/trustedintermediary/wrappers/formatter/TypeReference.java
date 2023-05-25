@@ -1,3 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.wrappers.formatter;
 
-public abstract class TypeReference<T> {}
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
+public abstract class TypeReference<T> {
+    public Type getType() {
+        return ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+    }
+}
