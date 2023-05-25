@@ -1,16 +1,14 @@
 package gov.hhs.cdc.trustedintermediary.external.jjwt
 
-import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.TokenGenerationException
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
-import spock.lang.Specification
-
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
+import spock.lang.Specification
 
 class JjwtEngineTest extends Specification {
 
@@ -66,41 +64,33 @@ class JjwtEngineTest extends Specification {
         thrown(TokenGenerationException)
     }
 
-    def "getExpirationDate works happy path"() {
+    def "getExpirationDate works with unexpired JWT"() {
         given:
-        def jwtEngine = JjwtEngine.getInstance()
-        def pemKey = new String(Files.readAllBytes(Path.of("..", "mock_credentials", "report-stream-sender-private-key-local.pem")))
-        TestApplicationContext.register(AuthEngine, JjwtEngine.getInstance())
-        TestApplicationContext.injectRegisteredImplementations()
-        def date = new Date(
-                System.currentTimeMillis()
-                + (300 * 1000L))
-        def expected = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).truncatedTo(ChronoUnit.MINUTES)
+        def pemKey = Files.readString(Path.of("..", "mock_credentials", "report-stream-sender-private-key-local.pem"))
+        def secondsFromNowExpiration = 300
+        def expectedExpirationCenter = LocalDateTime.now().plusSeconds(secondsFromNowExpiration).truncatedTo(ChronoUnit.SECONDS)
+        def expectedExpirationUpper = expectedExpirationCenter.plusSeconds(3)  // 3 seconds is the window in which we expect the the code below to execute to generate the JWT (which is very generous, it should take much shorter than this)
+
+        def jwt = JjwtEngine.getInstance().generateSenderToken("DogCow", "fake_URL", pemKey, "Dogcow", secondsFromNowExpiration)
 
         when:
-        def jwt = jwtEngine.getInstance().generateSenderToken("DogCow", "fake_URL", pemKey, "Dogcow", 300)
-        def actual = jwtEngine.getExpirationDate(jwt)
+        def actualExpiration = JjwtEngine.getInstance().getExpirationDate(jwt)
 
         then:
-        actual.truncatedTo(ChronoUnit.MINUTES) == expected
+        //testing that the actual expiration is between (inclusive) the expectedExpirationCenter and expectedExpirationUpper time
+        (actualExpiration.isEqual(expectedExpirationCenter) || actualExpiration.isAfter(expectedExpirationCenter)) && (actualExpiration.isEqual(expectedExpirationUpper) || actualExpiration.isBefore(expectedExpirationUpper))
     }
 
-    def "getExpirationDate works bad path"() {
+    def "getExpirationDate works when the JWT is expired"() {
         given:
         def fileName = "report-stream-expired-token"
-        def expiredToken = new String(Files.readAllBytes(Path.of("..", "mock_credentials", fileName + ".jwt")))
-        def jwtEngine = JjwtEngine.getInstance()
-        TestApplicationContext.register(AuthEngine, JjwtEngine.getInstance())
-        TestApplicationContext.injectRegisteredImplementations()
+        def expiredToken = Files.readString(Path.of("..", "mock_credentials", fileName + ".jwt"))
 
         when:
-        def minutes = 10L
-        def actual = jwtEngine.getExpirationDate(expiredToken)
-        def expected = LocalDateTime.now(ZoneId.systemDefault()).minusMinutes(minutes).truncatedTo(ChronoUnit.MINUTES)
+        def actual = JjwtEngine.getInstance().getExpirationDate(expiredToken)
+        def expected = LocalDateTime.ofInstant(Instant.ofEpochSecond(1683209064L), ZoneId.systemDefault())
 
         then:
-        // actual should be LocalDateTime.now() - 10 minutes when the jwt has expired
-        // ChronoUnit.MINUTES to expand the range or it has a potential of failing when seconds change.
-        actual.truncatedTo(ChronoUnit.MINUTES) == expected
+        actual == expected
     }
 }
