@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.jackson;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
@@ -38,9 +39,8 @@ public class Jackson implements Formatter, YamlCombiner {
     private <T> T convertToObject(ObjectMapper mapper, String input, TypeReference<T> typeReference)
             throws FormatterProcessingException {
         try {
-            var jacksonTypeReference = new com.fasterxml.jackson.core.type.TypeReference<T>() {};
-
-            return mapper.readValue(input, jacksonTypeReference);
+            JavaType javaType = mapper.getTypeFactory().constructType(typeReference.getType());
+            return mapper.readValue(input, javaType);
         } catch (JsonProcessingException e) {
             String errorMessage = "Jackson's objectMapper failed to convert data to object";
             logger.logError(errorMessage, e);
