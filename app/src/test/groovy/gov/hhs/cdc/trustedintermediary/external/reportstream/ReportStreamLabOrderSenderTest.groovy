@@ -98,15 +98,16 @@ class ReportStreamLabOrderSenderTest extends Specification {
         TestApplicationContext.register(Secrets, Mock(Secrets))
         TestApplicationContext.register(AuthEngine, Mock(AuthEngine))
         TestApplicationContext.injectRegisteredImplementations()
+        def expectedTokenValue = "3"
 
         def responseBody = """{"foo":"foo value", "access_token": 3, "boo":"boo value"}"""
         mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
 
         when:
-        def actual = ReportStreamLabOrderSender.getInstance().requestToken()
+        def actualTokenValue = ReportStreamLabOrderSender.getInstance().requestToken()
 
         then:
-        actual == "3"
+        actualTokenValue == expectedTokenValue
     }
 
     def "extractToken fails from not getting valid JSON from the auth token endpoint"() {
