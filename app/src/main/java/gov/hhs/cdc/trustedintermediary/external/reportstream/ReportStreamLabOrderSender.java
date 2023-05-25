@@ -59,7 +59,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
 
     @Inject private HttpClient client;
     @Inject private AuthEngine jwt;
-    @Inject private Formatter jackson;
+    @Inject private Formatter formatter;
     @Inject private HapiFhir fhir;
     @Inject private Logger logger;
     @Inject private Secrets secrets;
@@ -161,7 +161,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
 
         Map<String, String> value;
 
-        value = jackson.convertJsonToObject(responseBody, Map.class);
+        value = formatter.convertJsonToObject(responseBody, Map.class);
         return value.get("access_token");
     }
 
