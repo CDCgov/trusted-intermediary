@@ -18,12 +18,12 @@ import javax.inject.Inject;
  */
 public class AzureSecrets implements Secrets {
 
-    private final String keyVaultName =
+    private static final String KEY_VAULT_NAME =
             ApplicationContext.getProperty("KEY_VAULT_NAME"); // Verify the env variable name
-    private final String keyVaultUri = "https://" + keyVaultName + ".vault.azure.net";
-    private final SecretClient secretClient =
+    private static final String KEY_VAULT_URI = "https://" + KEY_VAULT_NAME + ".vault.azure.net";
+    private static final SecretClient SECRET_CLIENT =
             new SecretClientBuilder()
-                    .vaultUrl(keyVaultUri)
+                    .vaultUrl(KEY_VAULT_URI)
                     .credential(
                             new DefaultAzureCredentialBuilder()
                                     .build()) // looks for AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, and
@@ -44,7 +44,7 @@ public class AzureSecrets implements Secrets {
 
         logger.logInfo("Acquiring Azure key...");
         try {
-            KeyVaultSecret storedSecret = secretClient.getSecret(secretName);
+            KeyVaultSecret storedSecret = SECRET_CLIENT.getSecret(secretName);
             return storedSecret.getValue();
         } catch (AzureException exception) {
             throw new SecretRetrievalException(
