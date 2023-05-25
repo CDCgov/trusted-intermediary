@@ -4,11 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
-import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
-import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombiner;
 import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombinerException;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.util.HashMap;
 import java.util.Set;
 import javax.inject.Inject;
@@ -34,10 +35,12 @@ public class Jackson implements Formatter, YamlCombiner {
         return INSTANCE;
     }
 
-    private <T> T convertToObject(ObjectMapper mapper, String input, Class<T> clazz)
+    private <T> T convertToObject(ObjectMapper mapper, String input, TypeReference<T> typeReference)
             throws FormatterProcessingException {
         try {
-            return mapper.readValue(input, clazz);
+            var jacksonTypeReference = new com.fasterxml.jackson.core.type.TypeReference<T>() {};
+
+            return mapper.readValue(input, jacksonTypeReference);
         } catch (JsonProcessingException e) {
             String errorMessage = "Jackson's objectMapper failed to convert data to object";
             logger.logError(errorMessage, e);
@@ -46,15 +49,15 @@ public class Jackson implements Formatter, YamlCombiner {
     }
 
     @Override
-    public <T> T convertJsonToObject(String input, Class<T> clazz)
+    public <T> T convertJsonToObject(String input, TypeReference<T> typeReference)
             throws FormatterProcessingException {
-        return convertToObject(JSON_OBJECT_MAPPER, input, clazz);
+        return convertToObject(JSON_OBJECT_MAPPER, input, typeReference);
     }
 
     @Override
-    public <T> T convertYamlToObject(String input, Class<T> clazz)
+    public <T> T convertYamlToObject(String input, TypeReference<T> typeReference)
             throws FormatterProcessingException {
-        return convertToObject(YAML_OBJECT_MAPPER, input, clazz);
+        return convertToObject(YAML_OBJECT_MAPPER, input, typeReference);
     }
 
     @Override

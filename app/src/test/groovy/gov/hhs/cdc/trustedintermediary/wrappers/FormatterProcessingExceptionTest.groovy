@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.wrappers
 
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
 import spock.lang.Specification
 
 class FormatterProcessingExceptionTest extends Specification {
