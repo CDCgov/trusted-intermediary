@@ -11,6 +11,7 @@ import java.nio.file.Path
 class OrganizationsSettingsTest extends Specification {
 
     Path tempFile
+    OrganizationsSettings settings
 
     def setup() {
         TestApplicationContext.reset()
@@ -23,6 +24,7 @@ class OrganizationsSettingsTest extends Specification {
         String yamlContent = "- name: test-name\n  description: Test Description"
         tempFile = Files.createTempFile("organizations", ".yaml")
         Files.writeString(tempFile, yamlContent)
+        settings = OrganizationsSettings.getInstance()
     }
 
     def cleanup() {
@@ -31,7 +33,6 @@ class OrganizationsSettingsTest extends Specification {
 
     def "Load organizations from yaml file works"() {
         given:
-        def settings = OrganizationsSettings.getInstance()
         def expectedOrganizationsSize = 1
 
         when:
@@ -45,7 +46,6 @@ class OrganizationsSettingsTest extends Specification {
 
     def "Properties for loaded organizations match expected values"() {
         given:
-        def settings = OrganizationsSettings.getInstance()
         settings.loadOrganizations(tempFile)
         def expectedOrganizationName = "test-name"
         def expectedOrganizationDescription = "Test Description"
@@ -61,9 +61,8 @@ class OrganizationsSettingsTest extends Specification {
         actualOrganizationDescription == expectedOrganizationDescription
     }
 
-    def "findOrganization works"() {
+    def "findOrganization returns correct organization by name when exists"() {
         given:
-        def settings = OrganizationsSettings.getInstance()
         settings.loadOrganizations(tempFile)
         def expectedOrganizationName = "test-name"
 
@@ -74,5 +73,17 @@ class OrganizationsSettingsTest extends Specification {
         then:
         organization.isPresent()
         actualOrganizationName == expectedOrganizationName
+    }
+
+    def "findOrganization returns empty optional when organization does not exist"() {
+        given:
+        settings.loadOrganizations(tempFile)
+        def expectedOrganizationName = "non-existent-name"
+
+        when:
+        def organization = settings.findOrganization(expectedOrganizationName)
+
+        then:
+        !organization.isPresent()
     }
 }
