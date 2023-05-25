@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.wrappers;
+package gov.hhs.cdc.trustedintermediary.wrappers.formatter;
 
 /**
  * Signifies something that can convert objects to {@link String}s and {@link String}s back to
