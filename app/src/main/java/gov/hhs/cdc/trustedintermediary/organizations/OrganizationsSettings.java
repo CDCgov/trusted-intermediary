@@ -10,6 +10,10 @@ import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
 
+/**
+ * Responsible for loading a list or organizations from a settings file, mapping them to a list of
+ * {@link Organization} instances, and providing a way to verify an organization exists in the list.
+ */
 public class OrganizationsSettings {
 
     private static final OrganizationsSettings INSTANCE = new OrganizationsSettings();
