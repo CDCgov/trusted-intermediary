@@ -1,7 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.organizations;
 
-import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
-import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,8 +31,8 @@ public class OrganizationsSettings {
     public void loadOrganizations(Path filePath) throws IOException, FormatterProcessingException {
         String organizationsFileString = Files.readString(filePath);
         this.organizations =
-                (List<Organization>)
-                        formatter.convertYamlToObject(organizationsFileString, List.class);
+                formatter.convertYamlToObject(
+                        organizationsFileString, new TypeReference<List<Organization>>() {});
     }
 
     public Optional<Organization> findOrganization(String name) {
