@@ -18,4 +18,9 @@ public interface AuthEngine {
             throws TokenGenerationException;
 
     LocalDateTime getExpirationDate(String token);
+
+    void validateToken(String jwt, String publicKey)
+            throws InvalidTokenException, IllegalArgumentException;
+
+    // String validateReceiverToken();
 }

@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.jjwt;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
+import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException;
 import gov.hhs.cdc.trustedintermediary.wrappers.TokenGenerationException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -12,6 +13,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -103,6 +105,28 @@ public class JjwtEngine implements AuthEngine {
             return LocalDateTime.now(ZoneId.systemDefault())
                     .minusMinutes(minutes)
                     .truncatedTo(ChronoUnit.SECONDS);
+        }
+    }
+
+    @Override
+    public void validateToken(String jwt, String encodedKey)
+            throws InvalidTokenException, IllegalArgumentException {
+        try {
+            byte[] encode = Base64.getDecoder().decode(encodedKey);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encode);
+            var key = keyFactory.generatePublic(keySpec);
+            var parsedJwt = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt);
+
+            // TODO Catch invalid tokens, signed by incorrect alg, untrusted keys, and expired
+            // tokens
+
+        } catch (JwtException e) {
+            throw new InvalidTokenException(e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalArgumentException("The key algorithm isn't supported", e);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("The key wasn't formatted correctly", e);
         }
     }
 }

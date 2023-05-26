@@ -49,13 +49,14 @@ public class AuthDomainRegistration implements DomainConnector {
         // request.getHeaders().get('ContentType') == 'application/x-www-form-urlencoded'
 
         var authRequest = authController.parseAuthRequest(request);
+        var token = "";
 
-        // try {
-        var token = requestSessionTokenUsecase.getToken(authRequest);
-        // } catch (? e) {
-        //     logger.logError("Authentication failed", e);
-        //     return authController.constructResponse(400, e);
-        // }
+        try {
+            token = requestSessionTokenUsecase.getToken(authRequest);
+        } catch (Exception e) {
+            logger.logError("Authentication failed", e);
+            return authController.constructResponse(401, e);
+        }
 
         return authController.constructResponse(token);
     }
