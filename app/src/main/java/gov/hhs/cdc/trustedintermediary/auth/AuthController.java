@@ -2,7 +2,6 @@ package gov.hhs.cdc.trustedintermediary.auth;
 
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
-import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +14,6 @@ public class AuthController {
     static final String CONTENT_TYPE_LITERAL = "Content-Type";
     static final String APPLICATION_JWT_LITERAL = "application/jwt";
 
-    @Inject private AuthEngine jwt;
     @Inject Logger logger;
 
     private AuthController() {}
@@ -48,15 +46,19 @@ public class AuthController {
                 "ReportStream", authFields.get("client_assertion")); // TODO don't assume RS
     }
 
-    public DomainResponse constructResponse(String accessToken) {
+    public DomainResponse constructResponse(int httpStatus) {
+        return constructResponse(httpStatus, null);
+    }
 
-        if (accessToken == null) {
-            return new DomainResponse(401);
-        } else {
-            DomainResponse response = new DomainResponse(200);
-            response.setBody(accessToken);
+    public DomainResponse constructResponse(int httpStatus, String accessToken) {
+
+        DomainResponse response = new DomainResponse(httpStatus);
+
+        if (accessToken != null) {
             response.setHeaders(Map.of(CONTENT_TYPE_LITERAL, APPLICATION_JWT_LITERAL));
-            return response;
+            response.setBody(accessToken);
         }
+
+        return response;
     }
 }

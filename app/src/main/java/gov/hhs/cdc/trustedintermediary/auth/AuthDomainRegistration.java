@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint;
+import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,11 +54,17 @@ public class AuthDomainRegistration implements DomainConnector {
 
         try {
             token = requestSessionTokenUsecase.getToken(authRequest);
+            System.out.println("!" + token);
+
+        } catch (InvalidTokenException e) {
+            logger.logInfo("Authentication failed", e);
+            return authController.constructResponse(401);
+
         } catch (Exception e) {
-            logger.logError("Authentication failed", e);
-            return authController.constructResponse(401, e);
+            logger.logFatal("Bad authentication service configuration: Authentication failed", e);
+            return authController.constructResponse(500);
         }
 
-        return authController.constructResponse(token);
+        return authController.constructResponse(200, token);
     }
 }
