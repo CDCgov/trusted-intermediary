@@ -37,6 +37,48 @@ public class JjwtEngine implements AuthEngine {
     }
 
     @Override
+    public String generateToken(
+            String keyId,
+            String issuer,
+            String subject,
+            String audience,
+            int expirationSecondsFromNow,
+            String pemKey)
+            throws TokenGenerationException {
+
+        RSAPrivateKey privateKey;
+        try {
+            privateKey = readPrivateKey(pemKey);
+        } catch (NoSuchAlgorithmException e) {
+            throw new TokenGenerationException("The private key algorithm isn't supported", e);
+        } catch (Exception e) {
+            throw new TokenGenerationException("The private key wasn't formatted correctly", e);
+        }
+
+        JwtBuilder jwsObj = null;
+        try {
+            jwsObj =
+                    Jwts.builder()
+                            .setHeaderParam("kid", keyId)
+                            .setHeaderParam("typ", "JWT")
+                            .setIssuer(issuer)
+                            .setSubject(subject)
+                            .setAudience(audience)
+                            .setExpiration(
+                                    new Date(
+                                            System.currentTimeMillis()
+                                                    + (expirationSecondsFromNow * 1000L)))
+                            .setId(UUID.randomUUID().toString())
+                            .signWith(privateKey);
+
+            return jwsObj.compact();
+        } catch (JwtException exception) {
+            throw new TokenGenerationException(
+                    "Jjwt was unable to create or sign the JWT", exception);
+        }
+    }
+
+    @Override
     @Nonnull
     public String generateSenderToken(
             @Nonnull String sender,
@@ -111,15 +153,13 @@ public class JjwtEngine implements AuthEngine {
     @Override
     public void validateToken(String jwt, String encodedKey)
             throws InvalidTokenException, IllegalArgumentException {
+
         try {
             byte[] encode = Base64.getDecoder().decode(encodedKey);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encode);
             var key = keyFactory.generatePublic(keySpec);
-            var parsedJwt = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt);
-
-            // TODO Catch invalid tokens, signed by incorrect alg, untrusted keys, and expired
-            // tokens
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt);
 
         } catch (JwtException e) {
             throw new InvalidTokenException(e);

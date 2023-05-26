@@ -9,24 +9,20 @@ import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import gov.hhs.cdc.trustedintermediary.wrappers.TokenGenerationException;
 import java.util.Map;
-import java.util.Optional;
 import javax.inject.Inject;
 
 /** TODO */
 public class RequestSessionTokenUsecase {
 
+    private static final RequestSessionTokenUsecase INSTANCE = new RequestSessionTokenUsecase();
+
+    private static final String OUR_NAME = "cdc-trusted-intermediary";
+    private static final String RS_NAME = "report-stream";
+    private static final int TOKEN_TTL = 300;
+
     @Inject private AuthEngine auth;
     @Inject private Formatter jackson;
     @Inject private Secrets secrets;
-
-    private static final RequestSessionTokenUsecase INSTANCE = new RequestSessionTokenUsecase();
-
-    private static final String RS_URL_PREFIX_PROPERTY = "REPORT_STREAM_URL_PREFIX";
-    private static final String RS_DOMAIN_NAME =
-            Optional.ofNullable(ApplicationContext.getProperty(RS_URL_PREFIX_PROPERTY))
-                    .map(urlPrefix -> urlPrefix.replace("https://", "").replace("http://", ""))
-                    .orElse("");
-    private static final String CLIENT_NAME = "flexion.etor-service-sender";
 
     public static RequestSessionTokenUsecase getInstance() {
         return INSTANCE;
@@ -45,8 +41,8 @@ public class RequestSessionTokenUsecase {
         auth.validateToken(request.jwt(), rsPublicKey);
 
         // Provide a short-lived access token for subsequent calls to the TI service
-        return auth.generateSenderToken(
-                CLIENT_NAME, RS_DOMAIN_NAME, retrievePrivateKey(), CLIENT_NAME, 300);
+        return auth.generateToken(
+                OUR_NAME, OUR_NAME, RS_NAME, RS_NAME, TOKEN_TTL, retrievePrivateKey());
     }
 
     /** TODO: Consolidate; copied from ReportStreamLabOrderSender */

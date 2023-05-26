@@ -8,6 +8,16 @@ import javax.annotation.Nonnull;
  * generateSenderToken() generates a token using ETOR's private key.
  */
 public interface AuthEngine {
+
+    String generateToken(
+            String keyId,
+            String issuer,
+            String subject,
+            String audience,
+            int expirationSecondsFromNow,
+            String pemKey)
+            throws TokenGenerationException;
+
     @Nonnull
     String generateSenderToken(
             @Nonnull String sender,
@@ -21,6 +31,4 @@ public interface AuthEngine {
 
     void validateToken(String jwt, String publicKey)
             throws InvalidTokenException, IllegalArgumentException;
-
-    // String validateReceiverToken();
 }
