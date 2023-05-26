@@ -49,16 +49,6 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         this.rsTokenCache = token;
     }
 
-    private String cachedPrivateKey;
-
-    protected synchronized String getCachedPrivateKey() {
-        return cachedPrivateKey;
-    }
-
-    protected synchronized void setCachedPrivateKey(String cachedPrivateKey) {
-        this.cachedPrivateKey = cachedPrivateKey;
-    }
-
     @Inject private HttpClient client;
     @Inject private AuthEngine jwt;
     @Inject private Formatter formatter;

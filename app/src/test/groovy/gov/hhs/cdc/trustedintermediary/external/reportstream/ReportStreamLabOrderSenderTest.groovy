@@ -185,43 +185,6 @@ class ReportStreamLabOrderSenderTest extends Specification {
         noExceptionThrown()
     }
 
-    def "cachedPrivateKey getter and setter works" () {
-        given:
-        def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
-        def expected = "a fake azure key"
-
-        when:
-        rsLabOrderSender.setCachedPrivateKey(expected)
-        def actual = rsLabOrderSender.getCachedPrivateKey()
-
-        then:
-        expected == actual
-    }
-
-    def "cachedPrivateKey thread synchronization" () {
-        // TODO - Pending race-condition clarification
-        given:
-        def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
-        def threadCount = 15
-        def lock = new Object()
-        def threads = (1..threadCount).collect { index ->
-            new Thread( {
-                synchronized (lock) {
-                    rsLabOrderSender.setCachedPrivateKey("${index}")
-                    def result = rsLabOrderSender.getCachedPrivateKey()
-                    assert result =="${index}"
-                }
-            })
-        }
-
-        when:
-        threads*.start()
-        threads*.join()
-
-        then:
-        noExceptionThrown()
-    }
-
     def "retrievePrivateKey works when cache is empty" () {
         given:
         def mockSecret = Mock(Secrets)
