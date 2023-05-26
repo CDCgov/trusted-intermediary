@@ -8,16 +8,16 @@ import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache
-import gov.hhs.cdc.trustedintermediary.wrappers.Formatter
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
-import spock.lang.Specification
-import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException
-
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
+import spock.lang.Specification
 
 class ReportStreamLabOrderSenderTest extends Specification {
 
@@ -94,7 +94,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         actual == expected
     }
 
-    def "extractToken fails from not getting a String in the access_token"() {
+    def "extractToken works when access_token is a number"() {
         given:
         def mockClient = Mock(HttpClient)
         def mockCache = Mock(Cache)
@@ -104,16 +104,16 @@ class ReportStreamLabOrderSenderTest extends Specification {
         TestApplicationContext.register(AuthEngine, Mock(AuthEngine))
         TestApplicationContext.register(Cache, mockCache)
         TestApplicationContext.injectRegisteredImplementations()
+        def expectedTokenValue = "3"
 
-        def responseBody = """{"foo":"foo value", "access_token":3, "boo":"boo value"}"""
+        def responseBody = """{"foo":"foo value", "access_token": 3, "boo":"boo value"}"""
         mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
 
         when:
-        ReportStreamLabOrderSender.getInstance().requestToken()
+        def actualTokenValue = ReportStreamLabOrderSender.getInstance().requestToken()
 
         then:
-        def exception = thrown(UnableToSendLabOrderException)
-        exception.getCause().getClass() == ClassCastException
+        actualTokenValue == expectedTokenValue
     }
 
     def "extractToken fails from not getting valid JSON from the auth token endpoint"() {
@@ -161,7 +161,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         def mockFormatter = Mock(Formatter)
         def mockCache = Mock(Cache)
         mockClient.post(_ as String, _ as Map, _ as String) >> "something"
-        mockFormatter.convertJsonToObject(_ as String, _ as Class) >> Map.of("access_token", "fake-token")
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake-token")
         TestApplicationContext.register(Secrets, mockSecrets)
         TestApplicationContext.register(AuthEngine, mockAuthEngine)
         TestApplicationContext.register(HttpClient, mockClient)
@@ -326,7 +326,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
 
         mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(10, ChronoUnit.SECONDS)
         mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "fake token"
-        mockFormatter.convertJsonToObject(_ as String, _ as Class) >> Map.of("access_token", "fake token")
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake token")
         def responseBody = """{"foo":"foo value", "access_token":fake token, "boo":"boo value"}"""
         mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
 
@@ -354,7 +354,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
 
         mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "fake token"
         mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(10, ChronoUnit.SECONDS)
-        mockFormatter.convertJsonToObject(_ as String, _ as Class) >> Map.of("access_token", "fake token")
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake token")
         def responseBody = """{"foo":"foo value", "access_token":fake token, "boo":"boo value"}"""
         mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
         labOrderSender.setRsTokenCache("Invalid Token")
@@ -383,7 +383,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
 
         mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "fake token"
         mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(25, ChronoUnit.SECONDS)
-        mockFormatter.convertJsonToObject(_ as String, _ as Class) >> Map.of("access_token", "fake token")
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake token")
         def responseBody = """{"foo":"foo value", "access_token":fake token, "boo":"boo value"}"""
         mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
         labOrderSender.setRsTokenCache("valid Token")
