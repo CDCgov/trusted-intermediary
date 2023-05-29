@@ -56,7 +56,7 @@ public class AuthDomainRegistration implements DomainConnector {
             token = requestSessionTokenUsecase.getToken(authRequest);
             System.out.println("!" + token);
 
-        } catch (InvalidTokenException e) {
+        } catch (InvalidTokenException | UnknownOrganizationException e) {
             logger.logInfo("Authentication failed", e);
             return authController.constructResponse(401);
 

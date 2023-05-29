@@ -11,6 +11,7 @@ import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson;
 import gov.hhs.cdc.trustedintermediary.external.jjwt.JjwtEngine;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalSecrets;
 import gov.hhs.cdc.trustedintermediary.external.slf4j.Slf4jLogger;
+import gov.hhs.cdc.trustedintermediary.organizations.OrganizationsSettings;
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
@@ -64,5 +65,7 @@ public class App {
                 ApplicationContext.getEnvironment().equalsIgnoreCase("local")
                         ? LocalSecrets.getInstance()
                         : AzureSecrets.getInstance());
+        ApplicationContext.register(
+                OrganizationsSettings.class, OrganizationsSettings.getInstance());
     }
 }

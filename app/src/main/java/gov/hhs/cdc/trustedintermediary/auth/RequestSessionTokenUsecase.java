@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.auth;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
+import gov.hhs.cdc.trustedintermediary.organizations.OrganizationsSettings;
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException;
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
@@ -24,6 +25,7 @@ public class RequestSessionTokenUsecase {
     @Inject private AuthEngine auth;
     @Inject private Formatter formatter;
     @Inject private Secrets secrets;
+    @Inject private OrganizationsSettings organizationsSettings;
 
     public static RequestSessionTokenUsecase getInstance() {
         return INSTANCE;
@@ -33,7 +35,21 @@ public class RequestSessionTokenUsecase {
 
     public String getToken(AuthRequest request)
             throws InvalidTokenException, IllegalArgumentException, TokenGenerationException,
-                    SecretRetrievalException {
+                    SecretRetrievalException, UnknownOrganizationException {
+
+        var organizationName = request.scope();
+
+        var organization =
+                organizationsSettings
+                        .findOrganization(request.scope())
+                        .orElseThrow(
+                                () ->
+                                        new UnknownOrganizationException(
+                                                "The organization "
+                                                        + organizationName
+                                                        + " is unknown"));
+
+        // At this point, only organizations registered with us will proceed
 
         // Validate the JWT is signed by a trusted entity
         // TODO get key from Azure and/or cache
