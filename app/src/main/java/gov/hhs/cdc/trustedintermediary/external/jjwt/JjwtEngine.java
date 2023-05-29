@@ -2,8 +2,8 @@ package gov.hhs.cdc.trustedintermediary.external.jjwt;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.TokenGenerationException;
+import io.jsonwebtoken.ClaimJwtException;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -14,7 +14,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.Date;
 import java.util.UUID;
@@ -93,16 +92,15 @@ public class JjwtEngine implements AuthEngine {
     public LocalDateTime getExpirationDate(String jwt) {
 
         var tokenOnly = jwt.substring(0, jwt.lastIndexOf('.') + 1);
+
+        Claims claims;
         try {
-            Claims claims = Jwts.parserBuilder().build().parseClaimsJwt(tokenOnly).getBody();
-            Date expirationDate = claims.getExpiration();
-            return LocalDateTime.ofInstant(expirationDate.toInstant(), ZoneId.systemDefault());
-        } catch (ExpiredJwtException e) {
-            // TODO logging, include whole class
-            long minutes = 10;
-            return LocalDateTime.now(ZoneId.systemDefault())
-                    .minusMinutes(minutes)
-                    .truncatedTo(ChronoUnit.SECONDS);
+            claims = Jwts.parserBuilder().build().parseClaimsJwt(tokenOnly).getBody();
+        } catch (ClaimJwtException e) {
+            claims = e.getClaims();
         }
+
+        Date expirationDate = claims.getExpiration();
+        return LocalDateTime.ofInstant(expirationDate.toInstant(), ZoneId.systemDefault());
     }
 }
