@@ -159,7 +159,7 @@ public class JjwtEngine implements AuthEngine {
             var key = keyFactory.generatePublic(keySpec);
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt);
 
-        } catch (JwtException e) {
+        } catch (JwtException | IllegalArgumentException e) {
             throw new InvalidTokenException(e);
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalArgumentException("The key algorithm isn't supported", e);

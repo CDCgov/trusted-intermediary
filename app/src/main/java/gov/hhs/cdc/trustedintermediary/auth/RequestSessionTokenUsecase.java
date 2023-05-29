@@ -69,7 +69,7 @@ public class RequestSessionTokenUsecase {
         return key;
     }
 
-    /** TODO: Consolidate; copied from ReportStreamLabOrderSender */
+    /** TODO: Consolidate? Copied from ReportStreamLabOrderSender */
     protected String retrieveTiPrivateKey() throws SecretRetrievalException {
         var senderPrivateKey =
                 "report-stream-sender-private-key-" + ApplicationContext.getEnvironment();

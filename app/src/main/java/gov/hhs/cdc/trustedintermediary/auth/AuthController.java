@@ -42,8 +42,7 @@ public class AuthController {
 
         // TODO validate auth fields
 
-        return new AuthRequest(
-                "report-stream", authFields.get("client_assertion")); // TODO don't assume RS
+        return new AuthRequest(authFields.get("scope"), authFields.get("client_assertion"));
     }
 
     public DomainResponse constructResponse(int httpStatus) {
