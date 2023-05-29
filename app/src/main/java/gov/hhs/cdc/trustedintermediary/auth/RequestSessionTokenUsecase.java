@@ -22,7 +22,7 @@ public class RequestSessionTokenUsecase {
     private static final int TOKEN_TTL = 300;
 
     @Inject private AuthEngine auth;
-    @Inject private Formatter jackson;
+    @Inject private Formatter formatter;
     @Inject private Secrets secrets;
 
     public static RequestSessionTokenUsecase getInstance() {
@@ -63,7 +63,7 @@ public class RequestSessionTokenUsecase {
     /** TODO: Consolidate; copied from ReportStreamLabOrderSender */
     protected String extractToken(String responseBody) throws FormatterProcessingException {
         var value =
-                jackson.convertJsonToObject(
+                formatter.convertJsonToObject(
                         responseBody, new TypeReference<Map<String, String>>() {});
         return value.get("access_token");
     }
