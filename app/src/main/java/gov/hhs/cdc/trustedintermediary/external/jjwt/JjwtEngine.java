@@ -10,7 +10,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
-import java.security.interfaces.RSAPrivateKey;
+import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -45,7 +45,7 @@ public class JjwtEngine implements AuthEngine {
             String pemKey)
             throws TokenGenerationException {
 
-        RSAPrivateKey privateKey;
+        PrivateKey privateKey;
         try {
             privateKey = readPrivateKey(pemKey);
         } catch (NoSuchAlgorithmException e) {
@@ -87,7 +87,7 @@ public class JjwtEngine implements AuthEngine {
             int expirationSecondsFromNow)
             throws TokenGenerationException {
 
-        RSAPrivateKey privateKey;
+        PrivateKey privateKey;
         try {
             privateKey = readPrivateKey(pemKey);
         } catch (NoSuchAlgorithmException e) {
@@ -119,17 +119,14 @@ public class JjwtEngine implements AuthEngine {
         }
     }
 
-    protected RSAPrivateKey readPrivateKey(@Nonnull String pemKey)
+    protected PrivateKey readPrivateKey(@Nonnull String pemKey)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
-        String privatePemKey =
-                pemKey.replace("-----BEGIN PRIVATE KEY-----", "")
-                        .replaceAll(System.lineSeparator(), "")
-                        .replace("-----END PRIVATE KEY-----", "");
-        byte[] encode = Base64.getDecoder().decode(privatePemKey);
+
+        byte[] encode = Base64.getDecoder().decode(stripPemKeyHeaderAndFooter(pemKey));
 
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encode);
-        return (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
+        return keyFactory.generatePrivate(keySpec);
     }
 
     @Override
@@ -153,7 +150,7 @@ public class JjwtEngine implements AuthEngine {
             throws InvalidTokenException, IllegalArgumentException {
 
         try {
-            byte[] encode = Base64.getDecoder().decode(encodedKey);
+            byte[] encode = Base64.getDecoder().decode(stripPemKeyHeaderAndFooter(encodedKey));
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encode);
             var key = keyFactory.generatePublic(keySpec);
@@ -166,5 +163,13 @@ public class JjwtEngine implements AuthEngine {
         } catch (Exception e) {
             throw new IllegalArgumentException("The key wasn't formatted correctly", e);
         }
+    }
+
+    private String stripPemKeyHeaderAndFooter(String pemKey) {
+        return pemKey.replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----END PRIVATE KEY-----", "")
+                .replace("-----BEGIN PUBLIC KEY-----", "")
+                .replace("-----END PUBLIC KEY-----", "")
+                .replaceAll(System.lineSeparator(), "");
     }
 }
