@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.wrappers;
+package gov.hhs.cdc.trustedintermediary.wrappers.formatter;
 
 /** Custom exception class use to catch formatting processing exceptions */
 public class FormatterProcessingException extends Exception {

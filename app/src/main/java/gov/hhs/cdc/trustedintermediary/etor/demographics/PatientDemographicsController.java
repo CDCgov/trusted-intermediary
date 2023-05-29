@@ -3,10 +3,10 @@ package gov.hhs.cdc.trustedintermediary.etor.demographics;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiDemographics;
-import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
-import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import java.util.Map;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -45,7 +45,7 @@ public class PatientDemographicsController {
         var response = new DomainResponse(200);
 
         try {
-            var responseBody = formatter.convertToString(patientDemographicsResponse);
+            var responseBody = formatter.convertToJsonString(patientDemographicsResponse);
             response.setBody(responseBody);
         } catch (FormatterProcessingException e) {
             logger.logError("Error constructing an OK demographics response", e);
@@ -64,7 +64,7 @@ public class PatientDemographicsController {
             var stringMessage =
                     Optional.ofNullable(exception.getMessage())
                             .orElse(exception.getClass().toString());
-            var responseBody = formatter.convertToString(Map.of("error", stringMessage));
+            var responseBody = formatter.convertToJsonString(Map.of("error", stringMessage));
             domainResponse.setBody(responseBody);
         } catch (FormatterProcessingException e) {
             logger.logError("Error constructing an error response", e);

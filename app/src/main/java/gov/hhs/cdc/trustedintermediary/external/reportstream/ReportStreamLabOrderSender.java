@@ -5,14 +5,15 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException;
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
-import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
-import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
@@ -59,7 +60,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
 
     @Inject private HttpClient client;
     @Inject private AuthEngine jwt;
-    @Inject private Formatter jackson;
+    @Inject private Formatter formatter;
     @Inject private HapiFhir fhir;
     @Inject private Logger logger;
     @Inject private Secrets secrets;
@@ -158,10 +159,9 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     }
 
     protected String extractToken(String responseBody) throws FormatterProcessingException {
-
-        Map<String, String> value;
-
-        value = jackson.convertToObject(responseBody, Map.class);
+        var value =
+                formatter.convertJsonToObject(
+                        responseBody, new TypeReference<Map<String, String>>() {});
         return value.get("access_token");
     }
 

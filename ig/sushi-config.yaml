@@ -44,23 +44,26 @@ pages:
     title: Documentation Home
   guidance.md:
     title: General Guidance
-  etor-nbs.md:
-    title: ETOR - Newborn Screening
-  external-interfaces.md:
-    title: External Interfaces
-  internal-interfaces.md:
-    title: Internal Interfaces
-  example-overview.md:
-    title: Example Overview
   onboarding.md:
     title: Onboarding to the Intermediary
   connecting.md:
     title: Connecting to the Intermediary
+  etor-nbs.md:
+    title: ETOR - Newborn Screening
   external.md:
     title: Information for Sending to and Receiving from the Intermediary
+  external-interfaces.md:
+    title: External Interfaces
   internal.md:
     title: Information About the Internals of the Intermediary
-
+  internal-interfaces.md:
+    title: Internal Interfaces
+  example-overview.md:
+    title: Example Overview
+  faq.md:
+    title: Frequently Asked Questions (FAQ)
+  troubleshooting.md:
+    title: Troubleshooting Information
 
 #   implementation.xml:
 #   examples.xml:
@@ -113,6 +116,10 @@ menu:
 
   Examples:
     Example Overview: example-overview.html
+
+  FAQ: faq.html
+
+  Troubleshooting: troubleshooting.html
 
   Artifacts: artifacts.html
 
