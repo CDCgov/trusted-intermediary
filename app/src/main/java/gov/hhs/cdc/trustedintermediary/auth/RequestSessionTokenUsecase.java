@@ -2,12 +2,13 @@ package gov.hhs.cdc.trustedintermediary.auth;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
-import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
-import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException;
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import gov.hhs.cdc.trustedintermediary.wrappers.TokenGenerationException;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.util.Map;
 import javax.inject.Inject;
 
@@ -61,10 +62,9 @@ public class RequestSessionTokenUsecase {
 
     /** TODO: Consolidate; copied from ReportStreamLabOrderSender */
     protected String extractToken(String responseBody) throws FormatterProcessingException {
-
-        Map<String, String> value;
-
-        value = jackson.convertToObject(responseBody, Map.class);
+        var value =
+                jackson.convertJsonToObject(
+                        responseBody, new TypeReference<Map<String, String>>() {});
         return value.get("access_token");
     }
 }
