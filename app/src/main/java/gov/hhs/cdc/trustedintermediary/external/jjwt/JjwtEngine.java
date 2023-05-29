@@ -77,16 +77,6 @@ public class JjwtEngine implements AuthEngine {
         }
     }
 
-    protected PrivateKey readPrivateKey(@Nonnull String pemKey)
-            throws NoSuchAlgorithmException, InvalidKeySpecException {
-
-        byte[] encode = Base64.getDecoder().decode(stripPemKeyHeaderAndFooter(pemKey));
-
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encode);
-        return keyFactory.generatePrivate(keySpec);
-    }
-
     @Override
     public LocalDateTime getExpirationDate(String jwt) {
 
@@ -121,6 +111,16 @@ public class JjwtEngine implements AuthEngine {
         } catch (Exception e) {
             throw new IllegalArgumentException("The key wasn't formatted correctly", e);
         }
+    }
+
+    protected PrivateKey readPrivateKey(@Nonnull String pemKey)
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
+
+        byte[] encode = Base64.getDecoder().decode(stripPemKeyHeaderAndFooter(pemKey));
+
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encode);
+        return keyFactory.generatePrivate(keySpec);
     }
 
     private String stripPemKeyHeaderAndFooter(String pemKey) {
