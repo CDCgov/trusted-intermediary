@@ -38,6 +38,7 @@ public class App {
             registerDomains(app);
             ApplicationContext.injectRegisteredImplementations();
 
+            // TODO: do something different than this
             try {
                 Path DEFAULT_ORGANIZATION_FILE_PATH =
                         Paths.get(

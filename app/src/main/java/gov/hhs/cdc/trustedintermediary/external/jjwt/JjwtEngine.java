@@ -54,7 +54,7 @@ public class JjwtEngine implements AuthEngine {
             throw new TokenGenerationException("The private key wasn't formatted correctly", e);
         }
 
-        JwtBuilder jwsObj = null;
+        JwtBuilder jwsObj;
         try {
             jwsObj =
                     Jwts.builder()
@@ -63,48 +63,6 @@ public class JjwtEngine implements AuthEngine {
                             .setIssuer(issuer)
                             .setSubject(subject)
                             .setAudience(audience)
-                            .setExpiration(
-                                    new Date(
-                                            System.currentTimeMillis()
-                                                    + (expirationSecondsFromNow * 1000L)))
-                            .setId(UUID.randomUUID().toString())
-                            .signWith(privateKey);
-
-            return jwsObj.compact();
-        } catch (JwtException exception) {
-            throw new TokenGenerationException(
-                    "Jjwt was unable to create or sign the JWT", exception);
-        }
-    }
-
-    @Override
-    @Nonnull
-    public String generateSenderToken(
-            @Nonnull String sender,
-            @Nonnull String baseUrl,
-            @Nonnull String pemKey,
-            @Nonnull String keyId,
-            int expirationSecondsFromNow)
-            throws TokenGenerationException {
-
-        PrivateKey privateKey;
-        try {
-            privateKey = readPrivateKey(pemKey);
-        } catch (NoSuchAlgorithmException e) {
-            throw new TokenGenerationException("The private key algorithm isn't supported", e);
-        } catch (Exception e) {
-            throw new TokenGenerationException("The private key wasn't formatted correctly", e);
-        }
-
-        JwtBuilder jwsObj = null;
-        try {
-            jwsObj =
-                    Jwts.builder()
-                            .setHeaderParam("kid", keyId)
-                            .setHeaderParam("typ", "JWT")
-                            .setIssuer(sender)
-                            .setSubject(sender)
-                            .setAudience(baseUrl)
                             .setExpiration(
                                     new Date(
                                             System.currentTimeMillis()
