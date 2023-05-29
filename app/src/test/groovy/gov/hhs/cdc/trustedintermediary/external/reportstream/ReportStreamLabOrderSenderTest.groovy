@@ -237,7 +237,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         isValid
     }
 
-    def "rsTokencache getter and setter works, no synchronization"() {
+    def "rsTokenCache getter and setter works, no synchronization"() {
         given:
         def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
         def expected = "fake token"
@@ -251,6 +251,34 @@ class ReportStreamLabOrderSenderTest extends Specification {
     }
 
     // TODO cache getter and "setter" needs test for synchronization
+    def "rsTokenCache synchronization works"() {
+        given:
+        def labOrderSender = ReportStreamLabOrderSender.getInstance()
+        def threadNums = 5
+        def iterations = 25
+        def table = new HashMap<String, Integer>()
+
+        when:
+        List<Thread> threads = []
+        (1..threadNums).each { threadId ->
+            threads.add(new Thread({
+                for(int i=0; i<iterations; i++) {
+                    labOrderSender.setRsTokenCache("${i}")
+                    if (i == 24) {
+                        table.put("thread"+"${threadId}", i)
+                    }
+                }
+            }))
+        }
+
+        threads*.start()
+        threads*.join()
+
+        then:
+        labOrderSender.getRsTokenCache() == "${iterations - 1}"
+        table.size() == threadNums
+        table.values().toSet().size() == 1
+    }
 
     def "sendRequestBody bombs out due to http exception"() {
         given:
