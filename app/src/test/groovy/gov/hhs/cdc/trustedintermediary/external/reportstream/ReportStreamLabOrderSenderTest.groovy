@@ -250,7 +250,6 @@ class ReportStreamLabOrderSenderTest extends Specification {
         actual == expected
     }
 
-    // TODO cache getter and "setter" needs test for synchronization
     def "rsTokenCache synchronization works"() {
         given:
         def labOrderSender = ReportStreamLabOrderSender.getInstance()
