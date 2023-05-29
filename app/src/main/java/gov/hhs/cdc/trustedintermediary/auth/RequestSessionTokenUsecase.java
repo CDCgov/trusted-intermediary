@@ -1,8 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.auth;
 
-import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.organizations.OrganizationsSettings;
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
+import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
 import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException;
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
@@ -26,6 +26,7 @@ public class RequestSessionTokenUsecase {
     @Inject private Formatter formatter;
     @Inject private Secrets secrets;
     @Inject private OrganizationsSettings organizationsSettings;
+    @Inject private Cache cache;
 
     public static RequestSessionTokenUsecase getInstance() {
         return INSTANCE;
@@ -52,27 +53,27 @@ public class RequestSessionTokenUsecase {
         // At this point, only organizations registered with us will proceed
 
         // Validate the JWT is signed by a trusted entity
-        // TODO get key from Azure and/or cache
-        var rsPublicKey =
-                "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlDsjJmbSl1R/9F8HeyJgT5tMVJp7Svk6N80R+LitxwgNqd9SUSaLjTG662MssViR1nPsy2j/ieLVvKPCj51DRW5h5kVcaumEQxacm6MjOUGPYQ0Y1j8dWxWlkNqH1iRowXZH6ABHcwcecWWyf/lCRt12b0I+n5TJ/F8VVzJ7jRAjHkaOLHmM5tUI1dTJZAReh/qlXQmgjl9u2Pn4YazK8zYYnvplTvif+HuoIeR+Cll7w63Ue6/2OJVTOvblYpx7TG9ZHVEZDnoIks/cvRDnZKShLPql9RHDt5JhsVrFCdOdWa4IOw/IdSXWT/+VzmBiJQw9hhV53IPSUVyp/YaN0QIDAQAB"; // pragma: allowlist secret
-        auth.validateToken(request.jwt(), rsPublicKey);
+        var organizationPublicKey = retrieveOrganizationPublicKey(organizationName);
+        auth.validateToken(request.jwt(), organizationPublicKey);
 
         // Provide a short-lived access token for subsequent calls to the TI service
         return auth.generateToken(
-                OUR_NAME, OUR_NAME, RS_NAME, RS_NAME, TOKEN_TTL, retrievePrivateKey());
+                OUR_NAME, OUR_NAME, RS_NAME, RS_NAME, TOKEN_TTL, retrieveOrganizationPublicKey());
     }
 
     /** TODO: Consolidate; copied from ReportStreamLabOrderSender */
-    protected String retrievePrivateKey() throws SecretRetrievalException {
-        var senderPrivateKey =
-                "report-stream-sender-private-key-" + ApplicationContext.getEnvironment();
-        // String key = getCachedPrivateKey();
-        // if (key != null) {
-        //     return key;
-        // }
+    protected String retrieveOrganizationPublicKey(String organizationName)
+            throws SecretRetrievalException {
+        var organizationPublicKeyName = "organization-" + organizationName + "-public-key";
 
-        String key = secrets.getKey(senderPrivateKey);
-        // setCachedPrivateKey(key);
+        String key = cache.get(organizationPublicKeyName);
+        if (key != null) {
+            return key;
+        }
+
+        key = secrets.getKey(organizationPublicKeyName);
+        cache.put(organizationPublicKeyName, key);
+
         return key;
     }
 

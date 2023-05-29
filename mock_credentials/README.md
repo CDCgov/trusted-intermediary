@@ -9,7 +9,7 @@ deployed system.
 
 This is a private/public key pair that is used locally when TI acts as a sender to ReportStream.
 
-### rs-rsa-local-*
+### organization-report-stream-*
 
 This is a private/public key pair that is used locally as a stand-in for ReportStream's keys that we use to
 verify the JWT that they send to us is valid.  This is used when ReportStream is sending something to TI, and
