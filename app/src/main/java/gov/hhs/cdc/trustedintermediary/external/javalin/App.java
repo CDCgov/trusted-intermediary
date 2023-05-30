@@ -13,12 +13,12 @@ import gov.hhs.cdc.trustedintermediary.external.localfile.LocalSecrets;
 import gov.hhs.cdc.trustedintermediary.external.slf4j.Slf4jLogger;
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
-import gov.hhs.cdc.trustedintermediary.wrappers.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombiner;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import io.javalin.Javalin;
 import java.util.Set;
 

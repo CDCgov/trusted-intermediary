@@ -4,18 +4,20 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender
 import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException
+import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
-import gov.hhs.cdc.trustedintermediary.wrappers.Formatter
+import gov.hhs.cdc.trustedintermediary.wrappers.Cache
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
-import spock.lang.Specification
-import gov.hhs.cdc.trustedintermediary.wrappers.FormatterProcessingException
-
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
+import spock.lang.Specification
 
 class ReportStreamLabOrderSenderTest extends Specification {
 
@@ -61,10 +63,12 @@ class ReportStreamLabOrderSenderTest extends Specification {
         def mockAuthEngine = Mock(AuthEngine)
         def mockClient = Mock(HttpClient)
         def mockSecrets = Mock(Secrets)
+        def mockCache = Mock(Cache)
         TestApplicationContext.register(AuthEngine, mockAuthEngine)
         TestApplicationContext.register(HttpClient, mockClient)
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.register(Secrets, mockSecrets)
+        TestApplicationContext.register(Cache, mockCache)
         TestApplicationContext.injectRegisteredImplementations()
         when:
         mockSecrets.getKey(_ as String) >> "Fake Azure Key"
@@ -90,24 +94,26 @@ class ReportStreamLabOrderSenderTest extends Specification {
         actual == expected
     }
 
-    def "extractToken fails from not getting a String in the access_token"() {
+    def "extractToken works when access_token is a number"() {
         given:
         def mockClient = Mock(HttpClient)
+        def mockCache = Mock(Cache)
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.register(HttpClient, mockClient)
         TestApplicationContext.register(Secrets, Mock(Secrets))
         TestApplicationContext.register(AuthEngine, Mock(AuthEngine))
+        TestApplicationContext.register(Cache, mockCache)
         TestApplicationContext.injectRegisteredImplementations()
+        def expectedTokenValue = "3"
 
-        def responseBody = """{"foo":"foo value", "access_token":3, "boo":"boo value"}"""
+        def responseBody = """{"foo":"foo value", "access_token": 3, "boo":"boo value"}"""
         mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
 
         when:
-        ReportStreamLabOrderSender.getInstance().requestToken()
+        def actualTokenValue = ReportStreamLabOrderSender.getInstance().requestToken()
 
         then:
-        def exception = thrown(UnableToSendLabOrderException)
-        exception.getCause().getClass() == ClassCastException
+        actualTokenValue == expectedTokenValue
     }
 
     def "extractToken fails from not getting valid JSON from the auth token endpoint"() {
@@ -153,13 +159,15 @@ class ReportStreamLabOrderSenderTest extends Specification {
         def mockClient = Mock(HttpClient)
         def mockFhir = Mock(HapiFhir)
         def mockFormatter = Mock(Formatter)
+        def mockCache = Mock(Cache)
         mockClient.post(_ as String, _ as Map, _ as String) >> "something"
-        mockFormatter.convertJsonToObject(_ as String, _ as Class) >> Map.of("access_token", "fake-token")
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake-token")
         TestApplicationContext.register(Secrets, mockSecrets)
         TestApplicationContext.register(AuthEngine, mockAuthEngine)
         TestApplicationContext.register(HttpClient, mockClient)
         TestApplicationContext.register(HapiFhir, mockFhir)
         TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.register(Cache, mockCache)
         TestApplicationContext.injectRegisteredImplementations()
         mockFhir.encodeResourceToJson(_ as String) >> "Mock order"
         LabOrder<?> mockOrder = new LabOrder<String>() {
@@ -177,68 +185,36 @@ class ReportStreamLabOrderSenderTest extends Specification {
         noExceptionThrown()
     }
 
-    def "cachedPrivateKey getter and setter works" () {
-        given:
-        def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
-        def expected = "a fake azure key"
-
-        when:
-        rsLabOrderSender.setCachedPrivateKey(expected)
-        def actual = rsLabOrderSender.getCachedPrivateKey()
-
-        then:
-        expected == actual
-    }
-
-    def "cachedPrivateKey thread synchronization" () {
-        // TODO - Pending race-condition clarification
-        given:
-        def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
-        def threadCount = 15
-        def lock = new Object()
-        def threads = (1..threadCount).collect { index ->
-            new Thread( {
-                synchronized (lock) {
-                    rsLabOrderSender.setCachedPrivateKey("${index}")
-                    def result = rsLabOrderSender.getCachedPrivateKey()
-                    assert result =="${index}"
-                }
-            })
-        }
-
-        when:
-        threads*.start()
-        threads*.join()
-
-        then:
-        noExceptionThrown()
-    }
-
     def "retrievePrivateKey works when cache is empty" () {
         given:
-
         def mockSecret = Mock(Secrets)
         def expected = "New Fake Azure Key"
+        def keyCache = KeyCache.getInstance()
+        def key = "report-stream-sender-private-key-local"
         mockSecret.getKey(_ as String) >> expected
         TestApplicationContext.register(Secrets, mockSecret)
+        TestApplicationContext.register(Cache, keyCache)
         TestApplicationContext.injectRegisteredImplementations()
         def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
-        rsLabOrderSender.cachedPrivateKey = null
         when:
         def actual = rsLabOrderSender.retrievePrivateKey()
 
         then:
-        expected == actual
-        expected == rsLabOrderSender.getCachedPrivateKey()
+        actual == expected
+        keyCache.get(key) == expected
     }
 
     def "retrievePrivateKey works when cache is not empty" () {
         given:
+        def keyCache = KeyCache.getInstance()
+        def key = "report-stream-sender-private-key-local"
         def expected = "existing fake azure key"
+        TestApplicationContext.register(Cache, keyCache)
+        TestApplicationContext.injectRegisteredImplementations()
         def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
 
         when:
-        rsLabOrderSender.setCachedPrivateKey(expected)
+        keyCache.put(key, expected)
         def actual = rsLabOrderSender.retrievePrivateKey()
 
         then:
@@ -261,31 +237,17 @@ class ReportStreamLabOrderSenderTest extends Specification {
         isValid
     }
 
-    def "cache getter and setter works, no synchronization"() {
+    def "rsTokencache getter and setter works, no synchronization"() {
         given:
         def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
-        def threadCount = 10
-        def expected = "lock is working"
-        def lock = new Object()
-        def actual = "lock is not working"
-
-        def threads = (1..threadCount).collect { index ->
-            def value
-            new Thread({
-                synchronized (lock) {
-                    rsLabOrderSender.setRsTokenCache("Thread-${index}")
-                    value = rsLabOrderSender.getRsTokenCache()
-                    assert value == "Thread-${index}"
-                }
-            })
-        }
+        def expected = "fake token"
 
         when:
-        threads*.start()
-        threads*.join()
+        rsLabOrderSender.setRsTokenCache(expected)
+        def actual = rsLabOrderSender.getRsTokenCache()
 
         then:
-        noExceptionThrown()
+        actual == expected
     }
 
     // TODO cache getter and "setter" needs test for synchronization
@@ -327,7 +289,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
 
         mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(10, ChronoUnit.SECONDS)
         mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "fake token"
-        mockFormatter.convertJsonToObject(_ as String, _ as Class) >> Map.of("access_token", "fake token")
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake token")
         def responseBody = """{"foo":"foo value", "access_token":fake token, "boo":"boo value"}"""
         mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
 
@@ -355,7 +317,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
 
         mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "fake token"
         mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(10, ChronoUnit.SECONDS)
-        mockFormatter.convertJsonToObject(_ as String, _ as Class) >> Map.of("access_token", "fake token")
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake token")
         def responseBody = """{"foo":"foo value", "access_token":fake token, "boo":"boo value"}"""
         mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
         labOrderSender.setRsTokenCache("Invalid Token")
@@ -384,7 +346,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
 
         mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "fake token"
         mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(25, ChronoUnit.SECONDS)
-        mockFormatter.convertJsonToObject(_ as String, _ as Class) >> Map.of("access_token", "fake token")
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake token")
         def responseBody = """{"foo":"foo value", "access_token":fake token, "boo":"boo value"}"""
         mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
         labOrderSender.setRsTokenCache("valid Token")
