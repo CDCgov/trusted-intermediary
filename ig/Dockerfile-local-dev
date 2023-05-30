@@ -1,0 +1,8 @@
+# syntax=docker/dockerfile:1
+FROM alpine:3.18.0
+RUN apk update && apk add bash curl openjdk17 ruby-dev ruby-bundler ruby-jekyll npm git msttcorefonts-installer fontconfig && update-ms-fonts
+COPY --chmod=755 ./findandcopy.sh .
+RUN ./findandcopy.sh
+RUN npm install -g fsh-sushi
+
+WORKDIR /trusted-intermediary
