@@ -21,8 +21,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombiner;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import io.javalin.Javalin;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Set;
 
 /** Creates the starting point of our API. Handles the registration of the domains. */
@@ -37,20 +35,7 @@ public class App {
             registerClasses();
             registerDomains(app);
             ApplicationContext.injectRegisteredImplementations();
-
-            // TODO: do something different than this
-            try {
-                Path DEFAULT_ORGANIZATION_FILE_PATH =
-                        Paths.get(
-                                App.class
-                                        .getClassLoader()
-                                        .getResource("organizations.yaml")
-                                        .toURI());
-                OrganizationsSettings.getInstance()
-                        .loadOrganizations(DEFAULT_ORGANIZATION_FILE_PATH);
-            } catch (Exception e) {
-                throw new RuntimeException("ooops", e);
-            }
+            OrganizationsSettings.getInstance().loadOrganizations();
         } catch (Exception exception) {
             // Not using the logger because boostrapping has failed.
             System.out.println(

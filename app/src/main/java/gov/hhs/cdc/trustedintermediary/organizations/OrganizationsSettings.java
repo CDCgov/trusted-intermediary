@@ -1,9 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.organizations;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
-import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -32,11 +32,30 @@ public class OrganizationsSettings {
         return organizations;
     }
 
-    public void loadOrganizations(Path filePath) throws IOException, FormatterProcessingException {
-        String organizationsFileString = Files.readString(filePath);
-        this.organizations =
-                formatter.convertYamlToObject(
-                        organizationsFileString, new TypeReference<List<Organization>>() {});
+    public void loadOrganizations(Path filePath) throws OrganizationConfigException {
+        try {
+            String organizationsFileString = Files.readString(filePath);
+            this.organizations =
+                    formatter.convertYamlToObject(
+                            organizationsFileString, new TypeReference<>() {});
+        } catch (Exception exception) {
+            throw new OrganizationConfigException(
+                    "Unable to read the configuration file " + filePath, exception);
+        }
+    }
+
+    public void loadOrganizations() throws OrganizationConfigException {
+        try (InputStream organizationStream =
+                getClass().getClassLoader().getResourceAsStream("organizations.yaml")) {
+            String rawOrganizationYamlString =
+                    new String(organizationStream.readAllBytes(), StandardCharsets.UTF_8);
+            this.organizations =
+                    formatter.convertYamlToObject(
+                            rawOrganizationYamlString, new TypeReference<>() {});
+        } catch (Exception exception) {
+            throw new OrganizationConfigException(
+                    "Unable to read the default configuration file", exception);
+        }
     }
 
     public Optional<Organization> findOrganization(String name) {
