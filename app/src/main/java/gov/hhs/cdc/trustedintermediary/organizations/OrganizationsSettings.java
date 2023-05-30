@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -17,8 +18,9 @@ import javax.inject.Inject;
 public class OrganizationsSettings {
 
     private static final OrganizationsSettings INSTANCE = new OrganizationsSettings();
+    protected static String DEFAULT_ORGANIZATION_FILE = "organizations.yaml";
 
-    private List<Organization> organizations;
+    private List<Organization> organizations = new ArrayList<>();
 
     @Inject private Formatter formatter;
 
@@ -46,7 +48,7 @@ public class OrganizationsSettings {
 
     public void loadOrganizations() throws OrganizationConfigException {
         try (InputStream organizationStream =
-                getClass().getClassLoader().getResourceAsStream("organizations.yaml")) {
+                getClass().getClassLoader().getResourceAsStream(DEFAULT_ORGANIZATION_FILE)) {
             String rawOrganizationYamlString =
                     new String(organizationStream.readAllBytes(), StandardCharsets.UTF_8);
             this.organizations =

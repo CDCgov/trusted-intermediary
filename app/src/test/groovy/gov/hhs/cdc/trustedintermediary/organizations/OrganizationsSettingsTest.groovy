@@ -77,4 +77,31 @@ class OrganizationsSettingsTest extends Specification {
         then:
         !organization.isPresent()
     }
+
+    def "loadOrganizations throws an exception if it can't load the file"() {
+        when:
+        OrganizationsSettings.getInstance().loadOrganizations(Path.of("DogCow"))
+
+        then:
+        thrown(OrganizationConfigException)
+    }
+
+    def "default loadOrganizations runs correctly"() {
+        when:
+        OrganizationsSettings.getInstance().loadOrganizations()
+
+        then:
+        OrganizationsSettings.getInstance().getOrganizations().get(0) != null
+    }
+
+    def "default loadOrganizations blows up if it can't load"() {
+        given:
+        OrganizationsSettings.DEFAULT_ORGANIZATION_FILE = "DogCow"
+
+        when:
+        OrganizationsSettings.getInstance().loadOrganizations()
+
+        then:
+        thrown(OrganizationConfigException)
+    }
 }
