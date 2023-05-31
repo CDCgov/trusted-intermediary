@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.organizations.OrganizationsSettings;
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
 import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import gov.hhs.cdc.trustedintermediary.wrappers.TokenGenerationException;
@@ -26,6 +27,7 @@ public class RequestSessionTokenUsecase {
     @Inject private Secrets secrets;
     @Inject private OrganizationsSettings organizationsSettings;
     @Inject private Cache cache;
+    @Inject private Logger logger;
 
     public static RequestSessionTokenUsecase getInstance() {
         return INSTANCE;
@@ -37,6 +39,7 @@ public class RequestSessionTokenUsecase {
             throws InvalidTokenException, IllegalArgumentException, TokenGenerationException,
                     SecretRetrievalException, UnknownOrganizationException {
 
+        logger.logInfo("Validating that organization {} exists", request.scope());
         var organization =
                 organizationsSettings
                         .findOrganization(request.scope())
@@ -48,12 +51,16 @@ public class RequestSessionTokenUsecase {
                                                         + " is unknown"));
 
         // At this point, only organizations registered with us will proceed
+        logger.logInfo("Organization {} exists, validating their token", organization.getName());
 
         // Validate the JWT is signed by a trusted entity
         var organizationPublicKey = retrieveOrganizationPublicKey(organization.getName());
         auth.validateToken(request.jwt(), organizationPublicKey);
 
+        logger.logInfo("Organization {} token is valid", organization.getName());
+
         // Provide a short-lived access token for subsequent calls to the TI service
+        logger.logInfo("Generating TI login token");
         var tiPrivateKey = retrieveTiPrivateKey();
         return auth.generateToken(OUR_NAME, OUR_NAME, RS_NAME, RS_NAME, TOKEN_TTL, tiPrivateKey);
     }
