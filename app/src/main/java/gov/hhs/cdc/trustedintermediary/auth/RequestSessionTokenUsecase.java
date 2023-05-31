@@ -37,19 +37,20 @@ public class RequestSessionTokenUsecase {
             throws InvalidTokenException, IllegalArgumentException, TokenGenerationException,
                     SecretRetrievalException, UnknownOrganizationException {
 
-        var organizationName = request.scope();
-
-        organizationsSettings
-                .findOrganization(request.scope())
-                .orElseThrow(
-                        () ->
-                                new UnknownOrganizationException(
-                                        "The organization " + organizationName + " is unknown"));
+        var organization =
+                organizationsSettings
+                        .findOrganization(request.scope())
+                        .orElseThrow(
+                                () ->
+                                        new UnknownOrganizationException(
+                                                "The organization "
+                                                        + request.scope()
+                                                        + " is unknown"));
 
         // At this point, only organizations registered with us will proceed
 
         // Validate the JWT is signed by a trusted entity
-        var organizationPublicKey = retrieveOrganizationPublicKey(organizationName);
+        var organizationPublicKey = retrieveOrganizationPublicKey(organization.getName());
         auth.validateToken(request.jwt(), organizationPublicKey);
 
         // Provide a short-lived access token for subsequent calls to the TI service
