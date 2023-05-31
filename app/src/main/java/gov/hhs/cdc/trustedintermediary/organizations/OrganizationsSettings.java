@@ -18,7 +18,7 @@ import javax.inject.Inject;
 public class OrganizationsSettings {
 
     private static final OrganizationsSettings INSTANCE = new OrganizationsSettings();
-    protected static String DEFAULT_ORGANIZATION_FILE = "organizations.yaml";
+    protected static String defaultOrganizationFile = "organizations.yaml";
 
     private List<Organization> organizations = new ArrayList<>();
 
@@ -48,7 +48,7 @@ public class OrganizationsSettings {
 
     public void loadOrganizations() throws OrganizationConfigException {
         try (InputStream organizationStream =
-                getClass().getClassLoader().getResourceAsStream(DEFAULT_ORGANIZATION_FILE)) {
+                getClass().getClassLoader().getResourceAsStream(defaultOrganizationFile)) {
             String rawOrganizationYamlString =
                     new String(organizationStream.readAllBytes(), StandardCharsets.UTF_8);
             this.organizations =

@@ -96,7 +96,7 @@ class OrganizationsSettingsTest extends Specification {
 
     def "default loadOrganizations blows up if it can't load"() {
         given:
-        OrganizationsSettings.DEFAULT_ORGANIZATION_FILE = "DogCow"
+        OrganizationsSettings.defaultOrganizationFile = "DogCow"
 
         when:
         OrganizationsSettings.getInstance().loadOrganizations()
