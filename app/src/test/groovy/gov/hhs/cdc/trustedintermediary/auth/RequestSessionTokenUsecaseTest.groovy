@@ -35,14 +35,17 @@ class RequestSessionTokenUsecaseTest extends Specification {
         TestApplicationContext.register(OrganizationsSettings, organizationsSettings)
         TestApplicationContext.injectRegisteredImplementations()
 
-        organizationsSettings.findOrganization(_ as String) >> { Mock(Organization) }
+        def orgOptional = Optional.of(new Organization("RS", "blach blach")) as Optional<Organization>
+        organizationsSettings.findOrganization(_ as String) >> { orgOptional }
         secrets.getKey(_ as String) >> "KEY"
-        // authEngine.validateToken(_ as AuthRequest, _ as String)
+        authEngine.validateToken(_ as String, _ as String)
         def expected = "SESSION TOKEN"
-        authEngine.generateToken(_ as String, _ as String, _ as String, _ as String, _ as int, _ as String) >> expected
+
 
         when:
-        def actual = RequestSessionTokenUsecase.getToken(new AuthRequest("RS", "AUTH TOKEN"))
+        authEngine.generateToken(_ as String, _ as String, _ as String, _ as String, 300, _ as String) >> expected
+        def tokenUseCase = RequestSessionTokenUsecase.getInstance()
+        def actual = tokenUseCase.getToken(new AuthRequest("RS", "AUTH TOKEN"))
 
         then:
         actual == expected
