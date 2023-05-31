@@ -10,7 +10,10 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import gov.hhs.cdc.trustedintermediary.wrappers.TokenGenerationException;
 import javax.inject.Inject;
 
-/** TODO */
+/**
+ * Checks the token passed in by a client trying to log in. If the token passes muster, we generate
+ * a token of our own to be used as an API key by the client in subsequent calls.
+ */
 public class RequestSessionTokenUsecase {
 
     private static final RequestSessionTokenUsecase INSTANCE = new RequestSessionTokenUsecase();
