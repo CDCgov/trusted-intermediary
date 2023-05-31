@@ -41,6 +41,10 @@ The Docker image needs to be built and then run with an appropriate `mount` flag
 This will allow bi-directional writes so that the Docker container can generate the documentation, and as a developer you can view the generated documentation easily.
 A developer will also be able to update any input files for the documentation and re-run the documentation generation without any intermediate steps.
 
+In practice, when generating the documentation, VSCode is unable to cope with refreshing the `output` directory.  During and after documentation generation
+VSCode may use significant amounts of your CPU, locking up your computer and will typically crash.  To avoid this issue, it is recommended that a different
+IDE is used to work on the CDC Trusted Intermediary documentation such as IntelliJ.
+
 1. In a terminal, navigate to this `ig` directory
 2. run `docker buildx build -t ig-local-dev -f Dockerfile-local-dev .` to build the Docker container
 3. run `docker run -it --mount type=bind,source="$(pwd)",target=/trusted-intermediary ig-local-dev bash` to run the container and use an interactive `bash` shell inside the container
