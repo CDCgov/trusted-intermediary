@@ -44,7 +44,7 @@ class OrganizationsSettingsTest extends Specification {
 
         when:
         def organizations = OrganizationsSettings.getInstance().getOrganizations()
-        Organization organization = organizations[0]
+        Organization organization = organizations.entrySet().stream().findFirst().get().value
         def actualOrganizationName = organization.getName()
         def actualOrganizationDescription = organization.getDescription()
 
