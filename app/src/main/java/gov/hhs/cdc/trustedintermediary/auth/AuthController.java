@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
 
-/** TODO */
+/** Parses the request and generates the response that comes in for the auth endpoints. */
 public class AuthController {
 
     private static final AuthController AUTH_CONTROLLER = new AuthController();
