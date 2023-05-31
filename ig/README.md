@@ -10,35 +10,35 @@ The documentation for this project is kept in an HL7 FHIR style Implementation G
 - Git
 - [SUSHI](https://fshschool.org/docs/sushi/installation/)
 
-## Implemenation Guide Basics
+## Implementation Guide Basics
 
 To be written
 
 ## Generate Implementation Guide
 
 1. In a terminal, navigate to this `ig` directory
-1. run `./_updatePublisher.sh` in order to ensure you are using the most recent publisher release
-1. run `./_genonce.sh` to generate the Implementation Guide
-1. In a browser you can open up the `ig/output/index.html` file that was generated as this is the home page for the Implementation Guide
-2. Alternately, you may opt to use the local development Docker approach outlined below to avoid having to install the toolchain listed above.
+2. run `./_updatePublisher.sh` in order to ensure you are using the most recent publisher release
+3. run `./_genonce.sh` to generate the Implementation Guide
+4. In a browser you can open up the `ig/output/index.html` file that was generated as this is the home page for the Implementation Guide
+5. Alternately, you may opt to use the local development Docker approach outlined below to avoid having to install the toolchain listed above.
 
 ## Using Docker
 
 A Dockerfile is provided that can be used to generate the Implementation Guide.  This is used to generate the documentation in the CI/CD process.
 
 1. In a terminal, navigate to this `ig` directory
-1. run `docker buildx build -t ig-test .` to build the docker container
-1. run `docker run -it ig-test bash` to run the container and use an interactive `bash` shell inside the container
-1. The container already has updated tools when you built it
-1. The container also pre-generates the documentation.  This process could make the image build take 10-15 minutes
-1. All of the generated documentation should be in the `/trusted-intermediary/output` directory
-1. If building locally, you may want to add a `--no-cache` to the `docker buildx build` command so that the documentation generation is not cached
+2. run `docker buildx build -t ig-test .` to build the docker container
+3. run `docker run -it ig-test bash` to run the container and use an interactive `bash` shell inside the container
+4. The container already has updated tools when you built it
+5. The container also pre-generates the documentation.  This process could make the image build take 10-15 minutes
+6. All the generated documentation should be in the `/trusted-intermediary/output` directory
+7. If building locally, you may want to add a `--no-cache` to the `docker buildx build` command so that the documentation generation is not cached
 
 ## Using Docker for local development
 
 Provided is a Dockerfile suitable for running the implementation guide documentation generation without the need to install all the tooling locally.
 The Docker image needs to be built and then run with an appropriate `mount` flag in order to mount your local `ig` directory into the running Docker container.
-This will allow bi-directional writes so that the Docker container can generate the documentation, and as a developer you can view the generated documentation easily.
+This will allow bidirectional writes so that the Docker container can generate the documentation, and as a developer you can view the generated documentation easily.
 A developer will also be able to update any input files for the documentation and re-run the documentation generation without any intermediate steps.
 
 In practice, when generating the documentation, VSCode is unable to cope with refreshing the `output` directory.  During and after documentation generation
