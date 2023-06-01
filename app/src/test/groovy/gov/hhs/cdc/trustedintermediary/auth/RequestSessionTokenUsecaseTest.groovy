@@ -106,6 +106,25 @@ class RequestSessionTokenUsecaseTest extends Specification {
     }
 
     def "we've incorrectly configured the organization public key"() {
+        given:
+        def authEngine = Mock(AuthEngine)
+        def secrets = Mock(Secrets)
+        def organizationsSettings = Mock(OrganizationsSettings)
+
+        TestApplicationContext.register(AuthEngine, authEngine)
+        TestApplicationContext.register(Secrets, secrets)
+        TestApplicationContext.register(OrganizationsSettings, organizationsSettings)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        organizationsSettings.findOrganization(_ as String) >> Optional.of(new Organization())
+        secrets.getKey(_ as String) >> "KEY"
+        authEngine.validateToken(_ as String, _ as String) >> { throw new IllegalArgumentException() }
+
+        when:
+        RequestSessionTokenUsecase.getInstance().getToken(new AuthRequest("RS", "AUTH TOKEN"))
+
+        then:
+        thrown(IllegalArgumentException)
     }
 
     def "TI service is lacking a private key"() {
