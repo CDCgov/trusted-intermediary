@@ -128,6 +128,24 @@ class RequestSessionTokenUsecaseTest extends Specification {
     }
 
     def "TI service is lacking a private key"() {
+        given:
+        def authEngine = Mock(AuthEngine)
+        def secrets = Mock(Secrets)
+        def organizationsSettings = Mock(OrganizationsSettings)
+
+        TestApplicationContext.register(AuthEngine, authEngine)
+        TestApplicationContext.register(Secrets, secrets)
+        TestApplicationContext.register(OrganizationsSettings, organizationsSettings)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        organizationsSettings.findOrganization(_ as String) >> Optional.of(new Organization())
+        secrets.getKey(_ as String) >> "KEY" >> { throw new SecretRetrievalException("", new NullPointerException()) }
+
+        when:
+        RequestSessionTokenUsecase.getInstance().getToken(new AuthRequest("RS", "AUTH TOKEN"))
+
+        then:
+        thrown(SecretRetrievalException)
     }
 
     def "we've incorrectly configured our private key"() {
