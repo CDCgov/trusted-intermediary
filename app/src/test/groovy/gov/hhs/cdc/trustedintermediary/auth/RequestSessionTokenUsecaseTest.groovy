@@ -171,9 +171,43 @@ class RequestSessionTokenUsecaseTest extends Specification {
         thrown(TokenGenerationException)
     }
 
-    def "caching works when retreiving the organization's public key"() {
+    def "caching works when retrieving the organization's public key"() {
+        given:
+        def cache = Mock(Cache)
+        def secrets = Mock(Secrets)
+
+        TestApplicationContext.register(Cache, cache)
+        TestApplicationContext.register(Secrets, secrets)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        def expectedCachedKey = "DogCow"
+        cache.get(_ as String) >> expectedCachedKey
+
+        when:
+        def actualKey = RequestSessionTokenUsecase.getInstance().retrieveOrganizationPublicKey("an organization")
+
+        then:
+        actualKey == expectedCachedKey
+        0 * secrets.getKey(_ as String)
     }
 
-    def "caching works when retreiving TI's private key"() {
+    def "caching works when retrieving TI's private key"() {
+        given:
+        def cache = Mock(Cache)
+        def secrets = Mock(Secrets)
+
+        TestApplicationContext.register(Cache, cache)
+        TestApplicationContext.register(Secrets, secrets)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        def expectedCachedKey = "DogCow"
+        cache.get(_ as String) >> expectedCachedKey
+
+        when:
+        def actualKey = RequestSessionTokenUsecase.getInstance().retrieveTiPrivateKey()
+
+        then:
+        actualKey == expectedCachedKey
+        0 * secrets.getKey(_ as String)
     }
 }
