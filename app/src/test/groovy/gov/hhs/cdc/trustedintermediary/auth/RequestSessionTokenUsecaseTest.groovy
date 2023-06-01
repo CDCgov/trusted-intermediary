@@ -40,7 +40,7 @@ class RequestSessionTokenUsecaseTest extends Specification {
         organizationsSettings.findOrganization(_ as String) >> Optional.of(new Organization())
         secrets.getKey(_ as String) >> "KEY"
         def expectedSessionToken = "SESSION TOKEN"
-        authEngine.generateToken(_ as String, _ as String, _ as String, _ as String, 300, _ as String) >> expectedSessionToken
+        authEngine.generateToken(_ as String, _ as String, _, _, 300, _ as String) >> expectedSessionToken
 
         when:
         def actualSessionToken = RequestSessionTokenUsecase.getInstance().getToken(new AuthRequest("RS", "AUTH TOKEN"))
@@ -162,7 +162,7 @@ class RequestSessionTokenUsecaseTest extends Specification {
 
         organizationsSettings.findOrganization(_ as String) >> Optional.of(new Organization())
         secrets.getKey(_ as String) >> "KEY"
-        authEngine.generateToken(_ as String, _ as String, _ as String, _ as String, 300, _ as String) >> { throw new TokenGenerationException("", new NullPointerException())}
+        authEngine.generateToken(_ as String, _ as String, _, _, 300, _ as String) >> { throw new TokenGenerationException("", new NullPointerException())}
 
         when:
         RequestSessionTokenUsecase.getInstance().getToken(new AuthRequest("RS", "AUTH TOKEN"))

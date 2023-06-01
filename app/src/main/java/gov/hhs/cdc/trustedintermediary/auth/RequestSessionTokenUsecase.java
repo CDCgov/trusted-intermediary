@@ -20,7 +20,6 @@ public class RequestSessionTokenUsecase {
     private static final RequestSessionTokenUsecase INSTANCE = new RequestSessionTokenUsecase();
 
     private static final String OUR_NAME = "cdc-trusted-intermediary";
-    private static final String RS_NAME = "report-stream";
     private static final int TOKEN_TTL = 300;
 
     @Inject private AuthEngine auth;
@@ -62,7 +61,13 @@ public class RequestSessionTokenUsecase {
         // Provide a short-lived access token for subsequent calls to the TI service
         logger.logInfo("Generating TI login token");
         var tiPrivateKey = retrieveTiPrivateKey();
-        return auth.generateToken(OUR_NAME, OUR_NAME, RS_NAME, RS_NAME, TOKEN_TTL, tiPrivateKey);
+        return auth.generateToken(
+                OUR_NAME,
+                OUR_NAME,
+                organization.getName(),
+                organization.getName(),
+                TOKEN_TTL,
+                tiPrivateKey);
     }
 
     protected String retrieveOrganizationPublicKey(String organizationName)

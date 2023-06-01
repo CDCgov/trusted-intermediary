@@ -1,2 +1,4 @@
 - name: report-stream
   description: Report Stream
+- name: trusted-intermediary
+  description: Trusted Intermediary
