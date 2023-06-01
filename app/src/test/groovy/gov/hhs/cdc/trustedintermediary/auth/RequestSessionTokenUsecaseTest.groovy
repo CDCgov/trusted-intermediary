@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.auth
 
-import gov.hhs.cdc.trustedintermediary.auth.AuthRequest
-import gov.hhs.cdc.trustedintermediary.auth.RequestSessionTokenUsecase
+
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.organizations.Organization
 import gov.hhs.cdc.trustedintermediary.organizations.OrganizationsSettings
@@ -35,20 +34,17 @@ class RequestSessionTokenUsecaseTest extends Specification {
         TestApplicationContext.register(OrganizationsSettings, organizationsSettings)
         TestApplicationContext.injectRegisteredImplementations()
 
-        def orgOptional = Optional.of(new Organization("RS", "blach blach")) as Optional<Organization>
-        organizationsSettings.findOrganization(_ as String) >> { orgOptional }
+        def orgOptional = Optional.of(new Organization())
+        organizationsSettings.findOrganization(_ as String) >> orgOptional
         secrets.getKey(_ as String) >> "KEY"
-        authEngine.validateToken(_ as String, _ as String)
-        def expected = "SESSION TOKEN"
-
+        def expectedSessionToken = "SESSION TOKEN"
+        authEngine.generateToken(_ as String, _ as String, _ as String, _ as String, 300, _ as String) >> expectedSessionToken
 
         when:
-        authEngine.generateToken(_ as String, _ as String, _ as String, _ as String, 300, _ as String) >> expected
-        def tokenUseCase = RequestSessionTokenUsecase.getInstance()
-        def actual = tokenUseCase.getToken(new AuthRequest("RS", "AUTH TOKEN"))
+        def actualSessionToken = RequestSessionTokenUsecase.getInstance().getToken(new AuthRequest("RS", "AUTH TOKEN"))
 
         then:
-        actual == expected
+        actualSessionToken == expectedSessionToken
     }
 
     def "organization is not found"() {
