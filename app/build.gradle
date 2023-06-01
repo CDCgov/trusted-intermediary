@@ -57,9 +57,9 @@ dependencies {
     implementation 'org.slf4j:slf4j-simple:2.0.7' // Can be replaced with logBack, log4j, log4j2, Java Utility Logger
 
     //jackson
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.15.1'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.1'
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.1'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.2'
 
     //fhir
     implementation 'ca.uhn.hapi.fhir:hapi-fhir-base:6.6.0'
@@ -84,7 +84,7 @@ dependencies {
     testImplementation 'org.apache.groovy:groovy:4.0.12'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
     testImplementation 'com.openpojo:openpojo:0.9.1'
-    testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.14.1'
+    testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.14.2'
 }
 
 jacoco {
