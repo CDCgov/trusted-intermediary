@@ -48,6 +48,19 @@ class RequestSessionTokenUsecaseTest extends Specification {
     }
 
     def "organization is not found"() {
+        given:
+        def organizationsSettings = Mock(OrganizationsSettings)
+
+        TestApplicationContext.register(OrganizationsSettings, organizationsSettings)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        organizationsSettings.findOrganization(_ as String) >> Optional.empty()
+
+        when:
+        RequestSessionTokenUsecase.getInstance().getToken(new AuthRequest("RS", "AUTH TOKEN"))
+
+        then:
+        thrown(UnknownOrganizationException)
     }
 
     def "organization is lacking a public key"() {
