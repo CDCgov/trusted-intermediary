@@ -45,10 +45,6 @@ public class AuthDomainRegistration implements DomainConnector {
     }
 
     DomainResponse handleAuth(DomainRequest request) {
-
-        // TODO Require request ContentType = application/x-www-form-urlencoded
-        // request.getHeaders().get('ContentType') == 'application/x-www-form-urlencoded'
-
         var authRequest = authController.parseAuthRequest(request);
         var token = "";
 
