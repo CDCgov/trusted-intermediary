@@ -3,8 +3,10 @@ package gov.hhs.cdc.trustedintermediary.auth;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 /** Parses the request and generates the response that comes in for the auth endpoints. */
@@ -25,24 +27,11 @@ public class AuthController {
     public AuthRequest parseAuthRequest(DomainRequest request) {
         logger.logInfo("Parsing login request via JWT");
 
-        // Parse the response body
-        // TODO: yuck; use a library to handle this?
-        var authFields = new HashMap<String, String>();
-        var bodyEntries = request.getBody().split("&");
+        Map<String, Optional<String>> authFields = extractFormUrlEncode(request.getBody());
 
-        for (var entry : bodyEntries) {
-            var entryParts = entry.split("=", 2);
-
-            // TODO ensure length is 2?
-            // TODO convert field to array if it already exists in the map?
-            authFields.put(entryParts[0], entryParts[1]);
-            System.out.println(
-                    entryParts[0] + "=" + entryParts[1]); // TODO Need to URL decode entryParts[1]
-        }
-
-        // TODO validate auth fields
-
-        return new AuthRequest(authFields.get("scope"), authFields.get("client_assertion"));
+        return new AuthRequest(
+                authFields.get("scope").orElse(null),
+                authFields.get("client_assertion").orElse(null));
     }
 
     public DomainResponse constructResponse(int httpStatus) {
@@ -59,5 +48,20 @@ public class AuthController {
         }
 
         return response;
+    }
+
+    protected Map<String, Optional<String>> extractFormUrlEncode(String body) {
+        return Arrays.stream(body.split("&"))
+                .map(entry -> entry.split("=", 2))
+                .collect(
+                        Collectors.toMap(
+                                array -> array[0],
+                                array -> {
+                                    try {
+                                        return Optional.of(array[1]);
+                                    } catch (IndexOutOfBoundsException e) {
+                                        return Optional.empty();
+                                    }
+                                }));
     }
 }

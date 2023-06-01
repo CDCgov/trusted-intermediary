@@ -78,6 +78,17 @@ class OrganizationsSettingsTest extends Specification {
         !organization.isPresent()
     }
 
+    def "findOrganization returns empty optional when organization asked for is null"() {
+        given:
+        OrganizationsSettings.getInstance().loadOrganizations(tempFile)
+
+        when:
+        def organization = OrganizationsSettings.getInstance().findOrganization(null)
+
+        then:
+        !organization.isPresent()
+    }
+
     def "loadOrganizations throws an exception if it can't load the file"() {
         when:
         OrganizationsSettings.getInstance().loadOrganizations(Path.of("DogCow"))
