@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.organizations.Organization
 import gov.hhs.cdc.trustedintermediary.organizations.OrganizationsSettings
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache
+import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
 import spock.lang.Specification
@@ -35,8 +36,7 @@ class RequestSessionTokenUsecaseTest extends Specification {
         TestApplicationContext.register(OrganizationsSettings, organizationsSettings)
         TestApplicationContext.injectRegisteredImplementations()
 
-        def orgOptional = Optional.of(new Organization())
-        organizationsSettings.findOrganization(_ as String) >> orgOptional
+        organizationsSettings.findOrganization(_ as String) >> Optional.of(new Organization())
         secrets.getKey(_ as String) >> "KEY"
         def expectedSessionToken = "SESSION TOKEN"
         authEngine.generateToken(_ as String, _ as String, _ as String, _ as String, 300, _ as String) >> expectedSessionToken
@@ -84,6 +84,25 @@ class RequestSessionTokenUsecaseTest extends Specification {
     }
 
     def "client provided credentials are invalid"() {
+        given:
+        def authEngine = Mock(AuthEngine)
+        def secrets = Mock(Secrets)
+        def organizationsSettings = Mock(OrganizationsSettings)
+
+        TestApplicationContext.register(AuthEngine, authEngine)
+        TestApplicationContext.register(Secrets, secrets)
+        TestApplicationContext.register(OrganizationsSettings, organizationsSettings)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        organizationsSettings.findOrganization(_ as String) >> Optional.of(new Organization())
+        secrets.getKey(_ as String) >> "KEY"
+        authEngine.validateToken(_ as String, _ as String) >> { throw new InvalidTokenException(new NullPointerException()) }
+
+        when:
+        RequestSessionTokenUsecase.getInstance().getToken(new AuthRequest("RS", "AUTH TOKEN"))
+
+        then:
+        thrown(InvalidTokenException)
     }
 
     def "we've incorrectly configured the organization public key"() {
