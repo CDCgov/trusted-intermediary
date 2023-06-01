@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.organizations.Organization
 import gov.hhs.cdc.trustedintermediary.organizations.OrganizationsSettings
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache
+import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
 import spock.lang.Specification
 
@@ -64,6 +65,22 @@ class RequestSessionTokenUsecaseTest extends Specification {
     }
 
     def "organization is lacking a public key"() {
+        given:
+        def secrets = Mock(Secrets)
+        def organizationsSettings = Mock(OrganizationsSettings)
+
+        TestApplicationContext.register(Secrets, secrets)
+        TestApplicationContext.register(OrganizationsSettings, organizationsSettings)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        organizationsSettings.findOrganization(_ as String) >> Optional.of(new Organization())
+        secrets.getKey(_ as String) >> { throw new SecretRetrievalException("", new NullPointerException()) }
+
+        when:
+        RequestSessionTokenUsecase.getInstance().getToken(new AuthRequest("RS", "AUTH TOKEN"))
+
+        then:
+        thrown(SecretRetrievalException)
     }
 
     def "client provided credentials are invalid"() {
