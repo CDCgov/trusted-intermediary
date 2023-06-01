@@ -72,7 +72,11 @@ public class RequestSessionTokenUsecase {
 
     protected String retrieveOrganizationPublicKey(String organizationName)
             throws SecretRetrievalException {
-        return retrieveKey("organization-" + organizationName + "-public-key");
+        return retrieveKey(
+                "organization-"
+                        + organizationName
+                        + "-public-key-"
+                        + ApplicationContext.getEnvironment());
     }
 
     protected String retrieveTiPrivateKey() throws SecretRetrievalException {
