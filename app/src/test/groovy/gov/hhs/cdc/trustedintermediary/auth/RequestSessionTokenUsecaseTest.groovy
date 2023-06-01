@@ -9,6 +9,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Cache
 import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
+import gov.hhs.cdc.trustedintermediary.wrappers.TokenGenerationException
 import spock.lang.Specification
 
 class RequestSessionTokenUsecaseTest extends Specification {
@@ -149,6 +150,25 @@ class RequestSessionTokenUsecaseTest extends Specification {
     }
 
     def "we've incorrectly configured our private key"() {
+        given:
+        def authEngine = Mock(AuthEngine)
+        def secrets = Mock(Secrets)
+        def organizationsSettings = Mock(OrganizationsSettings)
+
+        TestApplicationContext.register(AuthEngine, authEngine)
+        TestApplicationContext.register(Secrets, secrets)
+        TestApplicationContext.register(OrganizationsSettings, organizationsSettings)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        organizationsSettings.findOrganization(_ as String) >> Optional.of(new Organization())
+        secrets.getKey(_ as String) >> "KEY"
+        authEngine.generateToken(_ as String, _ as String, _ as String, _ as String, 300, _ as String) >> { throw new TokenGenerationException("", new NullPointerException())}
+
+        when:
+        RequestSessionTokenUsecase.getInstance().getToken(new AuthRequest("RS", "AUTH TOKEN"))
+
+        then:
+        thrown(TokenGenerationException)
     }
 
     def "caching works when retreiving the organization's public key"() {
