@@ -3,6 +3,8 @@ package gov.hhs.cdc.trustedintermediary.auth;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
@@ -55,10 +57,12 @@ public class AuthController {
                 .map(entry -> entry.split("=", 2))
                 .collect(
                         Collectors.toMap(
-                                array -> array[0],
+                                array -> URLDecoder.decode(array[0], StandardCharsets.UTF_8),
                                 array -> {
                                     try {
-                                        return Optional.of(array[1]);
+                                        return Optional.of(
+                                                URLDecoder.decode(
+                                                        array[1], StandardCharsets.UTF_8));
                                     } catch (IndexOutOfBoundsException e) {
                                         return Optional.empty();
                                     }
