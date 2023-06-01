@@ -32,8 +32,8 @@ public class AuthController {
         Map<String, Optional<String>> authFields = extractFormUrlEncode(request.getBody());
 
         return new AuthRequest(
-                authFields.get("scope").orElse(null),
-                authFields.get("client_assertion").orElse(null));
+                authFields.getOrDefault("scope", Optional.empty()).orElse(null),
+                authFields.getOrDefault("client_assertion", Optional.empty()).orElse(null));
     }
 
     public DomainResponse constructResponse(int httpStatus) {

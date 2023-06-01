@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.auth
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import java.nio.charset.StandardCharsets
 import spock.lang.Specification
 
@@ -85,5 +86,41 @@ class AuthControllerTest extends Specification {
 
         then:
         extracted.get(encodedKey).get() == encodedValue
+    }
+
+    def "parseAuthRequest gets the correct AuthRequest"() {
+        given:
+        def scopeString = "scope"
+        def scope = "report-stream"
+        def clientAssertionString = "client_assertion"
+        def clientAssertion = "aSuperSpecialJwt"
+
+        def domainRequest = new DomainRequest()
+        domainRequest.setBody(scopeString + "=" + scope + "&" + clientAssertionString + "=" + clientAssertion)
+
+        when:
+        def actualRequest = AuthController.getInstance().parseAuthRequest(domainRequest)
+
+        then:
+        actualRequest.scope() == scope
+        actualRequest.jwt() == clientAssertion
+    }
+
+    def "parseAuthRequest is filled with nulls when the scope and client_assertion is not found"() {
+        given:
+        def somethingString = "something"
+        def something = "report-stream"
+        def somethingElseString = "somethingElse"
+        def somethingElse = "aSuperSpecialJwt"
+
+        def domainRequest = new DomainRequest()
+        domainRequest.setBody(somethingString + "=" + something + "&" + somethingElseString + "=" + somethingElse)
+
+        when:
+        def actualRequest = AuthController.getInstance().parseAuthRequest(domainRequest)
+
+        then:
+        actualRequest.scope() == null
+        actualRequest.jwt() == null
     }
 }
