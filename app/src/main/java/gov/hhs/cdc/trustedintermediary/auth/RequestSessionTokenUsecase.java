@@ -67,30 +67,23 @@ public class RequestSessionTokenUsecase {
 
     protected String retrieveOrganizationPublicKey(String organizationName)
             throws SecretRetrievalException {
-        var organizationPublicKeyName = "organization-" + organizationName + "-public-key";
-
-        String key = cache.get(organizationPublicKeyName);
-        if (key != null) {
-            return key;
-        }
-
-        key = secrets.getKey(organizationPublicKeyName);
-        cache.put(organizationPublicKeyName, key);
-
-        return key;
+        return retrieveKey("organization-" + organizationName + "-public-key");
     }
 
-    /** TODO: Consolidate? Copied from ReportStreamLabOrderSender */
     protected String retrieveTiPrivateKey() throws SecretRetrievalException {
-        var senderPrivateKey =
-                "report-stream-sender-private-key-" + ApplicationContext.getEnvironment();
-        String key = cache.get(senderPrivateKey);
+        return retrieveKey(
+                "report-stream-sender-private-key-" + ApplicationContext.getEnvironment());
+    }
+
+    private String retrieveKey(String keyId) throws SecretRetrievalException {
+        String key = cache.get(keyId);
         if (key != null) {
             return key;
         }
 
-        key = secrets.getKey(senderPrivateKey);
-        cache.put(senderPrivateKey, key);
+        key = secrets.getKey(keyId);
+        cache.put(keyId, key);
+
         return key;
     }
 }
