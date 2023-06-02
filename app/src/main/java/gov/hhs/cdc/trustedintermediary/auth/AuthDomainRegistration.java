@@ -53,6 +53,7 @@ public class AuthDomainRegistration implements DomainConnector {
         }
 
         var token = "";
+        var payload = "";
 
         try {
             token = requestSessionTokenUsecase.getToken(authRequest);
@@ -65,6 +66,13 @@ public class AuthDomainRegistration implements DomainConnector {
             return authController.constructResponse(500);
         }
 
-        return authController.constructResponse(200, token);
+        try {
+            payload = authController.constructPayload(authRequest, token);
+        } catch (Exception e) {
+            logger.logFatal("Internal formatter exception occurred", e);
+            return authController.constructResponse(500);
+        }
+
+        return authController.constructResponse(200, payload);
     }
 }

@@ -44,13 +44,13 @@ public class AuthController {
         return constructResponse(httpStatus, null);
     }
 
-    public DomainResponse constructResponse(int httpStatus, String accessToken) {
+    public DomainResponse constructResponse(int httpStatus, String payload) {
 
         DomainResponse response = new DomainResponse(httpStatus);
 
-        if (accessToken != null) {
+        if (payload != null) {
             response.setHeaders(Map.of(CONTENT_TYPE_LITERAL, APPLICATION_JWT_LITERAL));
-            response.setBody(accessToken);
+            response.setBody(payload);
         }
 
         return response;
@@ -74,12 +74,16 @@ public class AuthController {
                                 }));
     }
 
-    private String constructPayload(AuthRequest authRequest, String token) {
+    protected String constructPayload(AuthRequest authRequest, String token) {
+
+        String payloadJson;
+        if (token == null || token.isBlank()) {
+            return token;
+        }
         String scope = authRequest.scope();
         String token_type = "bearer";
         String sub = "?";
         Map<String, String> payload = new HashMap<>();
-        String payloadJson;
 
         payload.put("sub", sub);
         payload.put("token_type", token_type);
