@@ -88,6 +88,14 @@ class AuthControllerTest extends Specification {
         extracted.get(encodedKey).get() == encodedValue
     }
 
+    def "extractFormUrlEncode fails for illegal URL-encoded characters"() {
+        when:
+        AuthController.getInstance().extractFormUrlEncode("asdf%DSasdf")
+
+        then:
+        thrown(IllegalArgumentException)
+    }
+
     def "parseAuthRequest gets the correct AuthRequest"() {
         given:
         def scopeString = "scope"

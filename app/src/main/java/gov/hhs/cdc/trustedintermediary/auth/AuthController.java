@@ -26,7 +26,7 @@ public class AuthController {
         return AUTH_CONTROLLER;
     }
 
-    public AuthRequest parseAuthRequest(DomainRequest request) {
+    public AuthRequest parseAuthRequest(DomainRequest request) throws IllegalArgumentException {
         logger.logInfo("Parsing login request via JWT");
 
         Map<String, Optional<String>> authFields = extractFormUrlEncode(request.getBody());
@@ -52,7 +52,8 @@ public class AuthController {
         return response;
     }
 
-    protected Map<String, Optional<String>> extractFormUrlEncode(String body) {
+    protected Map<String, Optional<String>> extractFormUrlEncode(String body)
+            throws IllegalArgumentException {
         return Arrays.stream(body.split("&"))
                 .map(entry -> entry.split("=", 2))
                 .collect(

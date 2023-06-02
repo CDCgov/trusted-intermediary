@@ -45,7 +45,13 @@ public class AuthDomainRegistration implements DomainConnector {
     }
 
     DomainResponse handleAuth(DomainRequest request) {
-        var authRequest = authController.parseAuthRequest(request);
+        AuthRequest authRequest;
+        try {
+            authRequest = authController.parseAuthRequest(request);
+        } catch (Exception e) {
+            return authController.constructResponse(400);
+        }
+
         var token = "";
 
         try {
