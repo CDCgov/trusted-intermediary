@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 
@@ -41,9 +42,7 @@ public class OrganizationsSettings {
 
         organizations =
                 organizationList.stream()
-                        .collect(
-                                Collectors.toMap(
-                                        Organization::getName, organization -> organization));
+                        .collect(Collectors.toMap(Organization::getName, Function.identity()));
     }
 
     public Optional<Organization> findOrganization(String name) {
