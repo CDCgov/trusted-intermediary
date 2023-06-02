@@ -41,9 +41,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalError'
-      security:
-        - ApiKeyAuth: [ ]
-
 components:
   schemas:
     PatientDemographicsResponse:
@@ -59,7 +56,6 @@ components:
       description: Unauthorized Request
     InternalError:
       description: Internal Server Error
-
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
