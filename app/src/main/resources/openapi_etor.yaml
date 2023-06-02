@@ -29,6 +29,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PatientDemographicsResponse'
+        '401':
+          description: Failed due to Unauthorized Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description:  Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+      security:
+        - ApiKeyAuth: [ ]
+
 components:
   schemas:
     PatientDemographicsResponse:
@@ -40,3 +55,15 @@ components:
         patientId:
           type: string
           example: MRN7465737865
+    UnauthorizedError:
+      description: API key is missing or invalid
+    InternalError:
+      description: Internal Server Error
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: OUR-API-KEY
+security:
+  - ApiKeyAuth: []
