@@ -131,4 +131,19 @@ class AuthControllerTest extends Specification {
         actualRequest.scope() == null
         actualRequest.jwt() == null
     }
+
+    def "constructResponse single param works"() {
+        given:
+        def controller = AuthController.getInstance()
+        def httpStatusExpected = 400
+
+        when:
+        def response = controller.constructResponse(httpStatusExpected)
+        def httpStatusActual = response.getStatusCode()
+        def actualBody = response.getBody()
+
+        then:
+        httpStatusActual==httpStatusExpected
+        actualBody.isBlank()
+    }
 }
