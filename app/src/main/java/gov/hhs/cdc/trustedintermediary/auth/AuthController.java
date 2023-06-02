@@ -5,7 +5,10 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,6 +22,7 @@ public class AuthController {
     static final String APPLICATION_JWT_LITERAL = "application/jwt";
 
     @Inject Logger logger;
+    @Inject Formatter formatter;
 
     private AuthController() {}
 
@@ -68,5 +72,26 @@ public class AuthController {
                                         return Optional.empty();
                                     }
                                 }));
+    }
+
+    private String constructPayload(AuthRequest authRequest, String token) {
+        String scope = authRequest.scope();
+        String token_type = "bearer";
+        String sub = "?";
+        Map<String, String> payload = new HashMap<>();
+        String payloadJson;
+
+        payload.put("sub", sub);
+        payload.put("token_type", token_type);
+        payload.put("access_token", token);
+        payload.put("scope", scope);
+
+        try {
+            payloadJson = formatter.convertToJsonString(payload);
+        } catch (FormatterProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        return payloadJson;
     }
 }
