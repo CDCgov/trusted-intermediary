@@ -16,12 +16,12 @@ paths:
     post:
       summary: Provides a short-lived token when a valid user signed JWT is provided
       requestBody:
-        jwt: the user signed JWT
+        description: the user signed JWT
+        required: true
         content:
           application/jwt:
             schema:
               type: string
-        required: true
       responses:
         '200':
           description: the JWT is valid and an access token is returned
@@ -29,11 +29,25 @@ paths:
             application/jwt:
             schema:
               type: string
+              $ref: '#/components/schemas/AuthResponse'
 components:
   schemas:
-    TODOAuthResponse:
-      type: object
+    jwt:
+      type: application/jwt
       properties:
-        token:
+        #TODO - ask about JWT properties
+    AuthResponse:
+      type: object
+      properties: #TODO - need examples for each property
+        sub:
           type: string
-          example: TODO
+          example:
+        token_type:
+          type: string
+          example:
+        access_token:
+          type: string
+          example:
+        scope:
+          type: string
+          example:
