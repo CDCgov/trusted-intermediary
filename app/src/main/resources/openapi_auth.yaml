@@ -30,12 +30,29 @@ paths:
             schema:
               type: string
               $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: failed to parse authorization request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailedToParse'
+        '401':
+          description: Authentication failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailedToParse'
+        '500':
+          description: failed to parse authorization request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/BadAuthentication'
+                  - $ref: '#/components/schemas/InternalFormatterError'
+
 components:
   schemas:
-    jwt:
-      type: application/jwt
-      properties:
-        #TODO - ask about JWT properties
     AuthResponse:
       type: object
       properties: #TODO - need examples for each property
@@ -51,3 +68,16 @@ components:
         scope:
           type: string
           example:
+    BadAuthentication:
+      description: Bad authentication service configuration - Authentication failed
+    FailedToParse:
+      description: Authentication failed - could not parse request
+    InternalFormatterError:
+      description: Internal formatter exception occurred
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: OUR-API-KEY
+security:
+  - ApiKeyAuth: [ ]
