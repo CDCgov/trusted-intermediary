@@ -28,10 +28,9 @@ paths:
         '200':
           description: the JWT is valid and an access token is returned
           content:
-            application/jwt:
-            schema:
-              type: string
-              $ref: '#/components/schemas/AuthResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
         '400':
           description: failed to parse authorization request
           content:
@@ -54,7 +53,7 @@ components:
           description: bearer token
         access_token:
           type: string
-          description:
+          description: The token to use when authenticating against the service.
         scope:
           type: string
           description: client organization
