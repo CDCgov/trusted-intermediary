@@ -22,6 +22,8 @@ paths:
             schema:
               $ref: 'https://github.com/LinuxForHealth/FHIR/blob/main/fhir-openapi/src/main/webapp/META-INF/openapi.json?raw=true#/components/schemas/Bundle'
         required: true
+      security:
+        - ApiKeyAuth: [ ]
       responses:
         '200':
           description: the demographics were sent successfully
@@ -35,12 +37,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
-        '500':
-          description:  Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalError'
+
 components:
   schemas:
     PatientDemographicsResponse:
@@ -54,12 +51,8 @@ components:
           example: MRN7465737865
     UnauthorizedError:
       description: Unauthorized Request
-    InternalError:
-      description: Internal Server Error
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
       in: header
       name: OUR-API-KEY
-security:
-  - ApiKeyAuth: []
