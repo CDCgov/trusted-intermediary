@@ -140,10 +140,26 @@ class AuthControllerTest extends Specification {
         when:
         def response = controller.constructResponse(httpStatusExpected)
         def httpStatusActual = response.getStatusCode()
-        def actualBody = response.getBody()
+        def bodyActual = response.getBody()
 
         then:
-        httpStatusActual==httpStatusExpected
-        actualBody.isBlank()
+        httpStatusActual == httpStatusExpected
+        bodyActual.isBlank()
+    }
+
+    def "constructResponse double param works"() {
+        given:
+        def controller = AuthController.getInstance()
+        def httpStatusExpected = 200
+        def bodyExpected = "fake payload"
+
+        when:
+        def response = controller.constructResponse(httpStatusExpected, bodyExpected)
+        def httpStatusActual = response.getStatusCode()
+        def bodyActual = response.getBody()
+
+        then:
+        httpStatusActual == httpStatusExpected
+        bodyActual == bodyExpected
     }
 }
