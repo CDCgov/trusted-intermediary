@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,7 +23,7 @@ public class OrganizationsSettings {
     private static final OrganizationsSettings INSTANCE = new OrganizationsSettings();
     protected static String defaultOrganizationFile = "organizations.yaml";
 
-    private Map<String, Organization> organizations;
+    private Map<String, Organization> organizations = new HashMap<>();
 
     @Inject private Formatter formatter;
 
