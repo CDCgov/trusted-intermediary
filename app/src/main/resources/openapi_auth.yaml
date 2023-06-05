@@ -44,15 +44,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FailedToParse'
-        '500':
-          description: failed to parse authorization request
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/BadAuthentication'
-                  - $ref: '#/components/schemas/InternalFormatterError'
-
 components:
   schemas:
     AuthResponse:
