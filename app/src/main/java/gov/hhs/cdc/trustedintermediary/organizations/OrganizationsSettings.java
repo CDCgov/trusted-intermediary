@@ -6,9 +6,11 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 /**
@@ -20,7 +22,7 @@ public class OrganizationsSettings {
     private static final OrganizationsSettings INSTANCE = new OrganizationsSettings();
     protected static String defaultOrganizationFile = "organizations.yaml";
 
-    private List<Organization> organizations = new ArrayList<>();
+    private Map<String, Organization> organizations;
 
     @Inject private Formatter formatter;
 
@@ -30,16 +32,20 @@ public class OrganizationsSettings {
 
     private OrganizationsSettings() {}
 
-    public List<Organization> getOrganizations() {
+    public Map<String, Organization> getOrganizations() {
         return organizations;
     }
 
     public void loadOrganizations(Path filePath) throws OrganizationConfigException {
         try {
             String organizationsFileString = Files.readString(filePath);
-            this.organizations =
+            var organizationList =
                     formatter.convertYamlToObject(
-                            organizationsFileString, new TypeReference<>() {});
+                            organizationsFileString, new TypeReference<List<Organization>>() {});
+
+            organizations =
+                    organizationList.stream()
+                            .collect(Collectors.toMap(Organization::getName, Function.identity()));
         } catch (Exception exception) {
             throw new OrganizationConfigException(
                     "Unable to read the configuration file " + filePath, exception);
@@ -51,9 +57,13 @@ public class OrganizationsSettings {
                 getClass().getClassLoader().getResourceAsStream(defaultOrganizationFile)) {
             String rawOrganizationYamlString =
                     new String(organizationStream.readAllBytes(), StandardCharsets.UTF_8);
-            this.organizations =
+            var organizationList =
                     formatter.convertYamlToObject(
-                            rawOrganizationYamlString, new TypeReference<>() {});
+                            rawOrganizationYamlString, new TypeReference<List<Organization>>() {});
+
+            organizations =
+                    organizationList.stream()
+                            .collect(Collectors.toMap(Organization::getName, Function.identity()));
         } catch (Exception exception) {
             throw new OrganizationConfigException(
                     "Unable to read the default configuration file", exception);
@@ -61,11 +71,12 @@ public class OrganizationsSettings {
     }
 
     public Optional<Organization> findOrganization(String name) {
-        for (Organization organization : organizations) {
-            if (organization.getName().equals(name)) {
-                return Optional.of(organization);
-            }
+
+        if (organizations.containsKey(name)) {
+            Organization organization = organizations.get(name);
+            return Optional.of(organization);
         }
+
         return Optional.empty();
     }
 }

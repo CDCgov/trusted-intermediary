@@ -44,7 +44,7 @@ class OrganizationsSettingsTest extends Specification {
 
         when:
         def organizations = OrganizationsSettings.getInstance().getOrganizations()
-        Organization organization = organizations[0]
+        Organization organization = organizations.entrySet().stream().findFirst().get().value
         def actualOrganizationName = organization.getName()
         def actualOrganizationDescription = organization.getDescription()
 
@@ -102,7 +102,7 @@ class OrganizationsSettingsTest extends Specification {
         OrganizationsSettings.getInstance().loadOrganizations()
 
         then:
-        OrganizationsSettings.getInstance().getOrganizations().get(0) != null
+        !OrganizationsSettings.getInstance().getOrganizations().values().isEmpty()
     }
 
     def "default loadOrganizations blows up if it can't load"() {

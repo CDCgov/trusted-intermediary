@@ -19,6 +19,8 @@ import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import spock.lang.Specification
 
+import java.util.concurrent.ConcurrentHashMap
+
 class ReportStreamLabOrderSenderTest extends Specification {
 
     def setup() {
@@ -255,7 +257,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         def labOrderSender = ReportStreamLabOrderSender.getInstance()
         def threadNums = 5
         def iterations = 25
-        def table = new HashMap<String, Integer>()
+        def table = new ConcurrentHashMap<String, Integer>()
 
         when:
         List<Thread> threads = []
