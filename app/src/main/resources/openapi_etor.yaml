@@ -55,4 +55,4 @@ components:
     ApiKeyAuth:
       type: apiKey
       in: header
-      name: OUR-API-KEY
+      name: Authorization
