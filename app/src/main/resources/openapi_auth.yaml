@@ -48,19 +48,16 @@ components:
   schemas:
     AuthResponse:
       type: object
-      properties: #TODO - need examples for each property
-        sub:
-          type: string
-          example:
+      properties:
         token_type:
           type: string
-          example:
+          description: bearer token
         access_token:
           type: string
-          example:
+          description:
         scope:
           type: string
-          example:
+          description: client organization
     BadAuthentication:
       description: Bad authentication service configuration - Authentication failed
     FailedToParse:
