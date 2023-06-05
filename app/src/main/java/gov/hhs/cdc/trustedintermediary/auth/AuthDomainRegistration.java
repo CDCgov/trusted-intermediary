@@ -49,7 +49,7 @@ public class AuthDomainRegistration implements DomainConnector {
         try {
             authRequest = authController.parseAuthRequest(request);
         } catch (Exception e) {
-            logger.logInfo("Failed to parse the request", e);
+            logger.logError("Failed to parse the request", e);
             return authController.constructResponse(400);
         }
 
@@ -59,9 +59,8 @@ public class AuthDomainRegistration implements DomainConnector {
         try {
             token = requestSessionTokenUsecase.getToken(authRequest);
         } catch (InvalidTokenException | UnknownOrganizationException e) {
-            logger.logInfo("Authentication failed", e);
+            logger.logError("Authentication failed", e);
             return authController.constructResponse(401);
-
         } catch (Exception e) {
             logger.logFatal("Bad authentication service configuration: Authentication failed", e);
             return authController.constructResponse(500);
