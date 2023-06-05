@@ -23,7 +23,7 @@ paths:
               $ref: 'https://github.com/LinuxForHealth/FHIR/blob/main/fhir-openapi/src/main/webapp/META-INF/openapi.json?raw=true#/components/schemas/Bundle'
         required: true
       security:
-        - ApiKeyAuth: [ ]
+        - ApiKeyRequired: [ ]
       responses:
         '200':
           description: the demographics were sent successfully
@@ -52,7 +52,7 @@ components:
     UnauthorizedError:
       description: Unauthorized Request
   securitySchemes:
-    ApiKeyAuth:
+    ApiKeyRequired:
       type: apiKey
       in: header
       name: Authorization
