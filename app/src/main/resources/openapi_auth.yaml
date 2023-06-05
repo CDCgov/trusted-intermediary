@@ -14,37 +14,38 @@ externalDocs:
 paths:
   /v1/auth:
     post:
-      summary: Provides a short-lived token when a valid user signed JWT is provided
+      summary: Provides a short-lived token when a valid organization-signed JWT is provided.
       requestBody:
-        description: the user signed JWT
+        description: The organization-signed JWT
         required: true
         content:
-          application/jwt:
+          application/x-www-form-urlencoded:
             schema:
-              type: string
+              $ref: '#/components/schemas/AuthRequest'
       security:
         - OrgJwtAuth: [ ]
       responses:
         '200':
-          description: the JWT is valid and an access token is returned
+          description: The JWT is valid and an access token is returned.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
         '400':
-          description: failed to parse authorization request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FailedToParse'
+          description: Failed to parse the authentication request.
         '401':
           description: Authentication failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FailedToParse'
 components:
   schemas:
+    AuthRequest:
+      type: object
+      properties:
+        scope:
+          type: string
+          description: The client organization name.
+        client_assertion:
+          type: string
+          description: A short-lived JWT signed by the client organization.
     AuthResponse:
       type: object
       properties:
@@ -57,12 +58,6 @@ components:
         scope:
           type: string
           description: client organization
-    BadAuthentication:
-      description: Bad authentication service configuration - Authentication failed
-    FailedToParse:
-      description: Authentication failed - could not parse request
-    InternalFormatterError:
-      description: Internal formatter exception occurred
   securitySchemes:
     OrgJwtAuth:
       type: apiKey

@@ -49,6 +49,7 @@ public class AuthDomainRegistration implements DomainConnector {
         try {
             authRequest = authController.parseAuthRequest(request);
         } catch (Exception e) {
+            logger.logInfo("Failed to parse the request", e);
             return authController.constructResponse(400);
         }
 
