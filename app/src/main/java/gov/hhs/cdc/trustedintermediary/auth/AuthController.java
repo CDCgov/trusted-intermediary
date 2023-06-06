@@ -85,10 +85,9 @@ public class AuthController {
         }
 
         String scope = authRequest.scope();
-        String tokenType = "bearer";
         Map<String, String> payload = new HashMap<>();
 
-        payload.put("token_type", tokenType);
+        payload.put("token_type", "bearer");
         payload.put("access_token", bearerToken);
         payload.put("scope", scope);
 
