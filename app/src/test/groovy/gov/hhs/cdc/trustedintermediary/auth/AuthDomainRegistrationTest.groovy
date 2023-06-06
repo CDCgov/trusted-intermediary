@@ -131,7 +131,7 @@ class AuthDomainRegistrationTest extends Specification {
         1 * authController.constructResponse(500)
     }
 
-    def "handleAuth creates a 200 response when the controller can't construct a response"() {
+    def "handleAuth creates a 200 response when everything works fine"() {
         given:
         def domainRegistration = new AuthDomainRegistration()
 
