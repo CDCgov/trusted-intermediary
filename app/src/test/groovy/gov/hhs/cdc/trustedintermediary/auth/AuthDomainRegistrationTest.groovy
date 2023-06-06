@@ -52,9 +52,7 @@ class AuthDomainRegistrationTest extends Specification {
         domainRegistration.handleAuth(new DomainRequest())
 
         then:
-        1 * authController.constructResponse(_ as Integer) >> { Integer statusCode ->
-            assert statusCode == 400
-        }
+        1 * authController.constructResponse(400)
     }
 
     def "handleAuth creates a 401 response when the token is invalid"() {
@@ -62,7 +60,7 @@ class AuthDomainRegistrationTest extends Specification {
         def domainRegistration = new AuthDomainRegistration()
 
         def authController = Mock(AuthController)
-        def authUsecase = Stub(RequestSessionTokenUsecase)
+        def authUsecase = Mock(RequestSessionTokenUsecase)
         authUsecase.getToken(_) >> { throw new InvalidTokenException(new NullPointerException()) }
         TestApplicationContext.register(AuthController, authController)
         TestApplicationContext.register(RequestSessionTokenUsecase, authUsecase)
@@ -73,9 +71,7 @@ class AuthDomainRegistrationTest extends Specification {
         domainRegistration.handleAuth(new DomainRequest())
 
         then:
-        1 * authController.constructResponse(_ as Integer) >> { Integer statusCode ->
-            assert statusCode == 401
-        }
+        1 * authController.constructResponse(401)
     }
 
     def "handleAuth creates a 401 response when the organization is unknown"() {
@@ -83,7 +79,7 @@ class AuthDomainRegistrationTest extends Specification {
         def domainRegistration = new AuthDomainRegistration()
 
         def authController = Mock(AuthController)
-        def authUsecase = Stub(RequestSessionTokenUsecase)
+        def authUsecase = Mock(RequestSessionTokenUsecase)
         authUsecase.getToken(_) >> { throw new UnknownOrganizationException("a message") }
         TestApplicationContext.register(AuthController, authController)
         TestApplicationContext.register(RequestSessionTokenUsecase, authUsecase)
@@ -94,8 +90,62 @@ class AuthDomainRegistrationTest extends Specification {
         domainRegistration.handleAuth(new DomainRequest())
 
         then:
-        1 * authController.constructResponse(_ as Integer) >> { Integer statusCode ->
-            assert statusCode == 401
-        }
+        1 * authController.constructResponse(401)
+    }
+
+    def "handleAuth creates a 500 response when the usecase blows up"() {
+        given:
+        def domainRegistration = new AuthDomainRegistration()
+
+        def authController = Mock(AuthController)
+        def authUsecase = Mock(RequestSessionTokenUsecase)
+        authUsecase.getToken(_) >> { throw new NullPointerException() }
+        TestApplicationContext.register(AuthController, authController)
+        TestApplicationContext.register(RequestSessionTokenUsecase, authUsecase)
+        TestApplicationContext.register(AuthDomainRegistration, domainRegistration)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        domainRegistration.handleAuth(new DomainRequest())
+
+        then:
+        1 * authController.constructResponse(500)
+    }
+
+    def "handleAuth creates a 500 response when the controller can't construct a response"() {
+        given:
+        def domainRegistration = new AuthDomainRegistration()
+
+        def authController = Mock(AuthController)
+        def authUsecase = Mock(RequestSessionTokenUsecase)
+        authController.constructPayload(_, _) >> { throw new NullPointerException() }
+        TestApplicationContext.register(AuthController, authController)
+        TestApplicationContext.register(RequestSessionTokenUsecase, authUsecase)
+        TestApplicationContext.register(AuthDomainRegistration, domainRegistration)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        domainRegistration.handleAuth(new DomainRequest())
+
+        then:
+        1 * authController.constructResponse(500)
+    }
+
+    def "handleAuth creates a 200 response when the controller can't construct a response"() {
+        given:
+        def domainRegistration = new AuthDomainRegistration()
+
+        def authController = Mock(AuthController)
+        def authUsecase = Mock(RequestSessionTokenUsecase)
+        TestApplicationContext.register(AuthController, authController)
+        TestApplicationContext.register(RequestSessionTokenUsecase, authUsecase)
+        TestApplicationContext.register(AuthDomainRegistration, domainRegistration)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        domainRegistration.handleAuth(new DomainRequest())
+
+        then:
+        1 * authController.constructResponse(200, _)
     }
 }
