@@ -74,7 +74,8 @@ public class AuthController {
                                 }));
     }
 
-    protected String constructPayload(AuthRequest authRequest, String token) {
+    protected String constructPayload(AuthRequest authRequest, String token)
+            throws FormatterProcessingException {
 
         String payloadJson;
         if (token == null || token.isBlank()) {
@@ -88,11 +89,7 @@ public class AuthController {
         payload.put("access_token", token);
         payload.put("scope", scope);
 
-        try {
-            payloadJson = formatter.convertToJsonString(payload);
-        } catch (FormatterProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        payloadJson = formatter.convertToJsonString(payload);
 
         return payloadJson;
     }
