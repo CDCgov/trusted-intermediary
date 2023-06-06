@@ -79,10 +79,10 @@ public class AuthController {
 
         String payloadJson;
         String scope = authRequest.scope();
-        String token_type = "bearer";
+        String tokenType = "bearer";
         Map<String, String> payload = new HashMap<>();
 
-        payload.put("token_type", token_type);
+        payload.put("token_type", tokenType);
         payload.put("access_token", token);
         payload.put("scope", scope);
 
