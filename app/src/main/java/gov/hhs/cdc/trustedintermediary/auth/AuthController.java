@@ -78,12 +78,18 @@ public class AuthController {
             throws FormatterProcessingException {
 
         String payloadJson;
+        String bearerToken = "";
+
+        if (token != null && !token.isBlank()) {
+            bearerToken = token;
+        }
+
         String scope = authRequest.scope();
         String tokenType = "bearer";
         Map<String, String> payload = new HashMap<>();
 
-        payload.put("token_type", tokenType);
-        payload.put("access_token", token);
+        payload.put("token_type", token_type);
+        payload.put("access_token", bearerToken);
         payload.put("scope", scope);
 
         payloadJson = formatter.convertToJsonString(payload);
