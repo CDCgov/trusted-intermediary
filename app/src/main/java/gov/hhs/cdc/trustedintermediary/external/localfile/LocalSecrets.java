@@ -35,7 +35,7 @@ public class LocalSecrets implements Secrets {
         try {
             key = readSecretFromFileSystem(secretName);
         } catch (SecretRetrievalException exception) {
-            logger.logInfo(
+            logger.logWarning(
                     "Not finding the " + secretName + " on the filesystem, searching in resources");
             key = readSecretFromResources(secretName);
         }
