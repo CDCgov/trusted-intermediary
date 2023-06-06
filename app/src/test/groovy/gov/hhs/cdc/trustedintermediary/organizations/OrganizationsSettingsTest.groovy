@@ -94,7 +94,7 @@ class OrganizationsSettingsTest extends Specification {
         OrganizationsSettings.getInstance().loadOrganizations(Path.of("DogCow"))
 
         then:
-        thrown(OrganizationConfigException)
+        thrown(OrganizationsSettingsException)
     }
 
     def "default loadOrganizations runs correctly"() {
@@ -113,6 +113,6 @@ class OrganizationsSettingsTest extends Specification {
         OrganizationsSettings.getInstance().loadOrganizations()
 
         then:
-        thrown(OrganizationConfigException)
+        thrown(OrganizationsSettingsException)
     }
 }

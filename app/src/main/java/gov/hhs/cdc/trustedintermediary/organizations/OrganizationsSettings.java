@@ -37,7 +37,7 @@ public class OrganizationsSettings {
         return organizations;
     }
 
-    public void loadOrganizations(Path filePath) throws OrganizationConfigException {
+    public void loadOrganizations(Path filePath) throws OrganizationsSettingsException {
         try {
             String organizationsFileString = Files.readString(filePath);
             var organizationList =
@@ -48,12 +48,12 @@ public class OrganizationsSettings {
                     organizationList.stream()
                             .collect(Collectors.toMap(Organization::getName, Function.identity()));
         } catch (Exception exception) {
-            throw new OrganizationConfigException(
+            throw new OrganizationsSettingsException(
                     "Unable to read the configuration file " + filePath, exception);
         }
     }
 
-    public void loadOrganizations() throws OrganizationConfigException {
+    public void loadOrganizations() throws OrganizationsSettingsException {
         try (InputStream organizationStream =
                 getClass().getClassLoader().getResourceAsStream(defaultOrganizationFile)) {
             String rawOrganizationYamlString =
@@ -66,7 +66,7 @@ public class OrganizationsSettings {
                     organizationList.stream()
                             .collect(Collectors.toMap(Organization::getName, Function.identity()));
         } catch (Exception exception) {
-            throw new OrganizationConfigException(
+            throw new OrganizationsSettingsException(
                     "Unable to read the default configuration file", exception);
         }
     }
