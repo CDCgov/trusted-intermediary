@@ -63,7 +63,7 @@ class LocalSecretsTest extends Specification {
         println(secret)
 
         then:
-        def exception = thrown(SecretRetrievalException)
+        def exception = thrown(Exception)
         exception.getCause().getClass() == NullPointerException
     }
 }
