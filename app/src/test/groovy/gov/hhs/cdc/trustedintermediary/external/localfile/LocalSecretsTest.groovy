@@ -52,4 +52,18 @@ class LocalSecretsTest extends Specification {
         def exception = thrown(SecretRetrievalException)
         exception.getCause().getClass() == NoSuchFileException
     }
+
+    def "readSecretFromResources takes a bad secret name"() {
+        given:
+        def secrets = LocalSecrets.getInstance()
+        def name = "bad secret name"
+
+        when:
+        def secret = secrets.readSecretFromResources(name)
+        println(secret)
+
+        then:
+        def exception = thrown(SecretRetrievalException)
+        exception.getCause().getClass() == NullPointerException
+    }
 }
