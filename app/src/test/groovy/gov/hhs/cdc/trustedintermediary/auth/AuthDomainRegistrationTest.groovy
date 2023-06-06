@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.auth
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
+import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException
 import spock.lang.Specification
 
 class AuthDomainRegistrationTest extends Specification {
@@ -53,6 +54,48 @@ class AuthDomainRegistrationTest extends Specification {
         then:
         1 * authController.constructResponse(_ as Integer) >> { Integer statusCode ->
             assert statusCode == 400
+        }
+    }
+
+    def "handleAuth creates a 401 response when the token is invalid"() {
+        given:
+        def domainRegistration = new AuthDomainRegistration()
+
+        def authController = Mock(AuthController)
+        def authUsecase = Stub(RequestSessionTokenUsecase)
+        authUsecase.getToken(_) >> { throw new InvalidTokenException(new NullPointerException()) }
+        TestApplicationContext.register(AuthController, authController)
+        TestApplicationContext.register(RequestSessionTokenUsecase, authUsecase)
+        TestApplicationContext.register(AuthDomainRegistration, domainRegistration)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        domainRegistration.handleAuth(new DomainRequest())
+
+        then:
+        1 * authController.constructResponse(_ as Integer) >> { Integer statusCode ->
+            assert statusCode == 401
+        }
+    }
+
+    def "handleAuth creates a 401 response when the organization is unknown"() {
+        given:
+        def domainRegistration = new AuthDomainRegistration()
+
+        def authController = Mock(AuthController)
+        def authUsecase = Stub(RequestSessionTokenUsecase)
+        authUsecase.getToken(_) >> { throw new UnknownOrganizationException("a message") }
+        TestApplicationContext.register(AuthController, authController)
+        TestApplicationContext.register(RequestSessionTokenUsecase, authUsecase)
+        TestApplicationContext.register(AuthDomainRegistration, domainRegistration)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        domainRegistration.handleAuth(new DomainRequest())
+
+        then:
+        1 * authController.constructResponse(_ as Integer) >> { Integer statusCode ->
+            assert statusCode == 401
         }
     }
 }
