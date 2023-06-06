@@ -187,4 +187,17 @@ class AuthControllerTest extends Specification {
         then:
         actual == expected
     }
+
+    def "constructPayload when token is null"() {
+        given:
+        def token = ""
+        def controller = AuthController.getInstance()
+
+        when:
+        def payloadActual = controller.constructPayload(new AuthRequest("fake","fake"), token)
+        println(payloadActual.isBlank())
+
+        then:
+        payloadActual.isBlank()
+    }
 }
