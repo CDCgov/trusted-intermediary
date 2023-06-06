@@ -215,7 +215,7 @@ class AuthControllerTest extends Specification {
         def formatter = Jackson.getInstance()
         def token = " "
         def controller = AuthController.getInstance()
-        def payload = """{"access_token":"","scope":"fake","token_type":"bearer"}"""
+        def payload = """{"access_token":" ","scope":"fake","token_type":"bearer"}"""
         def expected = formatter.convertJsonToObject(payload, new TypeReference<Map<String,String>>() {})
         TestApplicationContext.register(Formatter, formatter)
         TestApplicationContext.injectRegisteredImplementations()
