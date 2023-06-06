@@ -55,6 +55,4 @@ class AuthDomainRegistrationTest extends Specification {
             assert statusCode == 400
         }
     }
-
-    // TODO AuthController.constructPayload
 }

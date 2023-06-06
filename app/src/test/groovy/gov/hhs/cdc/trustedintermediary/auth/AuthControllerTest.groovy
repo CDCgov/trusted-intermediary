@@ -2,6 +2,10 @@ package gov.hhs.cdc.trustedintermediary.auth
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
+import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
+
 import java.nio.charset.StandardCharsets
 import spock.lang.Specification
 
@@ -23,7 +27,7 @@ class AuthControllerTest extends Specification {
         def name = "Clarus"
 
         when:
-        def extracted = AuthController.getInstance().extractFormUrlEncode(scopeString + "=" + scope +"&" + soundString + "=" + sound + "&" + nameString + "=" + name)
+        def extracted = AuthController.getInstance().extractFormUrlEncode(scopeString + "=" + scope + "&" + soundString + "=" + sound + "&" + nameString + "=" + name)
 
         then:
         extracted.get(scopeString).get() == scope
@@ -161,5 +165,26 @@ class AuthControllerTest extends Specification {
         then:
         httpStatusActual == httpStatusExpected
         bodyActual == bodyExpected
+    }
+
+    def "constructPayload happy path"() {
+        given:
+        def formatter = Jackson.getInstance()
+        def controller = AuthController.getInstance()
+        def scope = "fake scope"
+        def assertion = "fake assertion"
+        def authRequest = new AuthRequest(scope, assertion)
+        def token = "fake access_token"
+        def payload = """{"scope":"${scope}","access_token":"fake access_token","token_type":"bearer"}"""
+        TestApplicationContext.register(Formatter, formatter)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def payloadActual = controller.constructPayload(authRequest, token)
+        def expected = formatter.convertJsonToObject(payload, new TypeReference<Map<String,String>>(){})
+        def actual = formatter.convertJsonToObject(payloadActual, new TypeReference<Map<String,String>>() {})
+
+        then:
+        actual == expected
     }
 }
