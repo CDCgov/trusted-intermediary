@@ -4,11 +4,9 @@ import java.io.IOException;
 import org.apache.hc.client5.http.fluent.Content;
 import org.apache.hc.client5.http.fluent.ContentResponseHandler;
 import org.apache.hc.client5.http.fluent.Request;
+import org.apache.hc.client5.http.fluent.Response;
 import org.apache.hc.client5.http.impl.classic.AbstractHttpClientResponseHandler;
-import org.apache.hc.core5.http.ClassicHttpResponse;
-import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.HttpEntity;
-import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.*;
 
 /** Mocks a client sending a request to the API * */
 public class Client {
@@ -25,14 +23,20 @@ public class Client {
     }
 
     public static String post(String path, String body) throws IOException {
+        return post(path, body, ContentType.APPLICATION_JSON);
+    }
+
+    public static String post(String path, String body, ContentType type) throws IOException {
         System.out.println("Calling the backend at POST " + path);
 
-        var response =
-                Request.post(protocolDomain + path)
-                        .bodyString(body, ContentType.APPLICATION_JSON)
-                        .execute();
+        return requestPost(path, body, type)
+                .handleResponse(new ContentResponseHandlerWithoutException())
+                .asString();
+    }
 
-        return response.handleResponse(new ContentResponseHandlerWithoutException()).asString();
+    public static Response requestPost(String path, String body, ContentType type)
+            throws IOException {
+        return Request.post(protocolDomain + path).bodyString(body, type).execute();
     }
 
     public static class ContentResponseHandlerWithoutException extends ContentResponseHandler {
