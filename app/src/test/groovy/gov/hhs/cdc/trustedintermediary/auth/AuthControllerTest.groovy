@@ -210,6 +210,25 @@ class AuthControllerTest extends Specification {
     def "constructPayload when token is blank"() {
         given:
         def formatter = Jackson.getInstance()
+        def token = " "
+        def controller = AuthController.getInstance()
+        def payload = """{"access_token":"","scope":"fake","token_type":"bearer"}"""
+        def expected = formatter.convertJsonToObject(payload, new TypeReference<Map<String,String>>() {})
+        TestApplicationContext.register(Formatter, formatter)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def payloadActual = controller.constructPayload(new AuthRequest("fake","fake"), token)
+        def actual = formatter.convertJsonToObject(payloadActual, new TypeReference<Map<String,String>>() {})
+        println(payloadActual)
+
+        then:
+        actual == expected
+    }
+
+    def "constructPayload when token is empty"() {
+        given:
+        def formatter = Jackson.getInstance()
         def token = ""
         def controller = AuthController.getInstance()
         def payload = """{"access_token":"","scope":"fake","token_type":"bearer"}"""
