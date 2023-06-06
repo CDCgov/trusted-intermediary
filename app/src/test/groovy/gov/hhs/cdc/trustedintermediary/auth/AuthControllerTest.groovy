@@ -205,7 +205,6 @@ class AuthControllerTest extends Specification {
         when:
         def payloadActual = controller.constructPayload(new AuthRequest("fake","fake"), token)
         def actual = formatter.convertJsonToObject(payloadActual, new TypeReference<Map<String,String>>() {})
-        println(payloadActual)
 
         then:
         actual == expected
@@ -224,7 +223,6 @@ class AuthControllerTest extends Specification {
         when:
         def payloadActual = controller.constructPayload(new AuthRequest("fake","fake"), token)
         def actual = formatter.convertJsonToObject(payloadActual, new TypeReference<Map<String,String>>() {})
-        println(payloadActual)
 
         then:
         actual == expected
@@ -243,7 +241,6 @@ class AuthControllerTest extends Specification {
         when:
         def payloadActual = controller.constructPayload(new AuthRequest("fake","fake"), token)
         def actual = formatter.convertJsonToObject(payloadActual, new TypeReference<Map<String,String>>() {})
-        println(payloadActual)
 
         then:
         actual == expected
