@@ -19,7 +19,7 @@ public class AuthController {
 
     private static final AuthController AUTH_CONTROLLER = new AuthController();
     static final String CONTENT_TYPE_LITERAL = "Content-Type";
-    static final String APPLICATION_JWT_LITERAL = "application/jwt";
+    static final String APPLICATION_JSON_LITERAL = "application/json";
 
     @Inject Logger logger;
     @Inject Formatter formatter;
@@ -49,32 +49,14 @@ public class AuthController {
         DomainResponse response = new DomainResponse(httpStatus);
 
         if (payload != null) {
-            response.setHeaders(Map.of(CONTENT_TYPE_LITERAL, APPLICATION_JWT_LITERAL));
+            response.setHeaders(Map.of(CONTENT_TYPE_LITERAL, APPLICATION_JSON_LITERAL));
             response.setBody(payload);
         }
 
         return response;
     }
 
-    protected Map<String, Optional<String>> extractFormUrlEncode(String body)
-            throws IllegalArgumentException {
-        return Arrays.stream(body.split("&"))
-                .map(entry -> entry.split("=", 2))
-                .collect(
-                        Collectors.toMap(
-                                array -> URLDecoder.decode(array[0], StandardCharsets.UTF_8),
-                                array -> {
-                                    try {
-                                        return Optional.of(
-                                                URLDecoder.decode(
-                                                        array[1], StandardCharsets.UTF_8));
-                                    } catch (IndexOutOfBoundsException e) {
-                                        return Optional.empty();
-                                    }
-                                }));
-    }
-
-    protected String constructPayload(AuthRequest authRequest, String token)
+    public String constructPayload(AuthRequest authRequest, String token)
             throws FormatterProcessingException {
 
         String payloadJson;
@@ -94,5 +76,23 @@ public class AuthController {
         payloadJson = formatter.convertToJsonString(payload);
 
         return payloadJson;
+    }
+
+    protected Map<String, Optional<String>> extractFormUrlEncode(String body)
+            throws IllegalArgumentException {
+        return Arrays.stream(body.split("&"))
+                .map(entry -> entry.split("=", 2))
+                .collect(
+                        Collectors.toMap(
+                                array -> URLDecoder.decode(array[0], StandardCharsets.UTF_8),
+                                array -> {
+                                    try {
+                                        return Optional.of(
+                                                URLDecoder.decode(
+                                                        array[1], StandardCharsets.UTF_8));
+                                    } catch (IndexOutOfBoundsException e) {
+                                        return Optional.empty();
+                                    }
+                                }));
     }
 }

@@ -145,13 +145,15 @@ class AuthControllerTest extends Specification {
         def response = controller.constructResponse(httpStatusExpected)
         def httpStatusActual = response.getStatusCode()
         def bodyActual = response.getBody()
+        def headersActual = response.getHeaders()
 
         then:
         httpStatusActual == httpStatusExpected
         bodyActual.isBlank()
+        headersActual.isEmpty()
     }
 
-    def "constructResponse double param works"() {
+    def "constructResponse double param works with a payload"() {
         given:
         def controller = AuthController.getInstance()
         def httpStatusExpected = 200
@@ -161,10 +163,12 @@ class AuthControllerTest extends Specification {
         def response = controller.constructResponse(httpStatusExpected, bodyExpected)
         def httpStatusActual = response.getStatusCode()
         def bodyActual = response.getBody()
+        def headersActual = response.getHeaders()
 
         then:
         httpStatusActual == httpStatusExpected
         bodyActual == bodyExpected
+        headersActual.get(AuthController.CONTENT_TYPE_LITERAL) == AuthController.APPLICATION_JSON_LITERAL
     }
 
     def "constructPayload happy path"() {
