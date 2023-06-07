@@ -1,0 +1,58 @@
+openapi: 3.0.3
+info:
+  title: Trusted Intermediary Auth
+  description: Provides authentication for the Trusted Intermediary service
+  contact:
+    email: cdc-ti@flexion.us
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.0.1
+externalDocs:
+  description: Trusted Intermediary Repository
+  url: https://github.com/CDCgov/trusted-intermediary
+paths:
+  /v1/auth:
+    post:
+      summary: Provides a short-lived token when a valid organization-signed JWT is provided.
+      requestBody:
+        description: The organization-signed JWT
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        '200':
+          description: The JWT is valid and an access token is returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Failed to parse the authentication request.
+        '401':
+          description: Authentication failed.
+components:
+  schemas:
+    AuthRequest:
+      type: object
+      properties:
+        scope:
+          type: string
+          description: The client organization name.
+        client_assertion:
+          type: string
+          description: A short-lived JWT signed by the client organization.
+    AuthResponse:
+      type: object
+      properties:
+        token_type:
+          type: string
+          description: bearer token
+        access_token:
+          type: string
+          description: The token to use when authenticating against the service.
+        scope:
+          type: string
+          description: client organization

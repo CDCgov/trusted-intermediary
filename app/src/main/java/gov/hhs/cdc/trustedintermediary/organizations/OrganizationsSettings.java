@@ -1,11 +1,12 @@
 package gov.hhs.cdc.trustedintermediary.organizations;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
-import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,8 +21,10 @@ import javax.inject.Inject;
 public class OrganizationsSettings {
 
     private static final OrganizationsSettings INSTANCE = new OrganizationsSettings();
+    protected static String defaultOrganizationFile = "organizations.yaml";
 
-    private Map<String, Organization> organizations;
+    private Map<String, Organization> organizations = new HashMap<>();
+
     @Inject private Formatter formatter;
 
     public static OrganizationsSettings getInstance() {
@@ -34,15 +37,38 @@ public class OrganizationsSettings {
         return organizations;
     }
 
-    public void loadOrganizations(Path filePath) throws IOException, FormatterProcessingException {
-        String organizationsFileString = Files.readString(filePath);
-        List<Organization> organizationList =
-                formatter.convertYamlToObject(
-                        organizationsFileString, new TypeReference<List<Organization>>() {});
+    public void loadOrganizations(Path filePath) throws OrganizationsSettingsException {
+        try {
+            String organizationsFileString = Files.readString(filePath);
+            var organizationList =
+                    formatter.convertYamlToObject(
+                            organizationsFileString, new TypeReference<List<Organization>>() {});
 
-        organizations =
-                organizationList.stream()
-                        .collect(Collectors.toMap(Organization::getName, Function.identity()));
+            organizations =
+                    organizationList.stream()
+                            .collect(Collectors.toMap(Organization::getName, Function.identity()));
+        } catch (Exception exception) {
+            throw new OrganizationsSettingsException(
+                    "Unable to read the configuration file " + filePath, exception);
+        }
+    }
+
+    public void loadOrganizations() throws OrganizationsSettingsException {
+        try (InputStream organizationStream =
+                getClass().getClassLoader().getResourceAsStream(defaultOrganizationFile)) {
+            String rawOrganizationYamlString =
+                    new String(organizationStream.readAllBytes(), StandardCharsets.UTF_8);
+            var organizationList =
+                    formatter.convertYamlToObject(
+                            rawOrganizationYamlString, new TypeReference<List<Organization>>() {});
+
+            organizations =
+                    organizationList.stream()
+                            .collect(Collectors.toMap(Organization::getName, Function.identity()));
+        } catch (Exception exception) {
+            throw new OrganizationsSettingsException(
+                    "Unable to read the default configuration file", exception);
+        }
     }
 
     public Optional<Organization> findOrganization(String name) {
