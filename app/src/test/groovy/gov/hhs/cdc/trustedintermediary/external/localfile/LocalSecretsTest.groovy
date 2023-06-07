@@ -66,4 +66,16 @@ class LocalSecretsTest extends Specification {
         def exception = thrown(Exception)
         exception.getCause().getClass() == NullPointerException
     }
+
+    def "readSecretFromResource works"() {
+        given:
+        def secretName = "report-stream-sender-private-key-local"  //pragma: allowlist secret
+        def expected = Files.readString(Path.of("..", "mock_credentials", secretName + ".pem"))
+
+        when:
+        def actual = LocalSecrets.getInstance().readSecretFromResources(secretName)
+
+        then:
+        actual == expected
+    }
 }
