@@ -5,7 +5,10 @@ import org.apache.hc.client5.http.fluent.Request;
 import org.apache.hc.client5.http.impl.classic.AbstractHttpClientResponseHandler;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.message.BasicClassicHttpResponse;
 
 /** Mocks a client sending a request to the API * */
 public class Client {
@@ -19,14 +22,15 @@ public class Client {
         return response.handleResponse(new ResponseHandlerWithoutException());
     }
 
-    public static ClassicHttpResponse post(String path, String body, ContentType type)
+    public static OurClassicHttpResponse post(String path, String body, ContentType type)
             throws IOException {
         System.out.println("Calling the backend at POST " + path);
         var response = Request.post(protocolDomain + path).bodyString(body, type).execute();
-        return response.handleResponse(new ResponseHandlerWithoutException());
+        return (OurClassicHttpResponse)
+                response.handleResponse(new ResponseHandlerWithoutException());
     }
 
-    public static ClassicHttpResponse post(String path, String body) throws IOException {
+    public static OurClassicHttpResponse post(String path, String body) throws IOException {
         return post(path, body, ContentType.APPLICATION_JSON);
     }
 
@@ -39,8 +43,33 @@ public class Client {
          * an exception when getting a 4xx or 5xx status code.
          */
         @Override
-        public ClassicHttpResponse handleResponse(final ClassicHttpResponse response) {
-            return response;
+        public OurClassicHttpResponse handleResponse(final ClassicHttpResponse response) {
+            OurClassicHttpResponse ourResponse = (OurClassicHttpResponse) response;
+            String body;
+            try {
+                body = EntityUtils.toString(response.getEntity());
+            } catch (ParseException | IOException e) {
+                throw new RuntimeException(e);
+            }
+            ourResponse.setBody(body);
+            return ourResponse;
+        }
+    }
+
+    public static class OurClassicHttpResponse extends BasicClassicHttpResponse {
+
+        private String body;
+
+        public OurClassicHttpResponse(int code) {
+            super(code);
+        }
+
+        public String getBody() {
+            return this.body;
+        }
+
+        public void setBody(String body) {
+            this.body = body;
         }
     }
 
