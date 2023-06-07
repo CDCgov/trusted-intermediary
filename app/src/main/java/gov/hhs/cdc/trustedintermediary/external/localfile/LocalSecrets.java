@@ -44,7 +44,7 @@ public class LocalSecrets implements Secrets {
         return key;
     }
 
-    private String readSecretFromFileSystem(String secretName) throws SecretRetrievalException {
+    protected String readSecretFromFileSystem(String secretName) throws SecretRetrievalException {
         try {
             return Files.readString(Path.of("..", "mock_credentials", secretName + ".pem"));
         } catch (IOException exception) {
@@ -53,7 +53,7 @@ public class LocalSecrets implements Secrets {
         }
     }
 
-    private String readSecretFromResources(String secretName) throws SecretRetrievalException {
+    protected String readSecretFromResources(String secretName) throws SecretRetrievalException {
         try (InputStream secretStream =
                 getClass().getClassLoader().getResourceAsStream(secretName + ".pem")) {
             return new String(secretStream.readAllBytes(), StandardCharsets.UTF_8);
