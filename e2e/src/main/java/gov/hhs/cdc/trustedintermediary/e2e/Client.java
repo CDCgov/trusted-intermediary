@@ -4,9 +4,12 @@ import java.io.IOException;
 import org.apache.hc.client5.http.fluent.Content;
 import org.apache.hc.client5.http.fluent.ContentResponseHandler;
 import org.apache.hc.client5.http.fluent.Request;
-import org.apache.hc.client5.http.fluent.Response;
 import org.apache.hc.client5.http.impl.classic.AbstractHttpClientResponseHandler;
-import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 
 /** Mocks a client sending a request to the API * */
 public class Client {
@@ -34,9 +37,27 @@ public class Client {
                 .asString();
     }
 
-    public static Response requestPost(String path, String body, ContentType type)
+    public static ClassicHttpResponse requestPost(String path, String body, ContentType type)
             throws IOException {
-        return Request.post(protocolDomain + path).bodyString(body, type).execute();
+        return Request.post(protocolDomain + path)
+                .bodyString(body, type)
+                .execute()
+                .handleResponse(new ResponseHandlerWithoutException());
+    }
+
+    public static class ResponseHandlerWithoutException
+            implements HttpClientResponseHandler<ClassicHttpResponse> {
+
+        /**
+         * Very similar code to {@link
+         * AbstractHttpClientResponseHandler#handleResponse(ClassicHttpResponse)} but doesn't throw
+         * an exception when getting a 4xx or 5xx status code.
+         */
+        @Override
+        public ClassicHttpResponse handleResponse(final ClassicHttpResponse response) {
+
+            return response;
+        }
     }
 
     public static class ContentResponseHandlerWithoutException extends ContentResponseHandler {
