@@ -21,8 +21,8 @@ class AuthTest extends Specification {
         def response = Client.post(authEndpointPath, postBody(existingClientId, validToken), ContentType.APPLICATION_FORM_URLENCODED)
 
         then:
-        //        response.getCode() == 200
-        def body = response.getBody()
+        response.getCode() == 200
+        def body = EntityUtils.toString(response.getEntity())
         def responseBody = JsonParsing.parse(body, Map.class)
         responseBody.scope == "report-stream"
         responseBody.token_type == "bearer"
