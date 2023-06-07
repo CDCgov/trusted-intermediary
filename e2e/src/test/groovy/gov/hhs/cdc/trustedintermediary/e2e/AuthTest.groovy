@@ -18,7 +18,7 @@ class AuthTest extends Specification {
 
     def "a 200 valid response is returned when known organization and valid token"() {
         when:
-        def response = Client.requestPost(authEndpointPath, postBody(existingClientId, validToken), ContentType.APPLICATION_FORM_URLENCODED)
+        def response = Client.post(authEndpointPath, postBody(existingClientId, validToken), ContentType.APPLICATION_FORM_URLENCODED)
 
         then:
         response.getCode() == 200
@@ -34,10 +34,10 @@ class AuthTest extends Specification {
         def invalidRequest= "%g"
 
         when:
-        def response = Client.requestPost(authEndpointPath, invalidRequest, ContentType.APPLICATION_FORM_URLENCODED)
+        def response = Client.post(authEndpointPath, invalidRequest, ContentType.APPLICATION_FORM_URLENCODED)
 
         then:
-        response.returnResponse().getCode() == 400
+        response.getCode() == 400
     }
 
     def "a 401 response is returned when poorly formatted request"() {
@@ -45,10 +45,10 @@ class AuthTest extends Specification {
         def invalidRequest= "invalid-request"
 
         when:
-        def response = Client.requestPost(authEndpointPath, invalidRequest, ContentType.APPLICATION_FORM_URLENCODED)
+        def response = Client.post(authEndpointPath, invalidRequest, ContentType.APPLICATION_FORM_URLENCODED)
 
         then:
-        response.returnResponse().getCode() == 401
+        response.getCode() == 401
     }
 
     def "a 401 response is returned when invalid token"() {
@@ -56,10 +56,10 @@ class AuthTest extends Specification {
         def invalidToken = "invalid-token"
 
         when:
-        def response = Client.requestPost(authEndpointPath, postBody(existingClientId, invalidToken), ContentType.APPLICATION_FORM_URLENCODED)
+        def response = Client.post(authEndpointPath, postBody(existingClientId, invalidToken), ContentType.APPLICATION_FORM_URLENCODED)
 
         then:
-        response.returnResponse().getCode() == 401
+        response.getCode() == 401
     }
 
     def "a 401 response is returned when unknown organization"() {
@@ -67,9 +67,9 @@ class AuthTest extends Specification {
         def invalidClientId = "invalid-client"
 
         when:
-        def response = Client.requestPost(authEndpointPath, postBody(invalidClientId, validToken), ContentType.APPLICATION_FORM_URLENCODED)
+        def response = Client.post(authEndpointPath, postBody(invalidClientId, validToken), ContentType.APPLICATION_FORM_URLENCODED)
 
         then:
-        response.returnResponse().getCode() == 401
+        response.getCode() == 401
     }
 }
