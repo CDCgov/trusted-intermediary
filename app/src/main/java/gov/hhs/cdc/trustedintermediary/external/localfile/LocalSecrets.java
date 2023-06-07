@@ -56,7 +56,9 @@ public class LocalSecrets implements Secrets {
     protected String readSecretFromResources(String secretName) throws SecretRetrievalException {
         try (InputStream secretStream =
                 getClass().getClassLoader().getResourceAsStream(secretName + ".pem")) {
-            return new String(secretStream.readAllBytes(), StandardCharsets.UTF_8);
+            return new String(
+                    secretStream != null ? secretStream.readAllBytes() : new byte[0],
+                    StandardCharsets.UTF_8);
         } catch (Exception exception) {
             throw new SecretRetrievalException(
                     "Error getting local key " + secretName + " from the resources", exception);

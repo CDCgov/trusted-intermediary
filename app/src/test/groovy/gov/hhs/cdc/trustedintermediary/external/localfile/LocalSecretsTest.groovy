@@ -59,11 +59,10 @@ class LocalSecretsTest extends Specification {
         def name = "bad secret name"
 
         when:
-        def secret = secrets.readSecretFromResources(name)
-        println(secret)
+        def actual = secrets.readSecretFromResources(name)
+        println("secret: " + actual)
 
         then:
-        def exception = thrown(Exception)
-        exception.getCause().getClass() == NullPointerException
+        actual.isBlank()
     }
 }
