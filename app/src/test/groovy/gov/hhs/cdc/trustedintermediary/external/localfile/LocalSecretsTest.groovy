@@ -1,9 +1,12 @@
 package gov.hhs.cdc.trustedintermediary.external.localfile
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException
+import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
 import java.nio.file.Files
+import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import spock.lang.Specification
 
@@ -34,5 +37,33 @@ class LocalSecretsTest extends Specification {
 
         then:
         thrown(SecretRetrievalException)
+    }
+
+    def "readSecretFromFileSystem takes a bad secret name"() {
+        given:
+        def secrets = LocalSecrets.getInstance()
+        def name = "bad secret name"
+
+        when:
+        def secret = secrets.readSecretFromFileSystem(name)
+        println(secret)
+
+        then:
+        def exception = thrown(SecretRetrievalException)
+        exception.getCause().getClass() == NoSuchFileException
+    }
+
+    def "readSecretFromResources takes a bad secret name"() {
+        given:
+        def secrets = LocalSecrets.getInstance()
+        def name = "bad secret name"
+
+        when:
+        def secret = secrets.readSecretFromResources(name)
+        println(secret)
+
+        then:
+        def exception = thrown(Exception)
+        exception.getCause().getClass() == NullPointerException
     }
 }

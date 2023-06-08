@@ -125,8 +125,13 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         Map<String, String> headers = Map.of("Content-Type", "application/x-www-form-urlencoded");
         try {
             senderToken =
-                    jwt.generateSenderToken(
-                            CLIENT_NAME, RS_DOMAIN_NAME, retrievePrivateKey(), CLIENT_NAME, 300);
+                    jwt.generateToken(
+                            CLIENT_NAME,
+                            CLIENT_NAME,
+                            CLIENT_NAME,
+                            RS_DOMAIN_NAME,
+                            300,
+                            retrievePrivateKey());
             body = composeRequestBody(senderToken);
             String rsResponse = client.post(RS_AUTH_API_URL, headers, body);
             token = extractToken(rsResponse);

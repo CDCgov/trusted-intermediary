@@ -4,6 +4,8 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.inject.Inject;
@@ -27,17 +29,37 @@ public class LocalSecrets implements Secrets {
     @Override
     public String getKey(String secretName) throws SecretRetrievalException {
 
-        logger.logInfo("Acquiring local key...");
+        logger.logInfo("Acquiring local key " + secretName);
         String key = "";
 
         try {
-            key = Files.readString(Path.of("..", "mock_credentials", secretName + ".pem"));
-        } catch (IOException e) {
-            var message = "Error getting local key";
-            logger.logError(message, e);
-            throw new SecretRetrievalException(message, e);
+            key = readSecretFromFileSystem(secretName);
+        } catch (SecretRetrievalException exception) {
+            logger.logWarning(
+                    "Not finding the " + secretName + " on the filesystem, searching in resources");
+            key = readSecretFromResources(secretName);
         }
 
+        logger.logInfo("Successfully got local key " + secretName);
         return key;
+    }
+
+    protected String readSecretFromFileSystem(String secretName) throws SecretRetrievalException {
+        try {
+            return Files.readString(Path.of("..", "mock_credentials", secretName + ".pem"));
+        } catch (IOException exception) {
+            throw new SecretRetrievalException(
+                    "Error getting local key " + secretName + " from the filesystem", exception);
+        }
+    }
+
+    protected String readSecretFromResources(String secretName) throws SecretRetrievalException {
+        try (InputStream secretStream =
+                getClass().getClassLoader().getResourceAsStream(secretName + ".pem")) {
+            return new String(secretStream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (Exception exception) {
+            throw new SecretRetrievalException(
+                    "Error getting local key " + secretName + " from the resources", exception);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.jjwt;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
+import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException;
 import gov.hhs.cdc.trustedintermediary.wrappers.TokenGenerationException;
 import io.jsonwebtoken.ClaimJwtException;
 import io.jsonwebtoken.Claims;
@@ -9,9 +10,10 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
-import java.security.interfaces.RSAPrivateKey;
+import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Base64;
@@ -34,16 +36,16 @@ public class JjwtEngine implements AuthEngine {
     }
 
     @Override
-    @Nonnull
-    public String generateSenderToken(
-            @Nonnull String sender,
-            @Nonnull String baseUrl,
-            @Nonnull String pemKey,
-            @Nonnull String keyId,
-            int expirationSecondsFromNow)
+    public String generateToken(
+            String keyId,
+            String issuer,
+            String subject,
+            String audience,
+            int expirationSecondsFromNow,
+            String pemKey)
             throws TokenGenerationException {
 
-        RSAPrivateKey privateKey;
+        PrivateKey privateKey;
         try {
             privateKey = readPrivateKey(pemKey);
         } catch (NoSuchAlgorithmException e) {
@@ -52,15 +54,15 @@ public class JjwtEngine implements AuthEngine {
             throw new TokenGenerationException("The private key wasn't formatted correctly", e);
         }
 
-        JwtBuilder jwsObj = null;
+        JwtBuilder jwsObj;
         try {
             jwsObj =
                     Jwts.builder()
                             .setHeaderParam("kid", keyId)
                             .setHeaderParam("typ", "JWT")
-                            .setIssuer(sender)
-                            .setSubject(sender)
-                            .setAudience(baseUrl)
+                            .setIssuer(issuer)
+                            .setSubject(subject)
+                            .setAudience(audience)
                             .setExpiration(
                                     new Date(
                                             System.currentTimeMillis()
@@ -73,19 +75,6 @@ public class JjwtEngine implements AuthEngine {
             throw new TokenGenerationException(
                     "Jjwt was unable to create or sign the JWT", exception);
         }
-    }
-
-    protected RSAPrivateKey readPrivateKey(@Nonnull String pemKey)
-            throws NoSuchAlgorithmException, InvalidKeySpecException {
-        String privatePemKey =
-                pemKey.replace("-----BEGIN PRIVATE KEY-----", "")
-                        .replaceAll(System.lineSeparator(), "")
-                        .replace("-----END PRIVATE KEY-----", "");
-        byte[] encode = Base64.getDecoder().decode(privatePemKey);
-
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encode);
-        return (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
     }
 
     @Override
@@ -102,5 +91,43 @@ public class JjwtEngine implements AuthEngine {
 
         Date expirationDate = claims.getExpiration();
         return LocalDateTime.ofInstant(expirationDate.toInstant(), ZoneId.systemDefault());
+    }
+
+    @Override
+    public void validateToken(String jwt, String encodedKey)
+            throws InvalidTokenException, IllegalArgumentException {
+
+        try {
+            byte[] encode = Base64.getDecoder().decode(stripPemKeyHeaderAndFooter(encodedKey));
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encode);
+            var key = keyFactory.generatePublic(keySpec);
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt);
+
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new InvalidTokenException(e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalArgumentException("The key algorithm isn't supported", e);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("The key wasn't formatted correctly", e);
+        }
+    }
+
+    protected PrivateKey readPrivateKey(@Nonnull String pemKey)
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
+
+        byte[] encode = Base64.getDecoder().decode(stripPemKeyHeaderAndFooter(pemKey));
+
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encode);
+        return keyFactory.generatePrivate(keySpec);
+    }
+
+    private String stripPemKeyHeaderAndFooter(String pemKey) {
+        return pemKey.replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----END PRIVATE KEY-----", "")
+                .replace("-----BEGIN PUBLIC KEY-----", "")
+                .replace("-----END PUBLIC KEY-----", "")
+                .replaceAll(System.lineSeparator(), "");
     }
 }

@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Trusted Intermediary
+  title: Trusted Intermediary ETOR
   description: A service that intermediates healthcare messages between a specific sender and receiver.
   contact:
     email: cdc-ti@flexion.us
@@ -22,6 +22,8 @@ paths:
             schema:
               $ref: 'https://github.com/LinuxForHealth/FHIR/blob/main/fhir-openapi/src/main/webapp/META-INF/openapi.json?raw=true#/components/schemas/Bundle'
         required: true
+      security:
+        - bearerAuthorization: [ ]
       responses:
         '200':
           description: the demographics were sent successfully
@@ -29,6 +31,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PatientDemographicsResponse'
+        '401':
+          description: Authentication failed due to invalid token or unknown organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+
 components:
   schemas:
     PatientDemographicsResponse:
@@ -40,3 +49,10 @@ components:
         patientId:
           type: string
           example: MRN7465737865
+    UnauthorizedError:
+      description: Unauthorized Request
+  securitySchemes:
+    bearerAuthorization:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

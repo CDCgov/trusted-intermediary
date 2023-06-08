@@ -12,7 +12,7 @@ import spock.lang.Specification
 
 class JjwtEngineTest extends Specification {
 
-    def "readPrivateaKey works"() {
+    def "readPrivateKey works"() {
         given:
         def expected = """SunRsaSign RSA private CRT key, 2048 bits
   params: null
@@ -31,34 +31,34 @@ class JjwtEngineTest extends Specification {
         actual.toString() == expected
     }
 
-    def "generateSenderToken blows up because the key isn't Base64"() {
+    def "generateToken blows up because the key isn't Base64"() {
         given:
         def key = "DogCow is not actually an Base64 encoded"
 
         when:
-        JjwtEngine.getInstance().generateSenderToken("sender", "baseUrl", key, "keyId", 300)
+        JjwtEngine.getInstance().generateToken("keyId", "issuer", "subject", "audience", 300, key)
 
         then:
         thrown(TokenGenerationException)
     }
 
-    def "generateSenderToken blows up because the key isn't valid RSA"() {
+    def "generateToken blows up because the key isn't valid RSA"() {
         given:
         def key = Base64.getEncoder().encodeToString("DogCow is not actually an RSA key".getBytes(StandardCharsets.UTF_8))
 
         when:
-        JjwtEngine.getInstance().generateSenderToken("sender", "baseUrl", key, "keyId", 300)
+        JjwtEngine.getInstance().generateToken("keyId", "issuer", "subject", "audience", 300, key)
 
         then:
         thrown(TokenGenerationException)
     }
 
-    def "generateSenderToken blows up because Jjwt doesn't like something"() {
+    def "generateToken blows up because Jjwt doesn't like something"() {
         given:
         def key = Files.readString(Path.of("..", "mock_credentials", "weak-rsa-key.pem"))
 
         when:
-        JjwtEngine.getInstance().generateSenderToken("sender", "baseUrl", key, "keyId", 300)
+        JjwtEngine.getInstance().generateToken("keyId", "issuer", "subject", "audience", 300, key)
 
         then:
         thrown(TokenGenerationException)
@@ -71,7 +71,7 @@ class JjwtEngineTest extends Specification {
         def expectedExpirationCenter = LocalDateTime.now().plusSeconds(secondsFromNowExpiration).truncatedTo(ChronoUnit.SECONDS)
         def expectedExpirationUpper = expectedExpirationCenter.plusSeconds(3)  // 3 seconds is the window in which we expect the the code below to execute to generate the JWT (which is very generous, it should take much shorter than this)
 
-        def jwt = JjwtEngine.getInstance().generateSenderToken("DogCow", "fake_URL", pemKey, "Dogcow", secondsFromNowExpiration)
+        def jwt = JjwtEngine.getInstance().generateToken("DogCow", "Dogcow", "subject", "fake_URL", secondsFromNowExpiration, pemKey)
 
         when:
         def actualExpiration = JjwtEngine.getInstance().getExpirationDate(jwt)
