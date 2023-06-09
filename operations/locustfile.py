@@ -2,18 +2,28 @@ from locust import HttpUser, task, events
 from locust.runners import MasterRunner
 
 
-request_body = None
+demographics_request_body = None
+auth_request_body = None
 
 
 @events.test_start.add_listener
 def test_start(environment):
-    global request_body
+    global demographics_request_body
+    global auth_request_body
     if isinstance(environment.runner, MasterRunner):
         # in a distributed run, the master does not typically need any test data
         return
+
     # read the sample request body for the demographics endpoint
-    with open("e2e/src/test/resources/newborn_patient.json", "r") as request_body_file:
-        request_body = request_body_file.read()
+    with open("e2e/src/test/resources/newborn_patient.json", "r") as f:
+        demographics_request_body = f.read()
+
+    # set up the sample request body for the auth endpoint
+    # using a valid test token found in the mock_credentials directory
+    auth_scope = "report-stream"
+    with open("mock_credentials/report-stream-valid-token.jwt") as f:
+        auth_token = f.read()
+    auth_request_body = {"scope": auth_scope, "client_assertion": auth_token}
 
 
 class SampleUser(HttpUser):
@@ -27,11 +37,11 @@ class SampleUser(HttpUser):
 
     @task(5)  # this task will get called 5x more than the other
     def post_v1_etor_demographics(self):
-        self.client.post("/v1/etor/demographics", data=request_body)
+        self.client.post("/v1/etor/demographics", data=demographics_request_body)
 
     @task(5)  # this task will get called 5x more than the other
     def post_v1_auth(self):
-        self.client.post("/v1/auth")
+        self.client.post("/v1/auth", data=auth_request_body)
 
 @events.quitting.add_listener
 def assert_stats(environment):
