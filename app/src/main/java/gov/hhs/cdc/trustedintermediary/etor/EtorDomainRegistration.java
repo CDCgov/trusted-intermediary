@@ -15,6 +15,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderExc
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiLabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileLabOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamLabOrderSender;
+import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import java.io.IOException;
@@ -78,6 +79,8 @@ public class EtorDomainRegistration implements DomainConnector {
             }
         } catch (SecretRetrievalException e) {
             // TODO exception handling
+        } catch (InvalidTokenException e) {
+            throw new RuntimeException(e);
         }
 
         var demographics = patientDemographicsController.parseDemographics(request);

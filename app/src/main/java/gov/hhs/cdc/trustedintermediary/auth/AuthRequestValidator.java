@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
+import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException;
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
@@ -51,8 +52,13 @@ public class AuthRequestValidator {
         return optToken.orElse("");
     }
 
-    public boolean isValidToken() throws SecretRetrievalException {
+    public boolean isValidToken() {
 
-        return jwtEngine.isValidAccessToken(this.token, retrievePrivateKey());
+        try {
+            jwtEngine.validateToken(this.token, retrievePrivateKey());
+            return true;
+        } catch (SecretRetrievalException | InvalidTokenException e) {
+            return false;
+        }
     }
 }
