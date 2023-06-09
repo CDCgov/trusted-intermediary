@@ -52,6 +52,6 @@ public class DemographicsRequestValidator {
 
     public boolean isValidToken() throws SecretRetrievalException {
 
-        return jwtEngine.isValidateAccessToken(this.token, retrievePrivateKey());
+        return jwtEngine.isValidAccessToken(this.token, retrievePrivateKey());
     }
 }

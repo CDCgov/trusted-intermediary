@@ -115,7 +115,7 @@ public class JjwtEngine implements AuthEngine {
     }
 
     @Override
-    public boolean isValidateAccessToken(String jwt, String privateKey) {
+    public boolean isValidAccessToken(String jwt, String privateKey) {
 
         try {
             Jws<Claims> claimsJws =
