@@ -29,6 +29,9 @@ class SampleUser(HttpUser):
     def post_v1_etor_demographics(self):
         self.client.post("/v1/etor/demographics", data=request_body)
 
+    @task(5)  # this task will get called 5x more than the other
+    def post_v1_auth(self):
+        self.client.post("/v1/auth")
 
 @events.quitting.add_listener
 def assert_stats(environment):
