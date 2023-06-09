@@ -39,7 +39,7 @@ class SampleUser(HttpUser):
     def post_v1_etor_demographics(self):
         self.client.post("/v1/etor/demographics", data=demographics_request_body)
 
-    @task(5)  # this task will get called 5x more than the other
+    @task
     def post_v1_auth(self):
         self.client.post("/v1/auth", data=auth_request_body)
 
