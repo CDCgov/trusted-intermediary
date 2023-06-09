@@ -192,7 +192,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         def mockSecret = Mock(Secrets)
         def expected = "New Fake Azure Key"
         def keyCache = KeyCache.getInstance()
-        def key = "report-stream-sender-private-key-local"
+        def key = "trusted-intermediary-private-key-local"
         mockSecret.getKey(_ as String) >> expected
         TestApplicationContext.register(Secrets, mockSecret)
         TestApplicationContext.register(Cache, keyCache)
@@ -209,7 +209,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
     def "retrievePrivateKey works when cache is not empty" () {
         given:
         def keyCache = KeyCache.getInstance()
-        def key = "report-stream-sender-private-key-local"
+        def key = "trusted-intermediary-private-key-local"
         def expected = "existing fake azure key"
         TestApplicationContext.register(Cache, keyCache)
         TestApplicationContext.injectRegisteredImplementations()
