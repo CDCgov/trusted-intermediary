@@ -5,13 +5,13 @@ import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException;
 import gov.hhs.cdc.trustedintermediary.wrappers.TokenGenerationException;
 import io.jsonwebtoken.ClaimJwtException;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -99,10 +99,10 @@ public class JjwtEngine implements AuthEngine {
             throws InvalidTokenException, IllegalArgumentException {
 
         try {
-            byte[] encode = Base64.getDecoder().decode(stripPemKeyHeaderAndFooter(encodedKey));
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encode);
-            var key = keyFactory.generatePublic(keySpec);
+            var key =
+                    isPrivateKey(encodedKey)
+                            ? readPrivateKey(encodedKey)
+                            : readPublicKey(encodedKey);
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt);
 
         } catch (JwtException | IllegalArgumentException e) {
@@ -115,17 +115,15 @@ public class JjwtEngine implements AuthEngine {
     }
 
     @Override
-    public boolean isValidAccessToken(String jwt, String privateKey) {
+    public boolean isPrivateKey(String key) {
 
         try {
-            Jws<Claims> claimsJws =
-                    Jwts.parserBuilder()
-                            .setSigningKey(readPrivateKey(privateKey))
-                            .build()
-                            .parseClaimsJws(jwt);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec((parseBase64(key)));
+            keyFactory.generatePrivate(keySpec);
 
             return true;
-        } catch (Exception e) {
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             return false;
         }
     }
@@ -133,11 +131,24 @@ public class JjwtEngine implements AuthEngine {
     protected PrivateKey readPrivateKey(@Nonnull String pemKey)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
 
-        byte[] encode = Base64.getDecoder().decode(stripPemKeyHeaderAndFooter(pemKey));
+        byte[] encode = parseBase64(pemKey);
 
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encode);
         return keyFactory.generatePrivate(keySpec);
+    }
+
+    protected PublicKey readPublicKey(@Nonnull String pemKey)
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
+
+        byte[] encode = parseBase64(pemKey);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encode);
+        return keyFactory.generatePublic(keySpec);
+    }
+
+    protected byte[] parseBase64(String keyString) {
+        return Base64.getDecoder().decode(stripPemKeyHeaderAndFooter(keyString));
     }
 
     private String stripPemKeyHeaderAndFooter(String pemKey) {

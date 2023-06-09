@@ -22,5 +22,5 @@ public interface AuthEngine {
     void validateToken(String jwt, String publicKey)
             throws InvalidTokenException, IllegalArgumentException;
 
-    boolean isValidAccessToken(String jwt, String privateKey);
+    boolean isPrivateKey(String key);
 }
