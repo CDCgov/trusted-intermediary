@@ -120,10 +120,11 @@ public class JjwtEngine implements AuthEngine {
         try {
             Jws<Claims> claimsJws =
                     Jwts.parserBuilder()
-                            .setSigningKey(stripPemKeyHeaderAndFooter(privateKey))
+                            .setSigningKey(readPrivateKey(privateKey))
                             .build()
                             .parseClaimsJws(jwt);
-            return true;
+
+            return LocalDateTime.now().isBefore(getExpirationDate(jwt));
         } catch (Exception e) {
             return false;
         }
