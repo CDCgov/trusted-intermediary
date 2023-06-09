@@ -81,7 +81,7 @@ public class RequestSessionTokenUsecase {
 
     protected String retrieveTiPrivateKey() throws SecretRetrievalException {
         return retrieveKey(
-                "report-stream-sender-private-key-" + ApplicationContext.getEnvironment());
+                "trusted-intermediary-private-key-" + ApplicationContext.getEnvironment());
     }
 
     private String retrieveKey(String keyId) throws SecretRetrievalException {
