@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendLabOrderUsecase;
+import gov.hhs.cdc.trustedintermediary.etor.demographics.DemographicsRequestValidator;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
@@ -15,6 +16,7 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiLabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileLabOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamLabOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -65,13 +67,16 @@ public class EtorDomainRegistration implements DomainConnector {
 
     DomainResponse handleOrder(DomainRequest request) {
 
-        // Get header map as client name and bearer token is in the header
-        Map<String, String> headers = request.getHeaders();
+        // Call the DemographicsRequestValidator class
+        DemographicsRequestValidator validator = new DemographicsRequestValidator(request);
 
         // Validate token
-        String bearerToken = headers.get("Authorization");
-        if (!isValidToken(bearerToken)) {
-            // return expire token, 401
+        try {
+            if (!validator.isValidToken()) {
+                // return 401
+            }
+        } catch (SecretRetrievalException e) {
+            // TODO exception handling
         }
 
         var demographics = patientDemographicsController.parseDemographics(request);
@@ -87,9 +92,5 @@ public class EtorDomainRegistration implements DomainConnector {
                 new PatientDemographicsResponse(demographics);
 
         return patientDemographicsController.constructResponse(patientDemographicsResponse);
-    }
-
-    private boolean isValidToken(String bearerToken) {
-        return false;
     }
 }
