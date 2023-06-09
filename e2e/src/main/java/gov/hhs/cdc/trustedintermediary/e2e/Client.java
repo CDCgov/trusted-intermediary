@@ -1,14 +1,15 @@
 package gov.hhs.cdc.trustedintermediary.e2e;
 
 import java.io.IOException;
-import org.apache.hc.client5.http.fluent.Content;
-import org.apache.hc.client5.http.fluent.ContentResponseHandler;
 import org.apache.hc.client5.http.fluent.Request;
-import org.apache.hc.client5.http.impl.classic.AbstractHttpClientResponseHandler;
+import org.apache.hc.client5.http.fluent.Response;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpEntity;
-import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 
 /** Mocks a client sending a request to the API * */
 public class Client {
@@ -16,44 +17,58 @@ public class Client {
     private static final String DEFAULT_PROTOCOL_DOMAIN = "http://localhost:8080";
     private static String protocolDomain = DEFAULT_PROTOCOL_DOMAIN;
 
-    public static String get(String path) throws IOException {
+    public static ClassicHttpResponse get(String path) throws IOException {
         System.out.println("Calling the backend at GET " + path);
-
         var response = Request.get(protocolDomain + path).execute();
-
-        return response.handleResponse(new ContentResponseHandlerWithoutException()).asString();
+        return handleResponseAndSetEntity(response);
     }
 
-    public static String post(String path, String body) throws IOException {
+    public static ClassicHttpResponse post(String path, String body, ContentType type)
+            throws IOException {
         System.out.println("Calling the backend at POST " + path);
-
-        var response =
-                Request.post(protocolDomain + path)
-                        .bodyString(body, ContentType.APPLICATION_JSON)
-                        .execute();
-
-        return response.handleResponse(new ContentResponseHandlerWithoutException()).asString();
+        var response = Request.post(protocolDomain + path).bodyString(body, type).execute();
+        return handleResponseAndSetEntity(response);
     }
 
-    public static class ContentResponseHandlerWithoutException extends ContentResponseHandler {
+    public static ClassicHttpResponse post(String path, String body) throws IOException {
+        return post(path, body, ContentType.APPLICATION_JSON);
+    }
+
+    private static ClassicHttpResponse handleResponseAndSetEntity(Response response)
+            throws IOException {
+        var responseHandler = new ResponseHandlerWithoutException();
+        var classicResponse = response.handleResponse(responseHandler);
+        classicResponse.setEntity(responseHandler.getEntity());
+        return classicResponse;
+    }
+
+    public static class ResponseHandlerWithoutException
+            implements HttpClientResponseHandler<ClassicHttpResponse> {
+
+        private HttpEntity entity;
 
         /**
-         * Very similar code to {@link
-         * AbstractHttpClientResponseHandler#handleResponse(ClassicHttpResponse)} but doesn't throw
-         * an exception when getting a 4xx or 5xx status code.
+         * This method implements the handleResponse method and saves the response body as an in
+         * memory entity so the http connection is not kept alive and is correctly closed.
          */
         @Override
-        public Content handleResponse(final ClassicHttpResponse response) throws IOException {
-
-            if (response.getCode() >= HttpStatus.SC_REDIRECTION) {
-                HttpEntity entity = response.getEntity();
-                if (entity == null) {
-                    return null;
-                }
-                return handleEntity(entity);
+        public ClassicHttpResponse handleResponse(final ClassicHttpResponse response) {
+            var contentEncoding = response.getEntity().getContentEncoding();
+            var contentType = response.getEntity().getContentType();
+            String entityString;
+            try {
+                entityString = EntityUtils.toString(response.getEntity());
+            } catch (IOException | ParseException e) {
+                throw new RuntimeException(e);
             }
+            this.entity =
+                    new StringEntity(
+                            entityString, ContentType.create(contentType, contentEncoding));
+            return response;
+        }
 
-            return super.handleResponse(response);
+        public HttpEntity getEntity() {
+            return this.entity;
         }
     }
 }

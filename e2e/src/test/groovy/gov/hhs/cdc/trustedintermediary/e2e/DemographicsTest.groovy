@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.e2e
 
-
+import org.apache.hc.core5.http.io.entity.EntityUtils
 import spock.lang.Specification
 
 import java.nio.charset.StandardCharsets
@@ -17,7 +17,8 @@ class DemographicsTest extends Specification {
         def expectedPatientId  = "MRN7465737865"
 
         when:
-        def responseBody = Client.post("/v1/etor/demographics", newbornPatientJsonFileString)
+        def response = Client.post("/v1/etor/demographics", newbornPatientJsonFileString)
+        def responseBody = EntityUtils.toString(response.getEntity())
         def parsedJsonBody = JsonParsing.parse(responseBody, Map.class)
 
         then:
@@ -28,7 +29,8 @@ class DemographicsTest extends Specification {
     def "bad response given for poorly formatted JSON"() {
 
         when:
-        def responseBody = Client.post("/v1/etor/demographics", newbornPatientJsonFileString.substring(1))
+        def response = Client.post("/v1/etor/demographics", newbornPatientJsonFileString.substring(1))
+        def responseBody = EntityUtils.toString(response.getEntity())
         //removed beginning '{' to make this JSON invalid
 
         then:
@@ -38,7 +40,8 @@ class DemographicsTest extends Specification {
     def "payload file check"() {
 
         when:
-        def responseBody = Client.post("/v1/etor/demographics", newbornPatientJsonFileString)
+        def response = Client.post("/v1/etor/demographics", newbornPatientJsonFileString)
+        def responseBody = EntityUtils.toString(response.getEntity())
         def sentPayload = SentPayloadReader.read()
         def parsedResponseBody = JsonParsing.parse(responseBody, Map.class)
 
