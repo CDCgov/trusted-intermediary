@@ -68,12 +68,6 @@ public class EtorDomainRegistration implements DomainConnector {
         // Get header map as client name and bearer token is in the header
         Map<String, String> headers = request.getHeaders();
 
-        // Validate client
-        String organization = headers.get("client"); // Capitalize?
-        if (!isValidOrganization(organization)) {
-            // return unauthorized user, 401
-        }
-
         // Validate token
         String bearerToken = headers.get("Authorization");
         if (!isValidToken(bearerToken)) {
@@ -96,10 +90,6 @@ public class EtorDomainRegistration implements DomainConnector {
     }
 
     private boolean isValidToken(String bearerToken) {
-        return false;
-    }
-
-    private boolean isValidOrganization(String organization) {
         return false;
     }
 }

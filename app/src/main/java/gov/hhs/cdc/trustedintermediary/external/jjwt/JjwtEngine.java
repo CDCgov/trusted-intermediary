@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException;
 import gov.hhs.cdc.trustedintermediary.wrappers.TokenGenerationException;
 import io.jsonwebtoken.ClaimJwtException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -110,6 +111,21 @@ public class JjwtEngine implements AuthEngine {
             throw new IllegalArgumentException("The key algorithm isn't supported", e);
         } catch (Exception e) {
             throw new IllegalArgumentException("The key wasn't formatted correctly", e);
+        }
+    }
+
+    @Override
+    public boolean isValidateAccessToken(String jwt, String privateKey) {
+
+        try {
+            Jws<Claims> claimsJws =
+                    Jwts.parserBuilder()
+                            .setSigningKey(stripPemKeyHeaderAndFooter(privateKey))
+                            .build()
+                            .parseClaimsJws(jwt);
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 
