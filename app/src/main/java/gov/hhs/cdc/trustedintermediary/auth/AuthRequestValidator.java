@@ -2,10 +2,6 @@ package gov.hhs.cdc.trustedintermediary.auth;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
-import gov.hhs.cdc.trustedintermediary.external.azure.AzureSecrets;
-import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache;
-import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson;
-import gov.hhs.cdc.trustedintermediary.external.jjwt.JjwtEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
@@ -13,21 +9,21 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import java.util.Map;
 import java.util.Optional;
+import javax.inject.Inject;
 
 /** TODO javadocs */
 public class AuthRequestValidator {
 
     private Map<String, String> headers;
-    private AuthEngine jwtEngine = JjwtEngine.getInstance();
-
-    private Formatter formatter = Jackson.getInstance();
-    private Cache keyCache = KeyCache.getInstance();
-    private Secrets secrets = AzureSecrets.getInstance();
+    @Inject private AuthEngine jwtEngine;
+    @Inject private Formatter formatter;
+    @Inject private Cache keyCache;
+    @Inject private Secrets secrets;
     private String token;
 
     private AuthRequestValidator() {}
 
-    public AuthRequestValidator getInstance() {
+    public static AuthRequestValidator getInstance() {
         return new AuthRequestValidator();
     }
 

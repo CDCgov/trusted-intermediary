@@ -124,14 +124,7 @@ public class JjwtEngine implements AuthEngine {
                             .build()
                             .parseClaimsJws(jwt);
 
-            return LocalDateTime.now()
-                    .isBefore(
-                            claimsJws
-                                    .getBody()
-                                    .getExpiration()
-                                    .toInstant()
-                                    .atZone(ZoneId.systemDefault())
-                                    .toLocalDateTime());
+            return true;
         } catch (Exception e) {
             return false;
         }
