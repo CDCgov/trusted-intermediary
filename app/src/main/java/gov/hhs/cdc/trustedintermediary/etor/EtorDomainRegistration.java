@@ -1,12 +1,12 @@
 package gov.hhs.cdc.trustedintermediary.etor;
 
+import gov.hhs.cdc.trustedintermediary.auth.AuthRequestValidator;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendLabOrderUsecase;
-import gov.hhs.cdc.trustedintermediary.etor.demographics.DemographicsRequestValidator;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
@@ -32,6 +32,7 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject PatientDemographicsController patientDemographicsController;
     @Inject ConvertAndSendLabOrderUsecase convertAndSendLabOrderUsecase;
     @Inject Logger logger;
+    @Inject AuthRequestValidator requestValidator;
 
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
             Map.of(new HttpEndpoint("POST", "/v1/etor/demographics"), this::handleOrder);
@@ -68,11 +69,11 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleOrder(DomainRequest request) {
 
         // Call the DemographicsRequestValidator class
-        DemographicsRequestValidator validator = new DemographicsRequestValidator(request);
+        requestValidator.init(request);
 
         // Validate token
         try {
-            if (!validator.isValidToken()) {
+            if (!requestValidator.isValidToken()) {
                 // return 401
             }
         } catch (SecretRetrievalException e) {

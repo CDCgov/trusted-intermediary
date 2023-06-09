@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.etor.demographics;
+package gov.hhs.cdc.trustedintermediary.auth;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /** TODO javadocs */
-public class DemographicsRequestValidator {
+public class AuthRequestValidator {
 
     private Map<String, String> headers;
     private AuthEngine jwtEngine = JjwtEngine.getInstance();
@@ -25,8 +25,13 @@ public class DemographicsRequestValidator {
     private Secrets secrets = AzureSecrets.getInstance();
     private String token;
 
-    public DemographicsRequestValidator(DomainRequest request) {
+    private AuthRequestValidator() {}
 
+    public AuthRequestValidator getInstance() {
+        return new AuthRequestValidator();
+    }
+
+    public void init(DomainRequest request) {
         this.headers = request.getHeaders();
         this.token = this.extractToken();
     }
