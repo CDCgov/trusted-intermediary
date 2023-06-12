@@ -31,7 +31,7 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject PatientDemographicsController patientDemographicsController;
     @Inject ConvertAndSendLabOrderUsecase convertAndSendLabOrderUsecase;
     @Inject Logger logger;
-    @Inject AuthRequestValidator requestValidator;
+    @Inject AuthRequestValidator authValidator;
 
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
             Map.of(new HttpEndpoint("POST", "/v1/etor/demographics"), this::handleOrder);
@@ -68,10 +68,10 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleOrder(DomainRequest request) {
 
         // Call the DemographicsRequestValidator class
-        requestValidator.init(request);
+        authValidator.init(request);
 
         // Validate token
-        if (!requestValidator.isValidToken()) {
+        if (!authValidator.isValidToken()) {
             // return 401
         }
 

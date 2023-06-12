@@ -7,7 +7,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
 import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException;
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import java.util.Map;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -15,9 +14,10 @@ import javax.inject.Inject;
 /** TODO javadocs */
 public class AuthRequestValidator {
 
+    private static final AuthRequestValidator INSTANCE = new AuthRequestValidator();
+
     private Map<String, String> headers;
     @Inject private AuthEngine jwtEngine;
-    @Inject private Formatter formatter;
     @Inject private Cache keyCache;
     @Inject private Secrets secrets;
     private String token;
@@ -25,7 +25,7 @@ public class AuthRequestValidator {
     private AuthRequestValidator() {}
 
     public static AuthRequestValidator getInstance() {
-        return new AuthRequestValidator();
+        return INSTANCE;
     }
 
     public void init(DomainRequest request) {
