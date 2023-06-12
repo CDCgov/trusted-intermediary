@@ -108,4 +108,28 @@ class EtorDomainRegistrationTest extends Specification {
         then:
         res.statusCode == 400
     }
+
+    def "demographics endpoint fails when unauthenticated"() {
+        given:
+        def domainRegistration = new EtorDomainRegistration()
+
+        def mockAuthValidator = Mock(AuthRequestValidator)
+        mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> false
+
+        def mockDemographicsController = Mock(PatientDemographicsController)
+
+        TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
+        TestApplicationContext.register(PatientDemographicsController, mockDemographicsController)
+        TestApplicationContext.register(AuthRequestValidator, mockAuthValidator)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        domainRegistration.handleOrder(new DomainRequest())
+
+        then:
+        1 * mockDemographicsController.constructResponse(_ as Integer, _ as String) >> { Integer httpStatus, String errorString ->
+            assert httpStatus == 401
+        }
+        0 * mockDemographicsController.parseDemographics(_)
+    }
 }
