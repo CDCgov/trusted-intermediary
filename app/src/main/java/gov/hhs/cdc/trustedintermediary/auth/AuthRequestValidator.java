@@ -7,6 +7,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
 import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException;
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
+import java.util.Optional;
 import javax.inject.Inject;
 
 /** TODO javadocs */
@@ -55,7 +56,7 @@ public class AuthRequestValidator {
     }
 
     private String extractToken(DomainRequest request) {
-        var authHeader = request.getHeaders().get("Authorization");
+        var authHeader = Optional.ofNullable(request.getHeaders().get("Authorization")).orElse("");
         return authHeader.replace("Bearer ", "");
     }
 
