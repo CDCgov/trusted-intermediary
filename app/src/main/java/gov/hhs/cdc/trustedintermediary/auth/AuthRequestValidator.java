@@ -26,7 +26,7 @@ public class AuthRequestValidator {
     }
 
     public boolean isValidAuthenticatedRequest(DomainRequest request)
-            throws SecretRetrievalException {
+            throws SecretRetrievalException, IllegalArgumentException {
 
         var token = extractToken(request);
 

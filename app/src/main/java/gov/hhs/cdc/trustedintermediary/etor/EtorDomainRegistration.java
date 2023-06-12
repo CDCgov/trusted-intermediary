@@ -75,7 +75,7 @@ public class EtorDomainRegistration implements DomainConnector {
                 logger.logError(errorMessage);
                 return patientDemographicsController.constructResponse(401, errorMessage);
             }
-        } catch (SecretRetrievalException e) {
+        } catch (SecretRetrievalException | IllegalArgumentException e) {
             logger.logFatal("Unable to validate whether the request is authenticated", e);
             return patientDemographicsController.constructResponse(500, e);
         }
