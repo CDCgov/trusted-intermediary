@@ -23,7 +23,7 @@ def test_start(environment):
     auth_scope = "report-stream"
     with open("mock_credentials/report-stream-valid-token.jwt") as f:
         auth_token = f.read()
-    auth_request_body = {"scope": auth_scope, "client_assertion": auth_token}
+    auth_request_body = f"scope={auth_scope}&client_assertion={auth_token}"
 
 
 class SampleUser(HttpUser):
