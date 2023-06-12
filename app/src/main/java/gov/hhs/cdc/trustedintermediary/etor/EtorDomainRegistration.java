@@ -71,8 +71,9 @@ public class EtorDomainRegistration implements DomainConnector {
         // Validate token
         try {
             if (!authValidator.isValidAuthenticatedRequest(request)) {
-                logger.logError("The request failed the authentication check");
-                return patientDemographicsController.constructResponse(401, new Exception());
+                var errorMessage = "The request failed the authentication check";
+                logger.logError(errorMessage);
+                return patientDemographicsController.constructResponse(401, errorMessage);
             }
         } catch (SecretRetrievalException e) {
             logger.logFatal("Unable to validate whether the request is authenticated", e);
