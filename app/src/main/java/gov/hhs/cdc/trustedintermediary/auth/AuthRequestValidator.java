@@ -7,8 +7,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
 import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException;
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
-import java.util.Map;
-import java.util.Optional;
 import javax.inject.Inject;
 
 /** TODO javadocs */
@@ -16,11 +14,9 @@ public class AuthRequestValidator {
 
     private static final AuthRequestValidator INSTANCE = new AuthRequestValidator();
 
-    private Map<String, String> headers;
     @Inject private AuthEngine jwtEngine;
     @Inject private Cache keyCache;
     @Inject private Secrets secrets;
-    private String token;
 
     private AuthRequestValidator() {}
 
@@ -28,9 +24,21 @@ public class AuthRequestValidator {
         return INSTANCE;
     }
 
-    public void init(DomainRequest request) {
-        this.headers = request.getHeaders();
-        this.token = this.extractToken();
+    public boolean isValidAuthenticatedRequest(DomainRequest request)
+            throws SecretRetrievalException {
+
+        var token = extractToken(request);
+
+        if (!tokenHasContent(token)) {
+            return false;
+        }
+
+        try {
+            jwtEngine.validateToken(token, retrievePrivateKey());
+            return true;
+        } catch (InvalidTokenException e) {
+            return false;
+        }
     }
 
     protected String retrievePrivateKey() throws SecretRetrievalException {
@@ -46,19 +54,12 @@ public class AuthRequestValidator {
         return key;
     }
 
-    protected String extractToken() {
-        Optional<String> optToken = Optional.ofNullable(this.headers.get("Authorization"));
-
-        return optToken.orElse("");
+    private String extractToken(DomainRequest request) {
+        var authHeader = request.getHeaders().get("Authorization");
+        return authHeader.replace("Bearer ", "");
     }
 
-    public boolean isValidToken() {
-
-        try {
-            jwtEngine.validateToken(this.token, retrievePrivateKey());
-            return true;
-        } catch (SecretRetrievalException | InvalidTokenException e) {
-            return false;
-        }
+    private boolean tokenHasContent(String token) {
+        return token != null && !token.isEmpty();
     }
 }

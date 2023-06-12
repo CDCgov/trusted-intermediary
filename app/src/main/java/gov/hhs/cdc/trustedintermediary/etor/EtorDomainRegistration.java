@@ -16,6 +16,7 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiLabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileLabOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamLabOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -67,12 +68,15 @@ public class EtorDomainRegistration implements DomainConnector {
 
     DomainResponse handleOrder(DomainRequest request) {
 
-        // Call the DemographicsRequestValidator class
-        authValidator.init(request);
-
         // Validate token
-        if (!authValidator.isValidToken()) {
-            // return 401
+        try {
+            if (!authValidator.isValidAuthenticatedRequest(request)) {
+                logger.logError("The request failed the authentication check");
+                return patientDemographicsController.constructResponse(401, new Exception());
+            }
+        } catch (SecretRetrievalException e) {
+            logger.logFatal("Unable to validate whether the request is authenticated", e);
+            return patientDemographicsController.constructResponse(500, e);
         }
 
         var demographics = patientDemographicsController.parseDemographics(request);
