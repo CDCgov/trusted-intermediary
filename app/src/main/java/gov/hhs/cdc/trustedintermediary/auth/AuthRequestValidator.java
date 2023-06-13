@@ -55,7 +55,7 @@ public class AuthRequestValidator {
         return key;
     }
 
-    private String extractToken(DomainRequest request) {
+    protected String extractToken(DomainRequest request) {
         var authHeader = Optional.ofNullable(request.getHeaders().get("Authorization")).orElse("");
         return authHeader.replace("Bearer ", "");
     }
