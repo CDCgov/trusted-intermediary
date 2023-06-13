@@ -79,6 +79,7 @@ class AuthRequestValidatorTest extends Specification{
         when:
         cache.get(_ as String) >> key
         def actual = validator.retrievePrivateKey()
+
         then:
         actual == expected
     }
@@ -99,6 +100,7 @@ class AuthRequestValidatorTest extends Specification{
         cache.get(_ as String) >> null
         secrets.getKey(_ as String) >> key
         def actual = validator.retrievePrivateKey()
+
         then:
         actual == expected
     }
@@ -119,6 +121,7 @@ class AuthRequestValidatorTest extends Specification{
         secrets.getKey(_ as String) >> key
         validator.retrievePrivateKey()
         def actual = cache.get("trusted-intermediary-private-key-local")
+
         then:
         actual == expected
     }
