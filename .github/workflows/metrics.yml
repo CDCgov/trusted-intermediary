@@ -21,7 +21,7 @@ jobs:
       - name: Checkout devops-deployment-metrics code
         uses: actions/checkout@v3
         with:
-          repository: basiliskus/devops-deployment-metrics
+          repository: flexion/devops-deployment-metrics
           path: devops-deployment-metrics
 
       - name: Install dependencies
