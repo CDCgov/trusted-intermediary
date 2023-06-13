@@ -121,7 +121,7 @@ public class JjwtEngine implements AuthEngine {
             readPrivateKey(key);
 
             return true;
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+        } catch (Exception e) {
             return false;
         }
     }
