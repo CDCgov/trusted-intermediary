@@ -45,13 +45,13 @@ As a _, so that _, I need _.
 - [ ] Security & Privacy tasks completed
   - [ ] Security & privacy gates passed
 - [ ] Testing tasks completed
-  - [ ] Unit test coverage of our code >= 90%
   - [ ] Load tests passed
+  - [ ] Unit test coverage of our code >= 90%
 - [ ] Build & Deploy tasks completed
-  - [ ] Source code is merged to the main branch
   - [ ] Build process updated
-  - [ ] Feature toggles created and/or deleted.  Document the feature toggle
   - [ ] API(s) are versioned
+  - [ ] Feature toggles created and/or deleted.  Document the feature toggle
+  - [ ] Source code is merged to the main branch
 
 ## Research Questions
 - *Optional: Any initial questions for research*
