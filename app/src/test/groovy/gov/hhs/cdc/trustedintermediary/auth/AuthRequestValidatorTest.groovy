@@ -102,4 +102,24 @@ class AuthRequestValidatorTest extends Specification{
         then:
         actual == expected
     }
+
+    def "retrievePrivateKey adds key to keyCache works"() {
+        given:
+        def cache = KeyCache.getInstance()
+        def secrets = Mock(Secrets)
+        def key = "fake key"
+        def expected = key
+        def validator = AuthRequestValidator.getInstance()
+        TestApplicationContext.register(Cache, cache)
+        TestApplicationContext.register(Secrets, secrets)
+        TestApplicationContext.register(AuthRequestValidator, validator)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        secrets.getKey(_ as String) >> key
+        validator.retrievePrivateKey()
+        def actual = cache.get("trusted-intermediary-private-key-local")
+        then:
+        actual == expected
+    }
 }
