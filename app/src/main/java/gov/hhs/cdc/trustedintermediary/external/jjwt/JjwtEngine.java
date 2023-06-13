@@ -114,8 +114,7 @@ public class JjwtEngine implements AuthEngine {
         }
     }
 
-    @Override
-    public boolean isPrivateKey(String key) {
+    protected boolean isPrivateKey(String key) {
 
         try {
             readPrivateKey(key);
