@@ -36,8 +36,8 @@ As a _, so that _, I need _.
   - [ ] Threat model updated
   - [ ] API documentation generated
   - [ ] Source code documentation created when the code is not self-documenting
-  - [ ] Logging added where useful
 - [ ] Code quality tasks completed
+  - [ ] Logging added where useful
   - [ ] Code refactored for clarity and no design/technical debt
   - [ ] Adhere to separation of concerns; code is not tightly coupled, especially to 3rd party dependencies
   - [ ] Code is reviewed or developed by pair; 1 approval is needed but consider requiring an outside-the-pair reviewer
