@@ -29,8 +29,24 @@ jobs:
         run: poetry install
 
       - name: Set up config file
-        working-directory: devops-deployment-metrics
-        run: sed -e '14,18d' -e 's/my_github_owner/CDCgov/' -e 's/my_github_repository/trusted-intermediary/' -e 's/12345678/42635194/' sample-config.toml > config.toml
+        uses: DamianReeves/write-file-action@master
+        with:
+          path: config.toml
+          write-mode: overwrite
+          contents: |
+            [general]
+            time-slice-days = 7
+            start-date = 2022-12-01T00:01:00
+            date-format = "%Y-%m-%d"
+
+            [[repositories]]
+            owner = "CDCgov"
+            repo = "trusted-intermediary"
+            id = "42635194"
+            deployment-frequency = "df"
+            change-fail-rate = "cf"
+            mean-time-to-recover = "mttrs"
+            deployment-log = "deployments"
 
       - name: Run DORA metrics application
         working-directory: devops-deployment-metrics
