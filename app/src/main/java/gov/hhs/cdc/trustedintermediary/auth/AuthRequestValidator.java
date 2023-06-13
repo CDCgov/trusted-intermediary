@@ -60,7 +60,7 @@ public class AuthRequestValidator {
         return authHeader.replace("Bearer ", "");
     }
 
-    private boolean tokenHasContent(String token) {
+    protected boolean tokenHasContent(String token) {
         return token != null && !token.isEmpty();
     }
 }

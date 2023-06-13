@@ -1,7 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor
 
 import gov.hhs.cdc.trustedintermediary.DemographicsMock
-import gov.hhs.cdc.trustedintermediary.auth.AuthRequestValidator
+import gov.hhs.cdc.trustedintermediary.auth.AuthRequestValidatorTest
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
@@ -11,12 +11,8 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse
 import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException
-import gov.hhs.cdc.trustedintermediary.external.hapi.HapiDemographics
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException
-import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
-
-import javax.crypto.NullCipher
 
 class EtorDomainRegistrationTest extends Specification {
 
@@ -55,7 +51,7 @@ class EtorDomainRegistrationTest extends Specification {
         given:
         def domainRegistration = new EtorDomainRegistration()
 
-        def mockAuthValidator = Mock(AuthRequestValidator)
+        def mockAuthValidator = Mock(AuthRequestValidatorTest)
         mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> true
 
         def mockDemographicsController = Mock(PatientDemographicsController)
@@ -70,7 +66,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
         TestApplicationContext.register(PatientDemographicsController, mockDemographicsController)
         TestApplicationContext.register(ConvertAndSendLabOrderUsecase, mockUsecase)
-        TestApplicationContext.register(AuthRequestValidator, mockAuthValidator)
+        TestApplicationContext.register(AuthRequestValidatorTest, mockAuthValidator)
         TestApplicationContext.injectRegisteredImplementations()
 
         def domainRequest = new DomainRequest()
@@ -91,7 +87,7 @@ class EtorDomainRegistrationTest extends Specification {
         def mockDemographicConrollor = Mock(PatientDemographicsController)
         def domainRequest = new DomainRequest()
         def mockLabOrderUseCase = Mock(ConvertAndSendLabOrderUsecase)
-        def mockAuthValidator = Mock(AuthRequestValidator)
+        def mockAuthValidator = Mock(AuthRequestValidatorTest)
         mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> true
         mockLabOrderUseCase.convertAndSend(_) >> {
             throw new UnableToSendLabOrderException("error", new NullPointerException())
@@ -100,7 +96,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
         TestApplicationContext.register(PatientDemographicsController, mockDemographicConrollor)
         TestApplicationContext.register(ConvertAndSendLabOrderUsecase, mockLabOrderUseCase)
-        TestApplicationContext.register(AuthRequestValidator, mockAuthValidator)
+        TestApplicationContext.register(AuthRequestValidatorTest, mockAuthValidator)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -114,14 +110,14 @@ class EtorDomainRegistrationTest extends Specification {
         given:
         def domainRegistration = new EtorDomainRegistration()
 
-        def mockAuthValidator = Mock(AuthRequestValidator)
+        def mockAuthValidator = Mock(AuthRequestValidatorTest)
         mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> false
 
         def mockDemographicsController = Mock(PatientDemographicsController)
 
         TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
         TestApplicationContext.register(PatientDemographicsController, mockDemographicsController)
-        TestApplicationContext.register(AuthRequestValidator, mockAuthValidator)
+        TestApplicationContext.register(AuthRequestValidatorTest, mockAuthValidator)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -138,14 +134,14 @@ class EtorDomainRegistrationTest extends Specification {
         given:
         def domainRegistration = new EtorDomainRegistration()
 
-        def mockAuthValidator = Mock(AuthRequestValidator)
+        def mockAuthValidator = Mock(AuthRequestValidatorTest)
         mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> { throw new SecretRetrievalException("DogCow", new NullPointerException()) }
 
         def mockDemographicsController = Mock(PatientDemographicsController)
 
         TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
         TestApplicationContext.register(PatientDemographicsController, mockDemographicsController)
-        TestApplicationContext.register(AuthRequestValidator, mockAuthValidator)
+        TestApplicationContext.register(AuthRequestValidatorTest, mockAuthValidator)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
