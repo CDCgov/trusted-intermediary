@@ -14,4 +14,15 @@ class AuthRequestValidatorTest extends Specification{
         def actual = validator.tokenHasContent(emptyToken)
         then:actual == expected
     }
+
+    def "tokenHascontent happy path returns true"() {
+        given:
+        def Token = "I'm not empty"
+        def expected = true
+        def validator = AuthRequestValidator.getInstance()
+
+        when:
+        def actual = validator.tokenHasContent(Token)
+        then:actual == expected
+    }
 }
