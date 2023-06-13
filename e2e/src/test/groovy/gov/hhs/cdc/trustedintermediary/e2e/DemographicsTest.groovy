@@ -9,7 +9,7 @@ import java.nio.file.Paths
 
 class DemographicsTest extends Specification {
 
-    def newbornPatientJsonFileString = new String(Files.readAllBytes(Paths.get("src/test/resources/newborn_patient.json")), StandardCharsets.UTF_8)
+    def newbornPatientJsonFileString = Files.readString(Paths.get("src/test/resources/newborn_patient.json"))
 
     def "a demographics response is returned from the ETOR demographics endpoint"() {
         given:

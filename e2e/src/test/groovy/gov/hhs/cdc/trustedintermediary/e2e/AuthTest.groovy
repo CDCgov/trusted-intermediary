@@ -11,10 +11,7 @@ class AuthTest extends Specification {
     def authEndpointPath = "/v1/auth"
     def postBody = { scope, client_assertion -> "scope=${scope}&client_assertion=${client_assertion}" }
     def existingClientId = "report-stream"
-    def validToken = new String(
-    Files.readAllBytes(
-    Path.of("..", "mock_credentials", "report-stream-valid-token.jwt")
-    ))
+    def validToken = Files.readString(Path.of("..", "mock_credentials", "report-stream-valid-token.jwt"))
 
     def "a 200 valid response is returned when known organization and valid token"() {
         when:
