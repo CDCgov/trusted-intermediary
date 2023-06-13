@@ -27,24 +27,33 @@ As a _, so that _, I need _.
 - [ ] Foundational: *Technical runway work to support this and future efforts*
 
 ## Definition of Done
-- [ ] Threat model updated
-- [ ] Code refactored for clarity and no design/technical debt
-- [ ] Adhere to separation of concerns; code is not tightly coupled, especially to 3rd party dependencies.
-- [ ] Source code is merged to the main branch.
-- [ ] Unit test coverage of our code >= 90%
-- [ ] Code is reviewed or developed by pair; 1 approval is needed but consider requiring an outside-the-pair reviewer.
-- [ ] Build process updated
-- [ ] Feature toggles created and/or deleted.  Document the feature toggle.
-- [ ] Source code documentation created when the code is not self-documenting.
-- [ ] API documentation generated
-- [ ] Code quality checks passed
-- [ ] Security & privacy gates passed
-- [ ] Load tests passed
-- [ ] Documentation and diagrams created or updated
-- [ ] API(s) are versioned
-- [ ] Debug logging
+- [ ] Documentation tasks completed
+  - [ ] Documentation and diagrams created or updated
+    - [ ] Implementation guide (`/ig` folder)
+    - [ ] ADRs (`/adr` folder)
+    - [ ] Main README.md
+    - [ ] Other READMEs in the repo
+  - [ ] Threat model updated
+  - [ ] API documentation generated
+  - [ ] Source code documentation created when the code is not self-documenting
+- [ ] Code quality tasks completed
+  - [ ] Logging added where useful
+  - [ ] Code refactored for clarity and no design/technical debt
+  - [ ] Adhere to separation of concerns; code is not tightly coupled, especially to 3rd party dependencies
+  - [ ] Code is reviewed or developed by pair; 1 approval is needed but consider requiring an outside-the-pair reviewer
+  - [ ] Code quality checks passed
+- [ ] Security & Privacy tasks completed
+  - [ ] Security & privacy gates passed
+- [ ] Testing tasks completed
+  - [ ] Load tests passed
+  - [ ] Unit test coverage of our code >= 90%
+- [ ] Build & Deploy tasks completed
+  - [ ] Build process updated
+  - [ ] API(s) are versioned
+  - [ ] Feature toggles created and/or deleted.  Document the feature toggle
+  - [ ] Source code is merged to the main branch
 
-## Research Questions 
+## Research Questions
 - *Optional: Any initial questions for research*
 
 ## Decisions
