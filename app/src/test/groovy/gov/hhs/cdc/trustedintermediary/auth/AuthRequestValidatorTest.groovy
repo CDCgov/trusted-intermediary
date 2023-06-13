@@ -41,7 +41,21 @@ class AuthRequestValidatorTest extends Specification{
 
         when:
         request.setHeaders(header)
-        println("headers: " + request.getHeaders())
+        def actual = validator.extractToken(request)
+
+        then:
+        actual == expected
+    }
+
+    def "extractToken unhappy path works"() {
+        given:
+        def header = Map.of("key", "value")
+        def expected = ""
+        def request = new DomainRequest()
+        def validator = AuthRequestValidator.getInstance()
+
+        when:
+        request.setHeaders(header)
         def actual = validator.extractToken(request)
 
         then:
