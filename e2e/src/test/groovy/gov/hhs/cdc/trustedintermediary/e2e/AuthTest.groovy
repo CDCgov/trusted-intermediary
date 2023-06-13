@@ -18,7 +18,7 @@ class AuthTest extends Specification {
 
     def "a 200 valid response is returned when known organization and valid token"() {
         when:
-        def response = Client.post(authEndpointPath, postBody(existingClientId, validToken), ContentType.APPLICATION_FORM_URLENCODED)
+        def response = Client.post(authEndpointPath, postBody(existingClientId, validToken), ContentType.APPLICATION_FORM_URLENCODED, Map.of())
 
         then:
         response.getCode() == 200
@@ -34,7 +34,7 @@ class AuthTest extends Specification {
         def invalidRequest = "%g"
 
         when:
-        def response = Client.post(authEndpointPath, invalidRequest, ContentType.APPLICATION_FORM_URLENCODED)
+        def response = Client.post(authEndpointPath, invalidRequest, ContentType.APPLICATION_FORM_URLENCODED, Map.of())
 
         then:
         response.getCode() == 400
@@ -45,7 +45,7 @@ class AuthTest extends Specification {
         def invalidRequest = "invalid-request"
 
         when:
-        def response = Client.post(authEndpointPath, invalidRequest, ContentType.APPLICATION_FORM_URLENCODED)
+        def response = Client.post(authEndpointPath, invalidRequest, ContentType.APPLICATION_FORM_URLENCODED, Map.of())
 
         then:
         response.getCode() == 401
@@ -56,7 +56,7 @@ class AuthTest extends Specification {
         def invalidToken = "invalid-token"
 
         when:
-        def response = Client.post(authEndpointPath, postBody(existingClientId, invalidToken), ContentType.APPLICATION_FORM_URLENCODED)
+        def response = Client.post(authEndpointPath, postBody(existingClientId, invalidToken), ContentType.APPLICATION_FORM_URLENCODED, Map.of())
 
         then:
         response.getCode() == 401
@@ -67,7 +67,7 @@ class AuthTest extends Specification {
         def invalidClientId = "invalid-client"
 
         when:
-        def response = Client.post(authEndpointPath, postBody(invalidClientId, validToken), ContentType.APPLICATION_FORM_URLENCODED)
+        def response = Client.post(authEndpointPath, postBody(invalidClientId, validToken), ContentType.APPLICATION_FORM_URLENCODED, Map.of())
 
         then:
         response.getCode() == 401
