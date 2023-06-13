@@ -31,7 +31,7 @@ class AuthTest extends Specification {
 
     def "a 400 response is returned when request has invalid format"() {
         given:
-        def invalidRequest= "%g"
+        def invalidRequest = "%g"
 
         when:
         def response = Client.post(authEndpointPath, invalidRequest, ContentType.APPLICATION_FORM_URLENCODED)
@@ -42,7 +42,7 @@ class AuthTest extends Specification {
 
     def "a 401 response is returned when poorly formatted request"() {
         given:
-        def invalidRequest= "invalid-request"
+        def invalidRequest = "invalid-request"
 
         when:
         def response = Client.post(authEndpointPath, invalidRequest, ContentType.APPLICATION_FORM_URLENCODED)
