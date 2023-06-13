@@ -21,7 +21,7 @@ class LocalSecretsTest extends Specification {
 
     def "getKey works"() {
         given:
-        def secretName = "report-stream-sender-private-key-local"  //pragma: allowlist secret
+        def secretName = "trusted-intermediary-private-key-local"  //pragma: allowlist secret
         def expected = Files.readString(Path.of("..", "mock_credentials", secretName + ".pem"))
 
         when:
