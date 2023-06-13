@@ -17,8 +17,7 @@ class DemographicsTest extends Specification {
         def expectedPatientId  = "MRN7465737865"
 
         when:
-        def response = Client.post("/v1/etor/demographics", newbornPatientJsonFileString)
-        def responseBody = EntityUtils.toString(response.getEntity())
+        def responseBody = DemographicsClient.submitDemographics(newbornPatientJsonFileString)
         def parsedJsonBody = JsonParsing.parse(responseBody, Map.class)
 
         then:
@@ -29,8 +28,7 @@ class DemographicsTest extends Specification {
     def "bad response given for poorly formatted JSON"() {
 
         when:
-        def response = Client.post("/v1/etor/demographics", newbornPatientJsonFileString.substring(1))
-        def responseBody = EntityUtils.toString(response.getEntity())
+        def responseBody = DemographicsClient.submitDemographics(newbornPatientJsonFileString.substring(1))
         //removed beginning '{' to make this JSON invalid
 
         then:
@@ -40,8 +38,7 @@ class DemographicsTest extends Specification {
     def "payload file check"() {
 
         when:
-        def response = Client.post("/v1/etor/demographics", newbornPatientJsonFileString)
-        def responseBody = EntityUtils.toString(response.getEntity())
+        def responseBody = DemographicsClient.submitDemographics(newbornPatientJsonFileString)
         def sentPayload = SentPayloadReader.read()
         def parsedResponseBody = JsonParsing.parse(responseBody, Map.class)
 
@@ -61,7 +58,7 @@ class DemographicsTest extends Specification {
 
     def "a 401 comes from the ETOR demographics endpoint when unauthenticated"() {
         when:
-        def response = Client.post("/v1/etor/demographics", newbornPatientJsonFileString)
+        def response = DemographicsClient.submitDemographicsRaw(newbornPatientJsonFileString, false)
 
         then:
         response.getCode() == 401
