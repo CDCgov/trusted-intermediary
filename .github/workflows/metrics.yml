@@ -52,7 +52,7 @@ jobs:
         working-directory: devops-deployment-metrics
         env:
           GITHUB_USERNAME: None
-          GITHUB_PASSWORD: ${{ secrets.DORA_METRICS_ACCESS_TOKEN_JOHNNKING }}
+          GITHUB_TOKEN: ${{ secrets.DORA_METRICS_ACCESS_TOKEN_JOHNNKING }}
         run: poetry run devops-deployment-metrics -c config.toml
 
       - name: Upload output metric files
