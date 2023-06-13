@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache
+import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
 import spock.lang.Specification
 
 class AuthRequestValidatorTest extends Specification{
@@ -77,6 +78,26 @@ class AuthRequestValidatorTest extends Specification{
 
         when:
         cache.get(_ as String) >> key
+        def actual = validator.retrievePrivateKey()
+        then:
+        actual == expected
+    }
+
+    def "retrievePrivateKey works when keyCache is empty"() {
+        given:
+        def cache = Mock(KeyCache)
+        def secrets = Mock(Secrets)
+        def key = "fake key"
+        def expected = key
+        def validator = AuthRequestValidator.getInstance()
+        TestApplicationContext.register(Cache, cache)
+        TestApplicationContext.register(Secrets, secrets)
+        TestApplicationContext.register(AuthRequestValidator, validator)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        cache.get(_ as String) >> null
+        secrets.getKey(_ as String) >> key
         def actual = validator.retrievePrivateKey()
         then:
         actual == expected
