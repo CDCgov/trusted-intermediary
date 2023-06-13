@@ -5,9 +5,9 @@ deployed system.
 
 ## Keys
 
-### report-stream-sender-*
+### trusted-intermediary-*
 
-This is a private/public key pair that is used locally when TI acts as a sender to ReportStream.
+This is a private/public key pair that is used locally for TI.  It may be used in multiple contexts.
 
 ### organization-report-stream-*
 

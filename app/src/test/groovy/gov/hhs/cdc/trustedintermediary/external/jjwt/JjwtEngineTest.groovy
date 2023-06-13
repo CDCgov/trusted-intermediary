@@ -21,7 +21,7 @@ class JjwtEngineTest extends Specification {
 
         def key = new String(
                 Files.readAllBytes(
-                Path.of("..", "mock_credentials", "report-stream-sender-private-key-local.pem")
+                Path.of("..", "mock_credentials", "trusted-intermediary-private-key-local.pem")
                 ))
 
         when:
@@ -66,7 +66,7 @@ class JjwtEngineTest extends Specification {
 
     def "getExpirationDate works with unexpired JWT"() {
         given:
-        def pemKey = Files.readString(Path.of("..", "mock_credentials", "report-stream-sender-private-key-local.pem"))
+        def pemKey = Files.readString(Path.of("..", "mock_credentials", "trusted-intermediary-private-key-local.pem"))
         def secondsFromNowExpiration = 300
         def expectedExpirationCenter = LocalDateTime.now().plusSeconds(secondsFromNowExpiration).truncatedTo(ChronoUnit.SECONDS)
         def expectedExpirationUpper = expectedExpirationCenter.plusSeconds(3)  // 3 seconds is the window in which we expect the the code below to execute to generate the JWT (which is very generous, it should take much shorter than this)

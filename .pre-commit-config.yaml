@@ -9,7 +9,7 @@ repos:
       - id: check-symlinks
       - id: check-yaml
       - id: detect-private-key
-        exclude: (mock_credentials|.+\/JjwtEngine.java|.+\/resources\/(organization-report-stream-public-key.pem|report-stream-sender-private-key-local.pem))
+        exclude: (mock_credentials|.+\/JjwtEngine.java|.+\/resources\/(organization-report-stream-public-key.pem|trusted-intermediary-private-key-local.pem))
       - id: end-of-file-fixer
       - id: no-commit-to-branch
       - id: trailing-whitespace
