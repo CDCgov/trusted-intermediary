@@ -118,9 +118,7 @@ public class JjwtEngine implements AuthEngine {
     public boolean isPrivateKey(String key) {
 
         try {
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec((parseBase64(key)));
-            keyFactory.generatePrivate(keySpec);
+            readPrivateKey(key);
 
             return true;
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
