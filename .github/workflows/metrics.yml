@@ -35,7 +35,7 @@ jobs:
       - name: Run DORA metrics application
         working-directory: devops-deployment-metrics
         env:
-          GITHUB_USERNAME: JohnNKing
+          GITHUB_USERNAME: None
           GITHUB_PASSWORD: ${{ secrets.DORA_METRICS_ACCESS_TOKEN_JOHNNKING }}
         run: poetry run devops-deployment-metrics -c config.toml
 
