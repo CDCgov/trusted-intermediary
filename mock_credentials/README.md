@@ -23,8 +23,8 @@ This is a private/public key pair that is used locally so we can create a signed
 
 ### `report-stream-valid-token.jwt`
 
-This is a JWT that is valid and should not expire in the near future. It is used for testing.
+This is a JWT for the report-stream organization that is valid and should not expire in the near future. It is used for testing.
 
 ### `report-stream-expired-token.jwt`
 
-This is a JWT that has expired and used for testing.
+This is a JWT for the report-stream organization that has expired and used for testing.
