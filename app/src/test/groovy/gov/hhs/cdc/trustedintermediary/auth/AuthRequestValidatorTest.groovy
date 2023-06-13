@@ -9,7 +9,7 @@ import spock.lang.Specification
 
 class AuthRequestValidatorTest extends Specification{
 
-    def "tokenHascontent unhappy path works"() {
+    def "tokenHasContent unhappy empty path works"() {
         given:
         def emptyToken = ""
         def expected = false
@@ -22,7 +22,20 @@ class AuthRequestValidatorTest extends Specification{
         actual == expected
     }
 
-    def "tokenHascontent happy path works"() {
+    def "tokenHasContent  unhappy null path works"() {
+        given:
+        def nullToken = null
+        def expected = false
+        def validator = AuthRequestValidator.getInstance()
+
+        when:
+        def actual = validator.tokenHasContent(nullToken)
+
+        then:
+        actual == expected
+    }
+
+    def "tokenHasContent happy path works"() {
         given:
         def Token = "I'm not empty"
         def expected = true
