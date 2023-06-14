@@ -3,6 +3,8 @@ package gov.hhs.cdc.trustedintermediary.auth
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache
+import gov.hhs.cdc.trustedintermediary.external.jjwt.JjwtEngine
+import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
 import spock.lang.Specification
@@ -81,16 +83,16 @@ class AuthRequestValidatorTest extends Specification{
 
     def "retrievePrivateKey works when keyCache not empty"() {
         given:
-        def cache = Mock(KeyCache)
+        def mockCache = Mock(KeyCache)
         def key = "fake key"
         def expected = key
         def validator = AuthRequestValidator.getInstance()
-        TestApplicationContext.register(Cache, cache)
+        TestApplicationContext.register(Cache, mockCache)
         TestApplicationContext.register(AuthRequestValidator, validator)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        cache.get(_ as String) >> key
+        mockCache.get(_ as String) >> key
         def actual = validator.retrievePrivateKey()
 
         then:
@@ -99,19 +101,19 @@ class AuthRequestValidatorTest extends Specification{
 
     def "retrievePrivateKey works when keyCache is empty"() {
         given:
-        def cache = Mock(KeyCache)
-        def secrets = Mock(Secrets)
+        def mockCache = Mock(KeyCache)
+        def mockSecrets = Mock(Secrets)
         def key = "fake key"
         def expected = key
         def validator = AuthRequestValidator.getInstance()
-        TestApplicationContext.register(Cache, cache)
-        TestApplicationContext.register(Secrets, secrets)
+        TestApplicationContext.register(Cache, mockCache)
+        TestApplicationContext.register(Secrets, mockSecrets)
         TestApplicationContext.register(AuthRequestValidator, validator)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        cache.get(_ as String) >> null
-        secrets.getKey(_ as String) >> key
+        mockCache.get(_ as String) >> null
+        mockSecrets.getKey(_ as String) >> key
         def actual = validator.retrievePrivateKey()
 
         then:
@@ -121,20 +123,43 @@ class AuthRequestValidatorTest extends Specification{
     def "retrievePrivateKey adds key to keyCache works"() {
         given:
         def cache = KeyCache.getInstance()
-        def secrets = Mock(Secrets)
+        def mockSecrets = Mock(Secrets)
         def key = "fake key"
         def expected = key
         def validator = AuthRequestValidator.getInstance()
         TestApplicationContext.register(Cache, cache)
-        TestApplicationContext.register(Secrets, secrets)
+        TestApplicationContext.register(Secrets, mockSecrets)
         TestApplicationContext.register(AuthRequestValidator, validator)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        secrets.getKey(_ as String) >> key
+        mockSecrets.getKey(_ as String) >> key
         validator.retrievePrivateKey()
         def actual = cache.get("trusted-intermediary-private-key-local")
 
+        then:
+        actual == expected
+    }
+
+    def "isValidAuthenticatedRequest happy path works"() {
+        given:
+        def validator = AuthRequestValidator.getInstance()
+        def token = "fake-token-here"
+        def header = Map.of("Authorization", "Bearer " + token)
+        def mockEngine = Mock(JjwtEngine)
+        def mockCache = Mock(KeyCache)
+        def request = new DomainRequest()
+        def expected = true
+        TestApplicationContext.register(Cache, mockCache)
+        TestApplicationContext.register(AuthEngine, mockEngine)
+        TestApplicationContext.register(AuthRequestValidator, validator)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        request.setHeaders(header)
+        mockCache.get(_ as String) >> {"my-fake-private-key"}
+        mockEngine.validateToken(_ as String, _ as String)
+        def actual = validator.isValidAuthenticatedRequest(request)
         then:
         actual == expected
     }
