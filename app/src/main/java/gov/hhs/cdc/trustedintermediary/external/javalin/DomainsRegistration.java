@@ -2,10 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.javalin;
 
 import gov.hhs.cdc.trustedintermediary.OpenApi;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
-import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
-import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnectorConstructionException;
-import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
-import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
+import gov.hhs.cdc.trustedintermediary.domainconnector.*;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
@@ -13,9 +10,9 @@ import io.javalin.http.Handler;
 import io.javalin.http.HandlerType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Registers the available domains to the application context and their specific handlers for the
@@ -31,17 +28,19 @@ public class DomainsRegistration {
     private DomainsRegistration() {}
 
     public static void registerDomains(
-            Javalin app, Set<Class<? extends DomainConnector>> domainConnectors) {
+            Javalin app, Set<Class<? extends DomainConnector>> domainConnectors)
+            throws UnableToReadOpenApiSpecificationException, DomainConnectorConstructionException {
 
         LOGGER.logInfo("Info");
         LOGGER.logWarning("Warning");
         LOGGER.logDebug("Debug");
         LOGGER.logError("Error");
 
-        var instantiatedDomains =
-                domainConnectors.stream()
-                        .map(DomainsRegistration::constructNewDomainConnector)
-                        .collect(Collectors.toSet());
+        var instantiatedDomains = new HashSet<DomainConnector>();
+        for (Class<? extends DomainConnector> domainConnector : domainConnectors) {
+            DomainConnector connector = constructNewDomainConnector(domainConnector);
+            instantiatedDomains.add(connector);
+        }
 
         registerDomainsWithApplicationContext(instantiatedDomains);
 
@@ -74,11 +73,12 @@ public class DomainsRegistration {
                                         }));
     }
 
-    static void registerOpenApi(Javalin app, Set<DomainConnector> domains) {
-        Set<String> openApiSpecifications =
-                domains.stream()
-                        .map(DomainConnector::openApiSpecification)
-                        .collect(Collectors.toSet());
+    static void registerOpenApi(Javalin app, Set<DomainConnector> domains)
+            throws UnableToReadOpenApiSpecificationException {
+        Set<String> openApiSpecifications = new HashSet<>();
+        for (DomainConnector domain : domains) {
+            openApiSpecifications.add(domain.openApiSpecification());
+        }
 
         // not using @Inject in a field of this class because we are still bootstrapping the
         // application context
