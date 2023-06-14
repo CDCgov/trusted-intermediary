@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.javalin
 import gov.hhs.cdc.trustedintermediary.OpenApi
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnectorConstructionException
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
@@ -109,7 +110,6 @@ class DomainsRegistrationTest extends Specification {
         def connector = DomainsRegistration.constructNewDomainConnector(GoodDomainConnector)
 
         then:
-        noExceptionThrown()
         connector != null
     }
 
@@ -118,7 +118,7 @@ class DomainsRegistrationTest extends Specification {
         DomainsRegistration.constructNewDomainConnector(BadDomainConnector)
 
         then:
-        thrown RuntimeException
+        thrown(DomainConnectorConstructionException)
     }
 
     def "every DomainConnector is registered"() {
