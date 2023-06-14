@@ -8,10 +8,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -46,9 +43,9 @@ public class JjwtEngine implements AuthEngine {
             String pemKey)
             throws TokenGenerationException {
 
-        PrivateKey privateKey;
+        Key privateKey;
         try {
-            privateKey = readPrivateKey(pemKey);
+            privateKey = readKey(pemKey);
         } catch (NoSuchAlgorithmException e) {
             throw new TokenGenerationException("The private key algorithm isn't supported", e);
         } catch (Exception e) {
@@ -99,10 +96,7 @@ public class JjwtEngine implements AuthEngine {
             throws InvalidTokenException, IllegalArgumentException {
 
         try {
-            var key =
-                    isPrivateKey(encodedKey)
-                            ? readPrivateKey(encodedKey)
-                            : readPublicKey(encodedKey);
+            var key = readKey(encodedKey);
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt);
 
         } catch (JwtException | IllegalArgumentException e) {
@@ -112,6 +106,11 @@ public class JjwtEngine implements AuthEngine {
         } catch (Exception e) {
             throw new IllegalArgumentException("The key wasn't formatted correctly", e);
         }
+    }
+
+    protected Key readKey(String encodedKey)
+            throws NoSuchAlgorithmException, InvalidKeySpecException, IllegalArgumentException {
+        return isPrivateKey(encodedKey) ? readPrivateKey(encodedKey) : readPublicKey(encodedKey);
     }
 
     protected boolean isPrivateKey(String key) {
@@ -126,7 +125,7 @@ public class JjwtEngine implements AuthEngine {
     }
 
     protected PrivateKey readPrivateKey(@Nonnull String pemKey)
-            throws NoSuchAlgorithmException, InvalidKeySpecException {
+            throws NoSuchAlgorithmException, InvalidKeySpecException, IllegalArgumentException {
 
         byte[] encode = parseBase64(pemKey);
 
@@ -136,7 +135,7 @@ public class JjwtEngine implements AuthEngine {
     }
 
     protected PublicKey readPublicKey(@Nonnull String pemKey)
-            throws NoSuchAlgorithmException, InvalidKeySpecException {
+            throws NoSuchAlgorithmException, InvalidKeySpecException, IllegalArgumentException {
 
         byte[] encode = parseBase64(pemKey);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -144,7 +143,7 @@ public class JjwtEngine implements AuthEngine {
         return keyFactory.generatePublic(keySpec);
     }
 
-    protected byte[] parseBase64(String keyString) {
+    protected byte[] parseBase64(String keyString) throws IllegalArgumentException {
         return Base64.getDecoder().decode(stripPemKeyHeaderAndFooter(keyString));
     }
 

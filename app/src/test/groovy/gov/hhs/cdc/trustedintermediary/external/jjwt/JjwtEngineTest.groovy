@@ -90,4 +90,26 @@ class JjwtEngineTest extends Specification {
         then:
         actual == expected
     }
+
+    def "readKey correctly reads a private key"() {
+        given:
+        def privateKeyString = Files.readString(Path.of("..", "mock_credentials", "trusted-intermediary-private-key-local.pem"))
+
+        when:
+        def key = JjwtEngine.getInstance().readKey(privateKeyString)
+
+        then:
+        key != null
+    }
+
+    def "readKey correctly reads a public key"() {
+        given:
+        def publicKeyString = Files.readString(Path.of("..", "mock_credentials", "trusted-intermediary-public-key-local.pem"))
+
+        when:
+        def key = JjwtEngine.getInstance().readKey(publicKeyString)
+
+        then:
+        key != null
+    }
 }
