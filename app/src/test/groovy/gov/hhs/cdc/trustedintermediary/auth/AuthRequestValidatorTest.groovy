@@ -160,6 +160,46 @@ class AuthRequestValidatorTest extends Specification{
         mockCache.get(_ as String) >> {"my-fake-private-key"}
         mockEngine.validateToken(_ as String, _ as String)
         def actual = validator.isValidAuthenticatedRequest(request)
+
+        then:
+        actual == expected
+    }
+
+    def "isValidAuthenticatedRequest unhappy empty path works"() {
+        given:
+        def validator = AuthRequestValidator.getInstance()
+        def token = ""
+        def header = Map.of("key", "Bearer " + token)
+        def request = new DomainRequest()
+        def expected = false
+
+        TestApplicationContext.register(AuthRequestValidator, validator)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        request.setHeaders(header)
+        def actual = validator.isValidAuthenticatedRequest(request)
+
+        then:
+        actual == expected
+    }
+
+    def "isValidAuthenticatedRequest unhappy empty path works"() {
+        given:
+        def validator = AuthRequestValidator.getInstance()
+        def token = ""
+        def header = Map.of("Authorization", "Bearer " + token)
+        def request = new DomainRequest()
+        def expected = false
+
+        TestApplicationContext.register(AuthRequestValidator, validator)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        request.setHeaders(header)
+        def actual = validator.isValidAuthenticatedRequest(request)
+        println("actual: " + actual)
+
         then:
         actual == expected
     }
