@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.javalin;
 import gov.hhs.cdc.trustedintermediary.OpenApi;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnectorConstructionException;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -96,7 +97,8 @@ public class DomainsRegistration {
                 });
     }
 
-    static DomainConnector constructNewDomainConnector(Class<? extends DomainConnector> clazz) {
+    static DomainConnector constructNewDomainConnector(Class<? extends DomainConnector> clazz)
+            throws DomainConnectorConstructionException {
         try {
             Constructor<? extends DomainConnector> constructor = clazz.getConstructor();
             return constructor.newInstance();
@@ -104,7 +106,8 @@ public class DomainsRegistration {
                 | InstantiationException
                 | IllegalAccessException
                 | InvocationTargetException exception) {
-            throw new RuntimeException(exception);
+            throw new DomainConnectorConstructionException(
+                    "Failed to construct new domain connector " + clazz, exception);
         }
     }
 
