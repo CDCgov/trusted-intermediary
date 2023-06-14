@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache
 import gov.hhs.cdc.trustedintermediary.external.jjwt.JjwtEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache
+import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
 import spock.lang.Specification
 
@@ -215,6 +216,30 @@ class AuthRequestValidatorTest extends Specification{
 
         when:
         request.setHeaders(header)
+        def actual = validator.isValidAuthenticatedRequest(request)
+
+        then:
+        actual == expected
+    }
+
+    def "isValidAuthenticatedRequest unhappy invalidTokenException path works"() {
+        given:
+        def validator = AuthRequestValidator.getInstance()
+        def token = "fake-token-here"
+        def header = Map.of("Authorization", "Bearer " + token)
+        def mockEngine = Mock(JjwtEngine)
+        def mockCache = Mock(KeyCache)
+        def request = new DomainRequest()
+        def expected = false
+        TestApplicationContext.register(Cache, mockCache)
+        TestApplicationContext.register(AuthEngine, mockEngine)
+        TestApplicationContext.register(AuthRequestValidator, validator)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        request.setHeaders(header)
+        mockCache.get(_ as String) >> {"my-fake-private-key"}
+        mockEngine.validateToken(_ as String, _ as String) >> { throw new InvalidTokenException(new Throwable("fake exception"))}
         def actual = validator.isValidAuthenticatedRequest(request)
 
         then:
