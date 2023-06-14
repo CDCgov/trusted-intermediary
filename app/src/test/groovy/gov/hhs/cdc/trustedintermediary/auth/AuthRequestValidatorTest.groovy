@@ -198,7 +198,24 @@ class AuthRequestValidatorTest extends Specification{
         when:
         request.setHeaders(header)
         def actual = validator.isValidAuthenticatedRequest(request)
-        println("actual: " + actual)
+
+        then:
+        actual == expected
+    }
+
+    def "isValidAuthenticatedRequest unhappy null path works"() {
+        given:
+        def validator = AuthRequestValidator.getInstance()
+        def header = new HashMap<String, String>()
+        def request = new DomainRequest()
+        def expected = false
+
+        TestApplicationContext.register(AuthRequestValidator, validator)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        request.setHeaders(header)
+        def actual = validator.isValidAuthenticatedRequest(request)
 
         then:
         actual == expected
