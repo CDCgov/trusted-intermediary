@@ -144,7 +144,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
 
     protected String retrievePrivateKey() throws SecretRetrievalException {
         var senderPrivateKey =
-                "report-stream-sender-private-key-" + ApplicationContext.getEnvironment();
+                "trusted-intermediary-private-key-" + ApplicationContext.getEnvironment();
         String key = this.keyCache.get(senderPrivateKey);
         if (key != null) {
             return key;

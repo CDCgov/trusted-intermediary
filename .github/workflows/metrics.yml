@@ -21,7 +21,7 @@ jobs:
       - name: Checkout devops-deployment-metrics code
         uses: actions/checkout@v3
         with:
-          repository: basiliskus/devops-deployment-metrics
+          repository: flexion/devops-deployment-metrics
           path: devops-deployment-metrics
 
       - name: Install dependencies
@@ -29,14 +29,30 @@ jobs:
         run: poetry install
 
       - name: Set up config file
-        working-directory: devops-deployment-metrics
-        run: sed -e '14,18d' -e 's/my_github_owner/CDCgov/' -e 's/my_github_repository/trusted-intermediary/' -e 's/12345678/42635194/' sample-config.toml > config.toml
+        uses: DamianReeves/write-file-action@master
+        with:
+          path: devops-deployment-metrics/config.toml
+          write-mode: overwrite
+          contents: |
+            [general]
+            time-slice-days = 7
+            start-date = 2022-12-01T00:01:00
+            date-format = "%Y-%m-%d"
+
+            [[repositories]]
+            owner = "CDCgov"
+            repo = "trusted-intermediary"
+            id = "42635194"
+            deployment-frequency = "df"
+            change-fail-rate = "cf"
+            mean-time-to-recover = "mttrs"
+            deployment-log = "deployments"
 
       - name: Run DORA metrics application
         working-directory: devops-deployment-metrics
         env:
-          GITHUB_USERNAME: JohnNKing
-          GITHUB_PASSWORD: ${{ secrets.DORA_METRICS_ACCESS_TOKEN_JOHNNKING }}
+          GITHUB_USERNAME: None
+          GITHUB_TOKEN: ${{ secrets.DORA_METRICS_ACCESS_TOKEN_JOHNNKING }}
         run: poetry run devops-deployment-metrics -c config.toml
 
       - name: Upload output metric files

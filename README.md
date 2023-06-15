@@ -12,7 +12,7 @@ To run the application directly, execute...
 ./gradlew clean run
 ```
 
-This will run the web API on port 8080.  You can view the API documentation at _TBD_.
+This will run the web API on port 8080.  You can view the API documentation at `/openapi`.
 
 ## Development
 
@@ -20,10 +20,10 @@ This will run the web API on port 8080.  You can view the API documentation at _
 
 The additional requirements needed to contribute towards development are...
 
-- [Pre-Commit](https://pre-commit.com).
+- [Pre-Commit](https://pre-commit.com)
 - [Locust.io](https://docs.locust.io/en/stable/installation.html)
 - [Python](https://docs.python-guide.org/starting/installation/)
-- [Terraform](https://www.terraform.io).
+- [Terraform](https://www.terraform.io)
 
 ### Compiling
 
@@ -47,7 +47,7 @@ To run the unit tests, execute...
 
 #### End-to-end Tests
 
-End-to-end tests are meant to interact and assert the overall flow of the API is operating correctly.
+End-to-end tests are meant to interact and assert the overall flow of the API is operating correctly. They require that the API to be running already.
 
 To run them, execute...
 
@@ -55,7 +55,7 @@ To run them, execute...
 ./gradlew e2e:clean e2e:test
 ```
 
-That requires the API to be running already.  To help streamline the execution of this flow, a helper Bash script can be executed...
+The previous command requires the API to be running already. To help streamline the execution of this flow, a helper Bash script can be executed...
 
 ```shell
 ./e2e-execute.sh
