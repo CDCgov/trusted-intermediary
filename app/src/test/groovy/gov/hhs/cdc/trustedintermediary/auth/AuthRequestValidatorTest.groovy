@@ -12,6 +12,12 @@ import spock.lang.Specification
 
 class AuthRequestValidatorTest extends Specification{
 
+    def setup() {
+        TestApplicationContext.reset()
+        TestApplicationContext.init()
+        TestApplicationContext.register(AuthRequestValidator, AuthRequestValidator.getInstance())
+    }
+
     def "tokenHasContent unhappy empty path works"() {
         given:
         def emptyToken = ""
@@ -58,6 +64,7 @@ class AuthRequestValidatorTest extends Specification{
         def expected = token
         def request = new DomainRequest()
         def validator = AuthRequestValidator.getInstance()
+        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         request.setHeaders(header)

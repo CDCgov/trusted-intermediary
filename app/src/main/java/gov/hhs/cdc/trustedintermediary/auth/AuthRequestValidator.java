@@ -34,16 +34,21 @@ public class AuthRequestValidator {
     public boolean isValidAuthenticatedRequest(DomainRequest request)
             throws SecretRetrievalException, IllegalArgumentException {
 
+        logger.logInfo("Authenticating request...");
         var token = extractToken(request);
 
         if (!tokenHasContent(token)) {
+            logger.logError("Invalid token, token is empty or null!");
             return false;
         }
 
         try {
+            logger.logDebug("Checking if bearer token is valid...");
             jwtEngine.validateToken(token, retrievePrivateKey());
+            logger.logInfo("Bearer token is valid");
             return true;
         } catch (InvalidTokenException e) {
+            logger.logError("Invalid bearer token!");
             return false;
         }
     }
@@ -62,6 +67,7 @@ public class AuthRequestValidator {
     }
 
     protected String extractToken(DomainRequest request) {
+        logger.logDebug("Extracting token from request...");
         var authHeader = Optional.ofNullable(request.getHeaders().get("Authorization")).orElse("");
         return authHeader.replace("Bearer ", "");
     }
