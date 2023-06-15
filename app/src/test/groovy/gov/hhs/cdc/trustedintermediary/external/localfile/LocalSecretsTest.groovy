@@ -60,7 +60,6 @@ class LocalSecretsTest extends Specification {
 
         when:
         def secret = secrets.readSecretFromResources(name)
-        println(secret)
 
         then:
         def exception = thrown(Exception)
