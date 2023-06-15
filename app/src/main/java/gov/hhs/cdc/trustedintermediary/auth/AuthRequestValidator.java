@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
 import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import java.util.Optional;
@@ -22,6 +23,7 @@ public class AuthRequestValidator {
     @Inject private AuthEngine jwtEngine;
     @Inject private Cache keyCache;
     @Inject private Secrets secrets;
+    @Inject private Logger logger;
 
     private AuthRequestValidator() {}
 
