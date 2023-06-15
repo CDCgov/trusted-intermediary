@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
+import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecificationException;
 import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombiner;
 import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombinerException;
 import java.io.IOException;
@@ -19,7 +20,8 @@ public class OpenApi {
         return INSTANCE;
     }
 
-    public String generateApiDocumentation(final Set<String> openApiSpecifications) {
+    public String generateApiDocumentation(final Set<String> openApiSpecifications)
+            throws UnableToReadOpenApiSpecificationException {
         openApiSpecifications.add(getBaselineDocumentation());
 
         try {
@@ -30,16 +32,19 @@ public class OpenApi {
             return ApplicationContext.getImplementation(YamlCombiner.class)
                     .combineYaml(openApiSpecifications);
         } catch (YamlCombinerException e) {
-            throw new RuntimeException(e);
+            throw new UnableToReadOpenApiSpecificationException(
+                    "Failed to combine YAML to generate API documentation", e);
         }
     }
 
-    String getBaselineDocumentation() {
+    String getBaselineDocumentation() throws UnableToReadOpenApiSpecificationException {
+        String fileName = "openapi_base.yaml";
         try (InputStream openApiStream =
-                getClass().getClassLoader().getResourceAsStream("openapi_base.yaml")) {
+                getClass().getClassLoader().getResourceAsStream(fileName)) {
             return new String(openApiStream.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new UnableToReadOpenApiSpecificationException(
+                    "Failed to open baseline documentation for " + fileName, e);
         }
     }
 }
