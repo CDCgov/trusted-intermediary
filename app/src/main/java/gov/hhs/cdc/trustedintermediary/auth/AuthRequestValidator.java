@@ -12,8 +12,8 @@ import javax.inject.Inject;
 
 /**
  * This class is used to check the validity of a http request. It has methods that extract the
- * bearer token, check is if the token is empty or null, and if the token is valid. For example,
- * expired tokens or tokens not signed by our private key, will be invalid.
+ * bearer token, check if the token is empty or null, and if the token is valid. For example,
+ * expired tokens, empty tokens, or tokens not signed by our private key, will be invalid.
  */
 public class AuthRequestValidator {
 
