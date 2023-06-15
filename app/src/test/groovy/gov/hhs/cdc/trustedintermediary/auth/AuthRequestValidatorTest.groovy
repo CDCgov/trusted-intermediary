@@ -96,7 +96,6 @@ class AuthRequestValidatorTest extends Specification{
         def expected = key
         def validator = AuthRequestValidator.getInstance()
         TestApplicationContext.register(Cache, mockCache)
-        TestApplicationContext.register(AuthRequestValidator, validator)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -116,7 +115,6 @@ class AuthRequestValidatorTest extends Specification{
         def validator = AuthRequestValidator.getInstance()
         TestApplicationContext.register(Cache, mockCache)
         TestApplicationContext.register(Secrets, mockSecrets)
-        TestApplicationContext.register(AuthRequestValidator, validator)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -137,7 +135,6 @@ class AuthRequestValidatorTest extends Specification{
         def validator = AuthRequestValidator.getInstance()
         TestApplicationContext.register(Cache, cache)
         TestApplicationContext.register(Secrets, mockSecrets)
-        TestApplicationContext.register(AuthRequestValidator, validator)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -160,7 +157,6 @@ class AuthRequestValidatorTest extends Specification{
         def expected = true
         TestApplicationContext.register(Cache, mockCache)
         TestApplicationContext.register(AuthEngine, mockEngine)
-        TestApplicationContext.register(AuthRequestValidator, validator)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -181,7 +177,6 @@ class AuthRequestValidatorTest extends Specification{
         def request = new DomainRequest()
         def expected = false
 
-        TestApplicationContext.register(AuthRequestValidator, validator)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -200,7 +195,6 @@ class AuthRequestValidatorTest extends Specification{
         def request = new DomainRequest()
         def expected = false
 
-        TestApplicationContext.register(AuthRequestValidator, validator)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -218,7 +212,6 @@ class AuthRequestValidatorTest extends Specification{
         def request = new DomainRequest()
         def expected = false
 
-        TestApplicationContext.register(AuthRequestValidator, validator)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -240,7 +233,6 @@ class AuthRequestValidatorTest extends Specification{
         def expected = false
         TestApplicationContext.register(Cache, mockCache)
         TestApplicationContext.register(AuthEngine, mockEngine)
-        TestApplicationContext.register(AuthRequestValidator, validator)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
