@@ -2,14 +2,11 @@ package gov.hhs.cdc.trustedintermediary.e2e
 
 import java.nio.file.Files
 import java.nio.file.Path
-import org.apache.hc.core5.http.ContentType
 import org.apache.hc.core5.http.io.entity.EntityUtils
 import spock.lang.Specification
 
 class AuthTest extends Specification {
 
-    def authEndpointPath = "/v1/auth"
-    def postBody = { scope, client_assertion -> "scope=${scope}&client_assertion=${client_assertion}" }
     def existingClientId = "report-stream"
     def validToken = Files.readString(Path.of("..", "mock_credentials", "report-stream-valid-token.jwt"))
 
