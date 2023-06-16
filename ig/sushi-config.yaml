@@ -4,10 +4,10 @@
 # │  see: https://fshschool.org/docs/sushi/configuration/.                                         │
 # ╰────────────────────────────────────────────────────────────────────────────────────────────────╯
 id: cdc.gov.ti.ig
-canonical: http://cdc.gov/reportstream/trustedintermediary
-name: CDCTrustedIntermediaryIG
-title: CDC ReportStream Trusted Intermediary Documentation
-description: Implementation Guide and other documentation for the CDC ReportStream Trusted Intermediary
+canonical: http://cdc.gov/reportstream/intermediary
+name: CDCReportStreamIntermediaryIG
+title: CDC ReportStream Intermediary Documentation
+description: Implementation Guide and other documentation for the CDC ReportStream Intermediary
 status: draft # draft | active | retired | unknown
 version: 0.1.0
 fhirVersion: 4.0.1 # https://www.hl7.org/fhir/valueset-FHIR-version.html
@@ -41,7 +41,7 @@ dependencies:
 #
 pages:
   index.md:
-    title: Documentation Home
+    title: Report Stream Intermediary
   guidance.md:
     title: General Guidance
   onboarding.md:
@@ -180,7 +180,7 @@ resources:
       - url: http://hl7.org/fhir/StructureDefinition/implementationguide-resource-format
         valueCode: application/fhir+json
     name: ADT-01 Example 1
-    exampleCanonical: http://cdc.gov/reportstream/trustedintermediary/StructureDefinition/ADT01
+    exampleCanonical: http://cdc.gov/reportstream/intermediary/StructureDefinition/ADT01
 
 # resources:
 #   Patient/my-example-patient:
