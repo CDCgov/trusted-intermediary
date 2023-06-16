@@ -52,12 +52,6 @@ pages:
     title: Information About the Internals of the Intermediary
   internal-interfaces.md:
     title: Internal Interfaces
-  example-overview.md:
-    title: Example Overview
-  faq.md:
-    title: Frequently Asked Questions (FAQ)
-  troubleshooting.md:
-    title: Troubleshooting Information
 
 #   implementation.xml:
 #   examples.xml:
@@ -102,13 +96,6 @@ menu:
   Internal:
     Internal Interfaces Overview:  internal.html
     Internal Interfaces: internal-interfaces.html
-
-  Examples:
-    Example Overview: example-overview.html
-
-  FAQ: faq.html
-
-  Troubleshooting: troubleshooting.html
 
   Artifacts: artifacts.html
 
