@@ -1,4 +1,6 @@
 import json
+import time
+import threading
 import urllib.parse
 import urllib.request
 
@@ -15,6 +17,40 @@ auth_request_body = None
 access_token = None
 
 
+def get_auth_request_body():
+    # set up the sample request body for the auth endpoint
+    # using a valid test token found in the mock_credentials directory
+    auth_scope = "report-stream"
+    with open("mock_credentials/report-stream-valid-token.jwt") as f:
+        auth_token = f.read()
+    params = urllib.parse.urlencode(
+        {"scope": auth_scope, "client_assertion": auth_token}
+    )
+    return params.encode("utf-8")
+
+
+def get_demographics_request_body():
+    # read the sample request body for the demographics endpoint
+    with open("e2e/src/test/resources/newborn_patient.json", "r") as f:
+        return f.read()
+
+
+def get_access_token(host, data):
+    # get a valid bearer token from the auth endpoint
+    request = urllib.request.Request(f"{host}{AUTH_ENDPOINT}", data=data)
+    response = urllib.request.urlopen(request)
+    jdata = json.load(response)
+    return jdata["access_token"]
+
+
+# def refresh_token(environment):
+#     global access_token
+
+#     while True:
+#         time.sleep(20)  # Refresh token every 5 seconds
+#         access_token = get_access_token(environment.host, auth_request_body)
+
+
 @events.test_start.add_listener
 def test_start(environment):
     global demographics_request_body
@@ -25,27 +61,12 @@ def test_start(environment):
         # in a distributed run, the master does not typically need any test data
         return
 
-    # read the sample request body for the demographics endpoint
-    with open("e2e/src/test/resources/newborn_patient.json", "r") as f:
-        demographics_request_body = f.read()
+    demographics_request_body = get_demographics_request_body()
+    auth_request_body = get_auth_request_body()
+    access_token = get_access_token(environment.host, auth_request_body)
 
-    # set up the sample request body for the auth endpoint
-    # using a valid test token found in the mock_credentials directory
-    auth_scope = "report-stream"
-    with open("mock_credentials/report-stream-valid-token.jwt") as f:
-        auth_token = f.read()
-
-    auth_request_body = urllib.parse.urlencode(
-        {"scope": auth_scope, "client_assertion": auth_token}
-    )
-
-    # get a valid bearer token from the auth endpoint
-    request = urllib.request.Request(
-        f"{environment.host}{AUTH_ENDPOINT}", data=auth_request_body.encode("utf-8")
-    )
-    response = urllib.request.urlopen(request)
-    data = json.load(response)
-    access_token = data["access_token"]
+    # Start the token refreshing thread
+    # threading.Thread(target=refresh_token, args=(environment,), daemon=True).start()
 
 
 class SampleUser(HttpUser):
@@ -58,11 +79,16 @@ class SampleUser(HttpUser):
 
     @task(5)  # this task will get called 5x more than the other
     def post_v1_etor_demographics(self):
-        self.client.post(
+        global access_token, auth_request_body
+
+        response = self.client.post(
             DEMOGRAPHICS_ENDPOINT,
             data=demographics_request_body,
             headers={"Authorization": access_token},
         )
+        if response.status_code == 401:
+            print("401 Unathorized. Assuming token expired and requesting a new one.")
+            access_token = get_access_token(self.environment.host, auth_request_body)
 
     @task
     def post_v1_auth(self):
