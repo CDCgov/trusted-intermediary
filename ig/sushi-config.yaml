@@ -42,12 +42,10 @@ dependencies:
 pages:
   index.md:
     title: Report Stream Intermediary
-  guidance.md:
-    title: General Guidance
   onboarding.md:
     title: Onboarding to the Intermediary
-  connecting.md:
-    title: Connecting to the Intermediary
+  sending.md:
+    title: Sending Data to the Intermediary
   etor-nbs.md:
     title: ETOR - Newborn Screening
   external.md:
@@ -100,10 +98,9 @@ menu:
 
   Onboarding: onboarding.html
 
-  Connecting: connecting.html
+  Sending Data: sending.html
 
   Use Cases:
-    General Guidance: guidance.html
     ETOR - Newborn Screening: etor-nbs.html
 
   External:
