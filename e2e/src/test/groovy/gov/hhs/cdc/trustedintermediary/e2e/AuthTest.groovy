@@ -42,7 +42,7 @@ class AuthTest extends Specification {
         def invalidRequest = "invalid-request"
 
         when:
-        def response = Client.post(authEndpointPath, invalidRequest, ContentType.APPLICATION_FORM_URLENCODED, Map.of())
+        def response = AuthClient.loginRaw(invalidRequest, "asdf")
 
         then:
         response.getCode() == 401
