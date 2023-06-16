@@ -1,8 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.localfile
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException
-import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
 import java.nio.file.Files

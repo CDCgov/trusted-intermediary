@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.e2e;
 
 import java.io.IOException;
+import java.util.Map;
 import org.apache.hc.client5.http.fluent.Request;
 import org.apache.hc.client5.http.fluent.Response;
 import org.apache.hc.core5.http.ClassicHttpResponse;
@@ -23,15 +24,22 @@ public class Client {
         return handleResponseAndSetEntity(response);
     }
 
-    public static ClassicHttpResponse post(String path, String body, ContentType type)
+    public static ClassicHttpResponse post(
+            String path, String body, ContentType type, Map<String, String> headers)
             throws IOException {
         System.out.println("Calling the backend at POST " + path);
-        var response = Request.post(protocolDomain + path).bodyString(body, type).execute();
+
+        var request = Request.post(protocolDomain + path).bodyString(body, type);
+        if (headers != null) {
+            headers.forEach(request::addHeader);
+        }
+
+        var response = request.execute();
         return handleResponseAndSetEntity(response);
     }
 
     public static ClassicHttpResponse post(String path, String body) throws IOException {
-        return post(path, body, ContentType.APPLICATION_JSON);
+        return post(path, body, ContentType.APPLICATION_JSON, null);
     }
 
     private static ClassicHttpResponse handleResponseAndSetEntity(Response response)

@@ -58,13 +58,17 @@ public class PatientDemographicsController {
     }
 
     public DomainResponse constructResponse(int httpStatus, Exception exception) {
+        var errorMessage =
+                Optional.ofNullable(exception.getMessage()).orElse(exception.getClass().toString());
+
+        return constructResponse(httpStatus, errorMessage);
+    }
+
+    public DomainResponse constructResponse(int httpStatus, String errorString) {
         var domainResponse = new DomainResponse(httpStatus);
 
         try {
-            var stringMessage =
-                    Optional.ofNullable(exception.getMessage())
-                            .orElse(exception.getClass().toString());
-            var responseBody = formatter.convertToJsonString(Map.of("error", stringMessage));
+            var responseBody = formatter.convertToJsonString(Map.of("error", errorString));
             domainResponse.setBody(responseBody);
         } catch (FormatterProcessingException e) {
             logger.logError("Error constructing an error response", e);

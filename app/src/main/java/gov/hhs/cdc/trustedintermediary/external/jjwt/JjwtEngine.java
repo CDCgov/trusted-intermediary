@@ -8,9 +8,11 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import java.security.Key;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -45,9 +47,9 @@ public class JjwtEngine implements AuthEngine {
             String pemKey)
             throws TokenGenerationException {
 
-        PrivateKey privateKey;
+        Key privateKey;
         try {
-            privateKey = readPrivateKey(pemKey);
+            privateKey = readKey(pemKey);
         } catch (NoSuchAlgorithmException e) {
             throw new TokenGenerationException("The private key algorithm isn't supported", e);
         } catch (Exception e) {
@@ -98,10 +100,7 @@ public class JjwtEngine implements AuthEngine {
             throws InvalidTokenException, IllegalArgumentException {
 
         try {
-            byte[] encode = Base64.getDecoder().decode(stripPemKeyHeaderAndFooter(encodedKey));
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encode);
-            var key = keyFactory.generatePublic(keySpec);
+            var key = readKey(encodedKey);
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt);
 
         } catch (JwtException | IllegalArgumentException e) {
@@ -113,14 +112,43 @@ public class JjwtEngine implements AuthEngine {
         }
     }
 
-    protected PrivateKey readPrivateKey(@Nonnull String pemKey)
-            throws NoSuchAlgorithmException, InvalidKeySpecException {
+    protected Key readKey(String encodedKey)
+            throws NoSuchAlgorithmException, InvalidKeySpecException, IllegalArgumentException {
+        return isPrivateKey(encodedKey) ? readPrivateKey(encodedKey) : readPublicKey(encodedKey);
+    }
 
-        byte[] encode = Base64.getDecoder().decode(stripPemKeyHeaderAndFooter(pemKey));
+    protected boolean isPrivateKey(String key) {
+
+        try {
+            readPrivateKey(key);
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    protected PrivateKey readPrivateKey(@Nonnull String pemKey)
+            throws NoSuchAlgorithmException, InvalidKeySpecException, IllegalArgumentException {
+
+        byte[] encode = parseBase64(pemKey);
 
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encode);
         return keyFactory.generatePrivate(keySpec);
+    }
+
+    protected PublicKey readPublicKey(@Nonnull String pemKey)
+            throws NoSuchAlgorithmException, InvalidKeySpecException, IllegalArgumentException {
+
+        byte[] encode = parseBase64(pemKey);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encode);
+        return keyFactory.generatePublic(keySpec);
+    }
+
+    protected byte[] parseBase64(String keyString) throws IllegalArgumentException {
+        return Base64.getDecoder().decode(stripPemKeyHeaderAndFooter(keyString));
     }
 
     private String stripPemKeyHeaderAndFooter(String pemKey) {

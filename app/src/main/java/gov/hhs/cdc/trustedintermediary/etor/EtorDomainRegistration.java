@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor;
 
+import gov.hhs.cdc.trustedintermediary.auth.AuthRequestValidator;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
@@ -16,6 +17,7 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiLabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileLabOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamLabOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -31,6 +33,7 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject PatientDemographicsController patientDemographicsController;
     @Inject ConvertAndSendLabOrderUsecase convertAndSendLabOrderUsecase;
     @Inject Logger logger;
+    @Inject AuthRequestValidator authValidator;
 
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
             Map.of(new HttpEndpoint("POST", "/v1/etor/demographics"), this::handleOrder);
@@ -67,6 +70,18 @@ public class EtorDomainRegistration implements DomainConnector {
     }
 
     DomainResponse handleOrder(DomainRequest request) {
+
+        // Validate token
+        try {
+            if (!authValidator.isValidAuthenticatedRequest(request)) {
+                var errorMessage = "The request failed the authentication check";
+                logger.logError(errorMessage);
+                return patientDemographicsController.constructResponse(401, errorMessage);
+            }
+        } catch (SecretRetrievalException | IllegalArgumentException e) {
+            logger.logFatal("Unable to validate whether the request is authenticated", e);
+            return patientDemographicsController.constructResponse(500, e);
+        }
 
         var demographics = patientDemographicsController.parseDemographics(request);
 

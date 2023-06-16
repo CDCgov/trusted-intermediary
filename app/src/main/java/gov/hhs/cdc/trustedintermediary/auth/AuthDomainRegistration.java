@@ -32,6 +32,7 @@ public class AuthDomainRegistration implements DomainConnector {
         ApplicationContext.register(AuthController.class, AuthController.getInstance());
         ApplicationContext.register(
                 RequestSessionTokenUsecase.class, RequestSessionTokenUsecase.getInstance());
+        ApplicationContext.register(AuthRequestValidator.class, AuthRequestValidator.getInstance());
         return endpoints;
     }
 
