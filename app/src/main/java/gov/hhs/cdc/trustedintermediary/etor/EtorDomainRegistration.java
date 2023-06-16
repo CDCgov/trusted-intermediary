@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint;
+import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecificationException;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendLabOrderUsecase;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender;
@@ -57,12 +58,14 @@ public class EtorDomainRegistration implements DomainConnector {
     }
 
     @Override
-    public String openApiSpecification() {
+    public String openApiSpecification() throws UnableToReadOpenApiSpecificationException {
+        String fileName = "openapi_etor.yaml";
         try (InputStream openApiStream =
-                getClass().getClassLoader().getResourceAsStream("openapi_etor.yaml")) {
+                getClass().getClassLoader().getResourceAsStream(fileName)) {
             return new String(openApiStream.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new UnableToReadOpenApiSpecificationException(
+                    "Failed to open OpenAPI specification for " + fileName, e);
         }
     }
 

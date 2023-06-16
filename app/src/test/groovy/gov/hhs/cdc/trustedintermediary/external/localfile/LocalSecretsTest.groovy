@@ -1,8 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.localfile
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException
-import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
 import java.nio.file.Files
@@ -60,10 +58,21 @@ class LocalSecretsTest extends Specification {
 
         when:
         def secret = secrets.readSecretFromResources(name)
-        println(secret)
 
         then:
         def exception = thrown(Exception)
         exception.getCause().getClass() == NullPointerException
+    }
+
+    def "readSecretFromResource works"() {
+        given:
+        def secretName = "trusted-intermediary-private-key-local"  //pragma: allowlist secret
+        def expected = Files.readString(Path.of("..", "mock_credentials", secretName + ".pem"))
+
+        when:
+        def actual = LocalSecrets.getInstance().readSecretFromResources(secretName)
+
+        then:
+        actual == expected
     }
 }

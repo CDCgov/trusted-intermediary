@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecificationException
 import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombiner
 import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombinerException
 import spock.lang.Specification
@@ -54,6 +55,6 @@ class OpenApiTest extends Specification {
         OpenApi.getInstance().generateApiDocumentation(["Moof", "Clarus"] as Set)
 
         then:
-        thrown(RuntimeException)
+        thrown(UnableToReadOpenApiSpecificationException)
     }
 }

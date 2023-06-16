@@ -3,6 +3,8 @@ package gov.hhs.cdc.trustedintermediary.external.javalin;
 import gov.hhs.cdc.trustedintermediary.OpenApi;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnectorConstructionException;
+import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecificationException;
 import gov.hhs.cdc.trustedintermediary.external.apache.ApacheClient;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureSecrets;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation;
@@ -45,7 +47,8 @@ public class App {
         }
     }
 
-    private static void registerDomains(Javalin app) {
+    private static void registerDomains(Javalin app)
+            throws DomainConnectorConstructionException, UnableToReadOpenApiSpecificationException {
         Set<Class<? extends DomainConnector>> domainConnectors =
                 ApplicationContext.getImplementors(DomainConnector.class);
 
