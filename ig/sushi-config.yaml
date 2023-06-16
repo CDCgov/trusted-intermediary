@@ -48,10 +48,6 @@ pages:
     title: Sending Data to the Intermediary
   etor-nbs.md:
     title: ETOR - Newborn Screening
-  external.md:
-    title: Information for Sending to and Receiving from the Intermediary
-  external-interfaces.md:
-    title: External Interfaces
   internal.md:
     title: Information About the Internals of the Intermediary
   internal-interfaces.md:
@@ -102,10 +98,6 @@ menu:
 
   Use Cases:
     ETOR - Newborn Screening: etor-nbs.html
-
-  External:
-    External Interfaces Overview:  external.html
-    External Interfaces: external-interfaces.html
 
   Internal:
     Internal Interfaces Overview:  internal.html
