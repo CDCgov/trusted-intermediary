@@ -72,7 +72,7 @@ class EtorDomainRegistrationTest extends Specification {
         def domainRequest = new DomainRequest()
 
         when:
-        def response = domainRegistration.handleOrder(domainRequest)
+        domainRegistration.handleOrder(domainRequest)
 
         then:
         1 * mockDemographicsController.constructResponse(_ as PatientDemographicsResponse) >> { PatientDemographicsResponse demographicsResponse ->
