@@ -1,6 +1,5 @@
 import time
 import logging
-import datetime
 import threading
 import urllib.parse
 import urllib.request
