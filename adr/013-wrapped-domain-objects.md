@@ -4,7 +4,7 @@ Date: 2023-06-19
 
 ## Decision
 
-We will "wrap" the HAPI FHIR (or any other FHIR library we may pivot to) resource classes with an interface to prevent the HAPI library from "poluting" our business logic.
+We will "wrap" the HAPI FHIR (or any other FHIR library we may pivot to) resource classes with an interface to prevent the HAPI library from "polluting" our business logic.
 
 ## Status
 
