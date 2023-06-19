@@ -41,7 +41,7 @@ dependencies:
 #
 pages:
   index.md:
-    title: Report Stream Intermediary
+    title: ReportStream Intermediary
   onboarding.md:
     title: Onboarding to the Intermediary
   sending.md:
