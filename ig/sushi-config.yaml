@@ -4,10 +4,10 @@
 # │  see: https://fshschool.org/docs/sushi/configuration/.                                         │
 # ╰────────────────────────────────────────────────────────────────────────────────────────────────╯
 id: cdc.gov.ti.ig
-canonical: http://cdc.gov/reportstream/trustedintermediary
-name: CDCTrustedIntermediaryIG
-title: CDC ReportStream Trusted Intermediary Documentation
-description: Implementation Guide and other documentation for the CDC ReportStream Trusted Intermediary
+canonical: http://cdc.gov/reportstream/intermediary
+name: CDCReportStreamIntermediaryIG
+title: CDC ReportStream Intermediary Documentation
+description: Implementation Guide and other documentation for the CDC ReportStream Intermediary
 status: draft # draft | active | retired | unknown
 version: 0.1.0
 fhirVersion: 4.0.1 # https://www.hl7.org/fhir/valueset-FHIR-version.html
@@ -41,29 +41,15 @@ dependencies:
 #
 pages:
   index.md:
-    title: Documentation Home
-  guidance.md:
-    title: General Guidance
+    title: ReportStream Intermediary
   onboarding.md:
     title: Onboarding to the Intermediary
-  connecting.md:
-    title: Connecting to the Intermediary
+  sending.md:
+    title: Sending Data to the Intermediary
   etor-nbs.md:
     title: ETOR - Newborn Screening
-  external.md:
-    title: Information for Sending to and Receiving from the Intermediary
-  external-interfaces.md:
-    title: External Interfaces
-  internal.md:
-    title: Information About the Internals of the Intermediary
-  internal-interfaces.md:
-    title: Internal Interfaces
-  example-overview.md:
-    title: Example Overview
-  faq.md:
-    title: Frequently Asked Questions (FAQ)
-  troubleshooting.md:
-    title: Troubleshooting Information
+  internals.md:
+    title: Internals of the Intermediary
 
 #   implementation.xml:
 #   examples.xml:
@@ -100,26 +86,12 @@ menu:
 
   Onboarding: onboarding.html
 
-  Connecting: connecting.html
+  Sending Data: sending.html
 
   Use Cases:
-    General Guidance: guidance.html
     ETOR - Newborn Screening: etor-nbs.html
 
-  External:
-    External Interfaces Overview:  external.html
-    External Interfaces: external-interfaces.html
-
-  Internal:
-    Internal Interfaces Overview:  internal.html
-    Internal Interfaces: internal-interfaces.html
-
-  Examples:
-    Example Overview: example-overview.html
-
-  FAQ: faq.html
-
-  Troubleshooting: troubleshooting.html
+  Internals: internals.html
 
   Artifacts: artifacts.html
 
@@ -180,7 +152,7 @@ resources:
       - url: http://hl7.org/fhir/StructureDefinition/implementationguide-resource-format
         valueCode: application/fhir+json
     name: ADT-01 Example 1
-    exampleCanonical: http://cdc.gov/reportstream/trustedintermediary/StructureDefinition/ADT01
+    exampleCanonical: http://cdc.gov/reportstream/intermediary/StructureDefinition/ADT01
 
 # resources:
 #   Patient/my-example-patient:
