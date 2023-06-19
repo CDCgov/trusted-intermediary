@@ -5,7 +5,7 @@ import threading
 import urllib.parse
 import urllib.request
 
-from locust import HttpUser, task, events
+from locust import FastHttpUser, task, events
 from locust.runners import MasterRunner
 
 
@@ -17,7 +17,7 @@ demographics_request_body = None
 auth_request_body = None
 
 
-class SampleUser(HttpUser):
+class SampleUser(FastHttpUser):
     # Each task gets called randomly, but the number next to '@task' denotes
     # how many more times that task will get called than other tasks
 
