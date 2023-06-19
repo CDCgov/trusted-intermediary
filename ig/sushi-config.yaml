@@ -48,10 +48,8 @@ pages:
     title: Sending Data to the Intermediary
   etor-nbs.md:
     title: ETOR - Newborn Screening
-  internal.md:
-    title: Information About the Internals of the Intermediary
-  internal-interfaces.md:
-    title: Internal Interfaces
+  internals.md:
+    title: Internals of the Intermediary
 
 #   implementation.xml:
 #   examples.xml:
@@ -93,9 +91,7 @@ menu:
   Use Cases:
     ETOR - Newborn Screening: etor-nbs.html
 
-  Internal:
-    Internal Interfaces Overview:  internal.html
-    Internal Interfaces: internal-interfaces.html
+  Internals: internals.html
 
   Artifacts: artifacts.html
 
