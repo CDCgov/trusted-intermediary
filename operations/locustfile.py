@@ -22,7 +22,6 @@ class SampleUser(HttpUser):
     # how many more times that task will get called than other tasks
 
     token_refresh_interval = 280
-    last_authenticated = None
     access_token = None
 
     def on_start(self):
@@ -42,7 +41,6 @@ class SampleUser(HttpUser):
         logging.debug("Authenticating...")
         response = self.client.post(AUTH_ENDPOINT, data=auth_request_body)
         data = response.json()
-        self.last_authenticated = datetime.datetime.now()
         self.access_token = data["access_token"]
 
     @task
