@@ -39,6 +39,8 @@ resource "azurerm_linux_web_app" "api" {
   location            = azurerm_service_plan.plan.location
   service_plan_id     = azurerm_service_plan.plan.id
 
+  https_only = true
+
   site_config {}
 
   app_settings = {
