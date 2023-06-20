@@ -3,7 +3,7 @@ set -e
 
 start_api() {
     echo 'Starting API'
-    ./gradlew --no-daemon app:clean app:run &
+    ./gradlew --no-daemon app:clean app:run > /dev/null 2>&1 &
     export API_PID="${!}"
     echo "API starting at PID ${API_PID}"
 }
