@@ -72,7 +72,7 @@ class EtorDomainRegistrationTest extends Specification {
         def domainRequest = new DomainRequest()
 
         when:
-        domainRegistration.handleOrder(domainRequest)
+        domainRegistration.handleDemographics(domainRequest)
 
         then:
         1 * mockDemographicsController.constructResponse(_ as PatientDemographicsResponse) >> { PatientDemographicsResponse demographicsResponse ->
@@ -100,7 +100,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def res = domainRegistration.handleOrder(domainRequest)
+        def res = domainRegistration.handleDemographics(domainRequest)
 
         then:
         res.statusCode == 400
@@ -121,7 +121,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        domainRegistration.handleOrder(new DomainRequest())
+        domainRegistration.handleDemographics(new DomainRequest())
 
         then:
         1 * mockDemographicsController.constructResponse(_ as Integer, _ as String) >> { Integer httpStatus, String errorString ->
@@ -145,7 +145,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        domainRegistration.handleOrder(new DomainRequest())
+        domainRegistration.handleDemographics(new DomainRequest())
 
         then:
         1 * mockDemographicsController.constructResponse(_ as Integer, _ as Exception) >> { Integer httpStatus, Exception exception ->
