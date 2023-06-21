@@ -9,7 +9,7 @@ import javax.inject.Inject;
 public class ApiConfig {
     private static final ApiConfig INSTANCE = new ApiConfig();
     private static final String PROPERTIES_FILE_NAME = "api.properties";
-    private static Properties properties;
+    private Properties properties;
 
     @Inject Logger logger;
 
