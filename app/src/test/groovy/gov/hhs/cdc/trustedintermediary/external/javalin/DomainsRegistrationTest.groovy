@@ -83,24 +83,7 @@ class DomainsRegistrationTest extends Specification {
         then:
         savedResult == bodyString
         savedStatusCode == statusCode
-        savedHeaders.entrySet().containsAll(headerMap.entrySet())
-    }
-
-    def "Test that X-Content-Type-Options is set by default"() {
-        given:
-
-        def statusCode = 418
-        def response = new DomainResponse(statusCode)
-
-        def javalinContext = Mock(Context)
-        def savedHeaders = [:]
-        javalinContext.header(_ as String, _ as String) >> { String key, String value -> savedHeaders.put(key, value) }
-
-        when:
-        DomainsRegistration.domainResponseFillsInJavalinContext(response, javalinContext)
-
-        then:
-        savedHeaders.get("X-Content-Type-Options") == "nosniff"
+        savedHeaders == headerMap
     }
 
     def "createHandler successfully stitches things together"() {

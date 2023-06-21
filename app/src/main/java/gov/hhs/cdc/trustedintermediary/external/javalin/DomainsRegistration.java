@@ -92,7 +92,6 @@ public class DomainsRegistration {
                 "/openapi",
                 ctx -> {
                     LOGGER.logInfo(ctx.method().name() + " " + ctx.url());
-                    ctx.header("X-Content-Type-Options", "nosniff");
                     ctx.header("Content-Type", "application/x-yaml");
                     ctx.result(fullOpenApiSpecification);
                 });
@@ -138,7 +137,6 @@ public class DomainsRegistration {
 
     static void domainResponseFillsInJavalinContext(DomainResponse response, Context ctx) {
         ctx.status(response.getStatusCode());
-        ctx.header("X-Content-Type-Options", "nosniff");
         response.getHeaders().forEach(ctx::header);
         ctx.result(response.getBody());
     }

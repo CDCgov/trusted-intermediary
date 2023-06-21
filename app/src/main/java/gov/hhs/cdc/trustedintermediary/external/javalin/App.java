@@ -31,13 +31,12 @@ public class App {
     public static void main(String[] args) {
         var app = Javalin.create().start(8080);
 
+        // apply this security header to all responses, but allow it to be overwritten by a specific
+        // endpoint by using `before` if needed
+        app.before(ctx -> ctx.header("X-Content-Type-Options", "nosniff"));
+
         try {
-            app.get(
-                    "/health",
-                    ctx -> {
-                        ctx.result("Operational");
-                        ctx.header("X-Content-Type-Options", "nosniff");
-                    });
+            app.get("/health", ctx -> ctx.result("Operational"));
 
             registerClasses();
             registerDomains(app);
