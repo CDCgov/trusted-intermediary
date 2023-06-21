@@ -72,5 +72,6 @@ public class App {
                         : AzureSecrets.getInstance());
         ApplicationContext.register(
                 OrganizationsSettings.class, OrganizationsSettings.getInstance());
+        ApplicationContext.register(ApiConfig.class, ApiConfig.getInstance());
     }
 }

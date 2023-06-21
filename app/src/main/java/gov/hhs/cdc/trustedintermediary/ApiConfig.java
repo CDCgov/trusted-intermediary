@@ -7,19 +7,25 @@ import java.util.Properties;
 import javax.inject.Inject;
 
 public class ApiConfig {
+    private static final ApiConfig INSTANCE = new ApiConfig();
     private static final String PROPERTIES_FILE_NAME = "api.properties";
-    private static Properties properties = new Properties();
+    private static Properties properties;
 
     @Inject Logger logger;
 
-    static {
+    private ApiConfig() {
+        properties = new Properties();
         try {
             InputStream inputStream =
                     ApiConfig.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME);
             properties.load(inputStream);
         } catch (IOException e) {
-            System.out.println("Failed to load property file due to: " + e.getMessage());
+            logger.logFatal("Failed to load property file", e);
         }
+    }
+
+    public static ApiConfig getInstance() {
+        return INSTANCE;
     }
 
     public static String getProperty(String key) {
