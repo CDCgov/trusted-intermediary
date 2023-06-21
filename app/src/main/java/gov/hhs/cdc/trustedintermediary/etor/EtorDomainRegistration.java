@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor;
 
+import gov.hhs.cdc.trustedintermediary.ApiConfig;
 import gov.hhs.cdc.trustedintermediary.auth.AuthRequestValidator;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
@@ -37,8 +38,10 @@ public class EtorDomainRegistration implements DomainConnector {
 
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
             Map.of(
-                    new HttpEndpoint("POST", "/v1/etor/demographics"), this::handleDemographics,
-                    new HttpEndpoint("POST", "/v1/etor/orders"), this::handleOrders);
+                    new HttpEndpoint("POST", ApiConfig.getProperty("endpoint.demographics")),
+                            this::handleDemographics,
+                    new HttpEndpoint("POST", ApiConfig.getProperty("endpoint.orders")),
+                            this::handleOrders);
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {

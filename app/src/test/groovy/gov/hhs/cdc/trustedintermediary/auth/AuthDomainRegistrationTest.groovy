@@ -16,7 +16,7 @@ class AuthDomainRegistrationTest extends Specification {
     def "domain registration has endpoints"() {
         given:
         def domainRegistration = new AuthDomainRegistration()
-        def specifiedEndpoint = new HttpEndpoint("POST", "/v1/auth")
+        def specifiedEndpoint = new HttpEndpoint("POST", ApiConfig.getProperty("endpoint.auth"))
 
         when:
         def endpoints = domainRegistration.domainRegistration()

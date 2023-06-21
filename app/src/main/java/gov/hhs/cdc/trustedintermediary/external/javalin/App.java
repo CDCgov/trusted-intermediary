@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.javalin;
 
+import gov.hhs.cdc.trustedintermediary.ApiConfig;
 import gov.hhs.cdc.trustedintermediary.OpenApi;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
@@ -32,7 +33,7 @@ public class App {
         var app = Javalin.create().start(8080);
 
         try {
-            app.get("/health", ctx -> ctx.result("Operational"));
+            app.get(ApiConfig.getProperty("endpoint.health"), ctx -> ctx.result("Operational"));
 
             registerClasses();
             registerDomains(app);
