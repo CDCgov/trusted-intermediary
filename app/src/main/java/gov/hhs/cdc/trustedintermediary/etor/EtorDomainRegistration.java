@@ -36,7 +36,9 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject AuthRequestValidator authValidator;
 
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
-            Map.of(new HttpEndpoint("POST", "/v1/etor/demographics"), this::handleOrder);
+            Map.of(
+                    new HttpEndpoint("POST", "/v1/etor/demographics"), this::handleDemographics,
+                    new HttpEndpoint("POST", "/v1/etor/orders"), this::handleOrders);
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
@@ -69,7 +71,7 @@ public class EtorDomainRegistration implements DomainConnector {
         }
     }
 
-    DomainResponse handleOrder(DomainRequest request) {
+    DomainResponse handleDemographics(DomainRequest request) {
 
         // Validate token
         try {
@@ -96,5 +98,13 @@ public class EtorDomainRegistration implements DomainConnector {
                 new PatientDemographicsResponse(demographics);
 
         return patientDemographicsController.constructResponse(patientDemographicsResponse);
+    }
+
+    DomainResponse handleOrders(DomainRequest domainRequest) {
+        //  Validate token
+        //  var orders = OrdersController.ParseOrders(request)
+        //  convertAndSendLabOrderUseCase.covertAndSend(order)
+        //  return OrdersController.constructResponse(OrdersResponse)
+        return new DomainResponse(200);
     }
 }

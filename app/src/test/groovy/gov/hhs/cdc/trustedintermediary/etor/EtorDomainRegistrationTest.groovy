@@ -24,14 +24,16 @@ class EtorDomainRegistrationTest extends Specification {
     def "domain registration has endpoints"() {
         given:
         def domainRegistration = new EtorDomainRegistration()
-        def specifiedEndpoint = new HttpEndpoint("POST", "/v1/etor/demographics")
+        def demographicsEndpoint = new HttpEndpoint("POST", "/v1/etor/demographics")
+        def ordersEndpoint = new HttpEndpoint("POST", "/v1/etor/orders")
 
         when:
         def endpoints = domainRegistration.domainRegistration()
 
         then:
         !endpoints.isEmpty()
-        endpoints.get(specifiedEndpoint) != null
+        endpoints.get(demographicsEndpoint) != null
+        endpoints.get(ordersEndpoint) != null
     }
 
     def "has an OpenAPI specification"() {
@@ -72,7 +74,7 @@ class EtorDomainRegistrationTest extends Specification {
         def domainRequest = new DomainRequest()
 
         when:
-        domainRegistration.handleOrder(domainRequest)
+        domainRegistration.handleDemographics(domainRequest)
 
         then:
         1 * mockDemographicsController.constructResponse(_ as PatientDemographicsResponse) >> { PatientDemographicsResponse demographicsResponse ->
@@ -81,7 +83,7 @@ class EtorDomainRegistrationTest extends Specification {
         1 * mockUsecase.convertAndSend(_ as Demographics)
     }
 
-    def "handleOrder generates an error response when the usecase throws an exception"() {
+    def "handleDemographics generates an error response when the usecase throws an exception"() {
         given:
         def domainRegistration = new EtorDomainRegistration()
         def mockDemographicConrollor = Mock(PatientDemographicsController)
@@ -100,7 +102,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def res = domainRegistration.handleOrder(domainRequest)
+        def res = domainRegistration.handleDemographics(domainRequest)
 
         then:
         res.statusCode == 400
@@ -121,7 +123,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        domainRegistration.handleOrder(new DomainRequest())
+        domainRegistration.handleDemographics(new DomainRequest())
 
         then:
         1 * mockDemographicsController.constructResponse(_ as Integer, _ as String) >> { Integer httpStatus, String errorString ->
@@ -145,12 +147,26 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        domainRegistration.handleOrder(new DomainRequest())
+        domainRegistration.handleDemographics(new DomainRequest())
 
         then:
         1 * mockDemographicsController.constructResponse(_ as Integer, _ as Exception) >> { Integer httpStatus, Exception exception ->
             assert httpStatus == 500
         }
         0 * mockDemographicsController.parseDemographics(_)
+    }
+
+    def "Orders endpoint happy path"() {
+        given:
+        def expected = 200
+        def connector = new EtorDomainRegistration()
+        def req = new DomainRequest()
+
+        when:
+        def res = connector.handleOrders(req)
+        def actual = res.statusCode
+
+        then:
+        actual == expected
     }
 }
