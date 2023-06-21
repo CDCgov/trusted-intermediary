@@ -8,6 +8,8 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 
 public class AuthClient {
+    private static final String API_ENDPOINT = "/v1/auth";
+
     public static String login(String clientId, String clientJwt)
             throws IOException, ParseException {
         String body;
@@ -23,7 +25,7 @@ public class AuthClient {
     public static ClassicHttpResponse loginRaw(String clientId, String clientJwt)
             throws IOException {
         return Client.post(
-                "/v1/auth",
+                API_ENDPOINT,
                 postBody(clientId, clientJwt),
                 ContentType.APPLICATION_FORM_URLENCODED,
                 Map.of());
