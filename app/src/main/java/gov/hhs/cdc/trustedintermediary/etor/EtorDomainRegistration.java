@@ -100,7 +100,7 @@ public class EtorDomainRegistration implements DomainConnector {
         return patientDemographicsController.constructResponse(patientDemographicsResponse);
     }
 
-    private DomainResponse handleOrders(DomainRequest domainRequest) {
+    DomainResponse handleOrders(DomainRequest domainRequest) {
         // Validate token
 
         // var orders = OrdersController.ParseOrders(request);

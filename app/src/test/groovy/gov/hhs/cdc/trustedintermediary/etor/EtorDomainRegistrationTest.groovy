@@ -155,4 +155,18 @@ class EtorDomainRegistrationTest extends Specification {
         }
         0 * mockDemographicsController.parseDemographics(_)
     }
+
+    def "Orders endpoint happy path"() {
+        given:
+        def expected = 200
+        def connector = new EtorDomainRegistration()
+        def req = new DomainRequest()
+
+        when:
+        def res = connector.handleOrders(req)
+        def actual = res.statusCode
+
+        then:
+        actual == expected
+    }
 }
