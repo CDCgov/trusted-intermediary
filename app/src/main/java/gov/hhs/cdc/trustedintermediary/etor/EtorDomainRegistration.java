@@ -107,7 +107,7 @@ public class EtorDomainRegistration implements DomainConnector {
 
         // TODO convertAndSendLabOrderUseCase.covertAndSend(order);
 
-        // TODO return OrderController.constructResponse(OrdersResponse);
+        // TODO return OrdersController.constructResponse(OrdersResponse);
         return new DomainResponse(200);
     }
 }
