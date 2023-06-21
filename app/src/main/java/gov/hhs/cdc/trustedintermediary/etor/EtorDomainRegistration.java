@@ -101,13 +101,13 @@ public class EtorDomainRegistration implements DomainConnector {
     }
 
     DomainResponse handleOrders(DomainRequest domainRequest) {
-        // Validate token
+        // TODO Validate token
 
-        // var orders = OrdersController.ParseOrders(request);
+        // TODO var orders = OrdersController.ParseOrders(request);
 
-        // convertAndSendLabOrderUseCase.covertAndSend(order);
+        // TODO convertAndSendLabOrderUseCase.covertAndSend(order);
 
-        // return OrderController.constructResponse(OrdersResponse);
+        // TODO return OrderController.constructResponse(OrdersResponse);
         return new DomainResponse(200);
     }
 }
