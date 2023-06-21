@@ -32,7 +32,12 @@ public class App {
         var app = Javalin.create().start(8080);
 
         try {
-            app.get("/health", ctx -> ctx.result("Operational"));
+            app.get(
+                    "/health",
+                    ctx -> {
+                        ctx.result("Operational");
+                        ctx.header("X-Content-Type-Options", "nosniff");
+                    });
 
             registerClasses();
             registerDomains(app);
