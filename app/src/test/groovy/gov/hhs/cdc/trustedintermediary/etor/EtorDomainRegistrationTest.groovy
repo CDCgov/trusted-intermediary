@@ -24,14 +24,16 @@ class EtorDomainRegistrationTest extends Specification {
     def "domain registration has endpoints"() {
         given:
         def domainRegistration = new EtorDomainRegistration()
-        def specifiedEndpoint = new HttpEndpoint("POST", "/v1/etor/demographics")
+        def demographicsEndpoint = new HttpEndpoint("POST", "/v1/etor/demographics")
+        def ordersEndpoint = new HttpEndpoint("POST", "/v1/etor/orders")
 
         when:
         def endpoints = domainRegistration.domainRegistration()
 
         then:
         !endpoints.isEmpty()
-        endpoints.get(specifiedEndpoint) != null
+        endpoints.get(demographicsEndpoint) != null
+        endpoints.get(ordersEndpoint) != null
     }
 
     def "has an OpenAPI specification"() {
@@ -81,7 +83,7 @@ class EtorDomainRegistrationTest extends Specification {
         1 * mockUsecase.convertAndSend(_ as Demographics)
     }
 
-    def "handleOrder generates an error response when the usecase throws an exception"() {
+    def "handleDemographics generates an error response when the usecase throws an exception"() {
         given:
         def domainRegistration = new EtorDomainRegistration()
         def mockDemographicConrollor = Mock(PatientDemographicsController)
