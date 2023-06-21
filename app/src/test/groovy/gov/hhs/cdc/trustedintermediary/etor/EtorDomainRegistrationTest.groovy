@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor
 
+import gov.hhs.cdc.trustedintermediary.ApiConfig
 import gov.hhs.cdc.trustedintermediary.DemographicsMock
 import gov.hhs.cdc.trustedintermediary.auth.AuthRequestValidator
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
