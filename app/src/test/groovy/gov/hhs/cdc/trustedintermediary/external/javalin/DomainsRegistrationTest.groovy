@@ -165,7 +165,7 @@ class DomainsRegistrationTest extends Specification {
 
             handler.handle(context)
         }
-        contentType == "application/yaml"
+        contentType == "application/x-yaml"
     }
 
     static class Example1DomainConnector implements DomainConnector {
