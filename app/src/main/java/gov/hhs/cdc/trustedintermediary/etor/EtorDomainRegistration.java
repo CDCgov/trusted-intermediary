@@ -30,8 +30,8 @@ import javax.inject.Inject;
  */
 public class EtorDomainRegistration implements DomainConnector {
 
-    public static final String DEMOGRAPHICS_ENDPOINT = "/v1/etor/demographics";
-    public static final String ORDERS_ENDPOINT = "/v1/etor/orders";
+    public static final String DEMOGRAPHICS_API_ENDPOINT = "/v1/etor/demographics";
+    public static final String ORDERS_API_ENDPOINT = "/v1/etor/orders";
 
     @Inject PatientDemographicsController patientDemographicsController;
     @Inject ConvertAndSendLabOrderUsecase convertAndSendLabOrderUsecase;
@@ -40,8 +40,8 @@ public class EtorDomainRegistration implements DomainConnector {
 
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
             Map.of(
-                    new HttpEndpoint("POST", DEMOGRAPHICS_ENDPOINT), this::handleDemographics,
-                    new HttpEndpoint("POST", ORDERS_ENDPOINT), this::handleOrders);
+                    new HttpEndpoint("POST", DEMOGRAPHICS_API_ENDPOINT), this::handleDemographics,
+                    new HttpEndpoint("POST", ORDERS_API_ENDPOINT), this::handleOrders);
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {

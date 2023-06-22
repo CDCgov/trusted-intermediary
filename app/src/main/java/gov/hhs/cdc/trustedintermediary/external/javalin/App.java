@@ -28,13 +28,13 @@ import java.util.Set;
 /** Creates the starting point of our API. Handles the registration of the domains. */
 public class App {
 
-    public static final String HEALTH_ENDPOINT = "/health";
+    public static final String HEALTH_API_ENDPOINT = "/health";
 
     public static void main(String[] args) {
         var app = Javalin.create().start(8080);
 
         try {
-            app.get(HEALTH_ENDPOINT, ctx -> ctx.result("Operational"));
+            app.get(HEALTH_API_ENDPOINT, ctx -> ctx.result("Operational"));
 
             registerClasses();
             registerDomains(app);
