@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.external.javalin;
 
-import gov.hhs.cdc.trustedintermediary.ApiConfig;
 import gov.hhs.cdc.trustedintermediary.OpenApi;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
@@ -29,11 +28,13 @@ import java.util.Set;
 /** Creates the starting point of our API. Handles the registration of the domains. */
 public class App {
 
+    public static final String HEALTH_ENDPOINT = "/health";
+
     public static void main(String[] args) {
         var app = Javalin.create().start(8080);
 
         try {
-            app.get(ApiConfig.getProperty("endpoint.health"), ctx -> ctx.result("Operational"));
+            app.get(HEALTH_ENDPOINT, ctx -> ctx.result("Operational"));
 
             registerClasses();
             registerDomains(app);
@@ -72,6 +73,5 @@ public class App {
                         : AzureSecrets.getInstance());
         ApplicationContext.register(
                 OrganizationsSettings.class, OrganizationsSettings.getInstance());
-        ApplicationContext.register(ApiConfig.class, ApiConfig.getInstance());
     }
 }

@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.etor
 
-import gov.hhs.cdc.trustedintermediary.ApiConfig
 import gov.hhs.cdc.trustedintermediary.DemographicsMock
 import gov.hhs.cdc.trustedintermediary.auth.AuthRequestValidator
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
@@ -25,8 +24,8 @@ class EtorDomainRegistrationTest extends Specification {
     def "domain registration has endpoints"() {
         given:
         def domainRegistration = new EtorDomainRegistration()
-        def demographicsEndpoint = new HttpEndpoint("POST", ApiConfig.getProperty("endpoint.demographics"))
-        def ordersEndpoint = new HttpEndpoint("POST", ApiConfig.getProperty("endpoint.orders"))
+        def demographicsEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.DEMOGRAPHICS_ENDPOINT)
+        def ordersEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.ORDERS_ENDPOINT)
 
         when:
         def endpoints = domainRegistration.domainRegistration()

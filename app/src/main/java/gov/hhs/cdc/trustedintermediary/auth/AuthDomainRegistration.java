@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.auth;
 
-import gov.hhs.cdc.trustedintermediary.ApiConfig;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
@@ -21,14 +20,14 @@ import javax.inject.Inject;
  */
 public class AuthDomainRegistration implements DomainConnector {
 
+    public static final String AUTH_ENDPOINT = "/v1/auth";
+
     @Inject AuthController authController;
     @Inject RequestSessionTokenUsecase requestSessionTokenUsecase;
     @Inject Logger logger;
 
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
-            Map.of(
-                    new HttpEndpoint("POST", ApiConfig.getProperty("endpoint.auth")),
-                    this::handleAuth);
+            Map.of(new HttpEndpoint("POST", AUTH_ENDPOINT), this::handleAuth);
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {

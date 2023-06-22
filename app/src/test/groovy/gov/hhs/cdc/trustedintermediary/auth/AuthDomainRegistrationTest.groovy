@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.auth
 
-import gov.hhs.cdc.trustedintermediary.ApiConfig
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
@@ -17,7 +16,7 @@ class AuthDomainRegistrationTest extends Specification {
     def "domain registration has endpoints"() {
         given:
         def domainRegistration = new AuthDomainRegistration()
-        def specifiedEndpoint = new HttpEndpoint("POST", ApiConfig.getProperty("endpoint.auth"))
+        def specifiedEndpoint = new HttpEndpoint("POST", AuthDomainRegistration.AUTH_ENDPOINT)
 
         when:
         def endpoints = domainRegistration.domainRegistration()

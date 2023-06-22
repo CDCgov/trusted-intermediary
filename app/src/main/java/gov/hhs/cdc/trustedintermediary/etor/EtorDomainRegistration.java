@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.etor;
 
-import gov.hhs.cdc.trustedintermediary.ApiConfig;
 import gov.hhs.cdc.trustedintermediary.auth.AuthRequestValidator;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
@@ -31,6 +30,9 @@ import javax.inject.Inject;
  */
 public class EtorDomainRegistration implements DomainConnector {
 
+    public static final String DEMOGRAPHICS_ENDPOINT = "/v1/etor/demographics";
+    public static final String ORDERS_ENDPOINT = "/v1/etor/orders";
+
     @Inject PatientDemographicsController patientDemographicsController;
     @Inject ConvertAndSendLabOrderUsecase convertAndSendLabOrderUsecase;
     @Inject Logger logger;
@@ -38,10 +40,8 @@ public class EtorDomainRegistration implements DomainConnector {
 
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
             Map.of(
-                    new HttpEndpoint("POST", ApiConfig.getProperty("endpoint.demographics")),
-                            this::handleDemographics,
-                    new HttpEndpoint("POST", ApiConfig.getProperty("endpoint.orders")),
-                            this::handleOrders);
+                    new HttpEndpoint("POST", DEMOGRAPHICS_ENDPOINT), this::handleDemographics,
+                    new HttpEndpoint("POST", ORDERS_ENDPOINT), this::handleOrders);
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
