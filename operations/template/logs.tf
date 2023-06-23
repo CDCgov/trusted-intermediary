@@ -5,15 +5,6 @@ resource "azurerm_log_analytics_workspace" "logs_workspace" {
   location            = azurerm_resource_group.group.location
 }
 
-resource "azurerm_log_analytics_saved_search" "raw_application_logs" {
-  name                       = "rawApplicationLogs"
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.logs_workspace.id
-
-  category     = "Application Logs"
-  display_name = "Raw Application Logs"
-  query        = "AppServiceConsoleLogs | extend JsonResult = parse_json(ResultDescription) | project-away TimeGenerated, Level, ResultDescription, Host, Type, _ResourceId, OperationName, TenantId, SourceSystem | evaluate bag_unpack(JsonResult)"
-}
-
 resource "azurerm_log_analytics_query_pack" "application_logs_pack" {
   name                = "Application Logs"
   resource_group_name = azurerm_resource_group.group.name
