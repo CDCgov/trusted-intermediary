@@ -8,6 +8,7 @@
         </timestamp>
         <logLevel />
         <message />
+        <threadName />
         <stackTrace />
       </providers>
     </encoder>
