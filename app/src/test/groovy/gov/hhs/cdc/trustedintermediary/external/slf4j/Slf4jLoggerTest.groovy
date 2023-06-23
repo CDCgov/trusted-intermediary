@@ -5,7 +5,7 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 
 import org.slf4j.event.Level
 import org.slf4j.MarkerFactory
-
+import org.slf4j.spi.NOPLoggingEventBuilder
 import spock.lang.Specification
 
 
@@ -15,34 +15,23 @@ class Slf4jLoggerTest extends Specification {
         given:
         TestApplicationContext.injectRegisteredImplementations()
         def logger = Slf4jLogger.getLogger()
-        def expectedLevel = Level.TRACE
-        def expectedMessage = "Trace message"
 
         when:
-        def logEventBuilder = logger.getLoggingEventBuilder(Logger.Level.TRACE, expectedMessage)
-        def actualLevel = logEventBuilder["loggingEvent"]["level"]
-        def actualMessage = logEventBuilder["loggingEvent"]["message"]
-
+        def logEventBuilder = logger.getLoggingEventBuilder(Logger.Level.TRACE, "Trace message")
         then:
-        actualLevel == expectedLevel
-        actualMessage.toString().contains(expectedMessage.toString())
+        logEventBuilder.getClass() == NOPLoggingEventBuilder
     }
 
     def "getLoggingEventBuilder returns DEBUG level builder test"() {
         given:
         TestApplicationContext.injectRegisteredImplementations()
         def logger = Slf4jLogger.getLogger()
-        def expectedLevel = Level.DEBUG
-        def expectedMessage = "Debug message"
 
         when:
-        def logEventBuilder = logger.getLoggingEventBuilder(Logger.Level.DEBUG, expectedMessage)
-        def actualLevel = logEventBuilder["loggingEvent"]["level"]
-        def actualMessage = logEventBuilder["loggingEvent"]["message"]
+        def logEventBuilder = logger.getLoggingEventBuilder(Logger.Level.DEBUG, "Debug message")
 
         then:
-        actualLevel == expectedLevel
-        actualMessage.toString().contains(expectedMessage.toString())
+        logEventBuilder.getClass() == NOPLoggingEventBuilder
     }
 
     def "getLoggingEventBuilder returns INFO level builder test"() {
