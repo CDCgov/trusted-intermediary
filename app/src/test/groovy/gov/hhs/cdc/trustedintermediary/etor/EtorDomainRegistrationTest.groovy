@@ -214,4 +214,26 @@ class EtorDomainRegistrationTest extends Specification {
         then:
         actual == expected
     }
+
+    def "Orders endpoint validator throws IllegalArgumentException unhappy path"() {
+        given:
+        def mockAuthValidator = Mock(AuthRequestValidator)
+        TestApplicationContext.register(AuthRequestValidator, mockAuthValidator)
+        def expected = 500
+        def connector = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, connector)
+        def req = new DomainRequest()
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> {
+            throw new IllegalArgumentException("DogCaow", new NullPointerException())
+        }
+        def res = connector.handleOrders(req)
+        def actual = res.statusCode
+        println("status code: " + actual)
+
+        then:
+        actual == expected
+    }
 }
