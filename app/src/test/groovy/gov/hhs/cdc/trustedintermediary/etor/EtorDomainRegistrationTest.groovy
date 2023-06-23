@@ -158,11 +158,16 @@ class EtorDomainRegistrationTest extends Specification {
 
     def "Orders endpoint happy path"() {
         given:
+        def mockAuthValidator = Mock(AuthRequestValidator)
+        TestApplicationContext.register(AuthRequestValidator, mockAuthValidator)
         def expected = 200
         def connector = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, connector)
         def req = new DomainRequest()
+        TestApplicationContext.injectRegisteredImplementations()
 
         when:
+        mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> true
         def res = connector.handleOrders(req)
         def actual = res.statusCode
 
