@@ -26,7 +26,8 @@ import java.util.function.Function;
 import javax.inject.Inject;
 
 /**
- * The domain connector for the ETOR domain. It connects it with the larger trusted intermediary.
+ * The domain connector for the ETOR domain. It connects it with the larger trusted intermediary. It
+ * houses the request processing logic for the demographics and orders endpoints.
  */
 public class EtorDomainRegistration implements DomainConnector {
 
