@@ -56,9 +56,6 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.7'
     implementation 'ch.qos.logback:logback-classic:1.4.8'
     implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
-    //    implementation 'org.slf4j:slf4j-simple:2.0.7' // Can be replaced with logBack, log4j, log4j2, Java Utility Logger
-    //    implementation 'org.tinylog:tinylog-impl:2.6.2'
-    //    implementation 'org.tinylog:slf4j-tinylog:2.6.2'
 
     //jackson
     implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
