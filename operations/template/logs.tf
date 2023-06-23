@@ -6,16 +6,19 @@ resource "azurerm_log_analytics_workspace" "logs_workspace" {
 }
 
 resource "azurerm_log_analytics_query_pack" "application_logs_pack" {
-  name                = "Application Logs"
+  name                = "TI Application Logs"
   resource_group_name = azurerm_resource_group.group.name
   location            = azurerm_resource_group.group.location
 }
 
 resource "azurerm_log_analytics_query_pack_query" "example" {
-  display_name  = "Raw Application Logs"
+  display_name  = "TI's Raw Application Logs"
+  description   = "View all TI's application logs in a structured format"
+
   query_pack_id = azurerm_log_analytics_query_pack.application_logs_pack.id
   categories    = ["applications"]
-  body          = "AppServiceConsoleLogs | extend JsonResult = parse_json(ResultDescription) | project-away TimeGenerated, Level, ResultDescription, Host, Type, _ResourceId, OperationName, TenantId, SourceSystem | evaluate bag_unpack(JsonResult)"
+
+  body = "AppServiceConsoleLogs | extend JsonResult = parse_json(ResultDescription) | project-away TimeGenerated, Level, ResultDescription, Host, Type, _ResourceId, OperationName, TenantId, SourceSystem | evaluate bag_unpack(JsonResult)"
 }
 
 resource "azurerm_monitor_diagnostic_setting" "app_to_logs" {
