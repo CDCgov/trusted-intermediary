@@ -119,7 +119,7 @@ public class EtorDomainRegistration implements DomainConnector {
         }
 
         //  var orders = ordersController.ParseOrders(request)
-        //  convertAndSendLabOrderUseCase.covertAndSend(order)
+        //  convertAndSendLabOrderUseCase.covertAndSend(orders)
         //  return ordersController.constructResponse(OrdersResponse)
         return new DomainResponse(200);
     }
