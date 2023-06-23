@@ -92,7 +92,7 @@ public class DomainsRegistration {
                 "/openapi",
                 ctx -> {
                     LOGGER.logInfo(ctx.method().name() + " " + ctx.url());
-                    ctx.header("Content-Type", "application/yaml");
+                    ctx.header("Content-Type", "application/x-yaml");
                     ctx.result(fullOpenApiSpecification);
                 });
     }
