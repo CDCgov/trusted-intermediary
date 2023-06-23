@@ -1,19 +1,15 @@
 package gov.hhs.cdc.trustedintermediary.external.slf4j
 
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
-import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-
-import org.slf4j.event.Level
 import org.slf4j.MarkerFactory
+import org.slf4j.event.Level
 import org.slf4j.spi.NOPLoggingEventBuilder
 import spock.lang.Specification
-
 
 class Slf4jLoggerTest extends Specification {
 
     def "getLoggingEventBuilder returns TRACE level builder test"() {
         given:
-        TestApplicationContext.injectRegisteredImplementations()
         def logger = Slf4jLogger.getLogger()
 
         when:
@@ -24,7 +20,6 @@ class Slf4jLoggerTest extends Specification {
 
     def "getLoggingEventBuilder returns DEBUG level builder test"() {
         given:
-        TestApplicationContext.injectRegisteredImplementations()
         def logger = Slf4jLogger.getLogger()
 
         when:
@@ -36,7 +31,6 @@ class Slf4jLoggerTest extends Specification {
 
     def "getLoggingEventBuilder returns INFO level builder test"() {
         given:
-        TestApplicationContext.injectRegisteredImplementations()
         def logger = Slf4jLogger.getLogger()
         def expectedLevel = Level.INFO
         def expectedMessage = "Info message"
@@ -53,7 +47,6 @@ class Slf4jLoggerTest extends Specification {
 
     def "getLoggingEventBuilder returns ERROR level builder test"() {
         given:
-        TestApplicationContext.injectRegisteredImplementations()
         def logger = Slf4jLogger.getLogger()
         def expectedLevel = Level.ERROR
         def expectedMessage = "Trace message"
@@ -70,7 +63,6 @@ class Slf4jLoggerTest extends Specification {
 
     def "getLoggingEventBuilder returns FATAL level builder test"() {
         given:
-        TestApplicationContext.injectRegisteredImplementations()
         def logger = Slf4jLogger.getLogger()
         def fatalLevel = Logger.Level.FATAL
         def expectedLevel = Level.ERROR
