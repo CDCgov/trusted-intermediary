@@ -174,4 +174,23 @@ class EtorDomainRegistrationTest extends Specification {
         then:
         actual == expected
     }
+
+    def "Orders endpoint validator returns false unhappy path" () {
+        given:
+        def mockAuthValidator = Mock(AuthRequestValidator)
+        TestApplicationContext.register(AuthRequestValidator, mockAuthValidator)
+        def expected = 401
+        def connector = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, connector)
+        def req = new DomainRequest()
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> false
+        def res = connector.handleOrders(req)
+        def actual = res.statusCode
+
+        then:
+        actual == expected
+    }
 }
