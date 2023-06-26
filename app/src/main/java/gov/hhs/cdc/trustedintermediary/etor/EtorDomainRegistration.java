@@ -26,7 +26,8 @@ import java.util.function.Function;
 import javax.inject.Inject;
 
 /**
- * The domain connector for the ETOR domain. It connects it with the larger trusted intermediary.
+ * The domain connector for the ETOR domain. It connects it with the larger trusted intermediary. It
+ * houses the request processing logic for the demographics and orders endpoints.
  */
 public class EtorDomainRegistration implements DomainConnector {
 
@@ -103,11 +104,26 @@ public class EtorDomainRegistration implements DomainConnector {
         return patientDemographicsController.constructResponse(patientDemographicsResponse);
     }
 
-    DomainResponse handleOrders(DomainRequest domainRequest) {
+    DomainResponse handleOrders(DomainRequest request) {
         //  Validate token
-        //  var orders = OrdersController.ParseOrders(request)
-        //  convertAndSendLabOrderUseCase.covertAndSend(order)
-        //  return OrdersController.constructResponse(OrdersResponse)
+        try {
+            if (!authValidator.isValidAuthenticatedRequest(request)) {
+                var errorMessage = "The request failed the authentication check";
+                logger.logError(errorMessage);
+
+                // ordersController.constructResponse(401, errorMessage)
+                return new DomainResponse(401);
+            }
+        } catch (SecretRetrievalException | IllegalArgumentException e) {
+            logger.logFatal("Unable to validate whether the request is authenticated", e);
+
+            // return ordersController.constructResponse(500, e)
+            return new DomainResponse(500);
+        }
+
+        //  var orders = ordersController.ParseOrders(request)
+        //  convertAndSendLabOrderUseCase.covertAndSend(orders)
+        //  return ordersController.constructResponse(OrdersResponse)
         return new DomainResponse(200);
     }
 }
