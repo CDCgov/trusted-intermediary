@@ -14,6 +14,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsCont
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrdersController;
+import gov.hhs.cdc.trustedintermediary.etor.orders.SendLabOrderUsecase;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiLabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileLabOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamLabOrderSender;
@@ -53,6 +54,7 @@ public class EtorDomainRegistration implements DomainConnector {
                 ConvertAndSendLabOrderUsecase.class, ConvertAndSendLabOrderUsecase.getInstance());
         ApplicationContext.register(LabOrderConverter.class, HapiLabOrderConverter.getInstance());
         ApplicationContext.register(OrdersController.class, OrdersController.getInstance());
+        ApplicationContext.register(SendLabOrderUsecase.class, SendLabOrderUsecase.getInstance());
 
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
             ApplicationContext.register(
