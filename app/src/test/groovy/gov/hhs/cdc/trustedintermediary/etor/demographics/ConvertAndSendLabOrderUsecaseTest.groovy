@@ -19,6 +19,16 @@ class ConvertAndSendLabOrderUsecaseTest extends Specification {
                     String getUnderlyingOrder() {
                         return "This is a mock inner order"
                     }
+
+                    @Override
+                    String getFhirResourceId() {
+                        return null
+                    }
+
+                    @Override
+                    String getPatientId() {
+                        return null
+                    }
                 }
 
         def mockConverter = Mock(LabOrderConverter)

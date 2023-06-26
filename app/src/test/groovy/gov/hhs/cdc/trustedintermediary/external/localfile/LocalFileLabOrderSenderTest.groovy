@@ -31,6 +31,16 @@ class LocalFileLabOrderSenderTest extends Specification{
                     String getUnderlyingOrder() {
                         return "Mock String Order"
                     }
+
+                    @Override
+                    String getFhirResourceId() {
+                        return null
+                    }
+
+                    @Override
+                    String getPatientId() {
+                        return null
+                    }
                 }
 
         TestApplicationContext.register(HapiFhir, fhir)
@@ -55,6 +65,16 @@ class LocalFileLabOrderSenderTest extends Specification{
                     @Override
                     String getUnderlyingOrder() {
                         return " Second Mock String Order"
+                    }
+
+                    @Override
+                    String getFhirResourceId() {
+                        return null
+                    }
+
+                    @Override
+                    String getPatientId() {
+                        return null
                     }
                 }
 

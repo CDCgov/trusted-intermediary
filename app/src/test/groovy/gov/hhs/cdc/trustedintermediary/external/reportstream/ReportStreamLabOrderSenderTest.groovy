@@ -178,6 +178,16 @@ class ReportStreamLabOrderSenderTest extends Specification {
                     String getUnderlyingOrder() {
                         return "Mock order"
                     }
+
+                    @Override
+                    String getFhirResourceId() {
+                        return null
+                    }
+
+                    @Override
+                    String getPatientId() {
+                        return null
+                    }
                 }
 
         when:
