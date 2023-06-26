@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.demographics
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
@@ -44,7 +45,7 @@ class PatientDemographicsControllerTest extends Specification {
         def formatter = Mock(Jackson)
         formatter.convertToJsonString(_ as PatientDemographicsResponse) >> mockBody
         TestApplicationContext.register(Formatter, formatter)
-
+        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -62,7 +63,7 @@ class PatientDemographicsControllerTest extends Specification {
         def formatter = Mock(Jackson)
         formatter.convertToJsonString(_ as PatientDemographicsResponse) >> { throw new FormatterProcessingException("couldn't make the JSON", new Exception()) }
         TestApplicationContext.register(Formatter, formatter)
-
+        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
