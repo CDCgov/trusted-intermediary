@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException;
 import javax.inject.Inject;
 
+/** The overall logic to receive and subsequently send a lab order. */
 public class SendLabOrderUsecase {
     private static final SendLabOrderUsecase INSTANCE = new SendLabOrderUsecase();
 
