@@ -28,7 +28,7 @@ import java.util.Set;
 /** Creates the starting point of our API. Handles the registration of the domains. */
 public class App {
 
-    public static final String HEALTH_API_ENDPOINT = "/health";
+    static final String HEALTH_API_ENDPOINT = "/health";
 
     public static void main(String[] args) {
         var app = Javalin.create().start(8080);

@@ -30,8 +30,8 @@ import javax.inject.Inject;
  */
 public class EtorDomainRegistration implements DomainConnector {
 
-    public static final String DEMOGRAPHICS_API_ENDPOINT = "/v1/etor/demographics";
-    public static final String ORDERS_API_ENDPOINT = "/v1/etor/orders";
+    static final String DEMOGRAPHICS_API_ENDPOINT = "/v1/etor/demographics";
+    static final String ORDERS_API_ENDPOINT = "/v1/etor/orders";
 
     @Inject PatientDemographicsController patientDemographicsController;
     @Inject ConvertAndSendLabOrderUsecase convertAndSendLabOrderUsecase;

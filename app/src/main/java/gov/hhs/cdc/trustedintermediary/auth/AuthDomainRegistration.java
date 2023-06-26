@@ -20,7 +20,7 @@ import javax.inject.Inject;
  */
 public class AuthDomainRegistration implements DomainConnector {
 
-    public static final String AUTH_API_ENDPOINT = "/v1/auth";
+    static final String AUTH_API_ENDPOINT = "/v1/auth";
 
     @Inject AuthController authController;
     @Inject RequestSessionTokenUsecase requestSessionTokenUsecase;
