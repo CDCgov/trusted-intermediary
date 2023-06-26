@@ -27,6 +27,7 @@ public class PatientDemographicsController {
     @Inject HapiFhir fhir;
     @Inject Formatter formatter;
     @Inject Logger logger;
+    @Inject DomainResponseHelper domainResponseHelper;
 
     private PatientDemographicsController() {}
 
@@ -42,20 +43,7 @@ public class PatientDemographicsController {
 
     public DomainResponse constructResponse(
             PatientDemographicsResponse patientDemographicsResponse) {
-        logger.logInfo("Constructing the response");
-        var response = new DomainResponse(200);
-
-        try {
-            var responseBody = formatter.convertToJsonString(patientDemographicsResponse);
-            response.setBody(responseBody);
-        } catch (FormatterProcessingException e) {
-            logger.logError("Error constructing an OK demographics response", e);
-            return DomainResponseHelper.constructGenericInternalServerErrorResponse();
-        }
-
-        response.setHeaders(Map.of(CONTENT_TYPE_LITERAL, APPLICATION_JSON_LITERAL));
-
-        return response;
+        return domainResponseHelper.constructResponse(patientDemographicsResponse);
     }
 
     public DomainResponse constructResponse(int httpStatus, Exception exception) {

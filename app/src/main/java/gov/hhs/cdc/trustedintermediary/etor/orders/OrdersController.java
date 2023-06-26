@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders;
 
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import javax.inject.Inject;
@@ -11,6 +12,7 @@ public class OrdersController {
 
     @Inject Formatter formatter;
     @Inject Logger logger;
+    @Inject DomainResponseHelper domainResponseHelper;
 
     private OrdersController() {}
 
@@ -19,6 +21,6 @@ public class OrdersController {
     }
 
     public DomainResponse constructResponse(OrdersResponse ordersResponse) {
-        return new DomainResponse(200);
+        return domainResponseHelper.constructResponse(ordersResponse);
     }
 }
