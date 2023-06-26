@@ -165,9 +165,10 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.register(EtorDomainRegistration, connector)
         def req = new DomainRequest()
         TestApplicationContext.injectRegisteredImplementations()
+        mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> true
 
         when:
-        mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> true
+
         def res = connector.handleOrders(req)
         def actual = res.statusCode
 
@@ -184,9 +185,10 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.register(EtorDomainRegistration, connector)
         def req = new DomainRequest()
         TestApplicationContext.injectRegisteredImplementations()
+        mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> false
 
         when:
-        mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> false
+
         def res = connector.handleOrders(req)
         def actual = res.statusCode
 
@@ -203,11 +205,12 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.register(EtorDomainRegistration, connector)
         def req = new DomainRequest()
         TestApplicationContext.injectRegisteredImplementations()
-
-        when:
         mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> {
             throw new SecretRetrievalException("DogCaow", new NullPointerException())
         }
+
+        when:
+
         def res = connector.handleOrders(req)
         def actual = res.statusCode
 
@@ -224,11 +227,12 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.register(EtorDomainRegistration, connector)
         def req = new DomainRequest()
         TestApplicationContext.injectRegisteredImplementations()
-
-        when:
         mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> {
             throw new IllegalArgumentException("DogCaow", new NullPointerException())
         }
+
+        when:
+
         def res = connector.handleOrders(req)
         def actual = res.statusCode
         println("status code: " + actual)
