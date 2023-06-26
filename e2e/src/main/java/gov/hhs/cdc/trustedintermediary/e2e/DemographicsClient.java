@@ -13,6 +13,7 @@ import org.apache.hc.core5.http.io.entity.EntityUtils;
 public class DemographicsClient {
 
     private static final String CLIENT_TOKEN;
+    private static final String API_ENDPOINT = "/v1/etor/demographics";
 
     static {
         try {
@@ -40,7 +41,6 @@ public class DemographicsClient {
             headers.put("Authorization", "Bearer " + loginToken);
         }
 
-        return Client.post(
-                "/v1/etor/demographics", fhirBody, ContentType.APPLICATION_JSON, headers);
+        return Client.post(API_ENDPOINT, fhirBody, ContentType.APPLICATION_JSON, headers);
     }
 }
