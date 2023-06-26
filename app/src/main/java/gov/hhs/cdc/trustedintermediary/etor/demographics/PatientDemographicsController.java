@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.demographics;
 
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiDemographics;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -49,7 +50,7 @@ public class PatientDemographicsController {
             response.setBody(responseBody);
         } catch (FormatterProcessingException e) {
             logger.logError("Error constructing an OK demographics response", e);
-            return constructGenericInternalServerErrorResponse();
+            return DomainResponseHelper.constructGenericInternalServerErrorResponse();
         }
 
         response.setHeaders(Map.of(CONTENT_TYPE_LITERAL, APPLICATION_JSON_LITERAL));
@@ -72,17 +73,11 @@ public class PatientDemographicsController {
             domainResponse.setBody(responseBody);
         } catch (FormatterProcessingException e) {
             logger.logError("Error constructing an error response", e);
-            return constructGenericInternalServerErrorResponse();
+            return DomainResponseHelper.constructGenericInternalServerErrorResponse();
         }
 
         domainResponse.setHeaders(Map.of(CONTENT_TYPE_LITERAL, APPLICATION_JSON_LITERAL));
 
-        return domainResponse;
-    }
-
-    private DomainResponse constructGenericInternalServerErrorResponse() {
-        var domainResponse = new DomainResponse(500);
-        domainResponse.setBody("An internal server error occurred");
         return domainResponse;
     }
 }
