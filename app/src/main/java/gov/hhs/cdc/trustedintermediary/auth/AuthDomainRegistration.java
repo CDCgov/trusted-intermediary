@@ -20,12 +20,14 @@ import javax.inject.Inject;
  */
 public class AuthDomainRegistration implements DomainConnector {
 
+    static final String AUTH_API_ENDPOINT = "/v1/auth";
+
     @Inject AuthController authController;
     @Inject RequestSessionTokenUsecase requestSessionTokenUsecase;
     @Inject Logger logger;
 
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
-            Map.of(new HttpEndpoint("POST", "/v1/auth"), this::handleAuth);
+            Map.of(new HttpEndpoint("POST", AUTH_API_ENDPOINT), this::handleAuth);
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {

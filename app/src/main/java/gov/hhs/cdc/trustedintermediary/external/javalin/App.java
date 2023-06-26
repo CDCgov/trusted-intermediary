@@ -28,6 +28,8 @@ import java.util.Set;
 /** Creates the starting point of our API. Handles the registration of the domains. */
 public class App {
 
+    static final String HEALTH_API_ENDPOINT = "/health";
+
     public static void main(String[] args) {
         var app = Javalin.create().start(8080);
 
@@ -36,7 +38,7 @@ public class App {
         app.before(ctx -> ctx.header("X-Content-Type-Options", "nosniff"));
 
         try {
-            app.get("/health", ctx -> ctx.result("Operational"));
+            app.get(HEALTH_API_ENDPOINT, ctx -> ctx.result("Operational"));
 
             registerClasses();
             registerDomains(app);
