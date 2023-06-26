@@ -19,21 +19,29 @@ public class DomainResponseHelper {
         return new DomainResponseHelper();
     }
 
-    public DomainResponse constructResponse(Object objectResponseBody) {
+    public DomainResponse constructResponse(int httpStatus, Object objectResponseBody) {
         logger.logInfo("Constructing the response");
-        var response = new DomainResponse(200);
+        var response = new DomainResponse(httpStatus);
 
         try {
             var responseBody = formatter.convertToJsonString(objectResponseBody);
             response.setBody(responseBody);
         } catch (FormatterProcessingException e) {
-            logger.logError("Error constructing an orders response", e);
+            logger.logError("Error constructing the response", e);
             return constructGenericInternalServerErrorResponse();
         }
 
         response.setHeaders(Map.of(CONTENT_TYPE_LITERAL, APPLICATION_JSON_LITERAL));
 
         return response;
+    }
+
+    public DomainResponse constructResponse(Object objectResponseBody) {
+        return constructResponse(200, objectResponseBody);
+    }
+
+    public DomainResponse constructErrorResponse(int httpStatus, String errorString) {
+        return constructResponse(httpStatus, Map.of("error", errorString));
     }
 
     public static DomainResponse constructGenericInternalServerErrorResponse() {

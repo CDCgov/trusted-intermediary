@@ -7,8 +7,6 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiDemographics;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
-import java.util.Map;
 import java.util.Optional;
 import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
@@ -46,26 +44,13 @@ public class PatientDemographicsController {
         return domainResponseHelper.constructResponse(patientDemographicsResponse);
     }
 
+    public DomainResponse constructResponse(int httpStatus, String errorString) {
+        return domainResponseHelper.constructErrorResponse(httpStatus, errorString);
+    }
+
     public DomainResponse constructResponse(int httpStatus, Exception exception) {
         var errorMessage =
                 Optional.ofNullable(exception.getMessage()).orElse(exception.getClass().toString());
-
-        return constructResponse(httpStatus, errorMessage);
-    }
-
-    public DomainResponse constructResponse(int httpStatus, String errorString) {
-        var domainResponse = new DomainResponse(httpStatus);
-
-        try {
-            var responseBody = formatter.convertToJsonString(Map.of("error", errorString));
-            domainResponse.setBody(responseBody);
-        } catch (FormatterProcessingException e) {
-            logger.logError("Error constructing an error response", e);
-            return DomainResponseHelper.constructGenericInternalServerErrorResponse();
-        }
-
-        domainResponse.setHeaders(Map.of(CONTENT_TYPE_LITERAL, APPLICATION_JSON_LITERAL));
-
-        return domainResponse;
+        return domainResponseHelper.constructErrorResponse(httpStatus, errorMessage);
     }
 }

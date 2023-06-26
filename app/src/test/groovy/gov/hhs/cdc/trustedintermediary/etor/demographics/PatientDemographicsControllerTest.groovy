@@ -16,6 +16,7 @@ class PatientDemographicsControllerTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(PatientDemographicsController, PatientDemographicsController.getInstance())
+        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
     }
 
     def "parseDemographics gets the Bundle and puts it as the underlying demographics"() {
@@ -45,7 +46,6 @@ class PatientDemographicsControllerTest extends Specification {
         def formatter = Mock(Jackson)
         formatter.convertToJsonString(_ as PatientDemographicsResponse) >> mockBody
         TestApplicationContext.register(Formatter, formatter)
-        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -63,7 +63,6 @@ class PatientDemographicsControllerTest extends Specification {
         def formatter = Mock(Jackson)
         formatter.convertToJsonString(_ as PatientDemographicsResponse) >> { throw new FormatterProcessingException("couldn't make the JSON", new Exception()) }
         TestApplicationContext.register(Formatter, formatter)
-        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
