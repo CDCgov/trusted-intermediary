@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.domainconnector;
 
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrdersResponse;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
@@ -14,16 +13,22 @@ public class DomainResponseHelper {
     @Inject Formatter formatter;
     @Inject Logger logger;
 
-    public DomainResponse constructResponse(OrdersResponse ordersResponse) {
-        // logger.logInfo("Constructing the order response");
+    private DomainResponseHelper() {}
+
+    public static DomainResponseHelper getInstance() {
+        return new DomainResponseHelper();
+    }
+
+    public DomainResponse constructResponse(Object objectResponseBody) {
+        logger.logInfo("Constructing the response");
         var response = new DomainResponse(200);
 
         try {
-            var responseBody = formatter.convertToJsonString(ordersResponse);
+            var responseBody = formatter.convertToJsonString(objectResponseBody);
             response.setBody(responseBody);
         } catch (FormatterProcessingException e) {
             logger.logError("Error constructing an orders response", e);
-            return DomainResponseHelper.constructGenericInternalServerErrorResponse();
+            return constructGenericInternalServerErrorResponse();
         }
 
         response.setHeaders(Map.of(CONTENT_TYPE_LITERAL, APPLICATION_JSON_LITERAL));

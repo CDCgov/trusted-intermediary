@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.OpenApi;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnectorConstructionException;
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper;
 import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecificationException;
 import gov.hhs.cdc.trustedintermediary.external.apache.ApacheClient;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureSecrets;
@@ -77,5 +78,6 @@ public class App {
                         : AzureSecrets.getInstance());
         ApplicationContext.register(
                 OrganizationsSettings.class, OrganizationsSettings.getInstance());
+        ApplicationContext.register(DomainResponseHelper.class, DomainResponseHelper.getInstance());
     }
 }
