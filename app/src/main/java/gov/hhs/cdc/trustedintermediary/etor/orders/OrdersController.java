@@ -18,5 +18,7 @@ public class OrdersController {
         return INSTANCE;
     }
 
-    public DomainResponse constructResponse(OrdersResponse ordersResponse) {}
+    public DomainResponse constructResponse(OrdersResponse ordersResponse) {
+        return new DomainResponse(200);
+    }
 }
