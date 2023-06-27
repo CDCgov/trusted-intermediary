@@ -7,7 +7,6 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiDemographics;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
-import java.util.Optional;
 import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
 
@@ -41,7 +40,7 @@ public class PatientDemographicsController {
 
     public DomainResponse constructResponse(
             PatientDemographicsResponse patientDemographicsResponse) {
-        return domainResponseHelper.constructResponse(patientDemographicsResponse);
+        return domainResponseHelper.constructOkResponse(patientDemographicsResponse);
     }
 
     public DomainResponse constructResponse(int httpStatus, String errorString) {
@@ -49,8 +48,6 @@ public class PatientDemographicsController {
     }
 
     public DomainResponse constructResponse(int httpStatus, Exception exception) {
-        var errorMessage =
-                Optional.ofNullable(exception.getMessage()).orElse(exception.getClass().toString());
-        return domainResponseHelper.constructErrorResponse(httpStatus, errorMessage);
+        return domainResponseHelper.constructErrorResponse(httpStatus, exception);
     }
 }

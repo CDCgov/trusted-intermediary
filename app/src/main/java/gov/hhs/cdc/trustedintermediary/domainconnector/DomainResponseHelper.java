@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import java.util.Map;
+import java.util.Optional;
 import javax.inject.Inject;
 
 public class DomainResponseHelper {
@@ -38,12 +39,18 @@ public class DomainResponseHelper {
         return response;
     }
 
-    public DomainResponse constructResponse(Object objectResponseBody) {
+    public DomainResponse constructOkResponse(Object objectResponseBody) {
         return constructResponse(200, objectResponseBody);
     }
 
     public DomainResponse constructErrorResponse(int httpStatus, String errorString) {
         return constructResponse(httpStatus, Map.of("error", errorString));
+    }
+
+    public DomainResponse constructErrorResponse(int httpStatus, Exception exception) {
+        var errorMessage =
+                Optional.ofNullable(exception.getMessage()).orElse(exception.getClass().toString());
+        return constructErrorResponse(httpStatus, errorMessage);
     }
 
     public static DomainResponse constructGenericInternalServerErrorResponse() {
