@@ -22,6 +22,16 @@ class SendLabOrderUsecaseTest extends Specification {
                     String getUnderlyingOrder() {
                         return "This is a mock inner order"
                     }
+
+                    @Override
+                    String getFhirResourceId() {
+                        return null
+                    }
+
+                    @Override
+                    String getPatientId() {
+                        return null
+                    }
                 }
 
         def mockSender = Mock(LabOrderSender)
@@ -42,6 +52,16 @@ class SendLabOrderUsecaseTest extends Specification {
                     @Override
                     String getUnderlyingOrder() {
                         return "This is a mock inner order"
+                    }
+
+                    @Override
+                    String getFhirResourceId() {
+                        return null
+                    }
+
+                    @Override
+                    String getPatientId() {
+                        return null
                     }
                 }
 
