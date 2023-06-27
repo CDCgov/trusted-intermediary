@@ -43,7 +43,9 @@ class HapiLabOrderTest extends Specification {
         innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(patient))
 
         when:
-        def orders = new HapiDemographics(innerOrders)
+        def orders = new HapiLabOrder(innerOrders)
+        println("getPatientId: " + orders.getPatientId())
+
 
         then:
         orders.getPatientId() == expectedPatientId
@@ -57,7 +59,7 @@ class HapiLabOrderTest extends Specification {
         innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(patient))
 
         when:
-        def orders = new HapiDemographics(innerOrders)
+        def orders = new HapiLabOrder(innerOrders)
 
         then:
         orders.getPatientId() == expectedPatientId
