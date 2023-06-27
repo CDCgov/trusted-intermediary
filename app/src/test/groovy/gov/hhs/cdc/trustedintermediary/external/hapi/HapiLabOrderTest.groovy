@@ -48,4 +48,18 @@ class HapiLabOrderTest extends Specification {
         then:
         orders.getPatientId() == expectedPatientId
     }
+
+    def "getPatientId unhappy path works"() {
+        given:
+        def expectedPatientId = ""
+        def innerOrders = new Bundle()
+        def patient = new Patient()
+        innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(patient))
+
+        when:
+        def orders = new HapiDemographics(innerOrders)
+
+        then:
+        orders.getPatientId() == expectedPatientId
+    }
 }
