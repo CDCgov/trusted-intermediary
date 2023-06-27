@@ -15,4 +15,17 @@ class HapiLabOrderTest extends Specification {
         then:
         actualInnerLabOrder == expectedInnerLabOrder
     }
+
+    def "getFhirResourceId works"() {
+        given:
+        def expectedId = "DogCow goes Moof"
+        def innerOrder = new Bundle()
+        innerOrder.setId(expectedId)
+
+        when:
+        def orders = new HapiLabOrder(innerOrder)
+
+        then:
+        orders.getFhirResourceId() == expectedId
+    }
 }
