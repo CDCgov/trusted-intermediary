@@ -71,6 +71,7 @@ public class App {
         ApplicationContext.register(HttpClient.class, ApacheClient.getInstance());
         ApplicationContext.register(AuthEngine.class, JjwtEngine.getInstance());
         ApplicationContext.register(Cache.class, KeyCache.getInstance());
+        ApplicationContext.register(DomainResponseHelper.class, DomainResponseHelper.getInstance());
         ApplicationContext.register(
                 Secrets.class,
                 ApplicationContext.getEnvironment().equalsIgnoreCase("local")
@@ -78,6 +79,5 @@ public class App {
                         : AzureSecrets.getInstance());
         ApplicationContext.register(
                 OrganizationsSettings.class, OrganizationsSettings.getInstance());
-        ApplicationContext.register(DomainResponseHelper.class, DomainResponseHelper.getInstance());
     }
 }
