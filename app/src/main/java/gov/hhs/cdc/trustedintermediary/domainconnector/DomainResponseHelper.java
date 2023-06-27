@@ -10,13 +10,15 @@ public class DomainResponseHelper {
     static final String CONTENT_TYPE_LITERAL = "Content-Type";
     static final String APPLICATION_JSON_LITERAL = "application/json";
 
+    private static final DomainResponseHelper INSTANCE = new DomainResponseHelper();
+
     @Inject Formatter formatter;
     @Inject Logger logger;
 
     private DomainResponseHelper() {}
 
     public static DomainResponseHelper getInstance() {
-        return new DomainResponseHelper();
+        return INSTANCE;
     }
 
     public DomainResponse constructResponse(int httpStatus, Object objectResponseBody) {
