@@ -21,6 +21,6 @@ public class OrdersController {
     }
 
     public DomainResponse constructResponse(OrdersResponse ordersResponse) {
-        return domainResponseHelper.constructResponse(ordersResponse);
+        return domainResponseHelper.constructOkResponse(ordersResponse);
     }
 }

@@ -111,19 +111,19 @@ public class EtorDomainRegistration implements DomainConnector {
                 var errorMessage = "The request failed the authentication check";
                 logger.logError(errorMessage);
 
-                // ordersController.constructResponse(401, errorMessage)
+                // ordersController.constructOkResponse(401, errorMessage)
                 return new DomainResponse(401);
             }
         } catch (SecretRetrievalException | IllegalArgumentException e) {
             logger.logFatal("Unable to validate whether the request is authenticated", e);
 
-            // return ordersController.constructResponse(500, e)
+            // return ordersController.constructOkResponse(500, e)
             return new DomainResponse(500);
         }
 
         //  var orders = ordersController.ParseOrders(request)
         //  convertAndSendLabOrderUseCase.covertAndSend(orders)
-        //  return ordersController.constructResponse(OrdersResponse)
+        //  return ordersController.constructOkResponse(OrdersResponse)
         return new DomainResponse(200);
     }
 }

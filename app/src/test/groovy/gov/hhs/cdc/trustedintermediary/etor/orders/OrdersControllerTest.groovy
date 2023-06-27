@@ -23,7 +23,7 @@ class OrdersControllerTest extends Specification {
         def statusCode = 200
         def expected = statusCode
         def orderResponse = new OrdersResponse("asdf-12341-jkl-7890", "blkjh-7685")
-        mockHelper.constructResponse(_ as OrdersResponse) >> new DomainResponse(statusCode)
+        mockHelper.constructOkResponse(_ as OrdersResponse) >> new DomainResponse(statusCode)
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
