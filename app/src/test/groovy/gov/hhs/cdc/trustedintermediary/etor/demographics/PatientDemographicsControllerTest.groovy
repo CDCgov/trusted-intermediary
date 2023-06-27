@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.demographics
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import org.hl7.fhir.r4.model.Bundle
@@ -13,7 +14,6 @@ class PatientDemographicsControllerTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(PatientDemographicsController, PatientDemographicsController.getInstance())
-        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
     }
 
     def "parseDemographics gets the Bundle and puts it as the underlying demographics"() {
@@ -33,5 +33,70 @@ class PatientDemographicsControllerTest extends Specification {
 
         then:
         patientDemographics.getUnderlyingDemographics() == mockBundle
+    }
+
+    def "demographics constructResponse with PatientDemographicsResponse works"() {
+        given:
+        def mockBody = "DogCow goes Moof"
+
+        def domainResponseHelper = Mock(DomainResponseHelper)
+        domainResponseHelper.constructOkResponse(_ as PatientDemographicsResponse) >> {
+            def response = new DomainResponse(200)
+            response.setBody(mockBody)
+            return response
+        }
+        TestApplicationContext.register(DomainResponseHelper, domainResponseHelper)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def response = PatientDemographicsController.getInstance().constructResponse(new PatientDemographicsResponse("asdf-12341-jkl-7890", "blkjh-7685"))
+
+        then:
+        response.getBody() == mockBody
+        response.getStatusCode() == 200
+    }
+
+    def "demographics constructResponse with error string works"() {
+        given:
+        def mockStatusCode = 500
+        def mockBody = "DogCow goes Moof"
+
+        def domainResponseHelper = Mock(DomainResponseHelper)
+        domainResponseHelper.constructErrorResponse(_ as int, _ as String) >> {
+            def response = new DomainResponse(mockStatusCode)
+            response.setBody(mockBody)
+            return response
+        }
+        TestApplicationContext.register(DomainResponseHelper, domainResponseHelper)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def response = PatientDemographicsController.getInstance().constructResponse(mockStatusCode, "error message")
+
+        then:
+        response.getBody() == mockBody
+        response.getStatusCode() == mockStatusCode
+    }
+
+    def "demographics constructResponse with exception string works"() {
+        given:
+        def mockStatusCode = 500
+        def mockBody = "DogCow goes Moof"
+
+        def domainResponseHelper = Mock(DomainResponseHelper)
+        domainResponseHelper.constructErrorResponse(_ as int, _ as Exception) >> {
+            def response = new DomainResponse(mockStatusCode)
+            response.setBody(mockBody)
+            return response
+        }
+        TestApplicationContext.register(DomainResponseHelper, domainResponseHelper)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def response = PatientDemographicsController.getInstance().constructResponse(mockStatusCode, new Exception("dogcow"))
+
+        then:
+        response.getBody() == mockBody
+        response.getStatusCode() == mockStatusCode
     }
 }
