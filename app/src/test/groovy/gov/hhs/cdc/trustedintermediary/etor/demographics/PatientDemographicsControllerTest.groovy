@@ -64,7 +64,7 @@ class PatientDemographicsControllerTest extends Specification {
         response.setBody(mockBody)
 
         def domainResponseHelper = Mock(DomainResponseHelper)
-        domainResponseHelper.constructErrorResponse( mockStatusCode, _ as String) >> { response }
+        domainResponseHelper.constructErrorResponse( mockStatusCode, _ as String) >> response
         def expected = response
 
         TestApplicationContext.register(DomainResponseHelper, domainResponseHelper)
