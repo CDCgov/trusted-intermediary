@@ -60,43 +60,43 @@ class PatientDemographicsControllerTest extends Specification {
         given:
         def mockStatusCode = 500
         def mockBody = "DogCow goes Moof"
+        def response = new DomainResponse(mockStatusCode)
+        response.setBody(mockBody)
 
         def domainResponseHelper = Mock(DomainResponseHelper)
-        domainResponseHelper.constructErrorResponse(_ as int, _ as String) >> {
-            def response = new DomainResponse(mockStatusCode)
-            response.setBody(mockBody)
-            return response
-        }
+        domainResponseHelper.constructErrorResponse( mockStatusCode, _ as String) >> { response }
+        def expected = response
+
         TestApplicationContext.register(DomainResponseHelper, domainResponseHelper)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def response = PatientDemographicsController.getInstance().constructResponse(mockStatusCode, "error message")
+        def actual = PatientDemographicsController.getInstance().constructResponse(mockStatusCode, "error message")
 
         then:
-        response.getBody() == mockBody
-        response.getStatusCode() == mockStatusCode
+        actual.getBody() == expected.getBody()
+        actual.getStatusCode() == expected.getStatusCode()
     }
 
     def "demographics constructResponse with exception string works"() {
         given:
         def mockStatusCode = 500
         def mockBody = "DogCow goes Moof"
+        def response = new DomainResponse(mockStatusCode)
+        response.setBody(mockBody)
+        def expected = response
 
         def domainResponseHelper = Mock(DomainResponseHelper)
-        domainResponseHelper.constructErrorResponse(_ as int, _ as Exception) >> {
-            def response = new DomainResponse(mockStatusCode)
-            response.setBody(mockBody)
-            return response
-        }
+        domainResponseHelper.constructErrorResponse(mockStatusCode, _ as Exception) >> response
+
         TestApplicationContext.register(DomainResponseHelper, domainResponseHelper)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def response = PatientDemographicsController.getInstance().constructResponse(mockStatusCode, new Exception("dogcow"))
+        def actual = PatientDemographicsController.getInstance().constructResponse(mockStatusCode, new Exception("dogcow"))
 
         then:
-        response.getBody() == mockBody
-        response.getStatusCode() == mockStatusCode
+        actual.getBody() == expected.getBody()
+        actual.getStatusCode() == expected.getStatusCode()
     }
 }
