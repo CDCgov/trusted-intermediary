@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.etor.demographics;
+package gov.hhs.cdc.trustedintermediary.etor.orders;
 
 /**
  * This exception class gets triggered when any exception occurs during the process of sending a lab

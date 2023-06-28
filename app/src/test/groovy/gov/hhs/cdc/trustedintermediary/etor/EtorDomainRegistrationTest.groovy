@@ -6,11 +6,11 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
-import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendLabOrderUsecase
+import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemographicsUsecase
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse
-import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException
+import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendLabOrderException
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException
 import spock.lang.Specification
 
@@ -63,11 +63,11 @@ class EtorDomainRegistrationTest extends Specification {
         mockDemographicsController.parseDemographics(_ as DomainRequest) >> new DemographicsMock(mockRequestId, "a patient ID", "demographics")
         mockDemographicsController.constructResponse(_ as PatientDemographicsResponse) >> new DomainResponse(418)
 
-        def mockUsecase = Mock(ConvertAndSendLabOrderUsecase)
+        def mockUsecase = Mock(ConvertAndSendDemographicsUsecase)
 
         TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
         TestApplicationContext.register(PatientDemographicsController, mockDemographicsController)
-        TestApplicationContext.register(ConvertAndSendLabOrderUsecase, mockUsecase)
+        TestApplicationContext.register(ConvertAndSendDemographicsUsecase, mockUsecase)
         TestApplicationContext.register(AuthRequestValidator, mockAuthValidator)
         TestApplicationContext.injectRegisteredImplementations()
 
@@ -88,7 +88,7 @@ class EtorDomainRegistrationTest extends Specification {
         def domainRegistration = new EtorDomainRegistration()
         def mockDemographicConrollor = Mock(PatientDemographicsController)
         def domainRequest = new DomainRequest()
-        def mockLabOrderUseCase = Mock(ConvertAndSendLabOrderUsecase)
+        def mockLabOrderUseCase = Mock(ConvertAndSendDemographicsUsecase)
         def mockAuthValidator = Mock(AuthRequestValidator)
         mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> true
         mockLabOrderUseCase.convertAndSend(_) >> {
@@ -97,7 +97,7 @@ class EtorDomainRegistrationTest extends Specification {
         mockDemographicConrollor.constructResponse(_ as Integer, _ as Exception) >> new DomainResponse(400)
         TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
         TestApplicationContext.register(PatientDemographicsController, mockDemographicConrollor)
-        TestApplicationContext.register(ConvertAndSendLabOrderUsecase, mockLabOrderUseCase)
+        TestApplicationContext.register(ConvertAndSendDemographicsUsecase, mockLabOrderUseCase)
         TestApplicationContext.register(AuthRequestValidator, mockAuthValidator)
         TestApplicationContext.injectRegisteredImplementations()
 

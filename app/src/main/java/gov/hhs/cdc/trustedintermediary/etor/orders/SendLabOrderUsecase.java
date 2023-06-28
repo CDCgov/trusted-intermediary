@@ -1,8 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders;
 
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder;
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender;
-import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException;
 import javax.inject.Inject;
 
 /** The overall logic to receive and subsequently send a lab order. */

@@ -1,7 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders;
 
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder;
-
 /** Response for the v1/etor/orders endpoint. */
 public class OrdersResponse {
 

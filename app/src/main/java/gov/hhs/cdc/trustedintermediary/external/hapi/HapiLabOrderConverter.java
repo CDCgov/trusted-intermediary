@@ -1,8 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder;
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderConverter;
+import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrder;
+import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.time.Instant;
 import java.util.Date;

@@ -1,9 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.external.reportstream;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder;
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender;
-import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException;
+import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrder;
+import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrderSender;
+import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendLabOrderException;
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;

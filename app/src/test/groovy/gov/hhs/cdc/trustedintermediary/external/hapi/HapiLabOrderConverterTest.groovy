@@ -2,7 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 
 import gov.hhs.cdc.trustedintermediary.DemographicsMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderConverter
+import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrderConverter
 import java.time.Instant
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Identifier

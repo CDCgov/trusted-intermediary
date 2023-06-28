@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder;
+import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrder;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Patient;
