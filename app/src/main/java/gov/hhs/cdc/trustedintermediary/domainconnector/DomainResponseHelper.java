@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import javax.inject.Inject;
 
+/** Provides helper methods for constructing a response to return to the client. */
 public class DomainResponseHelper {
     static final String CONTENT_TYPE_LITERAL = "Content-Type";
     static final String APPLICATION_JSON_LITERAL = "application/json";

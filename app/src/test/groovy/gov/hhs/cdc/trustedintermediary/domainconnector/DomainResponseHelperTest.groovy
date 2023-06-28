@@ -17,79 +17,79 @@ class DomainResponseHelperTest extends Specification {
 
     def "constructResponse returns expected response"() {
         given:
-        def mockResponseStatus = 200
-        def mockResponseBody = "DogCow goes Moof"
+        def expectedResponseStatus = 200
+        def expectedResponseBody = "DogCow goes Moof"
 
         def formatter = Mock(Jackson)
-        formatter.convertToJsonString(_ as Object) >> mockResponseBody
+        formatter.convertToJsonString(_ as Object) >> expectedResponseBody
         TestApplicationContext.register(Formatter, formatter)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def response = DomainResponseHelper.getInstance().constructResponse(mockResponseStatus, mockResponseBody)
+        def actual = DomainResponseHelper.getInstance().constructResponse(expectedResponseStatus, expectedResponseBody)
 
         then:
-        response.getBody() == mockResponseBody
-        response.getStatusCode() == mockResponseStatus
-        response.getHeaders().get(DomainResponseHelper.CONTENT_TYPE_LITERAL) == DomainResponseHelper.APPLICATION_JSON_LITERAL
+        actual.getBody() == expectedResponseBody
+        actual.getStatusCode() == expectedResponseStatus
+        actual.getHeaders().get(DomainResponseHelper.CONTENT_TYPE_LITERAL) == DomainResponseHelper.APPLICATION_JSON_LITERAL
     }
 
     def "constructOkResponse returns expected response"() {
         given:
-        def okResponseStatus = 200
-        def mockResponseBody = "DogCow goes Moof"
+        def expectedResponseStatus = 200
+        def expectedResponseBody = "DogCow goes Moof"
 
         def formatter = Mock(Jackson)
-        formatter.convertToJsonString(_ as Object) >> mockResponseBody
+        formatter.convertToJsonString(_ as Object) >> expectedResponseBody
         TestApplicationContext.register(Formatter, formatter)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def response = DomainResponseHelper.getInstance().constructOkResponse(mockResponseBody)
+        def actual = DomainResponseHelper.getInstance().constructOkResponse(expectedResponseBody)
 
         then:
-        response.getBody() == mockResponseBody
-        response.getStatusCode() == okResponseStatus
-        response.getHeaders().get(DomainResponseHelper.CONTENT_TYPE_LITERAL) == DomainResponseHelper.APPLICATION_JSON_LITERAL
+        actual.getBody() == expectedResponseBody
+        actual.getStatusCode() == expectedResponseStatus
+        actual.getHeaders().get(DomainResponseHelper.CONTENT_TYPE_LITERAL) == DomainResponseHelper.APPLICATION_JSON_LITERAL
     }
 
     def "constructErrorResponse with error message returns expected response"() {
         given:
-        def errorResponseStatus = 500
-        def errorResponseString = "This is an error"
-        def errorResponseBody = Map.of("error", errorResponseString)
+        def expectedResponseStatus = 500
+        def expectedResponseString = "This is an error"
+        def expectedResponseBody = Map.of("error", expectedResponseString)
         def formatter = Mock(Jackson)
-        formatter.convertToJsonString(_ as Map<String, String>) >> errorResponseBody
+        formatter.convertToJsonString(_ as Map<String, String>) >> expectedResponseBody
         TestApplicationContext.register(Formatter, formatter)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def response = DomainResponseHelper.getInstance().constructErrorResponse(errorResponseStatus, errorResponseString)
+        def actual = DomainResponseHelper.getInstance().constructErrorResponse(expectedResponseStatus, expectedResponseString)
 
         then:
-        response.getBody() == errorResponseBody.toString()
-        response.getStatusCode() == errorResponseStatus
-        response.getHeaders().get(DomainResponseHelper.CONTENT_TYPE_LITERAL) == DomainResponseHelper.APPLICATION_JSON_LITERAL
+        actual.getBody() == expectedResponseBody.toString()
+        actual.getStatusCode() == expectedResponseStatus
+        actual.getHeaders().get(DomainResponseHelper.CONTENT_TYPE_LITERAL) == DomainResponseHelper.APPLICATION_JSON_LITERAL
     }
 
     def "constructErrorResponse with exception returns expected response"() {
         given:
-        def mockBody = "DogCow goes Moof"
-        def mockResponseStatus = 404
+        def expectedBody = "DogCow goes Moof"
+        def expectedResponseStatus = 404
 
         def formatter = Mock(Jackson)
-        formatter.convertToJsonString(_ as Map) >> mockBody
+        formatter.convertToJsonString(_ as Map) >> expectedBody
         TestApplicationContext.register(Formatter, formatter)
 
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def response = DomainResponseHelper.getInstance().constructErrorResponse(mockResponseStatus, new Exception("dogcow"))
+        def actual = DomainResponseHelper.getInstance().constructErrorResponse(expectedResponseStatus, new Exception("dogcow"))
 
         then:
-        response.getBody() == mockBody
-        response.getStatusCode() == mockResponseStatus
-        response.getHeaders().get(DomainResponseHelper.CONTENT_TYPE_LITERAL) == DomainResponseHelper.APPLICATION_JSON_LITERAL
+        actual.getBody() == expectedBody
+        actual.getStatusCode() == expectedResponseStatus
+        actual.getHeaders().get(DomainResponseHelper.CONTENT_TYPE_LITERAL) == DomainResponseHelper.APPLICATION_JSON_LITERAL
     }
 
     def "constructGenericInternalServerErrorResponse returns expected response"() {
@@ -98,11 +98,11 @@ class DomainResponseHelperTest extends Specification {
         def expectedResponseBody = "An internal server error occurred"
 
         when:
-        def response = DomainResponseHelper.getInstance().constructGenericInternalServerErrorResponse()
+        def actual = DomainResponseHelper.getInstance().constructGenericInternalServerErrorResponse()
 
         then:
-        response.getBody() == expectedResponseBody
-        response.getStatusCode() == expectedResponseStatus
+        actual.getBody() == expectedResponseBody
+        actual.getStatusCode() == expectedResponseStatus
     }
 
     def "constructResponse fails to make the JSON"() {
@@ -114,33 +114,33 @@ class DomainResponseHelperTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def response = DomainResponseHelper.getInstance().constructResponse(200, "asdf1234")
+        def actual = DomainResponseHelper.getInstance().constructResponse(200, "asdf1234")
 
         then:
-        response.statusCode == 500
+        actual.statusCode == 500
     }
 
     def "failed constructErrorResponse uses a different error message if there isn't a message in the Exception"() {
 
         given:
-        def mockBody = "DogCow goes Moof"
-        def mockResponseStatus = 404
-        def mockException = new NullPointerException()
+        def expectedBody = "DogCow goes Moof"
+        def expectedResponseStatus = 404
+        def expectedException = new NullPointerException()
 
         def formatter = Mock(Jackson)
         1 * formatter.convertToJsonString(_ as Map) >> { Map error ->
-            assert error.get("error") == mockException.getClass().toString()
-            return mockBody
+            assert error.get("error") == expectedException.getClass().toString()
+            return expectedBody
         }
         TestApplicationContext.register(Formatter, formatter)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def response = DomainResponseHelper.getInstance().constructErrorResponse(mockResponseStatus, mockException)
+        def actual = DomainResponseHelper.getInstance().constructErrorResponse(expectedResponseStatus, expectedException)
 
         then:
-        response.getBody() == mockBody
-        response.getStatusCode() == mockResponseStatus
-        response.getHeaders().get(DomainResponseHelper.CONTENT_TYPE_LITERAL) == DomainResponseHelper.APPLICATION_JSON_LITERAL
+        actual.getBody() == expectedBody
+        actual.getStatusCode() == expectedResponseStatus
+        actual.getHeaders().get(DomainResponseHelper.CONTENT_TYPE_LITERAL) == DomainResponseHelper.APPLICATION_JSON_LITERAL
     }
 }

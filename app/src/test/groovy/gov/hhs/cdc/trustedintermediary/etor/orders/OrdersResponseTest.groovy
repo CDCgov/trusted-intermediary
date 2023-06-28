@@ -16,29 +16,29 @@ class OrdersResponseTest extends Specification {
 
     def "test demographics constructor"() {
         given:
-        def resourceId = "67890asdfg"
-        def patientId = "fthgyu687"
+        def expectedResourceId = "67890asdfg"
+        def expectedPatientId = "fthgyu687"
 
-        def orders = new OrdersMock(resourceId, patientId, null)
+        def orders = new OrdersMock(expectedResourceId, expectedPatientId, null)
 
         when:
-        def response = new OrdersResponse(orders)
+        def actual = new OrdersResponse(orders)
 
         then:
-        response.getFhirResourceId() == resourceId
-        response.getPatientId() == patientId
+        actual.getFhirResourceId() == expectedResourceId
+        actual.getPatientId() == expectedPatientId
     }
 
     def "test argument constructor"() {
         given:
-        def resourceId = "67890asdfg"
-        def patientId = "fthgyu687"
+        def expectedResourceId = "67890asdfg"
+        def expectedPatientId = "fthgyu687"
 
         when:
-        def response = new OrdersResponse(resourceId, patientId)
+        def actual = new OrdersResponse(expectedResourceId, expectedPatientId)
 
         then:
-        response.getFhirResourceId() == resourceId
-        response.getPatientId() == patientId
+        actual.getFhirResourceId() == expectedResourceId
+        actual.getPatientId() == expectedPatientId
     }
 }
