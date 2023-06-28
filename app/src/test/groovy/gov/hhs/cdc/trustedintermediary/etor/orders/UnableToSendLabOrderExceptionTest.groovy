@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.etor.demographics
+package gov.hhs.cdc.trustedintermediary.etor.orders
 
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendLabOrderException
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException
