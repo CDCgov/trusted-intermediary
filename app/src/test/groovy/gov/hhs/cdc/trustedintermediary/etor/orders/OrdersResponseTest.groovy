@@ -14,7 +14,7 @@ class OrdersResponseTest extends Specification {
         noExceptionThrown()
     }
 
-    def "test demographics constructor"() {
+    def "test orders constructor"() {
         given:
         def expectedResourceId = "67890asdfg"
         def expectedPatientId = "fthgyu687"

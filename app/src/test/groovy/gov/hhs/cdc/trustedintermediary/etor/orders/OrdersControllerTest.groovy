@@ -20,16 +20,15 @@ class OrdersControllerTest extends Specification {
         given:
         def controller = OrdersController.getInstance()
         def mockHelper = Mock(DomainResponseHelper)
-        def statusCode = 200
-        def expected = statusCode
+        def expectedStatusCode = 200
         def orderResponse = new OrdersResponse("asdf-12341-jkl-7890", "blkjh-7685")
-        mockHelper.constructOkResponse(_ as OrdersResponse) >> new DomainResponse(statusCode)
+        mockHelper.constructOkResponse(_ as OrdersResponse) >> new DomainResponse(expectedStatusCode)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def actual = controller.constructResponse(orderResponse).statusCode
+        def actualStatusCode = controller.constructResponse(orderResponse).statusCode
 
         then:
-        actual == expected
+        actualStatusCode == expectedStatusCode
     }
 }
