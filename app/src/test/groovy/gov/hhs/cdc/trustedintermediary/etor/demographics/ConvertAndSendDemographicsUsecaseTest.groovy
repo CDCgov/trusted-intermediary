@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.demographics
 
 import gov.hhs.cdc.trustedintermediary.DemographicsMock
+import gov.hhs.cdc.trustedintermediary.LabOrdersMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrder
 import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrderConverter
@@ -17,23 +18,7 @@ class ConvertAndSendDemographicsUsecaseTest extends Specification {
 
     def "ConvertAndSend"() {
         given:
-        LabOrder<?> mockOrder = new LabOrder<String>() {
-                    @Override
-                    String getUnderlyingOrder() {
-                        return "This is a mock inner order"
-                    }
-
-                    @Override
-                    String getFhirResourceId() {
-                        return null
-                    }
-
-                    @Override
-                    String getPatientId() {
-                        return null
-                    }
-                }
-
+        def mockOrder = new LabOrdersMock(null, null, null)
         def mockConverter = Mock(LabOrderConverter)
         def mockSender = Mock(LabOrderSender)
 

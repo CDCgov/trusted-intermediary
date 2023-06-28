@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders
 
-import gov.hhs.cdc.trustedintermediary.OrdersMock
+import gov.hhs.cdc.trustedintermediary.LabOrdersMock
 import gov.hhs.cdc.trustedintermediary.PojoTestUtils
 import spock.lang.Specification
 
@@ -19,7 +19,7 @@ class OrdersResponseTest extends Specification {
         def expectedResourceId = "67890asdfg"
         def expectedPatientId = "fthgyu687"
 
-        def orders = new OrdersMock(expectedResourceId, expectedPatientId, null)
+        def orders = new LabOrdersMock(expectedResourceId, expectedPatientId, null)
 
         when:
         def actual = new OrdersResponse(orders)

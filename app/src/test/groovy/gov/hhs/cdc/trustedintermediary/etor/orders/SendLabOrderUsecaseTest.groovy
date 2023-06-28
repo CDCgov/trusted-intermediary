@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders
 
-
+import gov.hhs.cdc.trustedintermediary.LabOrdersMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import spock.lang.Specification
 
@@ -14,23 +14,7 @@ class SendLabOrderUsecaseTest extends Specification {
 
     def "send sends successfully"() {
         given:
-        LabOrder<?> mockOrder = new LabOrder<String>() {
-                    @Override
-                    String getUnderlyingOrder() {
-                        return "This is a mock inner order"
-                    }
-
-                    @Override
-                    String getFhirResourceId() {
-                        return null
-                    }
-
-                    @Override
-                    String getPatientId() {
-                        return null
-                    }
-                }
-
+        def mockOrder = new LabOrdersMock(null, null, null)
         def mockSender = Mock(LabOrderSender)
 
         TestApplicationContext.register(LabOrderSender, mockSender)
@@ -45,23 +29,7 @@ class SendLabOrderUsecaseTest extends Specification {
 
     def "send fails to send"() {
         given:
-        LabOrder<?> mockOrder = new LabOrder<String>() {
-                    @Override
-                    String getUnderlyingOrder() {
-                        return "This is a mock inner order"
-                    }
-
-                    @Override
-                    String getFhirResourceId() {
-                        return null
-                    }
-
-                    @Override
-                    String getPatientId() {
-                        return null
-                    }
-                }
-
+        def mockOrder = new LabOrdersMock(null, null, null)
         def mockSender = Mock(LabOrderSender)
         mockSender.sendOrder(_ as LabOrder) >> { throw new UnableToSendLabOrderException("DogCow", new NullPointerException()) }
 
