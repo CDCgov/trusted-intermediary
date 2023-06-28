@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.reportstream
 
+import gov.hhs.cdc.trustedintermediary.LabOrdersMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder
 import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender
@@ -172,23 +173,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         TestApplicationContext.register(Cache, mockCache)
         TestApplicationContext.injectRegisteredImplementations()
         mockFhir.encodeResourceToJson(_ as String) >> "Mock order"
-        LabOrder<?> mockOrder = new LabOrder<String>() {
-
-                    @Override
-                    String getUnderlyingOrder() {
-                        return "Mock order"
-                    }
-
-                    @Override
-                    String getFhirResourceId() {
-                        return null
-                    }
-
-                    @Override
-                    String getPatientId() {
-                        return null
-                    }
-                }
+        LabOrder<?> mockOrder = new LabOrdersMock(null, null, "Mock order")
 
         when:
         ReportStreamLabOrderSender.getInstance().sendOrder(mockOrder)
