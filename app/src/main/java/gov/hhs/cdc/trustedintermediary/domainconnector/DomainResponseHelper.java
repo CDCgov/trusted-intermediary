@@ -9,8 +9,8 @@ import javax.inject.Inject;
 
 /** Provides helper methods for constructing a response to return to the client. */
 public class DomainResponseHelper {
-    static final String CONTENT_TYPE_LITERAL = "Content-Type";
-    static final String APPLICATION_JSON_LITERAL = "application/json";
+    protected static final String CONTENT_TYPE_LITERAL = "Content-Type";
+    protected static final String APPLICATION_JSON_LITERAL = "application/json";
 
     private static final DomainResponseHelper INSTANCE = new DomainResponseHelper();
 
