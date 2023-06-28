@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import javax.inject.Inject;
 
+/** Responsible for constructing a response for orders requests to be returned to the client. */
 public class OrdersController {
 
     private static final OrdersController INSTANCE = new OrdersController();
