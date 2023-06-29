@@ -107,6 +107,23 @@ class DomainsRegistrationTest extends Specification {
         1 * javalinContext.status(_ as Integer)
     }
 
+    def "authenticateRequest happy path works"() {
+        given:
+        def mockValidator = Mock(AuthRequestValidator)
+        def request = new DomainRequest()
+        def expected = null
+        TestApplicationContext.register(AuthRequestValidator, mockValidator)
+        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+        mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> true
+
+        when:
+        def actual = DomainsRegistration.authenticateRequest(request)
+
+        then:
+        noExceptionThrown()
+        actual == expected
+    }
 
     def "protected endpoint fails with a 401 when unauthenticated"() {
         given:
