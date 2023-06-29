@@ -119,33 +119,44 @@ public class DomainsRegistration {
             LOGGER.logInfo(ctx.method().name() + " " + ctx.url());
 
             var request = javalinContextToDomainRequest(ctx);
-
-            DomainResponse response = null;
-            if (isProtected) {
-                AuthRequestValidator authValidator =
-                        ApplicationContext.getImplementation(AuthRequestValidator.class);
-                DomainResponseHelper domainResponseHelper =
-                        ApplicationContext.getImplementation(DomainResponseHelper.class);
-                try {
-                    if (!authValidator.isValidAuthenticatedRequest(request)) {
-                        var errorMessage = "The request failed the authentication check";
-                        LOGGER.logError(errorMessage);
-                        response = domainResponseHelper.constructErrorResponse(401, errorMessage);
-                    }
-                } catch (SecretRetrievalException | IllegalArgumentException e) {
-                    LOGGER.logFatal("Unable to validate whether the request is authenticated", e);
-                    response = domainResponseHelper.constructErrorResponse(500, e);
-                }
-            }
-
-            if (response == null) {
-                response = handler.apply(request);
-            }
-
+            DomainResponse response = processRequest(request, handler, isProtected);
             domainResponseFillsInJavalinContext(response, ctx);
 
             LOGGER.logInfo("Handler complete");
         };
+    }
+
+    private static DomainResponse processRequest(
+            DomainRequest request,
+            Function<DomainRequest, DomainResponse> handler,
+            boolean isProtected) {
+        if (isProtected) {
+            DomainResponse authResponse = authenticateRequest(request);
+            if (authResponse != null) {
+                return authResponse;
+            }
+        }
+
+        return handler.apply(request);
+    }
+
+    private static DomainResponse authenticateRequest(DomainRequest request) {
+        AuthRequestValidator authValidator =
+                ApplicationContext.getImplementation(AuthRequestValidator.class);
+        DomainResponseHelper domainResponseHelper =
+                ApplicationContext.getImplementation(DomainResponseHelper.class);
+        try {
+            if (!authValidator.isValidAuthenticatedRequest(request)) {
+                var errorMessage = "The request failed the authentication check";
+                LOGGER.logError(errorMessage);
+                return domainResponseHelper.constructErrorResponse(401, errorMessage);
+            }
+        } catch (SecretRetrievalException | IllegalArgumentException e) {
+            LOGGER.logFatal("Unable to validate whether the request is authenticated", e);
+            return domainResponseHelper.constructErrorResponse(500, e);
+        }
+
+        return null;
     }
 
     static DomainRequest javalinContextToDomainRequest(Context ctx) {
