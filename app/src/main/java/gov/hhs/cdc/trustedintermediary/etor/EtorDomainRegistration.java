@@ -14,13 +14,13 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResp
 import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrdersController;
+import gov.hhs.cdc.trustedintermediary.etor.orders.OrdersResponse;
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendLabOrderUsecase;
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendLabOrderException;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiLabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileLabOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamLabOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -38,7 +38,9 @@ public class EtorDomainRegistration implements DomainConnector {
     static final String ORDERS_API_ENDPOINT = "/v1/etor/orders";
 
     @Inject PatientDemographicsController patientDemographicsController;
+    @Inject OrdersController ordersController;
     @Inject ConvertAndSendDemographicsUsecase convertAndSendDemographicsUsecase;
+    @Inject SendLabOrderUsecase sendLabOrderUsecase;
     @Inject Logger logger;
     @Inject AuthRequestValidator authValidator;
     @Inject DomainResponseHelper domainResponseHelper;
@@ -59,6 +61,8 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(LabOrderConverter.class, HapiLabOrderConverter.getInstance());
         ApplicationContext.register(OrdersController.class, OrdersController.getInstance());
         ApplicationContext.register(SendLabOrderUsecase.class, SendLabOrderUsecase.getInstance());
+        ApplicationContext.register(AuthRequestValidator.class, AuthRequestValidator.getInstance());
+        ApplicationContext.register(DomainResponseHelper.class, DomainResponseHelper.getInstance());
 
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
             ApplicationContext.register(
@@ -83,32 +87,31 @@ public class EtorDomainRegistration implements DomainConnector {
         }
     }
 
-    DomainResponse handleRequest(
-            DomainRequest request, Function<DomainRequest, DomainResponse> endpointHandler) {
-
-        // Validate token
-        try {
-            if (!authValidator.isValidAuthenticatedRequest(request)) {
-                var errorMessage = "The request failed the authentication check";
-                logger.logError(errorMessage);
-                return domainResponseHelper.constructErrorResponse(401, errorMessage);
-            }
-        } catch (SecretRetrievalException | IllegalArgumentException e) {
-            logger.logFatal("Unable to validate whether the request is authenticated", e);
-            return domainResponseHelper.constructErrorResponse(500, e);
-        }
-
-        return endpointHandler.apply(request);
-    }
+    //    DomainResponse handleRequest(
+    //            DomainRequest request, Function<DomainRequest, DomainResponse> endpointHandler) {
+    //
+    //        // Validate token
+    //        try {
+    //            if (!authValidator.isValidAuthenticatedRequest(request)) {
+    //                var errorMessage = "The request failed the authentication check";
+    //                logger.logError(errorMessage);
+    //                return domainResponseHelper.constructErrorResponse(401, errorMessage);
+    //            }
+    //        } catch (SecretRetrievalException | IllegalArgumentException e) {
+    //            logger.logFatal("Unable to validate whether the request is authenticated", e);
+    //            return domainResponseHelper.constructErrorResponse(500, e);
+    //        }
+    //
+    //        return endpointHandler.apply(request);
+    //    }
 
     DomainResponse handleDemographics(DomainRequest request) {
-
         var demographics = patientDemographicsController.parseDemographics(request);
 
         try {
             convertAndSendDemographicsUsecase.convertAndSend(demographics);
         } catch (UnableToSendLabOrderException e) {
-            logger.logError("Unable to send lab order", e);
+            logger.logError("Unable to convert and send demographics", e);
             return domainResponseHelper.constructErrorResponse(400, e);
         }
 
@@ -119,10 +122,16 @@ public class EtorDomainRegistration implements DomainConnector {
     }
 
     DomainResponse handleOrders(DomainRequest request) {
+        var orders = ordersController.parseOrders(request);
 
-        //  var orders = ordersController.ParseOrders(request)
-        //  convertAndSendLabOrderUseCase.covertAndSend(orders)
-        //  return ordersController.constructOkResponse(OrdersResponse)
-        return new domainResponseHelper.constructOkResponse();
+        try {
+            sendLabOrderUsecase.send(orders);
+        } catch (UnableToSendLabOrderException e) {
+            logger.logError("Unable to send lab order", e);
+            return domainResponseHelper.constructErrorResponse(400, e);
+        }
+
+        OrdersResponse ordersResponse = new OrdersResponse(orders);
+        return domainResponseHelper.constructOkResponse(ordersResponse);
     }
 }
