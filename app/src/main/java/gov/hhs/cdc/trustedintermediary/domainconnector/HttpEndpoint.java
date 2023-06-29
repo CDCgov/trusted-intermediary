@@ -5,6 +5,10 @@ import java.util.Objects;
 /** Specifies an HTTP endpoint. */
 public record HttpEndpoint(String verb, String path, boolean isProtected) {
 
+    public HttpEndpoint(String verb, String path) {
+        this(verb, path, false);
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
