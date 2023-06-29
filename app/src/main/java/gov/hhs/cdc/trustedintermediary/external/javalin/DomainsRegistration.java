@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.javalin;
 
 import gov.hhs.cdc.trustedintermediary.OpenApi;
+import gov.hhs.cdc.trustedintermediary.auth.AuthRequestValidator;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.*;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -65,7 +66,7 @@ public class DomainsRegistration {
                                             app.addHandler(
                                                     HandlerType.valueOf(endpoint.verb()),
                                                     endpoint.path(),
-                                                    createHandler(handler));
+                                                    createHandler(handler, endpoint.isProtected()));
                                             LOGGER.logInfo(
                                                     "verb: "
                                                             + endpoint.verb()
@@ -119,17 +120,21 @@ public class DomainsRegistration {
 
             var request = javalinContextToDomainRequest(ctx);
 
-            var response = null;
+            DomainResponse response = null;
             if (isProtected) {
+                AuthRequestValidator authValidator =
+                        ApplicationContext.getImplementation(AuthRequestValidator.class);
+                DomainResponseHelper domainResponseHelper =
+                        ApplicationContext.getImplementation(DomainResponseHelper.class);
                 try {
                     if (!authValidator.isValidAuthenticatedRequest(request)) {
                         var errorMessage = "The request failed the authentication check";
-                        logger.logError(errorMessage);
-                        respose = domainResponseHelper.constructErrorResponse(401, errorMessage);
+                        LOGGER.logError(errorMessage);
+                        response = domainResponseHelper.constructErrorResponse(401, errorMessage);
                     }
                 } catch (SecretRetrievalException | IllegalArgumentException e) {
-                    logger.logFatal("Unable to validate whether the request is authenticated", e);
-                    respose = domainResponseHelper.constructErrorResponse(500, e);
+                    LOGGER.logFatal("Unable to validate whether the request is authenticated", e);
+                    response = domainResponseHelper.constructErrorResponse(500, e);
                 }
             }
 
