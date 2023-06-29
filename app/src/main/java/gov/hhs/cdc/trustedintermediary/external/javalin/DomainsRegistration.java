@@ -126,7 +126,7 @@ public class DomainsRegistration {
         };
     }
 
-    private static DomainResponse processRequest(
+    static DomainResponse processRequest(
             DomainRequest request,
             Function<DomainRequest, DomainResponse> handler,
             boolean isProtected) {
@@ -140,7 +140,7 @@ public class DomainsRegistration {
         return handler.apply(request);
     }
 
-    private static DomainResponse authenticateRequest(DomainRequest request) {
+    static DomainResponse authenticateRequest(DomainRequest request) {
         AuthRequestValidator authValidator =
                 ApplicationContext.getImplementation(AuthRequestValidator.class);
         DomainResponseHelper domainResponseHelper =

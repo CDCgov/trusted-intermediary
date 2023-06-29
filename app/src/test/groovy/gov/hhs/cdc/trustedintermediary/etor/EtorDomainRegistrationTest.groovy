@@ -116,31 +116,6 @@ class EtorDomainRegistrationTest extends Specification {
     }
 
     // TODO: test should be moved to DomainsRegistrationTest
-    //    def "demographics endpoint fails with a 401 when unauthenticated"() {
-    //        given:
-    //        def domainRegistration = new EtorDomainRegistration()
-    //
-    //        def mockAuthValidator = Mock(AuthRequestValidator)
-    //        mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> false
-    //
-    //        def mockDemographicsController = Mock(PatientDemographicsController)
-    //
-    //        TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
-    //        TestApplicationContext.register(PatientDemographicsController, mockDemographicsController)
-    //        TestApplicationContext.register(AuthRequestValidator, mockAuthValidator)
-    //        TestApplicationContext.injectRegisteredImplementations()
-    //
-    //        when:
-    //        domainRegistration.handleDemographics(new DomainRequest())
-    //
-    //        then:
-    //        1 * mockDemographicsController.constructResponse(_ as Integer, _ as String) >> { Integer httpStatus, String errorString ->
-    //            assert httpStatus == 401
-    //        }
-    //        0 * mockDemographicsController.parseDemographics(_)
-    //    }
-
-    // TODO: test should be moved to DomainsRegistrationTest
     //    def "demographics endpoint fails with a 500 when the authentication checking completely fails"() {
     //        given:
     //        def domainRegistration = new EtorDomainRegistration()

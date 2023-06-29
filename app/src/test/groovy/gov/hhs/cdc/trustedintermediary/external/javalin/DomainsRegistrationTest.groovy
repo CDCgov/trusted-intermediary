@@ -1,11 +1,13 @@
 package gov.hhs.cdc.trustedintermediary.external.javalin
 
 import gov.hhs.cdc.trustedintermediary.OpenApi
+import gov.hhs.cdc.trustedintermediary.auth.AuthRequestValidator
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnectorConstructionException
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
 import io.javalin.Javalin
 import io.javalin.http.Context
@@ -103,6 +105,35 @@ class DomainsRegistrationTest extends Specification {
         then:
         handlerCalled == true
         1 * javalinContext.status(_ as Integer)
+    }
+
+
+    def "protected endpoint fails with a 401 when unauthenticated"() {
+        given:
+        def rawHandler = { request ->
+            return new DomainResponse(418)
+        }
+        def mockContext = Mock(Context)
+        mockContext.method() >> HandlerType.POST
+
+        def mockAuthValidator = Mock(AuthRequestValidator)
+        mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> false
+        TestApplicationContext.register(AuthRequestValidator, mockAuthValidator)
+
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def handler = DomainsRegistration.createHandler(rawHandler, true)
+        handler.handle(mockContext)
+
+        then:
+        true
+        1 * DomainsRegistration.authenticateRequest(_ as DomainRequest) >> { DomainResponse response ->
+            assert response.getStatusCode() == 401
+        }
     }
 
     def "constructNewDomainConnector works correctly with a default constructor"() {
