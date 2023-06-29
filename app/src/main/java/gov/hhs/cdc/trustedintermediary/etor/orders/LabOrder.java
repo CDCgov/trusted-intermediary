@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.etor.demographics;
+package gov.hhs.cdc.trustedintermediary.etor.orders;
 
 /**
  * Interface to wrap a third-party lab order class (Ex: Hapi FHIR Bundle)

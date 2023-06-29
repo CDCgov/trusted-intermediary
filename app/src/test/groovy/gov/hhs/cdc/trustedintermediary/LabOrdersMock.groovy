@@ -1,8 +1,8 @@
 package gov.hhs.cdc.trustedintermediary
 
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder
+import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrder
 /**
- * A mock implementation of the {@link gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder} interface that is easy to use in tests.
+ * A mock implementation of the {@link LabOrder} interface that is easy to use in tests.
  */
 class LabOrdersMock<T> implements LabOrder<T> {
 

@@ -7,14 +7,14 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint;
 import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecificationException;
-import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendLabOrderUsecase;
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderConverter;
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender;
+import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemographicsUsecase;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
-import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException;
+import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrderConverter;
+import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrdersController;
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendLabOrderUsecase;
+import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendLabOrderException;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiLabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileLabOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamLabOrderSender;
@@ -37,7 +37,7 @@ public class EtorDomainRegistration implements DomainConnector {
     static final String ORDERS_API_ENDPOINT = "/v1/etor/orders";
 
     @Inject PatientDemographicsController patientDemographicsController;
-    @Inject ConvertAndSendLabOrderUsecase convertAndSendLabOrderUsecase;
+    @Inject ConvertAndSendDemographicsUsecase convertAndSendDemographicsUsecase;
     @Inject Logger logger;
     @Inject AuthRequestValidator authValidator;
 
@@ -51,7 +51,8 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(
                 PatientDemographicsController.class, PatientDemographicsController.getInstance());
         ApplicationContext.register(
-                ConvertAndSendLabOrderUsecase.class, ConvertAndSendLabOrderUsecase.getInstance());
+                ConvertAndSendDemographicsUsecase.class,
+                ConvertAndSendDemographicsUsecase.getInstance());
         ApplicationContext.register(LabOrderConverter.class, HapiLabOrderConverter.getInstance());
         ApplicationContext.register(OrdersController.class, OrdersController.getInstance());
         ApplicationContext.register(SendLabOrderUsecase.class, SendLabOrderUsecase.getInstance());
@@ -96,7 +97,7 @@ public class EtorDomainRegistration implements DomainConnector {
         var demographics = patientDemographicsController.parseDemographics(request);
 
         try {
-            convertAndSendLabOrderUsecase.convertAndSend(demographics);
+            convertAndSendDemographicsUsecase.convertAndSend(demographics);
         } catch (UnableToSendLabOrderException e) {
             logger.logError("Unable to send lab order", e);
             return patientDemographicsController.constructResponse(400, e);

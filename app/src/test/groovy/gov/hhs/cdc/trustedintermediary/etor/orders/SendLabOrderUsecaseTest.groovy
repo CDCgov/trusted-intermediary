@@ -2,9 +2,6 @@ package gov.hhs.cdc.trustedintermediary.etor.orders
 
 import gov.hhs.cdc.trustedintermediary.LabOrdersMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender
-import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException
 import spock.lang.Specification
 
 class SendLabOrderUsecaseTest extends Specification {
