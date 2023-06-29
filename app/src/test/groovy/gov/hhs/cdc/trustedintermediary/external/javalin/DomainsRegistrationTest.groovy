@@ -169,6 +169,26 @@ class DomainsRegistrationTest extends Specification {
         actual == expected
     }
 
+    def "authenticateRequest IllegalArgumentException unhappy path works"() {
+        given:
+        def mockValidator = Mock(AuthRequestValidator)
+        def request = new DomainRequest()
+        def statusCode = 500
+        def expected = statusCode
+        TestApplicationContext.register(AuthRequestValidator, mockValidator)
+        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+        mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> { throw new IllegalArgumentException("internal error",new IllegalArgumentException()) }
+
+        when:
+        def res = DomainsRegistration.authenticateRequest(request)
+        def actual = res.getStatusCode()
+
+        then:
+        actual == expected
+    }
+
     def "protected endpoint fails with a 401 when unauthenticated"() {
         given:
         def rawHandler = { request ->
