@@ -12,6 +12,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemograph
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse
+import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrder
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrdersController
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrdersResponse
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendLabOrderUsecase
@@ -58,9 +59,6 @@ class EtorDomainRegistrationTest extends Specification {
         given:
         def domainRegistration = new EtorDomainRegistration()
 
-        def mockAuthValidator = Mock(AuthRequestValidator)
-        mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> true
-
         def mockDemographicsController = Mock(PatientDemographicsController)
         def mockResponseHelper = Mock(DomainResponseHelper)
 
@@ -69,12 +67,11 @@ class EtorDomainRegistrationTest extends Specification {
         mockDemographicsController.parseDemographics(_ as DomainRequest) >> new DemographicsMock(mockRequestId, "a patient ID", "demographics")
         mockResponseHelper.constructOkResponse(_ as PatientDemographicsResponse) >> new DomainResponse(418)
 
-        def mockUsecase = Mock(ConvertAndSendDemographicsUsecase)
+        def mockUseCase = Mock(ConvertAndSendDemographicsUsecase)
 
         TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
         TestApplicationContext.register(PatientDemographicsController, mockDemographicsController)
-        TestApplicationContext.register(ConvertAndSendDemographicsUsecase, mockUsecase)
-        TestApplicationContext.register(AuthRequestValidator, mockAuthValidator)
+        TestApplicationContext.register(ConvertAndSendDemographicsUsecase, mockUseCase)
         TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
         TestApplicationContext.injectRegisteredImplementations()
 
@@ -87,41 +84,36 @@ class EtorDomainRegistrationTest extends Specification {
         1 * mockResponseHelper.constructOkResponse(_ as PatientDemographicsResponse) >> { PatientDemographicsResponse demographicsResponse ->
             assert demographicsResponse.fhirResourceId == mockRequestId
         }
-        1 * mockUsecase.convertAndSend(_ as Demographics)
+        1 * mockUseCase.convertAndSend(_ as Demographics)
     }
 
-    // TODO: test should be moved to DomainsRegistrationTest
-    //    def "handleDemographics generates an error response when the usecase throws an exception"() {
-    //        given:
-    //        def domainRegistration = new EtorDomainRegistration()
-    //        TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
-    //
-    //        def mockDemographicController = Mock(PatientDemographicsController)
-    //        TestApplicationContext.register(PatientDemographicsController, mockDemographicController)
-    //
-    //        def domainRequest = new DomainRequest()
-    //        def mockLabOrderUseCase = Mock(ConvertAndSendDemographicsUsecase)
-    //        mockLabOrderUseCase.convertAndSend(_) >> {
-    //            throw new UnableToSendLabOrderException("error", new NullPointerException())
-    //        }
-    //        TestApplicationContext.register(ConvertAndSendDemographicsUsecase, mockLabOrderUseCase)
-    //
-    //        def mockAuthValidator = Mock(AuthRequestValidator)
-    //        mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> true
-    //        TestApplicationContext.register(AuthRequestValidator, mockAuthValidator)
-    //
-    //        def mockResponseHelper = Mock(DomainResponseHelper)
-    //        mockResponseHelper.constructErrorResponse(_ as Integer, _ as Exception) >> new DomainResponse(400)
-    //        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
-    //
-    //        TestApplicationContext.injectRegisteredImplementations()
-    //
-    //        when:
-    //        def res = domainRegistration.handleDemographics(domainRequest)
-    //
-    //        then:
-    //        res.statusCode == 400
-    //    }
+    def "handleDemographics generates an error response when the usecase throws an exception"() {
+        given:
+        def domainRegistration = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
+
+        def mockController = Mock(PatientDemographicsController)
+        mockController.parseDemographics(_ as DomainRequest) >> new DemographicsMock<?>(null, null, null)
+        TestApplicationContext.register(PatientDemographicsController, mockController)
+
+        def mockUseCase = Mock(ConvertAndSendDemographicsUsecase)
+        mockUseCase.convertAndSend(_ as Demographics<?>) >> {
+            throw new UnableToSendLabOrderException("error", new NullPointerException())
+        }
+        TestApplicationContext.register(ConvertAndSendDemographicsUsecase, mockUseCase)
+
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        mockResponseHelper.constructErrorResponse(_ as Integer, _ as Exception) >> new DomainResponse(400)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def res = domainRegistration.handleDemographics(new DomainRequest())
+
+        then:
+        res.statusCode == 400
+    }
 
     // TODO: test should be moved to DomainsRegistrationTest
     //    def "demographics endpoint fails with a 401 when unauthenticated"() {
@@ -193,10 +185,6 @@ class EtorDomainRegistrationTest extends Specification {
         mockResponseHelper.constructOkResponse(_ as OrdersResponse) >> new DomainResponse(expected)
         TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
 
-        def mockAuthValidator = Mock(AuthRequestValidator)
-        mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> true
-        TestApplicationContext.register(AuthRequestValidator, mockAuthValidator)
-
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -205,6 +193,35 @@ class EtorDomainRegistrationTest extends Specification {
 
         then:
         actual == expected
+    }
+
+
+    def "handleOrders generates an error response when the usecase throws an exception"() {
+        given:
+        def domainRegistration = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
+
+        def mockController = Mock(OrdersController)
+        mockController.parseOrders(_ as DomainRequest) >> new LabOrdersMock<?>(null, null, null)
+        TestApplicationContext.register(OrdersController, mockController)
+
+        def mockUseCase = Mock(SendLabOrderUsecase)
+        mockUseCase.send(_ as LabOrder<?>) >> {
+            throw new UnableToSendLabOrderException("error", new NullPointerException())
+        }
+        TestApplicationContext.register(SendLabOrderUsecase, mockUseCase)
+
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        mockResponseHelper.constructErrorResponse(_ as Integer, _ as Exception) >> new DomainResponse(400)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def res = domainRegistration.handleOrders(new DomainRequest())
+
+        then:
+        res.statusCode == 400
     }
 
     // TODO: test should be moved to DomainsRegistrationTest
