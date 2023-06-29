@@ -87,24 +87,6 @@ public class EtorDomainRegistration implements DomainConnector {
         }
     }
 
-    //    DomainResponse handleRequest(
-    //            DomainRequest request, Function<DomainRequest, DomainResponse> endpointHandler) {
-    //
-    //        // Validate token
-    //        try {
-    //            if (!authValidator.isValidAuthenticatedRequest(request)) {
-    //                var errorMessage = "The request failed the authentication check";
-    //                logger.logError(errorMessage);
-    //                return domainResponseHelper.constructErrorResponse(401, errorMessage);
-    //            }
-    //        } catch (SecretRetrievalException | IllegalArgumentException e) {
-    //            logger.logFatal("Unable to validate whether the request is authenticated", e);
-    //            return domainResponseHelper.constructErrorResponse(500, e);
-    //        }
-    //
-    //        return endpointHandler.apply(request);
-    //    }
-
     DomainResponse handleDemographics(DomainRequest request) {
         var demographics = patientDemographicsController.parseDemographics(request);
 
