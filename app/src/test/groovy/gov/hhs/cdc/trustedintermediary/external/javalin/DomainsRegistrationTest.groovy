@@ -9,6 +9,10 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
+import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
+import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException
+import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalExceptionTest
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import io.javalin.Javalin
 import io.javalin.http.Context
 import io.javalin.http.Handler
@@ -121,7 +125,47 @@ class DomainsRegistrationTest extends Specification {
         def actual = DomainsRegistration.authenticateRequest(request)
 
         then:
+        actual == expected
+    }
+
+    def "authenticateRequest unauthorized request unhappy path works"() {
+        given:
+        def mockValidator = Mock(AuthRequestValidator)
+        def request = new DomainRequest()
+        def statusCode = 401
+        def expected = statusCode
+        TestApplicationContext.register(AuthRequestValidator, mockValidator)
+        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+        mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> false
+
+        when:
+        def res = DomainsRegistration.authenticateRequest(request)
+        def actual = res.getStatusCode()
+
+        then:
         noExceptionThrown()
+        actual == expected
+    }
+
+    def "authenticateRequest SecretRetrievalException unhappy path works"() {
+        given:
+        def mockValidator = Mock(AuthRequestValidator)
+        def request = new DomainRequest()
+        def statusCode = 500
+        def expected = statusCode
+        TestApplicationContext.register(AuthRequestValidator, mockValidator)
+        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+        mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> { throw new SecretRetrievalException("internal error",new IllegalArgumentException()) }
+
+        when:
+        def res = DomainsRegistration.authenticateRequest(request)
+        def actual = res.getStatusCode()
+
+        then:
         actual == expected
     }
 
