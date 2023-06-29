@@ -1,8 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.external.localfile
 
+import gov.hhs.cdc.trustedintermediary.LabOrdersMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder
-import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException
+import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendLabOrderException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import spock.lang.Specification
 
@@ -25,13 +25,7 @@ class LocalFileLabOrderSenderTest extends Specification{
         def testStringOrder = "Some String"
         fhir.encodeResourceToJson(_ as String) >> testStringOrder
 
-        LabOrder<?> mockOrder = new LabOrder<String>() {
-
-                    @Override
-                    String getUnderlyingOrder() {
-                        return "Mock String Order"
-                    }
-                }
+        def mockOrder = new LabOrdersMock(null, null, "Mock String Order")
 
         TestApplicationContext.register(HapiFhir, fhir)
         TestApplicationContext.injectRegisteredImplementations()
@@ -50,13 +44,7 @@ class LocalFileLabOrderSenderTest extends Specification{
         def nullException = new NullPointerException()
         fhir.encodeResourceToJson(_ as String) >> {String argument -> throw nullException}
 
-        LabOrder<?> mockOrder = new LabOrder<String>() {
-
-                    @Override
-                    String getUnderlyingOrder() {
-                        return " Second Mock String Order"
-                    }
-                }
+        def mockOrder = new LabOrdersMock(null, null, "Second Mock String Order")
 
         TestApplicationContext.register(HapiFhir, fhir)
         TestApplicationContext.injectRegisteredImplementations()

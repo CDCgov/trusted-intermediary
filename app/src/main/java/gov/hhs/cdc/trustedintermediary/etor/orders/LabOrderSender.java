@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.etor.demographics;
+package gov.hhs.cdc.trustedintermediary.etor.orders;
 
 /** Interface for sending a lab order. */
 public interface LabOrderSender {

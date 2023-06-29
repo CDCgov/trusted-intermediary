@@ -1,9 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.external.reportstream
 
+import gov.hhs.cdc.trustedintermediary.LabOrdersMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender
-import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException
+import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrder
+import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrderSender
+import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendLabOrderException
 import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
@@ -172,13 +173,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         TestApplicationContext.register(Cache, mockCache)
         TestApplicationContext.injectRegisteredImplementations()
         mockFhir.encodeResourceToJson(_ as String) >> "Mock order"
-        LabOrder<?> mockOrder = new LabOrder<String>() {
-
-                    @Override
-                    String getUnderlyingOrder() {
-                        return "Mock order"
-                    }
-                }
+        LabOrder<?> mockOrder = new LabOrdersMock(null, null, "Mock order")
 
         when:
         ReportStreamLabOrderSender.getInstance().sendOrder(mockOrder)

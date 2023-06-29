@@ -1,10 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders
 
-import gov.hhs.cdc.trustedintermediary.DemographicsMock
+import gov.hhs.cdc.trustedintermediary.LabOrdersMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender
-import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException
 import spock.lang.Specification
 
 class SendLabOrderUsecaseTest extends Specification {
@@ -17,13 +14,7 @@ class SendLabOrderUsecaseTest extends Specification {
 
     def "send sends successfully"() {
         given:
-        LabOrder<?> mockOrder = new LabOrder<String>() {
-                    @Override
-                    String getUnderlyingOrder() {
-                        return "This is a mock inner order"
-                    }
-                }
-
+        def mockOrder = new LabOrdersMock(null, null, null)
         def mockSender = Mock(LabOrderSender)
 
         TestApplicationContext.register(LabOrderSender, mockSender)
@@ -38,13 +29,7 @@ class SendLabOrderUsecaseTest extends Specification {
 
     def "send fails to send"() {
         given:
-        LabOrder<?> mockOrder = new LabOrder<String>() {
-                    @Override
-                    String getUnderlyingOrder() {
-                        return "This is a mock inner order"
-                    }
-                }
-
+        def mockOrder = new LabOrdersMock(null, null, null)
         def mockSender = Mock(LabOrderSender)
         mockSender.sendOrder(_ as LabOrder) >> { throw new UnableToSendLabOrderException("DogCow", new NullPointerException()) }
 

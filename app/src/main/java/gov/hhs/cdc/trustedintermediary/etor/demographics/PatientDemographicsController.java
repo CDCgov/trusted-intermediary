@@ -2,13 +2,11 @@ package gov.hhs.cdc.trustedintermediary.etor.demographics;
 
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiDemographics;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
-import java.util.Map;
-import java.util.Optional;
 import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
 
@@ -26,6 +24,7 @@ public class PatientDemographicsController {
     @Inject HapiFhir fhir;
     @Inject Formatter formatter;
     @Inject Logger logger;
+    @Inject DomainResponseHelper domainResponseHelper;
 
     private PatientDemographicsController() {}
 
@@ -41,48 +40,14 @@ public class PatientDemographicsController {
 
     public DomainResponse constructResponse(
             PatientDemographicsResponse patientDemographicsResponse) {
-        logger.logInfo("Constructing the response");
-        var response = new DomainResponse(200);
-
-        try {
-            var responseBody = formatter.convertToJsonString(patientDemographicsResponse);
-            response.setBody(responseBody);
-        } catch (FormatterProcessingException e) {
-            logger.logError("Error constructing an OK demographics response", e);
-            return constructGenericInternalServerErrorResponse();
-        }
-
-        response.setHeaders(Map.of(CONTENT_TYPE_LITERAL, APPLICATION_JSON_LITERAL));
-
-        return response;
-    }
-
-    public DomainResponse constructResponse(int httpStatus, Exception exception) {
-        var errorMessage =
-                Optional.ofNullable(exception.getMessage()).orElse(exception.getClass().toString());
-
-        return constructResponse(httpStatus, errorMessage);
+        return domainResponseHelper.constructOkResponse(patientDemographicsResponse);
     }
 
     public DomainResponse constructResponse(int httpStatus, String errorString) {
-        var domainResponse = new DomainResponse(httpStatus);
-
-        try {
-            var responseBody = formatter.convertToJsonString(Map.of("error", errorString));
-            domainResponse.setBody(responseBody);
-        } catch (FormatterProcessingException e) {
-            logger.logError("Error constructing an error response", e);
-            return constructGenericInternalServerErrorResponse();
-        }
-
-        domainResponse.setHeaders(Map.of(CONTENT_TYPE_LITERAL, APPLICATION_JSON_LITERAL));
-
-        return domainResponse;
+        return domainResponseHelper.constructErrorResponse(httpStatus, errorString);
     }
 
-    private DomainResponse constructGenericInternalServerErrorResponse() {
-        var domainResponse = new DomainResponse(500);
-        domainResponse.setBody("An internal server error occurred");
-        return domainResponse;
+    public DomainResponse constructResponse(int httpStatus, Exception exception) {
+        return domainResponseHelper.constructErrorResponse(httpStatus, exception);
     }
 }
