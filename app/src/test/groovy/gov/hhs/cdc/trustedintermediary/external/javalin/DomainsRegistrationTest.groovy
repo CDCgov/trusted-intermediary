@@ -97,7 +97,7 @@ class DomainsRegistrationTest extends Specification {
         javalinContext.method() >> HandlerType.POST
 
         when:
-        def javalinHandler = DomainsRegistration.createHandler(rawHandler)
+        def javalinHandler = DomainsRegistration.createHandler(rawHandler, false)
         javalinHandler.handle(javalinContext)
 
         then:
