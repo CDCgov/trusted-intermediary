@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper;
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint;
 import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecificationException;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemographicsUsecase;
@@ -40,11 +41,13 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject ConvertAndSendDemographicsUsecase convertAndSendDemographicsUsecase;
     @Inject Logger logger;
     @Inject AuthRequestValidator authValidator;
+    @Inject DomainResponseHelper domainResponseHelper;
 
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
             Map.of(
-                    new HttpEndpoint("POST", DEMOGRAPHICS_API_ENDPOINT), this::handleDemographics,
-                    new HttpEndpoint("POST", ORDERS_API_ENDPOINT), this::handleOrders);
+                    new HttpEndpoint("POST", DEMOGRAPHICS_API_ENDPOINT, true),
+                            this::handleDemographics,
+                    new HttpEndpoint("POST", ORDERS_API_ENDPOINT, true), this::handleOrders);
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
@@ -80,19 +83,25 @@ public class EtorDomainRegistration implements DomainConnector {
         }
     }
 
-    DomainResponse handleDemographics(DomainRequest request) {
+    DomainResponse handleRequest(
+            DomainRequest request, Function<DomainRequest, DomainResponse> endpointHandler) {
 
         // Validate token
         try {
             if (!authValidator.isValidAuthenticatedRequest(request)) {
                 var errorMessage = "The request failed the authentication check";
                 logger.logError(errorMessage);
-                return patientDemographicsController.constructResponse(401, errorMessage);
+                return domainResponseHelper.constructErrorResponse(401, errorMessage);
             }
         } catch (SecretRetrievalException | IllegalArgumentException e) {
             logger.logFatal("Unable to validate whether the request is authenticated", e);
-            return patientDemographicsController.constructResponse(500, e);
+            return domainResponseHelper.constructErrorResponse(500, e);
         }
+
+        return endpointHandler.apply(request);
+    }
+
+    DomainResponse handleDemographics(DomainRequest request) {
 
         var demographics = patientDemographicsController.parseDemographics(request);
 
@@ -100,35 +109,20 @@ public class EtorDomainRegistration implements DomainConnector {
             convertAndSendDemographicsUsecase.convertAndSend(demographics);
         } catch (UnableToSendLabOrderException e) {
             logger.logError("Unable to send lab order", e);
-            return patientDemographicsController.constructResponse(400, e);
+            return domainResponseHelper.constructErrorResponse(400, e);
         }
 
         PatientDemographicsResponse patientDemographicsResponse =
                 new PatientDemographicsResponse(demographics);
 
-        return patientDemographicsController.constructResponse(patientDemographicsResponse);
+        return domainResponseHelper.constructOkResponse(patientDemographicsResponse);
     }
 
     DomainResponse handleOrders(DomainRequest request) {
-        //  Validate token
-        try {
-            if (!authValidator.isValidAuthenticatedRequest(request)) {
-                var errorMessage = "The request failed the authentication check";
-                logger.logError(errorMessage);
-
-                // ordersController.constructErrorResponse(401, errorMessage)
-                return new DomainResponse(401);
-            }
-        } catch (SecretRetrievalException | IllegalArgumentException e) {
-            logger.logFatal("Unable to validate whether the request is authenticated", e);
-
-            // return ordersController.constructErrorResponse(500, e)
-            return new DomainResponse(500);
-        }
 
         //  var orders = ordersController.ParseOrders(request)
         //  convertAndSendLabOrderUseCase.covertAndSend(orders)
         //  return ordersController.constructOkResponse(OrdersResponse)
-        return new DomainResponse(200);
+        return new domainResponseHelper.constructOkResponse();
     }
 }

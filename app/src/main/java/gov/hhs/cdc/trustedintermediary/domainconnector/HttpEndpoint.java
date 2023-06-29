@@ -3,7 +3,7 @@ package gov.hhs.cdc.trustedintermediary.domainconnector;
 import java.util.Objects;
 
 /** Specifies an HTTP endpoint. */
-public record HttpEndpoint(String verb, String path) {
+public record HttpEndpoint(String verb, String path, boolean isProtected) {
 
     @Override
     public boolean equals(final Object o) {

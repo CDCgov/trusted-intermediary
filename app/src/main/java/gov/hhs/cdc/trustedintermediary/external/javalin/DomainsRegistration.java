@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.OpenApi;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.*;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
@@ -111,13 +112,30 @@ public class DomainsRegistration {
         }
     }
 
-    static Handler createHandler(Function<DomainRequest, DomainResponse> handler) {
+    static Handler createHandler(
+            Function<DomainRequest, DomainResponse> handler, boolean isProtected) {
         return (Context ctx) -> {
             LOGGER.logInfo(ctx.method().name() + " " + ctx.url());
 
             var request = javalinContextToDomainRequest(ctx);
 
-            var response = handler.apply(request);
+            var response = null;
+            if (isProtected) {
+                try {
+                    if (!authValidator.isValidAuthenticatedRequest(request)) {
+                        var errorMessage = "The request failed the authentication check";
+                        logger.logError(errorMessage);
+                        respose = domainResponseHelper.constructErrorResponse(401, errorMessage);
+                    }
+                } catch (SecretRetrievalException | IllegalArgumentException e) {
+                    logger.logFatal("Unable to validate whether the request is authenticated", e);
+                    respose = domainResponseHelper.constructErrorResponse(500, e);
+                }
+            }
+
+            if (response == null) {
+                response = handler.apply(request);
+            }
 
             domainResponseFillsInJavalinContext(response, ctx);
 

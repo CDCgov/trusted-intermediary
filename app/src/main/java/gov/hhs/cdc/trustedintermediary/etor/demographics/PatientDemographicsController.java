@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.demographics;
 
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
-import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiDemographics;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
@@ -36,18 +35,5 @@ public class PatientDemographicsController {
         logger.logInfo("Parsing patient demographics");
         var fhirBundle = fhir.parseResource(request.getBody(), Bundle.class);
         return new HapiDemographics(fhirBundle);
-    }
-
-    public DomainResponse constructResponse(
-            PatientDemographicsResponse patientDemographicsResponse) {
-        return domainResponseHelper.constructOkResponse(patientDemographicsResponse);
-    }
-
-    public DomainResponse constructResponse(int httpStatus, String errorString) {
-        return domainResponseHelper.constructErrorResponse(httpStatus, errorString);
-    }
-
-    public DomainResponse constructResponse(int httpStatus, Exception exception) {
-        return domainResponseHelper.constructErrorResponse(httpStatus, exception);
     }
 }
