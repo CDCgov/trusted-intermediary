@@ -13,4 +13,22 @@ class OrdersControllerTest extends Specification {
         TestApplicationContext.init()
         TestApplicationContext.register(OrdersController, OrdersController.getInstance())
     }
+
+    def "parseOrder happy path works"() {
+        given:
+        def request = new DomainRequest()
+        def controller = OrdersController.getInstance()
+        def bundle = new Bundle()
+        def expected = bundle
+        def fhir = Mock(HapiFhir)
+        fhir.parseResource(_ as String, _ as Class) >> bundle
+        TestApplicationContext.register(HapiFhir, fhir)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def actual = controller.parseOrders(request).underlyingOrder
+
+        then:
+        actual == expected
+    }
 }
