@@ -68,6 +68,7 @@ class SampleUser(FastHttpUser):
 def test_start(environment):
     global demographics_request_body
     global auth_request_body
+    global order_request_body
 
     if isinstance(environment.runner, MasterRunner):
         # in a distributed run, the master does not typically need any test data
@@ -75,6 +76,7 @@ def test_start(environment):
 
     demographics_request_body = get_demographics_request_body()
     auth_request_body = get_auth_request_body()
+    order_request_body = get_orders_request_body()
 
 
 @events.quitting.add_listener
