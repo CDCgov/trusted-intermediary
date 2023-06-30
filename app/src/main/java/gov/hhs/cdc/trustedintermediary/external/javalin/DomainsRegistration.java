@@ -145,6 +145,7 @@ public class DomainsRegistration {
                 ApplicationContext.getImplementation(AuthRequestValidator.class);
         DomainResponseHelper domainResponseHelper =
                 ApplicationContext.getImplementation(DomainResponseHelper.class);
+        LOGGER.logDebug("Authenticating request...");
         try {
             if (!authValidator.isValidAuthenticatedRequest(request)) {
                 var errorMessage = "The request failed the authentication check";
@@ -156,6 +157,7 @@ public class DomainsRegistration {
             return domainResponseHelper.constructErrorResponse(500, e);
         }
 
+        LOGGER.logInfo("Request successfully validated");
         return null;
     }
 
