@@ -132,6 +132,8 @@ public class DomainsRegistration {
             boolean isProtected) {
         if (isProtected) {
             DomainResponse authResponse = authenticateRequest(request);
+            // if authResponse is not null, it means authentication was not successful
+            // and we need to return the DomainResponse
             if (authResponse != null) {
                 return authResponse;
             }
