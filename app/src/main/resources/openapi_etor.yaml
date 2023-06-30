@@ -31,12 +31,61 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PatientDemographicsResponse'
+        '400':
+          description: Unable to send demographics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
         '401':
           description: Authentication failed due to invalid token or unknown organization
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedError'
+                $ref: '#/components/schemas/UnauthorizedRequestError'
+        '500':
+          description: A fatal error occurred while retrieving secret or due to an illegal argument
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /v1/etor/orders:
+    post:
+      summary: forwards orders to a lab
+      requestBody:
+        description: a FHIR order resource wrapped in a FHIR Bundle
+        content:
+          application/json:
+            schema:
+              $ref: 'https://github.com/LinuxForHealth/FHIR/blob/main/fhir-openapi/src/main/webapp/META-INF/openapi.json?raw=true#/components/schemas/Bundle'
+        required: true
+      security:
+        - bearerAuthorization: [ ]
+      responses:
+        '200':
+          description: the orders were sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersResponse'
+        '400':
+          description: Unable to send orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: Authentication failed due to invalid token or unknown organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedRequestError'
+        '500':
+          description: A fatal error occurred while retrieving secret or due to an illegal argument
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
 
 components:
   schemas:
@@ -49,8 +98,21 @@ components:
         patientId:
           type: string
           example: MRN7465737865
-    UnauthorizedError:
+    OrdersResponse:
+      type: object
+      properties:
+        fhirResourceId:
+          type: string
+          example: Patient/infant-twin-1
+        patientId:
+          type: string
+          example: MRN7465737865
+    BadRequestError:
+      description: Bad Request
+    UnauthorizedRequestError:
       description: Unauthorized Request
+    InternalServerError:
+      description: Internal Server Error
   securitySchemes:
     bearerAuthorization:
       type: http
