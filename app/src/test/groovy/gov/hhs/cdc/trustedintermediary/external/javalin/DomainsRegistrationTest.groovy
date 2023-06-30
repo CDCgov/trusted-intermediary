@@ -62,7 +62,7 @@ class DomainsRegistrationTest extends Specification {
         def bodyString = "Moof"
         def headerMap = [
             "Clarus": "DogCow",
-            "Two": "Another time"
+            "Two"   : "Another time"
         ]
 
         def response = new DomainResponse(statusCode)
@@ -159,7 +159,7 @@ class DomainsRegistrationTest extends Specification {
         TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
-        mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> { throw new SecretRetrievalException("internal error",new IllegalArgumentException()) }
+        mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> { throw new SecretRetrievalException("internal error", new IllegalArgumentException()) }
 
         when:
         def res = DomainsRegistration.authenticateRequest(request)
@@ -179,11 +179,34 @@ class DomainsRegistrationTest extends Specification {
         TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
-        mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> { throw new IllegalArgumentException("internal error",new IllegalArgumentException()) }
+        mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> { throw new IllegalArgumentException("internal error", new IllegalArgumentException()) }
 
         when:
         def res = DomainsRegistration.authenticateRequest(request)
         def actual = res.getStatusCode()
+
+        then:
+        actual == expected
+    }
+
+    def "processRequest happy path works"() {
+        given:
+        def mockValidator = Mock(AuthRequestValidator)
+        def request = new DomainRequest()
+        def handler =  { DomainRequest req ->
+            return new DomainResponse(200)
+        }
+        def expected = (handler as Function<DomainRequest, DomainResponse>).apply(request).statusCode
+
+        def isProtected = true
+        TestApplicationContext.register(AuthRequestValidator, mockValidator)
+        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+        mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> true
+
+        when:
+        def actual = DomainsRegistration.processRequest(request, handler, isProtected).statusCode
+        println("actual: " + actual)
 
         then:
         actual == expected
@@ -288,7 +311,7 @@ class DomainsRegistrationTest extends Specification {
         Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
             Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> registration = new HashMap<>()
 
-            for (int endpointIndex = 0; endpointIndex < endpointCount; endpointIndex ++) {
+            for (int endpointIndex = 0; endpointIndex < endpointCount; endpointIndex++) {
                 Function<DomainRequest, DomainResponse> function = { request -> new DomainResponse(418) }
                 registration.put(new HttpEndpoint("PUT", "/dogcow" + endpointIndex), function)
             }
@@ -310,7 +333,7 @@ class DomainsRegistrationTest extends Specification {
         Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
             Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> registration = new HashMap<>()
 
-            for (int endpointIndex = 0; endpointIndex < endpointCount; endpointIndex ++) {
+            for (int endpointIndex = 0; endpointIndex < endpointCount; endpointIndex++) {
                 Function<DomainRequest, DomainResponse> function = { request -> new DomainResponse(418) }
                 registration.put(new HttpEndpoint("POST", "/moof" + endpointIndex), function)
             }
