@@ -206,6 +206,29 @@ class DomainsRegistrationTest extends Specification {
 
         when:
         def actual = DomainsRegistration.processRequest(request, handler, isProtected).statusCode
+
+        then:
+        actual == expected
+    }
+
+    def "processRequest unhappy path works"() {
+        given:
+        def mockValidator = Mock(AuthRequestValidator)
+        def request = new DomainRequest()
+        def handler =  { DomainRequest req ->
+            return new DomainResponse(401)
+        }
+        def expected = (handler as Function<DomainRequest, DomainResponse>).apply(request).statusCode
+        def isProtected = true
+        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.register(AuthRequestValidator, mockValidator)
+        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+        mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> false
+
+        when:
+        def actual = DomainsRegistration.processRequest(request, handler, isProtected).statusCode
         println("actual: " + actual)
 
         then:
