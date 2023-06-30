@@ -115,31 +115,6 @@ class EtorDomainRegistrationTest extends Specification {
         res.statusCode == 400
     }
 
-    // TODO: test should be moved to DomainsRegistrationTest
-    //    def "demographics endpoint fails with a 500 when the authentication checking completely fails"() {
-    //        given:
-    //        def domainRegistration = new EtorDomainRegistration()
-    //        TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
-    //
-    //        def mockAuthValidator = Mock(AuthRequestValidator)
-    //        mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> { throw new SecretRetrievalException("DogCow", new NullPointerException()) }
-    //        TestApplicationContext.register(AuthRequestValidator, mockAuthValidator)
-    //
-    //        def mockDemographicsController = Mock(PatientDemographicsController)
-    //        TestApplicationContext.register(PatientDemographicsController, mockDemographicsController)
-    //
-    //        TestApplicationContext.injectRegisteredImplementations()
-    //
-    //        when:
-    //        domainRegistration.handleDemographics(new DomainRequest())
-    //
-    //        then:
-    //        1 * mockDemographicsController.constructResponse(_ as Integer, _ as Exception) >> { Integer httpStatus, Exception exception ->
-    //            assert httpStatus == 500
-    //        }
-    //        0 * mockDemographicsController.parseDemographics(_)
-    //    }
-
     def "Orders endpoint happy path"() {
         given:
         def expected = 200
@@ -170,7 +145,6 @@ class EtorDomainRegistrationTest extends Specification {
         actual == expected
     }
 
-
     def "handleOrders generates an error response when the usecase throws an exception"() {
         given:
         def domainRegistration = new EtorDomainRegistration()
@@ -198,79 +172,4 @@ class EtorDomainRegistrationTest extends Specification {
         then:
         res.statusCode == 400
     }
-
-    // TODO: test should be moved to DomainsRegistrationTest
-    //    def "Orders endpoint validator returns false unhappy path" () {
-    //        given:
-    //        def expected = 401
-    //
-    //        def connector = new EtorDomainRegistration()
-    //        TestApplicationContext.register(EtorDomainRegistration, connector)
-    //
-    //        def mockUseCase = Mock(SendLabOrderUsecase)
-    //        TestApplicationContext.register(SendLabOrderUsecase, mockUseCase)
-    //
-    //        def mockController = Mock(OrdersController)
-    //        TestApplicationContext.register(OrdersController, mockController)
-    //
-    //        def mockAuthValidator = Mock(AuthRequestValidator)
-    //        mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> false
-    //        TestApplicationContext.register(AuthRequestValidator, mockAuthValidator)
-    //
-    //        TestApplicationContext.injectRegisteredImplementations()
-    //
-    //        when:
-    //        def res = connector.handleOrders(new DomainRequest())
-    //        def actual = res.statusCode
-    //
-    //        then:
-    //        actual == expected
-    //    }
-
-    // TODO: test should be moved to DomainsRegistrationTest
-    //    def "Orders endpoint validator throws SecretRetrievalException unhappy path"() {
-    //        given:
-    //        def mockAuthValidator = Mock(AuthRequestValidator)
-    //        TestApplicationContext.register(AuthRequestValidator, mockAuthValidator)
-    //        def expected = 500
-    //        def connector = new EtorDomainRegistration()
-    //        TestApplicationContext.register(EtorDomainRegistration, connector)
-    //        def req = new DomainRequest()
-    //        TestApplicationContext.injectRegisteredImplementations()
-    //        mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> {
-    //            throw new SecretRetrievalException("DogCaow", new NullPointerException())
-    //        }
-    //
-    //        when:
-    //
-    //        def res = connector.handleOrders(req)
-    //        def actual = res.statusCode
-    //
-    //        then:
-    //        actual == expected
-    //    }
-
-    // TODO: test should be moved to DomainsRegistrationTest
-    //    def "Orders endpoint validator throws IllegalArgumentException unhappy path"() {
-    //        given:
-    //        def mockAuthValidator = Mock(AuthRequestValidator)
-    //        TestApplicationContext.register(AuthRequestValidator, mockAuthValidator)
-    //        def expected = 500
-    //        def connector = new EtorDomainRegistration()
-    //        TestApplicationContext.register(EtorDomainRegistration, connector)
-    //        def req = new DomainRequest()
-    //        TestApplicationContext.injectRegisteredImplementations()
-    //        mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> {
-    //            throw new IllegalArgumentException("DogCaow", new NullPointerException())
-    //        }
-    //
-    //        when:
-    //
-    //        def res = connector.handleOrders(req)
-    //        def actual = res.statusCode
-    //        println("status code: " + actual)
-    //
-    //        then:
-    //        actual == expected
-    //    }
 }
