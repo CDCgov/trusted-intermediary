@@ -7,12 +7,13 @@ import urllib.request
 from locust import FastHttpUser, task, events
 from locust.runners import MasterRunner
 
-
 HEALTH_ENDPOINT = "/health"
 AUTH_ENDPOINT = "/v1/auth"
 DEMOGRAPHICS_ENDPOINT = "/v1/etor/demographics"
+ORDERS_ENDPOINT = "/v1/etor/orders"
 
 demographics_request_body = None
+order_request_body = None
 auth_request_body = None
 
 
@@ -51,6 +52,14 @@ class SampleUser(FastHttpUser):
         self.client.post(
             DEMOGRAPHICS_ENDPOINT,
             data=demographics_request_body,
+            headers={"Authorization": self.access_token},
+        )
+
+    @task(5)  # this task will get called 5x more than the other
+    def post_v1_etor_orders(self):
+        self.client.post(
+            ORDERS_ENDPOINT,
+            data=order_request_body,
             headers={"Authorization": self.access_token},
         )
 
@@ -95,4 +104,10 @@ def get_auth_request_body():
 def get_demographics_request_body():
     # read the sample request body for the demographics endpoint
     with open("e2e/src/test/resources/newborn_patient.json", "r") as f:
+        return f.read()
+
+
+def get_orders_request_body():
+    # read the sample request body for the orders endpoint
+    with open("e2e/src/test/resources/lab_order.json", "r") as f:
         return f.read()
