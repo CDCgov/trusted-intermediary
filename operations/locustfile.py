@@ -19,7 +19,8 @@ auth_request_body = None
 
 class SampleUser(FastHttpUser):
     # Each task gets called randomly, but the number next to '@task' denotes
-    # how many more times that task will get called than other tasks
+    # how many more times that task will get called than other tasks.
+    # Tasks with the same number get called approx. the same number of times.
 
     token_refresh_interval = 280
     access_token = None
@@ -47,7 +48,7 @@ class SampleUser(FastHttpUser):
     def get_health(self):
         self.client.get(HEALTH_ENDPOINT)
 
-    @task(5)  # this task will get called 5x more than the other
+    @task(5)
     def post_v1_etor_demographics(self):
         self.client.post(
             DEMOGRAPHICS_ENDPOINT,
@@ -55,7 +56,7 @@ class SampleUser(FastHttpUser):
             headers={"Authorization": self.access_token},
         )
 
-    @task(5)  # this task will get called 5x more than the other
+    @task(5)
     def post_v1_etor_orders(self):
         self.client.post(
             ORDERS_ENDPOINT,
