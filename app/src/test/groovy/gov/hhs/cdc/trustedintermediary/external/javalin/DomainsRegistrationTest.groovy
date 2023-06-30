@@ -113,134 +113,145 @@ class DomainsRegistrationTest extends Specification {
 
     def "authenticateRequest happy path works"() {
         given:
+        def expectedDomainResponse = null
+
         def mockValidator = Mock(AuthRequestValidator)
-        def request = new DomainRequest()
-        def expected = null
+        mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> true
         TestApplicationContext.register(AuthRequestValidator, mockValidator)
         TestApplicationContext.injectRegisteredImplementations()
-        mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> true
 
         when:
-        def actual = DomainsRegistration.authenticateRequest(request)
+        def actualDomainResponse = DomainsRegistration.authenticateRequest(new DomainRequest())
 
         then:
-        actual == expected
+        actualDomainResponse == expectedDomainResponse
     }
 
     def "authenticateRequest unauthorized request unhappy path works"() {
         given:
+        def expectedStatusCode = 401
+
         def mockValidator = Mock(AuthRequestValidator)
-        def request = new DomainRequest()
-        def statusCode = 401
-        def expected = statusCode
-        TestApplicationContext.register(AuthRequestValidator, mockValidator)
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.injectRegisteredImplementations()
         mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> false
+        TestApplicationContext.register(AuthRequestValidator, mockValidator)
+
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+
+        TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def res = DomainsRegistration.authenticateRequest(request)
-        def actual = res.getStatusCode()
+        def res = DomainsRegistration.authenticateRequest(new DomainRequest())
+        def actualStatusCode = res.getStatusCode()
 
         then:
         noExceptionThrown()
-        actual == expected
+        actualStatusCode == expectedStatusCode
     }
 
     def "authenticateRequest SecretRetrievalException unhappy path works"() {
         given:
+        def expectedStatusCode = 500
+
         def mockValidator = Mock(AuthRequestValidator)
-        def request = new DomainRequest()
-        def statusCode = 500
-        def expected = statusCode
-        TestApplicationContext.register(AuthRequestValidator, mockValidator)
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.injectRegisteredImplementations()
         mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> { throw new SecretRetrievalException("internal error", new IllegalArgumentException()) }
+        TestApplicationContext.register(AuthRequestValidator, mockValidator)
+
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+
+        TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def res = DomainsRegistration.authenticateRequest(request)
-        def actual = res.getStatusCode()
+        def res = DomainsRegistration.authenticateRequest(new DomainRequest())
+        def actualStatusCode = res.getStatusCode()
 
         then:
-        actual == expected
+        actualStatusCode == expectedStatusCode
     }
 
     def "authenticateRequest IllegalArgumentException unhappy path works"() {
         given:
+        def expectedStatusCode = 500
+
         def mockValidator = Mock(AuthRequestValidator)
-        def request = new DomainRequest()
-        def statusCode = 500
-        def expected = statusCode
-        TestApplicationContext.register(AuthRequestValidator, mockValidator)
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.injectRegisteredImplementations()
         mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> { throw new IllegalArgumentException("internal error", new IllegalArgumentException()) }
+        TestApplicationContext.register(AuthRequestValidator, mockValidator)
+
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+
+        TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def res = DomainsRegistration.authenticateRequest(request)
-        def actual = res.getStatusCode()
+        def res = DomainsRegistration.authenticateRequest(new DomainRequest())
+        def actualStatusCode = res.getStatusCode()
 
         then:
-        actual == expected
+        actualStatusCode == expectedStatusCode
     }
 
     def "processRequest happy path works"() {
         given:
-        def mockValidator = Mock(AuthRequestValidator)
+        def isProtected = true
         def request = new DomainRequest()
         def handler =  { DomainRequest req ->
             return new DomainResponse(200)
         }
-        def expected = (handler as Function<DomainRequest, DomainResponse>).apply(request).statusCode
+        def expectedStatusCode = (handler as Function<DomainRequest, DomainResponse>).apply(request).statusCode
 
-        def isProtected = true
-        TestApplicationContext.register(AuthRequestValidator, mockValidator)
-        TestApplicationContext.injectRegisteredImplementations()
+        def mockValidator = Mock(AuthRequestValidator)
         mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> true
+        TestApplicationContext.register(AuthRequestValidator, mockValidator)
+
+        TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def actual = DomainsRegistration.processRequest(request, handler, isProtected).statusCode
+        def actualStatusCode = DomainsRegistration.processRequest(request, handler, isProtected).statusCode
 
         then:
-        actual == expected
+        actualStatusCode == expectedStatusCode
     }
 
     def "processRequest unhappy path works"() {
         given:
-        def mockValidator = Mock(AuthRequestValidator)
+        def isProtected = true
         def request = new DomainRequest()
         def handler =  { DomainRequest req ->
             return new DomainResponse(401)
         }
-        def expected = (handler as Function<DomainRequest, DomainResponse>).apply(request).statusCode
-        def isProtected = true
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.register(AuthRequestValidator, mockValidator)
-        TestApplicationContext.injectRegisteredImplementations()
+        def expectedStatusCode = (handler as Function<DomainRequest, DomainResponse>).apply(request).statusCode
+
+        def mockValidator = Mock(AuthRequestValidator)
         mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> false
+        TestApplicationContext.register(AuthRequestValidator, mockValidator)
+
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+
+        TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def actual = DomainsRegistration.processRequest(request, handler, isProtected).statusCode
-        println("actual: " + actual)
+        def actualStatusCode = DomainsRegistration.processRequest(request, handler, isProtected).statusCode
 
         then:
-        actual == expected
+        actualStatusCode == expectedStatusCode
     }
 
     def "protected endpoint fails with a 401 when unauthenticated"() {
         given:
-        def statusCode = 401
-        def body = '{"error":"The request failed the authentication check"}'
+        def expectedStatusCode = 401
+        def expectedResultBody = '{"error":"The request failed the authentication check"}'
+
         def rawHandler = { request ->
             return new DomainResponse(418)
         }
+
         def mockContext = Mock(Context)
         mockContext.method() >> HandlerType.POST
+
         def mockAuthValidator = Mock(AuthRequestValidator)
         mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> false
         TestApplicationContext.register(AuthRequestValidator, mockAuthValidator)
+
         TestApplicationContext.register(Formatter, Jackson.getInstance())
+
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -248,8 +259,8 @@ class DomainsRegistrationTest extends Specification {
         handler.handle(mockContext)
 
         then:
-        1 * mockContext.status(statusCode)
-        1 * mockContext.result(body)
+        1 * mockContext.status(expectedStatusCode)
+        1 * mockContext.result(expectedResultBody)
     }
 
     def "constructNewDomainConnector works correctly with a default constructor"() {

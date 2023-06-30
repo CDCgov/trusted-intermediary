@@ -89,6 +89,8 @@ class EtorDomainRegistrationTest extends Specification {
 
     def "handleDemographics generates an error response when the usecase throws an exception"() {
         given:
+        def expectedStatusCode = 400
+
         def domainRegistration = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
 
@@ -110,14 +112,15 @@ class EtorDomainRegistrationTest extends Specification {
 
         when:
         def res = domainRegistration.handleDemographics(new DomainRequest())
+        def actualStatusCode = res.statusCode
 
         then:
-        res.statusCode == 400
+        actualStatusCode == expectedStatusCode
     }
 
     def "Orders endpoint happy path"() {
         given:
-        def expected = 200
+        def expectedStatusCode = 200
 
         def connector = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, connector)
@@ -132,21 +135,23 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.register(OrdersController, mockController)
 
         def mockResponseHelper = Mock(DomainResponseHelper)
-        mockResponseHelper.constructOkResponse(_ as OrdersResponse) >> new DomainResponse(expected)
+        mockResponseHelper.constructOkResponse(_ as OrdersResponse) >> new DomainResponse(expectedStatusCode)
         TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
 
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
         def res = connector.handleOrders(new DomainRequest())
-        def actual = res.statusCode
+        def actualStatusCode = res.statusCode
 
         then:
-        actual == expected
+        actualStatusCode == expectedStatusCode
     }
 
     def "handleOrders generates an error response when the usecase throws an exception"() {
         given:
+        def expectedStatusCode = 400
+
         def domainRegistration = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
 
@@ -168,8 +173,9 @@ class EtorDomainRegistrationTest extends Specification {
 
         when:
         def res = domainRegistration.handleOrders(new DomainRequest())
+        def actualStatusCode = res.statusCode
 
         then:
-        res.statusCode == 400
+        actualStatusCode == expectedStatusCode
     }
 }
