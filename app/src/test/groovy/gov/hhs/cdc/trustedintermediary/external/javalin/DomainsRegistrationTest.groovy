@@ -237,19 +237,18 @@ class DomainsRegistrationTest extends Specification {
 
     def "protected endpoint fails with a 401 when unauthenticated"() {
         given:
+        def statusCode = 401
+        def body = '{"error":"The request failed the authentication check"}'
         def rawHandler = { request ->
             return new DomainResponse(418)
         }
         def mockContext = Mock(Context)
         mockContext.method() >> HandlerType.POST
-
         def mockAuthValidator = Mock(AuthRequestValidator)
         mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> false
         TestApplicationContext.register(AuthRequestValidator, mockAuthValidator)
-
-        def mockResponseHelper = Mock(DomainResponseHelper)
-        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
-
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -257,10 +256,8 @@ class DomainsRegistrationTest extends Specification {
         handler.handle(mockContext)
 
         then:
-        true
-        1 * DomainsRegistration.authenticateRequest(_ as DomainRequest) >> { DomainResponse response ->
-            assert response.getStatusCode() == 401
-        }
+        1 * mockContext.status(statusCode)
+        1 * mockContext.result(body)
     }
 
     def "constructNewDomainConnector works correctly with a default constructor"() {
