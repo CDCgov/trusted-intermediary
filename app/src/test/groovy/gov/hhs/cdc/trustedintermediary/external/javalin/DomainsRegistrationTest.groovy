@@ -11,7 +11,6 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException
-import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalExceptionTest
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import io.javalin.Javalin
 import io.javalin.http.Context
@@ -26,6 +25,7 @@ class DomainsRegistrationTest extends Specification {
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
+        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
         TestApplicationContext.register(OpenApi, Mock(OpenApi))
         Example1DomainConnector.endpointCount = 0
         Example2DomainConnector.endpointCount = 0
@@ -117,7 +117,6 @@ class DomainsRegistrationTest extends Specification {
         def request = new DomainRequest()
         def expected = null
         TestApplicationContext.register(AuthRequestValidator, mockValidator)
-        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
         mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> true
 
@@ -135,7 +134,6 @@ class DomainsRegistrationTest extends Specification {
         def statusCode = 401
         def expected = statusCode
         TestApplicationContext.register(AuthRequestValidator, mockValidator)
-        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
         mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> false
@@ -156,7 +154,6 @@ class DomainsRegistrationTest extends Specification {
         def statusCode = 500
         def expected = statusCode
         TestApplicationContext.register(AuthRequestValidator, mockValidator)
-        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
         mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> { throw new SecretRetrievalException("internal error", new IllegalArgumentException()) }
@@ -176,7 +173,6 @@ class DomainsRegistrationTest extends Specification {
         def statusCode = 500
         def expected = statusCode
         TestApplicationContext.register(AuthRequestValidator, mockValidator)
-        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
         mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> { throw new IllegalArgumentException("internal error", new IllegalArgumentException()) }
@@ -200,7 +196,6 @@ class DomainsRegistrationTest extends Specification {
 
         def isProtected = true
         TestApplicationContext.register(AuthRequestValidator, mockValidator)
-        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
         mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> true
 
@@ -220,10 +215,8 @@ class DomainsRegistrationTest extends Specification {
         }
         def expected = (handler as Function<DomainRequest, DomainResponse>).apply(request).statusCode
         def isProtected = true
-        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.register(AuthRequestValidator, mockValidator)
-        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
         mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> false
 
@@ -248,7 +241,6 @@ class DomainsRegistrationTest extends Specification {
         mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> false
         TestApplicationContext.register(AuthRequestValidator, mockAuthValidator)
         TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
