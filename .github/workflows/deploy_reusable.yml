@@ -117,4 +117,4 @@ jobs:
       uses: azure/CLI@v1
       with:
         inlineScript: |
-            az storage blob upload-batch --account-name cdctistagingdocs --auth-mode key -d '$web' -s ${{ steps.extract.outputs.destination }}
+            az storage blob upload-batch --account-name cdcti${{ inputs.ENVIRONMENT }}docs --overwrite --auth-mode key -d '$web' -s ${{ steps.extract.outputs.destination }}
