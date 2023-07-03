@@ -25,22 +25,22 @@ public class Slf4jLogger implements Logger {
 
     @Override
     public void logTrace(String traceMessage) {
-        getLoggingEventBuilder(Level.TRACE, traceMessage).log();
+        LOGGER.atTrace().setMessage(() -> traceMessage).log();
     }
 
     @Override
     public void logDebug(String debugMessage) {
-        getLoggingEventBuilder(Level.DEBUG, debugMessage).log();
+        LOGGER.atDebug().setMessage(() -> debugMessage).log();
     }
 
     @Override
     public void logDebug(String debugMessage, Throwable e) {
-        getLoggingEventBuilder(Level.DEBUG, debugMessage).setCause(e).log();
+        LOGGER.atDebug().setMessage(() -> debugMessage).setCause(e).log();
     }
 
     @Override
     public void logInfo(String infoMessage, Object... parameters) {
-        var logBuilder = getLoggingEventBuilder(Level.INFO, infoMessage);
+        var logBuilder = LOGGER.atInfo().setMessage(() -> infoMessage);
 
         Arrays.stream(parameters).forEachOrdered(logBuilder::addArgument);
 
@@ -49,40 +49,31 @@ public class Slf4jLogger implements Logger {
 
     @Override
     public void logWarning(String warningMessage) {
-        getLoggingEventBuilder(Level.WARN, warningMessage).log();
+        LOGGER.atWarn().setMessage(() -> warningMessage).log();
     }
 
     @Override
     public void logError(String errorMessage) {
-        getLoggingEventBuilder(Level.ERROR, errorMessage).log();
+        LOGGER.atError().setMessage(() -> errorMessage).log();
     }
 
     @Override
     public void logError(String errorMessage, Throwable e) {
-        getLoggingEventBuilder(Level.ERROR, errorMessage).setCause(e).log();
+        LOGGER.atError().setMessage(() -> errorMessage).setCause(e).log();
     }
 
     @Override
     public void logFatal(String fatalMessage) {
-        getLoggingEventBuilder(Level.FATAL, fatalMessage).log();
+        logAtFatal().setMessage(() -> fatalMessage).log();
     }
 
     @Override
     public void logFatal(String fatalMessage, Throwable e) {
-        getLoggingEventBuilder(Level.FATAL, fatalMessage).setCause(e).log();
+        logAtFatal().setMessage(() -> fatalMessage).setCause(e).log();
     }
 
-    protected static LoggingEventBuilder getLoggingEventBuilder(Level level, String message) {
-        return switch (level) {
-            case TRACE -> LOGGER.atTrace().setMessage(() -> message);
-            case DEBUG -> LOGGER.atDebug().setMessage(() -> message);
-            case INFO -> LOGGER.atInfo().setMessage(() -> message);
-            case WARN -> LOGGER.atWarn().setMessage(() -> message);
-            case ERROR -> LOGGER.atError().setMessage(() -> message);
-            case FATAL -> {
-                Marker fatal = MarkerFactory.getMarker("FATAL");
-                yield LOGGER.atError().addMarker(fatal).setMessage(() -> message);
-            }
-        };
+    private LoggingEventBuilder logAtFatal() {
+        Marker fatal = MarkerFactory.getMarker("FATAL");
+        return LOGGER.atError().addMarker(fatal);
     }
 }
