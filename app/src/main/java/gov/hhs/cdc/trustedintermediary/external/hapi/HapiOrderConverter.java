@@ -1,8 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
-import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrder;
-import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrderConverter;
+import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
+import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.time.Instant;
 import java.util.Date;
@@ -21,22 +21,22 @@ import org.hl7.fhir.r4.model.ServiceRequest;
 import org.hl7.fhir.r4.model.UrlType;
 
 /**
- * Converts {@link Demographics} to a Hapi-specific FHIR lab order ({@link HapiLabOrder} or {@link
- * LabOrder<Bundle>}).
+ * Converts {@link Demographics} to a Hapi-specific FHIR lab order ({@link HapiOrder} or {@link
+ * Order <Bundle>}).
  */
-public class HapiLabOrderConverter implements LabOrderConverter {
-    private static final HapiLabOrderConverter INSTANCE = new HapiLabOrderConverter();
+public class HapiOrderConverter implements OrderConverter {
+    private static final HapiOrderConverter INSTANCE = new HapiOrderConverter();
 
     @Inject Logger logger;
 
-    public static HapiLabOrderConverter getInstance() {
+    public static HapiOrderConverter getInstance() {
         return INSTANCE;
     }
 
-    private HapiLabOrderConverter() {}
+    private HapiOrderConverter() {}
 
     @Override
-    public HapiLabOrder convertToOrder(final Demographics<?> demographics) {
+    public HapiOrder convertToOrder(final Demographics<?> demographics) {
         logger.logInfo("Converting demographics to order");
 
         var hapiDemographics = (Demographics<Bundle>) demographics;
@@ -63,15 +63,15 @@ public class HapiLabOrderConverter implements LabOrderConverter {
                 HapiHelper.resourcesInBundle(demographicsBundle, Patient.class)
                         .findFirst()
                         .orElse(null);
-        var omlLabOrderCoding =
+        var omlOrderCoding =
                 new Coding(
                         "http://terminology.hl7.org/CodeSystem/v2-0003",
                         "O21",
                         "OML - Laboratory order");
 
         var serviceRequest = createServiceRequest(patient, orderDateTime);
-        var messageHeader = createMessageHeader(omlLabOrderCoding);
-        var provenance = createProvenanceResource(orderDateTime, omlLabOrderCoding);
+        var messageHeader = createMessageHeader(omlOrderCoding);
+        var provenance = createProvenanceResource(orderDateTime, omlOrderCoding);
 
         demographicsBundle
                 .getEntry()
@@ -79,17 +79,17 @@ public class HapiLabOrderConverter implements LabOrderConverter {
         demographicsBundle.addEntry(new Bundle.BundleEntryComponent().setResource(serviceRequest));
         demographicsBundle.addEntry(new Bundle.BundleEntryComponent().setResource(provenance));
 
-        return new HapiLabOrder(demographicsBundle);
+        return new HapiOrder(demographicsBundle);
     }
 
-    private MessageHeader createMessageHeader(Coding omlLabOrderCoding) {
+    private MessageHeader createMessageHeader(Coding omlOrderCoding) {
         logger.logInfo("Creating new MessageHeader");
 
         var messageHeader = new MessageHeader();
 
         messageHeader.setId(UUID.randomUUID().toString());
 
-        messageHeader.setEvent(omlLabOrderCoding);
+        messageHeader.setEvent(omlOrderCoding);
 
         messageHeader.setMeta(
                 new Meta()
@@ -133,13 +133,13 @@ public class HapiLabOrderConverter implements LabOrderConverter {
         return serviceRequest;
     }
 
-    private Provenance createProvenanceResource(Date orderDate, Coding omlLabOrderCoding) {
+    private Provenance createProvenanceResource(Date orderDate, Coding omlOrderCoding) {
         logger.logInfo("Creating new Provenance");
         var provenance = new Provenance();
 
         provenance.setId(UUID.randomUUID().toString());
         provenance.setRecorded(orderDate);
-        provenance.setActivity(new CodeableConcept(omlLabOrderCoding));
+        provenance.setActivity(new CodeableConcept(omlOrderCoding));
 
         return provenance;
     }

@@ -1,14 +1,14 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders
 
-import gov.hhs.cdc.trustedintermediary.LabOrdersMock
+import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.PojoTestUtils
 import spock.lang.Specification
 
-class OrdersResponseTest extends Specification {
+class OrderResponseTest extends Specification {
 
     def "test getters and setters"() {
         when:
-        PojoTestUtils.validateGettersAndSetters(OrdersResponse.class)
+        PojoTestUtils.validateGettersAndSetters(OrderResponse.class)
 
         then:
         noExceptionThrown()
@@ -19,10 +19,10 @@ class OrdersResponseTest extends Specification {
         def expectedResourceId = "67890asdfg"
         def expectedPatientId = "fthgyu687"
 
-        def orders = new LabOrdersMock(expectedResourceId, expectedPatientId, null)
+        def orders = new OrderMock(expectedResourceId, expectedPatientId, null)
 
         when:
-        def actual = new OrdersResponse(orders)
+        def actual = new OrderResponse(orders)
 
         then:
         actual.getFhirResourceId() == expectedResourceId
@@ -35,7 +35,7 @@ class OrdersResponseTest extends Specification {
         def expectedPatientId = "fthgyu687"
 
         when:
-        def actual = new OrdersResponse(expectedResourceId, expectedPatientId)
+        def actual = new OrderResponse(expectedResourceId, expectedPatientId)
 
         then:
         actual.getFhirResourceId() == expectedResourceId

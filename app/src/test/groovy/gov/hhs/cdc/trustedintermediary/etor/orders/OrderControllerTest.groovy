@@ -6,18 +6,18 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
 
-class OrdersControllerTest extends Specification {
+class OrderControllerTest extends Specification {
 
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
-        TestApplicationContext.register(OrdersController, OrdersController.getInstance())
+        TestApplicationContext.register(OrderController, OrderController.getInstance())
     }
 
     def "parseOrder happy path works"() {
         given:
         def request = new DomainRequest()
-        def controller = OrdersController.getInstance()
+        def controller = OrderController.getInstance()
         def bundle = new Bundle()
         def expected = bundle
         def fhir = Mock(HapiFhir)

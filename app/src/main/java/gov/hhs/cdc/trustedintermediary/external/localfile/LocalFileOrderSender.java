@@ -1,8 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.external.localfile;
 
-import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrder;
-import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrderSender;
-import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendLabOrderException;
+import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
+import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
+import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.nio.charset.StandardCharsets;
@@ -10,23 +10,23 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import javax.inject.Inject;
 
-/** Accepts a {@link LabOrder} and writes it to a local file. */
-public class LocalFileLabOrderSender implements LabOrderSender {
+/** Accepts a {@link Order} and writes it to a local file. */
+public class LocalFileOrderSender implements OrderSender {
 
-    static final String LOCAL_FILE_NAME = "localfilelaborder.json";
-    private static final LocalFileLabOrderSender INSTANCE = new LocalFileLabOrderSender();
+    static final String LOCAL_FILE_NAME = "localfileorder.json";
+    private static final LocalFileOrderSender INSTANCE = new LocalFileOrderSender();
 
     @Inject HapiFhir fhir;
     @Inject Logger logger;
 
-    public static LocalFileLabOrderSender getInstance() {
+    public static LocalFileOrderSender getInstance() {
         return INSTANCE;
     }
 
-    private LocalFileLabOrderSender() {}
+    private LocalFileOrderSender() {}
 
     @Override
-    public void sendOrder(final LabOrder<?> order) throws UnableToSendLabOrderException {
+    public void sendOrder(final Order<?> order) throws UnableToSendOrderException {
         var fileLocation = Paths.get(LOCAL_FILE_NAME);
         logger.logInfo("Sending the order to the hard drive at {}", fileLocation.toAbsolutePath());
 
@@ -34,7 +34,7 @@ public class LocalFileLabOrderSender implements LabOrderSender {
             String serialized = fhir.encodeResourceToJson(order.getUnderlyingOrder());
             Files.writeString(fileLocation, serialized, StandardCharsets.UTF_8);
         } catch (Exception e) {
-            throw new UnableToSendLabOrderException("Error writing the lab order", e);
+            throw new UnableToSendOrderException("Error writing the lab order", e);
         }
     }
 }

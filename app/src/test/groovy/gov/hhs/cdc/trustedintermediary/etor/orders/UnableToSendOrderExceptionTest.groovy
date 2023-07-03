@@ -1,10 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders
 
-import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendLabOrderException
+
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException
 import spock.lang.Specification
 
-class UnableToSendLabOrderExceptionTest extends Specification {
+class UnableToSendOrderExceptionTest extends Specification {
     def "contructor works"() {
 
         given:
@@ -12,7 +12,7 @@ class UnableToSendLabOrderExceptionTest extends Specification {
         def cause = new HttpClientException(message, new IOException())
 
         when:
-        def exception = new UnableToSendLabOrderException(message, cause)
+        def exception = new UnableToSendOrderException(message, cause)
 
         then:
         exception.getMessage() == message
