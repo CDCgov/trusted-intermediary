@@ -15,15 +15,7 @@ import org.slf4j.spi.LoggingEventBuilder;
 public class Slf4jLogger implements Logger {
 
     private static final Slf4jLogger INSTANCE = new Slf4jLogger();
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger("local");
-
-    // ANSI escape code
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_RED = "\u001B[31m";
-    public static final String ANSI_GREEN = "\u001B[32m";
-    public static final String ANSI_YELLOW = "\u001B[33m";
-    public static final String ANSI_PURPLE = "\u001B[35m";
-    public static final String ANSI_CYAN = "\u001B[36m";
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger("tilogger");
 
     private Slf4jLogger() {}
 
@@ -80,18 +72,16 @@ public class Slf4jLogger implements Logger {
         getLoggingEventBuilder(Level.FATAL, fatalMessage).setCause(e).log();
     }
 
-    protected LoggingEventBuilder getLoggingEventBuilder(Level level, String message) {
+    protected static LoggingEventBuilder getLoggingEventBuilder(Level level, String message) {
         return switch (level) {
-            case TRACE -> LOGGER.atTrace().setMessage(() -> ANSI_PURPLE + message + ANSI_RESET);
-            case DEBUG -> LOGGER.atDebug().setMessage(() -> ANSI_CYAN + message + ANSI_RESET);
-            case INFO -> LOGGER.atInfo().setMessage(() -> ANSI_GREEN + message + ANSI_RESET);
-            case WARN -> LOGGER.atWarn().setMessage(() -> ANSI_YELLOW + message + ANSI_RESET);
-            case ERROR -> LOGGER.atError().setMessage(() -> ANSI_RED + message + ANSI_RESET);
+            case TRACE -> LOGGER.atTrace().setMessage(() -> message);
+            case DEBUG -> LOGGER.atDebug().setMessage(() -> message);
+            case INFO -> LOGGER.atInfo().setMessage(() -> message);
+            case WARN -> LOGGER.atWarn().setMessage(() -> message);
+            case ERROR -> LOGGER.atError().setMessage(() -> message);
             case FATAL -> {
                 Marker fatal = MarkerFactory.getMarker("FATAL");
-                yield LOGGER.atError()
-                        .addMarker(fatal)
-                        .setMessage(() -> ANSI_RED + message + ANSI_RESET);
+                yield LOGGER.atError().addMarker(fatal).setMessage(() -> message);
             }
         };
     }
