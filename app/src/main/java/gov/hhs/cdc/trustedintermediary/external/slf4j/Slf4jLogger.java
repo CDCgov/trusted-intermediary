@@ -15,7 +15,7 @@ import org.slf4j.spi.LoggingEventBuilder;
 public class Slf4jLogger implements Logger {
 
     private static final Slf4jLogger INSTANCE = new Slf4jLogger();
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger("tilogger");
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger("local");
 
     // ANSI escape code
     public static final String ANSI_RESET = "\u001B[0m";
