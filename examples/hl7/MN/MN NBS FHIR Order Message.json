@@ -211,7 +211,7 @@
         },
         {
             "resourceType": "Observation",
-            "id": "example",
+            "id": "faa6f28d-840a-41f9-9a50-a23cf89ef84b",
             "status": "final",
             "category": [
                 {
@@ -245,23 +245,11 @@
                 "unit": "g",
                 "system": "http://unitsofmeasure.org",
                 "code": "g"
-            },
-            "interpretation": [
-                {
-                    "coding": [
-                        {
-                            "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-                            "code": "N",
-                            "display": "Normal"
-                        }
-                    ],
-                    "text": "Normal"
-                }
-            ]
+            }
         },
         {
             "resourceType": "Observation",
-            "id": "example2",
+            "id": "aba644a3-3666-439e-b207-0693b4fce32e",
             "status": "final",
             "category": [
                 {
@@ -299,7 +287,7 @@
         },
         {
             "resourceType": "Observation",
-            "id": "example3",
+            "id": "2bb5a612-68c1-499a-886e-862e85833264",
             "status": "final",
             "category": [
                 {
@@ -341,7 +329,7 @@
         },
         {
             "resourceType": "Observation",
-            "id": "example4",
+            "id": "1c097524-defb-4dab-94c3-f603004ad7e3",
             "status": "final",
             "category": [
                 {
@@ -383,7 +371,7 @@
         },
         {
             "resourceType": "Observation",
-            "id": "example5",
+            "id": "50cc2c82-b46f-4f17-a771-321d6444faba",
             "status": "final",
             "category": [
                 {
@@ -425,7 +413,7 @@
         },
         {
             "resourceType": "Observation",
-            "id": "example6",
+            "id": "1224163e-6aa2-4994-9c2a-5752ac9339c0",
             "status": "final",
             "category": [
                 {
@@ -467,7 +455,7 @@
         },
         {
             "resourceType": "Observation",
-            "id": "example7",
+            "id": "d7ff0d8a-6eb6-43f0-b613-c052c4c37d10",
             "status": "final",
             "category": [
                 {
@@ -509,7 +497,7 @@
         },
         {
             "resourceType": "Observation",
-            "id": "example8",
+            "id": "e738c49e-ee7a-4939-9caa-2c689920cacf",
             "status": "final",
             "category": [
                 {
@@ -551,7 +539,7 @@
         },
         {
             "resourceType": "Observation",
-            "id": "example9",
+            "id": "6ca083b5-8f32-4f2b-86c9-45c083c9925d",
             "status": "final",
             "category": [
                 {
@@ -584,7 +572,7 @@
         },
         {
             "resourceType": "Observation",
-            "id": "example10",
+            "id": "a618f539-584e-461d-9fae-e9bfa4271d1b",
             "status": "final",
             "category": [
                 {
@@ -617,7 +605,7 @@
         },
         {
             "resourceType": "Observation",
-            "id": "example11",
+            "id": "2f60a26f-f631-4811-aeaa-3ff688c8c932",
             "status": "final",
             "category": [
                 {
@@ -650,7 +638,7 @@
         },
         {
             "resourceType": "Observation",
-            "id": "example12",
+            "id": "b16bde0f-2fe5-42d7-a449-62be659e4dcc",
             "status": "final",
             "category": [
                 {
@@ -683,7 +671,7 @@
         },
         {
             "resourceType": "Specimen",
-            "id": "example3",
+            "id": "1438062e-b4d2-4f63-a13c-2dd6e5f8e3ed",
             "type": {
                 "coding": [
                     {
@@ -701,7 +689,7 @@
         },
         {
             "resourceType": "ServiceRequest",
-            "id": "example14",
+            "id": "34685122-eb17-44c0-aa2c-6a67461dcb73",
             "status": "active",
             "subject": {
                 "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2"
@@ -720,7 +708,7 @@
         },
         {
             "resourceType": "ServiceRequest",
-            "id": "example15",
+            "id": "742d6734-e14c-45b3-af73-f1ee919b3e19",
             "status": "active",
             "subject": {
                 "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2"
