@@ -7,18 +7,20 @@ import urllib.request
 from locust import FastHttpUser, task, events
 from locust.runners import MasterRunner
 
-
 HEALTH_ENDPOINT = "/health"
 AUTH_ENDPOINT = "/v1/auth"
 DEMOGRAPHICS_ENDPOINT = "/v1/etor/demographics"
+ORDERS_ENDPOINT = "/v1/etor/orders"
 
 demographics_request_body = None
+order_request_body = None
 auth_request_body = None
 
 
 class SampleUser(FastHttpUser):
     # Each task gets called randomly, but the number next to '@task' denotes
-    # how many more times that task will get called than other tasks
+    # how many more times that task will get called than other tasks.
+    # Tasks with the same number get called approx. the same number of times.
 
     token_refresh_interval = 280
     access_token = None
@@ -46,11 +48,19 @@ class SampleUser(FastHttpUser):
     def get_health(self):
         self.client.get(HEALTH_ENDPOINT)
 
-    @task(5)  # this task will get called 5x more than the other
+    @task(5)
     def post_v1_etor_demographics(self):
         self.client.post(
             DEMOGRAPHICS_ENDPOINT,
             data=demographics_request_body,
+            headers={"Authorization": self.access_token},
+        )
+
+    @task(5)
+    def post_v1_etor_orders(self):
+        self.client.post(
+            ORDERS_ENDPOINT,
+            data=order_request_body,
             headers={"Authorization": self.access_token},
         )
 
@@ -59,6 +69,7 @@ class SampleUser(FastHttpUser):
 def test_start(environment):
     global demographics_request_body
     global auth_request_body
+    global order_request_body
 
     if isinstance(environment.runner, MasterRunner):
         # in a distributed run, the master does not typically need any test data
@@ -66,6 +77,7 @@ def test_start(environment):
 
     demographics_request_body = get_demographics_request_body()
     auth_request_body = get_auth_request_body()
+    order_request_body = get_orders_request_body()
 
 
 @events.quitting.add_listener
@@ -95,4 +107,10 @@ def get_auth_request_body():
 def get_demographics_request_body():
     # read the sample request body for the demographics endpoint
     with open("e2e/src/test/resources/newborn_patient.json", "r") as f:
+        return f.read()
+
+
+def get_orders_request_body():
+    # read the sample request body for the orders endpoint
+    with open("e2e/src/test/resources/lab_order.json", "r") as f:
         return f.read()
