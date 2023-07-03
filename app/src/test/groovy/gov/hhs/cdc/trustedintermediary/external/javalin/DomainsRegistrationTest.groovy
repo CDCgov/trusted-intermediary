@@ -144,7 +144,6 @@ class DomainsRegistrationTest extends Specification {
         def actualStatusCode = res.getStatusCode()
 
         then:
-        noExceptionThrown()
         actualStatusCode == expectedStatusCode
     }
 
@@ -188,14 +187,13 @@ class DomainsRegistrationTest extends Specification {
         actualStatusCode == expectedStatusCode
     }
 
-    def "processRequest happy path works"() {
+    def "processRequest returns a 200 status code response when authentication succeeds and nothing goes wrong"() {
         given:
-        def isProtected = true
-        def request = new DomainRequest()
+        def expectedStatusCode = 200
         def handler =  { DomainRequest req ->
-            return new DomainResponse(200)
+            return new DomainResponse(expectedStatusCode)
         }
-        def expectedStatusCode = (handler as Function<DomainRequest, DomainResponse>).apply(request).statusCode
+        def request = new DomainRequest()
 
         def mockValidator = Mock(AuthRequestValidator)
         mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> true
@@ -204,20 +202,19 @@ class DomainsRegistrationTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def actualStatusCode = DomainsRegistration.processRequest(request, handler, isProtected).statusCode
+        def actualStatusCode = DomainsRegistration.processRequest(request, handler, true).statusCode
 
         then:
         actualStatusCode == expectedStatusCode
     }
 
-    def "processRequest unhappy path works"() {
+    def "processRequest returns a 401 status code response when authentication fails"() {
         given:
-        def isProtected = true
-        def request = new DomainRequest()
+        def expectedStatusCode = 401
         def handler =  { DomainRequest req ->
-            return new DomainResponse(401)
+            return new DomainResponse(200)
         }
-        def expectedStatusCode = (handler as Function<DomainRequest, DomainResponse>).apply(request).statusCode
+        def request = new DomainRequest()
 
         def mockValidator = Mock(AuthRequestValidator)
         mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> false
@@ -228,7 +225,7 @@ class DomainsRegistrationTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def actualStatusCode = DomainsRegistration.processRequest(request, handler, isProtected).statusCode
+        def actualStatusCode = DomainsRegistration.processRequest(request, handler, true).statusCode
 
         then:
         actualStatusCode == expectedStatusCode
