@@ -1,9 +1,11 @@
 package gov.hhs.cdc.trustedintermediary.external.javalin;
 
 import gov.hhs.cdc.trustedintermediary.OpenApi;
+import gov.hhs.cdc.trustedintermediary.auth.AuthRequestValidator;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.*;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
@@ -64,7 +66,7 @@ public class DomainsRegistration {
                                             app.addHandler(
                                                     HandlerType.valueOf(endpoint.verb()),
                                                     endpoint.path(),
-                                                    createHandler(handler));
+                                                    createHandler(handler, endpoint.isProtected()));
                                             LOGGER.logInfo(
                                                     "verb: "
                                                             + endpoint.verb()
@@ -111,18 +113,54 @@ public class DomainsRegistration {
         }
     }
 
-    static Handler createHandler(Function<DomainRequest, DomainResponse> handler) {
+    static Handler createHandler(
+            Function<DomainRequest, DomainResponse> handler, boolean isProtected) {
         return (Context ctx) -> {
             LOGGER.logInfo(ctx.method().name() + " " + ctx.url());
 
             var request = javalinContextToDomainRequest(ctx);
-
-            var response = handler.apply(request);
-
+            DomainResponse response = processRequest(request, handler, isProtected);
             domainResponseFillsInJavalinContext(response, ctx);
 
             LOGGER.logInfo("Handler complete");
         };
+    }
+
+    protected static DomainResponse processRequest(
+            DomainRequest request,
+            Function<DomainRequest, DomainResponse> handler,
+            boolean isProtected) {
+        if (isProtected) {
+            DomainResponse authResponse = authenticateRequest(request);
+            // if authResponse is not null, it means authentication was not successful
+            // and we need to return the DomainResponse
+            if (authResponse != null) {
+                return authResponse;
+            }
+        }
+
+        return handler.apply(request);
+    }
+
+    protected static DomainResponse authenticateRequest(DomainRequest request) {
+        AuthRequestValidator authValidator =
+                ApplicationContext.getImplementation(AuthRequestValidator.class);
+        DomainResponseHelper domainResponseHelper =
+                ApplicationContext.getImplementation(DomainResponseHelper.class);
+        LOGGER.logDebug("Authenticating request...");
+        try {
+            if (!authValidator.isValidAuthenticatedRequest(request)) {
+                var errorMessage = "The request failed the authentication check";
+                LOGGER.logError(errorMessage);
+                return domainResponseHelper.constructErrorResponse(401, errorMessage);
+            }
+        } catch (SecretRetrievalException | IllegalArgumentException e) {
+            LOGGER.logFatal("Unable to validate whether the request is authenticated", e);
+            return domainResponseHelper.constructErrorResponse(500, e);
+        }
+
+        LOGGER.logInfo("Request successfully validated");
+        return null;
     }
 
     static DomainRequest javalinContextToDomainRequest(Context ctx) {

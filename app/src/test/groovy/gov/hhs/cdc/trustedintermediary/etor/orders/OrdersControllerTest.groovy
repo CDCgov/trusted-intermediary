@@ -1,10 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
-import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper
-import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
+import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
+import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
 
 class OrdersControllerTest extends Specification {
@@ -13,22 +12,23 @@ class OrdersControllerTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(OrdersController, OrdersController.getInstance())
-        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
     }
 
-    def "constructResponse works"() {
+    def "parseOrder happy path works"() {
         given:
+        def request = new DomainRequest()
         def controller = OrdersController.getInstance()
-        def mockHelper = Mock(DomainResponseHelper)
-        def expectedStatusCode = 200
-        def orderResponse = new OrdersResponse("asdf-12341-jkl-7890", "blkjh-7685")
-        mockHelper.constructOkResponse(_ as OrdersResponse) >> new DomainResponse(expectedStatusCode)
+        def bundle = new Bundle()
+        def expected = bundle
+        def fhir = Mock(HapiFhir)
+        fhir.parseResource(_ as String, _ as Class) >> bundle
+        TestApplicationContext.register(HapiFhir, fhir)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def actualStatusCode = controller.constructResponse(orderResponse).statusCode
+        def actual = controller.parseOrders(request).underlyingOrder
 
         then:
-        actualStatusCode == expectedStatusCode
+        actual == expected
     }
 }

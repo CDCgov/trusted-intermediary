@@ -1,10 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.etor;
 
-import gov.hhs.cdc.trustedintermediary.auth.AuthRequestValidator;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper;
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint;
 import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecificationException;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemographicsUsecase;
@@ -13,13 +13,13 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResp
 import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrdersController;
+import gov.hhs.cdc.trustedintermediary.etor.orders.OrdersResponse;
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendLabOrderUsecase;
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendLabOrderException;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiLabOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileLabOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamLabOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -37,14 +37,17 @@ public class EtorDomainRegistration implements DomainConnector {
     static final String ORDERS_API_ENDPOINT = "/v1/etor/orders";
 
     @Inject PatientDemographicsController patientDemographicsController;
+    @Inject OrdersController ordersController;
     @Inject ConvertAndSendDemographicsUsecase convertAndSendDemographicsUsecase;
+    @Inject SendLabOrderUsecase sendLabOrderUsecase;
     @Inject Logger logger;
-    @Inject AuthRequestValidator authValidator;
+    @Inject DomainResponseHelper domainResponseHelper;
 
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
             Map.of(
-                    new HttpEndpoint("POST", DEMOGRAPHICS_API_ENDPOINT), this::handleDemographics,
-                    new HttpEndpoint("POST", ORDERS_API_ENDPOINT), this::handleOrders);
+                    new HttpEndpoint("POST", DEMOGRAPHICS_API_ENDPOINT, true),
+                            this::handleDemographics,
+                    new HttpEndpoint("POST", ORDERS_API_ENDPOINT, true), this::handleOrders);
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
@@ -81,54 +84,32 @@ public class EtorDomainRegistration implements DomainConnector {
     }
 
     DomainResponse handleDemographics(DomainRequest request) {
-
-        // Validate token
-        try {
-            if (!authValidator.isValidAuthenticatedRequest(request)) {
-                var errorMessage = "The request failed the authentication check";
-                logger.logError(errorMessage);
-                return patientDemographicsController.constructResponse(401, errorMessage);
-            }
-        } catch (SecretRetrievalException | IllegalArgumentException e) {
-            logger.logFatal("Unable to validate whether the request is authenticated", e);
-            return patientDemographicsController.constructResponse(500, e);
-        }
-
         var demographics = patientDemographicsController.parseDemographics(request);
 
         try {
             convertAndSendDemographicsUsecase.convertAndSend(demographics);
         } catch (UnableToSendLabOrderException e) {
-            logger.logError("Unable to send lab order", e);
-            return patientDemographicsController.constructResponse(400, e);
+            logger.logError("Unable to convert and send demographics", e);
+            return domainResponseHelper.constructErrorResponse(400, e);
         }
 
         PatientDemographicsResponse patientDemographicsResponse =
                 new PatientDemographicsResponse(demographics);
 
-        return patientDemographicsController.constructResponse(patientDemographicsResponse);
+        return domainResponseHelper.constructOkResponse(patientDemographicsResponse);
     }
 
     DomainResponse handleOrders(DomainRequest request) {
-        //  Validate token
+        var orders = ordersController.parseOrders(request);
+
         try {
-            if (!authValidator.isValidAuthenticatedRequest(request)) {
-                var errorMessage = "The request failed the authentication check";
-                logger.logError(errorMessage);
-
-                // ordersController.constructErrorResponse(401, errorMessage)
-                return new DomainResponse(401);
-            }
-        } catch (SecretRetrievalException | IllegalArgumentException e) {
-            logger.logFatal("Unable to validate whether the request is authenticated", e);
-
-            // return ordersController.constructErrorResponse(500, e)
-            return new DomainResponse(500);
+            sendLabOrderUsecase.send(orders);
+        } catch (UnableToSendLabOrderException e) {
+            logger.logError("Unable to send lab order", e);
+            return domainResponseHelper.constructErrorResponse(400, e);
         }
 
-        //  var orders = ordersController.ParseOrders(request)
-        //  convertAndSendLabOrderUseCase.covertAndSend(orders)
-        //  return ordersController.constructOkResponse(OrdersResponse)
-        return new DomainResponse(200);
+        OrdersResponse ordersResponse = new OrdersResponse(orders);
+        return domainResponseHelper.constructOkResponse(ordersResponse);
     }
 }
