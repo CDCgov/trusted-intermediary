@@ -10,15 +10,15 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecif
 import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemographicsUsecase;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
-import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrderConverter;
-import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrderSender;
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrdersController;
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrdersResponse;
-import gov.hhs.cdc.trustedintermediary.etor.orders.SendLabOrderUsecase;
-import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendLabOrderException;
-import gov.hhs.cdc.trustedintermediary.external.hapi.HapiLabOrderConverter;
-import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileLabOrderSender;
-import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamLabOrderSender;
+import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController;
+import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter;
+import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse;
+import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
+import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase;
+import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
+import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileOrderSender;
+import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,9 +37,9 @@ public class EtorDomainRegistration implements DomainConnector {
     static final String ORDERS_API_ENDPOINT = "/v1/etor/orders";
 
     @Inject PatientDemographicsController patientDemographicsController;
-    @Inject OrdersController ordersController;
+    @Inject OrderController orderController;
     @Inject ConvertAndSendDemographicsUsecase convertAndSendDemographicsUsecase;
-    @Inject SendLabOrderUsecase sendLabOrderUsecase;
+    @Inject SendOrderUseCase sendOrderUseCase;
     @Inject Logger logger;
     @Inject DomainResponseHelper domainResponseHelper;
 
@@ -56,16 +56,14 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(
                 ConvertAndSendDemographicsUsecase.class,
                 ConvertAndSendDemographicsUsecase.getInstance());
-        ApplicationContext.register(LabOrderConverter.class, HapiLabOrderConverter.getInstance());
-        ApplicationContext.register(OrdersController.class, OrdersController.getInstance());
-        ApplicationContext.register(SendLabOrderUsecase.class, SendLabOrderUsecase.getInstance());
+        ApplicationContext.register(OrderConverter.class, HapiOrderConverter.getInstance());
+        ApplicationContext.register(OrderController.class, OrderController.getInstance());
+        ApplicationContext.register(SendOrderUseCase.class, SendOrderUseCase.getInstance());
 
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
-            ApplicationContext.register(
-                    LabOrderSender.class, LocalFileLabOrderSender.getInstance());
+            ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
         } else {
-            ApplicationContext.register(
-                    LabOrderSender.class, ReportStreamLabOrderSender.getInstance());
+            ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
         }
 
         return endpoints;
@@ -88,7 +86,7 @@ public class EtorDomainRegistration implements DomainConnector {
 
         try {
             convertAndSendDemographicsUsecase.convertAndSend(demographics);
-        } catch (UnableToSendLabOrderException e) {
+        } catch (UnableToSendOrderException e) {
             logger.logError("Unable to convert and send demographics", e);
             return domainResponseHelper.constructErrorResponse(400, e);
         }
@@ -100,16 +98,16 @@ public class EtorDomainRegistration implements DomainConnector {
     }
 
     DomainResponse handleOrders(DomainRequest request) {
-        var orders = ordersController.parseOrders(request);
+        var orders = orderController.parseOrders(request);
 
         try {
-            sendLabOrderUsecase.send(orders);
-        } catch (UnableToSendLabOrderException e) {
+            sendOrderUseCase.send(orders);
+        } catch (UnableToSendOrderException e) {
             logger.logError("Unable to send lab order", e);
             return domainResponseHelper.constructErrorResponse(400, e);
         }
 
-        OrdersResponse ordersResponse = new OrdersResponse(orders);
-        return domainResponseHelper.constructOkResponse(ordersResponse);
+        OrderResponse orderResponse = new OrderResponse(orders);
+        return domainResponseHelper.constructOkResponse(orderResponse);
     }
 }

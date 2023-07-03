@@ -14,12 +14,12 @@ public class SentPayloadReader {
 
     private static Path findFilePayload() {
 
-        Path expectedFilePath = Path.of("..", "app", "localfilelaborder.json");
+        Path expectedFilePath = Path.of("..", "app", "localfileorder.json");
 
         boolean doesFileExist = Files.exists(expectedFilePath);
 
         if (!doesFileExist) {
-            expectedFilePath = Path.of("..", "localfilelaborder.json");
+            expectedFilePath = Path.of("..", "localfileorder.json");
         }
 
         return expectedFilePath;

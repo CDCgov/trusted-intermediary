@@ -1,17 +1,17 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders;
 
 /** Response for the v1/etor/orders endpoint. */
-public class OrdersResponse {
+public class OrderResponse {
 
     private String fhirResourceId;
     private String patientId;
 
-    OrdersResponse(String fhirResourceId, String patientId) {
+    OrderResponse(String fhirResourceId, String patientId) {
         setFhirResourceId(fhirResourceId);
         setPatientId(patientId);
     }
 
-    public OrdersResponse(LabOrder<?> orders) {
+    public OrderResponse(Order<?> orders) {
         setFhirResourceId(orders.getFhirResourceId());
         setPatientId(orders.getPatientId());
     }

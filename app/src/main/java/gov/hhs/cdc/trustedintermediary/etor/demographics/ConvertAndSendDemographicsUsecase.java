@@ -1,9 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.etor.demographics;
 
-import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrder;
-import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrderConverter;
-import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrderSender;
-import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendLabOrderException;
+import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
+import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter;
+import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
+import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
 import javax.inject.Inject;
 
 /**
@@ -15,9 +15,9 @@ public class ConvertAndSendDemographicsUsecase {
     private static final ConvertAndSendDemographicsUsecase INSTANCE =
             new ConvertAndSendDemographicsUsecase();
 
-    @Inject LabOrderConverter converter;
+    @Inject OrderConverter converter;
 
-    @Inject LabOrderSender sender;
+    @Inject OrderSender sender;
 
     public static ConvertAndSendDemographicsUsecase getInstance() {
         return INSTANCE;
@@ -25,8 +25,8 @@ public class ConvertAndSendDemographicsUsecase {
 
     private ConvertAndSendDemographicsUsecase() {}
 
-    public void convertAndSend(Demographics<?> demographics) throws UnableToSendLabOrderException {
-        LabOrder<?> labOrder = converter.convertToOrder(demographics);
-        sender.sendOrder(labOrder);
+    public void convertAndSend(Demographics<?> demographics) throws UnableToSendOrderException {
+        Order<?> order = converter.convertToOrder(demographics);
+        sender.sendOrder(order);
     }
 }

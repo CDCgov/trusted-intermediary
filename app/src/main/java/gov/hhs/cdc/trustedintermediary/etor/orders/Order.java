@@ -5,7 +5,7 @@ package gov.hhs.cdc.trustedintermediary.etor.orders;
  *
  * @param <T> The underlying FHIR lab order type.
  */
-public interface LabOrder<T> {
+public interface Order<T> {
     T getUnderlyingOrder();
 
     String getFhirResourceId();
