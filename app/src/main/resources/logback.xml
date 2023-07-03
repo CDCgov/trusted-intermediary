@@ -22,9 +22,8 @@
   </appender>
 
   <appender name="TEXT_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-      <providers>
-      </providers>
+    <encoder>
+        <pattern>%date{ISO8601} [%thread] %-5level - %msg%n</pattern>
     </encoder>
   </appender>
 
