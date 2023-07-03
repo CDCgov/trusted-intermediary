@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.etor;
 
-import gov.hhs.cdc.trustedintermediary.auth.AuthRequestValidator;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
@@ -42,7 +41,6 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject ConvertAndSendDemographicsUsecase convertAndSendDemographicsUsecase;
     @Inject SendLabOrderUsecase sendLabOrderUsecase;
     @Inject Logger logger;
-    @Inject AuthRequestValidator authValidator;
     @Inject DomainResponseHelper domainResponseHelper;
 
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
@@ -61,8 +59,6 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(LabOrderConverter.class, HapiLabOrderConverter.getInstance());
         ApplicationContext.register(OrdersController.class, OrdersController.getInstance());
         ApplicationContext.register(SendLabOrderUsecase.class, SendLabOrderUsecase.getInstance());
-        ApplicationContext.register(AuthRequestValidator.class, AuthRequestValidator.getInstance());
-        ApplicationContext.register(DomainResponseHelper.class, DomainResponseHelper.getInstance());
 
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
             ApplicationContext.register(
