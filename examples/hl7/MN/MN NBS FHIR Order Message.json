@@ -1,21 +1,103 @@
 {
     "resourceType": "Bundle",
-    "id": "bundle-example",
-    "type": "transaction",
+    "id": "b4efef3a-749c-457d-956b-568e22768bf3",
+    "identifier": {
+        "value": "b4efef3a-749c-457d-956b-568e22768bf3"
+    },
+    "type": "message",
+    "timestamp": "2023-05-06T05:29:16.000-05:00",
     "entry": [
         {
-            "fullUrl": "Patient/11102779",
+            "fullUrl": "MessageHeader/3b5e0ea5-f204-4cb1-8027-7adf07d8065b",
             "resource": {
-                "resourceType": "Patient",
-                "id": "11102779",
+                "resourceType": "MessageHeader",
+                "id": "3b5e0ea5-f204-4cb1-8027-7adf07d8065b",
+                "meta": {
+                    "tag": [
+                        {
+                            "system": "http://terminology.hl7.org/CodeSystem/v2-0103",
+                            "code": "P",
+                            "display": "Production"
+                        }
+                    ]
+                },
+                "eventCoding": {
+                    "system": "http://terminology.hl7.org/CodeSystem/v2-0003",
+                    "code": "O21",
+                    "display": "OML - Laboratory order"
+                },
+                "source": {
+                    "name": "CDC Trusted Intermediary",
+                    "endpoint": "https://reportstream.cdc.gov/"
+                }
+            }
+        },
+        {
+            "fullUrl": "Provenance/3eb5944e-c7da-44d4-80dd-0763c63175c0",
+            "resource": {
+                "resourceType": "Provenance",
+                "id": "3eb5944e-c7da-44d4-80dd-0763c63175c0",
+                "recorded": "2023-05-06T05:29:16.000-05:00",
+                "agent": [
+                    {
+                        "who": {
+                            "reference": "Device/d33c30a0-3ea9-4464-8a51-a197eac9a375",
+                            "type": "Device"
+                        }
+                    }
+                ],
+                "target": [
+                    {
+                        "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
+                        "type": "Patient"
+                    }
+                ],
+                "activity": {
+                    "coding": [
+                        {
+                            "system": "http://terminology.hl7.org/CodeSystem/v2-0003",
+                            "code": "O21",
+                            "display": "OML - Laboratory order"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "fullUrl": "Device/d33c30a0-3ea9-4464-8a51-a197eac9a375",
+            "resource": {
+                "resourceType": "Device",
+                "id": "d33c30a0-3ea9-4464-8a51-a197eac9a375",
                 "identifier": [
                     {
-                        "system": "urn:oid:2.16.840.1.113883.3.37.4",
+                        "system": "https://reportstream.cdc.gov/",
+                        "value": "report-stream"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
+            "resource": {
+                "resourceType": "Patient",
+                "id": "09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
+                "identifier": [
+                    {
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                                    "code": "MR",
+                                    "display": "Medical Record Number"
+                                }
+                            ]
+                        },
                         "value": "11102779"
                     }
                 ],
                 "name": [
                     {
+                        "use": "official",
                         "family": "Smith",
                         "given": [
                             "BB Sarah"
@@ -24,6 +106,15 @@
                 ],
                 "gender": "male",
                 "birthDate": "2023-05-04",
+                "_birthDate": {
+                    "extension": [
+                        {
+                            "url": "http://hl7.org/fhir/StructureDefinition/patient-birthTime",
+                            "valueDateTime": "2023-05-04T13:10:23-05:00"
+                        }
+                    ]
+                },
+                "multipleBirthBoolean": false,
                 "address": [
                     {
                         "line": [
@@ -34,96 +125,56 @@
                         "postalCode": "56527-9657",
                         "country": "USA"
                     }
+                ],
+                "contact": [
+                    {
+                        "relationship": [
+                            {
+                                "coding": [
+                                    {
+                                        "system": "http://terminology.hl7.org/CodeSystem/v2-0131",
+                                        "code": "N",
+                                        "display": "Next-of-Kin"
+                                    },
+                                    {
+                                        "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+                                        "code": "MTH",
+                                        "display": "mother"
+                                    }
+                                ],
+                                "name": {
+                                    "family": "Smith",
+                                    "given": [
+                                        "Sadie",
+                                        "S"
+                                    ]
+                                },
+                                "address": {
+                                    "line": [
+                                        "555 STATE HIGHWAY 13"
+                                    ],
+                                    "city": "DEER CREEK",
+                                    "state": "MN",
+                                    "postalCode": "56527-9657",
+                                    "country": "USA"
+                                },
+                                "telecom": [
+                                    {
+                                        "system": "phone",
+                                        "value": "763-555-5555"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
                 ]
-            },
-            "request": {
-                "method": "POST",
-                "url": "Patient"
             }
         },
         {
-            "fullUrl": "RelatedPerson/1",
-            "resource": {
-                "resourceType": "RelatedPerson",
-                "id": "1",
-                "patient": {
-                    "reference": "Patient/11102779"
-                },
-                "name": {
-                    "family": "Smith",
-                    "given": [
-                        "Samual"
-                    ]
-                },
-                "telecom": [
-                    {
-                        "system": "phone",
-                        "value": "507-555-6666"
-                    }
-                ],
-                "relationship": {
-                    "coding": [
-                        {
-                            "system": "http://terminology.hl7.org/CodeSystem/v2-0131",
-                            "code": "FTH"
-                        }
-                    ]
-                }
-            },
-            "request": {
-                "method": "POST",
-                "url": "RelatedPerson"
-            }
-        },
-        {
-            "fullUrl": "RelatedPerson/2",
-            "resource": {
-                "resourceType": "RelatedPerson",
-                "id": "2",
-                "patient": {
-                    "reference": "Patient/11102779"
-                },
-                "name": {
-                    "family": "Smith",
-                    "given": [
-                        "Sadie",
-                        "S"
-                    ]
-                },
-                "address": {
-                    "line": [
-                        "555 STATE HIGHWAY 13"
-                    ],
-                    "city": "DEER CREEK",
-                    "state": "MN",
-                    "postalCode": "56527-9657",
-                    "country": "USA"
-                },
-                "telecom": [
-                    {
-                        "system": "phone",
-                        "value": "763-555-5555"
-                    }
-                ],
-                "relationship": {
-                    "coding": [
-                        {
-                            "system": "http://terminology.hl7.org/CodeSystem/v2-0131",
-                            "code": "MTH"
-                        }
-                    ]
-                }
-            },
-            "request": {
-                "method": "POST",
-                "url": "RelatedPerson"
-            }
-        },
-        {
-            "fullUrl": "Practitioner/1265136360",
+            "fullUrl": "Practitioner/d8f5b686-cdfc-48b4-b3ec-8d08ecb6ecaa",
             "resource": {
                 "resourceType": "Practitioner",
-                "id": "1265136360",
+                "id": "d8f5b686-cdfc-48b4-b3ec-8d08ecb6ecaa",
                 "identifier": [
                     {
                         "system": "http://hl7.org/fhir/sid/us-npi",
@@ -138,17 +189,13 @@
                         ]
                     }
                 ]
-            },
-            "request": {
-                "method": "POST",
-                "url": "Practitioner"
             }
         },
         {
-            "fullUrl": "Organization/1",
+            "fullUrl": "Organization/3f55d0e9-0780-4b8d-b3b6-d0ae078af275",
             "resource": {
                 "resourceType": "Organization",
-                "id": "1",
+                "id": "3f55d0e9-0780-4b8d-b3b6-d0ae078af275",
                 "identifier": [
                     {
                         "system": "urn:oid:2.16.840.1.113883.3.37.4",
@@ -160,10 +207,6 @@
                     }
                 ],
                 "name": "ST. CLOUD HOSPITAL"
-            },
-            "request": {
-                "method": "POST",
-                "url": "Organization"
             }
         },
         {
@@ -193,7 +236,7 @@
                 "text": "BIRTH WEIGHT MEASURED"
             },
             "subject": {
-                "reference": "Patient/11102779",
+                "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
                 "display": "BB Sarah Smith"
             },
             "effectiveDateTime": "2023-05-06T05:00:00-05:00",
@@ -243,7 +286,7 @@
                 "text": "OBSTETRIC ESTIMATION OF GESTATIONAL AGE"
             },
             "subject": {
-                "reference": "Patient/11102779",
+                "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
                 "display": "BB Sarah Smith"
             },
             "effectiveDateTime": "2023-05-06T05:00:00-05:00",
@@ -281,7 +324,7 @@
                 "text": "INFANT FACTORS THAT AFFECT NEWBORN SCREENING INTERPRETATION"
             },
             "subject": {
-                "reference": "Patient/11102779",
+                "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
                 "display": "BB Sarah Smith"
             },
             "effectiveDateTime": "2023-05-06T05:00:00-05:00",
@@ -323,7 +366,7 @@
                 "text": "DOES THE BABY HAVE A DECEASED SIBLING?"
             },
             "subject": {
-                "reference": "Patient/11102779",
+                "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
                 "display": "BB Sarah Smith"
             },
             "effectiveDateTime": "2023-05-06T05:00:00-05:00",
@@ -365,7 +408,7 @@
                 "text": "DOES THE BABY HAVE BIRTH DEFECTS?"
             },
             "subject": {
-                "reference": "Patient/11102779",
+                "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
                 "display": "BB Sarah Smith"
             },
             "effectiveDateTime": "2023-05-06T05:00:00-05:00",
@@ -407,7 +450,7 @@
                 "text": "FAMILY HISTORY OF DISORDER ON MN SCREENING PANEL"
             },
             "subject": {
-                "reference": "Patient/11102779",
+                "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
                 "display": "BB Sarah Smith"
             },
             "effectiveDateTime": "2023-05-06T05:00:00-05:00",
@@ -449,7 +492,7 @@
                 "text": "FEEDING TYPES"
             },
             "subject": {
-                "reference": "Patient/11102779",
+                "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
                 "display": "BB Sarah Smith"
             },
             "effectiveDateTime": "2023-05-06T05:00:00-05:00",
@@ -491,7 +534,7 @@
                 "text": "FEEDING TYPES"
             },
             "subject": {
-                "reference": "Patient/11102779",
+                "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
                 "display": "BB Sarah Smith"
             },
             "effectiveDateTime": "2023-05-06T05:00:00-05:00",
@@ -533,7 +576,7 @@
                 "text": "UNIQUE BAR CODE NUMBER OF CURRENT SAMPLE"
             },
             "subject": {
-                "reference": "Patient/11102779",
+                "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
                 "display": "BB Sarah Smith"
             },
             "effectiveDateTime": "2023-05-06T05:00:00-05:00",
@@ -566,7 +609,7 @@
                 "text": "DISCHARGE PROVIDER PRACTICE PHONE NUMBER"
             },
             "subject": {
-                "reference": "Patient/11102779",
+                "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
                 "display": "BB Sarah Smith"
             },
             "effectiveDateTime": "2023-05-06T05:00:00-05:00",
@@ -599,7 +642,7 @@
                 "text": "POST-DISCHARGE PROVIDER NAME"
             },
             "subject": {
-                "reference": "Patient/11102779",
+                "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
                 "display": "BB Sarah Smith"
             },
             "effectiveDateTime": "2023-05-06T05:00:00-05:00",
@@ -632,7 +675,7 @@
                 "text": "POST-DISCHARGE PROVIDER PRACTICE NAME"
             },
             "subject": {
-                "reference": "Patient/11102779",
+                "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
                 "display": "BB Sarah Smith"
             },
             "effectiveDateTime": "2023-05-06T05:00:00-05:00",
@@ -652,7 +695,7 @@
                 "text": "Blood spot specimen"
             },
             "subject": {
-                "reference": "Patient/11102779"
+                "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2"
             },
             "receivedTime": "2023-05-06T06:00:00-05:00"
         },
@@ -661,7 +704,7 @@
             "id": "example14",
             "status": "active",
             "subject": {
-                "reference": "Patient/11102779"
+                "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2"
             },
             "code": {
                 "coding": [
@@ -680,7 +723,7 @@
             "id": "example15",
             "status": "active",
             "subject": {
-                "reference": "Patient/11102779"
+                "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2"
             },
             "code": {
                 "coding": [
