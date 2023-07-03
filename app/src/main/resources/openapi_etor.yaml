@@ -36,7 +36,32 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedError'
+                $ref: '#/components/schemas/UnauthorizedRequestError'
+  /v1/etor/orders:
+    post:
+      summary: forwards orders to a lab
+      requestBody:
+        description: a FHIR order resource wrapped in a FHIR Bundle
+        content:
+          application/json:
+            schema:
+              $ref: 'https://github.com/LinuxForHealth/FHIR/blob/main/fhir-openapi/src/main/webapp/META-INF/openapi.json?raw=true#/components/schemas/Bundle'
+        required: true
+      security:
+        - bearerAuthorization: [ ]
+      responses:
+        '200':
+          description: the orders were sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersResponse'
+        '401':
+          description: Authentication failed due to invalid token or unknown organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedRequestError'
 
 components:
   schemas:
@@ -49,7 +74,16 @@ components:
         patientId:
           type: string
           example: MRN7465737865
-    UnauthorizedError:
+    OrdersResponse:
+      type: object
+      properties:
+        fhirResourceId:
+          type: string
+          example: Patient/infant-twin-1
+        patientId:
+          type: string
+          example: MRN7465737865
+    UnauthorizedRequestError:
       description: Unauthorized Request
   securitySchemes:
     bearerAuthorization:
