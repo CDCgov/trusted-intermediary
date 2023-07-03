@@ -1,12 +1,17 @@
 package gov.hhs.cdc.trustedintermediary.external.javalin
 
 import gov.hhs.cdc.trustedintermediary.OpenApi
+import gov.hhs.cdc.trustedintermediary.auth.AuthRequestValidator
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnectorConstructionException
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
+import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
+import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import io.javalin.Javalin
 import io.javalin.http.Context
 import io.javalin.http.Handler
@@ -20,6 +25,7 @@ class DomainsRegistrationTest extends Specification {
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
+        TestApplicationContext.register(DomainResponseHelper, DomainResponseHelper.getInstance())
         TestApplicationContext.register(OpenApi, Mock(OpenApi))
         Example1DomainConnector.endpointCount = 0
         Example2DomainConnector.endpointCount = 0
@@ -56,7 +62,7 @@ class DomainsRegistrationTest extends Specification {
         def bodyString = "Moof"
         def headerMap = [
             "Clarus": "DogCow",
-            "Two": "Another time"
+            "Two"   : "Another time"
         ]
 
         def response = new DomainResponse(statusCode)
@@ -97,12 +103,161 @@ class DomainsRegistrationTest extends Specification {
         javalinContext.method() >> HandlerType.POST
 
         when:
-        def javalinHandler = DomainsRegistration.createHandler(rawHandler)
+        def javalinHandler = DomainsRegistration.createHandler(rawHandler, false)
         javalinHandler.handle(javalinContext)
 
         then:
         handlerCalled == true
         1 * javalinContext.status(_ as Integer)
+    }
+
+    def "authenticateRequest happy path works"() {
+        given:
+        def expectedDomainResponse = null
+
+        def mockValidator = Mock(AuthRequestValidator)
+        mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> true
+        TestApplicationContext.register(AuthRequestValidator, mockValidator)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def actualDomainResponse = DomainsRegistration.authenticateRequest(new DomainRequest())
+
+        then:
+        actualDomainResponse == expectedDomainResponse
+    }
+
+    def "authenticateRequest unauthorized request unhappy path works"() {
+        given:
+        def expectedStatusCode = 401
+
+        def mockValidator = Mock(AuthRequestValidator)
+        mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> false
+        TestApplicationContext.register(AuthRequestValidator, mockValidator)
+
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def res = DomainsRegistration.authenticateRequest(new DomainRequest())
+        def actualStatusCode = res.getStatusCode()
+
+        then:
+        actualStatusCode == expectedStatusCode
+    }
+
+    def "authenticateRequest SecretRetrievalException unhappy path works"() {
+        given:
+        def expectedStatusCode = 500
+
+        def mockValidator = Mock(AuthRequestValidator)
+        mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> { throw new SecretRetrievalException("internal error", new IllegalArgumentException()) }
+        TestApplicationContext.register(AuthRequestValidator, mockValidator)
+
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def res = DomainsRegistration.authenticateRequest(new DomainRequest())
+        def actualStatusCode = res.getStatusCode()
+
+        then:
+        actualStatusCode == expectedStatusCode
+    }
+
+    def "authenticateRequest IllegalArgumentException unhappy path works"() {
+        given:
+        def expectedStatusCode = 500
+
+        def mockValidator = Mock(AuthRequestValidator)
+        mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> { throw new IllegalArgumentException("internal error", new IllegalArgumentException()) }
+        TestApplicationContext.register(AuthRequestValidator, mockValidator)
+
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def res = DomainsRegistration.authenticateRequest(new DomainRequest())
+        def actualStatusCode = res.getStatusCode()
+
+        then:
+        actualStatusCode == expectedStatusCode
+    }
+
+    def "processRequest returns a 200 status code response when authentication succeeds and nothing goes wrong"() {
+        given:
+        def expectedStatusCode = 200
+        def handler =  { DomainRequest req ->
+            return new DomainResponse(expectedStatusCode)
+        }
+        def request = new DomainRequest()
+
+        def mockValidator = Mock(AuthRequestValidator)
+        mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> true
+        TestApplicationContext.register(AuthRequestValidator, mockValidator)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def actualStatusCode = DomainsRegistration.processRequest(request, handler, true).statusCode
+
+        then:
+        actualStatusCode == expectedStatusCode
+    }
+
+    def "processRequest returns a 401 status code response when authentication fails"() {
+        given:
+        def expectedStatusCode = 401
+        def handler =  { DomainRequest req ->
+            return new DomainResponse(200)
+        }
+        def request = new DomainRequest()
+
+        def mockValidator = Mock(AuthRequestValidator)
+        mockValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> false
+        TestApplicationContext.register(AuthRequestValidator, mockValidator)
+
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def actualStatusCode = DomainsRegistration.processRequest(request, handler, true).statusCode
+
+        then:
+        actualStatusCode == expectedStatusCode
+    }
+
+    def "protected endpoint fails with a 401 when unauthenticated"() {
+        given:
+        def expectedStatusCode = 401
+        def expectedResultBody = '{"error":"The request failed the authentication check"}'
+
+        def rawHandler = { request ->
+            return new DomainResponse(418)
+        }
+
+        def mockContext = Mock(Context)
+        mockContext.method() >> HandlerType.POST
+
+        def mockAuthValidator = Mock(AuthRequestValidator)
+        mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> false
+        TestApplicationContext.register(AuthRequestValidator, mockAuthValidator)
+
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def handler = DomainsRegistration.createHandler(rawHandler, true)
+        handler.handle(mockContext)
+
+        then:
+        1 * mockContext.status(expectedStatusCode)
+        1 * mockContext.result(expectedResultBody)
     }
 
     def "constructNewDomainConnector works correctly with a default constructor"() {
@@ -176,7 +331,7 @@ class DomainsRegistrationTest extends Specification {
         Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
             Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> registration = new HashMap<>()
 
-            for (int endpointIndex = 0; endpointIndex < endpointCount; endpointIndex ++) {
+            for (int endpointIndex = 0; endpointIndex < endpointCount; endpointIndex++) {
                 Function<DomainRequest, DomainResponse> function = { request -> new DomainResponse(418) }
                 registration.put(new HttpEndpoint("PUT", "/dogcow" + endpointIndex), function)
             }
@@ -198,7 +353,7 @@ class DomainsRegistrationTest extends Specification {
         Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
             Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> registration = new HashMap<>()
 
-            for (int endpointIndex = 0; endpointIndex < endpointCount; endpointIndex ++) {
+            for (int endpointIndex = 0; endpointIndex < endpointCount; endpointIndex++) {
                 Function<DomainRequest, DomainResponse> function = { request -> new DomainResponse(418) }
                 registration.put(new HttpEndpoint("POST", "/moof" + endpointIndex), function)
             }
