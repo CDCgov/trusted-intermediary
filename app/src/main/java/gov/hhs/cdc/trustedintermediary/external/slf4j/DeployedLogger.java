@@ -12,14 +12,14 @@ import org.slf4j.spi.LoggingEventBuilder;
  * dependency of the logger. The idea is to have the logger dependency only in this class. If there
  * ever is a reason to use a different logger, then we only need to make the changes here.
  */
-public class Slf4jLogger implements Logger {
+public class DeployedLogger implements Logger {
 
-    private static final Slf4jLogger INSTANCE = new Slf4jLogger();
+    private static final DeployedLogger INSTANCE = new DeployedLogger();
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger("tilogger");
 
-    private Slf4jLogger() {}
+    private DeployedLogger() {}
 
-    public static Slf4jLogger getLogger() {
+    public static DeployedLogger getLogger() {
         return INSTANCE;
     }
 
