@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.e2e
 
+import org.apache.hc.core5.http.io.entity.EntityUtils
 import spock.lang.Specification
 
 import java.nio.file.Files
@@ -16,48 +17,43 @@ class OrderTest extends Specification {
         def expectedPatientId  = "MRN7465737865"
 
         when:
-        def responseBody = orderClient.submit(labOrderJsonFileString)
-        def parsedJsonBody = JsonParsing.parse(responseBody, Map.class)
+        def response = orderClient.submit(labOrderJsonFileString, true)
+        def parsedJsonBody = JsonParsing.parseContent(response)
 
         then:
+        response.getCode() == 200
         parsedJsonBody.fhirResourceId == expectedFhirResourceId
         parsedJsonBody.patientId == expectedPatientId
     }
 
     def "bad response given for poorly formatted JSON"() {
+        given:
+        def invalidJsonRequest = labOrderJsonFileString.substring(1)
 
         when:
-        def responseBody = orderClient.submit(labOrderJsonFileString.substring(1))
-        //removed beginning '{' to make this JSON invalid
+        def response = orderClient.submit(invalidJsonRequest, true)
+        def responseBody = EntityUtils.toString(response.getEntity())
 
         then:
+        response.getCode() == 500
         responseBody == "Server Error"
     }
 
     def "payload file check"() {
-
         when:
-        def responseBody = orderClient.submit(labOrderJsonFileString)
+        def response = orderClient.submit(labOrderJsonFileString, true)
         def sentPayload = SentPayloadReader.read()
-        def parsedResponseBody = JsonParsing.parse(responseBody, Map.class)
-
-        def parsedSentPayload = JsonParsing.parse(sentPayload, Map.class)
+        def parsedSentPayload = JsonParsing.parse(sentPayload)
+        def parsedLabOrderJsonFile = JsonParsing.parse(labOrderJsonFileString)
 
         then:
-
-        parsedSentPayload.entry[0].resource.resourceType == "MessageHeader"
-        parsedSentPayload.entry[3].resource.resourceType == "ServiceRequest"
-
-        parsedSentPayload.entry[2].resource.resourceType == "Patient"
-        parsedSentPayload.entry[2].resource.id == "infant-twin-1"
-
-        parsedSentPayload.entry[2].resource.identifier[0].value == parsedResponseBody.patientId  //the second (index 1) identifier so happens to be the MRN
-        parsedSentPayload.resourceType + "/" + parsedSentPayload.id == parsedResponseBody.fhirResourceId
+        response.getCode() == 200
+        parsedSentPayload == parsedLabOrderJsonFile
     }
 
     def "a 401 comes from the ETOR order endpoint when unauthenticated"() {
         when:
-        def response = orderClient.submitRaw(labOrderJsonFileString, false)
+        def response = orderClient.submit(labOrderJsonFileString, false)
 
         then:
         response.getCode() == 401
