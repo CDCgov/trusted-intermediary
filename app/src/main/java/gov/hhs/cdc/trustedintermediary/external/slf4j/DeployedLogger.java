@@ -21,21 +21,9 @@ public class DeployedLogger implements Logger {
     }
 
     @Override
-    public void logTrace(String traceMessage) {
-        Level level = Level.TRACE;
-        LoggerHelper.logMessageAtLevel(LOGGER, level, traceMessage).log();
-    }
-
-    @Override
     public void logDebug(String debugMessage) {
         Level level = Level.DEBUG;
         LoggerHelper.logMessageAtLevel(LOGGER, level, debugMessage).log();
-    }
-
-    @Override
-    public void logDebug(String debugMessage, Throwable e) {
-        Level level = Level.DEBUG;
-        LoggerHelper.logMessageAtLevel(LOGGER, level, debugMessage).setCause(e).log();
     }
 
     @Override
@@ -64,13 +52,6 @@ public class DeployedLogger implements Logger {
     public void logError(String errorMessage, Throwable e) {
         Level level = Level.ERROR;
         LoggerHelper.logMessageAtLevel(LOGGER, level, errorMessage).setCause(e).log();
-    }
-
-    @Override
-    public void logFatal(String fatalMessage) {
-        Level level = Level.ERROR;
-        LoggerHelper.addFatalMarker(LoggerHelper.logMessageAtLevel(LOGGER, level, fatalMessage))
-                .log();
     }
 
     @Override

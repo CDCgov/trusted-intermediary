@@ -43,33 +43,12 @@ public class LocalLogger implements Logger {
     }
 
     @Override
-    public void logTrace(String traceMessage) {
-        Level level = Level.TRACE;
-        LoggerHelper.logMessageAtLevel(
-                        LOGGER,
-                        level,
-                        wrapMessageInColor(LEVEL_COLOR_MAPPING.get(level), traceMessage))
-                .log();
-    }
-
-    @Override
     public void logDebug(String debugMessage) {
         Level level = Level.DEBUG;
         LoggerHelper.logMessageAtLevel(
                         LOGGER,
                         level,
                         wrapMessageInColor(LEVEL_COLOR_MAPPING.get(level), debugMessage))
-                .log();
-    }
-
-    @Override
-    public void logDebug(String debugMessage, Throwable e) {
-        Level level = Level.DEBUG;
-        LoggerHelper.logMessageAtLevel(
-                        LOGGER,
-                        level,
-                        wrapMessageInColor(LEVEL_COLOR_MAPPING.get(level), debugMessage))
-                .setCause(e)
                 .log();
     }
 
@@ -115,17 +94,6 @@ public class LocalLogger implements Logger {
                         level,
                         wrapMessageInColor(LEVEL_COLOR_MAPPING.get(level), errorMessage))
                 .setCause(e)
-                .log();
-    }
-
-    @Override
-    public void logFatal(String fatalMessage) {
-        Level level = Level.ERROR;
-        LoggerHelper.addFatalMarker(
-                        LoggerHelper.logMessageAtLevel(
-                                LOGGER,
-                                level,
-                                wrapMessageInColor(LEVEL_COLOR_MAPPING.get(level), fatalMessage)))
                 .log();
     }
 
