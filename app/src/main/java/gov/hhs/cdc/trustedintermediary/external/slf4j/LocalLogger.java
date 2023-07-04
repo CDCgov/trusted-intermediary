@@ -2,10 +2,9 @@ package gov.hhs.cdc.trustedintermediary.external.slf4j;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.Arrays;
+import java.util.Map;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
-import org.slf4j.spi.LoggingEventBuilder;
+import org.slf4j.event.Level;
 
 /**
  * Humble object interface for logging. Uses SLF4J behind the scenes. The local logger colorize its
@@ -24,6 +23,19 @@ public class LocalLogger implements Logger {
     public static final String ANSI_PURPLE = "\u001B[35m";
     public static final String ANSI_CYAN = "\u001B[36m";
 
+    private static final Map<Level, String> LEVEL_COLOR_MAPPING =
+            Map.of(
+                    Level.TRACE,
+                    ANSI_PURPLE,
+                    Level.DEBUG,
+                    ANSI_CYAN,
+                    Level.INFO,
+                    ANSI_GREEN,
+                    Level.WARN,
+                    ANSI_YELLOW,
+                    Level.ERROR,
+                    ANSI_RED);
+
     private LocalLogger() {}
 
     public static LocalLogger getInstance() {
@@ -32,22 +44,43 @@ public class LocalLogger implements Logger {
 
     @Override
     public void logTrace(String traceMessage) {
-        getLoggingEventBuilder(Level.TRACE, traceMessage).log();
+        Level level = Level.TRACE;
+        LoggerHelper.logMessageAtLevel(
+                        LOGGER,
+                        level,
+                        wrapMessageInColor(LEVEL_COLOR_MAPPING.get(level), traceMessage))
+                .log();
     }
 
     @Override
     public void logDebug(String debugMessage) {
-        getLoggingEventBuilder(Level.DEBUG, debugMessage).log();
+        Level level = Level.DEBUG;
+        LoggerHelper.logMessageAtLevel(
+                        LOGGER,
+                        level,
+                        wrapMessageInColor(LEVEL_COLOR_MAPPING.get(level), debugMessage))
+                .log();
     }
 
     @Override
     public void logDebug(String debugMessage, Throwable e) {
-        getLoggingEventBuilder(Level.DEBUG, debugMessage).setCause(e).log();
+        Level level = Level.DEBUG;
+        LoggerHelper.logMessageAtLevel(
+                        LOGGER,
+                        level,
+                        wrapMessageInColor(LEVEL_COLOR_MAPPING.get(level), debugMessage))
+                .setCause(e)
+                .log();
     }
 
     @Override
     public void logInfo(String infoMessage, Object... parameters) {
-        var logBuilder = getLoggingEventBuilder(Level.INFO, infoMessage);
+        Level level = Level.INFO;
+        var logBuilder =
+                LoggerHelper.logMessageAtLevel(
+                        LOGGER,
+                        level,
+                        wrapMessageInColor(LEVEL_COLOR_MAPPING.get(level), infoMessage));
 
         Arrays.stream(parameters).forEachOrdered(logBuilder::addArgument);
 
@@ -56,42 +89,59 @@ public class LocalLogger implements Logger {
 
     @Override
     public void logWarning(String warningMessage) {
-        getLoggingEventBuilder(Level.WARN, warningMessage).log();
+        Level level = Level.WARN;
+        LoggerHelper.logMessageAtLevel(
+                        LOGGER,
+                        level,
+                        wrapMessageInColor(LEVEL_COLOR_MAPPING.get(level), warningMessage))
+                .log();
     }
 
     @Override
     public void logError(String errorMessage) {
-        getLoggingEventBuilder(Level.ERROR, errorMessage).log();
+        Level level = Level.ERROR;
+        LoggerHelper.logMessageAtLevel(
+                        LOGGER,
+                        level,
+                        wrapMessageInColor(LEVEL_COLOR_MAPPING.get(level), errorMessage))
+                .log();
     }
 
     @Override
     public void logError(String errorMessage, Throwable e) {
-        getLoggingEventBuilder(Level.ERROR, errorMessage).setCause(e).log();
+        Level level = Level.ERROR;
+        LoggerHelper.logMessageAtLevel(
+                        LOGGER,
+                        level,
+                        wrapMessageInColor(LEVEL_COLOR_MAPPING.get(level), errorMessage))
+                .setCause(e)
+                .log();
     }
 
     @Override
     public void logFatal(String fatalMessage) {
-        getLoggingEventBuilder(Level.FATAL, fatalMessage).log();
+        Level level = Level.ERROR;
+        LoggerHelper.addFatalMarker(
+                        LoggerHelper.logMessageAtLevel(
+                                LOGGER,
+                                level,
+                                wrapMessageInColor(LEVEL_COLOR_MAPPING.get(level), fatalMessage)))
+                .log();
     }
 
     @Override
     public void logFatal(String fatalMessage, Throwable e) {
-        getLoggingEventBuilder(Level.FATAL, fatalMessage).setCause(e).log();
+        Level level = Level.ERROR;
+        LoggerHelper.addFatalMarker(
+                        LoggerHelper.logMessageAtLevel(
+                                LOGGER,
+                                level,
+                                wrapMessageInColor(LEVEL_COLOR_MAPPING.get(level), fatalMessage)))
+                .setCause(e)
+                .log();
     }
 
-    protected static LoggingEventBuilder getLoggingEventBuilder(Level level, String message) {
-        return switch (level) {
-            case TRACE -> LOGGER.atTrace().setMessage(() -> ANSI_PURPLE + message + ANSI_RESET);
-            case DEBUG -> LOGGER.atDebug().setMessage(() -> ANSI_CYAN + message + ANSI_RESET);
-            case INFO -> LOGGER.atInfo().setMessage(() -> ANSI_GREEN + message + ANSI_RESET);
-            case WARN -> LOGGER.atWarn().setMessage(() -> ANSI_YELLOW + message + ANSI_RESET);
-            case ERROR -> LOGGER.atError().setMessage(() -> ANSI_RED + message + ANSI_RESET);
-            case FATAL -> {
-                Marker fatal = MarkerFactory.getMarker("FATAL");
-                yield LOGGER.atError()
-                        .addMarker(fatal)
-                        .setMessage(() -> ANSI_RED + message + ANSI_RESET);
-            }
-        };
+    private static String wrapMessageInColor(String color, String message) {
+        return color + message + ANSI_RESET;
     }
 }
