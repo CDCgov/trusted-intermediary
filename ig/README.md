@@ -46,7 +46,7 @@ VSCode may use significant amounts of your CPU, locking up your computer and wil
 IDE is used to work on the CDC Trusted Intermediary documentation such as IntelliJ.
 
 1. In a terminal, navigate to this `ig` directory
-2. run `docker buildx build -t ig-local-dev -f Dockerfile-local-dev .` to build the Docker container
+2. run `docker build -t ig-local-dev -f Dockerfile-local-dev .` to build the Docker container
 3. run `docker run -it --mount type=bind,source="$(pwd)",target=/trusted-intermediary ig-local-dev bash` to run the container and use an interactive `bash` shell inside the container
 4. Inside the container environment it should default to a working directory of `/trusted-intermediary`; this is bound to the `ig` directory in your local git repo
 5. Periodically update the IG Publisher by running `./_updatePublisher.sh`.  The IG Publisher is updated multiple times per week to fix bugs and add new functionality.  Staying up to date with the latest version is a good idea. Notification messages when the IG Publisher is updated can be found at: https://chat.fhir.org/#narrow/stream/217600-tooling.2Freleases

@@ -5,3 +5,5 @@ RUN cp `find /usr/lib/ruby/gems/*/gems/jekyll-*/exe/jekyll` /usr/bin
 RUN npm install -g fsh-sushi
 
 WORKDIR /trusted-intermediary
+
+CMD ./_updatePublisher.sh -y && ./fix-execute.sh && ./_genonce.sh
