@@ -54,7 +54,7 @@ class OrderTest extends Specification {
         parsedSentPayload.resourceType + "/" + parsedSentPayload.id == parsedResponseBody.fhirResourceId
     }
 
-    def "a 401 comes from the ETOR demographics endpoint when unauthenticated"() {
+    def "a 401 comes from the ETOR order endpoint when unauthenticated"() {
         when:
         def response = DemographicsClient.submitDemographicsRaw(labOrderJsonFileString, false)
 
