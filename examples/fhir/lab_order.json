@@ -42,15 +42,15 @@
           {
             "who":
               {
-                "reference" : "Device/d33c30a0-3ea9-4464-8a51-a197eac9a375",
-                "type" : "Device"
+                "reference": "Device/d33c30a0-3ea9-4464-8a51-a197eac9a375",
+                "type": "Device"
               }
           }
         ],
         "target": [
           {
-            "reference" : "Patient/3e2d39d3-1e7d-4d2e-96a2-721e29fbba92",
-            "type" : "Patient"
+            "reference": "Patient/3e2d39d3-1e7d-4d2e-96a2-721e29fbba92",
+            "type": "Patient"
           }
         ],
         "activity": {
