@@ -7,6 +7,7 @@ import java.nio.file.Paths
 
 class OrderTest extends Specification {
 
+    def orderClient = new EndpointClient("/v1/etor/orders")
     def labOrderJsonFileString = Files.readString(Paths.get("src/test/resources/lab_order.json"))
 
     def "an order response is returned from the ETOR order endpoint"() {
@@ -15,7 +16,7 @@ class OrderTest extends Specification {
         def expectedPatientId  = "MRN7465737865"
 
         when:
-        def responseBody = DemographicsClient.submitDemographics(labOrderJsonFileString)
+        def responseBody = orderClient.submit(labOrderJsonFileString)
         def parsedJsonBody = JsonParsing.parse(responseBody, Map.class)
 
         then:
@@ -26,7 +27,7 @@ class OrderTest extends Specification {
     def "bad response given for poorly formatted JSON"() {
 
         when:
-        def responseBody = OrderClient.submitOrder(labOrderJsonFileString.substring(1))
+        def responseBody = orderClient.submit(labOrderJsonFileString.substring(1))
         //removed beginning '{' to make this JSON invalid
 
         then:
@@ -36,7 +37,7 @@ class OrderTest extends Specification {
     def "payload file check"() {
 
         when:
-        def responseBody = OrderClient.submitOrder(labOrderJsonFileString)
+        def responseBody = orderClient.submit(labOrderJsonFileString)
         def sentPayload = SentPayloadReader.read()
         def parsedResponseBody = JsonParsing.parse(responseBody, Map.class)
 
@@ -56,7 +57,7 @@ class OrderTest extends Specification {
 
     def "a 401 comes from the ETOR order endpoint when unauthenticated"() {
         when:
-        def response = DemographicsClient.submitDemographicsRaw(labOrderJsonFileString, false)
+        def response = orderClient.submitRaw(labOrderJsonFileString, false)
 
         then:
         response.getCode() == 401
