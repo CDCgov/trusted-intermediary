@@ -133,6 +133,7 @@ tasks.named('test') {
             '**/jackson/Jackson*',
             '**/slf4j/LocalLogger*',
             '**/slf4j/DeployedLogger*',
+            '**/slf4j/LoggerHelper*',
             '**/hapi/HapiFhirImplementation*',
             '**/jjwt/JjwtEngine*',
             '**/apache/ApacheClient*',
