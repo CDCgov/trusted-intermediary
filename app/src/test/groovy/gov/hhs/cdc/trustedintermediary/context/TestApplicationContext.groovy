@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.context
 
-
+import gov.hhs.cdc.trustedintermediary.external.slf4j.LocalLogger
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.external.slf4j.DeployedLogger
 
@@ -11,7 +11,7 @@ class TestApplicationContext extends ApplicationContext {
 
     def static init() {
         //initialize some default implementations that we want by default across nearly all tests
-        register(Logger, DeployedLogger.getLogger())
+        register(Logger, LocalLogger.getLogger())
     }
 
     def static reset() {
