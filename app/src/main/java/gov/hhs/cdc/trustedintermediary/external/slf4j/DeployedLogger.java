@@ -22,14 +22,12 @@ public class DeployedLogger implements Logger {
 
     @Override
     public void logDebug(String debugMessage) {
-        Level level = Level.DEBUG;
-        LoggerHelper.logMessageAtLevel(LOGGER, level, debugMessage).log();
+        LoggerHelper.logMessageAtLevel(LOGGER, Level.DEBUG, debugMessage).log();
     }
 
     @Override
     public void logInfo(String infoMessage, Object... parameters) {
-        Level level = Level.INFO;
-        var logBuilder = LoggerHelper.logMessageAtLevel(LOGGER, level, infoMessage);
+        var logBuilder = LoggerHelper.logMessageAtLevel(LOGGER, Level.INFO, infoMessage);
 
         Arrays.stream(parameters).forEachOrdered(logBuilder::addArgument);
 
@@ -38,26 +36,23 @@ public class DeployedLogger implements Logger {
 
     @Override
     public void logWarning(String warningMessage) {
-        Level level = Level.WARN;
-        LoggerHelper.logMessageAtLevel(LOGGER, level, warningMessage).log();
+        LoggerHelper.logMessageAtLevel(LOGGER, Level.WARN, warningMessage).log();
     }
 
     @Override
     public void logError(String errorMessage) {
-        Level level = Level.ERROR;
-        LoggerHelper.logMessageAtLevel(LOGGER, level, errorMessage).log();
+        LoggerHelper.logMessageAtLevel(LOGGER, Level.ERROR, errorMessage).log();
     }
 
     @Override
     public void logError(String errorMessage, Throwable e) {
-        Level level = Level.ERROR;
-        LoggerHelper.logMessageAtLevel(LOGGER, level, errorMessage).setCause(e).log();
+        LoggerHelper.logMessageAtLevel(LOGGER, Level.ERROR, errorMessage).setCause(e).log();
     }
 
     @Override
     public void logFatal(String fatalMessage, Throwable e) {
-        Level level = Level.ERROR;
-        LoggerHelper.addFatalMarker(LoggerHelper.logMessageAtLevel(LOGGER, level, fatalMessage))
+        LoggerHelper.addFatalMarker(
+                        LoggerHelper.logMessageAtLevel(LOGGER, Level.ERROR, fatalMessage))
                 .setCause(e)
                 .log();
     }
