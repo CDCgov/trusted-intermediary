@@ -1,8 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor
 
 import gov.hhs.cdc.trustedintermediary.DemographicsMock
-import gov.hhs.cdc.trustedintermediary.LabOrdersMock
-import gov.hhs.cdc.trustedintermediary.auth.AuthRequestValidator
+import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
@@ -12,12 +11,11 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemograph
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse
-import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrder
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrdersController
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrdersResponse
-import gov.hhs.cdc.trustedintermediary.etor.orders.SendLabOrderUsecase
-import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendLabOrderException
-import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException
+import gov.hhs.cdc.trustedintermediary.etor.orders.Order
+import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController
+import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse
+import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase
+import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
 import spock.lang.Specification
 
 class EtorDomainRegistrationTest extends Specification {
@@ -100,7 +98,7 @@ class EtorDomainRegistrationTest extends Specification {
 
         def mockUseCase = Mock(ConvertAndSendDemographicsUsecase)
         mockUseCase.convertAndSend(_ as Demographics<?>) >> {
-            throw new UnableToSendLabOrderException("error", new NullPointerException())
+            throw new UnableToSendOrderException("error", new NullPointerException())
         }
         TestApplicationContext.register(ConvertAndSendDemographicsUsecase, mockUseCase)
 
@@ -125,17 +123,17 @@ class EtorDomainRegistrationTest extends Specification {
         def connector = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, connector)
 
-        def mockUseCase = Mock(SendLabOrderUsecase)
-        TestApplicationContext.register(SendLabOrderUsecase, mockUseCase)
+        def mockUseCase = Mock(SendOrderUseCase)
+        TestApplicationContext.register(SendOrderUseCase, mockUseCase)
 
         def mockRequestId = "asdf-12341-jkl-7890"
-        def labOrdersMock = new LabOrdersMock<?>(mockRequestId, "a patient ID", "demographics")
-        def mockController = Mock(OrdersController)
-        mockController.parseOrders(_ as DomainRequest) >> labOrdersMock
-        TestApplicationContext.register(OrdersController, mockController)
+        def orderMock = new OrderMock<?>(mockRequestId, "a patient ID", "demographics")
+        def mockController = Mock(OrderController)
+        mockController.parseOrders(_ as DomainRequest) >> orderMock
+        TestApplicationContext.register(OrderController, mockController)
 
         def mockResponseHelper = Mock(DomainResponseHelper)
-        mockResponseHelper.constructOkResponse(_ as OrdersResponse) >> new DomainResponse(expectedStatusCode)
+        mockResponseHelper.constructOkResponse(_ as OrderResponse) >> new DomainResponse(expectedStatusCode)
         TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
 
         TestApplicationContext.injectRegisteredImplementations()
@@ -155,15 +153,15 @@ class EtorDomainRegistrationTest extends Specification {
         def domainRegistration = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
 
-        def mockController = Mock(OrdersController)
-        mockController.parseOrders(_ as DomainRequest) >> new LabOrdersMock<?>(null, null, null)
-        TestApplicationContext.register(OrdersController, mockController)
+        def mockController = Mock(OrderController)
+        mockController.parseOrders(_ as DomainRequest) >> new OrderMock<?>(null, null, null)
+        TestApplicationContext.register(OrderController, mockController)
 
-        def mockUseCase = Mock(SendLabOrderUsecase)
-        mockUseCase.send(_ as LabOrder<?>) >> {
-            throw new UnableToSendLabOrderException("error", new NullPointerException())
+        def mockUseCase = Mock(SendOrderUseCase)
+        mockUseCase.send(_ as Order<?>) >> {
+            throw new UnableToSendOrderException("error", new NullPointerException())
         }
-        TestApplicationContext.register(SendLabOrderUsecase, mockUseCase)
+        TestApplicationContext.register(SendOrderUseCase, mockUseCase)
 
         def mockResponseHelper = Mock(DomainResponseHelper)
         mockResponseHelper.constructErrorResponse(_ as Integer, _ as Exception) >> new DomainResponse(400)

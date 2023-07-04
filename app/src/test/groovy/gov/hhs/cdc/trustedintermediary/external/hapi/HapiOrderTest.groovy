@@ -7,17 +7,17 @@ import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.Patient
 import spock.lang.Specification
 
-class HapiLabOrderTest extends Specification {
+class HapiOrderTest extends Specification {
     def "getUnderlyingOrder Works"() {
         given:
-        def expectedInnerLabOrder = new Bundle()
-        def labOrder = new HapiLabOrder(expectedInnerLabOrder)
+        def expectedInnerOrder = new Bundle()
+        def order = new HapiOrder(expectedInnerOrder)
 
         when:
-        def actualInnerLabOrder = labOrder.getUnderlyingOrder()
+        def actualInnerOrder = order.getUnderlyingOrder()
 
         then:
-        actualInnerLabOrder == expectedInnerLabOrder
+        actualInnerOrder == expectedInnerOrder
     }
 
     def "getFhirResourceId works"() {
@@ -27,7 +27,7 @@ class HapiLabOrderTest extends Specification {
         innerOrder.setId(expectedId)
 
         when:
-        def orders = new HapiLabOrder(innerOrder)
+        def orders = new HapiOrder(innerOrder)
 
         then:
         orders.getFhirResourceId() == expectedId
@@ -43,7 +43,7 @@ class HapiLabOrderTest extends Specification {
         innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(patient))
 
         when:
-        def orders = new HapiLabOrder(innerOrders)
+        def orders = new HapiOrder(innerOrders)
         println("getPatientId: " + orders.getPatientId())
 
 
@@ -59,7 +59,7 @@ class HapiLabOrderTest extends Specification {
         innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(patient))
 
         when:
-        def orders = new HapiLabOrder(innerOrders)
+        def orders = new HapiOrder(innerOrders)
 
         then:
         orders.getPatientId() == expectedPatientId

@@ -1,35 +1,35 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
-import gov.hhs.cdc.trustedintermediary.etor.orders.LabOrder;
+import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Patient;
 
 /**
- * A concrete implementation of a {@link LabOrder} that uses the Hapi FHIR bundle as its underlying
+ * A concrete implementation of a {@link Order} that uses the Hapi FHIR bundle as its underlying
  * type.
  */
-public class HapiLabOrder implements LabOrder<Bundle> {
+public class HapiOrder implements Order<Bundle> {
 
-    private final Bundle innerLabOrder;
+    private final Bundle innerOrder;
 
-    public HapiLabOrder(Bundle innerLabOrder) {
-        this.innerLabOrder = innerLabOrder;
+    public HapiOrder(Bundle innerOrder) {
+        this.innerOrder = innerOrder;
     }
 
     @Override
     public Bundle getUnderlyingOrder() {
-        return innerLabOrder;
+        return innerOrder;
     }
 
     @Override
     public String getFhirResourceId() {
-        return innerLabOrder.getId();
+        return innerOrder.getId();
     }
 
     @Override
     public String getPatientId() {
-        return HapiHelper.resourcesInBundle(innerLabOrder, Patient.class)
+        return HapiHelper.resourcesInBundle(innerOrder, Patient.class)
                 .flatMap(patient -> patient.getIdentifier().stream())
                 .filter(
                         identifier ->
