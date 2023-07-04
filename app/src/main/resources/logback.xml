@@ -14,14 +14,31 @@
     </encoder>
   </appender>
 
-  <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+  <appender name="JSON_ASYNC" class="ch.qos.logback.classic.AsyncAppender">
     <appender-ref ref="JSON_CONSOLE" />
     <queueSize>1024</queueSize>
     <discardingThreshold>0</discardingThreshold>
     <includeCallerData>false</includeCallerData>
   </appender>
 
+  <appender name="TEXT_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+        <pattern>%date{ISO8601} [%thread] %-5level - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="TEXT_ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+    <appender-ref ref="TEXT_CONSOLE" />
+    <queueSize>1024</queueSize>
+    <discardingThreshold>0</discardingThreshold>
+    <includeCallerData>false</includeCallerData>
+  </appender>
+
+  <logger name="local" level="info" additivity="false">
+    <appender-ref ref="TEXT_ASYNC" />
+  </logger>
+
   <root level="info">
-    <appender-ref ref="ASYNC"/>
+    <appender-ref ref="JSON_ASYNC"/>
   </root>
 </configuration>

@@ -13,7 +13,8 @@ import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache;
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson;
 import gov.hhs.cdc.trustedintermediary.external.jjwt.JjwtEngine;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalSecrets;
-import gov.hhs.cdc.trustedintermediary.external.slf4j.Slf4jLogger;
+import gov.hhs.cdc.trustedintermediary.external.slf4j.DeployedLogger;
+import gov.hhs.cdc.trustedintermediary.external.slf4j.LocalLogger;
 import gov.hhs.cdc.trustedintermediary.organizations.OrganizationsSettings;
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
@@ -63,7 +64,11 @@ public class App {
     }
 
     private static void registerClasses() {
-        ApplicationContext.register(Logger.class, Slf4jLogger.getLogger());
+        ApplicationContext.register(
+                Logger.class,
+                ApplicationContext.getEnvironment().equalsIgnoreCase("local")
+                        ? LocalLogger.getInstance()
+                        : DeployedLogger.getInstance());
         ApplicationContext.register(Formatter.class, Jackson.getInstance());
         ApplicationContext.register(HapiFhir.class, HapiFhirImplementation.getInstance());
         ApplicationContext.register(YamlCombiner.class, Jackson.getInstance());
