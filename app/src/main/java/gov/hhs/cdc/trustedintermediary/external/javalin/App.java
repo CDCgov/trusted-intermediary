@@ -67,8 +67,8 @@ public class App {
         ApplicationContext.register(
                 Logger.class,
                 ApplicationContext.getEnvironment().equalsIgnoreCase("local")
-                        ? LocalLogger.getLogger()
-                        : DeployedLogger.getLogger());
+                        ? LocalLogger.getInstance()
+                        : DeployedLogger.getInstance());
         ApplicationContext.register(Formatter.class, Jackson.getInstance());
         ApplicationContext.register(HapiFhir.class, HapiFhirImplementation.getInstance());
         ApplicationContext.register(YamlCombiner.class, Jackson.getInstance());

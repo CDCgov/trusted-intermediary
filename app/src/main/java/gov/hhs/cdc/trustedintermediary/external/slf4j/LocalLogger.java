@@ -27,7 +27,7 @@ public class LocalLogger implements Logger {
 
     private LocalLogger() {}
 
-    public static LocalLogger getLogger() {
+    public static LocalLogger getInstance() {
         return INSTANCE;
     }
 

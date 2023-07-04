@@ -19,7 +19,7 @@ public class DeployedLogger implements Logger {
 
     private DeployedLogger() {}
 
-    public static DeployedLogger getLogger() {
+    public static DeployedLogger getInstance() {
         return INSTANCE;
     }
 
