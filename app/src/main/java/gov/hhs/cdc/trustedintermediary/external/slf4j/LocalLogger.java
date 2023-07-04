@@ -8,9 +8,8 @@ import org.slf4j.MarkerFactory;
 import org.slf4j.spi.LoggingEventBuilder;
 
 /**
- * Humble object interface for logging. This class was created in order to take away the 3rd party
- * dependency of the logger. The idea is to have the logger dependency only in this class. If there
- * ever is a reason to use a different logger, then we only need to make the changes here.
+ * Humble object interface for logging. Uses SLF4J behind the scenes. The local logger colorize its
+ * messages and prints things in an easy to read format.
  */
 public class LocalLogger implements Logger {
 
