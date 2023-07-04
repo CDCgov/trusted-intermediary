@@ -20,13 +20,10 @@ public class LocalLogger implements Logger {
     private static final String ANSI_RED = "\u001B[31m";
     private static final String ANSI_GREEN = "\u001B[32m";
     private static final String ANSI_YELLOW = "\u001B[33m";
-    private static final String ANSI_PURPLE = "\u001B[35m";
     private static final String ANSI_CYAN = "\u001B[36m";
 
     private static final Map<Level, String> LEVEL_COLOR_MAPPING =
             Map.of(
-                    Level.TRACE,
-                    ANSI_PURPLE,
                     Level.DEBUG,
                     ANSI_CYAN,
                     Level.INFO,
