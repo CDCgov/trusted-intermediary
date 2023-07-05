@@ -42,7 +42,7 @@ class DemographicsTest extends Specification {
     def "payload file check"() {
         when:
         def response = demographicsClient.submit(newbornPatientJsonFileString, true)
-        def parsedJsonBody = JsonParsing.parseContent(response)
+        def parsedResponseBody = JsonParsing.parseContent(response)
         def sentPayload = SentPayloadReader.read()
         def parsedSentPayload = JsonParsing.parse(sentPayload)
 
@@ -54,8 +54,8 @@ class DemographicsTest extends Specification {
         parsedSentPayload.entry[1].resource.resourceType == "Patient"
         parsedSentPayload.entry[1].resource.id == "infant-twin-1"
 
-        parsedSentPayload.entry[1].resource.identifier[1].value == parsedJsonBody.patientId  //the second (index 1) identifier so happens to be the MRN
-        parsedSentPayload.resourceType + "/" + parsedSentPayload.id == parsedJsonBody.fhirResourceId
+        parsedSentPayload.entry[1].resource.identifier[1].value == parsedResponseBody.patientId  //the second (index 1) identifier so happens to be the MRN
+        parsedSentPayload.resourceType + "/" + parsedSentPayload.id == parsedResponseBody.fhirResourceId
     }
 
     def "a 401 comes from the ETOR demographics endpoint when unauthenticated"() {
