@@ -55,7 +55,7 @@ jobs:
     uses: ./.github/workflows/deploy_reusable.yml
     if: needs.paths-filter.outputs.operations == 'true'
     with:
-      ENVIRONMENT: pr
+      ENVIRONMENT: pr${{ github.event.number }}
       REPO: trusted-intermediary-router
       REPO_DOCS: trusted-intermediary-docs
       APP: ${{ needs.terraform-deploy.outputs.APP }}
