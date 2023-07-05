@@ -37,22 +37,13 @@ class OrderTest extends Specification {
     def "payload file check"() {
 
         when:
-        def responseBody = orderClient.submit(labOrderJsonFileString)
         def sentPayload = SentPayloadReader.read()
-        def parsedResponseBody = JsonParsing.parse(responseBody, Map.class)
-
+        def parsedLabOrderJson = JsonParsing.parse(labOrderJsonFileString, Map.class)
         def parsedSentPayload = JsonParsing.parse(sentPayload, Map.class)
 
         then:
 
-        parsedSentPayload.entry[0].resource.resourceType == "MessageHeader"
-        parsedSentPayload.entry[3].resource.resourceType == "ServiceRequest"
-
-        parsedSentPayload.entry[2].resource.resourceType == "Patient"
-        parsedSentPayload.entry[2].resource.id == "infant-twin-1"
-
-        parsedSentPayload.entry[2].resource.identifier[0].value == parsedResponseBody.patientId  //the second (index 1) identifier so happens to be the MRN
-        parsedSentPayload.resourceType + "/" + parsedSentPayload.id == parsedResponseBody.fhirResourceId
+        parsedSentPayload == parsedLabOrderJson
     }
 
     def "a 401 comes from the ETOR order endpoint when unauthenticated"() {
