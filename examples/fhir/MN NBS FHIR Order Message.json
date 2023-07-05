@@ -29,7 +29,17 @@
                 "source": {
                     "name": "CDC Trusted Intermediary",
                     "endpoint": "https://reportstream.cdc.gov/"
-                }
+                },
+                "focus": [
+                    {
+                        "reference": "ServiceRequest/34685122-eb17-44c0-aa2c-6a67461dcb73",
+                        "type": "ServiceRequest"
+                    },
+                    {
+                        "reference": "ServiceRequest/742d6734-e14c-45b3-af73-f1ee919b3e19",
+                        "type": "ServiceRequest"
+                    }
+                ]
             }
         },
         {
