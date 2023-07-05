@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.e2e
 
+import org.apache.hc.core5.http.io.entity.EntityUtils
 import spock.lang.Specification
 
 import java.nio.file.Files
@@ -16,39 +17,43 @@ class OrderTest extends Specification {
         def expectedPatientId  = "MRN7465737865"
 
         when:
-        def responseBody = orderClient.submit(labOrderJsonFileString)
-        def parsedJsonBody = JsonParsing.parse(responseBody, Map.class)
+        def response = orderClient.submit(labOrderJsonFileString, true)
+        def parsedJsonBody = JsonParsing.parseContent(response)
 
         then:
+        response.getCode() == 200
         parsedJsonBody.fhirResourceId == expectedFhirResourceId
         parsedJsonBody.patientId == expectedPatientId
     }
 
     def "bad response given for poorly formatted JSON"() {
+        given:
+        def invalidJsonRequest = labOrderJsonFileString.substring(1)
 
         when:
-        def responseBody = orderClient.submit(labOrderJsonFileString.substring(1))
-        //removed beginning '{' to make this JSON invalid
+        def response = orderClient.submit(invalidJsonRequest, true)
+        def responseBody = EntityUtils.toString(response.getEntity())
 
         then:
+        response.getCode() == 500
         responseBody == "Server Error"
     }
 
     def "payload file check"() {
-
         when:
+        def response = orderClient.submit(labOrderJsonFileString, true)
         def sentPayload = SentPayloadReader.read()
-        def parsedLabOrderJson = JsonParsing.parse(labOrderJsonFileString, Map.class)
-        def parsedSentPayload = JsonParsing.parse(sentPayload, Map.class)
+        def parsedSentPayload = JsonParsing.parse(sentPayload)
+        def parsedLabOrderJsonFile = JsonParsing.parse(labOrderJsonFileString)
 
         then:
-
-        parsedSentPayload == parsedLabOrderJson
+        response.getCode() == 200
+        parsedSentPayload == parsedLabOrderJsonFile
     }
 
     def "a 401 comes from the ETOR order endpoint when unauthenticated"() {
         when:
-        def response = orderClient.submitRaw(labOrderJsonFileString, false)
+        def response = orderClient.submit(labOrderJsonFileString, false)
 
         then:
         response.getCode() == 401

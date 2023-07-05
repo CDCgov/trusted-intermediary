@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.ParseException;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
 
 public class EndpointClient {
     private String endpoint;
@@ -27,22 +25,21 @@ public class EndpointClient {
         }
     }
 
-    public String submit(String fhirBody) throws IOException, ParseException {
-        try (var response = submitRaw(fhirBody, true)) {
-            return EntityUtils.toString(response.getEntity());
-        }
-    }
-
-    public ClassicHttpResponse submitRaw(String fhirBody, boolean loginFirst)
-            throws IOException, ParseException {
+    public ClassicHttpResponse submit(String fhirBody, boolean loginFirst) throws IOException {
 
         Map<String, String> headers = new HashMap<>();
 
         if (loginFirst) {
-            var loginToken = AuthClient.login("report-stream", token);
-            headers.put("Authorization", "Bearer " + loginToken);
+            var accessToken = AuthClient.requestAccessToken("report-stream", token);
+            headers.put("Authorization", "Bearer " + accessToken);
         }
 
-        return Client.post(endpoint, fhirBody, ContentType.APPLICATION_JSON, headers);
+        return HttpClient.post(endpoint, fhirBody, ContentType.APPLICATION_JSON, headers);
+    }
+
+    public static Object getResponseBodyValue(ClassicHttpResponse response, String key)
+            throws IOException {
+        var responseBody = JsonParsing.parseContent(response);
+        return responseBody.get(key);
     }
 }

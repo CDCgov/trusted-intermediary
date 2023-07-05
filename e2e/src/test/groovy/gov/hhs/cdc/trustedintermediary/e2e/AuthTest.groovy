@@ -12,12 +12,12 @@ class AuthTest extends Specification {
 
     def "a 200 valid response is returned when known organization and valid token"() {
         when:
-        def response = AuthClient.loginRaw(existingClientId, validToken)
+        def response = AuthClient.authenticate(existingClientId, validToken)
 
         then:
         response.getCode() == 200
         def body = EntityUtils.toString(response.getEntity())
-        def responseBody = JsonParsing.parse(body, Map.class)
+        def responseBody = JsonParsing.parse(body)
         responseBody.scope == "report-stream"
         responseBody.token_type == "bearer"
         responseBody.access_token != null
@@ -28,21 +28,10 @@ class AuthTest extends Specification {
         def invalidRequest = "%g"
 
         when:
-        def response = AuthClient.loginRaw(invalidRequest, "asdf")
+        def response = AuthClient.authenticate(invalidRequest, "asdf")
 
         then:
         response.getCode() == 400
-    }
-
-    def "a 401 response is returned when poorly formatted request"() {
-        given:
-        def invalidRequest = "invalid-request"
-
-        when:
-        def response = AuthClient.loginRaw(invalidRequest, "asdf")
-
-        then:
-        response.getCode() == 401
     }
 
     def "a 401 response is returned when invalid token"() {
@@ -50,7 +39,7 @@ class AuthTest extends Specification {
         def invalidToken = "invalid-token"
 
         when:
-        def response = AuthClient.loginRaw(existingClientId, invalidToken)
+        def response = AuthClient.authenticate(existingClientId, invalidToken)
 
         then:
         response.getCode() == 401
@@ -61,7 +50,7 @@ class AuthTest extends Specification {
         def invalidClientId = "invalid-client"
 
         when:
-        def response = AuthClient.loginRaw(invalidClientId, validToken)
+        def response = AuthClient.authenticate(invalidClientId, validToken)
 
         then:
         response.getCode() == 401
