@@ -202,6 +202,22 @@
             }
         },
         {
+            "fullUrl": "PractitionerRole/e3b3ff93-1c84-4b82-9a23-e26c95985bd9",
+            "resource": {
+                "resourceType": "PractitionerRole",
+                "id": "e3b3ff93-1c84-4b82-9a23-e26c95985bd9",
+                "practitioner": {
+                    "reference": "Practitioner/d8f5b686-cdfc-48b4-b3ec-8d08ecb6ecaa",
+                    "type": "Practitioner"
+                },
+                "organization": {
+                    "reference": "Organization/3f55d0e9-0780-4b8d-b3b6-d0ae078af275",
+                    "type": "Organization"
+                }
+            }
+        },
+
+        {
             "fullUrl": "Organization/3f55d0e9-0780-4b8d-b3b6-d0ae078af275",
             "resource": {
                 "resourceType": "Organization",
@@ -742,10 +758,14 @@
                 "resourceType": "ServiceRequest",
                 "id": "34685122-eb17-44c0-aa2c-6a67461dcb73",
                 "status": "active",
+                "intent": "order",
                 "subject": {
                     "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2"
                 },
-                "intent": "order",
+                "requester": {
+                    "reference": "Practitioner/d8f5b686-cdfc-48b4-b3ec-8d08ecb6ecaa",
+                    "type": "Practitioner"
+                },
                 "code": {
                     "coding": [
                         {
@@ -765,10 +785,15 @@
                 "resourceType": "ServiceRequest",
                 "id": "742d6734-e14c-45b3-af73-f1ee919b3e19",
                 "status": "active",
-                "subject": {
-                    "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2"
-                },
                 "intent": "order",
+                "subject": {
+                    "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
+                    "type": "Patient"
+                },
+                "requester": {
+                    "reference": "Practitioner/d8f5b686-cdfc-48b4-b3ec-8d08ecb6ecaa",
+                    "type": "Practitioner"
+                },
                 "code": {
                     "coding": [
                         {
@@ -778,7 +803,8 @@
                         }
                     ],
                     "text": "Newborn screen card data panel"
-                }
+                },
+                "authoredOn": "2023-05-06T05:00:00Z"
             }
         }
     ]
