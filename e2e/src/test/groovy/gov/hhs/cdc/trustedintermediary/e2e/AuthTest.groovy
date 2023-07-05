@@ -12,7 +12,7 @@ class AuthTest extends Specification {
 
     def "a 200 valid response is returned when known organization and valid token"() {
         when:
-        def response = AuthClient.authenticate(existingClientId, validToken)
+        def response = EndpointClient.authenticate(existingClientId, validToken)
 
         then:
         response.getCode() == 200
@@ -28,7 +28,7 @@ class AuthTest extends Specification {
         def invalidRequest = "%g"
 
         when:
-        def response = AuthClient.authenticate(invalidRequest, "asdf")
+        def response = EndpointClient.authenticate(invalidRequest, "asdf")
 
         then:
         response.getCode() == 400
@@ -39,7 +39,7 @@ class AuthTest extends Specification {
         def invalidToken = "invalid-token"
 
         when:
-        def response = AuthClient.authenticate(existingClientId, invalidToken)
+        def response = EndpointClient.authenticate(existingClientId, invalidToken)
 
         then:
         response.getCode() == 401
@@ -50,7 +50,7 @@ class AuthTest extends Specification {
         def invalidClientId = "invalid-client"
 
         when:
-        def response = AuthClient.authenticate(invalidClientId, validToken)
+        def response = EndpointClient.authenticate(invalidClientId, validToken)
 
         then:
         response.getCode() == 401

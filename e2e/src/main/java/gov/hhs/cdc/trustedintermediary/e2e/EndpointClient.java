@@ -9,6 +9,7 @@ import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ContentType;
 
 public class EndpointClient {
+    private static final String AUTH_ENDPOINT = "/v1/auth";
     private String endpoint;
     private String token;
 
@@ -30,12 +31,21 @@ public class EndpointClient {
         Map<String, String> headers = new HashMap<>();
 
         if (loginFirst) {
-            var response = AuthClient.authenticate("report-stream", token);
+            var response = authenticate("report-stream", token);
             var parsedJsonBody = JsonParsing.parseContent(response);
             var loginToken = (String) parsedJsonBody.get("access_token");
             headers.put("Authorization", "Bearer " + loginToken);
         }
 
         return HttpClient.post(endpoint, fhirBody, ContentType.APPLICATION_JSON, headers);
+    }
+
+    public static ClassicHttpResponse authenticate(String clientId, String clientJwt)
+            throws IOException {
+        return HttpClient.post(
+                AUTH_ENDPOINT,
+                "scope=" + clientId + "&client_assertion=" + clientJwt,
+                ContentType.APPLICATION_FORM_URLENCODED,
+                Map.of());
     }
 }
