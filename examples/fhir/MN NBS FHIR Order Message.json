@@ -180,7 +180,6 @@
                 ]
             }
         },
-
         {
             "fullUrl": "ServiceRequest/34685122-eb17-44c0-aa2c-6a67461dcb73",
             "resource": {
@@ -237,27 +236,6 @@
             }
         },
         {
-            "fullUrl": "Specimen/1438062e-b4d2-4f63-a13c-2dd6e5f8e3ed",
-            "resource": {
-                "resourceType": "Specimen",
-                "id": "1438062e-b4d2-4f63-a13c-2dd6e5f8e3ed",
-                "type": {
-                    "coding": [
-                        {
-                            "system": "http://snomed.info/sct",
-                            "code": "440500007",
-                            "display": "Blood spot specimen"
-                        }
-                    ],
-                    "text": "Blood spot specimen"
-                },
-                "subject": {
-                    "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2"
-                },
-                "receivedTime": "2023-05-06T06:00:00-05:00"
-            }
-        },
-        {
             "fullUrl": "Practitioner/d8f5b686-cdfc-48b4-b3ec-8d08ecb6ecaa",
             "resource": {
                 "resourceType": "Practitioner",
@@ -310,6 +288,27 @@
                     }
                 ],
                 "name": "ST. CLOUD HOSPITAL"
+            }
+        },
+        {
+            "fullUrl": "Specimen/1438062e-b4d2-4f63-a13c-2dd6e5f8e3ed",
+            "resource": {
+                "resourceType": "Specimen",
+                "id": "1438062e-b4d2-4f63-a13c-2dd6e5f8e3ed",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://snomed.info/sct",
+                            "code": "440500007",
+                            "display": "Blood spot specimen"
+                        }
+                    ],
+                    "text": "Blood spot specimen"
+                },
+                "subject": {
+                    "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2"
+                },
+                "receivedTime": "2023-05-06T06:00:00-05:00"
             }
         },
         {
