@@ -131,7 +131,9 @@ tasks.named('test') {
         excludes = [
             '**/javalin/App*',
             '**/jackson/Jackson*',
-            '**/slf4j/Slf4jLogger*',
+            '**/slf4j/LocalLogger*',
+            '**/slf4j/DeployedLogger*',
+            '**/slf4j/LoggerHelper*',
             '**/hapi/HapiFhirImplementation*',
             '**/jjwt/JjwtEngine*',
             '**/apache/ApacheClient*',
