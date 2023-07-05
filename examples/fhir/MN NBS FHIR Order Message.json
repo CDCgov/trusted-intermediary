@@ -180,6 +180,83 @@
                 ]
             }
         },
+
+        {
+            "fullUrl": "ServiceRequest/34685122-eb17-44c0-aa2c-6a67461dcb73",
+            "resource": {
+                "resourceType": "ServiceRequest",
+                "id": "34685122-eb17-44c0-aa2c-6a67461dcb73",
+                "status": "active",
+                "intent": "order",
+                "subject": {
+                    "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2"
+                },
+                "requester": {
+                    "reference": "Practitioner/d8f5b686-cdfc-48b4-b3ec-8d08ecb6ecaa",
+                    "type": "Practitioner"
+                },
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "54089-8",
+                            "display": "Newborn screening panel American Health Information Community (AHIC)"
+                        }
+                    ],
+                    "text": "Newborn screening panel American Health Information Community (AHIC)"
+                },
+                "authoredOn": "2023-05-06T05:00:00Z"
+            }
+        },
+        {
+            "fullUrl": "ServiceRequest/742d6734-e14c-45b3-af73-f1ee919b3e19",
+            "resource": {
+                "resourceType": "ServiceRequest",
+                "id": "742d6734-e14c-45b3-af73-f1ee919b3e19",
+                "status": "active",
+                "intent": "order",
+                "subject": {
+                    "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
+                    "type": "Patient"
+                },
+                "requester": {
+                    "reference": "Practitioner/d8f5b686-cdfc-48b4-b3ec-8d08ecb6ecaa",
+                    "type": "Practitioner"
+                },
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "57717-1",
+                            "display": "Newborn screen card data panel"
+                        }
+                    ],
+                    "text": "Newborn screen card data panel"
+                },
+                "authoredOn": "2023-05-06T05:00:00Z"
+            }
+        },
+        {
+            "fullUrl": "Specimen/1438062e-b4d2-4f63-a13c-2dd6e5f8e3ed",
+            "resource": {
+                "resourceType": "Specimen",
+                "id": "1438062e-b4d2-4f63-a13c-2dd6e5f8e3ed",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://snomed.info/sct",
+                            "code": "440500007",
+                            "display": "Blood spot specimen"
+                        }
+                    ],
+                    "text": "Blood spot specimen"
+                },
+                "subject": {
+                    "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2"
+                },
+                "receivedTime": "2023-05-06T06:00:00-05:00"
+            }
+        },
         {
             "fullUrl": "Practitioner/d8f5b686-cdfc-48b4-b3ec-8d08ecb6ecaa",
             "resource": {
@@ -729,82 +806,6 @@
                 },
                 "effectiveDateTime": "2023-05-06T05:00:00-05:00",
                 "valueString": "Lakeridge Health Revere"
-            }
-        },
-        {
-            "fullUrl": "Specimen/1438062e-b4d2-4f63-a13c-2dd6e5f8e3ed",
-            "resource": {
-                "resourceType": "Specimen",
-                "id": "1438062e-b4d2-4f63-a13c-2dd6e5f8e3ed",
-                "type": {
-                    "coding": [
-                        {
-                            "system": "http://snomed.info/sct",
-                            "code": "440500007",
-                            "display": "Blood spot specimen"
-                        }
-                    ],
-                    "text": "Blood spot specimen"
-                },
-                "subject": {
-                    "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2"
-                },
-                "receivedTime": "2023-05-06T06:00:00-05:00"
-            }
-        },
-        {
-            "fullUrl": "ServiceRequest/34685122-eb17-44c0-aa2c-6a67461dcb73",
-            "resource": {
-                "resourceType": "ServiceRequest",
-                "id": "34685122-eb17-44c0-aa2c-6a67461dcb73",
-                "status": "active",
-                "intent": "order",
-                "subject": {
-                    "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2"
-                },
-                "requester": {
-                    "reference": "Practitioner/d8f5b686-cdfc-48b4-b3ec-8d08ecb6ecaa",
-                    "type": "Practitioner"
-                },
-                "code": {
-                    "coding": [
-                        {
-                            "system": "http://loinc.org",
-                            "code": "54089-8",
-                            "display": "Newborn screening panel American Health Information Community (AHIC)"
-                        }
-                    ],
-                    "text": "Newborn screening panel American Health Information Community (AHIC)"
-                },
-                "authoredOn": "2023-05-06T05:00:00Z"
-            }
-        },
-        {
-            "fullUrl": "ServiceRequest/742d6734-e14c-45b3-af73-f1ee919b3e19",
-            "resource": {
-                "resourceType": "ServiceRequest",
-                "id": "742d6734-e14c-45b3-af73-f1ee919b3e19",
-                "status": "active",
-                "intent": "order",
-                "subject": {
-                    "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
-                    "type": "Patient"
-                },
-                "requester": {
-                    "reference": "Practitioner/d8f5b686-cdfc-48b4-b3ec-8d08ecb6ecaa",
-                    "type": "Practitioner"
-                },
-                "code": {
-                    "coding": [
-                        {
-                            "system": "http://loinc.org",
-                            "code": "57717-1",
-                            "display": "Newborn screen card data panel"
-                        }
-                    ],
-                    "text": "Newborn screen card data panel"
-                },
-                "authoredOn": "2023-05-06T05:00:00Z"
             }
         }
     ]
