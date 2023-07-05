@@ -706,7 +706,7 @@
             }
         },
         {
-            "fullUrl": "Observation/1438062e-b4d2-4f63-a13c-2dd6e5f8e3ed",
+            "fullUrl": "Specimen/1438062e-b4d2-4f63-a13c-2dd6e5f8e3ed",
             "resource": {
                 "resourceType": "Specimen",
                 "id": "1438062e-b4d2-4f63-a13c-2dd6e5f8e3ed",
@@ -727,7 +727,7 @@
             }
         },
         {
-            "fullUrl": "Observation/34685122-eb17-44c0-aa2c-6a67461dcb73",
+            "fullUrl": "ServiceRequest/34685122-eb17-44c0-aa2c-6a67461dcb73",
             "resource": {
                 "resourceType": "ServiceRequest",
                 "id": "34685122-eb17-44c0-aa2c-6a67461dcb73",
@@ -750,7 +750,7 @@
             }
         },
         {
-            "fullUrl": "Observation/742d6734-e14c-45b3-af73-f1ee919b3e19",
+            "fullUrl": "ServiceRequest/742d6734-e14c-45b3-af73-f1ee919b3e19",
             "resource": {
                 "resourceType": "ServiceRequest",
                 "id": "742d6734-e14c-45b3-af73-f1ee919b3e19",
