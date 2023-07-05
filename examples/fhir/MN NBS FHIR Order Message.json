@@ -30,6 +30,13 @@
                     "name": "CDC Trusted Intermediary",
                     "endpoint": "https://reportstream.cdc.gov/"
                 },
+                "destination": [{
+                    "endpoint": "https://health.state.mn.us.internal",
+                    "receiver": {
+                        "reference": "Organization/94e5ae4f-3f51-428a-a7f9-d7d545493849",
+                        "type": "Organization"
+                    }
+                }],
                 "focus": [
                     {
                         "reference": "ServiceRequest/34685122-eb17-44c0-aa2c-6a67461dcb73",
@@ -191,9 +198,13 @@
                     "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2"
                 },
                 "requester": {
-                    "reference": "Practitioner/d8f5b686-cdfc-48b4-b3ec-8d08ecb6ecaa",
-                    "type": "Practitioner"
+                    "reference": "PractitionerRole/e3b3ff93-1c84-4b82-9a23-e26c95985bd9",
+                    "type": "PractitionerRole"
                 },
+                "specimen": [{
+                    "reference": "Specimen/1438062e-b4d2-4f63-a13c-2dd6e5f8e3ed",
+                    "type": "Specimen"
+                }],
                 "code": {
                     "coding": [
                         {
@@ -219,9 +230,13 @@
                     "type": "Patient"
                 },
                 "requester": {
-                    "reference": "Practitioner/d8f5b686-cdfc-48b4-b3ec-8d08ecb6ecaa",
-                    "type": "Practitioner"
+                    "reference": "PractitionerRole/e3b3ff93-1c84-4b82-9a23-e26c95985bd9",
+                    "type": "PractitionerRole"
                 },
+                "specimen": [{
+                    "reference": "Specimen/1438062e-b4d2-4f63-a13c-2dd6e5f8e3ed",
+                    "type": "Specimen"
+                }],
                 "code": {
                     "coding": [
                         {
@@ -271,7 +286,6 @@
                 }
             }
         },
-
         {
             "fullUrl": "Organization/3f55d0e9-0780-4b8d-b3b6-d0ae078af275",
             "resource": {
@@ -281,13 +295,23 @@
                     {
                         "system": "urn:oid:2.16.840.1.113883.3.37.4",
                         "value": "ST. CLOUD HOSPITAL"
-                    },
+                    }
+                ],
+                "name": "ST. CLOUD HOSPITAL"
+            }
+        },
+        {
+            "fullUrl": "Organization/94e5ae4f-3f51-428a-a7f9-d7d545493849",
+            "resource": {
+                "resourceType": "Organization",
+                "id": "94e5ae4f-3f51-428a-a7f9-d7d545493849",
+                "identifier": [
                     {
                         "system": "urn:oid:2.16.840.1.113883.3.37.4",
                         "value": "MN Public Health Lab"
                     }
                 ],
-                "name": "ST. CLOUD HOSPITAL"
+                "name": "MN Public Health Lab"
             }
         },
         {
