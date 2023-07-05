@@ -1,0 +1,36 @@
+MSH|^~\&|SendingApplicationName^2.16.840.1.114222.XXX^ISO|SendingFacilityName^2.16.840.1.114222.XXX^ISO|VA StarLIMSv10 Prod^2.16.840.1.114222.4.3.3.2.2.4^ISO|VA PHL Richmond^2.16.840.1.114222.4.1.9977^ISO|20170222185600-0500||OML^O21^OML_O21|MessageControlID|T|2.5.1|||AL|AL|||||LOI_NG_PRN_Profile^^2.16.840.1.113883.9.88^ISO~LOI_NDBS_COMPONENT^^2.16.840.1.113883.9.5^ISO||||||||||||||||||||||
+PID|1||987654321^^^HospitalSystem&2.16.840.1.114222.XXX&ISO^MR^MR||ONE^TESTCASE|MOMMAIDENONE|201702210152-0500|F||2106-3^White^HL70005|1776 Main Street^^Richmond^VA^23219||^^^^^804^5693861|||||||||N^Not Hispanic or Latino^HL70189||N|1|||||N||||||||||||
+NK1|1|ONE^MOMFIRST|MTH^Mother^HL70063|1776 Main Street^^Richmond^VA^23219|^^^^^804^5693861||N^Next-of-Kin^HL70131|||||||||19860416|||||||||||||||||9683^^^SSA&2.16.840.1.113883.4.1&ISO^SS|||||||||
+ORC|NW|XXXXX^HospitalSystem^2.16.840.1.114222.XXX^ISO|||||||201702221854-0500|||321^Rahal^Frederick^^^Dr^^^NPI&2.16.840.1.113883.4.6&ISO^L^^^NPI^^^^^^^^MD|||||||||BON SECOURS ST MARY'S HOSPITAL^^^^^NPI&2.16.840.1.113883.4.6&ISO^XX^^^10614|5801 BREMO RD^^RICHMOND^VA^23226^USA^^^51760|^^^^^804^2852011|||||||||||||||||||
+OBR|1|XXXXX^HospitalSystem^2.16.840.1.114222.XXX^ISO||54089-8^Newborn screening panel AHIC^LN|||201702221854-0500|||COLLECTOR||||||321^Rahal^Frederick^^^Dr^^^NPI&2.16.840.1.113883.4.6&ISO^L^^^NPI^^^^^^^^MD||||||||||||||||||||||||||
+DG1|1||code^Diagnosis^I10C|||W|||||||||1
+OBX|1|CWE|57721-3^Reason for lab test in Dried blood spot^LN||LA12421-6^Initial screen^LN||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|2|TX|57716-3^State printed on filter paper card [Identifier] in NBS card^LN||VA||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|3|CWE|79566-6^Collection method â€“ Dried blood spot^LN||LA25402-1^Heel stick^LN||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|4|NM|8339-4^Birth weight Measured^LN||2921|g^gram^UCUM|||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|5|NM|58229-6^Body weight Measured --when specimen taken^LN||2856|g^gram^UCUM|||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|6|NM|73806-2^Newborn age in hours^LN||41|h^hour^UCUM|||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|7|CWE|57722-1^Birth plurality of Pregnancy^LN||LA6112-2^1^LN||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|8|NM|57714-8^Obstetric estimation of gestational age^LN||38|wk^week^UCUM|||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|9|CWE|57713-0^Infant factors that affect newborn screening interpretation^LN||LA137-2^None^LN||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|10|TX|67703-9^Other infant factors that affect newborn screening interpretation Narrative^LN||None||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|11|CWE|67706-2^Maternal factors that affect newborn screening interpretation^LN||LA46-8^Other^LN||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|12|TX|67707-0^Other maternal factors that affect newborn screening interpretation Narrative^LN||Mother has Lupus||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|13|CWE|77739-1^Motherâ€™s Hepatitis B virus surface Ag status^LN||LA6577-6^Negative^LN||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|14|CWE|57712-2^Mother's education^LN||LA12457-0^High school graduate or GED completed^LN||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|15|CWE|67704-7^Feeding types^LN||LA16914-6^Breast milk^LN||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|16|TX|67705-4^Other feeding types Narrative^LN||None||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|17|CWE|58232-0^Hearing loss risk indicators [Identifier]^LN||LA137-2^None^LN||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|18|TX|57723-9^Unique bar code number of Current sample^LN||22820171||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|19|TX|57711-4^Unique bar code number of Initial sample^LN||Not Applicable||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|20|CX|62323-1^Post-discharge provider ID [Identifier]^LN||321||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|21|TX|62324-9^Post-discharge provider name in Provider^LN||Dr. Frederick Rahal||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|22|CX|62325-6^Post-discharge provider practice ID^LN||0000123||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|23|TX|62326-4^Post-discharge provider practice name^LN||Healthy OB Clinic||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|24|XAD|62327-2^Post-discharge provider practice address^LN||5901 Lakeside Avenue^^Richmond^VA^23228||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|25|XTN|62328-0^Post-discharge provider practice telephone number^LN||^^^^^804^2669616||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|26|CX|62329-8^Birth hospital facility ID [Identifier] in Facility^LN||10614||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|27|TX|62330-6^Birth hospital facility name^LN||BON SECOURS ST MARY'S HOSPITAL||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|28|XAD|62331-4^Birth hospital facility address^LN||5801 BREMO RD^^RICHMOND^VA^23226||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+OBX|29|XTN|62332-2^Birth hospital facility phone number in Facility^LN||^^^^^804^2852011||||||O|||201702221854-0500|||||||||||||||QST|AOE||||||||||||
+SPM|1|XXXXX^HospitalSystem^2.16.840.1.114222.XXX^ISO||440500007^Blood spot specimen^SCT|||||||||||||201702221854-0500|||||||||||||
