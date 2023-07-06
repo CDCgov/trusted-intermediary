@@ -88,14 +88,6 @@
       }
     },
     {
-      "fullUrl": "Organization/centracare.com",
-      "resource": {
-        "resourceType": "Organization",
-        "id": "centracare.com",
-        "name": "Centracare"
-      }
-    },
-    {
       "fullUrl": "Device/d33c30a0-3ea9-4464-8a51-a197eac9a375",
       "resource": {
         "resourceType": "Device",
@@ -104,6 +96,71 @@
           {
             "system": "https://reportstream.cdc.gov/",
             "value": "ReportStream"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Organization/centracare.com",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "centracare.com",
+        "name": "Centracare"
+      }
+    },
+    {
+      "fullUrl": "Organization/2.16.840.1.114222.4.1.10080",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "2.16.840.1.114222.4.1.10080",
+        "name": "MN Public Health Lab"
+      }
+    },
+    {
+      "fullUrl": "Organization/3f55d0e9-0780-4b8d-b3b6-d0ae078af275",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "3f55d0e9-0780-4b8d-b3b6-d0ae078af275",
+        "identifier": [
+          {
+            "value": "739"
+          }
+        ],
+        "name": "ST. CLOUD HOSPITAL"
+      }
+    },
+    {
+      "fullUrl": "PractitionerRole/e3b3ff93-1c84-4b82-9a23-e26c95985bd9",
+      "resource": {
+        "resourceType": "PractitionerRole",
+        "id": "e3b3ff93-1c84-4b82-9a23-e26c95985bd9",
+        "practitioner": {
+          "reference": "Practitioner/d8f5b686-cdfc-48b4-b3ec-8d08ecb6ecaa",
+          "type": "Practitioner"
+        },
+        "organization": {
+          "reference": "Organization/3f55d0e9-0780-4b8d-b3b6-d0ae078af275",
+          "type": "Organization"
+        }
+      }
+    },
+    {
+      "fullUrl": "Practitioner/d8f5b686-cdfc-48b4-b3ec-8d08ecb6ecaa",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "d8f5b686-cdfc-48b4-b3ec-8d08ecb6ecaa",
+        "identifier": [
+          {
+            "system": "http://hl7.org/fhir/sid/us-npi",
+            "value": "1265136360"
+          }
+        ],
+        "name": [
+          {
+            "family": "Jones",
+            "given": [
+              "Jane"
+            ]
           }
         ]
       }
@@ -268,63 +325,6 @@
           "text": "Newborn screen card data panel"
         },
         "authoredOn": "2023-05-06T05:00:00Z"
-      }
-    },
-    {
-      "fullUrl": "Practitioner/d8f5b686-cdfc-48b4-b3ec-8d08ecb6ecaa",
-      "resource": {
-        "resourceType": "Practitioner",
-        "id": "d8f5b686-cdfc-48b4-b3ec-8d08ecb6ecaa",
-        "identifier": [
-          {
-            "system": "http://hl7.org/fhir/sid/us-npi",
-            "value": "1265136360"
-          }
-        ],
-        "name": [
-          {
-            "family": "Jones",
-            "given": [
-              "Jane"
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "fullUrl": "PractitionerRole/e3b3ff93-1c84-4b82-9a23-e26c95985bd9",
-      "resource": {
-        "resourceType": "PractitionerRole",
-        "id": "e3b3ff93-1c84-4b82-9a23-e26c95985bd9",
-        "practitioner": {
-          "reference": "Practitioner/d8f5b686-cdfc-48b4-b3ec-8d08ecb6ecaa",
-          "type": "Practitioner"
-        },
-        "organization": {
-          "reference": "Organization/3f55d0e9-0780-4b8d-b3b6-d0ae078af275",
-          "type": "Organization"
-        }
-      }
-    },
-    {
-      "fullUrl": "Organization/3f55d0e9-0780-4b8d-b3b6-d0ae078af275",
-      "resource": {
-        "resourceType": "Organization",
-        "id": "3f55d0e9-0780-4b8d-b3b6-d0ae078af275",
-        "identifier": [
-          {
-            "value": "739"
-          }
-        ],
-        "name": "ST. CLOUD HOSPITAL"
-      }
-    },
-    {
-      "fullUrl": "Organization/2.16.840.1.114222.4.1.10080",
-      "resource": {
-        "resourceType": "Organization",
-        "id": "2.16.840.1.114222.4.1.10080",
-        "name": "MN Public Health Lab"
       }
     },
     {
