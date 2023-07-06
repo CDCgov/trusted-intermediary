@@ -27,14 +27,19 @@
           "display": "OML - Laboratory order"
         },
         "source": {
-          "name": "CDC Trusted Intermediary",
-          "endpoint": "https://reportstream.cdc.gov/"
+          "name": "Epic",
+          "endpoint": "1.2.840.114350.1.13.145.2.7.2.695071"
+        },
+        "sender": {
+          "reference": "Organization/centracare.com",
+          "type": "Organization"
         },
         "destination": [
           {
-            "endpoint": "https://health.state.mn.us.internal",
+            "name": "NATUS",
+            "endpoint": "http://natus.health.state.mn.us",
             "receiver": {
-              "reference": "Organization/94e5ae4f-3f51-428a-a7f9-d7d545493849",
+              "reference": "Organization/2.16.840.1.114222.4.1.10080",
               "type": "Organization"
             }
           }
@@ -83,6 +88,14 @@
       }
     },
     {
+      "fullUrl": "Organization/centracare.com",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "centracare.com",
+        "name": "Centracare"
+      }
+    },
+    {
       "fullUrl": "Device/d33c30a0-3ea9-4464-8a51-a197eac9a375",
       "resource": {
         "resourceType": "Device",
@@ -90,7 +103,7 @@
         "identifier": [
           {
             "system": "https://reportstream.cdc.gov/",
-            "value": "report-stream"
+            "value": "ReportStream"
           }
         ]
       }
@@ -307,16 +320,10 @@
       }
     },
     {
-      "fullUrl": "Organization/94e5ae4f-3f51-428a-a7f9-d7d545493849",
+      "fullUrl": "Organization/2.16.840.1.114222.4.1.10080",
       "resource": {
         "resourceType": "Organization",
-        "id": "94e5ae4f-3f51-428a-a7f9-d7d545493849",
-        "identifier": [
-          {
-            "system": "urn:oid:2.16.840.1.113883.3.37.4",
-            "value": "MN Public Health Lab"
-          }
-        ],
+        "id": "2.16.840.1.114222.4.1.10080",
         "name": "MN Public Health Lab"
       }
     },
