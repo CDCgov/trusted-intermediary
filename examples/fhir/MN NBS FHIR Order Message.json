@@ -95,7 +95,7 @@
         "identifier": [
           {
             "system": "https://reportstream.cdc.gov/",
-            "value": "ReportStream"
+            "value": "report-stream"
           }
         ]
       }
