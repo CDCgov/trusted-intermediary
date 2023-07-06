@@ -27,7 +27,9 @@ public class HapiFhirImplementation implements HapiFhir {
             return resourceParser.parseResource(clazz, fhirResource);
 
         } catch (Exception e) {
-            throw new UnableToSendOrderException("Empty body Exception", e);
+            throw new UnableToSendOrderException(
+                    "An error occurred while parsing the payload, make sure the payload is not empty and it has the correct format.",
+                    e);
         }
     }
 
