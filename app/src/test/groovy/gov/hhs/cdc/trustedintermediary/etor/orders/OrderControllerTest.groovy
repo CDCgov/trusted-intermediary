@@ -14,21 +14,35 @@ class OrderControllerTest extends Specification {
         TestApplicationContext.register(OrderController, OrderController.getInstance())
     }
 
-    def "parseOrder happy path works"() {
+    def "parseOrders happy path works"() {
         given:
-        def request = new DomainRequest()
         def controller = OrderController.getInstance()
-        def bundle = new Bundle()
-        def expected = bundle
+        def expectedBundle = new Bundle()
+
         def fhir = Mock(HapiFhir)
-        fhir.parseResource(_ as String, _ as Class) >> bundle
+        fhir.parseResource(_ as String, _ as Class) >> expectedBundle
         TestApplicationContext.register(HapiFhir, fhir)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def actual = controller.parseOrders(request).underlyingOrder
+        def actualBundle = controller.parseOrders(new DomainRequest()).underlyingOrder
 
         then:
-        actual == expected
+        actualBundle == expectedBundle
+    }
+
+    def "parseOrders throws an exception when unable to parse de request"() {
+        given:
+        def controller = OrderController.getInstance()
+        def fhir = Mock(HapiFhir)
+        fhir.parseResource(_ as String, _ as Class)  >> { throw new UnableToSendOrderException("DogCow", new NullPointerException()) }
+        TestApplicationContext.register(HapiFhir, fhir)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        controller.parseOrders(new DomainRequest())
+
+        then:
+        thrown(UnableToSendOrderException)
     }
 }
