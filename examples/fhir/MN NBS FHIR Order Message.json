@@ -210,7 +210,8 @@
         "status": "active",
         "intent": "order",
         "subject": {
-          "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2"
+          "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
+          "type": "Patient"
         },
         "requester": {
           "reference": "PractitionerRole/e3b3ff93-1c84-4b82-9a23-e26c95985bd9",
@@ -342,7 +343,8 @@
           "text": "Blood spot specimen"
         },
         "subject": {
-          "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2"
+          "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
+          "type": "Patient"
         },
         "receivedTime": "2023-05-06T06:00:00-05:00"
       }
@@ -377,7 +379,7 @@
         },
         "subject": {
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
-          "display": "BB Sarah Smith"
+          "type": "Patient"
         },
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueQuantity": {
@@ -418,7 +420,7 @@
         },
         "subject": {
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
-          "display": "BB Sarah Smith"
+          "type": "Patient"
         },
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueQuantity": {
@@ -447,7 +449,7 @@
         },
         "subject": {
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
-          "display": "BB Sarah Smith"
+          "type": "Patient"
         },
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueCodeableConcept": {
@@ -492,7 +494,7 @@
         },
         "subject": {
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
-          "display": "BB Sarah Smith"
+          "type": "Patient"
         },
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueCodeableConcept": {
@@ -537,7 +539,7 @@
         },
         "subject": {
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
-          "display": "BB Sarah Smith"
+          "type": "Patient"
         },
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueCodeableConcept": {
@@ -582,7 +584,7 @@
         },
         "subject": {
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
-          "display": "BB Sarah Smith"
+          "type": "Patient"
         },
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueCodeableConcept": {
@@ -615,7 +617,7 @@
         },
         "subject": {
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
-          "display": "BB Sarah Smith"
+          "type": "Patient"
         },
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueCodeableConcept": {
@@ -648,7 +650,7 @@
         },
         "subject": {
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
-          "display": "BB Sarah Smith"
+          "type": "Patient"
         },
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueCodeableConcept": {
@@ -681,7 +683,7 @@
         },
         "subject": {
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
-          "display": "BB Sarah Smith"
+          "type": "Patient"
         },
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueString": "0516199364"
@@ -705,7 +707,7 @@
         },
         "subject": {
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
-          "display": "BB Sarah Smith"
+          "type": "Patient"
         },
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueString": "Daniel Davis/218-555-1000"
@@ -729,7 +731,7 @@
         },
         "subject": {
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
-          "display": "BB Sarah Smith"
+          "type": "Patient"
         },
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueString": "DAVIS, DANIEL, MD"
@@ -753,7 +755,7 @@
         },
         "subject": {
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
-          "display": "BB Sarah Smith"
+          "type": "Patient"
         },
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueString": "Lakeridge Health Revere"
