@@ -23,9 +23,9 @@ public class HapiFhirImplementation implements HapiFhir {
     public <T extends IBaseResource> T parseResource(
             final String fhirResource, final Class<T> clazz) throws UnableToSendOrderException {
         IParser resourceParser = CONTEXT.newJsonParser();
+
         try {
             return resourceParser.parseResource(clazz, fhirResource);
-
         } catch (Exception e) {
             throw new UnableToSendOrderException(
                     "An error occurred while parsing the payload, make sure the payload is not empty and it has the correct format.",

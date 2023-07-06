@@ -101,8 +101,8 @@ public class EtorDomainRegistration implements DomainConnector {
     }
 
     DomainResponse handleOrders(DomainRequest request) {
-
         Order<?> orders;
+
         try {
             orders = orderController.parseOrders(request);
             sendOrderUseCase.send(orders);
