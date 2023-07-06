@@ -21,7 +21,7 @@ public class OrderController {
         return INSTANCE;
     }
 
-    public Order<?> parseOrders(DomainRequest request) {
+    public Order<?> parseOrders(DomainRequest request) throws UnableToSendOrderException {
         logger.logInfo("Parsing orders");
         var fhirBundle = fhir.parseResource(request.getBody(), Bundle.class);
         return new HapiOrder(fhirBundle);

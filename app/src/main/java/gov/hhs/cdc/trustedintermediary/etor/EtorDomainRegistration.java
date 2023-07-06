@@ -8,8 +8,10 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper;
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint;
 import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecificationException;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemographicsUsecase;
+import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
+import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse;
@@ -82,9 +84,10 @@ public class EtorDomainRegistration implements DomainConnector {
     }
 
     DomainResponse handleDemographics(DomainRequest request) {
-        var demographics = patientDemographicsController.parseDemographics(request);
+        Demographics<?> demographics;
 
         try {
+            demographics = patientDemographicsController.parseDemographics(request);
             convertAndSendDemographicsUsecase.convertAndSend(demographics);
         } catch (UnableToSendOrderException e) {
             logger.logError("Unable to convert and send demographics", e);
@@ -98,9 +101,10 @@ public class EtorDomainRegistration implements DomainConnector {
     }
 
     DomainResponse handleOrders(DomainRequest request) {
-        var orders = orderController.parseOrders(request);
 
+        Order<?> orders;
         try {
+            orders = orderController.parseOrders(request);
             sendOrderUseCase.send(orders);
         } catch (UnableToSendOrderException e) {
             logger.logError("Unable to send lab order", e);
