@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.OpenApi;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnectorConstructionException;
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper;
 import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecificationException;
 import gov.hhs.cdc.trustedintermediary.external.apache.ApacheClient;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureSecrets;
@@ -12,7 +13,8 @@ import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache;
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson;
 import gov.hhs.cdc.trustedintermediary.external.jjwt.JjwtEngine;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalSecrets;
-import gov.hhs.cdc.trustedintermediary.external.slf4j.Slf4jLogger;
+import gov.hhs.cdc.trustedintermediary.external.slf4j.DeployedLogger;
+import gov.hhs.cdc.trustedintermediary.external.slf4j.LocalLogger;
 import gov.hhs.cdc.trustedintermediary.organizations.OrganizationsSettings;
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
@@ -28,6 +30,8 @@ import java.util.Set;
 /** Creates the starting point of our API. Handles the registration of the domains. */
 public class App {
 
+    static final String HEALTH_API_ENDPOINT = "/health";
+
     public static void main(String[] args) {
         var app = Javalin.create().start(8080);
 
@@ -36,7 +40,7 @@ public class App {
         app.before(ctx -> ctx.header("X-Content-Type-Options", "nosniff"));
 
         try {
-            app.get("/health", ctx -> ctx.result("Operational"));
+            app.get(HEALTH_API_ENDPOINT, ctx -> ctx.result("Operational"));
 
             registerClasses();
             registerDomains(app);
@@ -60,7 +64,11 @@ public class App {
     }
 
     private static void registerClasses() {
-        ApplicationContext.register(Logger.class, Slf4jLogger.getLogger());
+        ApplicationContext.register(
+                Logger.class,
+                ApplicationContext.getEnvironment().equalsIgnoreCase("local")
+                        ? LocalLogger.getInstance()
+                        : DeployedLogger.getInstance());
         ApplicationContext.register(Formatter.class, Jackson.getInstance());
         ApplicationContext.register(HapiFhir.class, HapiFhirImplementation.getInstance());
         ApplicationContext.register(YamlCombiner.class, Jackson.getInstance());
@@ -68,6 +76,7 @@ public class App {
         ApplicationContext.register(HttpClient.class, ApacheClient.getInstance());
         ApplicationContext.register(AuthEngine.class, JjwtEngine.getInstance());
         ApplicationContext.register(Cache.class, KeyCache.getInstance());
+        ApplicationContext.register(DomainResponseHelper.class, DomainResponseHelper.getInstance());
         ApplicationContext.register(
                 Secrets.class,
                 ApplicationContext.getEnvironment().equalsIgnoreCase("local")

@@ -54,7 +54,8 @@ dependencies {
 
     //logging
     implementation 'org.slf4j:slf4j-api:2.0.7'
-    implementation 'org.slf4j:slf4j-simple:2.0.7' // Can be replaced with logBack, log4j, log4j2, Java Utility Logger
+    implementation 'ch.qos.logback:logback-classic:1.4.8'
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
 
     //jackson
     implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
@@ -81,10 +82,10 @@ dependencies {
     implementation 'com.azure:azure-security-keyvault-secrets:4.6.3'
     implementation 'com.azure:azure-identity:1.9.1'
 
-    testImplementation 'org.apache.groovy:groovy:4.0.12'
+    testImplementation 'org.apache.groovy:groovy:4.0.13'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
     testImplementation 'com.openpojo:openpojo:0.9.1'
-    testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.14.2'
+    testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.14.3'
 }
 
 jacoco {
@@ -130,7 +131,9 @@ tasks.named('test') {
         excludes = [
             '**/javalin/App*',
             '**/jackson/Jackson*',
-            '**/slf4j/Slf4jLogger*',
+            '**/slf4j/LocalLogger*',
+            '**/slf4j/DeployedLogger*',
+            '**/slf4j/LoggerHelper*',
             '**/hapi/HapiFhirImplementation*',
             '**/jjwt/JjwtEngine*',
             '**/apache/ApacheClient*',

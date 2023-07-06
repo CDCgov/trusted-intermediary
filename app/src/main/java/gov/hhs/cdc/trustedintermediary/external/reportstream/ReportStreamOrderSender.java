@@ -1,9 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.external.reportstream;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder;
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender;
-import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException;
+import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
+import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
+import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
@@ -22,10 +22,10 @@ import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-/** Accepts a {@link LabOrder} and sends it to ReportStream. */
-public class ReportStreamLabOrderSender implements LabOrderSender {
+/** Accepts a {@link Order} and sends it to ReportStream. */
+public class ReportStreamOrderSender implements OrderSender {
 
-    private static final ReportStreamLabOrderSender INSTANCE = new ReportStreamLabOrderSender();
+    private static final ReportStreamOrderSender INSTANCE = new ReportStreamOrderSender();
 
     private static final String RS_URL_PREFIX_PROPERTY = "REPORT_STREAM_URL_PREFIX";
     private static final String RS_WATERS_API_URL =
@@ -57,14 +57,14 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     @Inject private Secrets secrets;
     @Inject private Cache keyCache;
 
-    public static ReportStreamLabOrderSender getInstance() {
+    public static ReportStreamOrderSender getInstance() {
         return INSTANCE;
     }
 
-    private ReportStreamLabOrderSender() {}
+    private ReportStreamOrderSender() {}
 
     @Override
-    public void sendOrder(final LabOrder<?> order) throws UnableToSendLabOrderException {
+    public void sendOrder(final Order<?> order) throws UnableToSendOrderException {
         logger.logInfo("Sending the order to ReportStream at {}", RS_DOMAIN_NAME);
 
         String json = fhir.encodeResourceToJson(order.getUnderlyingOrder());
@@ -72,7 +72,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         sendRequestBody(json, bearerToken);
     }
 
-    protected String getRsToken() throws UnableToSendLabOrderException {
+    protected String getRsToken() throws UnableToSendOrderException {
         logger.logInfo("getting Report Stream token...");
         if (getRsTokenCache() != null && isValidToken()) {
             logger.logDebug("valid cache token");
@@ -95,7 +95,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
     }
 
     protected String sendRequestBody(@Nonnull String json, @Nonnull String bearerToken)
-            throws UnableToSendLabOrderException {
+            throws UnableToSendOrderException {
         logger.logInfo("Sending to payload to ReportStream");
 
         String res = "";
@@ -110,13 +110,13 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
         try {
             res = client.post(RS_WATERS_API_URL, headers, json);
         } catch (HttpClientException e) {
-            throw new UnableToSendLabOrderException("Error POSTing the payload to ReportStream", e);
+            throw new UnableToSendOrderException("Error POSTing the payload to ReportStream", e);
         }
 
         return res;
     }
 
-    protected String requestToken() throws UnableToSendLabOrderException {
+    protected String requestToken() throws UnableToSendOrderException {
         logger.logInfo("Requesting token from ReportStream");
 
         String senderToken = null;
@@ -136,7 +136,7 @@ public class ReportStreamLabOrderSender implements LabOrderSender {
             String rsResponse = client.post(RS_AUTH_API_URL, headers, body);
             token = extractToken(rsResponse);
         } catch (Exception e) {
-            throw new UnableToSendLabOrderException(
+            throw new UnableToSendOrderException(
                     "Error getting the API token from ReportStream", e);
         }
         return token;

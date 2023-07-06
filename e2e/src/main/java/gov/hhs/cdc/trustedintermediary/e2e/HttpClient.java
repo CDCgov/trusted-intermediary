@@ -13,7 +13,7 @@ import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 
 /** Mocks a client sending a request to the API * */
-public class Client {
+public class HttpClient {
 
     private static final String DEFAULT_PROTOCOL_DOMAIN = "http://localhost:8080";
     private static String protocolDomain = DEFAULT_PROTOCOL_DOMAIN;

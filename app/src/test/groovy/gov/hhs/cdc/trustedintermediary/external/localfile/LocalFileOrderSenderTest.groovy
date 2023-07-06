@@ -1,20 +1,20 @@
 package gov.hhs.cdc.trustedintermediary.external.localfile
 
+import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder
-import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException
+import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import spock.lang.Specification
 
 import java.nio.file.Files
 import java.nio.file.Paths
 
-class LocalFileLabOrderSenderTest extends Specification{
+class LocalFileOrderSenderTest extends Specification{
 
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
-        TestApplicationContext.register(LocalFileLabOrderSender, LocalFileLabOrderSender.getInstance())
+        TestApplicationContext.register(LocalFileOrderSender, LocalFileOrderSender.getInstance())
     }
 
     def "send order works"() {
@@ -25,22 +25,16 @@ class LocalFileLabOrderSenderTest extends Specification{
         def testStringOrder = "Some String"
         fhir.encodeResourceToJson(_ as String) >> testStringOrder
 
-        LabOrder<?> mockOrder = new LabOrder<String>() {
-
-                    @Override
-                    String getUnderlyingOrder() {
-                        return "Mock String Order"
-                    }
-                }
+        def mockOrder = new OrderMock(null, null, "Mock String Order")
 
         TestApplicationContext.register(HapiFhir, fhir)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        LocalFileLabOrderSender.getInstance().sendOrder(mockOrder)
+        LocalFileOrderSender.getInstance().sendOrder(mockOrder)
 
         then:
-        Files.readString(Paths.get(LocalFileLabOrderSender.LOCAL_FILE_NAME)) == testStringOrder
+        Files.readString(Paths.get(LocalFileOrderSender.LOCAL_FILE_NAME)) == testStringOrder
     }
 
     def "throws an exception when FHIR encoding does not work"() {
@@ -50,22 +44,16 @@ class LocalFileLabOrderSenderTest extends Specification{
         def nullException = new NullPointerException()
         fhir.encodeResourceToJson(_ as String) >> {String argument -> throw nullException}
 
-        LabOrder<?> mockOrder = new LabOrder<String>() {
-
-                    @Override
-                    String getUnderlyingOrder() {
-                        return " Second Mock String Order"
-                    }
-                }
+        def mockOrder = new OrderMock(null, null, "Second Mock String Order")
 
         TestApplicationContext.register(HapiFhir, fhir)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        LocalFileLabOrderSender.getInstance().sendOrder(mockOrder)
+        LocalFileOrderSender.getInstance().sendOrder(mockOrder)
 
         then:
-        def exception = thrown(UnableToSendLabOrderException)
+        def exception = thrown(UnableToSendOrderException)
         exception.getCause() == nullException
     }
 }

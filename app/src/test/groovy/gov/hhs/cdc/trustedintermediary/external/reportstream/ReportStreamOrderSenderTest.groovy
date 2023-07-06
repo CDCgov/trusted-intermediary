@@ -1,9 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.external.reportstream
 
+import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrder
-import gov.hhs.cdc.trustedintermediary.etor.demographics.LabOrderSender
-import gov.hhs.cdc.trustedintermediary.etor.demographics.UnableToSendLabOrderException
+import gov.hhs.cdc.trustedintermediary.etor.orders.Order
+import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender
+import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
 import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
@@ -21,12 +22,12 @@ import spock.lang.Specification
 
 import java.util.concurrent.ConcurrentHashMap
 
-class ReportStreamLabOrderSenderTest extends Specification {
+class ReportStreamOrderSenderTest extends Specification {
 
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
-        TestApplicationContext.register(LabOrderSender, ReportStreamLabOrderSender.getInstance())
+        TestApplicationContext.register(OrderSender, ReportStreamOrderSender.getInstance())
     }
 
     def "sendRequestBody works"() {
@@ -36,8 +37,8 @@ class ReportStreamLabOrderSenderTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        ReportStreamLabOrderSender.getInstance().sendRequestBody("message_1", "fake token")
-        ReportStreamLabOrderSender.getInstance().sendRequestBody("message_2", "fake token")
+        ReportStreamOrderSender.getInstance().sendRequestBody("message_1", "fake token")
+        ReportStreamOrderSender.getInstance().sendRequestBody("message_2", "fake token")
 
         then:
         2 * mockClient.post(_ as String, _ as Map<String, String>, _ as String) >> "200"
@@ -51,8 +52,8 @@ class ReportStreamLabOrderSenderTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        ReportStreamLabOrderSender.getInstance().sendRequestBody("message_1", "fake token")
-        ReportStreamLabOrderSender.getInstance().sendRequestBody("message_2", "fake token")
+        ReportStreamOrderSender.getInstance().sendRequestBody("message_1", "fake token")
+        ReportStreamOrderSender.getInstance().sendRequestBody("message_2", "fake token")
 
         then:
         def exception = thrown(Exception)
@@ -74,7 +75,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
         when:
         mockSecrets.getKey(_ as String) >> "Fake Azure Key"
-        def actual = ReportStreamLabOrderSender.getInstance().requestToken()
+        def actual = ReportStreamOrderSender.getInstance().requestToken()
         then:
         1 * mockAuthEngine.generateToken(_ as String, _ as String, _ as String, _ as String, 300, _ as String) >> "sender fake token"
         1 * mockClient.post(_ as String, _ as Map<String, String>, _ as String) >> """{"access_token":"${expected}", "token_type":"bearer"}"""
@@ -90,7 +91,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         def responseBody = """{"foo":"foo value", "access_token":"${expected}", "boo":"boo value"}"""
 
         when:
-        def actual = ReportStreamLabOrderSender.getInstance().extractToken(responseBody)
+        def actual = ReportStreamOrderSender.getInstance().extractToken(responseBody)
 
         then:
         actual == expected
@@ -112,7 +113,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
 
         when:
-        def actualTokenValue = ReportStreamLabOrderSender.getInstance().requestToken()
+        def actualTokenValue = ReportStreamOrderSender.getInstance().requestToken()
 
         then:
         actualTokenValue == expectedTokenValue
@@ -132,23 +133,23 @@ class ReportStreamLabOrderSenderTest extends Specification {
         clientMock.post(_ as String, _ as Map, _ as String) >> responseBody
 
         when:
-        ReportStreamLabOrderSender.getInstance().requestToken()
+        ReportStreamOrderSender.getInstance().requestToken()
 
         then:
-        def exception = thrown(UnableToSendLabOrderException)
+        def exception = thrown(UnableToSendOrderException)
         exception.getCause().getClass() == FormatterProcessingException
     }
 
     def "composeRequestBody works"() {
         given:
-        def reportStreamLabOrderSender = ReportStreamLabOrderSender.getInstance()
+        def reportStreamOrderSender = ReportStreamOrderSender.getInstance()
         def fakeToken = "rsFakeToken"
         def expected = "scope=flexion.*.report" +
                 "&grant_type=client_credentials" +
                 "&client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer" +
                 "&client_assertion=${fakeToken}"
         when:
-        def actual = reportStreamLabOrderSender.composeRequestBody(fakeToken)
+        def actual = reportStreamOrderSender.composeRequestBody(fakeToken)
         then:
         actual == expected
     }
@@ -172,16 +173,10 @@ class ReportStreamLabOrderSenderTest extends Specification {
         TestApplicationContext.register(Cache, mockCache)
         TestApplicationContext.injectRegisteredImplementations()
         mockFhir.encodeResourceToJson(_ as String) >> "Mock order"
-        LabOrder<?> mockOrder = new LabOrder<String>() {
-
-                    @Override
-                    String getUnderlyingOrder() {
-                        return "Mock order"
-                    }
-                }
+        Order<?> mockOrder = new OrderMock(null, null, "Mock order")
 
         when:
-        ReportStreamLabOrderSender.getInstance().sendOrder(mockOrder)
+        ReportStreamOrderSender.getInstance().sendOrder(mockOrder)
 
         then:
         noExceptionThrown()
@@ -197,9 +192,9 @@ class ReportStreamLabOrderSenderTest extends Specification {
         TestApplicationContext.register(Secrets, mockSecret)
         TestApplicationContext.register(Cache, keyCache)
         TestApplicationContext.injectRegisteredImplementations()
-        def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
+        def rsOrderSender = ReportStreamOrderSender.getInstance()
         when:
-        def actual = rsLabOrderSender.retrievePrivateKey()
+        def actual = rsOrderSender.retrievePrivateKey()
 
         then:
         actual == expected
@@ -213,11 +208,11 @@ class ReportStreamLabOrderSenderTest extends Specification {
         def expected = "existing fake azure key"
         TestApplicationContext.register(Cache, keyCache)
         TestApplicationContext.injectRegisteredImplementations()
-        def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
+        def rsOrderSender = ReportStreamOrderSender.getInstance()
 
         when:
         keyCache.put(key, expected)
-        def actual = rsLabOrderSender.retrievePrivateKey()
+        def actual = rsOrderSender.retrievePrivateKey()
 
         then:
         expected == actual
@@ -228,12 +223,12 @@ class ReportStreamLabOrderSenderTest extends Specification {
         def mockAuthEngine = Mock(AuthEngine)
         TestApplicationContext.register(AuthEngine, mockAuthEngine)
         mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(20, ChronoUnit.SECONDS)
-        TestApplicationContext.register(LabOrderSender, ReportStreamLabOrderSender.getInstance())
+        TestApplicationContext.register(OrderSender, ReportStreamOrderSender.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
-        ReportStreamLabOrderSender.getInstance().setRsTokenCache("our token from rs")
+        ReportStreamOrderSender.getInstance().setRsTokenCache("our token from rs")
 
         when:
-        def isValid = ReportStreamLabOrderSender.getInstance().isValidToken()
+        def isValid = ReportStreamOrderSender.getInstance().isValidToken()
 
         then:
         isValid
@@ -241,12 +236,12 @@ class ReportStreamLabOrderSenderTest extends Specification {
 
     def "rsTokenCache getter and setter works, no synchronization"() {
         given:
-        def rsLabOrderSender = ReportStreamLabOrderSender.getInstance()
+        def rsOrderSender = ReportStreamOrderSender.getInstance()
         def expected = "fake token"
 
         when:
-        rsLabOrderSender.setRsTokenCache(expected)
-        def actual = rsLabOrderSender.getRsTokenCache()
+        rsOrderSender.setRsTokenCache(expected)
+        def actual = rsOrderSender.getRsTokenCache()
 
         then:
         actual == expected
@@ -254,7 +249,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
 
     def "rsTokenCache synchronization works"() {
         given:
-        def labOrderSender = ReportStreamLabOrderSender.getInstance()
+        def orderSender = ReportStreamOrderSender.getInstance()
         def threadNums = 5
         def iterations = 25
         def table = new ConcurrentHashMap<String, Integer>()
@@ -264,7 +259,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         (1..threadNums).each { threadId ->
             threads.add(new Thread({
                 for(int i=0; i<iterations; i++) {
-                    labOrderSender.setRsTokenCache("${i}")
+                    orderSender.setRsTokenCache("${i}")
                     if (i == 24) {
                         table.put("thread"+"${threadId}", i)
                     }
@@ -276,17 +271,17 @@ class ReportStreamLabOrderSenderTest extends Specification {
         threads*.join()
 
         then:
-        labOrderSender.getRsTokenCache() == "${iterations - 1}"
+        orderSender.getRsTokenCache() == "${iterations - 1}"
         table.size() == threadNums
         table.values().toSet().size() == 1
     }
 
     def "sendRequestBody bombs out due to http exception"() {
         given:
-        def labOrderSender = ReportStreamLabOrderSender.getInstance()
+        def orderSender = ReportStreamOrderSender.getInstance()
         def mockClient = Mock(HttpClient)
         TestApplicationContext.register(HttpClient, mockClient)
-        TestApplicationContext.register(LabOrderSender, labOrderSender)
+        TestApplicationContext.register(OrderSender, orderSender)
         TestApplicationContext.injectRegisteredImplementations()
 
         mockClient.post(_ as String, _ as Map<String,String>, _ as String) >> {
@@ -294,16 +289,16 @@ class ReportStreamLabOrderSenderTest extends Specification {
         }
 
         when:
-        labOrderSender.sendRequestBody("json", "bearerToken")
+        orderSender.sendRequestBody("json", "bearerToken")
 
         then:
-        def exception = thrown(UnableToSendLabOrderException)
+        def exception = thrown(UnableToSendOrderException)
         exception.getCause().getClass() == HttpClientException
     }
 
     def "getRsToken when cache is empty"() {
         given:
-        def labOrderSender = ReportStreamLabOrderSender.getInstance()
+        def orderSender = ReportStreamOrderSender.getInstance()
         def mockClient = Mock(HttpClient)
         def mockAuthEngine = Mock(AuthEngine)
         def mockSecrets = Mock(Secrets)
@@ -313,7 +308,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         TestApplicationContext.register(HttpClient, mockClient)
         TestApplicationContext.register(Secrets, mockSecrets)
         mockSecrets.getKey(_ as String) >> "fake private key"
-        TestApplicationContext.register(LabOrderSender, labOrderSender)
+        TestApplicationContext.register(OrderSender, orderSender)
         TestApplicationContext.injectRegisteredImplementations()
 
         mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(10, ChronoUnit.SECONDS)
@@ -323,15 +318,15 @@ class ReportStreamLabOrderSenderTest extends Specification {
         mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
 
         when:
-        def token = labOrderSender.getRsToken()
+        def token = orderSender.getRsToken()
 
         then:
-        token == labOrderSender.getRsTokenCache()
+        token == orderSender.getRsTokenCache()
     }
 
     def "getRsToken when cache token is invalid"() {
         given:
-        def labOrderSender = ReportStreamLabOrderSender.getInstance()
+        def orderSender = ReportStreamOrderSender.getInstance()
         def mockClient = Mock(HttpClient)
         def mockAuthEngine = Mock(AuthEngine)
         def mockSecrets = Mock(Secrets)
@@ -341,7 +336,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         TestApplicationContext.register(HttpClient, mockClient)
         TestApplicationContext.register(Secrets, mockSecrets)
         mockSecrets.getKey(_ as String) >> "fakePrivateKey"
-        TestApplicationContext.register(LabOrderSender, labOrderSender)
+        TestApplicationContext.register(OrderSender, orderSender)
         TestApplicationContext.injectRegisteredImplementations()
 
         mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "fake token"
@@ -349,18 +344,18 @@ class ReportStreamLabOrderSenderTest extends Specification {
         mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake token")
         def responseBody = """{"foo":"foo value", "access_token":fake token, "boo":"boo value"}"""
         mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
-        labOrderSender.setRsTokenCache("Invalid Token")
+        orderSender.setRsTokenCache("Invalid Token")
 
         when:
-        def token = labOrderSender.getRsToken()
+        def token = orderSender.getRsToken()
 
         then:
-        token == labOrderSender.getRsTokenCache()
+        token == orderSender.getRsTokenCache()
     }
 
     def "getRsToken when cache token is valid"() {
         given:
-        def labOrderSender = ReportStreamLabOrderSender.getInstance()
+        def orderSender = ReportStreamOrderSender.getInstance()
         def mockClient = Mock(HttpClient)
         def mockAuthEngine = Mock(AuthEngine)
         def mockSecrets = Mock(Secrets)
@@ -370,7 +365,7 @@ class ReportStreamLabOrderSenderTest extends Specification {
         TestApplicationContext.register(HttpClient, mockClient)
         TestApplicationContext.register(Secrets, mockSecrets)
         mockSecrets.getKey(_ as String) >> "fakePrivateKey"
-        TestApplicationContext.register(LabOrderSender, labOrderSender)
+        TestApplicationContext.register(OrderSender, orderSender)
         TestApplicationContext.injectRegisteredImplementations()
 
         mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "fake token"
@@ -378,12 +373,12 @@ class ReportStreamLabOrderSenderTest extends Specification {
         mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake token")
         def responseBody = """{"foo":"foo value", "access_token":fake token, "boo":"boo value"}"""
         mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
-        labOrderSender.setRsTokenCache("valid Token")
+        orderSender.setRsTokenCache("valid Token")
 
         when:
-        def token = labOrderSender.getRsToken()
+        def token = orderSender.getRsToken()
 
         then:
-        token == labOrderSender.getRsTokenCache()
+        token == orderSender.getRsTokenCache()
     }
 }
