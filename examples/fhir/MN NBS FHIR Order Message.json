@@ -312,8 +312,7 @@
         "id": "3f55d0e9-0780-4b8d-b3b6-d0ae078af275",
         "identifier": [
           {
-            "system": "urn:oid:2.16.840.1.113883.3.37.4",
-            "value": "ST. CLOUD HOSPITAL"
+            "value": "739"
           }
         ],
         "name": "ST. CLOUD HOSPITAL"
