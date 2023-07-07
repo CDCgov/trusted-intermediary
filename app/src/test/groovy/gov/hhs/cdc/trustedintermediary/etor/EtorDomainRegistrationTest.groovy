@@ -140,7 +140,7 @@ class EtorDomainRegistrationTest extends Specification {
         def actualStatusCode = res.getStatusCode()
 
         then:
-        actualStatusCode == 400
+        actualStatusCode == expectedStatusCode
     }
 
     def "Orders endpoint happy path"() {
