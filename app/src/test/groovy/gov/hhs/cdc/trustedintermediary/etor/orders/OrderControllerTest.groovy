@@ -35,7 +35,7 @@ class OrderControllerTest extends Specification {
         given:
         def controller = OrderController.getInstance()
         def fhir = Mock(HapiFhir)
-        fhir.parseResource(_ as String, _ as Class)  >> { throw new UnableToSendOrderException("DogCow", new NullPointerException()) }
+        fhir.parseResource(_ as String, _ as Class)  >> { throw new FhirParseException("DogCow", new NullPointerException()) }
         TestApplicationContext.register(HapiFhir, fhir)
         TestApplicationContext.injectRegisteredImplementations()
 

@@ -98,7 +98,7 @@ class EtorDomainRegistrationTest extends Specification {
 
         def mockUseCase = Mock(ConvertAndSendDemographicsUsecase)
         mockUseCase.convertAndSend(_ as Demographics<?>) >> {
-            throw new UnableToSendOrderException("error", new NullPointerException())
+            throw new FhirParseException("error", new NullPointerException())
         }
         TestApplicationContext.register(ConvertAndSendDemographicsUsecase, mockUseCase)
 
@@ -159,7 +159,7 @@ class EtorDomainRegistrationTest extends Specification {
 
         def mockUseCase = Mock(SendOrderUseCase)
         mockUseCase.send(_ as Order<?>) >> {
-            throw new UnableToSendOrderException("error", new NullPointerException())
+            throw new FhirParseException("error", new NullPointerException())
         }
         TestApplicationContext.register(SendOrderUseCase, mockUseCase)
 
@@ -185,7 +185,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
 
         def mockController = Mock(OrderController)
-        mockController.parseOrders(_ as DomainRequest) >> { throw new UnableToSendOrderException("DogCow", new NullPointerException()) }
+        mockController.parseOrders(_ as DomainRequest) >> { throw new FhirParseException("DogCow", new NullPointerException()) }
         TestApplicationContext.register(OrderController, mockController)
 
         def mockResponseHelper = Mock(DomainResponseHelper)
