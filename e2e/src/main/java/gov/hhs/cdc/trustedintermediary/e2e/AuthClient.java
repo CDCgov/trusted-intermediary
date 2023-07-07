@@ -6,7 +6,7 @@ import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ContentType;
 
 public class AuthClient {
-    private static final String API_ENDPOINT = "/v1/auth";
+    private static final String API_ENDPOINT = "/v1/auth/token";
 
     public static ClassicHttpResponse authenticate(String clientId, String clientJwt)
             throws IOException {
