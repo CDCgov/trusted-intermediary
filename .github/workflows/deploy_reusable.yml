@@ -117,4 +117,4 @@ jobs:
       uses: azure/CLI@v1
       with:
         inlineScript: |
-            az storage blob sync --account-name cdcti${{ inputs.ENVIRONMENT }}docs -c '$web' -s ${{ steps.extract.outputs.destination }}
+            az storage blob sync --account-name cdcti${{ inputs.ENVIRONMENT }}{{ inputs.ENVIRONMENT == 'pr' ? github.event.number : '' }}docs -c '$web' -s ${{ steps.extract.outputs.destination }}
