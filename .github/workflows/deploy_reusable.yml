@@ -117,4 +117,10 @@ jobs:
       uses: azure/CLI@v1
       with:
         inlineScript: |
-            az storage blob sync --account-name cdcti${{ inputs.ENVIRONMENT }}${{ inputs.ENVIRONMENT == 'pr' ? github.event.number : '' }}docs -c '$web' -s ${{ steps.extract.outputs.destination }}
+          if [ "${{ inputs.ENVIRONMENT }}" == "pr" ]; then
+            MODIFIED_ENVIRONMENT=${{ inputs.ENVIRONMENT }}${{ github.event.number }}
+          else
+            MODIFIED_ENVIRONMENT=${{ inputs.ENVIRONMENT }}
+          fi
+
+          az storage blob sync --account-name cdcti${MODIFIED_ENVIRONMENT}docs -c '$web' -s ${{ steps.extract.outputs.destination }}
