@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders;
 
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
+import gov.hhs.cdc.trustedintermediary.etor.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrder;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -21,7 +22,7 @@ public class OrderController {
         return INSTANCE;
     }
 
-    public Order<?> parseOrders(DomainRequest request) throws UnableToSendOrderException {
+    public Order<?> parseOrders(DomainRequest request) throws FhirParseException {
         logger.logInfo("Parsing orders");
         var fhirBundle = fhir.parseResource(request.getBody(), Bundle.class);
         return new HapiOrder(fhirBundle);

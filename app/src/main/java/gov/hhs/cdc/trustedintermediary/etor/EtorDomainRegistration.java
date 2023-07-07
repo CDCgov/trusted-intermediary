@@ -89,6 +89,9 @@ public class EtorDomainRegistration implements DomainConnector {
         try {
             demographics = patientDemographicsController.parseDemographics(request);
             convertAndSendDemographicsUsecase.convertAndSend(demographics);
+        } catch (FhirParseException e) {
+            logger.logError("Unable to parse demographics request", e);
+            return domainResponseHelper.constructErrorResponse(400, e);
         } catch (UnableToSendOrderException e) {
             logger.logError("Unable to convert and send demographics", e);
             return domainResponseHelper.constructErrorResponse(400, e);
@@ -106,8 +109,11 @@ public class EtorDomainRegistration implements DomainConnector {
         try {
             orders = orderController.parseOrders(request);
             sendOrderUseCase.send(orders);
+        } catch (FhirParseException e) {
+            logger.logError("Unable to parse order request", e);
+            return domainResponseHelper.constructErrorResponse(400, e);
         } catch (UnableToSendOrderException e) {
-            logger.logError("Unable to send lab order", e);
+            logger.logError("Unable to convert and send order", e);
             return domainResponseHelper.constructErrorResponse(400, e);
         }
 

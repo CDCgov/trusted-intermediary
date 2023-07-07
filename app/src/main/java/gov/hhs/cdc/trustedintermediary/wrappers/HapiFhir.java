@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.wrappers;
 
-import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
+import gov.hhs.cdc.trustedintermediary.etor.FhirParseException;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 /**
@@ -11,7 +11,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 public interface HapiFhir {
 
     <T extends IBaseResource> T parseResource(String fhirResource, Class<T> clazz)
-            throws UnableToSendOrderException;
+            throws FhirParseException;
 
     String encodeResourceToJson(Object resource);
 }

@@ -2,7 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
-import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
+import gov.hhs.cdc.trustedintermediary.etor.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
@@ -21,13 +21,13 @@ public class HapiFhirImplementation implements HapiFhir {
 
     @Override
     public <T extends IBaseResource> T parseResource(
-            final String fhirResource, final Class<T> clazz) throws UnableToSendOrderException {
+            final String fhirResource, final Class<T> clazz) throws FhirParseException {
         IParser resourceParser = CONTEXT.newJsonParser();
 
         try {
             return resourceParser.parseResource(clazz, fhirResource);
         } catch (Exception e) {
-            throw new UnableToSendOrderException(
+            throw new FhirParseException(
                     "An error occurred while parsing the payload, make sure the payload is not empty and it has the correct format.",
                     e);
         }
