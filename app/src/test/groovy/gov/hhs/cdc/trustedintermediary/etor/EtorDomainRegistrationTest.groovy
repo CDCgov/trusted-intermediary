@@ -15,6 +15,7 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.Order
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase
+import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
 import spock.lang.Specification
 
 class EtorDomainRegistrationTest extends Specification {
@@ -97,7 +98,7 @@ class EtorDomainRegistrationTest extends Specification {
 
         def mockUseCase = Mock(ConvertAndSendDemographicsUsecase)
         mockUseCase.convertAndSend(_ as Demographics<?>) >> {
-            throw new FhirParseException("error", new NullPointerException())
+            throw new UnableToSendOrderException("error", new NullPointerException())
         }
         TestApplicationContext.register(ConvertAndSendDemographicsUsecase, mockUseCase)
 
@@ -158,7 +159,7 @@ class EtorDomainRegistrationTest extends Specification {
 
         def mockUseCase = Mock(SendOrderUseCase)
         mockUseCase.send(_ as Order<?>) >> {
-            throw new FhirParseException("error", new NullPointerException())
+            throw new UnableToSendOrderException("error", new NullPointerException())
         }
         TestApplicationContext.register(SendOrderUseCase, mockUseCase)
 
