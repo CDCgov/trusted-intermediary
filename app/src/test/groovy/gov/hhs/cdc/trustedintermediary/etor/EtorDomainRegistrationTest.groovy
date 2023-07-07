@@ -16,6 +16,7 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
+import gov.hhs.cdc.trustedintermediary.external.javalin.DomainsRegistration
 import spock.lang.Specification
 
 class EtorDomainRegistrationTest extends Specification {
@@ -114,6 +115,32 @@ class EtorDomainRegistrationTest extends Specification {
 
         then:
         actualStatusCode == expectedStatusCode
+    }
+
+    def "handlesDemographics throws 400 error when a FhirParseException is triggered"() {
+
+        given:
+        def expectedStatusCode = 400
+        def domainRegistration = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
+        def mockRequest = new DomainRequest()
+        def message = "Something blew up!"
+        def cause = new IllegalArgumentException()
+        def fhirParseException = new FhirParseException(message, cause)
+        def mockPatientDemographicsController = Mock(PatientDemographicsController)
+        mockPatientDemographicsController.parseDemographics(mockRequest) >> { throw fhirParseException }
+        TestApplicationContext.register(PatientDemographicsController, mockPatientDemographicsController)
+        def mockHelper = Mock(DomainResponseHelper)
+        mockHelper.constructErrorResponse(expectedStatusCode, fhirParseException) >> { new DomainResponse(expectedStatusCode)}
+        TestApplicationContext.register(DomainResponseHelper, mockHelper)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def res = domainRegistration.handleDemographics(mockRequest)
+        def actualStatusCode = res.getStatusCode()
+
+        then:
+        actualStatusCode == 400
     }
 
     def "Orders endpoint happy path"() {
