@@ -2,7 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.demographics
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
-import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
+import gov.hhs.cdc.trustedintermediary.etor.FhirParseException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
@@ -42,6 +42,6 @@ class PatientDemographicsControllerTest extends Specification {
         controller.parseDemographics(new DomainRequest())
 
         then:
-        thrown(UnableToSendOrderException)
+        thrown(FhirParseException)
     }
 }

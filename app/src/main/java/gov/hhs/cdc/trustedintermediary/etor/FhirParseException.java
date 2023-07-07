@@ -6,7 +6,7 @@ package gov.hhs.cdc.trustedintermediary.etor;
  * bundle.
  */
 public class FhirParseException extends Exception {
-    FhirParseException(String message, Throwable cause) {
+    public FhirParseException(String message, Throwable cause) {
         super(message, cause);
     }
 }

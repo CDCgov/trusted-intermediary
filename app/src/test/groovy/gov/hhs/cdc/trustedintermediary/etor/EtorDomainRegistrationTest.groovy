@@ -15,7 +15,6 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.Order
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase
-import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
 import spock.lang.Specification
 
 class EtorDomainRegistrationTest extends Specification {
