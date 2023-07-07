@@ -14,9 +14,9 @@ externalDocs:
 paths:
   /v1/etor/demographics:
     post:
-      summary: forwards demographic information to a lab
+      summary: Forwards demographic information to a lab
       requestBody:
-        description: a FHIR patient resource wrapped in a FHIR Bundle
+        description: A FHIR patient resource wrapped in a FHIR Bundle
         content:
           application/json:
             schema:
@@ -26,11 +26,17 @@ paths:
         - bearerAuthorization: [ ]
       responses:
         '200':
-          description: the demographics were sent successfully
+          description: The demographics were sent successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PatientDemographicsResponse'
+        '400':
+          description: Unable to parse demographics request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
         '401':
           description: Authentication failed due to invalid token or unknown organization
           content:
@@ -39,9 +45,9 @@ paths:
                 $ref: '#/components/schemas/UnauthorizedRequestError'
   /v1/etor/orders:
     post:
-      summary: forwards orders to a lab
+      summary: Forwards orders to a lab
       requestBody:
-        description: a FHIR order resource wrapped in a FHIR Bundle
+        description: A FHIR order resource wrapped in a FHIR Bundle
         content:
           application/json:
             schema:
@@ -51,11 +57,17 @@ paths:
         - bearerAuthorization: [ ]
       responses:
         '200':
-          description: the orders were sent successfully
+          description: The orders were sent successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrdersResponse'
+        '400':
+          description: Unable to parse order request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
         '401':
           description: Authentication failed due to invalid token or unknown organization
           content:
@@ -83,6 +95,8 @@ components:
         patientId:
           type: string
           example: MRN7465737865
+    BadRequestError:
+      description: Bad Request
     UnauthorizedRequestError:
       description: Unauthorized Request
   securitySchemes:
