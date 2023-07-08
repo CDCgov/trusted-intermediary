@@ -94,7 +94,7 @@ public class EtorDomainRegistration implements DomainConnector {
             logger.logError("Unable to parse demographics request", e);
             return domainResponseHelper.constructErrorResponse(400, e);
         } catch (UnableToSendOrderException e) {
-            logger.logError("Unable to convert and send demographics", e);
+            logger.logError("Unable to send demographics", e);
             return domainResponseHelper.constructErrorResponse(400, e);
         }
 
@@ -114,7 +114,7 @@ public class EtorDomainRegistration implements DomainConnector {
             logger.logError("Unable to parse order request", e);
             return domainResponseHelper.constructErrorResponse(400, e);
         } catch (UnableToSendOrderException e) {
-            logger.logError("Unable to convert and send order", e);
+            logger.logError("Unable to send order", e);
             return domainResponseHelper.constructErrorResponse(400, e);
         }
 
