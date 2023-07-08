@@ -2,7 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
-import gov.hhs.cdc.trustedintermediary.etor.FhirParseException;
+import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 

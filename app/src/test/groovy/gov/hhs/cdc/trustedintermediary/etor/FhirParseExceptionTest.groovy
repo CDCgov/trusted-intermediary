@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor
 
+import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException
 import spock.lang.Specification
 
 class FhirParseExceptionTest extends Specification {

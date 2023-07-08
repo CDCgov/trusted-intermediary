@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.etor;
+package gov.hhs.cdc.trustedintermediary.wrappers;
 
 /**
  * This exception class gets triggered when an exception is thrown during parsing of a fhir bundle.

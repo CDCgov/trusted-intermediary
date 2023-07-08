@@ -1,8 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.etor.demographics;
 
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
-import gov.hhs.cdc.trustedintermediary.etor.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiDemographics;
+import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import javax.inject.Inject;

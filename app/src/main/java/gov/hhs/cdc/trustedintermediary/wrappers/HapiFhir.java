@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.wrappers;
 
-import gov.hhs.cdc.trustedintermediary.etor.FhirParseException;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 /**
