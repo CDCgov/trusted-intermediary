@@ -69,6 +69,7 @@ public class ReportStreamOrderSender implements OrderSender {
 
         String json = fhir.encodeResourceToJson(order.getUnderlyingOrder());
         String bearerToken = getRsToken();
+        logger.logInfo("RS auth={}", bearerToken);
         sendRequestBody(json, bearerToken);
     }
 
@@ -110,6 +111,8 @@ public class ReportStreamOrderSender implements OrderSender {
         } catch (HttpClientException e) {
             throw new UnableToSendOrderException("Error POSTing the payload to ReportStream", e);
         }
+
+        logger.logInfo("RS response={}", res);
 
         return res;
     }
