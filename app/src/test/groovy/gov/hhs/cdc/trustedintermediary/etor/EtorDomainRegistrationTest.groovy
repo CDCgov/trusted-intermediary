@@ -16,6 +16,7 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
+import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException
 import spock.lang.Specification
 
 class EtorDomainRegistrationTest extends Specification {
@@ -103,7 +104,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.register(ConvertAndSendDemographicsUsecase, mockUseCase)
 
         def mockResponseHelper = Mock(DomainResponseHelper)
-        mockResponseHelper.constructErrorResponse(_ as Integer, _ as Exception) >> new DomainResponse(400)
+        mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as Exception) >> new DomainResponse(expectedStatusCode)
         TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
 
         TestApplicationContext.injectRegisteredImplementations()
@@ -111,6 +112,32 @@ class EtorDomainRegistrationTest extends Specification {
         when:
         def res = domainRegistration.handleDemographics(new DomainRequest())
         def actualStatusCode = res.statusCode
+
+        then:
+        actualStatusCode == expectedStatusCode
+    }
+
+    def "handlesDemographics throws 400 error when a FhirParseException is triggered"() {
+
+        given:
+        def expectedStatusCode = 400
+        def domainRegistration = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
+        def mockRequest = new DomainRequest()
+        def message = "Something blew up!"
+        def cause = new IllegalArgumentException()
+        def fhirParseException = new FhirParseException(message, cause)
+        def mockPatientDemographicsController = Mock(PatientDemographicsController)
+        mockPatientDemographicsController.parseDemographics(mockRequest) >> { throw fhirParseException }
+        TestApplicationContext.register(PatientDemographicsController, mockPatientDemographicsController)
+        def mockHelper = Mock(DomainResponseHelper)
+        mockHelper.constructErrorResponse(expectedStatusCode, fhirParseException) >> { new DomainResponse(expectedStatusCode)}
+        TestApplicationContext.register(DomainResponseHelper, mockHelper)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def res = domainRegistration.handleDemographics(mockRequest)
+        def actualStatusCode = res.getStatusCode()
 
         then:
         actualStatusCode == expectedStatusCode
@@ -164,7 +191,32 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.register(SendOrderUseCase, mockUseCase)
 
         def mockResponseHelper = Mock(DomainResponseHelper)
-        mockResponseHelper.constructErrorResponse(_ as Integer, _ as Exception) >> new DomainResponse(400)
+        mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as Exception) >> new DomainResponse(expectedStatusCode)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def res = domainRegistration.handleOrders(new DomainRequest())
+        def actualStatusCode = res.statusCode
+
+        then:
+        actualStatusCode == expectedStatusCode
+    }
+
+    def "handleOrders returns a 400 response when the request is not parseable"() {
+        given:
+        def expectedStatusCode = 400
+
+        def domainRegistration = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
+
+        def mockController = Mock(OrderController)
+        mockController.parseOrders(_ as DomainRequest) >> { throw new FhirParseException("DogCow", new NullPointerException()) }
+        TestApplicationContext.register(OrderController, mockController)
+
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as Exception) >> new DomainResponse(expectedStatusCode)
         TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
 
         TestApplicationContext.injectRegisteredImplementations()

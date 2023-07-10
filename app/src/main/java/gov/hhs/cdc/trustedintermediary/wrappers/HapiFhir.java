@@ -9,7 +9,8 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
  */
 public interface HapiFhir {
 
-    <T extends IBaseResource> T parseResource(String fhirResource, Class<T> clazz);
+    <T extends IBaseResource> T parseResource(String fhirResource, Class<T> clazz)
+            throws FhirParseException;
 
     String encodeResourceToJson(Object resource);
 }

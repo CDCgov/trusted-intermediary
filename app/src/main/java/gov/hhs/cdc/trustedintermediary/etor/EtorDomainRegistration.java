@@ -8,8 +8,10 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper;
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint;
 import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecificationException;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemographicsUsecase;
+import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
+import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse;
@@ -19,6 +21,7 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
+import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.io.IOException;
 import java.io.InputStream;
@@ -82,12 +85,16 @@ public class EtorDomainRegistration implements DomainConnector {
     }
 
     DomainResponse handleDemographics(DomainRequest request) {
-        var demographics = patientDemographicsController.parseDemographics(request);
+        Demographics<?> demographics;
 
         try {
+            demographics = patientDemographicsController.parseDemographics(request);
             convertAndSendDemographicsUsecase.convertAndSend(demographics);
+        } catch (FhirParseException e) {
+            logger.logError("Unable to parse demographics request", e);
+            return domainResponseHelper.constructErrorResponse(400, e);
         } catch (UnableToSendOrderException e) {
-            logger.logError("Unable to convert and send demographics", e);
+            logger.logError("Unable to send demographics", e);
             return domainResponseHelper.constructErrorResponse(400, e);
         }
 
@@ -98,12 +105,16 @@ public class EtorDomainRegistration implements DomainConnector {
     }
 
     DomainResponse handleOrders(DomainRequest request) {
-        var orders = orderController.parseOrders(request);
+        Order<?> orders;
 
         try {
+            orders = orderController.parseOrders(request);
             sendOrderUseCase.send(orders);
+        } catch (FhirParseException e) {
+            logger.logError("Unable to parse order request", e);
+            return domainResponseHelper.constructErrorResponse(400, e);
         } catch (UnableToSendOrderException e) {
-            logger.logError("Unable to send lab order", e);
+            logger.logError("Unable to send order", e);
             return domainResponseHelper.constructErrorResponse(400, e);
         }
 
