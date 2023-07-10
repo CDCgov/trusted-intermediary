@@ -103,7 +103,7 @@ components:
           type: string
           example: Unable to parse request
     UnauthorizedRequestError:
-      description: Unauthorized Request
+      description: Unauthorized request
       type: object
       properties:
         error:
