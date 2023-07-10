@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.e2e
 
-import org.apache.groovy.parser.antlr4.util.StringUtils
 import spock.lang.Specification
 
 import java.nio.file.Files
@@ -48,7 +47,7 @@ class OrderTest extends Specification {
 
         then:
         response.getCode() == 400
-        !StringUtils.isEmpty(parsedJsonBody.error as String)
+        !(parsedJsonBody.error as String).isEmpty()
     }
 
     def "return a 401 response when making an unauthenticated request"() {
@@ -58,6 +57,6 @@ class OrderTest extends Specification {
 
         then:
         response.getCode() == 401
-        !StringUtils.isEmpty(parsedJsonBody.error as String)
+        !(parsedJsonBody.error as String).isEmpty()
     }
 }
