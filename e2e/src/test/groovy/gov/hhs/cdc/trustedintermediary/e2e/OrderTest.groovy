@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.e2e
 
-import org.apache.hc.core5.http.io.entity.EntityUtils
+import org.apache.groovy.parser.antlr4.util.StringUtils
 import spock.lang.Specification
 
 import java.nio.file.Files
@@ -44,17 +44,20 @@ class OrderTest extends Specification {
 
         when:
         def response = orderClient.submit(invalidJsonRequest, true)
-        def responseBody = EntityUtils.toString(response.getEntity())
+        def parsedJsonBody = JsonParsing.parseContent(response)
 
         then:
         response.getCode() == 400
+        !StringUtils.isEmpty(parsedJsonBody.error as String)
     }
 
     def "return a 401 response when making an unauthenticated request"() {
         when:
         def response = orderClient.submit(labOrderJsonFileString, false)
+        def parsedJsonBody = JsonParsing.parseContent(response)
 
         then:
         response.getCode() == 401
+        !StringUtils.isEmpty(parsedJsonBody.error as String)
     }
 }

@@ -97,8 +97,18 @@ components:
           example: MRN7465737865
     BadRequestError:
       description: Bad Request
+      type: object
+      properties:
+        error:
+          type: string
+          example: Unable to parse request
     UnauthorizedRequestError:
       description: Unauthorized Request
+      type: object
+      properties:
+        error:
+          type: string
+          example: Authentication failed
   securitySchemes:
     bearerAuthorization:
       type: http
