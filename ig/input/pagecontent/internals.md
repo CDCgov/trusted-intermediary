@@ -1,6 +1,6 @@
 ### Overview
 
-The ReportStream Intermediary is microservice behind the larger ReportStream system.  This page documents some of the internals behind the microservice.
+The ReportStream Intermediary is a microservice behind the larger ReportStream system.  This page documents some of the internals behind the microservice.
 
 ### GitHub
 
