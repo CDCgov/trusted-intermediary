@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.demographics;
 
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiDemographics;
+import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import javax.inject.Inject;
@@ -25,7 +26,7 @@ public class PatientDemographicsController {
         return PATIENT_DEMOGRAPHICS_CONTROLLER;
     }
 
-    public Demographics<?> parseDemographics(DomainRequest request) {
+    public Demographics<?> parseDemographics(DomainRequest request) throws FhirParseException {
         logger.logInfo("Parsing patient demographics");
         var fhirBundle = fhir.parseResource(request.getBody(), Bundle.class);
         return new HapiDemographics(fhirBundle);

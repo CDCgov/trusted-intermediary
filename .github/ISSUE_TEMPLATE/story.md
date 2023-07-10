@@ -34,7 +34,7 @@ As a _, so that _, I need _.
     - [ ] Main README.md
     - [ ] Other READMEs in the repo
   - [ ] Threat model updated
-  - [ ] API documentation generated
+  - [ ] API documentation updated
   - [ ] Source code documentation created when the code is not self-documenting
 - [ ] Code quality tasks completed
   - [ ] Logging added where useful
