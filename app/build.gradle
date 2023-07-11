@@ -63,10 +63,10 @@ dependencies {
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.2'
 
     //fhir
-    implementation 'ca.uhn.hapi.fhir:hapi-fhir-base:6.6.1'
-    implementation 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.6.1'
-    implementation 'ca.uhn.hapi.fhir:hapi-fhir-caching-caffeine:6.6.1'
-    implementation 'ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:6.6.1'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-base:6.6.2'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.6.2'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-caching-caffeine:6.6.2'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:6.6.2'
     implementation 'org.fhir:ucum:1.0.3'
 
     // Apache Client
@@ -80,12 +80,12 @@ dependencies {
 
     // azure sdk
     implementation 'com.azure:azure-security-keyvault-secrets:4.6.3'
-    implementation 'com.azure:azure-identity:1.9.1'
+    implementation 'com.azure:azure-identity:1.9.2'
 
     testImplementation 'org.apache.groovy:groovy:4.0.13'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
     testImplementation 'com.openpojo:openpojo:0.9.1'
-    testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.14.3'
+    testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.15'
 }
 
 jacoco {

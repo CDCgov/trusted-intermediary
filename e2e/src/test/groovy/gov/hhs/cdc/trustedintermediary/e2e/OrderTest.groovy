@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.e2e
 
-import org.apache.hc.core5.http.io.entity.EntityUtils
 import spock.lang.Specification
 
 import java.nio.file.Files
@@ -26,19 +25,6 @@ class OrderTest extends Specification {
         parsedJsonBody.patientId == expectedPatientId
     }
 
-    def "bad response given for poorly formatted JSON"() {
-        given:
-        def invalidJsonRequest = labOrderJsonFileString.substring(1)
-
-        when:
-        def response = orderClient.submit(invalidJsonRequest, true)
-        def responseBody = EntityUtils.toString(response.getEntity())
-
-        then:
-        response.getCode() == 500
-        responseBody == "Server Error"
-    }
-
     def "payload file check"() {
         when:
         def response = orderClient.submit(labOrderJsonFileString, true)
@@ -51,11 +37,26 @@ class OrderTest extends Specification {
         parsedSentPayload == parsedLabOrderJsonFile
     }
 
-    def "a 401 comes from the ETOR order endpoint when unauthenticated"() {
+    def "return a 400 response when request has unexpected format"() {
+        given:
+        def invalidJsonRequest = labOrderJsonFileString.substring(1)
+
+        when:
+        def response = orderClient.submit(invalidJsonRequest, true)
+        def parsedJsonBody = JsonParsing.parseContent(response)
+
+        then:
+        response.getCode() == 400
+        !(parsedJsonBody.error as String).isEmpty()
+    }
+
+    def "return a 401 response when making an unauthenticated request"() {
         when:
         def response = orderClient.submit(labOrderJsonFileString, false)
+        def parsedJsonBody = JsonParsing.parseContent(response)
 
         then:
         response.getCode() == 401
+        !(parsedJsonBody.error as String).isEmpty()
     }
 }

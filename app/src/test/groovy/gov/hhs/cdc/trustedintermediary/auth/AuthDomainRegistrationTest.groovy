@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.auth
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
 import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException
 import spock.lang.Specification
@@ -43,8 +44,10 @@ class AuthDomainRegistrationTest extends Specification {
         def domainRegistration = new AuthDomainRegistration()
 
         def authController = Mock(AuthController)
+        def mockResponseHelper = Mock(DomainResponseHelper)
         authController.parseAuthRequest(_ as DomainRequest) >> { throw new IllegalArgumentException() }
         TestApplicationContext.register(AuthController, authController)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
         TestApplicationContext.register(AuthDomainRegistration, domainRegistration)
         TestApplicationContext.injectRegisteredImplementations()
 
@@ -52,7 +55,7 @@ class AuthDomainRegistrationTest extends Specification {
         domainRegistration.handleAuth(new DomainRequest())
 
         then:
-        1 * authController.constructResponse(400)
+        1 * mockResponseHelper.constructErrorResponse(400, _ as Exception)
     }
 
     def "handleAuth creates a 401 response when the token is invalid"() {
@@ -62,6 +65,8 @@ class AuthDomainRegistrationTest extends Specification {
         def authController = Mock(AuthController)
         def authUsecase = Mock(RequestSessionTokenUsecase)
         authUsecase.getToken(_) >> { throw new InvalidTokenException(new NullPointerException()) }
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
         TestApplicationContext.register(AuthController, authController)
         TestApplicationContext.register(RequestSessionTokenUsecase, authUsecase)
         TestApplicationContext.register(AuthDomainRegistration, domainRegistration)
@@ -71,7 +76,7 @@ class AuthDomainRegistrationTest extends Specification {
         domainRegistration.handleAuth(new DomainRequest())
 
         then:
-        1 * authController.constructResponse(401)
+        1 * mockResponseHelper.constructErrorResponse(401, _ as Exception)
     }
 
     def "handleAuth creates a 401 response when the organization is unknown"() {
@@ -82,6 +87,8 @@ class AuthDomainRegistrationTest extends Specification {
         def authUsecase = Mock(RequestSessionTokenUsecase)
         authUsecase.getToken(_) >> { throw new UnknownOrganizationException("a message") }
         TestApplicationContext.register(AuthController, authController)
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
         TestApplicationContext.register(RequestSessionTokenUsecase, authUsecase)
         TestApplicationContext.register(AuthDomainRegistration, domainRegistration)
         TestApplicationContext.injectRegisteredImplementations()
@@ -90,7 +97,7 @@ class AuthDomainRegistrationTest extends Specification {
         domainRegistration.handleAuth(new DomainRequest())
 
         then:
-        1 * authController.constructResponse(401)
+        1 * mockResponseHelper.constructErrorResponse(401, _ as Exception)
     }
 
     def "handleAuth creates a 500 response when the usecase blows up"() {
@@ -101,6 +108,8 @@ class AuthDomainRegistrationTest extends Specification {
         def authUsecase = Mock(RequestSessionTokenUsecase)
         authUsecase.getToken(_) >> { throw new NullPointerException() }
         TestApplicationContext.register(AuthController, authController)
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
         TestApplicationContext.register(RequestSessionTokenUsecase, authUsecase)
         TestApplicationContext.register(AuthDomainRegistration, domainRegistration)
         TestApplicationContext.injectRegisteredImplementations()
@@ -109,34 +118,19 @@ class AuthDomainRegistrationTest extends Specification {
         domainRegistration.handleAuth(new DomainRequest())
 
         then:
-        1 * authController.constructResponse(500)
-    }
-
-    def "handleAuth creates a 500 response when the controller can't construct a response"() {
-        given:
-        def domainRegistration = new AuthDomainRegistration()
-
-        def authController = Mock(AuthController)
-        def authUsecase = Mock(RequestSessionTokenUsecase)
-        authController.constructPayload(_, _) >> { throw new NullPointerException() }
-        TestApplicationContext.register(AuthController, authController)
-        TestApplicationContext.register(RequestSessionTokenUsecase, authUsecase)
-        TestApplicationContext.register(AuthDomainRegistration, domainRegistration)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        domainRegistration.handleAuth(new DomainRequest())
-
-        then:
-        1 * authController.constructResponse(500)
+        1 * mockResponseHelper.constructErrorResponse(500, _ as String)
     }
 
     def "handleAuth creates a 200 response when everything works fine"() {
         given:
         def domainRegistration = new AuthDomainRegistration()
+        def expectedScope = "Moof"
+        def expectedToken = "DogCow"
 
         def authController = Mock(AuthController)
         def authUsecase = Mock(RequestSessionTokenUsecase)
+        authUsecase.getToken(_ as AuthRequest) >> expectedToken
+        authController.parseAuthRequest(_ as DomainRequest) >> new AuthRequest(expectedScope, "token comes into us")
         TestApplicationContext.register(AuthController, authController)
         TestApplicationContext.register(RequestSessionTokenUsecase, authUsecase)
         TestApplicationContext.register(AuthDomainRegistration, domainRegistration)
@@ -146,6 +140,6 @@ class AuthDomainRegistrationTest extends Specification {
         domainRegistration.handleAuth(new DomainRequest())
 
         then:
-        1 * authController.constructResponse(200, _)
+        1 * authController.constructAuthenticatedResponse(expectedToken, expectedScope)
     }
 }

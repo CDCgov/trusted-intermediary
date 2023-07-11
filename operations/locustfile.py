@@ -8,7 +8,7 @@ from locust import FastHttpUser, task, events
 from locust.runners import MasterRunner
 
 HEALTH_ENDPOINT = "/health"
-AUTH_ENDPOINT = "/v1/auth"
+AUTH_ENDPOINT = "/v1/auth/token"
 DEMOGRAPHICS_ENDPOINT = "/v1/etor/demographics"
 ORDERS_ENDPOINT = "/v1/etor/orders"
 

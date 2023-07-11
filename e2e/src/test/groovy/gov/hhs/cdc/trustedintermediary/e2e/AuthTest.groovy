@@ -2,7 +2,6 @@ package gov.hhs.cdc.trustedintermediary.e2e
 
 import java.nio.file.Files
 import java.nio.file.Path
-import org.apache.hc.core5.http.io.entity.EntityUtils
 import spock.lang.Specification
 
 class AuthTest extends Specification {
@@ -16,8 +15,7 @@ class AuthTest extends Specification {
 
         then:
         response.getCode() == 200
-        def body = EntityUtils.toString(response.getEntity())
-        def responseBody = JsonParsing.parse(body)
+        def responseBody = JsonParsing.parseContent(response)
         responseBody.scope == "report-stream"
         responseBody.token_type == "bearer"
         responseBody.access_token != null
