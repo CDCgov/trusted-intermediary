@@ -1,7 +1,12 @@
 package gov.hhs.cdc.trustedintermediary.auth;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
-import gov.hhs.cdc.trustedintermediary.domainconnector.*;
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper;
+import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint;
+import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecificationException;
 import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.io.IOException;
