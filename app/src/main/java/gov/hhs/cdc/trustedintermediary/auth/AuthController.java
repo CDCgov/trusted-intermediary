@@ -2,13 +2,11 @@ package gov.hhs.cdc.trustedintermediary.auth;
 
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,11 +16,9 @@ import javax.inject.Inject;
 public class AuthController {
 
     private static final AuthController AUTH_CONTROLLER = new AuthController();
-    static final String CONTENT_TYPE_LITERAL = "Content-Type";
-    static final String APPLICATION_JSON_LITERAL = "application/json";
 
     @Inject Logger logger;
-    @Inject Formatter formatter;
+    @Inject DomainResponseHelper domainResponseHelper;
 
     private AuthController() {}
 
@@ -40,38 +36,9 @@ public class AuthController {
                 authFields.getOrDefault("client_assertion", Optional.empty()).orElse(null));
     }
 
-    public DomainResponse constructResponse(int httpStatus) {
-        return constructResponse(httpStatus, null);
-    }
-
-    public DomainResponse constructResponse(int httpStatus, String payload) {
-
-        DomainResponse response = new DomainResponse(httpStatus);
-
-        if (payload != null) {
-            response.setHeaders(Map.of(CONTENT_TYPE_LITERAL, APPLICATION_JSON_LITERAL));
-            response.setBody(payload);
-        }
-
-        return response;
-    }
-
-    public String constructPayload(AuthRequest authRequest, String token)
-            throws FormatterProcessingException {
-
-        String payloadJson;
-        String bearerToken = (token != null) ? token : "";
-
-        String scope = authRequest.scope();
-        Map<String, String> payload = new HashMap<>();
-
-        payload.put("token_type", "bearer");
-        payload.put("access_token", bearerToken);
-        payload.put("scope", scope);
-
-        payloadJson = formatter.convertToJsonString(payload);
-
-        return payloadJson;
+    public DomainResponse constructAuthenticatedResponse(String token, String client) {
+        var payload = Map.of("token_type", "bearer", "access_token", token, "scope", client);
+        return domainResponseHelper.constructOkResponse(payload);
     }
 
     protected Map<String, Optional<String>> extractFormUrlEncode(String body)

@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper;
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint;
 import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecificationException;
 import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException;
@@ -23,6 +24,7 @@ public class AuthDomainRegistration implements DomainConnector {
     static final String AUTH_API_ENDPOINT = "/v1/auth/token";
 
     @Inject AuthController authController;
+    @Inject DomainResponseHelper domainResponseHelper;
     @Inject RequestSessionTokenUsecase requestSessionTokenUsecase;
     @Inject Logger logger;
 
@@ -56,29 +58,22 @@ public class AuthDomainRegistration implements DomainConnector {
             authRequest = authController.parseAuthRequest(request);
         } catch (Exception e) {
             logger.logError("Failed to parse the request", e);
-            return authController.constructResponse(400);
+            return domainResponseHelper.constructErrorResponse(400, e);
         }
 
         var token = "";
-        var payload = "";
 
         try {
             token = requestSessionTokenUsecase.getToken(authRequest);
         } catch (InvalidTokenException | UnknownOrganizationException e) {
             logger.logError("Authentication failed", e);
-            return authController.constructResponse(401);
+            return domainResponseHelper.constructErrorResponse(401, e);
         } catch (Exception e) {
-            logger.logFatal("Bad authentication service configuration: Authentication failed", e);
-            return authController.constructResponse(500);
+            var message = "Bad authentication service configuration";
+            logger.logFatal(message, e);
+            return domainResponseHelper.constructErrorResponse(500, message);
         }
 
-        try {
-            payload = authController.constructPayload(authRequest, token);
-        } catch (Exception e) {
-            logger.logFatal("Internal formatter exception occurred", e);
-            return authController.constructResponse(500);
-        }
-
-        return authController.constructResponse(200, payload);
+        return authController.constructAuthenticatedResponse(token, authRequest.scope());
     }
 }

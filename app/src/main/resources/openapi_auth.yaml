@@ -31,8 +31,16 @@ paths:
                 $ref: '#/components/schemas/AuthResponse'
         '400':
           description: Failed to parse the authentication request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthParseFailed'
         '401':
           description: Authentication failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthFailed'
 components:
   schemas:
     AuthRequest:
@@ -56,3 +64,15 @@ components:
         scope:
           type: string
           description: client organization
+    AuthFailed:
+      type: object
+      properties:
+        error:
+          type: string
+          example: The organization DogCow is unknown
+    AuthParseFailed:
+      type: object
+      properties:
+        error:
+          type: string
+          example: 'URLDecoder: Illegal hex characters in escape (%) pattern - Error at index 0 in: \"%f\"'

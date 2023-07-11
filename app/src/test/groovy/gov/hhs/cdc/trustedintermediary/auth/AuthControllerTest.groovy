@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.auth
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
+import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
@@ -136,113 +137,22 @@ class AuthControllerTest extends Specification {
         actualRequest.jwt() == null
     }
 
-    def "constructResponse single param works"() {
+    def "constructAuthenticatedResponse has scope and token"() {
         given:
-        def controller = AuthController.getInstance()
-        def httpStatusExpected = 400
+        def expectedToken = "Clarus"
+        def expectedScope = "DogCow"
 
-        when:
-        def response = controller.constructResponse(httpStatusExpected)
-        def httpStatusActual = response.getStatusCode()
-        def bodyActual = response.getBody()
-        def headersActual = response.getHeaders()
-
-        then:
-        httpStatusActual == httpStatusExpected
-        bodyActual.isBlank()
-        headersActual.isEmpty()
-    }
-
-    def "constructResponse double param works with a payload"() {
-        given:
-        def controller = AuthController.getInstance()
-        def httpStatusExpected = 200
-        def bodyExpected = "fake payload"
-
-        when:
-        def response = controller.constructResponse(httpStatusExpected, bodyExpected)
-        def httpStatusActual = response.getStatusCode()
-        def bodyActual = response.getBody()
-        def headersActual = response.getHeaders()
-
-        then:
-        httpStatusActual == httpStatusExpected
-        bodyActual == bodyExpected
-        headersActual.get(AuthController.CONTENT_TYPE_LITERAL) == AuthController.APPLICATION_JSON_LITERAL
-    }
-
-    def "constructPayload happy path"() {
-        given:
-        def formatter = Jackson.getInstance()
-        def controller = AuthController.getInstance()
-        def scope = "fake scope"
-        def assertion = "fake assertion"
-        def authRequest = new AuthRequest(scope, assertion)
-        def token = "fake access_token"
-        def payload = """{"scope":"${scope}","access_token":"fake access_token","token_type":"bearer"}"""
-        TestApplicationContext.register(Formatter, formatter)
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def payloadActual = controller.constructPayload(authRequest, token)
-        def expected = formatter.convertJsonToObject(payload, new TypeReference<Map<String,String>>(){})
-        def actual = formatter.convertJsonToObject(payloadActual, new TypeReference<Map<String,String>>() {})
+        AuthController.getInstance().constructAuthenticatedResponse(expectedToken, expectedScope)
 
         then:
-        actual == expected
-    }
-
-    def "constructPayload when token is null"() {
-        given:
-        def formatter = Jackson.getInstance()
-        def token = null
-        def controller = AuthController.getInstance()
-        def payload = """{"access_token":"","scope":"fake","token_type":"bearer"}"""
-        def expected = formatter.convertJsonToObject(payload, new TypeReference<Map<String,String>>() {})
-        TestApplicationContext.register(Formatter, formatter)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        def payloadActual = controller.constructPayload(new AuthRequest("fake","fake"), token)
-        def actual = formatter.convertJsonToObject(payloadActual, new TypeReference<Map<String,String>>() {})
-
-        then:
-        actual == expected
-    }
-
-    def "constructPayload when token is blank"() {
-        given:
-        def formatter = Jackson.getInstance()
-        def token = " "
-        def controller = AuthController.getInstance()
-        def payload = """{"access_token":" ","scope":"fake","token_type":"bearer"}"""
-        def expected = formatter.convertJsonToObject(payload, new TypeReference<Map<String,String>>() {})
-        TestApplicationContext.register(Formatter, formatter)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        def payloadActual = controller.constructPayload(new AuthRequest("fake","fake"), token)
-        def actual = formatter.convertJsonToObject(payloadActual, new TypeReference<Map<String,String>>() {})
-
-        then:
-        actual == expected
-    }
-
-    def "constructPayload when token is empty"() {
-        given:
-        def formatter = Jackson.getInstance()
-        def token = ""
-        def controller = AuthController.getInstance()
-        def payload = """{"access_token":"","scope":"fake","token_type":"bearer"}"""
-        def expected = formatter.convertJsonToObject(payload, new TypeReference<Map<String,String>>() {})
-        TestApplicationContext.register(Formatter, formatter)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        def payloadActual = controller.constructPayload(new AuthRequest("fake","fake"), token)
-        def actual = formatter.convertJsonToObject(payloadActual, new TypeReference<Map<String,String>>() {})
-
-        then:
-        actual == expected
+        mockResponseHelper.constructOkResponse(_ as Map) >> { Map payload ->
+            assert payload.containsValue(expectedToken)
+            assert payload.containsValue(expectedScope)
+        }
     }
 }

@@ -28,3 +28,7 @@ This is a JWT for the report-stream organization that is valid and should not ex
 ### `report-stream-expired-token.jwt`
 
 This is a JWT for the report-stream organization that has expired and used for testing.
+
+### `trusted-intermediary-valid-token.jwt`
+
+This is a JWT for the trusted-intermediary organization that is valid and should not expire in the near future. It is used for testing.
