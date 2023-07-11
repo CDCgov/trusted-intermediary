@@ -27,9 +27,11 @@ class AuthTest extends Specification {
 
         when:
         def response = AuthClient.authenticate(invalidRequest, "asdf")
+        def parsedJsonBody = JsonParsing.parseContent(response)
 
         then:
         response.getCode() == 400
+        !(parsedJsonBody.error as String).isEmpty()
     }
 
     def "a 401 response is returned when invalid token"() {
@@ -38,9 +40,11 @@ class AuthTest extends Specification {
 
         when:
         def response = AuthClient.authenticate(existingClientId, invalidToken)
+        def parsedJsonBody = JsonParsing.parseContent(response)
 
         then:
         response.getCode() == 401
+        !(parsedJsonBody.error as String).isEmpty()
     }
 
     def "a 401 response is returned when unknown organization"() {
@@ -49,8 +53,10 @@ class AuthTest extends Specification {
 
         when:
         def response = AuthClient.authenticate(invalidClientId, validToken)
+        def parsedJsonBody = JsonParsing.parseContent(response)
 
         then:
         response.getCode() == 401
+        !(parsedJsonBody.error as String).isEmpty()
     }
 }
