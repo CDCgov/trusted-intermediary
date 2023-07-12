@@ -487,18 +487,6 @@
         "resourceType": "Observation",
         "id": "50cc2c82-b46f-4f17-a771-321d6444faba",
         "status": "final",
-        "category": [
-          {
-            "coding": [
-              {
-                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
-                "code": "exam",
-                "display": "Exam"
-              }
-            ],
-            "text": "Exam"
-          }
-        ],
         "code": {
           "coding": [
             {
@@ -532,18 +520,6 @@
         "resourceType": "Observation",
         "id": "1224163e-6aa2-4994-9c2a-5752ac9339c0",
         "status": "final",
-        "category": [
-          {
-            "coding": [
-              {
-                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
-                "code": "social-history",
-                "display": "Social History"
-              }
-            ],
-            "text": "Social History"
-          }
-        ],
         "code": {
           "coding": [
             {
