@@ -23,8 +23,8 @@
         },
         "eventCoding": {
           "system": "http://terminology.hl7.org/CodeSystem/v2-0003",
-          "code": "O21",
-          "display": "OML - Laboratory order"
+          "code": "O01",
+          "display": "ORM - Order message (also RDE, RDS, RGV, RAS)"
         },
         "source": {
           "name": "Epic",
@@ -88,8 +88,8 @@
           "coding": [
             {
               "system": "http://terminology.hl7.org/CodeSystem/v2-0003",
-              "code": "O21",
-              "display": "OML - Laboratory order"
+              "code": "O01",
+              "display": "ORM - Order message (also RDE, RDS, RGV, RAS)"
             }
           ]
         }
@@ -363,18 +363,6 @@
         "resourceType": "Observation",
         "id": "faa6f28d-840a-41f9-9a50-a23cf89ef84b",
         "status": "final",
-        "category": [
-          {
-            "coding": [
-              {
-                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
-                "code": "vital-signs",
-                "display": "Vital Signs"
-              }
-            ],
-            "text": "Vital Signs"
-          }
-        ],
         "code": {
           "coding": [
             {
@@ -404,18 +392,6 @@
         "resourceType": "Observation",
         "id": "aba644a3-3666-439e-b207-0693b4fce32e",
         "status": "final",
-        "category": [
-          {
-            "coding": [
-              {
-                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
-                "code": "vital-signs",
-                "display": "Vital Signs"
-              }
-            ],
-            "text": "Vital Signs"
-          }
-        ],
         "code": {
           "coding": [
             {
@@ -478,18 +454,6 @@
         "resourceType": "Observation",
         "id": "1c097524-defb-4dab-94c3-f603004ad7e3",
         "status": "final",
-        "category": [
-          {
-            "coding": [
-              {
-                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
-                "code": "social-history",
-                "display": "Social History"
-              }
-            ],
-            "text": "Social History"
-          }
-        ],
         "code": {
           "coding": [
             {
