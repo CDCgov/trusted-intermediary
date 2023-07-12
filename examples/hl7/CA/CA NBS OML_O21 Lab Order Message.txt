@@ -1,0 +1,14 @@
+MSH|^~\&|EPIC|R356|SISHIERECEIVER|SISGDSP|20220207150825|RL6240|OML^O21|121121|D|2. 5.1
+PID|||3000657^^^EPI||SURROGATEEVENT^BABYBOY|BLUEBERRY|20220203182821|M||2054- 5^Black or African American|4040 CENTRAL AVE^^PACIFIC GROVE^CA^93950||||E^ENGLISH|||||||2186-5^Not Hispanic|||A
+PD1||||1234567890^PCPLASTNAME^PCPFIRSTNAME^^^^^^^^^^NPI^^
+NK1|1|SURROGA TEEVENT^NORMA|||8315550909^^^GBS@nomail.com|||||||||||19980131|||||||||||||||||12 3-09-8555
+ORC|NW|3492201783|20035610^EPC|||||||||1518194786^RALLABANDI^SRUJANA||||||||||||12345 Hwy.^^MONTEREY^CA^93333
+OBR|1|3492201783^EPC|20035610^EPC||||20220207150719|||^TESTLASTNAME^TESTFIRSTNAME OBX|1|NM|57716-3^State printed on filter paper card [Identifier] in NBS card^LN||3477701755 OBX|2|ST|57721-3^Reason for lab test in Dried blood spot^LN||LA12421-6^Initial Screen^LN
+OBX|3|ST|67704-7^Feeding Types^LN||LA16917-9^NPO^LN
+OBX|4|ST|79566-6^Collection method - DBS^LN||LA25402-1^Heel Stick^LN
+OBX|5|ST|57713-0^Infant factors that affect newborn screening interpretation^LN||LA137-2^None^LN
+OBX|6|ST|73766-8^Place where birth occurred^LN||LA6218-7^Hospital^LN
+OBX|7|NM|57714-8^Obstetric estimation of gestational age^LN||39|wk^weeks
+OBX|8|NM|8339-4^Birthweight^LN||5555|g^gram
+OBX|9|ST|62327-2^Post-discharge provider practice address^LN||5901 Lakeside Avenue^^Richmond^CA^94804
+OBX|10|ST|62328-0^Newborn Physician Phone Number^LN||8316498788 OBX|11|ST|79569-0^RBC transfusion^LN||LA25396-5^RBC OBX|12|ST|62317-3^RBC transfusion Date^LN||20230314063821 OBX|13|ST|GDSPWOC^BABY WARD OF COURT^GDSP
