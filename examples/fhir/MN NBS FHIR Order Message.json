@@ -377,6 +377,10 @@
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
           "type": "Patient"
         },
+        "basedOn": [{
+          "reference": "ServiceRequest/742d6734-e14c-45b3-af73-f1ee919b3e19",
+          "type": "ServiceRequest"
+        }],
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueQuantity": {
           "value": 1769.859285,
@@ -406,6 +410,10 @@
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
           "type": "Patient"
         },
+        "basedOn": [{
+          "reference": "ServiceRequest/742d6734-e14c-45b3-af73-f1ee919b3e19",
+          "type": "ServiceRequest"
+        }],
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueQuantity": {
           "value": 32,
@@ -435,6 +443,10 @@
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
           "type": "Patient"
         },
+        "basedOn": [{
+          "reference": "ServiceRequest/742d6734-e14c-45b3-af73-f1ee919b3e19",
+          "type": "ServiceRequest"
+        }],
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueCodeableConcept": {
           "coding": [
@@ -468,6 +480,10 @@
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
           "type": "Patient"
         },
+        "basedOn": [{
+          "reference": "ServiceRequest/742d6734-e14c-45b3-af73-f1ee919b3e19",
+          "type": "ServiceRequest"
+        }],
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueCodeableConcept": {
           "coding": [
@@ -501,6 +517,10 @@
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
           "type": "Patient"
         },
+        "basedOn": [{
+          "reference": "ServiceRequest/742d6734-e14c-45b3-af73-f1ee919b3e19",
+          "type": "ServiceRequest"
+        }],
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueCodeableConcept": {
           "coding": [
@@ -534,6 +554,10 @@
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
           "type": "Patient"
         },
+        "basedOn": [{
+          "reference": "ServiceRequest/742d6734-e14c-45b3-af73-f1ee919b3e19",
+          "type": "ServiceRequest"
+        }],
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueCodeableConcept": {
           "coding": [
@@ -567,6 +591,10 @@
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
           "type": "Patient"
         },
+        "basedOn": [{
+          "reference": "ServiceRequest/742d6734-e14c-45b3-af73-f1ee919b3e19",
+          "type": "ServiceRequest"
+        }],
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueCodeableConcept": {
           "coding": [
@@ -600,6 +628,10 @@
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
           "type": "Patient"
         },
+        "basedOn": [{
+          "reference": "ServiceRequest/742d6734-e14c-45b3-af73-f1ee919b3e19",
+          "type": "ServiceRequest"
+        }],
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueCodeableConcept": {
           "coding": [
@@ -633,6 +665,10 @@
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
           "type": "Patient"
         },
+        "basedOn": [{
+          "reference": "ServiceRequest/742d6734-e14c-45b3-af73-f1ee919b3e19",
+          "type": "ServiceRequest"
+        }],
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueString": "0516199364"
       }
@@ -657,6 +693,10 @@
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
           "type": "Patient"
         },
+        "basedOn": [{
+          "reference": "ServiceRequest/742d6734-e14c-45b3-af73-f1ee919b3e19",
+          "type": "ServiceRequest"
+        }],
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueString": "Daniel Davis/218-555-1000"
       }
@@ -681,6 +721,10 @@
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
           "type": "Patient"
         },
+        "basedOn": [{
+          "reference": "ServiceRequest/742d6734-e14c-45b3-af73-f1ee919b3e19",
+          "type": "ServiceRequest"
+        }],
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueString": "DAVIS, DANIEL, MD"
       }
@@ -705,6 +749,10 @@
           "reference": "Patient/09a7a7cc-7456-4f09-bdf6-ebc730902fd2",
           "type": "Patient"
         },
+        "basedOn": [{
+          "reference": "ServiceRequest/742d6734-e14c-45b3-af73-f1ee919b3e19",
+          "type": "ServiceRequest"
+        }],
         "effectiveDateTime": "2023-05-06T05:00:00-05:00",
         "valueString": "Lakeridge Health Revere"
       }
