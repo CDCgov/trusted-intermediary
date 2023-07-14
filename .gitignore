@@ -10,11 +10,10 @@ bin
 # Ignore environment file
 .env
 
-# Ignore VSCode settings files
+# Ignore IDE settings files
 .vscode
-
-# Ignore JetBrains settings files
 .idea
+.fleet
 
 # Ignore macOS Finder directory config
 .DS_Store
