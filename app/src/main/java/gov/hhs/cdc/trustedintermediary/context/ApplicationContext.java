@@ -4,6 +4,7 @@
  */
 package gov.hhs.cdc.trustedintermediary.context;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -152,8 +153,8 @@ public class ApplicationContext {
 
     public static String getEnvironment() {
         Dotenv dotenv = Dotenv.load();
+        String environment = dotenv.get("ENV");
 
-        String environment = getProperty("ENV");
         if (environment == null || environment.isEmpty()) {
             return "local";
         }
