@@ -151,6 +151,8 @@ public class ApplicationContext {
     }
 
     public static String getEnvironment() {
+        Dotenv dotenv = Dotenv.load();
+
         String environment = getProperty("ENV");
         if (environment == null || environment.isEmpty()) {
             return "local";

@@ -45,6 +45,9 @@ java {
 }
 
 dependencies {
+
+    implementation 'io.github.cdimascio:dotenv-java:3.0.0' // Replace with the latest version available
+
     implementation 'io.javalin:javalin:5.6.1'
 
     implementation 'org.reflections:reflections:0.10.2'
