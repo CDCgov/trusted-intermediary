@@ -92,6 +92,9 @@ the swarm parameters for the test and the local url where the app is running
 
 ### Deploying
 
+### Environment Configurations
+A .env file can be used for easier setup. The `.env.example` file (located in the  root) can be copied to `app/` as '.env' with the appropriate values entered.
+
 #### Initial Azure and GitHub Configuration
 
 There is minimal set-up to do to get Terraform squared away before you can run the Terraform commands in
