@@ -25,6 +25,8 @@ public class ApplicationContext {
     protected static final Map<Class<?>, Object> OBJECT_MAP = new ConcurrentHashMap<>();
     protected static final Set<Object> IMPLEMENTATIONS = new HashSet<>();
 
+    protected static Dotenv dotenv = Dotenv.load();
+
     protected ApplicationContext() {}
 
     public static void register(Class<?> clazz, Object implementation) {
@@ -148,13 +150,11 @@ public class ApplicationContext {
     }
 
     public static String getProperty(String key) {
-        return System.getenv(key);
+        return dotenv.get(key);
     }
 
     public static String getEnvironment() {
-        Dotenv dotenv = Dotenv.load();
         String environment = dotenv.get("ENV");
-
         if (environment == null || environment.isEmpty()) {
             return "local";
         }
