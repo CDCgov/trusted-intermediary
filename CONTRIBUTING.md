@@ -42,3 +42,7 @@ to merge a pull request, it must:
 - Receive a +1 from a majority of team members associated with the request.
   If there is significant dissent between the team, a meeting will be held to
   discuss a plan of action for the pull request.
+
+## Commit Signing
+
+Create a master key.  This can be your signing key or not.
