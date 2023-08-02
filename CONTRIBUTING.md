@@ -57,14 +57,18 @@ brew install gnupg
 
 ### Create a Signing Key
 
-Follow the steps outlined on [GitHub's documentation for generating a GPG key](https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key) but with the following modifications.
+Follow the steps outlined on [GitHub's documentation for generating a GPG key](https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key), but consider the following.
 
-When it asks for what kind of key you want, pick `RSA (sign only)` (which is commonly option 4).
-
-When it asks for what key size you want, enter in `4096`.
+- When it asks for what kind of key you want, pick `RSA (sign only)` (which is commonly option 4).
+- When it asks for what key size you want, enter in `4096`.
 
 ### Add the Key to GitHub
 
 ### Set-up Git to Sign Commits
+
+Follow just the GPG key steps outlined on [GitHub's documentation for adding your GPG key](https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key), but consider the following.
+
+- When running the `git config` commands, you may not want to use `--global` unless you want the settings to apply to all your cloned git repositories, even ones that aren't from GitHub.
+- You will only need to install and configure a GUI PIN entry program (for example, `pinentry-mac`) if you don't do your commits in a terminal.  For example, a non-terminal, GUI interface in your IDE or the GitHub application.
 
 ### (Optional) Move the Sub Key to a YubiKey
