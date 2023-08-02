@@ -45,18 +45,26 @@ to merge a pull request, it must:
 
 ## Commit Signing
 
-[Signing your commits](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits) ensures that you truly authored them.  Technically, there is nothing built into `git` that stops me from changing my git author information to be a forgery of yours and making commits that look like they came from you.  Commit signing rely on PKI which is incredibly hard to break.
+[Signing your commits](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits) ensures that you truly authored them.  Technically, there is nothing built into `git` that stops me from changing my git author information to be a forgery of yours and making commits that look like they came from you.  Commit signing relies on PKI which is incredibly hard to break.
 
 ### Prerequsites
 
-You need to install GPG.  If you are on a Mac, you can do this easily with Brew.
+You need to install GPG.  If you are on a Mac, you can do this easily with [Brew](https://brew.sh).
 
-```commandline
+```shell
 brew install gnupg
 ```
 
-### Create an Ultimate Key
+### Create a Signing Key
 
-### Create a Sub Key
+Follow the steps outlined on [GitHub's documentation for generating a GPG key](https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key) but with the following modifications.
+
+When it asks for what kind of key you want, pick `RSA (sign only)` (which is commonly option 4).
+
+When it asks for what key size you want, enter in `4096`.
+
+### Add the Key to GitHub
+
+### Set-up Git to Sign Commits
 
 ### (Optional) Move the Sub Key to a YubiKey
