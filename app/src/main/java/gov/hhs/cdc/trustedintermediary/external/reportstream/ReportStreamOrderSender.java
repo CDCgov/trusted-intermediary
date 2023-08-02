@@ -73,7 +73,7 @@ public class ReportStreamOrderSender implements OrderSender {
         logRsSubmissionId(rsResponseBody);
     }
 
-    private void logRsSubmissionId(String rsResponseBody) {
+    protected void logRsSubmissionId(String rsResponseBody) {
         try {
             var rsResponse =
                     formatter.convertJsonToObject(
