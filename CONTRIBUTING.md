@@ -50,6 +50,9 @@ ensures that you truly authored them.  Technically, there is nothing built into 
 git author information to be a forgery of yours and making commits that look like they came from you.  Commit signing
 relies on PKI which is incredibly hard to break.
 
+There are many permutations on the steps below if you want a more complex set-up.  For example, sub keys, different
+capabilities, and different key types.  This guide does not go into those intricacies.
+
 ### Prerequsites
 
 You need to install GPG.  If you are on a Mac, you can do this easily with [Brew](https://brew.sh).
