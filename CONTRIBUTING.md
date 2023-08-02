@@ -64,9 +64,11 @@ Follow the steps outlined on [GitHub's documentation for generating a GPG key](h
 
 ### Add the Key to GitHub
 
+Follow the steps outlined on [GitHub's documentation for adding your GPG key](https://docs.github.com/en/authentication/managing-commit-signature-verification/adding-a-gpg-key-to-your-github-account).
+
 ### Set-up Git to Sign Commits
 
-Follow just the GPG key steps outlined on [GitHub's documentation for adding your GPG key](https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key), but consider the following.
+Follow just the GPG key steps outlined on [GitHub's documentation for configuring git with your signing key](https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key), but consider the following.
 
 - When running the `git config` commands, you may not want to use `--global` unless you want the settings to apply to all your cloned git repositories, even ones that aren't from GitHub.
 - You will only need to install and configure a GUI PIN entry program (for example, `pinentry-mac`) if you don't do your commits in a terminal.  For example, a non-terminal, GUI interface in your IDE or the GitHub application.
