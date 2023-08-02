@@ -61,6 +61,7 @@ Follow the steps outlined on [GitHub's documentation for generating a GPG key](h
 
 - When it asks for what kind of key you want, pick `RSA (sign only)` (which is commonly option 4).
 - When it asks for what key size you want, enter in `4096`.
+- Remember the password you set!
 
 ### Add the Key to GitHub
 
@@ -73,4 +74,11 @@ Follow just the GPG key steps outlined on [GitHub's documentation for configurin
 - When running the `git config` commands, you may not want to use `--global` unless you want the settings to apply to all your cloned git repositories, even ones that aren't from GitHub.
 - You will only need to install and configure a GUI PIN entry program (for example, `pinentry-mac`) if you don't do your commits in a terminal.  For example, a non-terminal, GUI interface in your IDE or the GitHub application.
 
-### (Optional) Move the Sub Key to a YubiKey
+### (Optional) Move the Key to a YubiKey
+
+Following these steps will result in your YubiKey holding your signing key.  This will require your YubiKey to be plugged-in whenever you make a commit.  You will no longer need to remember the password for the key but instead need to enter the YubiKey PIN from time to time.
+
+Follow the steps outlined on [asdf](https://github.com/drduh/YubiKey-Guide#configure-smartcard), but consider the following.
+
+- There's no need to set the information on the YubiKey like the name, lang, or login.
+- If you've followed this process, there is just the ultimate key to move over, not any sub keys.  You'll only move over the ultimate key to the signature key (not encryption, not authentication) part of the YubiKey.
