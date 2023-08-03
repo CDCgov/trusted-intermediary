@@ -166,7 +166,7 @@ class ReportStreamOrderSenderTest extends Specification {
         TestApplicationContext.register(Secrets, mockSecrets)
 
         def mockClient = Mock(HttpClient)
-        mockClient.post(_ as String, _ as Map, _ as String) >> """{"submissionId": "fake-id"}"""
+        mockClient.post(_ as String, _ as Map, _ as String) >> """{"submissionId": "fake-id", "key": "value"}"""
         TestApplicationContext.register(HttpClient, mockClient)
 
         def mockFhir = Mock(HapiFhir)
@@ -174,10 +174,8 @@ class ReportStreamOrderSenderTest extends Specification {
         TestApplicationContext.register(HapiFhir, mockFhir)
 
         def mockFormatter = Mock(Formatter)
-        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake-token")  >> new ReportStreamSubmissionResponse("fake-id")
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake-token")  >> Map.of("submissionId", "fake-id")
         TestApplicationContext.register(Formatter, mockFormatter)
-
-        TestApplicationContext.register(ReportStreamSubmissionResponse, ReportStreamSubmissionResponse.class)
 
         def mockCache = Mock(Cache)
         TestApplicationContext.register(Cache, mockCache)
@@ -401,11 +399,9 @@ class ReportStreamOrderSenderTest extends Specification {
     def "logRsSubmissionId logs submissionId if convertJsonToObject is successful"() {
         given:
         def mockSubmissionId = "fake-id"
-        def mockResponseBody = """{"submissionId": ${mockSubmissionId}}"""
+        def mockResponseBody = """{"submissionId": "${mockSubmissionId}", "key": "value"}"""
 
-        def mockFormatter = Mock(Formatter)
-        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> new ReportStreamSubmissionResponse(mockSubmissionId)
-        TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
 
         def mockLogger = Mock(Logger)
         TestApplicationContext.register(Logger, mockLogger)
@@ -421,7 +417,7 @@ class ReportStreamOrderSenderTest extends Specification {
 
     def "logRsSubmissionId logs error if convertJsonToObject fails"() {
         given:
-        def mockResponseBody = '{"submissionId": "fake-id"}'
+        def mockResponseBody = '{"submissionId": "fake-id", "key": "value"}'
         def exception = new FormatterProcessingException("couldn't convert json", new Exception())
 
         def mockFormatter = Mock(Formatter)

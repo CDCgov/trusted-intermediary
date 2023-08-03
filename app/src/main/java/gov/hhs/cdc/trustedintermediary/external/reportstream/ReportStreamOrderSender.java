@@ -77,10 +77,10 @@ public class ReportStreamOrderSender implements OrderSender {
         try {
             var rsResponse =
                     formatter.convertJsonToObject(
-                            rsResponseBody, new TypeReference<ReportStreamSubmissionResponse>() {});
+                            rsResponseBody, new TypeReference<Map<String, Object>>() {});
             logger.logInfo(
                     "Order successfully sent, ReportStream submissionId={}",
-                    rsResponse.submissionId());
+                    rsResponse.get("submissionId"));
         } catch (FormatterProcessingException e) {
             logger.logError("Unable to log RS response", e);
         }
