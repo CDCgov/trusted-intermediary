@@ -19,7 +19,6 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
-import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -64,7 +63,8 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(SendOrderUseCase.class, SendOrderUseCase.getInstance());
 
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
-            ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
+            // ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
+            ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
         } else {
             ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
         }
