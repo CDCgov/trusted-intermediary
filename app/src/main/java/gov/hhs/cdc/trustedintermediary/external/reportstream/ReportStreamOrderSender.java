@@ -68,8 +68,8 @@ public class ReportStreamOrderSender implements OrderSender {
         logger.logInfo("Sending the order to ReportStream at {}", RS_DOMAIN_NAME);
 
         String json = fhir.encodeResourceToJson(order.getUnderlyingOrder());
-        String bearerToken = getRsToken();
-        sendRequestBody(json, bearerToken);
+        //        String bearerToken = getRsToken();
+        sendRequestBody(json, "");
     }
 
     protected String getRsToken() throws UnableToSendOrderException {
@@ -100,13 +100,7 @@ public class ReportStreamOrderSender implements OrderSender {
 
         String res = "";
         Map<String, String> headers =
-                Map.of(
-                        "Authorization",
-                        "Bearer " + bearerToken,
-                        "client",
-                        CLIENT_NAME,
-                        "Content-Type",
-                        "application/fhir+ndjson");
+                Map.of("client", CLIENT_NAME, "Content-Type", "application/fhir+ndjson");
         try {
             res = client.post(RS_WATERS_API_URL, headers, json);
         } catch (HttpClientException e) {

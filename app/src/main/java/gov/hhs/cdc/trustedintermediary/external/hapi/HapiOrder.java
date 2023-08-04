@@ -1,8 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
+import java.util.stream.Collectors;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Patient;
 
 /**
@@ -14,6 +16,12 @@ public class HapiOrder implements Order<Bundle> {
     private final Bundle innerOrder;
 
     public HapiOrder(Bundle innerOrder) {
+        var messageHeader =
+                HapiHelper.resourcesInBundle(innerOrder, MessageHeader.class)
+                        .collect(Collectors.toList())
+                        .get(0);
+        messageHeader.getEventCoding().setCode("O21");
+
         this.innerOrder = innerOrder;
     }
 
