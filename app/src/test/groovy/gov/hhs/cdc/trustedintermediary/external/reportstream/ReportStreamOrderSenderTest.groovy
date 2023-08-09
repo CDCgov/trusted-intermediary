@@ -2,13 +2,13 @@ package gov.hhs.cdc.trustedintermediary.external.reportstream
 
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.orders.Order
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
 import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
@@ -155,28 +155,35 @@ class ReportStreamOrderSenderTest extends Specification {
     }
 
     def "send order works"() {
-
         given:
+        def orderSender = ReportStreamOrderSender.getInstance()
+        TestApplicationContext.register(OrderSender, orderSender)
+
         def mockAuthEngine = Mock(AuthEngine)
-        def mockSecrets = Mock(Secrets)
-        def mockClient = Mock(HttpClient)
-        def mockFhir = Mock(HapiFhir)
-        def mockFormatter = Mock(Formatter)
-        def mockCache = Mock(Cache)
-        mockClient.post(_ as String, _ as Map, _ as String) >> "something"
-        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake-token")
-        TestApplicationContext.register(Secrets, mockSecrets)
         TestApplicationContext.register(AuthEngine, mockAuthEngine)
+
+        def mockSecrets = Mock(Secrets)
+        TestApplicationContext.register(Secrets, mockSecrets)
+
+        def mockClient = Mock(HttpClient)
+        mockClient.post(_ as String, _ as Map, _ as String) >> """{"submissionId": "fake-id", "key": "value"}"""
         TestApplicationContext.register(HttpClient, mockClient)
-        TestApplicationContext.register(HapiFhir, mockFhir)
-        TestApplicationContext.register(Formatter, mockFormatter)
-        TestApplicationContext.register(Cache, mockCache)
-        TestApplicationContext.injectRegisteredImplementations()
+
+        def mockFhir = Mock(HapiFhir)
         mockFhir.encodeResourceToJson(_ as String) >> "Mock order"
-        Order<?> mockOrder = new OrderMock(null, null, "Mock order")
+        TestApplicationContext.register(HapiFhir, mockFhir)
+
+        def mockFormatter = Mock(Formatter)
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake-token")  >> Map.of("submissionId", "fake-id")
+        TestApplicationContext.register(Formatter, mockFormatter)
+
+        def mockCache = Mock(Cache)
+        TestApplicationContext.register(Cache, mockCache)
+
+        TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        ReportStreamOrderSender.getInstance().sendOrder(mockOrder)
+        ReportStreamOrderSender.getInstance().sendOrder(new OrderMock(null, null, "Mock order"))
 
         then:
         noExceptionThrown()
@@ -356,29 +363,76 @@ class ReportStreamOrderSenderTest extends Specification {
     def "getRsToken when cache token is valid"() {
         given:
         def orderSender = ReportStreamOrderSender.getInstance()
-        def mockClient = Mock(HttpClient)
-        def mockAuthEngine = Mock(AuthEngine)
-        def mockSecrets = Mock(Secrets)
-        def mockFormatter = Mock(Formatter)
-        TestApplicationContext.register(Formatter, mockFormatter)
-        TestApplicationContext.register(AuthEngine, mockAuthEngine)
-        TestApplicationContext.register(HttpClient, mockClient)
-        TestApplicationContext.register(Secrets, mockSecrets)
-        mockSecrets.getKey(_ as String) >> "fakePrivateKey"
+        orderSender.setRsTokenCache("valid Token")
         TestApplicationContext.register(OrderSender, orderSender)
-        TestApplicationContext.injectRegisteredImplementations()
 
+        def mockFormatter = Mock(Formatter)
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake token")
+        TestApplicationContext.register(Formatter, mockFormatter)
+
+        def mockLogFormatter = Mock(Formatter)
+        mockLogFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> null
+        TestApplicationContext.register(Formatter, mockLogFormatter)
+
+        def mockAuthEngine = Mock(AuthEngine)
         mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "fake token"
         mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(25, ChronoUnit.SECONDS)
-        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake token")
-        def responseBody = """{"foo":"foo value", "access_token":fake token, "boo":"boo value"}"""
-        mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
-        orderSender.setRsTokenCache("valid Token")
+        TestApplicationContext.register(AuthEngine, mockAuthEngine)
+
+        def mockClient = Mock(HttpClient)
+        mockClient.post(_ as String, _ as Map, _ as String) >> """{"foo":"foo value", "access_token":fake token, "boo":"boo value"}"""
+        TestApplicationContext.register(HttpClient, mockClient)
+
+        def mockSecrets = Mock(Secrets)
+        mockSecrets.getKey(_ as String) >> "fakePrivateKey"
+        TestApplicationContext.register(Secrets, mockSecrets)
+
+        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         def token = orderSender.getRsToken()
 
         then:
         token == orderSender.getRsTokenCache()
+    }
+
+    def "logRsSubmissionId logs submissionId if convertJsonToObject is successful"() {
+        given:
+        def mockSubmissionId = "fake-id"
+        def mockResponseBody = """{"submissionId": "${mockSubmissionId}", "key": "value"}"""
+
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+
+        def mockLogger = Mock(Logger)
+        TestApplicationContext.register(Logger, mockLogger)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        ReportStreamOrderSender.getInstance().logRsSubmissionId(mockResponseBody)
+
+        then:
+        1 * mockLogger.logInfo(_ as String, mockSubmissionId)
+    }
+
+    def "logRsSubmissionId logs error if convertJsonToObject fails"() {
+        given:
+        def mockResponseBody = '{"submissionId": "fake-id", "key": "value"}'
+        def exception = new FormatterProcessingException("couldn't convert json", new Exception())
+
+        def mockFormatter = Mock(Formatter)
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> { throw exception }
+        TestApplicationContext.register(Formatter, mockFormatter)
+
+        def mockLogger = Mock(Logger)
+        TestApplicationContext.register(Logger, mockLogger)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        ReportStreamOrderSender.getInstance().logRsSubmissionId(mockResponseBody)
+
+        then:
+        1 * mockLogger.logError(_ as String, exception)
     }
 }
