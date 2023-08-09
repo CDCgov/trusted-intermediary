@@ -69,19 +69,31 @@ public class ReportStreamOrderSender implements OrderSender {
 
         String json = fhir.encodeResourceToJson(order.getUnderlyingOrder());
         String bearerToken = getRsToken();
-        sendRequestBody(json, bearerToken);
+        String rsResponseBody = sendRequestBody(json, bearerToken);
+        logRsSubmissionId(rsResponseBody);
+    }
+
+    protected void logRsSubmissionId(String rsResponseBody) {
+        try {
+            var rsResponse =
+                    formatter.convertJsonToObject(
+                            rsResponseBody, new TypeReference<Map<String, Object>>() {});
+            logger.logInfo(
+                    "Order successfully sent, ReportStream submissionId={}",
+                    rsResponse.get("submissionId"));
+        } catch (FormatterProcessingException e) {
+            logger.logError("Unable to log RS response", e);
+        }
     }
 
     protected String getRsToken() throws UnableToSendOrderException {
-        logger.logInfo("getting Report Stream token...");
+        logger.logInfo("Looking up ReportStream token");
         if (getRsTokenCache() != null && isValidToken()) {
             logger.logDebug("valid cache token");
             return getRsTokenCache();
         }
 
-        logger.logDebug("requesting a new token...");
         String token = requestToken();
-        logger.logDebug("token request successful");
         setRsTokenCache(token);
 
         return token;
@@ -96,7 +108,7 @@ public class ReportStreamOrderSender implements OrderSender {
 
     protected String sendRequestBody(@Nonnull String json, @Nonnull String bearerToken)
             throws UnableToSendOrderException {
-        logger.logInfo("Sending to payload to ReportStream");
+        logger.logInfo("Sending payload to ReportStream");
 
         String res = "";
         Map<String, String> headers =
