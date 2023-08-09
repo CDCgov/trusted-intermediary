@@ -30,7 +30,7 @@ class DemographicsTest extends Specification {
         when:
         def response = demographicsClient.submit(newbornPatientJsonFileString, true)
         def parsedResponseBody = JsonParsing.parseContent(response)
-        def sentPayload = SentPayloadReader.read()
+        def sentPayload = Files.readString(Path.of("..", "examples", "fhir/lab_order.json"))
         def parsedSentPayload = JsonParsing.parse(sentPayload)
 
         then:
