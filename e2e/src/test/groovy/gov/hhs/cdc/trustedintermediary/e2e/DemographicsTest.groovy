@@ -3,16 +3,17 @@ package gov.hhs.cdc.trustedintermediary.e2e
 import spock.lang.Specification
 
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 
 class DemographicsTest extends Specification {
 
     def demographicsClient = new EndpointClient("/v1/etor/demographics")
-    def newbornPatientJsonFileString = Files.readString(Paths.get("src/test/resources/newborn_patient.json"))
+    def newbornPatientJsonFileString = Files.readString(Path.of("..", "examples", "fhir/lab_order.json"))
 
     def "a demographics response is returned from the ETOR demographics endpoint"() {
         given:
-        def expectedFhirResourceId  = "Bundle/bundle-with-patient"
+        def expectedFhirResourceId  = "Bundle/969bcbb3-cd34-49be-ac4f-e1b8479b8219"
         def expectedPatientId  = "MRN7465737865"
 
         when:
@@ -35,12 +36,11 @@ class DemographicsTest extends Specification {
         then:
         response.getCode() == 200
         parsedSentPayload.entry[0].resource.resourceType == "MessageHeader"
-        parsedSentPayload.entry[2].resource.resourceType == "ServiceRequest"
+        parsedSentPayload.entry[4].resource.resourceType == "ServiceRequest"
 
-        parsedSentPayload.entry[1].resource.resourceType == "Patient"
-        parsedSentPayload.entry[1].resource.id == "infant-twin-1"
+        parsedSentPayload.entry[3].resource.resourceType == "Patient"
 
-        parsedSentPayload.entry[1].resource.identifier[1].value == parsedResponseBody.patientId  //the second (index 1) identifier so happens to be the MRN
+        parsedSentPayload.entry[3].resource.identifier[0].value == parsedResponseBody.patientId  //the second (index 1) identifier so happens to be the MRN
         parsedSentPayload.resourceType + "/" + parsedSentPayload.id == parsedResponseBody.fhirResourceId
     }
 

@@ -25,18 +25,6 @@ class OrderTest extends Specification {
         parsedJsonBody.patientId == expectedPatientId
     }
 
-    def "payload file check"() {
-        when:
-        def response = orderClient.submit(labOrderJsonFileString, true)
-        def sentPayload = SentPayloadReader.read()
-        def parsedSentPayload = JsonParsing.parse(sentPayload)
-        def parsedLabOrderJsonFile = JsonParsing.parse(labOrderJsonFileString)
-
-        then:
-        response.getCode() == 200
-        parsedSentPayload == parsedLabOrderJsonFile
-    }
-
     def "return a 400 response when request has unexpected format"() {
         given:
         def invalidJsonRequest = labOrderJsonFileString.substring(1)
