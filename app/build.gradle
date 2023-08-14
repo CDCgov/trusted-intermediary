@@ -67,7 +67,7 @@ dependencies {
     implementation 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.6.2'
     implementation 'ca.uhn.hapi.fhir:hapi-fhir-caching-caffeine:6.6.2'
     implementation 'ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:6.6.2'
-    implementation 'org.fhir:ucum:1.0.3'
+    implementation 'org.fhir:ucum:1.0.7'
 
     // Apache Client
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
