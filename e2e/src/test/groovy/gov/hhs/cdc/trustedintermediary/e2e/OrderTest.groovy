@@ -8,7 +8,7 @@ import java.nio.file.Paths
 class OrderTest extends Specification {
 
     def orderClient = new EndpointClient("/v1/etor/orders")
-    def labOrderJsonFileString = Files.readString(Paths.get("src/test/resources/lab_order.json"))
+    def labOrderJsonFileString = Files.readString(Paths.get("../examples/fhir/lab_order.json"))
 
     def "an order response is returned from the ETOR order endpoint"() {
         given:
