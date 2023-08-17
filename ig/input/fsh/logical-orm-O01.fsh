@@ -1,19 +1,18 @@
-// defines the ADT-01 input that is expected for newborn screening
+// defines the OORM-O01 (loosely) input that is expected for newborn screening
 
-Logical: ORM01
-Id: orm-01-logical-model
-Title: "ORM-01"
-Description: "The expected input for the demographic data for the newborn screening ETOR workflow"
-* MSH 1..1 SU MSHSegment "MSH segment"
-* EVN 1..1 SU EVNSegment "EVN segment"
-* PID 1..1 SU PIDSegment "PID segment"
-*
-* messageString 0..1 SU string "the full message as delimeted text"
+Logical: ORMO01
+Id: orm-O01-logical-model
+Title: "ORM-O01"
+Description: "The expected input from a hospital for the newborn screening ETOR workflow"
+* MSH 1..1 SU ORM-MSHSegment "ORM-MSH segment"
+* PID 1..1 SU ORM-PIDSegment "ORM-PID segment"
 
-Logical: MSHSegment
-Id: segment-msh-logical-model
-Title: "MSH Segment"
-Description: "The MSH Segment"
+
+
+Logical: ORM-MSHSegment
+Id: segment-orm-msh-logical-model
+Title: "ORM-MSH Segment"
+Description: "The ORM-MSH Segment"
 * segmentType 1..1 SU string "MSH"
 * delimeters 1..1 SU string "The delimeters for the message"
 * sendingApplication 1..1 SU string "The sending application"
@@ -28,11 +27,10 @@ Description: "The MSH Segment"
 * versionId 1..1 SU string "the HL7 version of this message"
 // there are other optional fields we might want to define
 
-
-Logical: PIDSegment
-Id: segment-pid-logical-model
-Title: "PID Segment"
-Description: "The PID Segment"
+Logical: ORM-PIDSegment
+Id: segment-orm-pid-logical-model
+Title: "ORM-PID Segment"
+Description: "The ORM-PID Segment"
 * segmentType 1..1 SU string "PID"
 * setId 1..1 SU string "a sequence number"
 * patientId 0..1 SU string "a patient id (retained for backward compatibility, but should be blank"
@@ -54,3 +52,10 @@ Description: "The PID Segment"
 * patientAccountNumber 1..1 SU string "patient account number"
 * ssn 0..1 SU string "retained for backward compatibility"
 // other optional fields
+
+//Logical: ORM-ORCSegment
+//Id: segment-orm-orc-logical-model
+//Title: "ORM-ORC Segment"
+//Description: "The ORM-ORC Segment"
+
+// there are other optional fields we might want to define
