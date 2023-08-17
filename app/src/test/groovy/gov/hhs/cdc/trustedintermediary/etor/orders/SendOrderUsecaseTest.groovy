@@ -15,8 +15,10 @@ class SendOrderUsecaseTest extends Specification {
     def "send sends successfully"() {
         given:
         def mockOrder = new OrderMock(null, null, null)
+        def mockConverter = Mock(OrderConverter)
         def mockSender = Mock(OrderSender)
 
+        TestApplicationContext.register(OrderConverter, mockConverter)
         TestApplicationContext.register(OrderSender, mockSender)
         TestApplicationContext.injectRegisteredImplementations()
 
@@ -24,15 +26,18 @@ class SendOrderUsecaseTest extends Specification {
         SendOrderUseCase.getInstance().send(mockOrder)
 
         then:
-        1 * mockSender.sendOrder(mockOrder)
+        1 * mockConverter.convertMetadataToOmlOrder(mockOrder)
+        1 * mockSender.sendOrder(_)
     }
 
     def "send fails to send"() {
         given:
         def mockOrder = new OrderMock(null, null, null)
+        def mockConverter = Mock(OrderConverter)
         def mockSender = Mock(OrderSender)
-        mockSender.sendOrder(_ as Order) >> { throw new UnableToSendOrderException("DogCow", new NullPointerException()) }
+        mockSender.sendOrder(_) >> { throw new UnableToSendOrderException("DogCow", new NullPointerException()) }
 
+        TestApplicationContext.register(OrderConverter, mockConverter)
         TestApplicationContext.register(OrderSender, mockSender)
         TestApplicationContext.injectRegisteredImplementations()
 
