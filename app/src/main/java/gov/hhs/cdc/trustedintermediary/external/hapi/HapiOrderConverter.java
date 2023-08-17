@@ -82,8 +82,27 @@ public class HapiOrderConverter implements OrderConverter {
         return new HapiOrder(demographicsBundle);
     }
 
+    @Override
     public Order<?> convertMetadataToOmlOrder(Order<?> order) {
-        return order;
+        logger.logInfo("Converting order to have OML metadata");
+
+        var hapiOrder = (Order<Bundle>) order;
+        var orderBundle = hapiOrder.getUnderlyingOrder();
+
+        var omlOrderCoding =
+                new Coding(
+                        "http://terminology.hl7.org/CodeSystem/v2-0003",
+                        "O21",
+                        "OML - Laboratory order");
+
+        var messageHeader =
+                HapiHelper.resourcesInBundle(orderBundle, MessageHeader.class)
+                        .findFirst()
+                        .orElseGet(MessageHeader::new);
+
+        messageHeader.setEvent(omlOrderCoding);
+
+        return new HapiOrder(orderBundle);
     }
 
     private MessageHeader createMessageHeader(Coding omlOrderCoding) {
