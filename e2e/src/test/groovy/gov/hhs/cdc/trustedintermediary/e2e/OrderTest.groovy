@@ -8,12 +8,12 @@ import java.nio.file.Path
 class OrderTest extends Specification {
 
     def orderClient = new EndpointClient("/v1/etor/orders")
-    def labOrderJsonFileString = Files.readString(Path.of("../examples/fhir/lab_order.json"))
+    def labOrderJsonFileString = Files.readString(Path.of("../examples/fhir/MN NBS FHIR Order Message.json"))
 
     def "an order response is returned from the ETOR order endpoint"() {
         given:
-        def expectedFhirResourceId  = "Bundle/969bcbb3-cd34-49be-ac4f-e1b8479b8219"
-        def expectedPatientId  = "MRN7465737865"
+        def expectedFhirResourceId  = "Bundle/b4efef3a-749c-457d-956b-568e22768bf3"
+        def expectedPatientId  = "11102779"
 
         when:
         def response = orderClient.submit(labOrderJsonFileString, true)
