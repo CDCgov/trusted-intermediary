@@ -169,14 +169,13 @@ CDC including this GitHub page may be subject to applicable federal law, includi
 #### CDC-TI Setup
 
 1. Checkout `rs-form-data` branch for `CDCgov/trusted-intermediary`
-2. Run `./gradlew shadowJar`
-3. Run TI with `REPORT_STREAM_URL_PREFIX=http://localhost:7071/ ./gradlew clean app:run`
+2. Run TI with `REPORT_STREAM_URL_PREFIX=http://localhost:7071/ ./gradlew clean app:run`
 
 #### ReportStream Setup
 
 1. Checkout `flexion/test/ti-rs-setup` branch for `CDCgov/prime-reportstream`
 2. CD to `prime-reportstream/prime-router`
-3. Run `./gradlew clean package`
+3. Point to RS docs to run RS
 4. Run RS with `docker compose up --build -d`
 5. Run `./prime multiple-settings set -i ./settings/staging/0149-etor.yml`
 6. Run `./prime organization addkey --public-key /path/to/trusted-intermediary/mock_credentials/organization-trusted-intermediary-public-key-local.pem --scope "flexion.*.report" --orgName flexion --kid flexion.etor-service-sender --doit`
@@ -189,12 +188,12 @@ CDC including this GitHub page may be subject to applicable federal law, includi
         ```
         {
           "@type": "UserApiKey",
-          "apiKey": "RS Private Key at trusted-intermediary/mock_credentials/organization-report-stream-private-key.pem",
+          "apiKey": "TI's private key in RS at trusted-intermediary/mock_credentials/organization-report-stream-private-key.pem",
           "user": "flexion"
         }
         ```
 
-## Submit request to ReportStream:
+#### Submit request to ReportStream
 
 `curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-hospital' --header 'Authorization: Bearer none' --data-binary '@/path/to/ORM_O01.hl7' 'http://localhost:7071/api/reports'`
 
