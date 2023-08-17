@@ -83,7 +83,7 @@ public class HapiOrderConverter implements OrderConverter {
     }
 
     public Order<?> convertMetadataToOmlOrder(Order<?> order) {
-        return null;
+        return order;
     }
 
     private MessageHeader createMessageHeader(Coding omlOrderCoding) {
