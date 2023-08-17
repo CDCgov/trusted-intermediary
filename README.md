@@ -164,6 +164,46 @@ Please read [`CONTRIBUTING.md`](CONTRIBUTING.md) for additional details.
 All comments, messages, pull requests, and other submissions received through
 CDC including this GitHub page may be subject to applicable federal law, including but not limited to the Federal Records Act, and may be archived. Learn more at [http://www.cdc.gov/other/privacy.html](http://www.cdc.gov/other/privacy.html).
 
+### Setup with ReportStream
+
+#### CDC-TI Setup
+
+1. Checkout `rs-form-data` branch for `CDCgov/trusted-intermediary`
+2. Run `./gradlew shadowJar`
+3. Run TI with `REPORT_STREAM_URL_PREFIX=http://localhost:7071/ ./gradlew clean app:run`
+
+#### ReportStream Setup
+
+1. Checkout `flexion/test/ti-rs-setup` branch for `CDCgov/prime-reportstream`
+2. CD to `prime-reportstream/prime-router`
+3. Run `./gradlew clean package`
+4. Run RS with `docker compose up --build -d`
+5. Run `./prime multiple-settings set -i ./settings/staging/0149-etor.yml`
+6. Run `./prime organization addkey --public-key /path/to/trusted-intermediary/mock_credentials/organization-trusted-intermediary-public-key-local.pem --scope "flexion.*.report" --orgName flexion --kid flexion.etor-service-sender --doit`
+7. Setup local vault secret
+    1. Go to: `http://localhost:8200/`
+    2. Use token in `prime-router/.vault/env/.env.local` to authenticate
+    3. Go to `Secrets engines` > `secret/` > `Create secret`
+        1. Path for this secret: `FLEXION--ETOR-SERVICE-RECEIVER`
+        2. JSON data:
+        ```
+        {
+          "@type": "UserApiKey",
+          "apiKey": "RS Private Key at trusted-intermediary/mock_credentials/organization-report-stream-private-key.pem",
+          "user": "flexion"
+        }
+        ```
+
+## Submit request to ReportStream:
+
+`curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-hospital' --header 'Authorization: Bearer none' --data-binary '@/path/to/ORM_O01.hl7' 'http://localhost:7071/api/reports'`
+
+or
+
+`curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.etor-service-sender' --header 'Authorization: Bearer none' --data-binary '@/path/to/lab_order.json' 'http://localhost:7071/api/reports'`
+
+After one or two minutes, check that hl7 files have been dropped to `prime-reportstream/prime-router/build/sftp` folder
+
 ## DORA Metrics
 
 We use [DORA Metrics](https://cloud.google.com/blog/products/devops-sre/using-the-four-keys-to-measure-your-devops-performance) to measure our DevOps performance. We currently are tracking Deployment Frequency, Change Fail Rate and Mean Time to Recovery.
