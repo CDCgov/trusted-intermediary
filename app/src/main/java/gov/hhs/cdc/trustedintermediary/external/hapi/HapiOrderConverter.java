@@ -82,6 +82,10 @@ public class HapiOrderConverter implements OrderConverter {
         return new HapiOrder(demographicsBundle);
     }
 
+    public Order<?> convertMetadataToOmlOrder(Order<?> order) {
+        return null;
+    }
+
     private MessageHeader createMessageHeader(Coding omlOrderCoding) {
         logger.logInfo("Creating new MessageHeader");
 
