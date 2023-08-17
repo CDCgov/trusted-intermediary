@@ -34,6 +34,15 @@ class OrderTest extends Specification {
 
         then:
         response.getCode() == 200
+
+        //test that the MessageHeader's event is now an OML_O21
+        parsedSentPayload.entry[0].resource.resourceType == "MessageHeader"
+        parsedSentPayload.entry[0].resource.eventCoding.code == "O21"
+        parsedSentPayload.entry[0].resource.eventCoding.display.contains("OML")
+
+        //test that everything else is the same except the MessageHeader's event
+        parsedSentPayload.entry[0].resource.remove("eventCoding")
+        parsedLabOrderJsonFile.entry[0].resource.remove("eventCoding")
         parsedSentPayload == parsedLabOrderJsonFile
     }
 
