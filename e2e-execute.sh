@@ -10,9 +10,9 @@ start_api() {
 
     pushd ./app/
 
+    DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     SUB_DIR="build/libs"
     JAR_NAME="app-all.jar"
-    DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
     echo 'Starting API'
     java -jar "${DIR}"/"${SUB_DIR}"/"${JAR_NAME}" > /dev/null &
