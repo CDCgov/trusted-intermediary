@@ -26,6 +26,11 @@ import org.hl7.fhir.r4.model.UrlType;
  */
 public class HapiOrderConverter implements OrderConverter {
     private static final HapiOrderConverter INSTANCE = new HapiOrderConverter();
+    private static final Coding OML_CODING =
+            new Coding(
+                    "http://terminology.hl7.org/CodeSystem/v2-0003",
+                    "O21",
+                    "OML - Laboratory order");
 
     @Inject Logger logger;
 
@@ -63,15 +68,10 @@ public class HapiOrderConverter implements OrderConverter {
                 HapiHelper.resourcesInBundle(demographicsBundle, Patient.class)
                         .findFirst()
                         .orElse(null);
-        var omlOrderCoding =
-                new Coding(
-                        "http://terminology.hl7.org/CodeSystem/v2-0003",
-                        "O21",
-                        "OML - Laboratory order");
 
         var serviceRequest = createServiceRequest(patient, orderDateTime);
-        var messageHeader = createMessageHeader(omlOrderCoding);
-        var provenance = createProvenanceResource(orderDateTime, omlOrderCoding);
+        var messageHeader = createMessageHeader();
+        var provenance = createProvenanceResource(orderDateTime);
 
         demographicsBundle
                 .getEntry()
@@ -89,12 +89,6 @@ public class HapiOrderConverter implements OrderConverter {
         var hapiOrder = (Order<Bundle>) order;
         var orderBundle = hapiOrder.getUnderlyingOrder();
 
-        var omlOrderCoding =
-                new Coding(
-                        "http://terminology.hl7.org/CodeSystem/v2-0003",
-                        "O21",
-                        "OML - Laboratory order");
-
         var messageHeader =
                 HapiHelper.resourcesInBundle(orderBundle, MessageHeader.class)
                         .findFirst()
@@ -105,19 +99,19 @@ public class HapiOrderConverter implements OrderConverter {
             orderBundle.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader));
         }
 
-        messageHeader.setEvent(omlOrderCoding);
+        messageHeader.setEvent(OML_CODING);
 
         return new HapiOrder(orderBundle);
     }
 
-    private MessageHeader createMessageHeader(Coding omlOrderCoding) {
+    private MessageHeader createMessageHeader() {
         logger.logInfo("Creating new MessageHeader");
 
         var messageHeader = new MessageHeader();
 
         messageHeader.setId(UUID.randomUUID().toString());
 
-        messageHeader.setEvent(omlOrderCoding);
+        messageHeader.setEvent(OML_CODING);
 
         messageHeader.setMeta(
                 new Meta()
@@ -161,13 +155,13 @@ public class HapiOrderConverter implements OrderConverter {
         return serviceRequest;
     }
 
-    private Provenance createProvenanceResource(Date orderDate, Coding omlOrderCoding) {
+    private Provenance createProvenanceResource(Date orderDate) {
         logger.logInfo("Creating new Provenance");
         var provenance = new Provenance();
 
         provenance.setId(UUID.randomUUID().toString());
         provenance.setRecorded(orderDate);
-        provenance.setActivity(new CodeableConcept(omlOrderCoding));
+        provenance.setActivity(new CodeableConcept(OML_CODING));
 
         return provenance;
     }
