@@ -98,7 +98,12 @@ public class HapiOrderConverter implements OrderConverter {
         var messageHeader =
                 HapiHelper.resourcesInBundle(orderBundle, MessageHeader.class)
                         .findFirst()
-                        .orElseGet(MessageHeader::new);
+                        .orElse(null);
+
+        if (messageHeader == null) {
+            messageHeader = new MessageHeader();
+            orderBundle.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader));
+        }
 
         messageHeader.setEvent(omlOrderCoding);
 
