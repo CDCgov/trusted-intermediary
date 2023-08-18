@@ -106,7 +106,7 @@ def get_auth_request_body():
 
 def get_demographics_request_body():
     # read the sample request body for the demographics endpoint
-    with open("examples/fhir/MN NBS FHIR Order Message.json", "r") as f:
+    with open("examples/fhir/newborn_patient.json", "r") as f:
         return f.read()
 
 

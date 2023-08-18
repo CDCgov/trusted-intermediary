@@ -31,8 +31,9 @@ As a _, so that _, I need _.
   - [ ] Documentation and diagrams created or updated
     - [ ] Implementation guide (`/ig` folder)
     - [ ] ADRs (`/adr` folder)
-    - [ ] Main README.md
+    - [ ] Main `README.md`
     - [ ] Other READMEs in the repo
+    - [ ] If applicable, update the `ReportStream Setup` section in `README.md`
   - [ ] Threat model updated
   - [ ] API documentation updated
   - [ ] Source code documentation created when the code is not self-documenting

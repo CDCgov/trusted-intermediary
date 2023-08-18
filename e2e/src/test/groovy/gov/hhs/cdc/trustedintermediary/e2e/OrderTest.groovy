@@ -3,12 +3,12 @@ package gov.hhs.cdc.trustedintermediary.e2e
 import spock.lang.Specification
 
 import java.nio.file.Files
-import java.nio.file.Paths
+import java.nio.file.Path
 
 class OrderTest extends Specification {
 
     def orderClient = new EndpointClient("/v1/etor/orders")
-    def labOrderJsonFileString = Files.readString(Paths.get("../examples/fhir/lab_order.json"))
+    def labOrderJsonFileString = Files.readString(Path.of("../examples/fhir/lab_order.json"))
 
     def "an order response is returned from the ETOR order endpoint"() {
         given:
@@ -23,6 +23,18 @@ class OrderTest extends Specification {
         response.getCode() == 200
         parsedJsonBody.fhirResourceId == expectedFhirResourceId
         parsedJsonBody.patientId == expectedPatientId
+    }
+
+    def "payload file check"() {
+        when:
+        def response = orderClient.submit(labOrderJsonFileString, true)
+        def sentPayload = SentPayloadReader.read()
+        def parsedSentPayload = JsonParsing.parse(sentPayload)
+        def parsedLabOrderJsonFile = JsonParsing.parse(labOrderJsonFileString)
+
+        then:
+        response.getCode() == 200
+        parsedSentPayload == parsedLabOrderJsonFile
     }
 
     def "return a 400 response when request has unexpected format"() {
