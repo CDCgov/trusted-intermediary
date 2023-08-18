@@ -22,7 +22,8 @@ import org.hl7.fhir.r4.model.UrlType;
 
 /**
  * Converts {@link Demographics} to a Hapi-specific FHIR lab order ({@link HapiOrder} or {@link
- * Order <Bundle>}).
+ * Order <Bundle>}). Also converts an order to identify as an HL7v2 OML in the {@link
+ * MessageHeader}.
  */
 public class HapiOrderConverter implements OrderConverter {
     private static final HapiOrderConverter INSTANCE = new HapiOrderConverter();
