@@ -7,13 +7,19 @@ shadowJar() {
 }
 
 start_api() {
+
+    pushd ./app/
+
     DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    SUB_DIR="app/build/libs"
+    SUB_DIR="build/libs"
     JAR_NAME="app-all.jar"
+
     echo 'Starting API'
     java -jar "${DIR}"/"${SUB_DIR}"/"${JAR_NAME}" > /dev/null &
     export API_PID="${!}"
     echo "API starting at PID ${API_PID}"
+
+    popd
 }
 
 wait_for_api() {

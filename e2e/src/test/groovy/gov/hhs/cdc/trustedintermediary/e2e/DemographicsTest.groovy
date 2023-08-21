@@ -10,6 +10,10 @@ class DemographicsTest extends Specification {
     def demographicsClient = new EndpointClient("/v1/etor/demographics")
     def newbornPatientJsonFileString = Files.readString(Path.of("../examples/fhir/newborn_patient.json"))
 
+    def setup() {
+        SentPayloadReader.delete()
+    }
+
     def "a demographics response is returned from the ETOR demographics endpoint"() {
         given:
         def expectedFhirResourceId  = "Bundle/bundle-with-patient"

@@ -10,6 +10,10 @@ class OrderTest extends Specification {
     def orderClient = new EndpointClient("/v1/etor/orders")
     def labOrderJsonFileString = Files.readString(Path.of("../examples/fhir/MN NBS FHIR Order Message.json"))
 
+    def setup() {
+        SentPayloadReader.delete()
+    }
+
     def "an order response is returned from the ETOR order endpoint"() {
         given:
         def expectedFhirResourceId  = "Bundle/b4efef3a-749c-457d-956b-568e22768bf3"
