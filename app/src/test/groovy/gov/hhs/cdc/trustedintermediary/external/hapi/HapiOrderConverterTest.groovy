@@ -1,10 +1,12 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi
 
 import gov.hhs.cdc.trustedintermediary.DemographicsMock
+import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
 import java.time.Instant
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Patient
@@ -17,6 +19,8 @@ class HapiOrderConverterTest extends Specification {
     Patient mockPatient
     Bundle mockDemographicsBundle
     DemographicsMock<Bundle> mockDemographics
+    Bundle mockOrderBundle
+    OrderMock<Bundle> mockOrder
 
     def setup() {
         TestApplicationContext.reset()
@@ -27,6 +31,9 @@ class HapiOrderConverterTest extends Specification {
         mockPatient = new Patient()
         mockDemographicsBundle = new Bundle().addEntry(new Bundle.BundleEntryComponent().setResource(mockPatient))
         mockDemographics = new DemographicsMock("fhirResourceId", "patientId", mockDemographicsBundle)
+
+        mockOrderBundle = new Bundle().addEntry(new Bundle.BundleEntryComponent().setResource(mockPatient))
+        mockOrder = new OrderMock("fhirResourceId", "patientId", mockOrderBundle)
     }
 
     def "the converter fills in gaps of any missing data in the Bundle"() {
@@ -116,7 +123,7 @@ class HapiOrderConverterTest extends Specification {
         serviceRequest.hasAuthoredOn()
     }
 
-    def "the order datetime should match for bundle, service request, and provenance resources"(){
+    def "the order datetime should match for bundle, service request, and provenance resources"() {
 
         when:
         def orderBundle = HapiOrderConverter.getInstance().convertToOrder(mockDemographics).getUnderlyingOrder()
@@ -131,5 +138,35 @@ class HapiOrderConverterTest extends Specification {
         bundleDateTime == serviceRequestDateTime
         bundleDateTime == provenanceDateTime
         serviceRequestDateTime == provenanceDateTime
+    }
+
+    def "convert the pre-existing message header to specify OML"() {
+        given:
+        mockOrderBundle.addEntry(
+                new Bundle.BundleEntryComponent().setResource(
+                new MessageHeader().setEvent(new Coding(
+                "http://terminology.hl7.org/CodeSystem/v2-0003",
+                "O01",
+                "ORM"))))
+
+        when:
+        def convertedOrderBundle = HapiOrderConverter.getInstance().convertMetadataToOmlOrder(mockOrder).getUnderlyingOrder() as Bundle
+
+        then:
+        def convertedMessageHeader = convertedOrderBundle.getEntry().get(1).getResource() as MessageHeader
+
+        convertedMessageHeader.getEventCoding().getCode() == "O21"
+        convertedMessageHeader.getEventCoding().getDisplay().contains("OML")
+    }
+
+    def "adds the message header to specify OML"() {
+        when:
+        def convertedOrderBundle = HapiOrderConverter.getInstance().convertMetadataToOmlOrder(mockOrder).getUnderlyingOrder() as Bundle
+
+        then:
+        def convertedMessageHeader = convertedOrderBundle.getEntry().get(1).getResource() as MessageHeader
+
+        convertedMessageHeader.getEventCoding().getCode() == "O21"
+        convertedMessageHeader.getEventCoding().getDisplay().contains("OML")
     }
 }

@@ -6,22 +6,13 @@ import java.nio.file.Path;
 
 public class SentPayloadReader {
 
-    public static String read() throws IOException {
-        Path payloadFile = findFilePayload();
+    private static final Path SENT_PAYLOAD_PATH = Path.of("..", "app", "localfileorder.json");
 
-        return Files.readString(payloadFile);
+    public static String read() throws IOException {
+        return Files.readString(SENT_PAYLOAD_PATH);
     }
 
-    private static Path findFilePayload() {
-
-        Path expectedFilePath = Path.of("..", "app", "localfileorder.json");
-
-        boolean doesFileExist = Files.exists(expectedFilePath);
-
-        if (!doesFileExist) {
-            expectedFilePath = Path.of("..", "localfileorder.json");
-        }
-
-        return expectedFilePath;
+    public static void delete() throws IOException {
+        Files.deleteIfExists(SENT_PAYLOAD_PATH);
     }
 }
