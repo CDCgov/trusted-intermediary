@@ -20,6 +20,7 @@ class LocalFileOrderSenderTest extends Specification{
     def "send order works"() {
 
         given:
+        def localFilePath = Paths.get(LocalFileOrderSender.LOCAL_FILE_NAME)
         def fhir = Mock(HapiFhir)
 
         def testStringOrder = "Some String"
@@ -34,7 +35,8 @@ class LocalFileOrderSenderTest extends Specification{
         LocalFileOrderSender.getInstance().sendOrder(mockOrder)
 
         then:
-        Files.readString(Paths.get(LocalFileOrderSender.LOCAL_FILE_NAME)) == testStringOrder
+        Files.readString(localFilePath) == testStringOrder
+        Files.delete(localFilePath)
     }
 
     def "throws an exception when FHIR encoding does not work"() {
