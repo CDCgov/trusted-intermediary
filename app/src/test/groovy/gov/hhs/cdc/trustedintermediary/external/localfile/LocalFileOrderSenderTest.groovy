@@ -17,6 +17,10 @@ class LocalFileOrderSenderTest extends Specification{
         TestApplicationContext.register(LocalFileOrderSender, LocalFileOrderSender.getInstance())
     }
 
+    def cleanup() {
+        Files.deleteIfExists(Paths.get(LocalFileOrderSender.LOCAL_FILE_NAME))
+    }
+
     def "send order works"() {
 
         given:
