@@ -79,7 +79,7 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
     // azure sdk
-    implementation 'com.azure:azure-security-keyvault-secrets:4.6.4'
+    implementation 'com.azure:azure-security-keyvault-secrets:4.6.5'
     implementation 'com.azure:azure-identity:1.10.0'
 
     testImplementation 'org.apache.groovy:groovy:4.0.13'
