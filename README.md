@@ -25,6 +25,10 @@ The additional requirements needed to contribute towards development are...
 - [Python](https://docs.python-guide.org/starting/installation/)
 - [Terraform](https://www.terraform.io)
 
+### Environment Configuration
+
+To make use of an `.env` file to store environment variables, the `.env.example` file located in the root of the repo can be copied as `.env`, with the appropriate values entered.
+
 ### Compiling
 
 To compile the application, execute...
@@ -91,9 +95,6 @@ the swarm parameters for the test and the local url where the app is running
 (usually http://localhost:8080).  You can also set time limits for the tests under 'Advanced Settings'.
 
 ### Deploying
-
-### Environment Configurations
-A .env file can be used for easier setup. The `.env.example` file (located in the  root) can be copied to `app/` as '.env' with the appropriate values entered.
 
 #### Initial Azure and GitHub Configuration
 
