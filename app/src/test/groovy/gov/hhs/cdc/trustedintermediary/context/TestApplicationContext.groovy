@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.context
 
 import gov.hhs.cdc.trustedintermediary.external.slf4j.LocalLogger
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
+import io.github.cdimascio.dotenv.Dotenv
 
 /**
  * This test class resets the implementation registration in the ApplicationContext so different test cases can start on a clean slate.
@@ -9,6 +10,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 class TestApplicationContext extends ApplicationContext {
 
     def static init() {
+        setDotenv(Dotenv.configure().filename(".env.test").load())
         //initialize some default implementations that we want by default across nearly all tests
         register(Logger, LocalLogger.getInstance())
     }
