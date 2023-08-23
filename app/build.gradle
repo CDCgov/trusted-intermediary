@@ -45,8 +45,6 @@ java {
 }
 
 dependencies {
-    implementation 'io.github.cdimascio:java-dotenv:5.2.2' // Replace with the latest version available
-
     implementation 'io.javalin:javalin:5.6.2'
 
     implementation 'org.reflections:reflections:0.10.2'
@@ -88,6 +86,9 @@ dependencies {
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
     testImplementation 'com.openpojo:openpojo:0.9.1'
     testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.15.1'
+
+    // dotenv-java
+    implementation 'io.github.cdimascio:dotenv-java:3.0.0'
 }
 
 jacoco {
