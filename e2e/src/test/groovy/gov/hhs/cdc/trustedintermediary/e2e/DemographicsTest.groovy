@@ -3,12 +3,16 @@ package gov.hhs.cdc.trustedintermediary.e2e
 import spock.lang.Specification
 
 import java.nio.file.Files
-import java.nio.file.Paths
+import java.nio.file.Path
 
 class DemographicsTest extends Specification {
 
     def demographicsClient = new EndpointClient("/v1/etor/demographics")
-    def newbornPatientJsonFileString = Files.readString(Paths.get("src/test/resources/newborn_patient.json"))
+    def newbornPatientJsonFileString = Files.readString(Path.of("../examples/fhir/newborn_patient.json"))
+
+    def setup() {
+        SentPayloadReader.delete()
+    }
 
     def "a demographics response is returned from the ETOR demographics endpoint"() {
         given:

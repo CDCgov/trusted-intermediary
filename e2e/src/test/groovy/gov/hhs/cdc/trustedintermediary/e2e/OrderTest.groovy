@@ -3,17 +3,21 @@ package gov.hhs.cdc.trustedintermediary.e2e
 import spock.lang.Specification
 
 import java.nio.file.Files
-import java.nio.file.Paths
+import java.nio.file.Path
 
 class OrderTest extends Specification {
 
     def orderClient = new EndpointClient("/v1/etor/orders")
-    def labOrderJsonFileString = Files.readString(Paths.get("src/test/resources/lab_order.json"))
+    def labOrderJsonFileString = Files.readString(Path.of("../examples/fhir/MN NBS FHIR Order Message.json"))
+
+    def setup() {
+        SentPayloadReader.delete()
+    }
 
     def "an order response is returned from the ETOR order endpoint"() {
         given:
-        def expectedFhirResourceId  = "Bundle/969bcbb3-cd34-49be-ac4f-e1b8479b8219"
-        def expectedPatientId  = "MRN7465737865"
+        def expectedFhirResourceId  = "Bundle/b4efef3a-749c-457d-956b-568e22768bf3"
+        def expectedPatientId  = "11102779"
 
         when:
         def response = orderClient.submit(labOrderJsonFileString, true)
@@ -34,6 +38,15 @@ class OrderTest extends Specification {
 
         then:
         response.getCode() == 200
+
+        //test that the MessageHeader's event is now an OML_O21
+        parsedSentPayload.entry[0].resource.resourceType == "MessageHeader"
+        parsedSentPayload.entry[0].resource.eventCoding.code == "O21"
+        parsedSentPayload.entry[0].resource.eventCoding.display.contains("OML")
+
+        //test that everything else is the same except the MessageHeader's event
+        parsedSentPayload.entry[0].resource.remove("eventCoding")
+        parsedLabOrderJsonFile.entry[0].resource.remove("eventCoding")
         parsedSentPayload == parsedLabOrderJsonFile
     }
 

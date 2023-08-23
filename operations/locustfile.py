@@ -106,11 +106,11 @@ def get_auth_request_body():
 
 def get_demographics_request_body():
     # read the sample request body for the demographics endpoint
-    with open("e2e/src/test/resources/newborn_patient.json", "r") as f:
+    with open("examples/fhir/newborn_patient.json", "r") as f:
         return f.read()
 
 
 def get_orders_request_body():
     # read the sample request body for the orders endpoint
-    with open("e2e/src/test/resources/lab_order.json", "r") as f:
+    with open("examples/fhir/lab_order.json", "r") as f:
         return f.read()
