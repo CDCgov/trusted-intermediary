@@ -1,9 +1,5 @@
 // defines the OML-O01 (loosely) input that is expected for newborn screening
 
-//TODO: The MSH, PID, ORC, OBR, OBX segments are cross referenced from other logicals
-//TODO: Check for correct fields for each segment
-//TODO: We need proper cardinality for ORM segment fields
-
 Logical: OML021
 Id: oml-021-logical-model
 Title: "OML-021"

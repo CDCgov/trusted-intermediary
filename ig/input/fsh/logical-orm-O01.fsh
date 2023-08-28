@@ -1,9 +1,5 @@
 // defines the ORM-O01 (loosely) input that is expected for newborn screening
 
-//TODO: lines 11-12; Do we want to cross refernce the MSH and PID Segments fron the ADT message, or should they be custom to the ORM?
-//TODO: Check for correct fields for each segment
-//TODO: We need proper cardinality for ORM segment fields
-
 Logical: ORMO01
 Id: orm-O01-logical-model
 Title: "ORM-O01"
