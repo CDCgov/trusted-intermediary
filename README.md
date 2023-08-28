@@ -169,22 +169,39 @@ CDC including this GitHub page may be subject to applicable federal law, includi
 #### CDC-TI Setup
 
 1. Checkout `rs-form-data` branch for `CDCgov/trusted-intermediary`
-2. Run TI with `REPORT_STREAM_URL_PREFIX=http://localhost:7071/ ./gradlew clean app:run`
+2. Run TI with `REPORT_STREAM_URL_PREFIX=http://localhost:7071 ./gradlew clean app:run`
 
 #### ReportStream Setup
 
-1. Checkout `master` branch for `CDCgov/prime-reportstream`
+1. Checkout `flexion/test/ti-rs-setup` branch for `CDCgov/prime-reportstream`
 2. Follow [the steps in the ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/docs-deprecated/getting-started/getting-started.md#first-build) to build the baseline
 3. CD to `prime-reportstream/prime-router`
 4. Run RS with `docker compose up --build -d`
-5. Run `./prime multiple-settings set -i ./settings/staging/0149-etor.yml`
-6. Run `./prime organization addkey --public-key /path/to/trusted-intermediary/mock_credentials/organization-trusted-intermediary-public-key-local.pem --scope "flexion.*.report" --orgName flexion --kid flexion.etor-service-sender --doit`
-7. Setup local vault secret
+5. Run `./gradlew resetDB && ./gradlew reloadTable && ./gradlew reloadSettings`
+6. Edit `prime-router/settings/staging/0149-etor.yml`
+   1. Comment the following two lines under `receivers.transport`:
+
+   ```
+   reportUrl: "https://cdcti-staging-api.azurewebsites.net/v1/etor/orders"
+   authTokenUrl: "https://cdcti-staging-api.azurewebsites.net/v1/auth/token"
+   ```
+
+   2. Uncomment the following lines to call the local instance of the API instead:
+
+   ```
+   reportUrl: "http://host.docker.internal:8080/v1/etor/orders"
+   authTokenUrl: "http://host.docker.internal:8080/v1/auth/token"
+   ```
+
+7. Run `./prime multiple-settings set -i ./settings/staging/0149-etor.yml`
+8. Run `./prime organization addkey --public-key /path/to/trusted-intermediary/mock_credentials/organization-trusted-intermediary-public-key-local.pem --scope "flexion.*.report" --orgName flexion --kid flexion.etor-service-sender --doit`
+9. Setup local vault secret
     1. Go to: `http://localhost:8200/`
     2. Use token in `prime-router/.vault/env/.env.local` to authenticate
     3. Go to `Secrets engines` > `secret/` > `Create secret`
         1. Path for this secret: `FLEXION--ETOR-SERVICE-RECEIVER`
         2. JSON data:
+
         ```
         {
           "@type": "UserApiKey",
@@ -195,11 +212,11 @@ CDC including this GitHub page may be subject to applicable federal law, includi
 
 #### Submit request to ReportStream
 
-`curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-hospital' --header 'Authorization: Bearer none' --data-binary '@/path/to/ORM_O01.hl7' 'http://localhost:7071/api/reports'`
+`curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-hospital' --header 'Authorization: Bearer none' --data-binary '@/path/to/ORM_O01.hl7' 'http://localhost:7071/api/waters'`
 
 or
 
-`curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.etor-service-sender' --header 'Authorization: Bearer none' --data-binary '@/path/to/lab_order.json' 'http://localhost:7071/api/reports'`
+`curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.etor-service-sender' --header 'Authorization: Bearer none' --data-binary '@/path/to/lab_order.json' 'http://localhost:7071/api/waters'`
 
 After one or two minutes, check that hl7 files have been dropped to `prime-reportstream/prime-router/build/sftp` folder
 
