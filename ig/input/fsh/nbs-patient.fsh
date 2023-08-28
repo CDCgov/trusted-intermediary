@@ -1,5 +1,4 @@
 // definition of the Patient resource we expect for CDC TI NBS
-
 Profile: NBSPatient
 Parent: $USCorePatient
 Description: "The Patient resource containing demographic data for a newborn"
