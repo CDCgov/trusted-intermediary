@@ -23,8 +23,8 @@ Usage: #definition
 * target[+] = Reference(Logical/segment-obx-logical-model)
 * recorded = "2023-08-29T17:52:36.0000Z"
 * occurredDateTime = "2023-08-29"
-* reason = Code(http://terminology.hl7.org/CodeSystem/v3-ActReason, "METAMGT")
+* reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT
 * reason.text = "Created an OBX segment resource"
-* activity = Code(http://terminology.hl7.org/CodeSystem/v3-DataOperation, "CREATE")
-* agent[0].type = Coding(http://terminology.hl7.org/CodeSystem/provenance-participant-type, "author")
-* agent[0].who.display = "T. R. Johnson"
+* activity = http://terminology.hl7.org/CodeSystem/v3-DataOperation#CREATE
+* agent[+].type = http://terminology.hl7.org/CodeSystem/provenance-participant-type#author
+* agent[=].who.display = "T. R. Johnson"
