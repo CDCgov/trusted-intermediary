@@ -19,4 +19,7 @@ Description: "The MSH Segment"
 * versionId 1..1 SU string "MSH-12 the HL7 version of this message"
 * versionId 1..1 SU string "MSH-15 the HL7 version of this message" //TODO
 * versionId 1..1 SU string "MSH-16 the HL7 version of this message" //TODO
-* versionId 1..1 SU string "MSH-21 the HL7 version of this message" //TODO
+* messageProfileIdentifier 1..1 SU string "MSH-21 Message Profile Identifier"
+* messageProfileIdentifierEntityIdentifier 1..1 SU string "MSH-21.1 Entity Identifier"
+* messageProfileIdentifierUniversalId 1..1 SU string "MSH-21.3 Universal ID"
+* messageProfileIdentifierUniversalIdType 1..1 SU string "MSH-21.4 Universal ID Type"
