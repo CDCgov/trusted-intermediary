@@ -18,7 +18,7 @@ Description: "The MSH Segment"
 * processingId 1..1 SU string "MSH-11 the processing id"
 * versionId 1..1 SU string "MSH-12 the HL7 version of this message"
 * versionId 1..1 SU string "MSH-15 the HL7 version of this message" //TODO
-* versionId 1..1 SU string "MSH-16 the HL7 version of this message" //TODO
+* applicationAcknowledgementType 1..1 SU string "MSH-16 Application Acknowledgement Type"
 * messageProfileIdentifier 1..1 SU string "MSH-21 Message Profile Identifier"
 * messageProfileIdentifierEntityIdentifier 1..1 SU string "MSH-21.1 Entity Identifier"
 * messageProfileIdentifierUniversalId 1..1 SU string "MSH-21.3 Universal ID"
