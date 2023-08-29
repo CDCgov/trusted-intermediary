@@ -3,7 +3,7 @@ Id: segment-msh-logical-model
 Title: "MSH Segment"
 Description: "The MSH Segment"
 * segmentType 1..1 SU string "MSH"
-* delimeters 1..1 SU string "MSH-1 The delimeters for the message"
+* fieldSeparator 1..1 SU string "MSH-1 The field separator for the message"
 * encodingCharacters 1..1 SU string "MSH-2 Encoding Characters"
 * sendingApplication 1..1 SU string "MSH-3 The sending application"
 * sendingApplicationNamespaceId 1..1 SU string "MSH-3.1 Sending Application Namespace ID"
