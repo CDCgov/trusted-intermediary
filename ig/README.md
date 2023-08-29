@@ -57,9 +57,8 @@ IDE is used to work on the CDC Trusted Intermediary documentation such as Intell
 3. Run `docker run -it --mount type=bind,source="$(pwd)",target=/trusted-intermediary ig-local-dev bash` to run the container and use an interactive `bash` shell inside the container
 4. Inside the container environment it should default to a working directory of `/trusted-intermediary`; this is bound to the `ig` directory in your local git repo
 5. Periodically update the IG Publisher by running `./_updatePublisher.sh`.  The IG Publisher is updated multiple times per week to fix bugs and add new functionality.  Staying up to date with the latest version is a good idea. Notification messages when the IG Publisher is updated can be found at: https://chat.fhir.org/#narrow/stream/217600-tooling.2Freleases
-6. After running the publisher update, you will have to fix the execute permission on a couple of the scripts by running `./fix-execute.sh`
-7. In order to build the documentation, run `./_genonce.sh`
-8. You can browse the generated documentation by opening in a browser `file:///path/to/repo/ig/output/index.html`
+6. In order to build the documentation, run `./_genonce.sh`
+7. You can browse the generated documentation by opening in a browser `file:///path/to/repo/ig/output/index.html`
 
 ## Remove cached layers
 
