@@ -10,3 +10,19 @@ Description: "The SPM Segment"
 * codingSystem 1..1 SU string "SPM-4.3 Name of Coding System"
 * specimenCollectionDateTime 1..1 SU string "SPM-17	Specimen Collection Date Time"
 * rangeStartDateTime 1..1 SU string "SPM-17.1: Range Start Date Time"
+// other optional fields
+
+
+// Provenance Section begins
+Instance: segment-spm-logical-model
+InstanceOf: Provenance
+Title: "Initial creation of SPM segment changelog"
+Usage: #definition
+* target[+] = Reference(Logical/segment-spm-logical-model)
+* recorded = "2023-08-29T18:19:36.0000Z"
+* occurredDateTime = "2023-08-29"
+* reason = Code(http://terminology.hl7.org/CodeSystem/v3-ActReason, "METAMGT")
+* reason.text = "Created an SPM segment resource"
+* activity = Code(http://terminology.hl7.org/CodeSystem/v3-DataOperation, "CREATE")
+* agent[0].type = Coding(http://terminology.hl7.org/CodeSystem/provenance-participant-type, "author")
+* agent[0].who.display = "T. R. Johnson"
