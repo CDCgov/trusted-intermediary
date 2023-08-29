@@ -17,7 +17,7 @@ Description: "The MSH Segment"
 * messageControlId 1..1 SU string "MSH-10 a control id for the message"
 * processingId 1..1 SU string "MSH-11 the processing id"
 * versionId 1..1 SU string "MSH-12 the HL7 version of this message"
-* versionId 1..1 SU string "MSH-15 the HL7 version of this message" //TODO
+* acceptAcknowledgmentType 1..1 SU string "MSH-15 Accept Acknowledgment Type"
 * applicationAcknowledgementType 1..1 SU string "MSH-16 Application Acknowledgement Type"
 * messageProfileIdentifier 1..1 SU string "MSH-21 Message Profile Identifier"
 * messageProfileIdentifierEntityIdentifier 1..1 SU string "MSH-21.1 Entity Identifier"
