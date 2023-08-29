@@ -15,3 +15,18 @@ Description: "The MSH Segment"
 * processingId 1..1 SU string "MSH-11 the processing id"
 * versionId 1..1 SU string "MSH-12 the HL7 version of this message"
 // there are other optional fields we might want to define
+
+
+// Provenance Section begins
+Instance: segment-msh-logical-model
+InstanceOf: Provenance
+Title: "Initial creation of MSH segment changelog"
+Usage: #definition
+* target[+] = Reference(Logical/segment-msh-logical-model)
+* recorded = "2023-08-29T17:46:36.0000Z"
+* occurredDateTime = "2023-08-29"
+* reason = Code(http://terminology.hl7.org/CodeSystem/v3-ActReason, "METAMGT")
+* reason.text = "Created an MSH segment resource"
+* activity = Code(http://terminology.hl7.org/CodeSystem/v3-DataOperation, "CREATE")
+* agent[0].type = Coding(http://terminology.hl7.org/CodeSystem/provenance-participant-type, "author")
+* agent[0].who.display = "T. R. Johnson"
