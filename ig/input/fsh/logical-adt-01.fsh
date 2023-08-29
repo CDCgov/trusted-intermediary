@@ -10,21 +10,18 @@ Description: "The expected input for the demographic data for the newborn screen
 * messageString 0..1 SU string "the full message as delimeted text"
 
 
-// history entries follow https://confluence.hl7.org/display/FHIR/IG+Publisher+Documentation#IGPublisherDocumentation-HistoryEntries
-
+// Provenance Section begins
 Instance: adt01-initial-history
 InstanceOf: Provenance
 Title: "Initial creation of ADT01 message changelog"
 Usage: #definition
 * target[+] = Reference(Logical/adt-01-logical-model)
-* recorded = "2023-01-30T13:00:00.0000Z"
+* recorded = "2023-08-29T17:26:36.0000Z"
 * occurredDateTime = "2023-08-29"
 * reason = Code(http://terminology.hl7.org/CodeSystem/v3-ActReason, "METAMGT")
-* reason.text = "Initial Logical as per the C2S layout"
+* reason.text = "Created an ADT message resource"
 * activity = Code(http://terminology.hl7.org/CodeSystem/v3-DataOperation, "CREATE")
 * agent[0].type = Coding(http://terminology.hl7.org/CodeSystem/provenance-participant-type, "author")
 * agent[0].who.display = "T. R. Johnson"
-* agent[1].type = Coding(http://terminology.hl7.org/CodeSystem/provenance-participant-type, "verifier")
-* agent[1].who.display = "T. R. Johnson"
 
 
