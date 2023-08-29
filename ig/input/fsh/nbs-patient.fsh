@@ -25,7 +25,7 @@ Instance: nbs-patient-example-01-history
 InstanceOf: Provenance
 Title: "Initial creation of Patient resource changelog"
 Usage: #definition
-* target[+] = Reference(Profile/nbs-patient-example-01)
+* target[+] = Reference(Profile/NBSPatient)
 * recorded = "2023-08-29T18:14:36.0000Z"
 * occurredDateTime = "2023-08-29"
 * reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT

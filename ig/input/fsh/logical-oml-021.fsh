@@ -18,7 +18,7 @@ Instance: oml-021-logical-model
 InstanceOf: Provenance
 Title: "Initial creation of OML-021 message changelog"
 Usage: #definition
-* target[+] = Reference(Logical/oml-021-logical-model)
+* target[+] = Reference(Logical/OML021)
 * recorded = "2023-08-29T17:32:36.0000Z"
 * occurredDateTime = "2023-08-29"
 * reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT

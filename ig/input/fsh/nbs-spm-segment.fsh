@@ -18,7 +18,7 @@ Instance: segment-spm-logical-model
 InstanceOf: Provenance
 Title: "Initial creation of SPM segment changelog"
 Usage: #definition
-* target[+] = Reference(Logical/segment-spm-logical-model)
+* target[+] = Reference(Logical/SPMSegment)
 * recorded = "2023-08-29T18:19:36.0000Z"
 * occurredDateTime = "2023-08-29"
 * reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT

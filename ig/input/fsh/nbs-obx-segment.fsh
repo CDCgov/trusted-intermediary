@@ -20,7 +20,7 @@ Instance: segment-obx-logical-model
 InstanceOf: Provenance
 Title: "Initial creation of OBX segment changelog"
 Usage: #definition
-* target[+] = Reference(Logical/segment-obx-logical-model)
+* target[+] = Reference(Logical/OBXSegment)
 * recorded = "2023-08-29T17:52:36.0000Z"
 * occurredDateTime = "2023-08-29"
 * reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT

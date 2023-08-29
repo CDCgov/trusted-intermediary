@@ -16,7 +16,7 @@ Instance: orm-O01-logical-model
 InstanceOf: Provenance
 Title: "Initial creation of ORM-O01 message changelog"
 Usage: #definition
-* target[+] = Reference(Logical/orm-O01-logical-model)
+* target[+] = Reference(Logical/ORMO01)
 * recorded = "2023-08-29T17:36:36.0000Z"
 * occurredDateTime = "2023-08-29"
 * reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT

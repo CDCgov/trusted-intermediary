@@ -15,7 +15,7 @@ Instance: adt01-initial-history
 InstanceOf: Provenance
 Title: "Initial creation of ADT01 message changelog"
 Usage: #definition
-* target[+] = Reference(Logical/adt-01-logical-model)
+* target[+] = Reference(Logical/ADT01)
 * recorded = "2023-08-29T17:26:36.0000Z"
 * occurredDateTime = "2023-08-29"
 * reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT
