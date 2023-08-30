@@ -23,11 +23,11 @@ Description: "The NK1 Segment (HL7 Description)"
 
 
 // Provenance Section begins
-Instance: segment-nk1-logical-model
+Instance: segment-nk1-logical-model-history-create
 InstanceOf: Provenance
 Title: "Initial creation of NK1 segment changelog"
 Usage: #definition
-* target[+] = Reference(Logical/NK1Segment)
+* target[+] = Reference(StructureDefinition/segment-nk1-logical-model)
 * recorded = "2023-08-29T17:49:36.0000Z"
 * occurredDateTime = "2023-08-29"
 * reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT
@@ -35,4 +35,3 @@ Usage: #definition
 * activity = http://terminology.hl7.org/CodeSystem/v3-DataOperation#CREATE
 * agent[+].type = http://terminology.hl7.org/CodeSystem/provenance-participant-type#author
 * agent[=].who.display = "T. R. Johnson"
-

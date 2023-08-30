@@ -26,11 +26,11 @@ Description: "The PID Segment"
 
 
 // Provenance Section begins
-Instance: segment-pid-logical-model
+Instance: segment-pid-logical-model-history-create
 InstanceOf: Provenance
 Title: "Initial creation of PID segment changelog"
 Usage: #definition
-* target[+] = Reference(Logical/PIDSegment)
+* target[+] = Reference(StructureDefinition/segment-pid-logical-model)
 * recorded = "2023-08-29T18:17:36.0000Z"
 * occurredDateTime = "2023-08-29"
 * reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT

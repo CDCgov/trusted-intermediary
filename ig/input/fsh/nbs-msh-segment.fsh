@@ -18,11 +18,11 @@ Description: "The MSH Segment"
 
 
 // Provenance Section begins
-Instance: segment-msh-logical-model-history
+Instance: segment-msh-logical-model-history-create
 InstanceOf: Provenance
 Title: "Initial creation of MSH segment changelog"
 Usage: #definition
-* target[+] = Reference(Logical/segment-msh-logical-model)
+* target[+] = Reference(StructureDefinition/segment-msh-logical-model)
 * recorded = "2023-08-29T17:46:36.0000Z"
 * occurredDateTime = "2023-08-29"
 * reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT

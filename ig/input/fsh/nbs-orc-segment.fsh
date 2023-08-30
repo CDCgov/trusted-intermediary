@@ -13,11 +13,11 @@ Description: "The ORC Segment"
 
 
 // Provenance Section begins
-Instance: segment-orc-logical-model
+Instance: segment-orc-logical-model-history-create
 InstanceOf: Provenance
 Title: "Initial creation of ORC segment changelog"
 Usage: #definition
-* target[+] = Reference(Logical/ORCSegment)
+* target[+] = Reference(StructureDefinition/segment-orc-logical-model)
 * recorded = "2023-08-29T17:54:36.0000Z"
 * occurredDateTime = "2023-08-29"
 * reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT

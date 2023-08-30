@@ -15,11 +15,11 @@ Description: "The OBR Segment"
 
 
 // Provenance Section begins
-Instance: segment-obr-logical-model
+Instance: segment-obr-logical-model-history-create
 InstanceOf: Provenance
 Title: "Initial creation of OBR segment changelog"
 Usage: #definition
-* target[+] = Reference(Logical/OBRSegment)
+* target[+] = Reference(StructureDefinition/segment-obr-logical-model)
 * recorded = "2023-08-29T17:50:36.0000Z"
 * occurredDateTime = "2023-08-29"
 * reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT

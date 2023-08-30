@@ -9,11 +9,11 @@ Description: "The EVN Segment"
 
 
 // Provenance Section begins
-Instance: segment-evn-logical-model
+Instance: segment-evn-logical-model-history-create
 InstanceOf: Provenance
 Title: "Initial creation of EVN segment changelog"
 Usage: #definition
-* target[+] = Reference(Logical/EVNSegment)
+* target[+] = Reference(StructureDefinition/segment-evn-logical-model)
 * recorded = "2023-08-29T17:44:36.0000Z"
 * occurredDateTime = "2023-08-29"
 * reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT

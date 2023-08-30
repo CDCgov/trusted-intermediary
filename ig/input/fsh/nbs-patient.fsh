@@ -21,11 +21,24 @@ Description: "An example NBS patient resource"
 
 
 // Provenance Section begins
-Instance: nbs-patient-example-01-history
+Instance: nbs-patient-profile-history-create
 InstanceOf: Provenance
-Title: "Initial creation of Patient resource changelog"
+Title: "Initial creation of Patient profile resource changelog"
 Usage: #definition
-* target[+] = Reference(Profile/NBSPatient)
+* target[+] = Reference(StructureDefinition/NBSPatient)
+* recorded = "2023-08-29T18:14:36.0000Z"
+* occurredDateTime = "2023-08-29"
+* reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT
+* reason.text = "Created a patient resource"
+* activity = http://terminology.hl7.org/CodeSystem/v3-DataOperation#CREATE
+* agent[+].type = http://terminology.hl7.org/CodeSystem/provenance-participant-type#author
+* agent[=].who.display = "T. R. Johnson"
+
+Instance: nbs-patient-example-history-create
+InstanceOf: Provenance
+Title: "Initial creation of Patient example changelog"
+Usage: #definition
+* target[+] = Reference(Patient/nbs-patient-example-01)
 * recorded = "2023-08-29T18:14:36.0000Z"
 * occurredDateTime = "2023-08-29"
 * reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT
