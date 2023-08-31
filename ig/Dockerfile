@@ -8,5 +8,5 @@ WORKDIR /trusted-intermediary
 
 COPY input/ ./input/
 COPY ig.ini sushi-config.yaml .
-COPY --chmod=755 _updatePublisher.sh fix-execute.sh .
-RUN ./_updatePublisher.sh -y && rm *.bat && ./fix-execute.sh && ./_genonce.sh
+COPY --chmod=755 _updatePublisher.sh .
+RUN ./_updatePublisher.sh -y && rm *.bat && ./_genonce.sh
