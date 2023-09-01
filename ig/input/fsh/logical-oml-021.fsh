@@ -13,4 +13,16 @@ Description: "The expected output for OML formatted data for the newborn screeni
 * OBX 1..* SU OBXSegment "OBX segment"
 
 
-
+// Provenance Section begins
+Instance: oml-021-logical-model-history-create
+InstanceOf: Provenance
+Title: "Initial creation of OML-021 message changelog"
+Usage: #definition
+* target[+] = Reference(StructureDefinition/oml-021-logical-model)
+* recorded = "2023-08-29T17:32:36.0000Z"
+* occurredDateTime = "2023-08-29"
+* reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT
+* reason.text = "Created an OML message resource"
+* activity = http://terminology.hl7.org/CodeSystem/v3-DataOperation#CREATE
+* agent[+].type = http://terminology.hl7.org/CodeSystem/provenance-participant-type#author
+* agent[=].who.display = "T. R. Johnson"

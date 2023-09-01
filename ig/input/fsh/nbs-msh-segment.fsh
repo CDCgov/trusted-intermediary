@@ -35,3 +35,19 @@ Description: "The MSH Segment"
 * messageProfileIdentifierEntityIdentifier 1..1 SU string "MSH-21.1 Message Profile Identifier Entity Identifier"
 * messageProfileIdentifierUniversalId 1..1 SU string "MSH-21.3 Message Profile Identifier Universal ID"
 * messageProfileIdentifierUniversalIdType 1..1 SU id "MSH-21.4 Message Profile Identifier Universal ID Type"
+
+
+
+// Provenance Section begins
+Instance: segment-msh-logical-model-history-create
+InstanceOf: Provenance
+Title: "Initial creation of MSH segment changelog"
+Usage: #definition
+* target[+] = Reference(StructureDefinition/segment-msh-logical-model)
+* recorded = "2023-08-29T17:46:36.0000Z"
+* occurredDateTime = "2023-08-29"
+* reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT
+* reason.text = "Created an MSH segment resource"
+* activity = http://terminology.hl7.org/CodeSystem/v3-DataOperation#CREATE
+* agent[+].type = http://terminology.hl7.org/CodeSystem/provenance-participant-type#author
+* agent[=].who.display = "T. R. Johnson"

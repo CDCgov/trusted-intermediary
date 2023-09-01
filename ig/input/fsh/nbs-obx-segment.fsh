@@ -12,4 +12,19 @@ Description: "The OBX Segment"
 * dateTimeOfTheObservation 1..1 SU string "OBX-14 Date/time Of Observation"
 * observationType 1..1 SU string "OBX-29 Observation Type"
 * observationSubType 1..1 SU string "OBX-30 Observation Sub-type"
-// other optional fields
+// other optional
+
+
+// Provenance Section begins
+Instance: segment-obx-logical-model-history-create
+InstanceOf: Provenance
+Title: "Initial creation of OBX segment changelog"
+Usage: #definition
+* target[+] = Reference(StructureDefinition/segment-obx-logical-model)
+* recorded = "2023-08-29T17:52:36.0000Z"
+* occurredDateTime = "2023-08-29"
+* reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT
+* reason.text = "Created an OBX segment resource"
+* activity = http://terminology.hl7.org/CodeSystem/v3-DataOperation#CREATE
+* agent[+].type = http://terminology.hl7.org/CodeSystem/provenance-participant-type#author
+* agent[=].who.display = "T. R. Johnson"
