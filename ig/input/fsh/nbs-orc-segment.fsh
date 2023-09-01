@@ -11,11 +11,11 @@ Description: "The ORC Segment"
 * orderStatus 1..1 SU string "ORC-5 Order Status"
 * dateTimeOfTransaction 1..1 SU dateTime "ORC-9 Date/Time of Transaction"
 * orderingFacilityName 1..2 SU string "ORC-21 Ordering Facility Name"
-* orderingFacilityNameOrganizationName" 1..1 SU string "ORC-21.1 Ordering Facility Organization Name"
-* orderingFacilityNameTypeCode" 1..1 SU code "ORC-21.2 Ordering Facility Type Code"
-* orderingFacilityNameAssigningAuthority" 1..1 SU code "ORC-21.6 Ordering Facility Assigning Authority"
-* orderingFacilityNameIdentifierTypeCode" 1..1 SU id "ORC-21.7 Ordering Facility Identifier Type Code"
-* orderingFacilityNameOrganizationIdentifier" 1..1 SU string "ORC-21.10 Ordering Facility Organization Identifier"
+* orderingFacilityNameOrganizationName 1..1 SU string "ORC-21.1 Ordering Facility Organization Name"
+* orderingFacilityNameTypeCode 1..1 SU code "ORC-21.2 Ordering Facility Type Code"
+* orderingFacilityNameAssigningAuthority 1..1 SU code "ORC-21.6 Ordering Facility Assigning Authority"
+* orderingFacilityNameIdentifierTypeCode 1..1 SU id "ORC-21.7 Ordering Facility Identifier Type Code"
+* orderingFacilityNameOrganizationIdentifier 1..1 SU string "ORC-21.10 Ordering Facility Organization Identifier"
 
 // Provenance Section begins
 Instance: segment-orc-logical-model-history-create
