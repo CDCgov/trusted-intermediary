@@ -2,15 +2,20 @@ Logical: ORCSegment
 Id: segment-orc-logical-model
 Title: "ORC Segment"
 Description: "The ORC Segment"
-* orderControl 1..1 SU string "ORC-1 Order Control"
-* ORCPlacerOrderNumber 1..1 SU string "ORC-2 Placer Order Number"
-* fillerOrderNumber 1..1 SU string "ORC-3 Filler Order Number"
-* placerGroupNumber 1..1 SU string "ORC-4 Placer Group Number"
-* dateTimeOfTransaction 1..1 SU string "ORC-9 Date/Time of Transaction"
-* orderingProvider 1..1 SU string "ORC-12 Ordering Provider"
-* orderingFacilityName 1..1 SU string "ORC-11 prdering Facility Name"
-// other optional fields
-
+* orderControl 1..1 SU id "ORC-1 Order Control"
+* placerOrderNumber 1..1 SU Identifier "ORC-2 Placer Order Number"
+* placerOrderNumberEntityIdentifier 1..1 SU string "ORC-2.1 Placer Order Number Entity Identifier"
+* placerOrderNumberNamespaceID 1..1 SU code "ORC-2.2 Placer Order Number Namespace ID"
+* placerOrderNumberUniversalID 1..1 SU string "ORC-2.3 Placer Order Number Universal ID"
+* placerOrderNumberUniversalIDType 1..1 SU id "ORC-2.4 Placer Order Number Universal ID Type"
+* orderStatus 1..1 SU string "ORC-5 Order Status"
+* dateTimeOfTransaction 1..1 SU dateTime "ORC-9 Date/Time of Transaction"
+* orderingFacilityName 1..2 SU string "ORC-21 Ordering Facility Name"
+* orderingFacilityNameOrganizationName" 1..1 SU string "ORC-21.1 Ordering Facility Organization Name"
+* orderingFacilityNameTypeCode" 1..1 SU code "ORC-21.2 Ordering Facility Type Code"
+* orderingFacilityNameAssigningAuthority" 1..1 SU code "ORC-21.6 Ordering Facility Assigning Authority"
+* orderingFacilityNameIdentifierTypeCode" 1..1 SU id "ORC-21.7 Ordering Facility Identifier Type Code"
+* orderingFacilityNameOrganizationIdentifier" 1..1 SU string "ORC-21.10 Ordering Facility Organization Identifier"
 
 // Provenance Section begins
 Instance: segment-orc-logical-model-history-create
