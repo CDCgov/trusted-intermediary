@@ -30,3 +30,16 @@ Usage: #definition
 * activity = http://terminology.hl7.org/CodeSystem/v3-DataOperation#CREATE
 * agent[+].type = http://terminology.hl7.org/CodeSystem/provenance-participant-type#author
 * agent[=].who.display = "T. R. Johnson"
+
+Instance: segment-orc-logical-model-history-update
+InstanceOf: Provenance
+Title: "Addition of ORC-2 and ORC-21 segments"
+Usage: #definition
+* target[+] = Reference(StructureDefinition/segment-orc-logical-model)
+* recorded = "2023-09-04T00:00:00.0000Z"
+* occurredDateTime = "2023-09-04"
+* reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT
+* reason.text = "Added sub-segments we initially support"
+* activity = http://terminology.hl7.org/CodeSystem/v3-DataOperation#UPDATE
+* agent[+].type = http://terminology.hl7.org/CodeSystem/provenance-participant-type#author
+* agent[=].who.display = "basiliskus"
