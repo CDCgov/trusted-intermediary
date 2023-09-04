@@ -28,6 +28,8 @@ Description: "The PID Segment"
 * phoneNumberHome 0..1 SU string "PID-13 Phone Number - Home"
 * phoneNumberHomeType 0..1 SU code "PID-13.3 Phone Number Telecommunication Equipment Type"
 * phoneNumberHomeAnyText 0..1 SU string "PID-13.9 Phone Number Any Text"
+* multipleBirthIndicator 0..1 SU code "PID-24 Multple Birth Indicator"
+* birthOrder 0..1 SU positiveInt "PID-25 Birth Order"
 * patientDeathIndicator 0..1 SU code "PID-30 Patient Death Indicator"
 
 // Provenance Section begins
@@ -44,3 +46,16 @@ Usage: #definition
 * agent[+].type = http://terminology.hl7.org/CodeSystem/provenance-participant-type#author
 * agent[=].who.display = "T. R. Johnson"
 
+
+Instance: segment-pid-logical-model-history-update
+InstanceOf: Provenance
+Title: "addition of PID segment fields and cardinality correction"
+Usage: #definition
+* target[+] = Reference(StructureDefinition/segment-pid-logical-model)
+* recorded = "2023-09-04T18:17:36.0000Z"
+* occurredDateTime = "2023-09-04"
+* reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT
+* reason.text = "changed the sub-segments to the ones we initially support."
+* activity = http://terminology.hl7.org/CodeSystem/v3-DataOperation#UPDATE
+* agent[+].type = http://terminology.hl7.org/CodeSystem/provenance-participant-type#author
+* agent[=].who.display = "T. R. Johnson"
