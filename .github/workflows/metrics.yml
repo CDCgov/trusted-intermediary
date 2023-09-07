@@ -19,7 +19,7 @@ jobs:
         uses: snok/install-poetry@v1
 
       - name: Checkout devops-deployment-metrics code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: flexion/devops-deployment-metrics
           path: devops-deployment-metrics
