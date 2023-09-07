@@ -32,7 +32,7 @@ Usage: #definition
 * agent[=].who.display = "T. R. Johnson"
 
 
-Instance: segment-obr-logical-model-history-create
+Instance: segment-obr-logical-model-history-update
 InstanceOf: Provenance
 Title: "Removal of OBR-3, OBR-8, OBR-15 and OBR-16 segments"
 Usage: #definition
