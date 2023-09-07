@@ -41,6 +41,6 @@ Usage: #definition
 * occurredDateTime = "2023-09-07"
 * reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT
 * reason.text = "Updated segments to match the ones we initially support"
-* activity = http://terminology.hl7.org/CodeSystem/v3-DataOperation#CREATE
+* activity = http://terminology.hl7.org/CodeSystem/v3-DataOperation#UPDATE
 * agent[+].type = http://terminology.hl7.org/CodeSystem/provenance-participant-type#author
 * agent[=].who.display = "jorg3lopez"
