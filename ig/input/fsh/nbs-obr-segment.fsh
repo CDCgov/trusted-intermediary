@@ -2,28 +2,27 @@ Logical: OBRSegment
 Id: segment-obr-logical-model
 Title: "OBR Segment"
 Description: "The OBR Segment"
-* setOBRId 1..1 SU string "OBR-1 Set ID"
-* OBRplacerOrderNumber 1..1 SU string "OBR-2 Placer Order Number"
-* fillerOrderNumber 1..1 SU string "OBR-3 Filler Order Number"
+* setOBRId 1..1 SU positiveInt "OBR-1 Set ID"
+* placerOrderNumber 1..1 SU string "OBR-2 Placer Order Number"
+* placerOrderNumberEntityIdentifier 1..1 SU string "OBR-2.1 Placer Order Number Entity Identifier"
+* placerOrderNumberNamespaceID 1..1 SU string "OBR-2.2 Placer Order Number Namespace ID"
+* placerOrderNumberUniversalID 1..1 SU string "OBR-2.3 Placer Order Number Universal ID"
+* placerOrderNumberUniversalIDType 1..1 SU code "OBR-2.4 Placer Order Number Universal ID Type"
 * universalServiceIdentifier 1..1 SU string "OBR-4 Universal Service Identifier"
 * observationDateTime 1..1 SU string "OBR-7 Observation Date/Time"
-* observationEndDateTime 1..1 SU string "OBR-8 Observation End Time"
-* specimenID 1..1 SU string "OBR-15 or OBR-16  Specimen Id"
-* specimenType 1..1 SU string "OBR-15 or OBR-16 Specimen Type"
-* specimenCollectionDateTime 1..1 SU string "OBR-7 Specimen Collection Date/Time"
 // other optional fields
 
 
 // Provenance Section begins
 Instance: segment-obr-logical-model-history-create
 InstanceOf: Provenance
-Title: "Initial creation of OBR segment changelog"
+Title: "Removal of OBR-3, OBR-8, OBR-15 and OBR-16 segments"
 Usage: #definition
 * target[+] = Reference(StructureDefinition/segment-obr-logical-model)
-* recorded = "2023-08-29T17:50:36.0000Z"
-* occurredDateTime = "2023-08-29"
+* recorded = "2023-09-07T00:00:00.0000Z"
+* occurredDateTime = "2023-09-07"
 * reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT
-* reason.text = "Created an OBR segment resource"
+* reason.text = "Updated segments to match the ones we initially support"
 * activity = http://terminology.hl7.org/CodeSystem/v3-DataOperation#CREATE
 * agent[+].type = http://terminology.hl7.org/CodeSystem/provenance-participant-type#author
-* agent[=].who.display = "T. R. Johnson"
+* agent[=].who.display = "jorg3lopez"
