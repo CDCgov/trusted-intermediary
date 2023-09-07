@@ -13,7 +13,7 @@ Description: "The OBR Segment"
 * universalServiceIdentifierText 1..1 SU string "OBR-4.2 Universal Service Identifier Text"
 * universalServiceIdentifierNameOfCodingSystem 1..1 SU string "OBR-4.3 Universal Service Identifier Name Of Coding System"
 * universalServiceIdentifierOriginalText 1..1 SU string "OBR-4.9 Universal Service Identifier Original Text"
-* observationDateTime 1..1 SU string "OBR-7 Observation Date/Time"
+* observationDateTime 1..1 SU dateTime "OBR-7 Observation Date/Time"
 // other optional fields
 
 
