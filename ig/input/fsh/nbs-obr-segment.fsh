@@ -18,6 +18,8 @@ Description: "The OBR Segment"
 
 
 // Provenance Section begins
+Instance: segment-obr-logical-model-history-create
+InstanceOf: Provenance
 Title: "Initial creation of OBR segment changelog"
 Usage: #definition
 * target[+] = Reference(StructureDefinition/segment-obr-logical-model)
