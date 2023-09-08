@@ -174,7 +174,7 @@ CDC including this GitHub page may be subject to applicable federal law, includi
 #### ReportStream Setup
 
 1. Checkout `master` branch for `CDCgov/prime-reportstream`
-2. Follow [the steps in the ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/docs-deprecated/getting-started/getting-started.md#first-build) to build the baseline
+2. Follow [the steps in the ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/docs-deprecated/getting-started/getting-started.md#building-the-baseline) to build the baseline
 3. CD to `prime-reportstream/prime-router`
 4. Run RS with `docker compose up --build -d`
 5. Run `./gradlew resetDB && ./gradlew reloadTable && ./gradlew reloadSettings`
