@@ -168,8 +168,20 @@ CDC including this GitHub page may be subject to applicable federal law, includi
 
 #### CDC-TI Setup
 
-1. Checkout `rs-form-data` branch for `CDCgov/trusted-intermediary`
-2. Run TI with `REPORT_STREAM_URL_PREFIX=http://localhost:7071 ./gradlew clean app:run`
+1. Checkout `main` branch for `CDCgov/trusted-intermediary`
+2. Edit the `app/src/main/java/gov/hhs/cdc/trustedintermediary/etor/EtorDomainRegistration.java` file and replace:
+   ```Java
+   │ 66 │        if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
+   │ 67 │            ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
+   │ 68 │        } else {
+   │ 69 │            ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
+   │ 70 │        }
+   ```
+   with:
+   ```Java
+   │ 66 │        ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
+   ```
+3. Run TI with `REPORT_STREAM_URL_PREFIX=http://localhost:7071 ./gradlew clean app:run`
 
 #### ReportStream Setup
 
