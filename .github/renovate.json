@@ -23,5 +23,6 @@
             "matchPackageNames": ["ca.uhn.hapi.fhir:org.hl7.fhir.utilities"],
             "allowedVersions": "!/5\\.6\\.881/"
         }
-    ]
+    ],
+    "pinDigests": false
 }
