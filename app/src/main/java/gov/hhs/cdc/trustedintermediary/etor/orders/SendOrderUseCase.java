@@ -19,4 +19,8 @@ public class SendOrderUseCase {
         var omlOrder = converter.convertMetadataToOmlOrder(order);
         sender.sendOrder(omlOrder);
     }
+
+    public void sendWithoutModification(final Order<?> order) throws UnableToSendOrderException {
+        sender.sendOrder(order);
+    }
 }
