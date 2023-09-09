@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders;
 
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
+import gov.hhs.cdc.trustedintermediary.etor.tasks.Task;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrder;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiTask;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;

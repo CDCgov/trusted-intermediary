@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
-import gov.hhs.cdc.trustedintermediary.etor.orders.Task;
+import gov.hhs.cdc.trustedintermediary.etor.tasks.Task;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;

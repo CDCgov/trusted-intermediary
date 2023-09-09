@@ -1,7 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.localfile;
 
-import gov.hhs.cdc.trustedintermediary.etor.orders.Task;
-import gov.hhs.cdc.trustedintermediary.etor.orders.TaskNotifier;
+import gov.hhs.cdc.trustedintermediary.etor.tasks.Task;
+import gov.hhs.cdc.trustedintermediary.etor.tasks.TaskNotifier;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import java.nio.charset.StandardCharsets;

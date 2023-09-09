@@ -1,5 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders;
 
+import gov.hhs.cdc.trustedintermediary.etor.tasks.Task;
+import gov.hhs.cdc.trustedintermediary.etor.tasks.TaskNotifier;
 import javax.inject.Inject;
 
 /** The overall logic to receive, convert to OML, and subsequently send a lab order. */
