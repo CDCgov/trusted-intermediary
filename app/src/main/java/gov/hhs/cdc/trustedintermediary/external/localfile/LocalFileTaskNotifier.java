@@ -7,6 +7,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Map;
 import javax.inject.Inject;
 
 public class LocalFileTaskNotifier implements TaskNotifier {
@@ -29,7 +30,7 @@ public class LocalFileTaskNotifier implements TaskNotifier {
         logger.logInfo("Sending the task to the hard drive at {}", fileLocation.toAbsolutePath());
 
         try {
-            String serialized = formatter.convertToJsonString(task.getTaskId());
+            String serialized = formatter.convertToJsonString(Map.of("taskId", task.getTaskId()));
             Files.writeString(fileLocation, serialized, StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new RuntimeException("Error writing the task", e);
