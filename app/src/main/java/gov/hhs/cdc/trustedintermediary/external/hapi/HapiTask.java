@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.hapi;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Task;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.Resource;
 
 public class HapiTask implements Task<Bundle> {
 
@@ -18,8 +19,11 @@ public class HapiTask implements Task<Bundle> {
     }
 
     @Override
-    public String getFhirResourceId() {
-        return innerTask.getId();
+    public String getTaskId() {
+        return HapiHelper.resourcesInBundle(innerTask, org.hl7.fhir.r4.model.Task.class)
+                .map(Resource::getId)
+                .findFirst()
+                .orElse("");
     }
 
     @Override

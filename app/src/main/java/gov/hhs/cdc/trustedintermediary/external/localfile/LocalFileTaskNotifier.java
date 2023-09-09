@@ -29,7 +29,7 @@ public class LocalFileTaskNotifier implements TaskNotifier {
         logger.logInfo("Sending the task to the hard drive at {}", fileLocation.toAbsolutePath());
 
         try {
-            String serialized = formatter.convertToJsonString(task.getFhirResourceId());
+            String serialized = formatter.convertToJsonString(task.getTaskId());
             Files.writeString(fileLocation, serialized, StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new RuntimeException("Error writing the task", e);

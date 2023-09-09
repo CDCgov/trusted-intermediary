@@ -2,22 +2,22 @@ package gov.hhs.cdc.trustedintermediary.etor.orders;
 
 public class TaskResponse {
 
-    private String fhirResourceId;
+    private String taskId;
     private String serviceRequestId;
     private String specimenId;
 
     public TaskResponse(Task<?> task) {
-        setFhirResourceId(task.getFhirResourceId());
+        setTaskId(task.getTaskId());
         setServiceRequestId(task.getServiceRequestId());
         setSpecimenId(task.getSpecimenId());
     }
 
-    public String getFhirResourceId() {
-        return fhirResourceId;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setFhirResourceId(String fhirResourceId) {
-        this.fhirResourceId = fhirResourceId;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
     public String getServiceRequestId() {
