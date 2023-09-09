@@ -1,0 +1,20 @@
+plugins {
+    id 'java'
+}
+
+group = 'gov.hhs.cdc.trustedintermediary'
+version = 'unspecified'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'gov.hhs.cdc.trustedintermediary:shared:unspecified'
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}

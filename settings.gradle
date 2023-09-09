@@ -9,4 +9,6 @@
 
 rootProject.name = 'trusted-intermediary'
 include('app')
+include('shared')
+include('etor')
 include('e2e')
