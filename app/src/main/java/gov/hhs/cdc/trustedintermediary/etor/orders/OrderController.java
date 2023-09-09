@@ -32,7 +32,7 @@ public class OrderController {
 
     public Task<?> parseTasks(DomainRequest request) throws FhirParseException {
         logger.logInfo("Parsing task");
-        var fhirBundle = fhir.parseResource(request.getBody(), Bundle.class);
+        var fhirBundle = fhir.parseResource(request.getBody(), org.hl7.fhir.r4.model.Task.class);
         return new HapiTask(fhirBundle);
     }
 }

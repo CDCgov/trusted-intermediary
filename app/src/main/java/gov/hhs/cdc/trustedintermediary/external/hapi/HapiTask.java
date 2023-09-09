@@ -1,43 +1,34 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import gov.hhs.cdc.trustedintermediary.etor.tasks.Task;
-import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Reference;
-import org.hl7.fhir.r4.model.Resource;
 
-public class HapiTask implements Task<Bundle> {
+public class HapiTask implements Task<org.hl7.fhir.r4.model.Task> {
 
-    private final Bundle innerTask;
+    private final org.hl7.fhir.r4.model.Task innerTask;
 
-    public HapiTask(Bundle innerOrder) {
+    public HapiTask(org.hl7.fhir.r4.model.Task innerOrder) {
         this.innerTask = innerOrder;
     }
 
     @Override
-    public Bundle getUnderlyingTask() {
+    public org.hl7.fhir.r4.model.Task getUnderlyingTask() {
         return innerTask;
     }
 
     @Override
     public String getTaskId() {
-        return HapiHelper.resourcesInBundle(innerTask, org.hl7.fhir.r4.model.Task.class)
-                .map(Resource::getId)
-                .findFirst()
-                .orElse("");
+        return innerTask.getId();
     }
 
     @Override
     public String getServiceRequestId() {
-        return HapiHelper.resourcesInBundle(innerTask, org.hl7.fhir.r4.model.Task.class)
-                .map(task -> task.getFocus().getReference())
-                .findFirst()
-                .orElse("");
+        return innerTask.getFocus().getReference();
     }
 
     @Override
     public String getSpecimenId() {
-        return HapiHelper.resourcesInBundle(innerTask, org.hl7.fhir.r4.model.Task.class)
-                .flatMap(task -> task.getOutput().stream())
+        return innerTask.getOutput().stream()
                 .filter(output -> output.getValue().hasType("Reference"))
                 .map(output -> output.getValue().castToReference(output.getValue()))
                 .map(Reference::getReference)
