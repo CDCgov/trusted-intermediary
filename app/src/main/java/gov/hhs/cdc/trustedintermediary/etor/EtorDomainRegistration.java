@@ -11,8 +11,18 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemograph
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
-import gov.hhs.cdc.trustedintermediary.etor.orders.*;
+import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
+import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController;
+import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter;
+import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse;
+import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
+import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase;
+import gov.hhs.cdc.trustedintermediary.etor.orders.Task;
+import gov.hhs.cdc.trustedintermediary.etor.orders.TaskNotifier;
+import gov.hhs.cdc.trustedintermediary.etor.orders.TaskResponse;
+import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
+import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileTaskNotifier;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
@@ -65,7 +75,7 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(TaskNotifier.class, LocalFileTaskNotifier.getInstance());
 
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
-            ApplicationContext.register(OrderSender.class, LocalFileTaskNotifier.getInstance());
+            ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
         } else {
             ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
         }
