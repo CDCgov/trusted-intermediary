@@ -37,6 +37,7 @@ public class HapiTask implements Task<Bundle> {
                 .filter(output -> output.getValue().hasType("Reference"))
                 .map(output -> output.getValue().castToReference(output.getValue()))
                 .map(Reference::getReference)
+                .filter(reference -> reference.startsWith("Specimen/"))
                 .findFirst()
                 .orElse("");
     }

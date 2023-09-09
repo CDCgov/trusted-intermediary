@@ -27,7 +27,8 @@ public class SendOrderUseCase {
 
     public void sendTask(final Task<?> task) throws UnableToSendOrderException {
         // TODO: save the task, we now own it.
-        // TODO: grab ServiceRequest, from the OG EHR
+        // TODO: grab ServiceRequest, from the OG EHR, modify the `intent` and save it for when the
+        // lab requests it.
         notifier.sendTaskId(task);
     }
 }
