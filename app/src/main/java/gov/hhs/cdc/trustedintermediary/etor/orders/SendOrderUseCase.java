@@ -23,4 +23,8 @@ public class SendOrderUseCase {
     public void sendWithoutModification(final Order<?> order) throws UnableToSendOrderException {
         sender.sendOrder(order);
     }
+
+    public void sendTask(final Task<?> task) throws UnableToSendOrderException {
+        sender.sendOrder(task);
+    }
 }

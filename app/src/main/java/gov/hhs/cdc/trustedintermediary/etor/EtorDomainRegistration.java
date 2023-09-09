@@ -11,13 +11,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemograph
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
-import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController;
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter;
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse;
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
-import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase;
-import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
+import gov.hhs.cdc.trustedintermediary.etor.orders.*;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
@@ -147,11 +141,11 @@ public class EtorDomainRegistration implements DomainConnector {
     }
 
     DomainResponse handleFhirOrderRestful(DomainRequest request) {
-        Order<?> orders;
+        Task<?> task;
 
         try {
-            orders = orderController.parseOrders(request);
-            sendOrderUseCase.send(orders);
+            task = orderController.parseTasks(request);
+            sendOrderUseCase.sendTask(task);
         } catch (FhirParseException e) {
             logger.logError("Unable to parse order request", e);
             return domainResponseHelper.constructErrorResponse(400, e);
@@ -160,7 +154,7 @@ public class EtorDomainRegistration implements DomainConnector {
             return domainResponseHelper.constructErrorResponse(400, e);
         }
 
-        OrderResponse orderResponse = new OrderResponse(orders);
-        return domainResponseHelper.constructOkResponse(orderResponse);
+        TaskResponse taskResponse = new TaskResponse(task);
+        return domainResponseHelper.constructOkResponse(taskResponse);
     }
 }
