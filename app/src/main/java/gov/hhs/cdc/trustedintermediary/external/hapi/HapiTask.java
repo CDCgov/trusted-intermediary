@@ -2,8 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import gov.hhs.cdc.trustedintermediary.etor.orders.Task;
 import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Reference;
 
 public class HapiTask implements Task<Bundle> {
 
@@ -25,32 +24,19 @@ public class HapiTask implements Task<Bundle> {
 
     @Override
     public String getServiceRequestId() {
-        return HapiHelper.resourcesInBundle(innerTask, Patient.class)
-                .flatMap(patient -> patient.getIdentifier().stream())
-                .filter(
-                        identifier ->
-                                identifier
-                                        .getType()
-                                        .hasCoding(
-                                                "http://terminology.hl7.org/CodeSystem/v2-0203",
-                                                "MR"))
-                .map(Identifier::getValue)
+        return HapiHelper.resourcesInBundle(innerTask, org.hl7.fhir.r4.model.Task.class)
+                .map(task -> task.getFocus().getReference())
                 .findFirst()
                 .orElse("");
     }
 
     @Override
     public String getSpecimenId() {
-        return HapiHelper.resourcesInBundle(innerTask, Patient.class)
-                .flatMap(patient -> patient.getIdentifier().stream())
-                .filter(
-                        identifier ->
-                                identifier
-                                        .getType()
-                                        .hasCoding(
-                                                "http://terminology.hl7.org/CodeSystem/v2-0203",
-                                                "MR"))
-                .map(Identifier::getValue)
+        return HapiHelper.resourcesInBundle(innerTask, org.hl7.fhir.r4.model.Task.class)
+                .flatMap(task -> task.getOutput().stream())
+                .filter(output -> output.getValue().hasType("Reference"))
+                .map(output -> output.getValue().castToReference(output.getValue()))
+                .map(Reference::getReference)
                 .findFirst()
                 .orElse("");
     }

@@ -25,6 +25,6 @@ public class SendOrderUseCase {
     }
 
     public void sendTask(final Task<?> task) throws UnableToSendOrderException {
-        sender.sendOrder(task);
+        sender.sendTask(task);
     }
 }
