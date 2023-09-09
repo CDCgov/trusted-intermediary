@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.orders;
 
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrder;
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiTask;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -31,6 +32,6 @@ public class OrderController {
     public Task<?> parseTasks(DomainRequest request) throws FhirParseException {
         logger.logInfo("Parsing task");
         var fhirBundle = fhir.parseResource(request.getBody(), Bundle.class);
-        return new HapiOrder(fhirBundle);
+        return new HapiTask(fhirBundle);
     }
 }
