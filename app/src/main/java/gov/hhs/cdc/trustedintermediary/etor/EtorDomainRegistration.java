@@ -55,12 +55,15 @@ public class EtorDomainRegistration implements DomainConnector {
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
             Map.of(
                     new HttpEndpoint("POST", DEMOGRAPHICS_API_ENDPOINT, true),
-                            this::handleDemographics,
-                    new HttpEndpoint("POST", ORDERS_API_ENDPOINT, true), this::handleOrders,
+                    this::handleDemographics,
+                    new HttpEndpoint("POST", ORDERS_API_ENDPOINT, true),
+                    this::handleOrders,
                     new HttpEndpoint("POST", ORDER_FHIR_MESSAGE_API_ENDPOINT, true),
-                            this::handleFhirOrderMessage,
+                    this::handleFhirOrderMessage,
                     new HttpEndpoint("POST", ORDER_FHIR_TASK_API_ENDPOINT, true),
-                            this::handleFhirOrderRestful);
+                    this::handleFhirOrderRestful,
+                    new HttpEndpoint("PUT", ORDER_FHIR_TASK_API_ENDPOINT, true),
+                    this::updateTask);
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
@@ -162,6 +165,21 @@ public class EtorDomainRegistration implements DomainConnector {
             return domainResponseHelper.constructErrorResponse(400, e);
         } catch (UnableToSendOrderException e) {
             logger.logError("Unable to send order", e);
+            return domainResponseHelper.constructErrorResponse(400, e);
+        }
+
+        TaskResponse taskResponse = new TaskResponse(task);
+        return domainResponseHelper.constructOkResponse(taskResponse);
+    }
+
+    DomainResponse updateTask(DomainRequest request) {
+        Task<?> task;
+
+        try {
+            task = orderController.parseTasks(request);
+            // TODO to update our task with data from this task
+        } catch (FhirParseException e) {
+            logger.logError("Unable to parse order request", e);
             return domainResponseHelper.constructErrorResponse(400, e);
         }
 
