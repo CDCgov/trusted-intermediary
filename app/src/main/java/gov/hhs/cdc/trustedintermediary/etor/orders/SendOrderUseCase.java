@@ -8,6 +8,7 @@ public class SendOrderUseCase {
 
     @Inject OrderConverter converter;
     @Inject OrderSender sender;
+    @Inject TaskNotifier notifier;
 
     private SendOrderUseCase() {}
 
@@ -25,6 +26,6 @@ public class SendOrderUseCase {
     }
 
     public void sendTask(final Task<?> task) throws UnableToSendOrderException {
-        sender.sendTask(task);
+        notifier.sendTaskId(task);
     }
 }
