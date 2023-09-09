@@ -13,7 +13,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsCont
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
 import gov.hhs.cdc.trustedintermediary.etor.orders.*;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
-import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileOrderSender;
+import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileTaskNotifier;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -62,9 +62,10 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(OrderConverter.class, HapiOrderConverter.getInstance());
         ApplicationContext.register(OrderController.class, OrderController.getInstance());
         ApplicationContext.register(SendOrderUseCase.class, SendOrderUseCase.getInstance());
+        ApplicationContext.register(TaskNotifier.class, LocalFileTaskNotifier.getInstance());
 
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
-            ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
+            ApplicationContext.register(OrderSender.class, LocalFileTaskNotifier.getInstance());
         } else {
             ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
         }

@@ -26,6 +26,8 @@ public class SendOrderUseCase {
     }
 
     public void sendTask(final Task<?> task) throws UnableToSendOrderException {
+        // TODO: save the task, we now own it.
+        // TODO: grab ServiceRequest, from the OG EHR
         notifier.sendTaskId(task);
     }
 }

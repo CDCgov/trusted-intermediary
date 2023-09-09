@@ -14,11 +14,11 @@ class LocalFileOrderSenderTest extends Specification{
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
-        TestApplicationContext.register(LocalFileOrderSender, LocalFileOrderSender.getInstance())
+        TestApplicationContext.register(LocalFileTaskNotifier, LocalFileTaskNotifier.getInstance())
     }
 
     def cleanup() {
-        Files.deleteIfExists(Paths.get(LocalFileOrderSender.LOCAL_FILE_NAME))
+        Files.deleteIfExists(Paths.get(LocalFileTaskNotifier.LOCAL_FILE_NAME))
     }
 
     def "send order works"() {
@@ -35,10 +35,10 @@ class LocalFileOrderSenderTest extends Specification{
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        LocalFileOrderSender.getInstance().sendOrder(mockOrder)
+        LocalFileTaskNotifier.getInstance().sendOrder(mockOrder)
 
         then:
-        Files.readString(Paths.get(LocalFileOrderSender.LOCAL_FILE_NAME)) == testStringOrder
+        Files.readString(Paths.get(LocalFileTaskNotifier.LOCAL_FILE_NAME)) == testStringOrder
     }
 
     def "throws an exception when FHIR encoding does not work"() {
@@ -54,7 +54,7 @@ class LocalFileOrderSenderTest extends Specification{
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        LocalFileOrderSender.getInstance().sendOrder(mockOrder)
+        LocalFileTaskNotifier.getInstance().sendOrder(mockOrder)
 
         then:
         def exception = thrown(UnableToSendOrderException)
