@@ -38,6 +38,8 @@ public class EtorDomainRegistration implements DomainConnector {
 
     static final String DEMOGRAPHICS_API_ENDPOINT = "/v1/etor/demographics";
     static final String ORDERS_API_ENDPOINT = "/v1/etor/orders";
+    static final String ORDER_FHIR_MESSAGE_API_ENDPOINT = "/v1/etor/orders/message";
+    static final String ORDER_FHIR_TASK_API_ENDPOINT = "/v1/etor/orders/task";
 
     @Inject PatientDemographicsController patientDemographicsController;
     @Inject OrderController orderController;
@@ -50,7 +52,11 @@ public class EtorDomainRegistration implements DomainConnector {
             Map.of(
                     new HttpEndpoint("POST", DEMOGRAPHICS_API_ENDPOINT, true),
                             this::handleDemographics,
-                    new HttpEndpoint("POST", ORDERS_API_ENDPOINT, true), this::handleOrders);
+                    new HttpEndpoint("POST", ORDERS_API_ENDPOINT, true), this::handleOrders,
+                    new HttpEndpoint("POST", ORDER_FHIR_MESSAGE_API_ENDPOINT, true),
+                            this::handleFhirOrderMessage,
+                    new HttpEndpoint("POST", ORDER_FHIR_TASK_API_ENDPOINT, true),
+                            this::handleFhirOrderRestful);
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
@@ -105,6 +111,42 @@ public class EtorDomainRegistration implements DomainConnector {
     }
 
     DomainResponse handleOrders(DomainRequest request) {
+        Order<?> orders;
+
+        try {
+            orders = orderController.parseOrders(request);
+            sendOrderUseCase.send(orders);
+        } catch (FhirParseException e) {
+            logger.logError("Unable to parse order request", e);
+            return domainResponseHelper.constructErrorResponse(400, e);
+        } catch (UnableToSendOrderException e) {
+            logger.logError("Unable to send order", e);
+            return domainResponseHelper.constructErrorResponse(400, e);
+        }
+
+        OrderResponse orderResponse = new OrderResponse(orders);
+        return domainResponseHelper.constructOkResponse(orderResponse);
+    }
+
+    DomainResponse handleFhirOrderMessage(DomainRequest request) {
+        Order<?> orders;
+
+        try {
+            orders = orderController.parseOrders(request);
+            sendOrderUseCase.send(orders);
+        } catch (FhirParseException e) {
+            logger.logError("Unable to parse order request", e);
+            return domainResponseHelper.constructErrorResponse(400, e);
+        } catch (UnableToSendOrderException e) {
+            logger.logError("Unable to send order", e);
+            return domainResponseHelper.constructErrorResponse(400, e);
+        }
+
+        OrderResponse orderResponse = new OrderResponse(orders);
+        return domainResponseHelper.constructOkResponse(orderResponse);
+    }
+
+    DomainResponse handleFhirOrderRestful(DomainRequest request) {
         Order<?> orders;
 
         try {
