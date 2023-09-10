@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi
 
-import gov.hhs.cdc.trustedintermediary.wrappers.hapi.HapiHelper
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Provenance

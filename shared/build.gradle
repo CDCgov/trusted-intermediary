@@ -5,6 +5,7 @@ plugins {
     id 'com.diffplug.spotless' version '6.11.0'
     id 'org.cyclonedx.bom' version '1.7.4'
     id 'org.sonarqube' version '4.0.0.2929'
+    id 'java-test-fixtures'
 }
 
 cyclonedxBom {
@@ -72,9 +73,10 @@ dependencies {
     implementation 'com.azure:azure-identity:1.10.0'
 
     testImplementation 'org.apache.groovy:groovy:4.0.14'
+    testFixturesImplementation 'org.apache.groovy:groovy:4.0.14'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
-    testImplementation 'com.openpojo:openpojo:0.9.1'
-    testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.15.1'
+    testFixturesImplementation 'com.openpojo:openpojo:0.9.1'
+    testFixturesImplementation 'nl.jqno.equalsverifier:equalsverifier:3.15.1'
 }
 
 jacoco {

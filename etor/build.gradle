@@ -37,6 +37,7 @@ java {
 
 dependencies {
     implementation project(':shared')
+    testImplementation testFixtures(project(':shared'))
 
     testImplementation 'org.apache.groovy:groovy:4.0.14'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
