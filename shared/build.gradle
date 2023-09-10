@@ -1,12 +1,38 @@
 plugins {
     id 'java-library'
+    id 'groovy'
+    id 'jacoco'
+    id 'com.diffplug.spotless' version '6.11.0'
+    id 'org.cyclonedx.bom' version '1.7.4'
+    id 'org.sonarqube' version '4.0.0.2929'
 }
 
-//group = 'gov.hhs.cdc.trustedintermediary'
-//version = 'unspecified'
+cyclonedxBom {
+
+    // Specified the type of project being built. Defaults to 'library'
+    projectType = "application"
+
+    // Boms destination directory (defaults to build/reports)
+
+    // The file name for the generated BOMs (before the file format suffix). Defaults to 'bom'
+    outputName = "bom"
+
+    // The file format generated, can be xml, json or all for generating both
+    outputFormat = "all"
+
+    // Exclude BOM Serial Number
+    includeBomSerialNumber = false
+
+}
 
 repositories {
     mavenCentral()
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 dependencies {
@@ -45,10 +71,83 @@ dependencies {
     implementation 'com.azure:azure-security-keyvault-secrets:4.6.5'
     implementation 'com.azure:azure-identity:1.10.0'
 
-    testImplementation platform('org.junit:junit-bom:5.9.1')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.apache.groovy:groovy:4.0.14'
+    testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
+    testImplementation 'com.openpojo:openpojo:0.9.1'
+    testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.15.1'
 }
 
-test {
+jacoco {
+    toolVersion = '0.8.10'
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.90
+            }
+        }
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, excludes: test.jacoco.excludes)
+        }))
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, excludes: test.jacoco.excludes)
+        }))
+    }
+}
+
+tasks.named('test') {
     useJUnitPlatform()
+
+    jacoco {
+        excludes = [
+            '**/javalin/App*',
+            '**/jackson/Jackson*',
+            '**/slf4j/LocalLogger*',
+            '**/slf4j/DeployedLogger*',
+            '**/slf4j/LoggerHelper*',
+            '**/hapi/HapiFhirImplementation*',
+            '**/jjwt/JjwtEngine*',
+            '**/apache/ApacheClient*',
+            '**/azure/AzureSecrets*'
+        ]
+    }
+}
+
+spotless {
+    java {
+        googleJavaFormat().aosp()
+    }
+
+    groovy {
+        greclipse().configFile('../greclipse.properties')
+        excludeJava()
+    }
+
+    groovyGradle {
+        greclipse().configFile('../greclipse.properties')
+    }
+}
+
+sonar {
+    properties {
+        property "sonar.projectName", "Trusted Intermediary"
+        property "sonar.projectKey", "trusted-intermediary"
+        property "sonar.organization", "cdcgov"
+        property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.coverage.exclusions", test.jacoco.excludes
+    }
 }

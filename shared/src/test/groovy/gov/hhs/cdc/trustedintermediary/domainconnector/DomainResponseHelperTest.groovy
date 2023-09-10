@@ -2,8 +2,8 @@ package gov.hhs.cdc.trustedintermediary.domainconnector
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
-import gov.hhs.cdc.trustedintermediary.external.formatter.Formatter
-import gov.hhs.cdc.trustedintermediary.external.formatter.FormatterProcessingException
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
 import spock.lang.Specification
 
 

@@ -3,7 +3,6 @@ package gov.hhs.cdc.trustedintermediary.external.localfile
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
-import gov.hhs.cdc.trustedintermediary.localfile.LocalFileOrderSender
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import spock.lang.Specification
 

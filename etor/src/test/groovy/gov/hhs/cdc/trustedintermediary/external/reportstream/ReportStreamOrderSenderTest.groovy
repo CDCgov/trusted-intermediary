@@ -9,13 +9,13 @@ import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
-import gov.hhs.cdc.trustedintermediary.external.formatter.Formatter
-import gov.hhs.cdc.trustedintermediary.external.formatter.FormatterProcessingException
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
-import gov.hhs.cdc.trustedintermediary.external.formatter.TypeReference
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import spock.lang.Specification

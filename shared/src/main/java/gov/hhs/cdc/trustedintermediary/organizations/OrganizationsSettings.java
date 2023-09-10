@@ -1,7 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.organizations;
 
-import gov.hhs.cdc.trustedintermediary.external.formatter.Formatter;
-import gov.hhs.cdc.trustedintermediary.external.formatter.TypeReference;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
