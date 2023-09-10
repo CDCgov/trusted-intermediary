@@ -9,33 +9,7 @@
 plugins {
     id 'groovy'
     id 'application'
-    id 'jacoco'
-    id 'com.diffplug.spotless' version '6.11.0'
     id 'com.github.johnrengelman.shadow' version '8.0.0'
-    id 'org.cyclonedx.bom' version '1.7.4'
-    id 'org.sonarqube' version '4.0.0.2929'
-}
-
-cyclonedxBom {
-
-    // Specified the type of project being built. Defaults to 'library'
-    projectType = "application"
-
-    // Boms destination directory (defaults to build/reports)
-
-    // The file name for the generated BOMs (before the file format suffix). Defaults to 'bom'
-    outputName = "bom"
-
-    // The file format generated, can be xml, json or all for generating both
-    outputFormat = "all"
-
-    // Exclude BOM Serial Number
-    includeBomSerialNumber = false
-
-}
-
-repositories {
-    mavenCentral()
 }
 
 java {
@@ -57,10 +31,6 @@ dependencies {
     testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.15.1'
 }
 
-jacoco {
-    toolVersion = '0.8.10'
-}
-
 jacocoTestCoverageVerification {
     violationRules {
         rule {
@@ -72,7 +42,7 @@ jacocoTestCoverageVerification {
 
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, excludes: test.jacoco.excludes)
+            fileTree(dir: it, excludes: rootProject.ext.jacoco_excludes)
         }))
     }
 }
@@ -84,7 +54,7 @@ jacocoTestReport {
 
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, excludes: test.jacoco.excludes)
+            fileTree(dir: it, excludes: rootProject.ext.jacoco_excludes)
         }))
     }
 }
@@ -95,43 +65,4 @@ application {
 
 tasks.named('test') {
     useJUnitPlatform()
-
-    jacoco {
-        excludes = [
-            '**/javalin/App*',
-            '**/jackson/Jackson*',
-            '**/slf4j/LocalLogger*',
-            '**/slf4j/DeployedLogger*',
-            '**/slf4j/LoggerHelper*',
-            '**/hapi/HapiFhirImplementation*',
-            '**/jjwt/JjwtEngine*',
-            '**/apache/ApacheClient*',
-            '**/azure/AzureSecrets*'
-        ]
-    }
-}
-
-spotless {
-    java {
-        googleJavaFormat().aosp()
-    }
-
-    groovy {
-        greclipse().configFile('../greclipse.properties')
-        excludeJava()
-    }
-
-    groovyGradle {
-        greclipse().configFile('../greclipse.properties')
-    }
-}
-
-sonar {
-    properties {
-        property "sonar.projectName", "Trusted Intermediary"
-        property "sonar.projectKey", "trusted-intermediary"
-        property "sonar.organization", "cdcgov"
-        property "sonar.host.url", "https://sonarcloud.io"
-        property "sonar.coverage.exclusions", test.jacoco.excludes
-    }
 }
