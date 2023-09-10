@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.external.localfile;
+package gov.hhs.cdc.trustedintermediary.localfile;
 
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;

@@ -8,6 +8,7 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper;
 import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecificationException;
 import gov.hhs.cdc.trustedintermediary.external.apache.ApacheClient;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureSecrets;
+import gov.hhs.cdc.trustedintermediary.external.formatter.Formatter;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation;
 import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache;
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson;
@@ -23,7 +24,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombiner;
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import io.javalin.Javalin;
 import java.util.Set;
 

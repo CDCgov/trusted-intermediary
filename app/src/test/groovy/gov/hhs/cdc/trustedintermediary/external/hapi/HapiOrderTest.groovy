@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi
 
+
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding

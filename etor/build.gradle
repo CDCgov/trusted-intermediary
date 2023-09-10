@@ -1,16 +1,16 @@
 plugins {
-    id 'java'
+    id 'java-library'
 }
 
-group = 'gov.hhs.cdc.trustedintermediary'
-version = 'unspecified'
+//group = 'gov.hhs.cdc.trustedintermediary'
+//version = 'unspecified'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation 'gov.hhs.cdc.trustedintermediary:shared:unspecified'
+    implementation project(':shared')
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 }

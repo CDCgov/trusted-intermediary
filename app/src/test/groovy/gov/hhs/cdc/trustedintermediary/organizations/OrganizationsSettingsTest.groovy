@@ -2,7 +2,7 @@ package gov.hhs.cdc.trustedintermediary.organizations
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
+import gov.hhs.cdc.trustedintermediary.external.formatter.Formatter
 import spock.lang.Specification
 
 import java.nio.file.Files

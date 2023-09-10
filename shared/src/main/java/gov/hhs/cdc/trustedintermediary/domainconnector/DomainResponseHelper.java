@@ -1,8 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.domainconnector;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
+import gov.hhs.cdc.trustedintermediary.external.formatter.Formatter;
+import gov.hhs.cdc.trustedintermediary.external.formatter.FormatterProcessingException;
 import java.util.Map;
 import java.util.Optional;
 import javax.inject.Inject;

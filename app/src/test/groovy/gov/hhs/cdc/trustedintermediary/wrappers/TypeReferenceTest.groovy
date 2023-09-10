@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.wrappers
 
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
+import gov.hhs.cdc.trustedintermediary.external.formatter.TypeReference
 import spock.lang.Specification
 
 class TypeReferenceTest extends Specification {
