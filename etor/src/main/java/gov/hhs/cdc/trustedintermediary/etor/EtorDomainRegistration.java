@@ -18,8 +18,12 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
+import gov.hhs.cdc.trustedintermediary.etor.tasks.Task;
+import gov.hhs.cdc.trustedintermediary.etor.tasks.TaskNotifier;
+import gov.hhs.cdc.trustedintermediary.etor.tasks.TaskResponse;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileOrderSender;
+import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileTaskNotifier;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -38,6 +42,8 @@ public class EtorDomainRegistration implements DomainConnector {
 
     static final String DEMOGRAPHICS_API_ENDPOINT = "/v1/etor/demographics";
     static final String ORDERS_API_ENDPOINT = "/v1/etor/orders";
+    static final String ORDER_FHIR_MESSAGE_API_ENDPOINT = "/v1/etor/orders/message";
+    static final String ORDER_FHIR_TASK_API_ENDPOINT = "/v1/etor/orders/task";
 
     @Inject PatientDemographicsController patientDemographicsController;
     @Inject OrderController orderController;
@@ -49,8 +55,15 @@ public class EtorDomainRegistration implements DomainConnector {
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
             Map.of(
                     new HttpEndpoint("POST", DEMOGRAPHICS_API_ENDPOINT, true),
-                            this::handleDemographics,
-                    new HttpEndpoint("POST", ORDERS_API_ENDPOINT, true), this::handleOrders);
+                    this::handleDemographics,
+                    new HttpEndpoint("POST", ORDERS_API_ENDPOINT, true),
+                    this::handleOrders,
+                    new HttpEndpoint("POST", ORDER_FHIR_MESSAGE_API_ENDPOINT, true),
+                    this::handleFhirOrderMessage,
+                    new HttpEndpoint("POST", ORDER_FHIR_TASK_API_ENDPOINT, true),
+                    this::handleFhirOrderRestful,
+                    new HttpEndpoint("PUT", ORDER_FHIR_TASK_API_ENDPOINT, true),
+                    this::updateTask);
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
@@ -62,6 +75,7 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(OrderConverter.class, HapiOrderConverter.getInstance());
         ApplicationContext.register(OrderController.class, OrderController.getInstance());
         ApplicationContext.register(SendOrderUseCase.class, SendOrderUseCase.getInstance());
+        ApplicationContext.register(TaskNotifier.class, LocalFileTaskNotifier.getInstance());
 
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
             ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
@@ -120,5 +134,56 @@ public class EtorDomainRegistration implements DomainConnector {
 
         OrderResponse orderResponse = new OrderResponse(orders);
         return domainResponseHelper.constructOkResponse(orderResponse);
+    }
+
+    DomainResponse handleFhirOrderMessage(DomainRequest request) {
+        Order<?> orders;
+
+        try {
+            orders = orderController.parseOrders(request);
+            sendOrderUseCase.sendWithoutModification(orders);
+        } catch (FhirParseException e) {
+            logger.logError("Unable to parse order request", e);
+            return domainResponseHelper.constructErrorResponse(400, e);
+        } catch (UnableToSendOrderException e) {
+            logger.logError("Unable to send order", e);
+            return domainResponseHelper.constructErrorResponse(400, e);
+        }
+
+        OrderResponse orderResponse = new OrderResponse(orders);
+        return domainResponseHelper.constructOkResponse(orderResponse);
+    }
+
+    DomainResponse handleFhirOrderRestful(DomainRequest request) {
+        Task<?> task;
+
+        try {
+            task = orderController.parseTasks(request);
+            sendOrderUseCase.sendTask(task);
+        } catch (FhirParseException e) {
+            logger.logError("Unable to parse order request", e);
+            return domainResponseHelper.constructErrorResponse(400, e);
+        } catch (UnableToSendOrderException e) {
+            logger.logError("Unable to send order", e);
+            return domainResponseHelper.constructErrorResponse(400, e);
+        }
+
+        TaskResponse taskResponse = new TaskResponse(task);
+        return domainResponseHelper.constructOkResponse(taskResponse);
+    }
+
+    DomainResponse updateTask(DomainRequest request) {
+        Task<?> task;
+
+        try {
+            task = orderController.parseTasks(request);
+            // TODO to update our task with data from this task
+        } catch (FhirParseException e) {
+            logger.logError("Unable to parse order request", e);
+            return domainResponseHelper.constructErrorResponse(400, e);
+        }
+
+        TaskResponse taskResponse = new TaskResponse(task);
+        return domainResponseHelper.constructOkResponse(taskResponse);
     }
 }
