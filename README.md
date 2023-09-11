@@ -224,13 +224,19 @@ CDC including this GitHub page may be subject to applicable federal law, includi
 
 #### Submit request to ReportStream
 
-`curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-hospital' --header 'Authorization: Bearer none' --data-binary '@/path/to/ORM_O01.hl7' 'http://localhost:7071/api/waters'`
+```
+curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-hospital' --header 'Authorization: Bearer <token>' --data-binary '@/path/to/message.hl7' 'http://localhost:7071/api/waters'
+```
 
 or
 
-`curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.etor-service-sender' --header 'Authorization: Bearer none' --data-binary '@/path/to/lab_order.json' 'http://localhost:7071/api/waters'`
+```
+curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.etor-service-sender' --header 'Authorization: Bearer <token>' --data-binary '@/path/to/message.fhir' 'http://localhost:7071/api/waters'
+```
 
 After one or two minutes, check that hl7 files have been dropped to `prime-reportstream/prime-router/build/sftp` folder
+
+**Note**: `<token>` should be replaced by the bearer token received from the `/api/token` endpoint
 
 ## DORA Metrics
 
