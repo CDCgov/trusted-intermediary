@@ -85,6 +85,12 @@ ext.jacoco_excludes = [
         '**/azure/AzureSecrets*'
 ]
 
+tasks.register('allUnitTests') {
+    dependsOn 'app:test'
+    dependsOn 'shared:test'
+    dependsOn 'etor:test'
+}
+
 sonar {
     properties {
         property "sonar.projectName", "Trusted Intermediary"

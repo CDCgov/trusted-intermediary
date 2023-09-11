@@ -42,7 +42,7 @@ Once compiled, the built artifact is `/app/build/libs/app-all.jar`.
 To run the unit tests, execute...
 
 ```shell
-./gradlew app:clean shared:test app:test etor:test
+./gradlew clean allUnitTests
 ```
 
 #### End-to-end Tests

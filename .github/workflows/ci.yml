@@ -23,7 +23,7 @@ jobs:
           cache: gradle
 
       - name: Run unit tests
-        run: ./gradlew clean shared:test app:test etor:test testCodeCoverageReport jacocoTestCoverageVerification
+        run: ./gradlew clean allUnitTests testCodeCoverageReport jacocoTestCoverageVerification
 
   docker-build-test:
     name: Docker Build Test
