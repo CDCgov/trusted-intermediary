@@ -51,7 +51,7 @@ Usage: #definition
 * recorded = "2023-09-11T00:00:00.0000Z"
 * occurredDateTime = "2023-09-11"
 * reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT
-* reason.text = "Added segment that is not required, but we support"
+* reason.text = "Added a field that is not required, but we support"
 * activity = http://terminology.hl7.org/CodeSystem/v3-DataOperation#UPDATE
 * agent[+].type = http://terminology.hl7.org/CodeSystem/provenance-participant-type#author
 * agent[=].who.display = "basiliskus"
