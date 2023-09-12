@@ -14,8 +14,7 @@ Description: "The OBR Segment"
 * universalServiceIdentifierNameOfCodingSystem 1..1 SU string "OBR-4.3 Universal Service Identifier Name Of Coding System"
 * universalServiceIdentifierOriginalText 1..1 SU string "OBR-4.9 Universal Service Identifier Original Text"
 * observationDateTime 1..1 SU dateTime "OBR-7 Observation Date/Time"
-// other optional fields
-
+* specimenActionCode 1..1 SU string "OBR-11 Specimen Action Code (value is always 'P')"
 
 // Provenance Section begins
 Instance: segment-obr-logical-model-history-create
@@ -31,7 +30,6 @@ Usage: #definition
 * agent[+].type = http://terminology.hl7.org/CodeSystem/provenance-participant-type#author
 * agent[=].who.display = "T. R. Johnson"
 
-
 Instance: segment-obr-logical-model-history-update
 InstanceOf: Provenance
 Title: "Removal of OBR-3, OBR-8, OBR-15 and OBR-16 segments"
@@ -44,3 +42,16 @@ Usage: #definition
 * activity = http://terminology.hl7.org/CodeSystem/v3-DataOperation#UPDATE
 * agent[+].type = http://terminology.hl7.org/CodeSystem/provenance-participant-type#author
 * agent[=].who.display = "jorg3lopez"
+
+Instance: segment-obr-logical-model-history-update
+InstanceOf: Provenance
+Title: "Addition of OBR-11 segment"
+Usage: #definition
+* target[+] = Reference(StructureDefinition/segment-obr-logical-model)
+* recorded = "2023-09-11T00:00:00.0000Z"
+* occurredDateTime = "2023-09-11"
+* reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT
+* reason.text = "Added a field that is not required, but we support"
+* activity = http://terminology.hl7.org/CodeSystem/v3-DataOperation#UPDATE
+* agent[+].type = http://terminology.hl7.org/CodeSystem/provenance-participant-type#author
+* agent[=].who.display = "basiliskus"
