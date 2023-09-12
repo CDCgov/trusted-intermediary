@@ -168,13 +168,25 @@ CDC including this GitHub page may be subject to applicable federal law, includi
 
 #### CDC-TI Setup
 
-1. Checkout `rs-form-data` branch for `CDCgov/trusted-intermediary`
-2. Run TI with `REPORT_STREAM_URL_PREFIX=http://localhost:7071 ./gradlew clean app:run`
+1. Checkout `main` branch for `CDCgov/trusted-intermediary`
+2. Edit the `app/src/main/java/gov/hhs/cdc/trustedintermediary/etor/EtorDomainRegistration.java` file and replace:
+   ```Java
+   │ 66 │        if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
+   │ 67 │            ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
+   │ 68 │        } else {
+   │ 69 │            ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
+   │ 70 │        }
+   ```
+   with:
+   ```Java
+   │ 66 │        ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
+   ```
+3. Run TI with `REPORT_STREAM_URL_PREFIX=http://localhost:7071 ./gradlew clean app:run`
 
 #### ReportStream Setup
 
-1. Checkout `flexion/test/ti-rs-setup` branch for `CDCgov/prime-reportstream`
-2. Follow [the steps in the ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/docs-deprecated/getting-started/getting-started.md#first-build) to build the baseline
+1. Checkout `master` branch for `CDCgov/prime-reportstream`
+2. Follow [the steps in the ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/docs-deprecated/getting-started/getting-started.md#building-the-baseline) to build the baseline
 3. CD to `prime-reportstream/prime-router`
 4. Run RS with `docker compose up --build -d`
 5. Run `./gradlew resetDB && ./gradlew reloadTable && ./gradlew reloadSettings`
@@ -212,13 +224,19 @@ CDC including this GitHub page may be subject to applicable federal law, includi
 
 #### Submit request to ReportStream
 
-`curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-hospital' --header 'Authorization: Bearer none' --data-binary '@/path/to/ORM_O01.hl7' 'http://localhost:7071/api/waters'`
+```
+curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-hospital' --header 'Authorization: Bearer <token>' --data-binary '@/path/to/message.hl7' 'http://localhost:7071/api/waters'
+```
 
 or
 
-`curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.etor-service-sender' --header 'Authorization: Bearer none' --data-binary '@/path/to/lab_order.json' 'http://localhost:7071/api/waters'`
+```
+curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.etor-service-sender' --header 'Authorization: Bearer <token>' --data-binary '@/path/to/message.fhir' 'http://localhost:7071/api/waters'
+```
 
 After one or two minutes, check that hl7 files have been dropped to `prime-reportstream/prime-router/build/sftp` folder
+
+**Note**: `<token>` should be replaced by the bearer token received from the `/api/token` endpoint
 
 ## DORA Metrics
 
