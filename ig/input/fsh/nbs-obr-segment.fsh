@@ -43,7 +43,7 @@ Usage: #definition
 * agent[+].type = http://terminology.hl7.org/CodeSystem/provenance-participant-type#author
 * agent[=].who.display = "jorg3lopez"
 
-Instance: segment-obr-logical-model-history-update
+Instance: segment-obr-logical-model-history-update-2
 InstanceOf: Provenance
 Title: "Addition of OBR-11 segment"
 Usage: #definition
