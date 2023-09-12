@@ -14,7 +14,7 @@ Description: "The OBR Segment"
 * universalServiceIdentifierNameOfCodingSystem 1..1 SU string "OBR-4.3 Universal Service Identifier Name Of Coding System"
 * universalServiceIdentifierOriginalText 1..1 SU string "OBR-4.9 Universal Service Identifier Original Text"
 * observationDateTime 1..1 SU dateTime "OBR-7 Observation Date/Time"
-* specimenActionCode 0..1 SU string "OBR-11 Specimen Action Code (value is always 'P')"
+* specimenActionCode 1..1 SU string "OBR-11 Specimen Action Code (value is always 'P')"
 
 // Provenance Section begins
 Instance: segment-obr-logical-model-history-create
