@@ -108,7 +108,7 @@ jobs:
 
     - name: Extract generated documentation from the documentation image
       id: extract
-      uses: shrink/actions-docker-extract@v2
+      uses: shrink/actions-docker-extract@v3
       with:
         image: '${{ inputs.REGISTRY }}/${{ inputs.REPO_DOCS }}:${{ github.sha }}'
         path: /trusted-intermediary/output/.
