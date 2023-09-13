@@ -91,7 +91,7 @@ tasks.register('allUnitTests') {
     dependsOn 'etor:test'
 }
 
-tasks.register('allBuild') {
+tasks.register('allBuilds') {
     dependsOn 'app:build'
     dependsOn 'shared:build'
     dependsOn 'etor:build'
