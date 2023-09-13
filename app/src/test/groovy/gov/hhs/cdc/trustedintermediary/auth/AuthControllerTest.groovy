@@ -3,10 +3,6 @@ package gov.hhs.cdc.trustedintermediary.auth
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper
-import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
-
 import java.nio.charset.StandardCharsets
 import spock.lang.Specification
 

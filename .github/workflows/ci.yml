@@ -23,7 +23,7 @@ jobs:
           cache: gradle
 
       - name: Run unit tests
-        run: ./gradlew clean app:test jacocoTestReport jacocoTestCoverageVerification
+        run: ./gradlew clean allUnitTests testCodeCoverageReport jacocoTestCoverageVerification
 
   docker-build-test:
     name: Docker Build Test
@@ -88,7 +88,7 @@ jobs:
         run: ./gradlew spotlessCheck
 
       - name: Sonar
-        run: ./gradlew app:build app:jacocoTestReport app:sonar --info
+        run: ./gradlew allBuilds testCodeCoverageReport sonar --info
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

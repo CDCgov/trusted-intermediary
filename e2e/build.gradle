@@ -1,11 +1,6 @@
 plugins {
     id 'java'
     id 'groovy'
-    id 'com.diffplug.spotless' version '6.11.0'
-}
-
-repositories {
-    mavenCentral()
 }
 
 java {
@@ -29,19 +24,4 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
-}
-
-spotless {
-    java {
-        googleJavaFormat().aosp()
-    }
-
-    groovy {
-        greclipse().configFile("../greclipse.properties")
-        excludeJava()
-    }
-
-    groovyGradle {
-        greclipse().configFile("../greclipse.properties")
-    }
 }
