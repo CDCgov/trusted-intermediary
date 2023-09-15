@@ -2,20 +2,32 @@ Logical: OBXSegment
 Id: segment-obx-logical-model
 Title: "OBX Segment"
 Description: "The OBX Segment"
-* setOBXId 1..1 SU string "OBX-1 (1) Birthweight an identifier"
-* valueType 0..1 SU id "OBX-2 A Value Type"
-* observationIdentifier 1..1 SU code "OBX-3 Observation Identifier"
-* identifier 1..1 SU string "OBX-3.1 Identifier"
-* observationtText 1..1 SU string "OBX-3.2 Text"
-* observationNameOfCodingSystem 1..1 SU id "OBX-3.3 Name of Coding System"
-* observationSubID 1..1 SU string "OBX-4 (LOINC 54089-8) Observation Sub-ID"
-* observationValue 1..1 SU string "OBX-5 (LOINC or 99MDH) Observation Value"
-* observationValueUnits 1..1 SU code "OBX-6 Units (Observation Value)"
-* obxValueUnitsIdentifier 1..1 SU code "OBX-6.1 (Unit) Identifier"
-* obxValueUnitsText 1..1 SU code "OBX-6.2 (Unit) Text"
-* obxValueUnitsNameOfCodingSystem 1..1 SU code "OBX-6.3 (Unit) Name of Coding System"
-* observationResultStatus 1..1 SU id "OBX-11 Observation Result Status"
-* dateTimeOfTheObservation 1..1 SU dateTime "OBX-14 Date/Time Of Observation"
+* setOBXId 1..1 string "OBX-1 (1) Birthweight an identifier"
+* valueType 0..1 id "OBX-2 A Value Type"
+* observationIdentifier 1..1 code "OBX-3 Observation Identifier"
+* identifier 1..1 string "OBX-3.1 Identifier"
+* observationtText 1..1 string "OBX-3.2 Text"
+* observationNameOfCodingSystem 1..1 id "OBX-3.3 Name of Coding System"
+* observationSubID 1..1 string "OBX-4 (LOINC 54089-8) Observation Sub-ID"
+* observationValue 1..1 string "OBX-5 (LOINC or 99MDH) Observation Value"
+* observationValueUnits 1..1 code "OBX-6 Units (Observation Value)"
+* obxValueUnitsIdentifier 1..1 code "OBX-6.1 (Unit) Identifier"
+* obxValueUnitsText 1..1 code "OBX-6.2 (Unit) Text"
+* obxValueUnitsNameOfCodingSystem 1..1 code "OBX-6.3 (Unit) Name of Coding System"
+* observationReferenceRange 1..1 string "OBX-7 Observation Reference Range"
+* observationAbnormalFlags 1..1 code "OBX-8 Observation Abnormal Flags"
+* observationResultStatus 1..1 id "OBX-11 Observation Result Status"
+* dateTimeOfTheObservation 1..1 dateTime "OBX-14 Date/Time Of Observation"
+* observationProducersId 1..1 code "OBX-15 Producer's Id"
+* obxProducersIdIdentifier 1..1 string "OBX-15.1 Producer's Id Identifier"
+* obxProducersIdText 1..1 string "OBX-15.2 Producer's Id Text"
+* obxProducersIdNameOfCodingSystem 1..1 id "OBX-15.3 Producer's Id Name of Coding System"
+* obxResponsibleObserver 1..1 id "OBX-16 Responsible Observer"
+* observationMethod 1..1 code "OBX-17 Responsible Observer"
+* analysisDateTime 1..1 dateTime "OBX-19 Analysis Date/Time"
+* performingOrganizationName 1..1 code "OBX-23 Performing Organization Name"
+* performingOrganizationAddress 1..1 code "OBX-24 Performing Organization Address"
+* performingOrgMedDirector 1..1 code "OBX-25 Performing Organization Medical Director"
 // other optional
 
 
@@ -36,7 +48,7 @@ Usage: #definition
 
 Instance: segment-obx-logical-model-history-update
 InstanceOf: Provenance
-Title: "addition of required OBX segment fields and cardinality correction"
+Title: "addition of converted OBX segment fields and data type correction"
 Usage: #definition
 * target[+] = Reference(StructureDefinition/segment-obx-logical-model)
 * recorded = "2023-09-15T17:41:23.0000Z"
