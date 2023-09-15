@@ -8,20 +8,14 @@ Description: "The OBX Segment"
 * identifier 1..1 SU string "OBX-3.1 Identifier"
 * observationtText 1..1 SU string "OBX-3.2 Text"
 * observationNameOfCodingSystem 1..1 SU id "OBX-3.3 Name of Coding System"
-* observationOriginalText 1..1 SU string "OBX-3.9 Original Text"
 * observationSubID 1..1 SU string "OBX-4 (LOINC 54089-8) Observation Sub-ID"
-* observationGroup 1..1 SU string "OBX-4.2 Observation Group"
-* observationSequence 1..1 SU string "OBX-4.3 Observation Sequence"
-* observationSubIdentifier 1..1 SU string "OBX-4.4 Observation Identifier"
 * observationValue 1..1 SU string "OBX-5 (LOINC or 99MDH) Observation Value"
-* observationValueIdentifier 1..1 SU string "OBX-5.1 Observation Identifier"
-* observationValueText 0..1 SU string "OBX-5.2 Observation Text"
-* observationValueNameOfCodingSystem 1..1 SU string "OBX-5.3 Observation Name of Coding System"
-* observationValueUnits 1..1 SU code "OBX-6 Unit For Observation Value"
+* observationValueUnits 1..1 SU code "OBX-6 Units (Observation Value)"
+* obxValueUnitsIdentifier 1..1 SU code "OBX-6.1 (Unit) Identifier"
+* obxValueUnitsText 1..1 SU code "OBX-6.2 (Unit) Text"
+* obxValueUnitsNameOfCodingSystem 1..1 SU code "OBX-6.3 (Unit) Name of Coding System"
 * observationResultStatus 1..1 SU id "OBX-11 Observation Result Status"
-* dateTimeOfTheObservation 1..1 SU dateTime "OBX-14 Date/time Of Observation"
-* observationType 1..1 SU string "OBX-29 Observation Type"
-* observationSubType 1..1 SU string "OBX-30 Observation Sub-type"
+* dateTimeOfTheObservation 1..1 SU dateTime "OBX-14 Date/Time Of Observation"
 // other optional
 
 
@@ -45,8 +39,8 @@ InstanceOf: Provenance
 Title: "addition of required OBX segment fields and cardinality correction"
 Usage: #definition
 * target[+] = Reference(StructureDefinition/segment-obx-logical-model)
-* recorded = "2023-09-07T17:41:23.0000Z"
-* occurredDateTime = "2023-09-07"
+* recorded = "2023-09-15T17:41:23.0000Z"
+* occurredDateTime = "2023-09-15"
 * reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT
 * reason.text = "changed the sub-segments to the ones the system will initially support."
 * activity = http://terminology.hl7.org/CodeSystem/v3-DataOperation#UPDATE
