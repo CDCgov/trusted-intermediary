@@ -3,7 +3,7 @@ Id: segment-obx-logical-model
 Title: "OBX Segment"
 Description: "The OBX Segment"
 * setOBXId 1..1 string "OBX-1 Set ID - OBX"
-* valueType 0..1 id "OBX-2 A Value Type"
+* valueType 0..1 id "OBX-2 Value Type"
 * observationIdentifier 1..1 code "OBX-3 Observation Identifier"
 * identifier 1..1 string "OBX-3.1 Identifier"
 * observationtText 1..1 string "OBX-3.2 Text"
