@@ -50,7 +50,7 @@ dependencies {
     testFixturesImplementation 'org.apache.groovy:groovy:4.0.15'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
     testFixturesImplementation 'com.openpojo:openpojo:0.9.1'
-    testFixturesImplementation 'nl.jqno.equalsverifier:equalsverifier:3.15.1'
+    testFixturesImplementation 'nl.jqno.equalsverifier:equalsverifier:3.15.2'
 }
 
 jacocoTestCoverageVerification {
