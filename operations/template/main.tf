@@ -37,7 +37,7 @@ resource "azurerm_service_plan" "plan" {
 
 # Create the staging App Service
 resource "azurerm_linux_web_app" "api" {
-  name                = "cdcti-${var.environment}-api"
+  name                = "cdcti-${var.environment}-api2"
   resource_group_name = data.azurerm_resource_group.group.name
   location            = azurerm_service_plan.plan.location
   service_plan_id     = azurerm_service_plan.plan.id
@@ -62,7 +62,7 @@ resource "azurerm_linux_web_app" "api" {
 }
 
 resource "azurerm_storage_account" "docs" {
-  name                            = "cdcti${var.environment}docs"
+  name                            = "cdcti${var.environment}docs2"
   resource_group_name             = data.azurerm_resource_group.group.name
   location                        = data.azurerm_resource_group.group.location
   account_tier                    = "Standard"
