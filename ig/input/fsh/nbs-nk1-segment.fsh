@@ -2,13 +2,13 @@ Logical: NK1Segment
 Id: segment-nk1-logical-model
 Title: "NK1 Segment"
 Description: "The NK1 Segment (HL7 Description)"
-* setNK1Id 1..1 SU string "NK1-1: Set ID - NK1"
+* setNK1Id 1..1 SU positiveInt "NK1-1: Set ID - NK1"
 * name 1..1 SU string "NK1-2 Name"
 * familyName 1..1 SU string "NK1-2.1 Family Name"
 * surname 1..1 SU string "NK1-2.1.1 Surname"
 * relationship 1..1 SU string "NK1-3 Relationship"
 * relationshipIdentifier 1..1 SU string "NK1-3.1 idenitifier"
-* relationshipCodingSystem 1..1 SU string "Name of Coding System"
+* relationshipCodingSystem 1..1 SU string "NK1-3.3 Name of Coding System"
 * originalText 1..1 SU string "NK1-3.9 Original Text"
 * streetAddress 1..1 SU string "NK1-4.1 Street Address"
 * streetOrMailingAddress 1..1 SU string "NK1-4.1.1 Street or Mailing Address"
@@ -35,3 +35,16 @@ Usage: #definition
 * activity = http://terminology.hl7.org/CodeSystem/v3-DataOperation#CREATE
 * agent[+].type = http://terminology.hl7.org/CodeSystem/provenance-participant-type#author
 * agent[=].who.display = "T. R. Johnson"
+
+Instance: segment-nk1-logical-model-history-create
+InstanceOf: Provenance
+Title: "Edited description of NK1.3.3"
+Usage: #definition
+* target[+] = Reference(StructureDefinition/segment-nk1-logical-model)
+* recorded = "2023-09-27T10:21:00.0000Z"
+* occurredDateTime = "2023-09-27"
+* reason = http://terminology.hl7.org/CodeSystem/v3-ActReason#METAMGT
+* reason.text = "Created an NK1 segment resource with supported subsegments"
+* activity = http://terminology.hl7.org/CodeSystem/v3-DataOperation#CREATE
+* agent[+].type = http://terminology.hl7.org/CodeSystem/provenance-participant-type#author
+* agent[=].who.display = "jorg3lopez"
