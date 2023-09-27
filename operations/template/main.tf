@@ -8,17 +8,20 @@ locals {
   rs_domain_prefix               = "${local.selected_rs_environment_prefix}${length(local.selected_rs_environment_prefix) == 0 ? "" : "."}"
 }
 
-# Create the staging resource group
-resource "azurerm_resource_group" "group" {
-  name     = "cdcti-${var.environment}"
-  location = "Central US"
+data "azurerm_resource_group" "group" {
+  name = "csels-rsti-${var.environment}-moderate-rg"
 }
+
+#resource "azurerm_resource_group" "group" {
+#  name     = "cdcti-${var.environment}"
+#  location = "Central US"
+#}
 
 # Create the container registry
 resource "azurerm_container_registry" "registry" {
   name                = "cdcti${var.environment}containerregistry"
-  resource_group_name = azurerm_resource_group.group.name
-  location            = azurerm_resource_group.group.location
+  resource_group_name = data.azurerm_resource_group.group.name
+  location            = data.azurerm_resource_group.group.location
   sku                 = "Standard"
   admin_enabled       = true
 }
@@ -26,8 +29,8 @@ resource "azurerm_container_registry" "registry" {
 # Create the staging service plan
 resource "azurerm_service_plan" "plan" {
   name                = "cdcti-${var.environment}-service-plan"
-  resource_group_name = azurerm_resource_group.group.name
-  location            = azurerm_resource_group.group.location
+  resource_group_name = data.azurerm_resource_group.group.name
+  location            = data.azurerm_resource_group.group.location
   os_type             = "Linux"
   sku_name            = "B1"
 }
@@ -35,7 +38,7 @@ resource "azurerm_service_plan" "plan" {
 # Create the staging App Service
 resource "azurerm_linux_web_app" "api" {
   name                = "cdcti-${var.environment}-api"
-  resource_group_name = azurerm_resource_group.group.name
+  resource_group_name = data.azurerm_resource_group.group.name
   location            = azurerm_service_plan.plan.location
   service_plan_id     = azurerm_service_plan.plan.id
 
@@ -60,8 +63,8 @@ resource "azurerm_linux_web_app" "api" {
 
 resource "azurerm_storage_account" "docs" {
   name                            = "cdcti${var.environment}docs"
-  resource_group_name             = azurerm_resource_group.group.name
-  location                        = azurerm_resource_group.group.location
+  resource_group_name             = data.azurerm_resource_group.group.name
+  location                        = data.azurerm_resource_group.group.location
   account_tier                    = "Standard"
   account_replication_type        = "GRS"
   account_kind                    = "StorageV2"

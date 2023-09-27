@@ -1,8 +1,8 @@
 resource "azurerm_key_vault" "key_storage" {
   name = "ti-key-vault-${var.environment}"
 
-  resource_group_name = azurerm_resource_group.group.name
-  location            = azurerm_resource_group.group.location
+  resource_group_name = data.azurerm_resource_group.group.name
+  location            = data.azurerm_resource_group.group.location
 
   sku_name  = "standard"
   tenant_id = data.azurerm_client_config.current.tenant_id

@@ -1,14 +1,14 @@
 resource "azurerm_log_analytics_workspace" "logs_workspace" {
   name = "ti-logs-${var.environment}"
 
-  resource_group_name = azurerm_resource_group.group.name
-  location            = azurerm_resource_group.group.location
+  resource_group_name = data.azurerm_resource_group.group.name
+  location            = data.azurerm_resource_group.group.location
 }
 
 resource "azurerm_log_analytics_query_pack" "application_logs_pack" {
   name                = "TI Application Logs"
-  resource_group_name = azurerm_resource_group.group.name
-  location            = azurerm_resource_group.group.location
+  resource_group_name = data.azurerm_resource_group.group.name
+  location            = data.azurerm_resource_group.group.location
 }
 
 resource "azurerm_log_analytics_query_pack_query" "example" {
