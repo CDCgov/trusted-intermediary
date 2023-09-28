@@ -24,7 +24,7 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "group" { //create the PR resource group because it has a dynamic name that cannot be always pre-created
-  name     = "els-rsti-pr${var.pr_number}-moderate-rg"
+  name     = "csels-rsti-pr${var.pr_number}-moderate-rg"
   location = "East US"
 }
 
