@@ -23,7 +23,7 @@ provider "azurerm" {
   }
 }
 
-resource "azurerm_resource_group" "group" {  //create the PR resource group because it has a dynamic name that cannot be always pre-created
+resource "azurerm_resource_group" "group" { //create the PR resource group because it has a dynamic name that cannot be always pre-created
   name     = "els-rsti-pr${var.pr_number}-moderate-rg"
   location = "East US"
 }
@@ -32,7 +32,7 @@ module "template" {
   source = "../../template/"
 
   environment = "pr${var.pr_number}"
-  deployer_id = "d59c2c86-de5e-41b7-a752-0869a73f5a60"  //github app registration in Flexion Azure Entra
+  deployer_id = "d59c2c86-de5e-41b7-a752-0869a73f5a60" //github app registration in Flexion Azure Entra
 
   depends_on = [azurerm_resource_group.group]
 }
