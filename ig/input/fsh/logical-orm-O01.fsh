@@ -4,11 +4,11 @@ Logical: ORMO01
 Id: orm-O01-logical-model
 Title: "ORM-O01"
 Description: "The expected input for ORM formatted data for the newborn screening ETOR workflow"
-* MSH 1..1 SU MSHSegment "MSH segment"
-* PID 1..1 SU PIDSegment "PID segment"
-* ORC 1..* SU ORCSegment "ORC segment"
-* OBR 1..* SU OBRSegment "OBR segment"
-* OBX 1..* SU OBXSegment "OBX segment"
+* MSH 1..1 MSHSegment "MSH segment"
+* PID 1..1 PIDSegment "PID segment"
+* ORC 1..* ORCSegment "ORC segment"
+* OBR 1..* OBRSegment "OBR segment"
+* OBX 1..* OBXSegment "OBX segment"
 
 
 // Provenance Section begins
