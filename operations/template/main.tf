@@ -12,11 +12,6 @@ data "azurerm_resource_group" "group" {
   name = "csels-rsti-${var.environment}-moderate-rg"
 }
 
-#resource "azurerm_resource_group" "group" {
-#  name     = "cdcti-${var.environment}"
-#  location = "Central US"
-#}
-
 # Create the container registry
 resource "azurerm_container_registry" "registry" {
   name                = "cdcti${var.environment}containerregistry"
