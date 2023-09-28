@@ -123,4 +123,4 @@ jobs:
             MODIFIED_ENVIRONMENT=${{ inputs.ENVIRONMENT }}
           fi
 
-          az storage blob sync --account-name cdcti${MODIFIED_ENVIRONMENT}docs -c '$web' -s ${{ steps.extract.outputs.destination }}
+          az storage blob sync --account-name cdcti${MODIFIED_ENVIRONMENT}docs2 -c '$web' -s ${{ steps.extract.outputs.destination }}
