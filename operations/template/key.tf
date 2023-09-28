@@ -13,8 +13,7 @@ resource "azurerm_key_vault" "key_storage" {
 resource "azurerm_key_vault_access_policy" "allow_github_deployer" {
   key_vault_id = azurerm_key_vault.key_storage.id
   tenant_id    = data.azurerm_client_config.current.tenant_id
-#  object_id    = "d59c2c86-de5e-41b7-a752-0869a73f5a60" //github app registration
-  object_id    = "f5feabe7-5d37-40ba-94f2-e5c0760b4561" //github app registration
+  object_id    = var.deployer_id
 
   secret_permissions = [
     "Set",
