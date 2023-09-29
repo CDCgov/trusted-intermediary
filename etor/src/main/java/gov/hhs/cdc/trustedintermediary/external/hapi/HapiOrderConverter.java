@@ -105,6 +105,30 @@ public class HapiOrderConverter implements OrderConverter {
         return new HapiOrder(orderBundle);
     }
 
+    @Override
+    public Order<?> addContactSectionToPatientResource(Order<?> order) {
+        logger.logInfo("Adding contact section in Patient resource");
+
+        var hapiOrder = (Order<Bundle>) order;
+        var orderBundle = hapiOrder.getUnderlyingOrder();
+
+        HapiHelper.resourcesInBundle(orderBundle, Patient.class)
+                .forEach(
+                        p -> {
+                            var myContact = p.addContact();
+                            myContact.addRelationship();
+                            myContact.setName(
+                                    p.castToHumanName(
+                                            p.getExtensionByUrl(
+                                                            "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName")
+                                                    .getValue()));
+                            myContact.setTelecom(p.getTelecom());
+                            myContact.setAddress(p.getAddressFirstRep());
+                        });
+
+        return new HapiOrder((orderBundle));
+    }
+
     private MessageHeader createMessageHeader() {
         logger.logInfo("Creating new MessageHeader");
 
