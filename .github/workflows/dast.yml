@@ -26,14 +26,6 @@ jobs:
       - name: ShadowJar
         run: ./gradlew clean shadowJar
 
-      - name: Install Latest Version of Docker Compose v2
-        run: |
-          COMPOSE_VERSION=$(curl --silent https://api.github.com/repos/docker/compose/releases/latest | jq '.tag_name' -r)
-          INSTALL_LOCATION=/usr/libexec/docker/cli-plugins/docker-compose
-          sudo curl -L "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-linux-x86_64" -o ${INSTALL_LOCATION}
-          sudo chmod +x ${INSTALL_LOCATION}
-          docker compose version
-
       - name: Run App in Container
         run: docker compose up --build -d
 
