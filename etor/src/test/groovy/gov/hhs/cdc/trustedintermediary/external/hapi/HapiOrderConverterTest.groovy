@@ -4,6 +4,15 @@ import gov.hhs.cdc.trustedintermediary.DemographicsMock
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
+import org.hl7.fhir.instance.model.api.IBaseDatatype
+import org.hl7.fhir.r4.model.Address
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.ContactPoint
+import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.model.Type
+
 import java.time.Instant
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
@@ -168,5 +177,69 @@ class HapiOrderConverterTest extends Specification {
 
         convertedMessageHeader.getEventCoding().getCode() == "O21"
         convertedMessageHeader.getEventCoding().getDisplay().contains("OML")
+    }
+
+    def "add contact section to patient resource"() {
+        given:
+        def patientExtension = new Extension()
+        patientExtension.setUrl("http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName")
+
+        def humanName = new HumanName()
+        humanName.setText("SADIE S SMITH")
+        humanName.setFamily("SMITH")
+        humanName.addGiven("SADIE")
+        humanName.addGiven("S")
+
+        patientExtension.setValue(humanName)
+
+        def telecomExtension = new Extension()
+        telecomExtension.setUrl("https://reportstream.cdc.gov/fhir/StructureDefinition/text")
+        telecomExtension.setValue(new StringType("(763)555-5555"))
+
+        def telecom = new ContactPoint()
+        telecom.addExtension(telecomExtension)
+        telecom.setSystem(ContactPoint.ContactPointSystem.PHONE)
+        telecom.setValue("(763)555-5555")
+        telecom.setUse(ContactPoint.ContactPointUse.HOME)
+
+        def address = new Address()
+        address.setUse(Address.AddressUse.HOME)
+        address.addLine("555 STATE HIGHWAY 13")
+        address.setCity("DEER CREEK")
+        address.setDistrict("OTTER TAIL")
+        address.setState("MN")
+        address.setPostalCode("56527-9657")
+        address.setCountry("USA")
+
+        def patient = new Patient()
+        patient.addTelecom(telecom)
+        patient.addExtension(patientExtension)
+        patient.addAddress(address)
+
+        def patientEntry = new Bundle.BundleEntryComponent().setResource(patient)
+
+        def entryList = new ArrayList<Bundle.BundleEntryComponent>()
+        entryList.add(patientEntry)
+
+        mockOrderBundle.setEntry(entryList)
+
+        when:
+        def convertedOrderBundle = HapiOrderConverter.getInstance().addContactSectionToPatientResource(mockOrder).getUnderlyingOrder() as Bundle
+
+        then:
+        def convertedPatient = convertedOrderBundle.getEntry().get(0).getResource() as Patient
+
+        println()
+        println("PHONE SYSTEM: " + convertedPatient.getContact()[0].getTelecom().get(0).getSystem())
+        println("PHONE VALUE: " + convertedPatient.getContact()[0].getTelecom().get(0).getValue())
+        println("PHONE USE: " + convertedPatient.getContact()[0].getTelecom().get(0).getUse())
+        println()
+        println("ADDRESS LINE: " + convertedPatient.getContact()[0].getAddress().getLine().get(0))
+        println("ADDRESS CITY: " + convertedPatient.getContact()[0].getAddress().getCity())
+        println("ADDRESS POSTAL CODE: " + convertedPatient.getContact()[0].getAddress().getPostalCode())
+        println()
+
+
+        convertedPatient.getContact()  != null
     }
 }

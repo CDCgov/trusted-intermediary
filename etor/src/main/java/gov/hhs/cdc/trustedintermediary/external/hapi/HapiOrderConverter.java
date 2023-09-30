@@ -116,7 +116,8 @@ public class HapiOrderConverter implements OrderConverter {
                 .forEach(
                         p -> {
                             var myContact = p.addContact();
-                            myContact.addRelationship();
+                            myContact.addRelationship(); // TODO extract rerlationship and add to
+                            // contact
                             myContact.setName(
                                     p.castToHumanName(
                                             p.getExtensionByUrl(
