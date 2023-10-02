@@ -95,7 +95,8 @@ the swarm parameters for the test and the local url where the app is running
 #### Initial Azure and GitHub Configuration
 
 There is minimal set-up to do to get Terraform squared away before you can run the Terraform commands in
-a new Azure environment.
+a new Azure environment in the Flexion space.  For example, the `flexion` environment.  This does not apply to the CDC
+space.
 
 1. Create a resource group: `cdcti-terraform`.
 2. Create a storage account: `cdctiterraform` (with `cdcti-terraform` as the resource group).

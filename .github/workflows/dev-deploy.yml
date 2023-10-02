@@ -14,9 +14,9 @@ jobs:
     with:
       TERRAFORM_DIRECTORY: operations/environments/dev
     secrets:
-      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CDC_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_CDC_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_CDC_DMZ_C1_SUBSCRIPTION_ID }}
 
   dev-deploy:
     name: Dev Application Deploy
@@ -31,6 +31,6 @@ jobs:
     secrets:
       ACR_USERNAME: ${{ needs.terraform-deploy.outputs.ACR_USERNAME }}
       ACR_PASSWORD: ${{ needs.terraform-deploy.outputs.ACR_PASSWORD }}
-      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CDC_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_CDC_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_CDC_DMZ_C1_SUBSCRIPTION_ID }}

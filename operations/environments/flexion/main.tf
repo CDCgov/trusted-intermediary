@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "3.75.0"
+      version = "3.74.0"
     }
   }
 
@@ -11,6 +11,7 @@ terraform {
     resource_group_name  = "cdcti-terraform"
     storage_account_name = "cdctiterraform"
     container_name       = "tfstate"
+    key                  = "flexion.terraform.tfstate"
   }
 }
 
@@ -23,16 +24,9 @@ provider "azurerm" {
   }
 }
 
-resource "azurerm_resource_group" "group" { //create the PR resource group because it has a dynamic name that cannot be always pre-created
-  name     = "csels-rsti-pr${var.pr_number}-moderate-rg"
-  location = "East US"
-}
-
 module "template" {
   source = "../../template/"
 
-  environment = "pr${var.pr_number}"
+  environment = "flexion"
   deployer_id = "d59c2c86-de5e-41b7-a752-0869a73f5a60" //github app registration in Flexion Azure Entra
-
-  depends_on = [azurerm_resource_group.group]
 }
