@@ -145,20 +145,27 @@ There is minimal set-up to do to get Terraform squared away before you can run t
 a new Azure environment in the Flexion Entra domain.  For example, the `internal` environment.  This does not apply to the CDC
 Entra domains and subscriptions.
 
-1. Create a resource group: `cdcti-terraform`.
-2. Create a storage account: `cdctiterraform` (with `cdcti-terraform` as the resource group).
-3. Within the new storage account, create a Container named "tfstate"
+1. Create a resource group.
+2. Create a storage account inside the aforementioned resource group.
+3. Within the new storage account, create a Container.
 4. Within Azure Entra...
-   - Create an App Registration: `cdcti-github`
-   - Within your Subscription, create a Service Account and assign the Contributor role
-   - Add federated credentials for:
-     - `repo:CDCgov/trusted-intermediary:ref:refs/heads/main` (for terraform apply)
-     - `repo:CDCgov/trusted-intermediary:environment:staging` (for staging webapp deploy)
-     - And presumably other repo paths needed in the future for other environments
-5. Add secrets to your GitHub Actions.
-   - `AZURE_TENANT_ID` with the tenant ID from Azure Active Directory.
-   - `AZURE_SUBSCRIPTION_ID` with the ID from the subscription that everything should be deployed into.
-   - `AZURE_CLIENT_ID` with the ID of the App Registration created previously.
+   1. Create an App Registration.
+   2. Add federated credentials to the App Registration
+      - `repo:CDCgov/trusted-intermediary:ref:refs/heads/main` (for terraform apply).
+      - `repo:CDCgov/trusted-intermediary:environment:staging` (for staging webapp deploy).
+      - And presumably other repo paths needed in the future for other environments and branches.
+   3. Within your Subscription, assign the Contributor role to the previously created App Registration.
+5. Add GitHub Action secrets to your GitHub repository.
+   - A secret with the tenant ID from Azure Entra directory.
+   - A secret with the ID from the subscription that everything should be deployed into.
+   - A secret with the ID of the App Registration created previously.
+6. Create a copy of one of the environments under the [operations](./operations) folder.
+   1. Name the copy off of the name of the new environment.
+   2. Edit the `main.tf` file with the names of the resources previously created: `resource_group_name`,
+      `storage_account_name`, `container_name`.  Also update the `environment` to match the new folder name.
+7. Create a GitHub Action workflow so that automatic deploys can occur.  You can take inspiration from our
+   [Internal environment deployment](./.github/workflows/internal-deploy.yml).  Make sure you set the `AZURE_CLIENT_ID`,
+   `AZURE_TENANT_ID`, and `AZURE_SUBSCRIPTION_ID` based on the secrets created previously.
 
 ### Pre-Commit Hooks
 
