@@ -11,7 +11,7 @@ terraform {
     resource_group_name  = "cdcti-terraform"
     storage_account_name = "cdctiterraform"
     container_name       = "tfstate"
-    key                  = "flexion.terraform.tfstate"
+    key                  = "internal.terraform.tfstate"
   }
 }
 
@@ -27,6 +27,6 @@ provider "azurerm" {
 module "template" {
   source = "../../template/"
 
-  environment = "flexion"
+  environment = "internal"
   deployer_id = "d59c2c86-de5e-41b7-a752-0869a73f5a60" //github app registration in Flexion Azure Entra
 }
