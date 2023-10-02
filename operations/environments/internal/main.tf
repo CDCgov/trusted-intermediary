@@ -11,7 +11,7 @@ terraform {
     resource_group_name  = "cdcti-terraform"
     storage_account_name = "cdctiterraform"
     container_name       = "tfstate"
-    key                  = "flexion.terraform.tfstate"
+    key                  = "internal.terraform.tfstate"
   }
 }
 
