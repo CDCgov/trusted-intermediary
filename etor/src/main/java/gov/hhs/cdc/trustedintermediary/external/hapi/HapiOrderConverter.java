@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 import javax.inject.Inject;
@@ -111,13 +112,18 @@ public class HapiOrderConverter implements OrderConverter {
 
         var hapiOrder = (Order<Bundle>) order;
         var orderBundle = hapiOrder.getUnderlyingOrder();
+        var codingList = new ArrayList<Coding>();
+        codingList.add(
+                new Coding()
+                        .setSystem("http://hl7.org/fhir/ValueSet/contact-relationship")
+                        .setCode("MOTHER"));
 
         HapiHelper.resourcesInBundle(orderBundle, Patient.class)
                 .forEach(
                         p -> {
                             var myContact = p.addContact();
-                            myContact.addRelationship(); // TODO extract rerlationship and add to
-                            // contact
+                            myContact.addRelationship();
+                            myContact.getRelationshipFirstRep().setCoding(codingList);
                             myContact.setName(
                                     p.castToHumanName(
                                             p.getExtensionByUrl(

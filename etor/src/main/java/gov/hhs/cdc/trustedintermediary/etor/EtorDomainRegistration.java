@@ -109,7 +109,7 @@ public class EtorDomainRegistration implements DomainConnector {
 
         try {
             orders = orderController.parseOrders(request);
-            sendOrderUseCase.send(orders);
+            sendOrderUseCase.convertAndSend(orders);
         } catch (FhirParseException e) {
             logger.logError("Unable to parse order request", e);
             return domainResponseHelper.constructErrorResponse(400, e);

@@ -23,7 +23,7 @@ class SendOrderUsecaseTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        SendOrderUseCase.getInstance().send(mockOrder)
+        SendOrderUseCase.getInstance().convertAndSend(mockOrder)
 
         then:
         1 * mockConverter.convertMetadataToOmlOrder(mockOrder)
@@ -42,7 +42,7 @@ class SendOrderUsecaseTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        SendOrderUseCase.getInstance().send(mockOrder)
+        SendOrderUseCase.getInstance().convertAndSend(mockOrder)
 
         then:
         thrown(UnableToSendOrderException)

@@ -238,6 +238,8 @@ class HapiOrderConverterTest extends Specification {
         println("ADDRESS CITY: " + convertedPatient.getContact()[0].getAddress().getCity())
         println("ADDRESS POSTAL CODE: " + convertedPatient.getContact()[0].getAddress().getPostalCode())
         println()
+        println("RELATIONSHIP: " + convertedPatient.getContact()[0].getRelationship().get(0).getCoding().get(0).getCode())
+        println()
 
 
         convertedPatient.getContact()  != null

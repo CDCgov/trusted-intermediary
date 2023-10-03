@@ -15,7 +15,7 @@ public class SendOrderUseCase {
         return INSTANCE;
     }
 
-    public void send(final Order<?> order) throws UnableToSendOrderException {
+    public void convertAndSend(final Order<?> order) throws UnableToSendOrderException {
         var omlOrder = converter.convertMetadataToOmlOrder(order);
         omlOrder = converter.addContactSectionToPatientResource(omlOrder);
         sender.sendOrder(omlOrder);

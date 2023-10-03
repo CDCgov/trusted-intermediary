@@ -185,7 +185,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.register(OrderController, mockController)
 
         def mockUseCase = Mock(SendOrderUseCase)
-        mockUseCase.send(_ as Order<?>) >> {
+        mockUseCase.convertAndSend(_ as Order<?>) >> {
             throw new UnableToSendOrderException("error", new NullPointerException())
         }
         TestApplicationContext.register(SendOrderUseCase, mockUseCase)
