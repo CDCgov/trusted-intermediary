@@ -127,7 +127,7 @@ make them on the `internal` branch instead of your original branch.
 
 The Dev environment is similar to the Internal environment but deploys to a CDC Azure Entra domain and subscription.  It
 is also meant to be the Wild West.  Dev deploys similarly to the Internal environment, but you interact with the
-`internal` branch.
+`dev` branch.
 
 ##### Staging
 
