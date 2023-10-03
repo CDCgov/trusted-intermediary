@@ -1,0 +1,34 @@
+MSH|^~\&|MAYOREFLAB|MAYOREFLAB|C7041420||202309260758|C7041420|ORU^R01|169066674328696234|P|2.3
+PID|||MRN||LAST NAME^FIRST^MIDDLE||DOB|SEX|||ADDRESS 1^ADDRESS 2^CITY^STATE^ZIP||PHONE|||||VISIT ID/CSN
+OBR|1|1008303116^EPC|23MAYO-265S0173^Beaker~M186031683^MAYO|F5DNA^Factor V Leiden (R506Q) Mutation, B|||202309221145|||||||202309230940||90111^BLANCHET^PAULETTE^M||||||202309260754|||F
+OBX|1|ST|21838^Factor V Leiden (R506Q) Mutation, B^MAYO^21668-9^F5 gene.p.Arg506Gln:PrThr:Pt:Bld/Tiss:Ord:Molgen^LN||Negative||Negative||||F||||||||202309260754
+OBX|2|ST|21839^F5DNA Interpretation^MAYO^69049-5^Coagulation specialist review:Imp:Pt:XXX:Nar:^LN||SEE COMMENTS||||||F||||||||202309260754
+NTE|1|TX|This individual DOES NOT have the factor V Leiden F5
+NTE|2|TX|c.1601G>A; p.Arg534Gln (legacy numbering Arg506Gln)
+NTE|3|TX|variant. Although the factor V Leiden variant is absent,
+NTE|4|TX|the individual may have other genetic and environmental
+NTE|5|TX|risk factors for venous thromboembolism. If indicated,
+NTE|6|TX|consider genetic consultation and counseling for this
+NTE|7|TX|individual and family members regarding laboratory testing.
+NTE|8|TX|
+NTE|9|TX|-------------------ADDITIONAL INFORMATION-------------------
+NTE|10|TX|This test uses TaqMan Genotyping chemistry to amplify and
+NTE|11|TX|detect specific single nucleotide polymorphisms in purified
+NTE|12|TX|genomic DNA.
+NTE|13|TX|
+NTE|14|TX|DISCLAIMER
+NTE|15|TX|Discrepancy between the activated protein C resistance
+NTE|16|TX|assay and the DNA based F5 c.1601 G>A. p.Arg534Gln assay
+NTE|17|TX|may be observed in patients receiving allogenic stem cell
+NTE|18|TX|transplants or liver transplants.
+NTE|19|TX|This test was developed and its performance characteristics
+NTE|20|TX|determined by Mayo Clinic in a manner consistent with CLIA
+NTE|21|TX|requirements. This test has not been cleared or approved by
+NTE|22|TX|the U.S. Food and Drug Administration.
+OBX|3|ST|21841^F5DNA Reviewed By^MAYO^18771-6^Provider.signing name:Pn:Pt:Report:Nom:^LN||SEE COMMENTS||||||F||||||||202309260754
+NTE|1|F|RESULT: Rajiv K. Pruthi, MBBS
+NTE|2|TX|
+NTE|3|TX|Test Performed by:
+NTE|4|TX|Mayo Clinic Laboratories - Rochester Main Campus
+NTE|5|TX|200 First Street SW, Rochester, MN 55905
+NTE|6|TX|Lab Director: William G. Morice M.D. Ph.D.; CLIA# 24D0404292
