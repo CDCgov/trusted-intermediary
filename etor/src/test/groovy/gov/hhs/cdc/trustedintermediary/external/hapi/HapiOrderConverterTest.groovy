@@ -186,16 +186,10 @@ class HapiOrderConverterTest extends Specification {
         def relationshipSystem = "http://terminology.hl7.org/CodeSystem/v3-RoleCode"
         def relationshipDisplay = "MOTHER"
 
-
         def patient = fakePatientResource()
-
-
-
         def patientEntry = new Bundle.BundleEntryComponent().setResource(patient)
-
         def entryList = new ArrayList<Bundle.BundleEntryComponent>()
         entryList.add(patientEntry)
-
         mockOrderBundle.setEntry(entryList)
 
         when:
@@ -204,20 +198,6 @@ class HapiOrderConverterTest extends Specification {
         then:
         def convertedPatient = convertedOrderBundle.getEntry().get(0).getResource() as Patient
         def contactSection = convertedPatient.getContact()[0]
-
-        println()
-        println("PHONE SYSTEM: " + convertedPatient.getContact()[0].getTelecom().get(0).getSystem())
-        println("PHONE VALUE: " + convertedPatient.getContact()[0].getTelecom().get(0).getValue())
-        println("PHONE USE: " + convertedPatient.getContact()[0].getTelecom().get(0).getUse())
-        println()
-        println("ADDRESS LINE: " + convertedPatient.getContact()[0].getAddress().getLine().get(0))
-        println("ADDRESS CITY: " + convertedPatient.getContact()[0].getAddress().getCity())
-        println("ADDRESS POSTAL CODE: " + convertedPatient.getContact()[0].getAddress().getPostalCode())
-        println()
-        println("RELATIONSHIP CDOE: " + convertedPatient.getContact()[0].getRelationship().get(0).getCoding().get(0).getCode())
-        println("RELATIONSHIP DISPLAY: " + convertedPatient.getContact()[0].getRelationship().get(0).getCoding().get(0).getDisplay())
-        println()
-
 
         contactSection  != null
         // Name
@@ -265,7 +245,6 @@ class HapiOrderConverterTest extends Specification {
         def telecom = new ContactPoint()
         telecom.addExtension(telecomExtension)
         telecom.setSystem(ContactPoint.ContactPointSystem.PHONE)
-        telecom.setValue("(763)555-5555")
         telecom.setUse(ContactPoint.ContactPointUse.HOME)
 
         def address = new Address()
