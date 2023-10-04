@@ -63,11 +63,11 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(OrderController.class, OrderController.getInstance());
         ApplicationContext.register(SendOrderUseCase.class, SendOrderUseCase.getInstance());
 
-        if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
-            ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
-        } else {
+//        if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
+//            ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
+//        } else {
             ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
-        }
+//        }
 
         return endpoints;
     }
