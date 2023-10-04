@@ -125,11 +125,17 @@ public class HapiOrderConverter implements OrderConverter {
                             var myContact = p.addContact();
                             myContact.addRelationship();
                             myContact.getRelationshipFirstRep().setCoding(codingList);
-                            myContact.setName(
-                                    p.castToHumanName(
-                                            p.getExtensionByUrl(
-                                                            "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName")
-                                                    .getValue()));
+
+                            if (p.getExtensionByUrl(
+                                            "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName")
+                                    != null) {
+                                myContact.setName(
+                                        p.castToHumanName(
+                                                p.getExtensionByUrl(
+                                                                "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName")
+                                                        .getValue()));
+                            }
+
                             myContact.setTelecom(p.getTelecom());
                             myContact.setAddress(p.getAddressFirstRep());
                         });
