@@ -4,7 +4,7 @@
 
 Any distribution of the Java 17 JDK.
 
-For apple silicone you will want to enable the Docker option for `Use Rosetta for x86/amd64 emulation on Apple Silicon`.
+For apple silicon you will want to enable the Docker option for `Use Rosetta for x86/amd64 emulation on Apple Silicon`.
 After enabling this option it is recommended that you delete all docker images and containers and rebuild them
 with this option enabled.
 
