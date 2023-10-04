@@ -181,8 +181,12 @@ class HapiOrderConverterTest extends Specification {
 
     def "add contact section to patient resource"() {
         given:
+        def patientMothersMaidenNameURL = "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName"
+        def relationshipCode = "MTH"
+        def relationshipSystem = "http://terminology.hl7.org/CodeSystem/v3-RoleCode"
+        def relationshipDisplay = "MOTHER"
         def patientExtension = new Extension()
-        patientExtension.setUrl("http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName")
+        patientExtension.setUrl(patientMothersMaidenNameURL)
 
         def humanName = new HumanName()
         humanName.setText("SADIE S SMITH")
@@ -228,6 +232,7 @@ class HapiOrderConverterTest extends Specification {
 
         then:
         def convertedPatient = convertedOrderBundle.getEntry().get(0).getResource() as Patient
+        def contactSection = convertedPatient.getContact()[0]
 
         println()
         println("PHONE SYSTEM: " + convertedPatient.getContact()[0].getTelecom().get(0).getSystem())
@@ -238,10 +243,33 @@ class HapiOrderConverterTest extends Specification {
         println("ADDRESS CITY: " + convertedPatient.getContact()[0].getAddress().getCity())
         println("ADDRESS POSTAL CODE: " + convertedPatient.getContact()[0].getAddress().getPostalCode())
         println()
-        println("RELATIONSHIP: " + convertedPatient.getContact()[0].getRelationship().get(0).getCoding().get(0).getCode())
+        println("RELATIONSHIP CDOE: " + convertedPatient.getContact()[0].getRelationship().get(0).getCoding().get(0).getCode())
+        println("RELATIONSHIP DISPLAY: " + convertedPatient.getContact()[0].getRelationship().get(0).getCoding().get(0).getDisplay())
         println()
 
 
-        convertedPatient.getContact()  != null
+        contactSection  != null
+        // Name
+        def contactSectionHunanName = contactSection.getName()
+        contactSectionHunanName.getText() == humanName.getText()
+        contactSectionHunanName.getFamily() == humanName.getFamily()
+        contactSectionHunanName.getGiven() == humanName.getGiven()
+        // Relationship
+        def relationship = contactSection.getRelationship().get(0).getCoding().get(0)
+        relationship.getCode() == relationshipCode
+        relationship.getSystem() == relationshipSystem
+        relationship.getDisplay() == relationshipDisplay
+        // Telecom
+        def contactTelecom = contactSection.getTelecom().get(0)
+        def convertedPatientTelecom = convertedPatient.getTelecom().get(0)
+        contactTelecom.getSystem() == convertedPatientTelecom.getSystem()
+        contactTelecom.getValue() == convertedPatientTelecom.getValue()
+        contactTelecom.getUse() == convertedPatientTelecom.getUse()
+        // Address
+        def contactSectionAddress = contactSection.getAddress()
+        def convertedPatientAddress = convertedPatient.getAddress().get(0)
+        contactSectionAddress.getLine().get(0) == convertedPatientAddress.getLine().get(0)
+        contactSectionAddress.getCity() == convertedPatientAddress.getCity()
+        contactSectionAddress.getPostalCode() == convertedPatientAddress.getPostalCode()
     }
 }

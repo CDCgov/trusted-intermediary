@@ -115,8 +115,9 @@ public class HapiOrderConverter implements OrderConverter {
         var codingList = new ArrayList<Coding>();
         codingList.add(
                 new Coding()
-                        .setSystem("http://hl7.org/fhir/ValueSet/contact-relationship")
-                        .setCode("MOTHER"));
+                        .setSystem("http://terminology.hl7.org/CodeSystem/v3-RoleCode")
+                        .setCode("MTH")
+                        .setDisplay("MOTHER"));
 
         HapiHelper.resourcesInBundle(orderBundle, Patient.class)
                 .forEach(
