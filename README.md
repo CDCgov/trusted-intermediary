@@ -218,14 +218,11 @@ CDC including this GitHub page may be subject to applicable federal law, includi
    ```
 3. Run TI with `REPORT_STREAM_URL_PREFIX=http://localhost:7071 ./gradlew clean app:run`
 
-## ReportStream Setup
+#### ReportStream Setup
 
 For Apple Silicon you will want to enable the Docker option for `Use Rosetta for x86/amd64 emulation on Apple Silicon`.
 After enabling this option it is recommended that you delete all docker images and containers and rebuild them
 with this option enabled.
-
-
-### Running TI with ReportStream
 
 1. Checkout `master` branch for `CDCgov/prime-reportstream`
 2. Follow [the steps in the ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/docs-deprecated/getting-started/getting-started.md#building-the-baseline) to build the baseline
