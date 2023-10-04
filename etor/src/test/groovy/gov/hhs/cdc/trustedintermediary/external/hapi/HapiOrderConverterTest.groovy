@@ -4,14 +4,11 @@ import gov.hhs.cdc.trustedintermediary.DemographicsMock
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
-import org.hl7.fhir.instance.model.api.IBaseDatatype
 import org.hl7.fhir.r4.model.Address
-import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.StringType
-import org.hl7.fhir.r4.model.Type
 
 import java.time.Instant
 import org.hl7.fhir.r4.model.Bundle
@@ -184,7 +181,7 @@ class HapiOrderConverterTest extends Specification {
         def patientMothersMaidenNameURL = "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName"
         def relationshipCode = "MTH"
         def relationshipSystem = "http://terminology.hl7.org/CodeSystem/v3-RoleCode"
-        def relationshipDisplay = "MOTHER"
+        def relationshipDisplay = "mother"
 
         def patient = fakePatientResource()
         def patientEntry = new Bundle.BundleEntryComponent().setResource(patient)
@@ -199,9 +196,11 @@ class HapiOrderConverterTest extends Specification {
         def convertedPatient = convertedOrderBundle.getEntry().get(0).getResource() as Patient
         def contactSection = convertedPatient.getContact()[0]
 
-        contactSection  != null
+        contactSection != null
         // Name
-        def convertedPatientHumanName = convertedPatient.castToHumanName(convertedPatient.getExtensionByUrl(patientMothersMaidenNameURL).getValue())
+        def convertedPatientHumanName =
+                convertedPatient.castToHumanName(convertedPatient.getExtensionByUrl(patientMothersMaidenNameURL)
+                .getValue())
         def contactSectionHunanName = contactSection.getName()
         contactSectionHunanName.getText() == convertedPatientHumanName.getText()
         contactSectionHunanName.getFamily() == convertedPatientHumanName.getFamily()

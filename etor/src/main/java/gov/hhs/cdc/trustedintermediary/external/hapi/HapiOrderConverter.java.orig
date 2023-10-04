@@ -127,6 +127,18 @@ public class HapiOrderConverter implements OrderConverter {
                             myContact.addRelationship();
                             myContact.getRelationshipFirstRep().setCoding(codingList);
 
+<<<<<<< HEAD
+                            if (p.getExtensionByUrl(
+                                            "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName")
+                                    != null) {
+                                myContact.setName(
+                                        p.castToHumanName(
+                                                p.getExtensionByUrl(
+                                                                "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName")
+                                                        .getValue()));
+                            }
+
+=======
                             var mothersMaidenNameExtension =
                                     p.getExtensionByUrl(
                                             "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName");
@@ -135,6 +147,7 @@ public class HapiOrderConverter implements OrderConverter {
                                 myContact.setName(
                                         p.castToHumanName(mothersMaidenNameExtension.getValue()));
                             }
+>>>>>>> 2040a97 (setName null check)
                             myContact.setTelecom(p.getTelecom());
                             myContact.setAddress(p.getAddressFirstRep());
                         });
