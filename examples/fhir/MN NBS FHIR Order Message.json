@@ -344,48 +344,6 @@
       }
     }
   }, {
-    "fullUrl" : "Practitioner/1696524905590098000.1b15ae2a-294b-4bc2-8833-bd7c092da451",
-    "resource" : {
-      "resourceType" : "Practitioner",
-      "id" : "1696524905590098000.1b15ae2a-294b-4bc2-8833-bd7c092da451",
-      "meta" : {
-        "extension" : [ {
-          "url" : "http://ibm.com/fhir/cdm/StructureDefinition/source-data-model-version",
-          "valueString" : "2.5.1"
-        } ],
-        "tag" : [ {
-          "extension" : [ {
-            "url" : "https://reportstream.cdc.gov/fhir/StructureDefinition/code-index-name",
-            "valueString" : "identifier"
-          } ],
-          "system" : "http://terminology.hl7.org/CodeSystem/v2-0103",
-          "code" : "P"
-        } ]
-      },
-      "identifier" : [ { } ]
-    }
-  }, {
-    "fullUrl" : "Practitioner/1696524905593616000.50d7ff17-4b52-4935-ae59-4252163b4ad7",
-    "resource" : {
-      "resourceType" : "Practitioner",
-      "id" : "1696524905593616000.50d7ff17-4b52-4935-ae59-4252163b4ad7",
-      "meta" : {
-        "extension" : [ {
-          "url" : "http://ibm.com/fhir/cdm/StructureDefinition/source-data-model-version",
-          "valueString" : "2.5.1"
-        } ],
-        "tag" : [ {
-          "extension" : [ {
-            "url" : "https://reportstream.cdc.gov/fhir/StructureDefinition/code-index-name",
-            "valueString" : "identifier"
-          } ],
-          "system" : "http://terminology.hl7.org/CodeSystem/v2-0103",
-          "code" : "P"
-        } ]
-      },
-      "identifier" : [ { } ]
-    }
-  }, {
     "fullUrl" : "Practitioner/1696524905599676000.ad4c02b2-9fbb-4ced-a8f9-67b393e96297",
     "resource" : {
       "resourceType" : "Practitioner",
