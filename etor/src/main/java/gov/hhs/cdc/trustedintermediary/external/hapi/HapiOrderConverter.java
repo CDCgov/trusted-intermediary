@@ -34,7 +34,7 @@ public class HapiOrderConverter implements OrderConverter {
                     "O21",
                     "OML - Laboratory order");
 
-    private static final List CODING_LIST =
+    private static final List<Coding> CODING_LIST =
             List.of(
                     new Coding(
                             "http://terminology.hl7.org/CodeSystem/v3-RoleCode", "MTH", "mother"));
