@@ -16,7 +16,7 @@ class OrderTest extends Specification {
 
     def "an order response is returned from the ETOR order endpoint"() {
         given:
-        def expectedFhirResourceId  = "Bundle/b4efef3a-749c-457d-956b-568e22768bf3"
+        def expectedFhirResourceId  = "Bundle/1696524903034430000.eb38702e-23df-4650-9e4c-c7d4b3b6b92b"
         def expectedPatientId  = "11102779"
 
         when:
