@@ -183,7 +183,7 @@ class HapiOrderConverterTest extends Specification {
         def relationshipSystem = "http://terminology.hl7.org/CodeSystem/v3-RoleCode"
         def relationshipDisplay = "mother"
 
-        def patient = fakePatientResource()
+        def patient = fakePatientResource(true)
         def patientEntry = new Bundle.BundleEntryComponent().setResource(patient)
         def entryList = new ArrayList<Bundle.BundleEntryComponent>()
         entryList.add(patientEntry)
@@ -224,18 +224,41 @@ class HapiOrderConverterTest extends Specification {
         contactSectionAddress.getPostalCode() == convertedPatientAddress.getPostalCode()
     }
 
-    Patient fakePatientResource() {
-        def patientMothersMaidenNameURL = "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName"
+    def "no humanName section in contact"() {
+        given:
+        def addHumanName = false
+        def patientResourceNoHumanName = fakePatientResource(addHumanName)
+        def patientEntry = new Bundle.BundleEntryComponent().setResource(patientResourceNoHumanName)
+        def entryList = new ArrayList<Bundle.BundleEntryComponent>()
+        entryList.add(patientEntry)
+        mockOrderBundle.setEntry(entryList)
+        when:
+        def convertedOrderBundle = HapiOrderConverter.getInstance().addContactSectionToPatientResource(mockOrder).getUnderlyingOrder() as Bundle
+
+        then:
+        def convertedPatient = convertedOrderBundle.getEntry().get(0).getResource() as Patient
+        def contactSection = convertedPatient.getContact()[0]
+        def humanNameExtension = contactSection.getExtensionByUrl("http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName")
+
+        humanNameExtension == null
+    }
+
+    Patient fakePatientResource(boolean addHumanName) {
+
         def patientExtension = new Extension()
-        patientExtension.setUrl(patientMothersMaidenNameURL)
 
-        def humanName = new HumanName()
-        humanName.setText("SADIE S SMITH")
-        humanName.setFamily("SMITH")
-        humanName.addGiven("SADIE")
-        humanName.addGiven("S")
+        if (addHumanName) {
+            def patientMothersMaidenNameURL = "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName"
+            patientExtension.setUrl(patientMothersMaidenNameURL)
 
-        patientExtension.setValue(humanName)
+            def humanName = new HumanName()
+            humanName.setText("SADIE S SMITH")
+            humanName.setFamily("SMITH")
+            humanName.addGiven("SADIE")
+            humanName.addGiven("S")
+            patientExtension.setValue(humanName)
+        }
+
 
         def telecomExtension = new Extension()
         telecomExtension.setUrl("https://reportstream.cdc.gov/fhir/StructureDefinition/text")
