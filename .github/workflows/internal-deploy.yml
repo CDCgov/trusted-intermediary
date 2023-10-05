@@ -1,29 +1,29 @@
-name: Deploy to Dev Environment
+name: Deploy to Internal Environment
 
 on:
   push:
     branches:
-      - dev
+      - internal
   workflow_dispatch:
 
 jobs:
 
   terraform-deploy:
-    name: Dev Infrastructure Deploy
+    name: Internal Infrastructure Deploy
     uses: ./.github/workflows/terraform-deploy_reusable.yml
     with:
-      TERRAFORM_DIRECTORY: operations/environments/dev
+      TERRAFORM_DIRECTORY: operations/environments/internal
     secrets:
-      AZURE_CLIENT_ID: ${{ secrets.AZURE_CDC_CLIENT_ID }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_CDC_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_CDC_DMZ_C1_SUBSCRIPTION_ID }}
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-  dev-deploy:
-    name: Dev Application Deploy
+  internal-deploy:
+    name: Internal Application Deploy
     needs: terraform-deploy
     uses: ./.github/workflows/deploy_reusable.yml
     with:
-      ENVIRONMENT: dev
+      ENVIRONMENT: internal
       REPO: trusted-intermediary-router
       REPO_DOCS: trusted-intermediary-docs
       APP: ${{ needs.terraform-deploy.outputs.APP }}
@@ -31,6 +31,6 @@ jobs:
     secrets:
       ACR_USERNAME: ${{ needs.terraform-deploy.outputs.ACR_USERNAME }}
       ACR_PASSWORD: ${{ needs.terraform-deploy.outputs.ACR_PASSWORD }}
-      AZURE_CLIENT_ID: ${{ secrets.AZURE_CDC_CLIENT_ID }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_CDC_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_CDC_DMZ_C1_SUBSCRIPTION_ID }}
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}

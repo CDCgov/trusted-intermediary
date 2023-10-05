@@ -1,11 +1,9 @@
 # CDC Trusted Intermediary
 
 ## Requirements
-
 Any distribution of the Java 17 JDK.
 
 ## Using and Running
-
 To run the application directly, execute...
 
 ```shell
@@ -13,6 +11,15 @@ To run the application directly, execute...
 ```
 
 This will run the web API on port 8080.  You can view the API documentation at `/openapi`.
+
+### Generating and using a token
+1. Run `brew install mike-engel/jwt-cli/jwt-cli`
+2. Run `jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256  --no-iat -S @/PATH_TO_FILE_ON_YOUR_MACHINE/trusted-intermediary/mock_credentials/organization-trusted-intermediary-private-key-local.pem`
+3. Copy token from terminal and paste into your postman body with the key `client_assertion`
+4. Add a key to the body with the key `scope` and value of `trusted-intermediary`
+5. Body type should be `x-wwww-form-urlencoded`
+6. You should be able to run the post call against the `v1/auth/token` endpoint to receive a bearer token [to be used in this step](#submit-request-to-reportstream)
+
 
 ## Development
 
@@ -92,52 +99,80 @@ the swarm parameters for the test and the local url where the app is running
 
 ### Deploying
 
-#### Initial Azure and GitHub Configuration
+#### Environments
 
-There is minimal set-up to do to get Terraform squared away before you can run the Terraform commands in
-a new Azure environment.
+We have a number of environments that are split between CDC and non-CDC Azure Entra domains and subscriptions.
 
-1. Create a resource group: `cdcti-terraform`.
-2. Create a storage account: `cdctiterraform` (with `cdcti-terraform` as the resource group).
-3. Within the new storage account, create a Container named "tfstate"
-4. Within Azure Active Directory...
-   - Create an App Registration: `cdcti-github`
-   - Within your Subscription, create a Service Account and assign the Contributor role
-   - Add federated credentials for:
-     - `repo:CDCgov/trusted-intermediary:ref:refs/heads/main` (for terraform apply)
-     - `repo:CDCgov/trusted-intermediary:environment:staging` (for staging webapp deploy)
-     - And presumably other repo paths needed in the future for other environments
-5. Add secrets to your GitHub Actions.
-   - `AZURE_TENANT_ID` with the tenant ID from Azure Active Directory.
-   - `AZURE_SUBSCRIPTION_ID` with the ID from the subscription that everything should be deployed into.
-   - `AZURE_CLIENT_ID` with the ID of the App Registration created previously.
+##### Internal
 
-#### Dev Environment Deployment
+The Internal environment is meant to be the Wild West.  Meaning anyone can push to it to test something, and there is no
+requirement that only good builds be pushed to it.  Use the Internal environment if you want to test something in a
+deployed environment in a _non-CDC_ Azure Entra domain and subscription.
 
-The Dev environment is meant to be the Wild West.  Meaning anyone can push to it to test something, and there is no
-requirement that only good builds be pushed to it.  Use the Dev environment if you want to test something in a deployed
-environment.
-
-To deploy to the Dev environment...
+To deploy to the Internal environment...
 1. Check with the team that no one is already using it.
-2. [Find the `dev` branch](https://github.com/CDCgov/trusted-intermediary/branches/all?query=dev) and delete it in
-   GitHub.
-3. Delete your local `dev` branch if needed.
+2. [Find the `internal` branch](https://github.com/CDCgov/trusted-intermediary/branches/all?query=internal) and delete
+   it inGitHub.
+3. Delete your local `internal` branch if needed.
    ```shell
-   git branch -D dev
+   git branch -D internal
    ```
-4. From the branch you want to test, create a new `dev` branch.
+4. From the branch you want to test, create a new `internal` branch.
    ```shell
-   git checkout -b dev
+   git checkout -b internal
    ```
 5. Push the branch to GitHub.
    ```shell
-   git push --set-upstream origin dev
+   git push --set-upstream origin internal
    ```
 
-Then the [deploy](https://github.com/CDCgov/trusted-intermediary/actions/workflows/dev-deploy.yml) will run.  Remember
-that you now have the `dev` branch checked out locally.  If you make subsequent code changes, you will make them on the `dev`
-branch instead of your original branch.
+Then the [deploy](https://github.com/CDCgov/trusted-intermediary/actions/workflows/internal-deploy.yml) will run.
+Remember that you now have the `internal` branch checked out locally.  If you make subsequent code changes, you will
+make them on the `internal` branch instead of your original branch.
+
+##### Dev
+
+The Dev environment is similar to the Internal environment but deploys to a CDC Azure Entra domain and subscription.  It
+is also meant to be the Wild West.  Dev deploys similarly to the Internal environment, but you interact with the
+`dev` branch.
+
+##### Staging
+
+The Staging environment is production-like and meant to be stable.  It deploys to a non-CDC Azure Entra domain and
+subscription.  Deployments occur when a commit is made to the `main` branch.  `main` is a protected branch and requires
+PR reviews before merge.
+
+##### Prod
+
+The Prod environment does not exist yet.
+
+#### Initial Azure and GitHub Configuration
+
+There is minimal set-up to do to get Terraform squared away before you can run the Terraform commands in
+a new Azure environment in the Flexion Entra domain.  For example, the `internal` environment.  This does not apply to the CDC
+Entra domains and subscriptions.
+
+1. Create a resource group.
+2. Create a storage account inside the aforementioned resource group.
+3. Within the new storage account, create a Container.
+4. Within Azure Entra...
+   1. Create an App Registration.
+   2. Add federated credentials to the App Registration
+      - `repo:CDCgov/trusted-intermediary:ref:refs/heads/main` (for terraform apply).
+      - `repo:CDCgov/trusted-intermediary:environment:staging` (for staging webapp deploy).
+      - And presumably other repo paths needed in the future for other environments and branches.
+   3. Within your Subscription, assign the Contributor role to the previously created App Registration.
+5. Add GitHub Action secrets to your GitHub repository.
+   - A secret with the tenant ID from Azure Entra directory.
+   - A secret with the ID from the subscription that everything should be deployed into.
+   - A secret with the ID of the App Registration created previously.
+6. Create a copy of one of the environments under the [operations](./operations) folder.
+   1. Name the copy off of the name of the new environment.
+   2. Edit the `main.tf` file with the names of the resources previously created: `resource_group_name`,
+      `storage_account_name`, `container_name`.  Also update the `environment` to match the new folder name.
+7. Create a GitHub Action workflow so that automatic deploys can occur.  You can take inspiration from our
+   [Internal environment deployment](./.github/workflows/internal-deploy.yml).  Make sure you set the `AZURE_CLIENT_ID`,
+   `AZURE_TENANT_ID`, and `AZURE_SUBSCRIPTION_ID` based on the secrets created previously.
 
 ### Pre-Commit Hooks
 
@@ -184,6 +219,10 @@ CDC including this GitHub page may be subject to applicable federal law, includi
 3. Run TI with `REPORT_STREAM_URL_PREFIX=http://localhost:7071 ./gradlew clean app:run`
 
 #### ReportStream Setup
+
+For Apple Silicon you will want to enable the Docker option for `Use Rosetta for x86/amd64 emulation on Apple Silicon`.
+After enabling this option it is recommended that you delete all docker images and containers and rebuild them
+with this option enabled.
 
 1. Checkout `master` branch for `CDCgov/prime-reportstream`
 2. Follow [the steps in the ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/docs-deprecated/getting-started/getting-started.md#building-the-baseline) to build the baseline

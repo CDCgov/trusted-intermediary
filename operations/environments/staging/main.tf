@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "3.74.0"
+      version = "3.75.0"
     }
   }
 
@@ -28,4 +28,5 @@ module "template" {
   source = "../../template/"
 
   environment = "staging"
+  deployer_id = "d59c2c86-de5e-41b7-a752-0869a73f5a60" //github app registration in Flexion Azure Entra
 }
