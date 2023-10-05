@@ -12,7 +12,6 @@ import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
@@ -130,8 +129,7 @@ public class HapiOrderConverter implements OrderConverter {
                             var mothersMaidenNameExtension =
                                     p.getExtensionByUrl(
                                             "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName");
-                            if (mothersMaidenNameExtension != null
-                                    && mothersMaidenNameExtension.getValue() instanceof HumanName) {
+                            if (mothersMaidenNameExtension != null) {
                                 myContact.setName(
                                         p.castToHumanName(mothersMaidenNameExtension.getValue()));
                             }
