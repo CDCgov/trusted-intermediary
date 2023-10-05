@@ -122,8 +122,13 @@ public class HapiOrderConverter implements OrderConverter {
                 .forEach(
                         p -> {
                             var myContact = p.addContact();
+<<<<<<< HEAD
                             var motherRelationship = myContact.addRelationship();
-                            motherRelationship.setCoding(CODING_LIST);
+                            motherRelationship.setCoding(codingList);
+=======
+                            myContact.addRelationship();
+                            myContact.getRelationshipFirstRep().setCoding(CODING_LIST);
+>>>>>>> 630eef5 (PR suggested changes)
 
                             var mothersMaidenNameExtension =
                                     p.getExtensionByUrl(
