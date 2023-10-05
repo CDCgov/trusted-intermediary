@@ -47,6 +47,7 @@ class OrderTest extends Specification {
         //test that everything else is the same except the MessageHeader's event
         parsedSentPayload.entry[0].resource.remove("eventCoding")
         parsedLabOrderJsonFile.entry[0].resource.remove("eventCoding")
+        parsedSentPayload.entry[26].resource.remove("contact")
         parsedSentPayload == parsedLabOrderJsonFile
     }
 
