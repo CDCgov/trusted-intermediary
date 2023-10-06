@@ -39,10 +39,6 @@ class OrderTest extends Specification {
         then:
         response.getCode() == 200
 
-        //test that the MessageHeader's event is now an OML_O21
-        parsedSentPayload.entry[0].resource.resourceType == "MessageHeader"
-        parsedSentPayload.entry[0].resource.eventCoding.code == "O21"
-        parsedSentPayload.entry[0].resource.eventCoding.display.contains("OML")
         parsedSentPayload.entry[24].resource.contact.name.text.contains("SADIE S SMITH")
 
         //test that everything else is the same except the MessageHeader's event
@@ -50,6 +46,20 @@ class OrderTest extends Specification {
         parsedLabOrderJsonFile.entry[0].resource.remove("eventCoding")
         parsedSentPayload.entry[24].resource.remove("contact")
         parsedSentPayload == parsedLabOrderJsonFile
+    }
+
+    def "check that message type is converted to OML_O21"() {
+        when:
+        def response = orderClient.submit(labOrderJsonFileString, true)
+        def sentPayload = SentPayloadReader.read()
+        def parsedSentPayload = JsonParsing.parse(sentPayload)
+        def parsedLabOrderJsonFile = JsonParsing.parse(labOrderJsonFileString)
+
+        then:
+        //test that the MessageHeader's event is now an OML_O21
+        parsedSentPayload.entry[0].resource.resourceType == "MessageHeader"
+        parsedSentPayload.entry[0].resource.eventCoding.code == "O21"
+        parsedSentPayload.entry[0].resource.eventCoding.display.contains("OML")
     }
 
     def "return a 400 response when request has unexpected format"() {
