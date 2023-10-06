@@ -16,7 +16,7 @@ class OrderTest extends Specification {
 
     def "an order response is returned from the ETOR order endpoint"() {
         given:
-        def expectedFhirResourceId  = "Bundle/b4efef3a-749c-457d-956b-568e22768bf3"
+        def expectedFhirResourceId  = "Bundle/1696524903034430000.eb38702e-23df-4650-9e4c-c7d4b3b6b92b"
         def expectedPatientId  = "11102779"
 
         when:
@@ -29,7 +29,7 @@ class OrderTest extends Specification {
         parsedJsonBody.patientId == expectedPatientId
     }
 
-    def "payload file check"() {
+    def "check that contact info is added to order before sending to report stream"() {
         when:
         def response = orderClient.submit(labOrderJsonFileString, true)
         def sentPayload = SentPayloadReader.read()
@@ -43,10 +43,12 @@ class OrderTest extends Specification {
         parsedSentPayload.entry[0].resource.resourceType == "MessageHeader"
         parsedSentPayload.entry[0].resource.eventCoding.code == "O21"
         parsedSentPayload.entry[0].resource.eventCoding.display.contains("OML")
+        parsedSentPayload.entry[24].resource.contact.name.text.contains("SADIE S SMITH")
 
         //test that everything else is the same except the MessageHeader's event
         parsedSentPayload.entry[0].resource.remove("eventCoding")
         parsedLabOrderJsonFile.entry[0].resource.remove("eventCoding")
+        parsedSentPayload.entry[24].resource.remove("contact")
         parsedSentPayload == parsedLabOrderJsonFile
     }
 

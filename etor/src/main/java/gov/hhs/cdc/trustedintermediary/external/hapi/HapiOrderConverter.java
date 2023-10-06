@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
@@ -32,6 +33,11 @@ public class HapiOrderConverter implements OrderConverter {
                     "http://terminology.hl7.org/CodeSystem/v2-0003",
                     "O21",
                     "OML - Laboratory order");
+
+    private static final List<Coding> CODING_LIST =
+            List.of(
+                    new Coding(
+                            "http://terminology.hl7.org/CodeSystem/v3-RoleCode", "MTH", "mother"));
 
     @Inject Logger logger;
 
@@ -101,6 +107,34 @@ public class HapiOrderConverter implements OrderConverter {
         }
 
         messageHeader.setEvent(OML_CODING);
+
+        return new HapiOrder(orderBundle);
+    }
+
+    @Override
+    public Order<?> addContactSectionToPatientResource(Order<?> order) {
+        logger.logInfo("Adding contact section in Patient resource");
+
+        var hapiOrder = (Order<Bundle>) order;
+        var orderBundle = hapiOrder.getUnderlyingOrder();
+
+        HapiHelper.resourcesInBundle(orderBundle, Patient.class)
+                .forEach(
+                        p -> {
+                            var myContact = p.addContact();
+                            var motherRelationship = myContact.addRelationship();
+                            motherRelationship.setCoding(CODING_LIST);
+
+                            var mothersMaidenNameExtension =
+                                    p.getExtensionByUrl(
+                                            "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName");
+                            if (mothersMaidenNameExtension != null) {
+                                myContact.setName(
+                                        p.castToHumanName(mothersMaidenNameExtension.getValue()));
+                            }
+                            myContact.setTelecom(p.getTelecom());
+                            myContact.setAddress(p.getAddressFirstRep());
+                        });
 
         return new HapiOrder(orderBundle);
     }
