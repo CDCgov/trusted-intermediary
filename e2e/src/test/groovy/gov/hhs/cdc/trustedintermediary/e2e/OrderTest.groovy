@@ -37,14 +37,22 @@ class OrderTest extends Specification {
         def parsedLabOrderJsonFile = JsonParsing.parse(labOrderJsonFileString)
 
         then:
-        response.getCode() == 200
-
         parsedSentPayload.entry[24].resource.contact.name.text.contains("SADIE S SMITH")
+    }
 
-        //test that everything else is the same except the MessageHeader's event
+    def "check that the rest of the message is unchanged except the parts we changed"() {
+        when:
+        def response = orderClient.submit(labOrderJsonFileString, true)
+        def sentPayload = SentPayloadReader.read()
+        def parsedSentPayload = JsonParsing.parse(sentPayload)
+        def parsedLabOrderJsonFile = JsonParsing.parse(labOrderJsonFileString)
+
+        then:
+        //test that everything else is the same except the MessageHeader's event and Patient contact
         parsedSentPayload.entry[0].resource.remove("eventCoding")
         parsedLabOrderJsonFile.entry[0].resource.remove("eventCoding")
         parsedSentPayload.entry[24].resource.remove("contact")
+
         parsedSentPayload == parsedLabOrderJsonFile
     }
 
