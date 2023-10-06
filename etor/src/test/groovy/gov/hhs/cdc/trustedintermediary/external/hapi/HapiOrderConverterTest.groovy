@@ -238,16 +238,16 @@ class HapiOrderConverterTest extends Specification {
         then:
         def convertedPatient = convertedOrderBundle.getEntry().get(0).getResource() as Patient
         def contactSection = convertedPatient.getContact()[0]
-        def humanNameExtension = contactSection.getExtensionByUrl("http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName")
 
-        humanNameExtension == null
+        !contactSection.hasName()
     }
 
     Patient fakePatientResource(boolean addHumanName) {
 
-        def patientExtension = new Extension()
+        def patient = new Patient()
 
         if (addHumanName) {
+            def patientExtension = new Extension()
             def patientMothersMaidenNameURL = "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName"
             patientExtension.setUrl(patientMothersMaidenNameURL)
 
@@ -257,6 +257,7 @@ class HapiOrderConverterTest extends Specification {
             humanName.addGiven("SADIE")
             humanName.addGiven("S")
             patientExtension.setValue(humanName)
+            patient.addExtension(patientExtension)
         }
 
 
@@ -278,9 +279,7 @@ class HapiOrderConverterTest extends Specification {
         address.setPostalCode("56527-9657")
         address.setCountry("USA")
 
-        def patient = new Patient()
         patient.addTelecom(telecom)
-        patient.addExtension(patientExtension)
         patient.addAddress(address)
 
         return patient
