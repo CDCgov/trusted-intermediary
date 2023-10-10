@@ -89,7 +89,7 @@ class AuthRequestValidatorTest extends Specification{
         actual == expected
     }
 
-    def "retrievePrivateKey works when keyCache not empty"() {
+    def "retrievePublicKey works when keyCache not empty"() {
         given:
         def mockCache = Mock(KeyCache)
         def key = "fake key"
@@ -106,7 +106,7 @@ class AuthRequestValidatorTest extends Specification{
         actual == expected
     }
 
-    def "retrievePrivateKey works when keyCache is empty"() {
+    def "retrievePublicKey works when keyCache is empty"() {
         given:
         def mockCache = Mock(KeyCache)
         def mockSecrets = Mock(Secrets)
@@ -126,7 +126,7 @@ class AuthRequestValidatorTest extends Specification{
         actual == expected
     }
 
-    def "retrievePrivateKey adds key to keyCache works"() {
+    def "retrievePublicKey adds key to keyCache works"() {
         given:
         def cache = KeyCache.getInstance()
         def mockSecrets = Mock(Secrets)
@@ -140,7 +140,7 @@ class AuthRequestValidatorTest extends Specification{
         when:
         mockSecrets.getKey(_ as String) >> key
         validator.retrievePublicKey()
-        def actual = cache.get("trusted-intermediary-private-key-local")
+        def actual = cache.get("trusted-intermediary-public-key-local")
 
         then:
         actual == expected

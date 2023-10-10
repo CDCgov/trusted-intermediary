@@ -49,7 +49,7 @@ public class JjwtEngine implements AuthEngine {
 
         Key privateKey;
         try {
-            privateKey = readKey(pemKey);
+            privateKey = readPrivateKey(pemKey);
         } catch (NoSuchAlgorithmException e) {
             throw new TokenGenerationException("The private key algorithm isn't supported", e);
         } catch (Exception e) {
@@ -83,12 +83,18 @@ public class JjwtEngine implements AuthEngine {
     public LocalDateTime getExpirationDate(String jwt) {
 
         var tokenOnly = jwt.substring(0, jwt.lastIndexOf('.') + 1);
-        tokenOnly = "eyJ0eXBlIjoiSldUIn0K" + tokenOnly.substring(jwt.indexOf('.'));
-        // TODO: create an unsecured header and prepend that.
+        var claimsOnly = tokenOnly.substring(tokenOnly.indexOf('.'));
+        // Passing jwt header with alg:None to satisfy jjwt expectations
+        var customHeaderAndClaims = "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0" + claimsOnly;
 
         Claims claims;
         try {
-            claims = Jwts.parser().unsecured().build().parseUnsecuredClaims(tokenOnly).getPayload();
+            claims =
+                    Jwts.parser()
+                            .unsecured()
+                            .build()
+                            .parseUnsecuredClaims(customHeaderAndClaims)
+                            .getPayload();
         } catch (ClaimJwtException e) {
             claims = e.getClaims();
         }
@@ -103,7 +109,7 @@ public class JjwtEngine implements AuthEngine {
 
         try {
             var key = readPublicKey(encodedKey);
-            Jwts.parser().verifyWith(key).build().parseClaimsJws(jwt);
+            Jwts.parser().verifyWith(key).build().parseSignedClaims(jwt);
 
         } catch (JwtException | IllegalArgumentException e) {
             throw new InvalidTokenException(e);
@@ -111,22 +117,6 @@ public class JjwtEngine implements AuthEngine {
             throw new IllegalArgumentException("The key algorithm isn't supported", e);
         } catch (Exception e) {
             throw new IllegalArgumentException("The key wasn't formatted correctly", e);
-        }
-    }
-
-    protected Key readKey(String encodedKey)
-            throws NoSuchAlgorithmException, InvalidKeySpecException, IllegalArgumentException {
-        return isPrivateKey(encodedKey) ? readPrivateKey(encodedKey) : readPublicKey(encodedKey);
-    }
-
-    protected boolean isPrivateKey(String key) {
-
-        try {
-            readPrivateKey(key);
-
-            return true;
-        } catch (Exception e) {
-            return false;
         }
     }
 
