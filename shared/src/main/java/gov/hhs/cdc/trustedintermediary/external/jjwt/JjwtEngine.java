@@ -30,6 +30,7 @@ import javax.annotation.Nonnull;
 public class JjwtEngine implements AuthEngine {
 
     private static final JjwtEngine INSTANCE = new JjwtEngine();
+    private static final String CUSTOM_HEADER = "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0";
 
     private JjwtEngine() {}
 
@@ -89,7 +90,7 @@ public class JjwtEngine implements AuthEngine {
         var tokenOnly = jwt.substring(0, jwt.lastIndexOf('.') + 1);
         var claimsOnly = tokenOnly.substring(tokenOnly.indexOf('.'));
         // Passing jwt header with alg:None to satisfy jjwt expectations
-        var customHeaderAndClaims = "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0" + claimsOnly;
+        var customHeaderAndClaims = CUSTOM_HEADER + claimsOnly;
 
         Claims claims;
         try {
