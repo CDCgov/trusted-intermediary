@@ -100,7 +100,7 @@ class AuthRequestValidatorTest extends Specification{
 
         when:
         mockCache.get(_ as String) >> key
-        def actual = validator.retrievePrivateKey()
+        def actual = validator.retrievePublicKey()
 
         then:
         actual == expected
@@ -120,7 +120,7 @@ class AuthRequestValidatorTest extends Specification{
         when:
         mockCache.get(_ as String) >> null
         mockSecrets.getKey(_ as String) >> key
-        def actual = validator.retrievePrivateKey()
+        def actual = validator.retrievePublicKey()
 
         then:
         actual == expected
@@ -139,7 +139,7 @@ class AuthRequestValidatorTest extends Specification{
 
         when:
         mockSecrets.getKey(_ as String) >> key
-        validator.retrievePrivateKey()
+        validator.retrievePublicKey()
         def actual = cache.get("trusted-intermediary-private-key-local")
 
         then:

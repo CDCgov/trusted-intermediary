@@ -83,7 +83,7 @@ public class JjwtEngine implements AuthEngine {
     public LocalDateTime getExpirationDate(String jwt) {
 
         var tokenOnly = jwt.substring(0, jwt.lastIndexOf('.') + 1);
-        tokenOnly = "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0" + tokenOnly.substring(jwt.indexOf('.'));
+        tokenOnly = "eyJ0eXBlIjoiSldUIn0K" + tokenOnly.substring(jwt.indexOf('.'));
         // TODO: create an unsecured header and prepend that.
 
         Claims claims;
@@ -102,8 +102,8 @@ public class JjwtEngine implements AuthEngine {
             throws InvalidTokenException, IllegalArgumentException {
 
         try {
-            var key = readKey(encodedKey);
-            Jwts.parser().setSigningKey(key).build().parseClaimsJws(jwt);
+            var key = readPublicKey(encodedKey);
+            Jwts.parser().verifyWith(key).build().parseClaimsJws(jwt);
 
         } catch (JwtException | IllegalArgumentException e) {
             throw new InvalidTokenException(e);
