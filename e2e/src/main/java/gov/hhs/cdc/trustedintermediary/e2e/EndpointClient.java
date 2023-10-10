@@ -19,7 +19,11 @@ public class EndpointClient {
         try {
             this.token =
                     Files.readString(
-                            Path.of("..", "mock_credentials", "report-stream-valid-token.jwt"));
+                                    Path.of(
+                                            "..",
+                                            "mock_credentials",
+                                            "report-stream-valid-token.jwt"))
+                            .trim();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

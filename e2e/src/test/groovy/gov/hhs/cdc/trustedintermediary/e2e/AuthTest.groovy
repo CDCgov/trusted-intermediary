@@ -7,7 +7,7 @@ import spock.lang.Specification
 class AuthTest extends Specification {
 
     def existingClientId = "report-stream"
-    def validToken = Files.readString(Path.of("..", "mock_credentials", "report-stream-valid-token.jwt"))
+    def validToken = Files.readString(Path.of("..", "mock_credentials", "report-stream-valid-token.jwt")).trim()
 
     def "a 200 valid response is returned when known organization and valid token"() {
         when:
