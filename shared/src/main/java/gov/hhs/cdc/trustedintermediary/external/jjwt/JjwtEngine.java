@@ -60,16 +60,20 @@ public class JjwtEngine implements AuthEngine {
         try {
             jwsObj =
                     Jwts.builder()
-                            .setHeaderParam("kid", keyId)
-                            .setHeaderParam("typ", "JWT")
-                            .setIssuer(issuer)
-                            .setSubject(subject)
-                            .setAudience(audience)
-                            .setExpiration(
+                            .header()
+                            .keyId(keyId)
+                            .add("typ", "JWT")
+                            .and()
+                            .issuer(issuer)
+                            .subject(subject)
+                            .audience()
+                            .add(audience)
+                            .and()
+                            .expiration(
                                     new Date(
                                             System.currentTimeMillis()
                                                     + (expirationSecondsFromNow * 1000L)))
-                            .setId(UUID.randomUUID().toString())
+                            .id(UUID.randomUUID().toString())
                             .signWith(privateKey);
 
             return jwsObj.compact();
