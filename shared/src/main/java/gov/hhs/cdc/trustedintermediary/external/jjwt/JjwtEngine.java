@@ -30,6 +30,7 @@ import javax.annotation.Nonnull;
 public class JjwtEngine implements AuthEngine {
 
     private static final JjwtEngine INSTANCE = new JjwtEngine();
+    private static final String CUSTOM_HEADER = "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0";
 
     private JjwtEngine() {}
 
@@ -49,7 +50,7 @@ public class JjwtEngine implements AuthEngine {
 
         Key privateKey;
         try {
-            privateKey = readKey(pemKey);
+            privateKey = readPrivateKey(pemKey);
         } catch (NoSuchAlgorithmException e) {
             throw new TokenGenerationException("The private key algorithm isn't supported", e);
         } catch (Exception e) {
@@ -60,16 +61,20 @@ public class JjwtEngine implements AuthEngine {
         try {
             jwsObj =
                     Jwts.builder()
-                            .setHeaderParam("kid", keyId)
-                            .setHeaderParam("typ", "JWT")
-                            .setIssuer(issuer)
-                            .setSubject(subject)
-                            .setAudience(audience)
-                            .setExpiration(
+                            .header()
+                            .keyId(keyId)
+                            .add("typ", "JWT")
+                            .and()
+                            .issuer(issuer)
+                            .subject(subject)
+                            .audience()
+                            .add(audience)
+                            .and()
+                            .expiration(
                                     new Date(
                                             System.currentTimeMillis()
                                                     + (expirationSecondsFromNow * 1000L)))
-                            .setId(UUID.randomUUID().toString())
+                            .id(UUID.randomUUID().toString())
                             .signWith(privateKey);
 
             return jwsObj.compact();
@@ -83,10 +88,18 @@ public class JjwtEngine implements AuthEngine {
     public LocalDateTime getExpirationDate(String jwt) {
 
         var tokenOnly = jwt.substring(0, jwt.lastIndexOf('.') + 1);
+        var claimsOnly = tokenOnly.substring(tokenOnly.indexOf('.'));
+        // Passing jwt header with alg:None to satisfy jjwt expectations
+        var customHeaderAndClaims = CUSTOM_HEADER + claimsOnly;
 
         Claims claims;
         try {
-            claims = Jwts.parserBuilder().build().parseClaimsJwt(tokenOnly).getBody();
+            claims =
+                    Jwts.parser()
+                            .unsecured()
+                            .build()
+                            .parseUnsecuredClaims(customHeaderAndClaims)
+                            .getPayload();
         } catch (ClaimJwtException e) {
             claims = e.getClaims();
         }
@@ -100,8 +113,8 @@ public class JjwtEngine implements AuthEngine {
             throws InvalidTokenException, IllegalArgumentException {
 
         try {
-            var key = readKey(encodedKey);
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt);
+            var key = readPublicKey(encodedKey);
+            Jwts.parser().verifyWith(key).build().parseSignedClaims(jwt);
 
         } catch (JwtException | IllegalArgumentException e) {
             throw new InvalidTokenException(e);
@@ -109,22 +122,6 @@ public class JjwtEngine implements AuthEngine {
             throw new IllegalArgumentException("The key algorithm isn't supported", e);
         } catch (Exception e) {
             throw new IllegalArgumentException("The key wasn't formatted correctly", e);
-        }
-    }
-
-    protected Key readKey(String encodedKey)
-            throws NoSuchAlgorithmException, InvalidKeySpecException, IllegalArgumentException {
-        return isPrivateKey(encodedKey) ? readPrivateKey(encodedKey) : readPublicKey(encodedKey);
-    }
-
-    protected boolean isPrivateKey(String key) {
-
-        try {
-            readPrivateKey(key);
-
-            return true;
-        } catch (Exception e) {
-            return false;
         }
     }
 

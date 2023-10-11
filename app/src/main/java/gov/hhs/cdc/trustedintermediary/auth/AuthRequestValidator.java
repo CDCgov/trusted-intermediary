@@ -44,25 +44,24 @@ public class AuthRequestValidator {
 
         try {
             logger.logDebug("Checking if bearer token is valid...");
-            jwtEngine.validateToken(token, retrievePrivateKey());
+            jwtEngine.validateToken(token, retrievePublicKey());
             logger.logInfo("Bearer token is valid");
             return true;
         } catch (InvalidTokenException e) {
-            logger.logError("Invalid bearer token!");
+            logger.logError("Invalid bearer token!", e);
             return false;
         }
     }
 
-    protected String retrievePrivateKey() throws SecretRetrievalException {
-        var senderPrivateKey =
-                "trusted-intermediary-private-key-" + ApplicationContext.getEnvironment();
-        String key = this.keyCache.get(senderPrivateKey);
+    protected String retrievePublicKey() throws SecretRetrievalException {
+        var ourPublicKey = "trusted-intermediary-public-key-" + ApplicationContext.getEnvironment();
+        String key = this.keyCache.get(ourPublicKey);
         if (key != null) {
             return key;
         }
 
-        key = secrets.getKey(senderPrivateKey);
-        this.keyCache.put(senderPrivateKey, key);
+        key = secrets.getKey(ourPublicKey);
+        this.keyCache.put(ourPublicKey, key);
         return key;
     }
 

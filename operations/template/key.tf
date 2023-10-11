@@ -58,6 +58,18 @@ resource "azurerm_key_vault_secret" "trusted_intermediary_public_key" {
   depends_on = [azurerm_key_vault_access_policy.allow_github_deployer] //wait for the permission that allows our deployer to write the secret
 }
 
+resource "azurerm_key_vault_secret" "trusted_intermediary_public_key_internal" {
+  name  = "trusted-intermediary-public-key-${var.environment}"
+  value = "dogcow"
+
+  key_vault_id = azurerm_key_vault.key_storage.id
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+  depends_on = [azurerm_key_vault_access_policy.allow_github_deployer] //wait for the permission that allows our deployer to write the secret
+}
+
 resource "azurerm_key_vault_secret" "trusted_intermediary_private_key" {
   name  = "trusted-intermediary-private-key-${var.environment}"
   value = "dogcow"

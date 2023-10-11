@@ -38,9 +38,9 @@ dependencies {
     implementation 'org.apache.httpcomponents.client5:httpclient5-fluent:5.2.1'
 
     // jjwt
-    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.2'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.2'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.2'
 
     // azure sdk
     implementation 'com.azure:azure-security-keyvault-secrets:4.7.0'
