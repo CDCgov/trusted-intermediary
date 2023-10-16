@@ -3,7 +3,7 @@ name: Work Request
 about: A request for the intermediary team that will be reviewed in an upcoming stand-up.
 title: ''
 labels: request
-assignees: @scleary1cs
+assignees: scleary1cs
 
 ---
 
