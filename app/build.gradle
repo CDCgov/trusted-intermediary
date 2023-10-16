@@ -24,7 +24,6 @@ dependencies {
     testImplementation testFixtures(project(':shared'))
 
     implementation 'io.javalin:javalin:5.6.3'
-    implementation 'org.eclipse.jetty:jetty-http:11.0.17' // Overriding the version of Jetty from Javalin
 
     testImplementation 'org.apache.groovy:groovy:4.0.15'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
