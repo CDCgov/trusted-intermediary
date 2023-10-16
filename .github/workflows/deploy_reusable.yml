@@ -68,10 +68,20 @@ jobs:
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
     - name: Log in to registry 2
+      id: login-to-registry
       uses: azure/CLI@v1
       with:
         inlineScript: |
-          az acr login --name ${{ inputs.REGISTRY }}
+          ACR2_PASSWORD=$(az acr login --name ${{ inputs.REGISTRY }} --expose-token --output tsv --query accessToken)
+          echo "::add-mask::$ACR2_PASSWORD"
+          echo "ACR2_PASSWORD=$ACR2_PASSWORD" >> "$GITHUB_OUTPUT"
+
+    - name: Log in to registry 3
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ inputs.REGISTRY }}
+        username: 00000000-0000-0000-0000-000000000000
+        password: ${{ steps.login-to-registry.outputs.ACR2_PASSWORD }}
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v5
