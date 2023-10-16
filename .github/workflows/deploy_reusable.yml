@@ -57,7 +57,7 @@ jobs:
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
     - name: Retrieve registry password
-      id: login-to-registry
+      id: retrieve-registry-password
       uses: azure/CLI@v1
       with:
         inlineScript: |
@@ -70,7 +70,7 @@ jobs:
       with:
         registry: ${{ inputs.REGISTRY }}
         username: 00000000-0000-0000-0000-000000000000
-        password: ${{ steps.login-to-registry.outputs.ACR_PASSWORD }}
+        password: ${{ steps.retrieve-registry-password.outputs.ACR_PASSWORD }}
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v5
@@ -115,7 +115,7 @@ jobs:
         images: '${{ inputs.REGISTRY }}/${{ inputs.REPO }}:${{ github.sha }}'
 
     - name: Retrieve registry password
-      id: login-to-registry
+      id: retrieve-registry-password
       uses: azure/CLI@v1
       with:
         inlineScript: |
@@ -128,7 +128,7 @@ jobs:
       with:
         registry: ${{ inputs.REGISTRY }}
         username: 00000000-0000-0000-0000-000000000000
-        password: ${{ steps.login-to-registry.outputs.ACR_PASSWORD }}
+        password: ${{ steps.retrieve-registry-password.outputs.ACR_PASSWORD }}
 
     - name: Extract generated documentation from the documentation image
       id: extract
