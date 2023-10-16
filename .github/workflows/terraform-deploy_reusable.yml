@@ -79,3 +79,4 @@ jobs:
           echo "APP=$(terraform output -raw publish_app)" >> "$GITHUB_OUTPUT"
           echo "ACR_USERNAME=$(terraform output -raw acr_username)" >> "$GITHUB_OUTPUT"
           echo "ACR_PASSWORD=$(terraform output -raw acr_password)" >> "$GITHUB_OUTPUT"
+          echo "" >> "$GITHUB_OUTPUT"
