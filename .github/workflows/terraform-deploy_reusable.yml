@@ -28,12 +28,6 @@ on:
       APP:
         description: The web application's name
         value: ${{ jobs.terraform-deploy.outputs.APP }}
-#      ACR_USERNAME:
-#        description: The username to login to the container registry
-#        value: ${{ jobs.terraform-deploy.outputs.ACR_USERNAME }}
-#      ACR_PASSWORD:
-#        description: The password to login to the container registry
-#        value: ${{ jobs.terraform-deploy.outputs.ACR_PASSWORD }}
 
 jobs:
   terraform-deploy:
@@ -54,8 +48,6 @@ jobs:
     outputs:
       REGISTRY: ${{ steps.export-terraform-output.outputs.REGISTRY }}
       APP: ${{ steps.export-terraform-output.outputs.APP }}
-#      ACR_USERNAME: ${{ steps.export-terraform-output.outputs.ACR_USERNAME }}
-#      ACR_PASSWORD: ${{ steps.export-terraform-output.outputs.ACR_PASSWORD }}
 
     steps:
 
@@ -77,6 +69,3 @@ jobs:
         run: |
           echo "REGISTRY=$(terraform output -raw registry)" >> "$GITHUB_OUTPUT"
           echo "APP=$(terraform output -raw publish_app)" >> "$GITHUB_OUTPUT"
-#          echo "ACR_USERNAME=$(terraform output -raw acr_username)" >> "$GITHUB_OUTPUT"
-#          echo "ACR_PASSWORD=$(terraform output -raw acr_password)" >> "$GITHUB_OUTPUT"
-#          echo "" >> "$GITHUB_OUTPUT"

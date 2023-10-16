@@ -36,8 +36,6 @@ jobs:
       APP: ${{ needs.terraform-deploy.outputs.APP }}
       REGISTRY: ${{ needs.terraform-deploy.outputs.REGISTRY }}
     secrets:
-#      ACR_USERNAME: ${{ needs.terraform-deploy.outputs.ACR_USERNAME }}
-#      ACR_PASSWORD: ${{ needs.terraform-deploy.outputs.ACR_PASSWORD }}
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
