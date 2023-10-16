@@ -75,7 +75,7 @@ jobs:
       - id: export-terraform-output
         name: Export Terraform Output
         run: |
-          echo "REGISTRY=$(terraform output -raw registry)" >> $GITHUB_OUTPUT
-          echo "APP=$(terraform output -raw publish_app)" >> $GITHUB_OUTPUT
-          echo "ACR_USERNAME=$(terraform output -raw acr_username)" >> $GITHUB_OUTPUT
-          echo "ACR_PASSWORD=$(terraform output -raw acr_password)" >> $GITHUB_OUTPUT
+          echo "REGISTRY=$(terraform output -raw registry)" >> "$GITHUB_OUTPUT"
+          echo "APP=$(terraform output -raw publish_app)" >> "$GITHUB_OUTPUT"
+          echo "ACR_USERNAME=$(terraform output -raw acr_username)" >> "$GITHUB_OUTPUT"
+          echo "ACR_PASSWORD=$(terraform output -raw acr_password)" >> "$GITHUB_OUTPUT"
