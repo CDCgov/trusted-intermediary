@@ -54,6 +54,7 @@ dependencies {
 
     // dotenv-java
     implementation 'io.github.cdimascio:dotenv-java:3.0.0'
+    testFixturesImplementation 'io.github.cdimascio:dotenv-java:3.0.0'
     //    testFixturesImplementation 'io.github.cdimascio:dotenv-java:3.0.0'
 }
 
