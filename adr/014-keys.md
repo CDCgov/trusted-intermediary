@@ -1,19 +1,33 @@
 # 14. Keys
 
-Date: 2023-10-11
+Date: 2023-10-23
 
 ## Decision
 
-We need to formalize and standardize how we are handling both our public and private keys, as well as naming conventions
+### Internal Keys
+
+These keys are used for the intermediary's internal use.  These keys will follow the following naming paradigm...
+
+`trusted-intermediary-<key type>-key-<environment>`.
+
+For example, `trusted-intermediary-private-key-staging` or `trusted-intermediary-public-key-prod`.
+
+### Organization Keys
+
+These are keys for external orgs to authenticate with us. Currently, report stream is the only organization we have. The pattern for the name of these keys is
+
+`organization-<org name>-<key type>-key-<environment>`.
+
+For example, `organization-report-stream-public-key-staging`
 
 ## Status
 
-Pending.
+Accepted.
 
 ## Context
 
-We currently have our keys listed in keybase inside of a team specific folder. We do not currently have any organization to this team-specific folder. The names of the keys in the folder do not match the name of the secrets in the Azure dev and staging environments.  We will need to agree to a unified and easy to understand naming standard that should include who the key is for, whether it's an org key, and the environment that the key is for.      
-
+This naming convention applies to all locations where our keys are stored.  Previously, we didn't have a consistent naming convention across all our locations which caused confusion on which key was to be used in which context and environment.
 
 ### Related Issues
 
+- #584
