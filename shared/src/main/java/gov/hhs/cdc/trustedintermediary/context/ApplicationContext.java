@@ -146,11 +146,15 @@ public class ApplicationContext {
         return declaringClassImplementation;
     }
 
-    public static String getProperty(String key) {
-        return Environment.getProperty(key);
+    public static String getProperty(String key) throws Exception {
+        return DotEnv.get(key);
+    }
+
+    public static String getProperty(String key, String defaultValue) {
+        return DotEnv.get(key, defaultValue);
     }
 
     public static String getEnvironment() {
-        return Environment.getEnvironmentType();
+        return getProperty("ENV", "local");
     }
 }

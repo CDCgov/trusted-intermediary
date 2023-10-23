@@ -3,15 +3,19 @@ package gov.hhs.cdc.trustedintermediary.context;
 import io.github.cdimascio.dotenv.Dotenv;
 
 class DotEnv {
-    private static final Dotenv DOTENV = Dotenv.load();
+    private static final Dotenv DOTENV = Dotenv.configure().ignoreIfMissing().load();
 
     private DotEnv() {}
 
-    public static String get(String key) {
-        return DOTENV.get(key);
+    public static String get(String key) throws Exception {
+        String value = DOTENV.get(key);
+        if (value != null) {
+            return value;
+        }
+        throw new Exception();
     }
 
-    public static boolean isNull() {
-        return DOTENV == null;
+    public static String get(String key, String defaultValue) {
+        return DOTENV.get(key, defaultValue);
     }
 }
