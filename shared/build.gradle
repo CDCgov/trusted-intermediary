@@ -22,15 +22,15 @@ dependencies {
     implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
 
     //jackson
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.2'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.15.3'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.3'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.3'
 
     //fhir
-    api 'ca.uhn.hapi.fhir:hapi-fhir-base:6.8.3'
-    api 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.8.3'
-    implementation 'ca.uhn.hapi.fhir:hapi-fhir-caching-caffeine:6.8.3'
-    implementation 'ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:6.8.3'
+    api 'ca.uhn.hapi.fhir:hapi-fhir-base:6.8.4'
+    api 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.8.4'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-caching-caffeine:6.8.4'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:6.8.4'
     api 'org.fhir:ucum:1.0.8'
 
     // Apache Client
@@ -38,13 +38,13 @@ dependencies {
     implementation 'org.apache.httpcomponents.client5:httpclient5-fluent:5.2.1'
 
     // jjwt
-    implementation 'io.jsonwebtoken:jjwt-api:0.12.2'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.2'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.2'
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 
     // azure sdk
-    implementation 'com.azure:azure-security-keyvault-secrets:4.7.0'
-    implementation 'com.azure:azure-identity:1.10.3'
+    implementation 'com.azure:azure-security-keyvault-secrets:4.7.1'
+    implementation 'com.azure:azure-identity:1.10.4'
 
     testImplementation 'org.apache.groovy:groovy:4.0.15'
     testFixturesImplementation 'org.apache.groovy:groovy:4.0.15'
