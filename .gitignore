@@ -35,3 +35,5 @@ ig/template
 
 __pycache__
 localfileorder.json
+
+tools/

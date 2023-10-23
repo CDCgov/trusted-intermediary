@@ -4,7 +4,6 @@
  */
 package gov.hhs.cdc.trustedintermediary.context;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,11 +24,7 @@ public class ApplicationContext {
     protected static final Map<Class<?>, Object> OBJECT_MAP = new ConcurrentHashMap<>();
     protected static final Set<Object> IMPLEMENTATIONS = new HashSet<>();
 
-    protected static Dotenv dotenv;
-
-    protected ApplicationContext() {
-        setDotenv(Dotenv.configure().load());
-    }
+    protected ApplicationContext() {}
 
     public static void register(Class<?> clazz, Object implementation) {
         OBJECT_MAP.put(clazz, implementation);
@@ -152,21 +147,10 @@ public class ApplicationContext {
     }
 
     public static String getProperty(String key) {
-        return dotenv.get(key);
+        return Environment.getProperty(key);
     }
 
     public static String getEnvironment() {
-        if (dotenv == null) {
-            setDotenv(Dotenv.load());
-        }
-        String environment = dotenv.get("ENV");
-        if (environment == null || environment.isEmpty()) {
-            return "local";
-        }
-        return environment;
-    }
-
-    public static void setDotenv(Dotenv env) {
-        dotenv = env;
+        return Environment.getEnvironmentType();
     }
 }
