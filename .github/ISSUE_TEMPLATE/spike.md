@@ -1,6 +1,6 @@
 ---
 name: Spike
-about: Describe this issue template's purpose here.
+about: Research related task, when all that is needed is information gathering.
 title: ''
 labels: spike
 assignees: ''
