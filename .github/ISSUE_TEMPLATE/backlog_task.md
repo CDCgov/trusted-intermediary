@@ -1,6 +1,7 @@
 ---
 name: Backlog Task
-about: Non-story related task, typically foundational.  Can be used for both research and engineering tasks.
+about: Non-story related task, typically foundational.  Can be used for both research
+  and engineering tasks.
 title: ''
 labels: foundational
 assignees: ''
