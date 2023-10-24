@@ -111,6 +111,36 @@ class ReportStreamOrderSenderTest extends Specification {
         1 * mockCache.put(_ as String, fakeOurPrivateKey)
     }
 
+    def "requestToken doesn't cache our private key if RS auth call fails"() {
+        given:
+        def mockAuthEngine = Mock(AuthEngine)
+        def mockClient = Mock(HttpClient)
+        def mockSecrets = Mock(Secrets)
+        def mockCache = Mock(Cache)
+        def mockFormatter = Mock(Formatter)
+
+        //        def fakeOurPrivateKey = "DogCow" // pragma: allowlist secret
+        //        mockSecrets.getKey(_ as String) >> fakeOurPrivateKey
+        mockClient.post(_, _, _) >> { throw new HttpClientException("Fake failure", new NullPointerException()) }
+
+        mockFormatter.convertJsonToObject(_ , _) >> [access_token: "Moof!"]
+
+        TestApplicationContext.register(AuthEngine, mockAuthEngine)
+        TestApplicationContext.register(HttpClient, mockClient)
+        TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.register(Secrets, mockSecrets)
+        TestApplicationContext.register(Cache, mockCache)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        ReportStreamOrderSender.getInstance().requestToken()
+
+        then:
+        thrown(UnableToSendOrderException)
+        0 * mockCache.put(_ , _)
+    }
+
     def "extractToken works"() {
         given:
         TestApplicationContext.register(Formatter, Jackson.getInstance())
