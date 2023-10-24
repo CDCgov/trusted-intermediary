@@ -7,12 +7,8 @@ class DotEnv {
 
     private DotEnv() {}
 
-    public static String get(String key) throws Exception {
-        String value = DOTENV.get(key);
-        if (value != null) {
-            return value;
-        }
-        throw new Exception();
+    public static String get(String key) {
+        return DOTENV.get(key);
     }
 
     public static String get(String key, String defaultValue) {

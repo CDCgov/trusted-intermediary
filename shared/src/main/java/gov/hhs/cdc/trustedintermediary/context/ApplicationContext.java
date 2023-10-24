@@ -146,7 +146,7 @@ public class ApplicationContext {
         return declaringClassImplementation;
     }
 
-    public static String getProperty(String key) throws Exception {
+    public static String getProperty(String key) {
         return DotEnv.get(key);
     }
 
