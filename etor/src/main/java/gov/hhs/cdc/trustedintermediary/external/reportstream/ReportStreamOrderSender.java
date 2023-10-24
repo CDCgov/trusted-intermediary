@@ -37,6 +37,9 @@ public class ReportStreamOrderSender implements OrderSender {
                     .map(urlPrefix -> urlPrefix.replace("https://", "").replace("http://", ""))
                     .orElse("");
 
+    private static final String OUR_PRIVATE_KEY_ID =
+            "trusted-intermediary-private-key-" + ApplicationContext.getEnvironment();
+
     private static final String CLIENT_NAME = "flexion.etor-service-sender";
 
     private String rsTokenCache;
@@ -155,15 +158,13 @@ public class ReportStreamOrderSender implements OrderSender {
     }
 
     protected String retrievePrivateKey() throws SecretRetrievalException {
-        var senderPrivateKey =
-                "trusted-intermediary-private-key-" + ApplicationContext.getEnvironment();
-        String key = this.keyCache.get(senderPrivateKey);
+        String key = this.keyCache.get(OUR_PRIVATE_KEY_ID);
         if (key != null) {
             return key;
         }
 
-        key = secrets.getKey(senderPrivateKey);
-        this.keyCache.put(senderPrivateKey, key);
+        key = secrets.getKey(OUR_PRIVATE_KEY_ID);
+        this.keyCache.put(OUR_PRIVATE_KEY_ID, key);
         return key;
     }
 
