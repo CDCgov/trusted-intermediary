@@ -86,8 +86,6 @@ class ReportStreamOrderSenderTest extends Specification {
 
     def "requestToken saves our private key only after successful call to RS"() {
         given:
-        def mockAuthEngine = Mock(AuthEngine)
-        def mockClient = Mock(HttpClient)
         def mockSecrets = Mock(Secrets)
         def mockCache = Mock(Cache)
         def mockFormatter = Mock(Formatter)
@@ -96,8 +94,8 @@ class ReportStreamOrderSenderTest extends Specification {
         mockSecrets.getKey(_ as String) >> fakeOurPrivateKey
         mockFormatter.convertJsonToObject(_ , _) >> [access_token: "Moof!"]
 
-        TestApplicationContext.register(AuthEngine, mockAuthEngine)
-        TestApplicationContext.register(HttpClient, mockClient)
+        TestApplicationContext.register(AuthEngine, Mock(AuthEngine))
+        TestApplicationContext.register(HttpClient, Mock(HttpClient))
         TestApplicationContext.register(Formatter, mockFormatter)
         TestApplicationContext.register(Secrets, mockSecrets)
         TestApplicationContext.register(Cache, mockCache)
@@ -113,9 +111,7 @@ class ReportStreamOrderSenderTest extends Specification {
 
     def "requestToken doesn't cache our private key if RS auth call fails"() {
         given:
-        def mockAuthEngine = Mock(AuthEngine)
         def mockClient = Mock(HttpClient)
-        def mockSecrets = Mock(Secrets)
         def mockCache = Mock(Cache)
         def mockFormatter = Mock(Formatter)
 
@@ -123,10 +119,10 @@ class ReportStreamOrderSenderTest extends Specification {
 
         mockFormatter.convertJsonToObject(_ , _) >> [access_token: "Moof!"]
 
-        TestApplicationContext.register(AuthEngine, mockAuthEngine)
+        TestApplicationContext.register(AuthEngine, Mock(AuthEngine))
         TestApplicationContext.register(HttpClient, mockClient)
         TestApplicationContext.register(Formatter, mockFormatter)
-        TestApplicationContext.register(Secrets, mockSecrets)
+        TestApplicationContext.register(Secrets, Mock(Secrets))
         TestApplicationContext.register(Cache, mockCache)
 
         TestApplicationContext.injectRegisteredImplementations()
