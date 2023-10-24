@@ -139,6 +139,7 @@ public class ReportStreamOrderSender implements OrderSender {
         String body;
         Map<String, String> headers = Map.of("Content-Type", "application/x-www-form-urlencoded");
         try {
+            var ourPrivateKey = retrievePrivateKey();
             senderToken =
                     jwt.generateToken(
                             CLIENT_NAME,
@@ -146,7 +147,7 @@ public class ReportStreamOrderSender implements OrderSender {
                             CLIENT_NAME,
                             RS_DOMAIN_NAME,
                             300,
-                            retrievePrivateKey());
+                            ourPrivateKey);
             body = composeRequestBody(senderToken);
             String rsResponse = client.post(RS_AUTH_API_URL, headers, body);
             token = extractToken(rsResponse);
