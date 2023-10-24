@@ -158,7 +158,7 @@ public class ReportStreamOrderSender implements OrderSender {
         }
 
         // only cache our private key if we successfully authenticate to RS
-        keyCache.put(OUR_PRIVATE_KEY_ID, ourPrivateKey);
+        cachePrivateKeyIfNotCachedAlready(ourPrivateKey);
 
         return token;
     }
@@ -172,6 +172,15 @@ public class ReportStreamOrderSender implements OrderSender {
         key = secrets.getKey(OUR_PRIVATE_KEY_ID);
 
         return key;
+    }
+
+    protected void cachePrivateKeyIfNotCachedAlready(String privateKey) {
+        String key = keyCache.get(OUR_PRIVATE_KEY_ID);
+        if (key != null) {
+            return;
+        }
+
+        keyCache.put(OUR_PRIVATE_KEY_ID, privateKey);
     }
 
     protected String extractToken(String responseBody) throws FormatterProcessingException {

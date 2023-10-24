@@ -119,8 +119,6 @@ class ReportStreamOrderSenderTest extends Specification {
         def mockCache = Mock(Cache)
         def mockFormatter = Mock(Formatter)
 
-        //        def fakeOurPrivateKey = "DogCow" // pragma: allowlist secret
-        //        mockSecrets.getKey(_ as String) >> fakeOurPrivateKey
         mockClient.post(_, _, _) >> { throw new HttpClientException("Fake failure", new NullPointerException()) }
 
         mockFormatter.convertJsonToObject(_ , _) >> [access_token: "Moof!"]
@@ -139,6 +137,38 @@ class ReportStreamOrderSenderTest extends Specification {
         then:
         thrown(UnableToSendOrderException)
         0 * mockCache.put(_ , _)
+    }
+
+    def "cachePrivateKeyIfNotCachedAlready doesn't cache when the key is already is cached"() {
+        given:
+        def mockCache = Mock(Cache)
+        mockCache.get(_ as String) >> "DogCow private key"
+
+        TestApplicationContext.register(Cache, mockCache)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        ReportStreamOrderSender.getInstance().cachePrivateKeyIfNotCachedAlready("Moof!")
+
+        then:
+        0 * mockCache.put(_, _)
+    }
+
+    def "cachePrivateKeyIfNotCachedAlready caches when the key isn't cached"() {
+        given:
+        def mockCache = Mock(Cache)
+        mockCache.get(_ as String) >> null
+
+        TestApplicationContext.register(Cache, mockCache)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        ReportStreamOrderSender.getInstance().cachePrivateKeyIfNotCachedAlready("Moof!")
+
+        then:
+        1 * mockCache.put(_, _)
     }
 
     def "extractToken works"() {
