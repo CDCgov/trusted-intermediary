@@ -9,7 +9,7 @@ script_dir="$(dirname "$0")"
 # Path to the resource folder
 folder_path="$script_dir/shared/src/main/resources"
 
-# Check if folder exists, and create if if not
+# Check if folder exists, and create it if not
 if [ ! -d "$folder_path" ]; then
     mkdir -p "$folder_path" || { echo "Error creating directory."; exit 1; }
 fi
