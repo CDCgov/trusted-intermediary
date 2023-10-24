@@ -41,6 +41,8 @@ public class ReportStreamOrderSender implements OrderSender {
             "trusted-intermediary-private-key-" + ApplicationContext.getEnvironment();
 
     private static final String CLIENT_NAME = "flexion.etor-service-sender";
+    private static final Map<String, String> RS_AUTH_API_HEADERS =
+            Map.of("Content-Type", "application/x-www-form-urlencoded");
 
     private String rsTokenCache;
 
@@ -134,13 +136,11 @@ public class ReportStreamOrderSender implements OrderSender {
     protected String requestToken() throws UnableToSendOrderException {
         logger.logInfo("Requesting token from ReportStream");
 
-        String senderToken = null;
-        String token = "";
-        String body;
-        Map<String, String> headers = Map.of("Content-Type", "application/x-www-form-urlencoded");
+        String token;
+
         try {
-            var ourPrivateKey = retrievePrivateKey();
-            senderToken =
+            String ourPrivateKey = retrievePrivateKey();
+            String senderToken =
                     jwt.generateToken(
                             CLIENT_NAME,
                             CLIENT_NAME,
@@ -148,24 +148,25 @@ public class ReportStreamOrderSender implements OrderSender {
                             RS_DOMAIN_NAME,
                             300,
                             ourPrivateKey);
-            body = composeRequestBody(senderToken);
-            String rsResponse = client.post(RS_AUTH_API_URL, headers, body);
+            String body = composeRequestBody(senderToken);
+            String rsResponse = client.post(RS_AUTH_API_URL, RS_AUTH_API_HEADERS, body);
             token = extractToken(rsResponse);
         } catch (Exception e) {
             throw new UnableToSendOrderException(
                     "Error getting the API token from ReportStream", e);
         }
+
         return token;
     }
 
     protected String retrievePrivateKey() throws SecretRetrievalException {
-        String key = this.keyCache.get(OUR_PRIVATE_KEY_ID);
+        String key = keyCache.get(OUR_PRIVATE_KEY_ID);
         if (key != null) {
             return key;
         }
 
         key = secrets.getKey(OUR_PRIVATE_KEY_ID);
-        this.keyCache.put(OUR_PRIVATE_KEY_ID, key);
+        keyCache.put(OUR_PRIVATE_KEY_ID, key);
         return key;
     }
 
