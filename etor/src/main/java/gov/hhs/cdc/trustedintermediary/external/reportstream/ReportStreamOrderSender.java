@@ -136,10 +136,11 @@ public class ReportStreamOrderSender implements OrderSender {
     protected String requestToken() throws UnableToSendOrderException {
         logger.logInfo("Requesting token from ReportStream");
 
+        String ourPrivateKey;
         String token;
 
         try {
-            String ourPrivateKey = retrievePrivateKey();
+            ourPrivateKey = retrievePrivateKey();
             String senderToken =
                     jwt.generateToken(
                             CLIENT_NAME,
@@ -156,6 +157,9 @@ public class ReportStreamOrderSender implements OrderSender {
                     "Error getting the API token from ReportStream", e);
         }
 
+        // only cache our private key if we successfully authenticate to RS
+        keyCache.put(OUR_PRIVATE_KEY_ID, ourPrivateKey);
+
         return token;
     }
 
@@ -166,7 +170,7 @@ public class ReportStreamOrderSender implements OrderSender {
         }
 
         key = secrets.getKey(OUR_PRIVATE_KEY_ID);
-        keyCache.put(OUR_PRIVATE_KEY_ID, key);
+
         return key;
     }
 

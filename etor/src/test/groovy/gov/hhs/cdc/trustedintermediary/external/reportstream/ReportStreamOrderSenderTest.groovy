@@ -193,11 +193,9 @@ class ReportStreamOrderSenderTest extends Specification {
         given:
         def mockSecret = Mock(Secrets)
         def expected = "New Fake Azure Key"
-        def keyCache = KeyCache.getInstance()
-        def key = "trusted-intermediary-private-key-local"
         mockSecret.getKey(_ as String) >> expected
         TestApplicationContext.register(Secrets, mockSecret)
-        TestApplicationContext.register(Cache, keyCache)
+        TestApplicationContext.register(Cache, KeyCache.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
         def rsOrderSender = ReportStreamOrderSender.getInstance()
         when:
@@ -205,7 +203,6 @@ class ReportStreamOrderSenderTest extends Specification {
 
         then:
         actual == expected
-        keyCache.get(key) == expected
     }
 
     def "retrievePrivateKey works when cache is not empty" () {
