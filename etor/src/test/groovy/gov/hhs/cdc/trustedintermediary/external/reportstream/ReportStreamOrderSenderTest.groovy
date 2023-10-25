@@ -341,36 +341,32 @@ class ReportStreamOrderSenderTest extends Specification {
         exception.getCause().getClass() == HttpClientException
     }
 
-    def "getRsToken when cache is empty"() {
+    def "getRsToken when cache is empty we call RS to get a new one"() {
         given:
-        def orderSender = ReportStreamOrderSender.getInstance()
         def mockClient = Mock(HttpClient)
-        def mockAuthEngine = Mock(AuthEngine)
-        def mockSecrets = Mock(Secrets)
         def mockFormatter = Mock(Formatter)
         def mockCache = Mock(Cache)
-        TestApplicationContext.register(Formatter, mockFormatter)
-        TestApplicationContext.register(AuthEngine, mockAuthEngine)
-        TestApplicationContext.register(HttpClient, mockClient)
-        TestApplicationContext.register(Secrets, mockSecrets)
-        mockSecrets.getKey(_ as String) >> "fake private key"
-        TestApplicationContext.register(Cache, mockCache)
+
+        //make the cache empty
         mockCache.get(_ as String) >> null
-        TestApplicationContext.register(OrderSender, orderSender)
+
+        def freshTokenFromRs = "new token"
+        mockFormatter.convertJsonToObject(_, _ as TypeReference) >> [access_token: freshTokenFromRs]
+
+        TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.register(AuthEngine, Mock(AuthEngine))
+        TestApplicationContext.register(HttpClient, mockClient)
+        TestApplicationContext.register(Cache, mockCache)
+        TestApplicationContext.register(Secrets, Mock(Secrets))
+
         TestApplicationContext.injectRegisteredImplementations()
 
-        mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(10, ChronoUnit.SECONDS)
-        mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "fake token"
-        def fakeRsToken = "DogCow"
-        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", fakeRsToken)
-        def responseBody = """{"foo":"foo value", "access_token":fake token, "boo":"boo value"}"""
-        mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
-
         when:
-        def token = orderSender.getRsToken()
+        def token = ReportStreamOrderSender.getInstance().getRsToken()
 
         then:
-        token == fakeRsToken
+        1 * mockClient.post(_, _, _)
+        token == freshTokenFromRs
     }
 
     def "getRsToken when cache token is invalid we call RS to get a new one"() {
@@ -386,7 +382,7 @@ class ReportStreamOrderSenderTest extends Specification {
         mockAuthEngine.getExpirationDate(_) >> LocalDateTime.now().plus(10, ChronoUnit.SECONDS)
 
         def freshTokenFromRs = "new token"
-        mockFormatter.convertJsonToObject(_, _ as TypeReference) >> Map.of("access_token", freshTokenFromRs)
+        mockFormatter.convertJsonToObject(_, _ as TypeReference) >> [access_token: freshTokenFromRs]
 
         TestApplicationContext.register(Formatter, mockFormatter)
         TestApplicationContext.register(AuthEngine, mockAuthEngine)
