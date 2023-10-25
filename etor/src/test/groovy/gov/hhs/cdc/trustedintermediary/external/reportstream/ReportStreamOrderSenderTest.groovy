@@ -135,7 +135,7 @@ class ReportStreamOrderSenderTest extends Specification {
         0 * mockCache.put(_ , _)
     }
 
-    def "cachePrivateKeyIfNotCachedAlready doesn't cache when the key is already is cached"() {
+    def "cacheOurPrivateKeyIfNotCachedAlready doesn't cache when the key is already is cached"() {
         given:
         def mockCache = Mock(Cache)
         mockCache.get(_ as String) >> "DogCow private key"
@@ -145,13 +145,13 @@ class ReportStreamOrderSenderTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        ReportStreamOrderSender.getInstance().cachePrivateKeyIfNotCachedAlready("Moof!")
+        ReportStreamOrderSender.getInstance().cacheOurPrivateKeyIfNotCachedAlready("Moof!")
 
         then:
         0 * mockCache.put(_, _)
     }
 
-    def "cachePrivateKeyIfNotCachedAlready caches when the key isn't cached"() {
+    def "cacheOurPrivateKeyIfNotCachedAlready caches when the key isn't cached"() {
         given:
         def mockCache = Mock(Cache)
         mockCache.get(_ as String) >> null
@@ -161,7 +161,7 @@ class ReportStreamOrderSenderTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        ReportStreamOrderSender.getInstance().cachePrivateKeyIfNotCachedAlready("Moof!")
+        ReportStreamOrderSender.getInstance().cacheOurPrivateKeyIfNotCachedAlready("Moof!")
 
         then:
         1 * mockCache.put(_, _)

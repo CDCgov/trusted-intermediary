@@ -158,7 +158,7 @@ public class ReportStreamOrderSender implements OrderSender {
         }
 
         // only cache our private key if we successfully authenticate to RS
-        cachePrivateKeyIfNotCachedAlready(ourPrivateKey);
+        cacheOurPrivateKeyIfNotCachedAlready(ourPrivateKey);
 
         return token;
     }
@@ -174,7 +174,7 @@ public class ReportStreamOrderSender implements OrderSender {
         return key;
     }
 
-    protected void cachePrivateKeyIfNotCachedAlready(String privateKey) {
+    void cacheOurPrivateKeyIfNotCachedAlready(String privateKey) {
         String key = keyCache.get(OUR_PRIVATE_KEY_ID);
         if (key != null) {
             return;
