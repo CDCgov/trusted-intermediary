@@ -266,17 +266,21 @@ class ReportStreamOrderSenderTest extends Specification {
         def mockAuthEngine = Mock(AuthEngine)
         def mockSecrets = Mock(Secrets)
         def mockFormatter = Mock(Formatter)
+        def mockCache = Mock(Cache)
         TestApplicationContext.register(Formatter, mockFormatter)
         TestApplicationContext.register(AuthEngine, mockAuthEngine)
         TestApplicationContext.register(HttpClient, mockClient)
         TestApplicationContext.register(Secrets, mockSecrets)
         mockSecrets.getKey(_ as String) >> "fake private key"
+        TestApplicationContext.register(Cache, mockCache)
+        mockCache.get(_ as String) >> null
         TestApplicationContext.register(OrderSender, orderSender)
         TestApplicationContext.injectRegisteredImplementations()
 
         mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(10, ChronoUnit.SECONDS)
         mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "fake token"
-        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake token")
+        def fakeRsToken = "DogCow"
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", fakeRsToken)
         def responseBody = """{"foo":"foo value", "access_token":fake token, "boo":"boo value"}"""
         mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
 
@@ -284,7 +288,7 @@ class ReportStreamOrderSenderTest extends Specification {
         def token = orderSender.getRsToken()
 
         then:
-        token == orderSender.getRsTokenCache()
+        token == fakeRsToken
     }
 
     def "getRsToken when cache token is invalid"() {
