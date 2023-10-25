@@ -24,6 +24,10 @@ public class ApplicationContext {
     protected static final Map<Class<?>, Object> OBJECT_MAP = new ConcurrentHashMap<>();
     protected static final Set<Object> IMPLEMENTATIONS = new HashSet<>();
 
+    static {
+        DotEnv.load();
+    }
+
     protected ApplicationContext() {}
 
     public static void register(Class<?> clazz, Object implementation) {

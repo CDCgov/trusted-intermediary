@@ -8,8 +8,11 @@ import java.lang.reflect.Field
 class DotEnvTest extends Specification {
     def "get method should return value for existing key"() {
         given:
-        def dotenv = Mock(Dotenv)
-        Object st = DotEnv.getMetaClass().getStatic()
+        def mockDotenv = Mock(Dotenv)
+        mockDotenv.get(_ as String) >> "test_value"
+
+        DotEnv.load(mockDotenv)
+
         //        dotenv.get("test_key") >> "test_value"
         //        final var dotenv = Dotenv.configure().directory("app/src/main/resources").ignoreIfMissing().load();
         //        DotEnv.mixin()
@@ -32,6 +35,7 @@ class DotEnvTest extends Specification {
         String value = DotEnv.get("test_key")
 
         then:
+        1==1
         value == "test_value"
     }
 
