@@ -55,7 +55,7 @@ public class ReportStreamOrderSender implements OrderSender {
     @Inject private HapiFhir fhir;
     @Inject private Logger logger;
     @Inject private Secrets secrets;
-    @Inject private Cache keyCache;
+    @Inject private Cache cache;
 
     public static ReportStreamOrderSender getInstance() {
         return INSTANCE;
@@ -157,13 +157,13 @@ public class ReportStreamOrderSender implements OrderSender {
     protected String retrievePrivateKey() throws SecretRetrievalException {
         var senderPrivateKey =
                 "trusted-intermediary-private-key-" + ApplicationContext.getEnvironment();
-        String key = this.keyCache.get(senderPrivateKey);
+        String key = this.cache.get(senderPrivateKey);
         if (key != null) {
             return key;
         }
 
         key = secrets.getKey(senderPrivateKey);
-        this.keyCache.put(senderPrivateKey, key);
+        this.cache.put(senderPrivateKey, key);
         return key;
     }
 
