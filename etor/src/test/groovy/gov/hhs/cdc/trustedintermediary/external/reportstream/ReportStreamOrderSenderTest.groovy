@@ -308,14 +308,14 @@ class ReportStreamOrderSenderTest extends Specification {
     def "ensure jwt that expires 15 seconds from now is valid"() {
         given:
         def mockAuthEngine = Mock(AuthEngine)
-        TestApplicationContext.register(AuthEngine, mockAuthEngine)
+
         mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(20, ChronoUnit.SECONDS)
-        TestApplicationContext.register(OrderSender, ReportStreamOrderSender.getInstance())
+
+        TestApplicationContext.register(AuthEngine, mockAuthEngine)
         TestApplicationContext.injectRegisteredImplementations()
-        ReportStreamOrderSender.getInstance().setRsTokenCache("our token from rs")
 
         when:
-        def isValid = ReportStreamOrderSender.getInstance().isValidToken()
+        def isValid = ReportStreamOrderSender.getInstance().isValidToken("our token from rs")
 
         then:
         isValid
