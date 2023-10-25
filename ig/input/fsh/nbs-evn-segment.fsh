@@ -4,7 +4,7 @@ Title: "EVN Segment"
 Description: "The EVN Segment"
 * segmentType 1..1 string "EVN"
 * eventTypeCode 1..1 string "A01" // this is apparently not in the spec anymore but retained for backward compatibility
-* eventDateTime 1..1 string "Date and time of the event"
+* eventDateTime 1..1 string "Date and Time of the Event"
 // there are other optional fields we might want to define
 
 
