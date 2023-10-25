@@ -38,6 +38,7 @@ public class ReportStreamOrderSender implements OrderSender {
                     .orElse("");
 
     private static final String CLIENT_NAME = "flexion.etor-service-sender";
+    private static final String RS_TOKEN_CACHE_ID = "report-stream-token";
 
     private String rsTokenCache;
 
@@ -88,19 +89,22 @@ public class ReportStreamOrderSender implements OrderSender {
 
     protected String getRsToken() throws UnableToSendOrderException {
         logger.logInfo("Looking up ReportStream token");
-        if (getRsTokenCache() != null && isValidToken()) {
+
+        var token = cache.get(RS_TOKEN_CACHE_ID);
+
+        if (token != null && isValidToken(token)) {
             logger.logDebug("valid cache token");
-            return getRsTokenCache();
+            return token;
         }
 
-        String token = requestToken();
-        setRsTokenCache(token);
+        token = requestToken();
+
+        cache.put(RS_TOKEN_CACHE_ID, token);
 
         return token;
     }
 
-    protected boolean isValidToken() {
-        String token = getRsTokenCache();
+    protected boolean isValidToken(String token) {
         LocalDateTime expirationDate = jwt.getExpirationDate(token);
 
         return LocalDateTime.now().isBefore(expirationDate.minus(15, ChronoUnit.SECONDS));
