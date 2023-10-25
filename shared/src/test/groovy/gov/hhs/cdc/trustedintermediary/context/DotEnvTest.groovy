@@ -9,30 +9,12 @@ class DotEnvTest extends Specification {
     def "get method should return value for existing key"() {
         given:
         def mockDotenv = Mock(Dotenv)
-        mockDotenv.get(_ as String) >> "test_value"
+        mockDotenv.get("test_id") >> "test_value"
 
         DotEnv.load(mockDotenv)
 
-        //        dotenv.get("test_key") >> "test_value"
-        //        final var dotenv = Dotenv.configure().directory("app/src/main/resources").ignoreIfMissing().load();
-        //        DotEnv.mixin()
-
-        //        Dotenv dotenv = GroovyMock(global: true) as Dotenv
-        //        dotenv.get("test_key" as String) >> "test_value"
-
-
-        //        Field field = DotEnv.class.getDeclaredField("DOTENV")
-        //        field.setAccessible(true)
-        //        field.set(null, dotenv)
-
-        //        DotEnv.mixin(new Expando() {
-        //            def get(key) {
-        //                return dotenv.get(key)
-        //            }
-        //        } as Class)
-
         when:
-        String value = DotEnv.get("test_key")
+        String value = DotEnv.get("test_id")
 
         then:
         1==1
