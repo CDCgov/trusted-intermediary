@@ -45,12 +45,6 @@ public class ReportStreamOrderSender implements OrderSender {
     private static final Map<String, String> RS_AUTH_API_HEADERS =
             Map.of("Content-Type", "application/x-www-form-urlencoded");
 
-    private String rsTokenCache;
-
-    protected synchronized void setRsTokenCache(String token) {
-        this.rsTokenCache = token;
-    }
-
     @Inject private HttpClient client;
     @Inject private AuthEngine jwt;
     @Inject private Formatter formatter;
