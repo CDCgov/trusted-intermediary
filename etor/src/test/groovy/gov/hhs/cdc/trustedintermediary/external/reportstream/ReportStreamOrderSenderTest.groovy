@@ -8,19 +8,17 @@ import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache
-import gov.hhs.cdc.trustedintermediary.wrappers.Logger
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import spock.lang.Specification
-
-import java.util.concurrent.ConcurrentHashMap
 
 class ReportStreamOrderSenderTest extends Specification {
 
@@ -239,48 +237,6 @@ class ReportStreamOrderSenderTest extends Specification {
 
         then:
         isValid
-    }
-
-    def "rsTokenCache getter and setter works, no synchronization"() {
-        given:
-        def rsOrderSender = ReportStreamOrderSender.getInstance()
-        def expected = "fake token"
-
-        when:
-        rsOrderSender.setRsTokenCache(expected)
-        def actual = rsOrderSender.getRsTokenCache()
-
-        then:
-        actual == expected
-    }
-
-    def "rsTokenCache synchronization works"() {
-        given:
-        def orderSender = ReportStreamOrderSender.getInstance()
-        def threadNums = 5
-        def iterations = 25
-        def table = new ConcurrentHashMap<String, Integer>()
-
-        when:
-        List<Thread> threads = []
-        (1..threadNums).each { threadId ->
-            threads.add(new Thread({
-                for(int i=0; i<iterations; i++) {
-                    orderSender.setRsTokenCache("${i}")
-                    if (i == 24) {
-                        table.put("thread"+"${threadId}", i)
-                    }
-                }
-            }))
-        }
-
-        threads*.start()
-        threads*.join()
-
-        then:
-        orderSender.getRsTokenCache() == "${iterations - 1}"
-        table.size() == threadNums
-        table.values().toSet().size() == 1
     }
 
     def "sendRequestBody bombs out due to http exception"() {
