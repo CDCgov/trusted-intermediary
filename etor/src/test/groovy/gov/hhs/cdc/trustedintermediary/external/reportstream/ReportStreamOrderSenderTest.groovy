@@ -73,13 +73,98 @@ class ReportStreamOrderSenderTest extends Specification {
         TestApplicationContext.register(Secrets, mockSecrets)
         TestApplicationContext.register(Cache, mockCache)
         TestApplicationContext.injectRegisteredImplementations()
+
         when:
         mockSecrets.getKey(_ as String) >> "Fake Azure Key"
         def actual = ReportStreamOrderSender.getInstance().requestToken()
+
         then:
         1 * mockAuthEngine.generateToken(_ as String, _ as String, _ as String, _ as String, 300, _ as String) >> "sender fake token"
         1 * mockClient.post(_ as String, _ as Map<String, String>, _ as String) >> """{"access_token":"${expected}", "token_type":"bearer"}"""
         actual == expected
+    }
+
+    def "requestToken saves our private key only after successful call to RS"() {
+        given:
+        def mockSecrets = Mock(Secrets)
+        def mockCache = Mock(Cache)
+        def mockFormatter = Mock(Formatter)
+
+        def fakeOurPrivateKey = "DogCow" // pragma: allowlist secret
+        mockSecrets.getKey(_ as String) >> fakeOurPrivateKey
+        mockFormatter.convertJsonToObject(_ , _) >> [access_token: "Moof!"]
+
+        TestApplicationContext.register(AuthEngine, Mock(AuthEngine))
+        TestApplicationContext.register(HttpClient, Mock(HttpClient))
+        TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.register(Secrets, mockSecrets)
+        TestApplicationContext.register(Cache, mockCache)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        ReportStreamOrderSender.getInstance().requestToken()
+
+        then:
+        1 * mockCache.put(_ as String, fakeOurPrivateKey)
+    }
+
+    def "requestToken doesn't cache our private key if RS auth call fails"() {
+        given:
+        def mockClient = Mock(HttpClient)
+        def mockCache = Mock(Cache)
+        def mockFormatter = Mock(Formatter)
+
+        mockClient.post(_, _, _) >> { throw new HttpClientException("Fake failure", new NullPointerException()) }
+
+        mockFormatter.convertJsonToObject(_ , _) >> [access_token: "Moof!"]
+
+        TestApplicationContext.register(AuthEngine, Mock(AuthEngine))
+        TestApplicationContext.register(HttpClient, mockClient)
+        TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.register(Secrets, Mock(Secrets))
+        TestApplicationContext.register(Cache, mockCache)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        ReportStreamOrderSender.getInstance().requestToken()
+
+        then:
+        thrown(UnableToSendOrderException)
+        0 * mockCache.put(_ , _)
+    }
+
+    def "cacheOurPrivateKeyIfNotCachedAlready doesn't cache when the key is already is cached"() {
+        given:
+        def mockCache = Mock(Cache)
+        mockCache.get(_ as String) >> "DogCow private key"
+
+        TestApplicationContext.register(Cache, mockCache)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        ReportStreamOrderSender.getInstance().cacheOurPrivateKeyIfNotCachedAlready("Moof!")
+
+        then:
+        0 * mockCache.put(_, _)
+    }
+
+    def "cacheOurPrivateKeyIfNotCachedAlready caches when the key isn't cached"() {
+        given:
+        def mockCache = Mock(Cache)
+        mockCache.get(_ as String) >> null
+
+        TestApplicationContext.register(Cache, mockCache)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        ReportStreamOrderSender.getInstance().cacheOurPrivateKeyIfNotCachedAlready("Moof!")
+
+        then:
+        1 * mockCache.put(_, _)
     }
 
     def "extractToken works"() {
@@ -193,11 +278,9 @@ class ReportStreamOrderSenderTest extends Specification {
         given:
         def mockSecret = Mock(Secrets)
         def expected = "New Fake Azure Key"
-        def keyCache = KeyCache.getInstance()
-        def key = "trusted-intermediary-private-key-local"
         mockSecret.getKey(_ as String) >> expected
         TestApplicationContext.register(Secrets, mockSecret)
-        TestApplicationContext.register(Cache, keyCache)
+        TestApplicationContext.register(Cache, KeyCache.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
         def rsOrderSender = ReportStreamOrderSender.getInstance()
         when:
@@ -205,7 +288,6 @@ class ReportStreamOrderSenderTest extends Specification {
 
         then:
         actual == expected
-        keyCache.get(key) == expected
     }
 
     def "retrievePrivateKey works when cache is not empty" () {
