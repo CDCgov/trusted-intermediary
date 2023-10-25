@@ -47,10 +47,6 @@ public class ReportStreamOrderSender implements OrderSender {
 
     private String rsTokenCache;
 
-    protected synchronized String getRsTokenCache() {
-        return this.rsTokenCache;
-    }
-
     protected synchronized void setRsTokenCache(String token) {
         this.rsTokenCache = token;
     }

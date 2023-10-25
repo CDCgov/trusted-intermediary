@@ -379,62 +379,52 @@ class ReportStreamOrderSenderTest extends Specification {
         def mockAuthEngine = Mock(AuthEngine)
         def mockFormatter = Mock(Formatter)
         def mockCache = Mock(Cache)
-        TestApplicationContext.register(Formatter, mockFormatter)
-        TestApplicationContext.register(AuthEngine, mockAuthEngine)
-        TestApplicationContext.register(HttpClient, mockClient)
-        TestApplicationContext.register(Cache, mockCache)
+
         mockCache.get(_ as String) >> "shouldn't be returned"
-        TestApplicationContext.register(Secrets, Mock(Secrets))
-        TestApplicationContext.injectRegisteredImplementations()
 
         //mock the auth engine so that the JWT looks like it is invalid
         mockAuthEngine.getExpirationDate(_) >> LocalDateTime.now().plus(10, ChronoUnit.SECONDS)
 
-        def tokenFromRS = "new token"
-        mockFormatter.convertJsonToObject(_, _ as TypeReference) >> Map.of("access_token", tokenFromRS)
+        def freshTokenFromRs = "new token"
+        mockFormatter.convertJsonToObject(_, _ as TypeReference) >> Map.of("access_token", freshTokenFromRs)
+
+        TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.register(AuthEngine, mockAuthEngine)
+        TestApplicationContext.register(HttpClient, mockClient)
+        TestApplicationContext.register(Cache, mockCache)
+        TestApplicationContext.register(Secrets, Mock(Secrets))
+
+        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         def token = ReportStreamOrderSender.getInstance().getRsToken()
 
         then:
         1 * mockClient.post(_, _, _)
-        token == tokenFromRS
+        token == freshTokenFromRs
     }
 
-    def "getRsToken when cache token is valid"() {
+    def "getRsToken when cache token is valid, return that cached token"() {
         given:
-        def orderSender = ReportStreamOrderSender.getInstance()
-        orderSender.setRsTokenCache("valid Token")
-        TestApplicationContext.register(OrderSender, orderSender)
-
-        def mockFormatter = Mock(Formatter)
-        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake token")
-        TestApplicationContext.register(Formatter, mockFormatter)
-
-        def mockLogFormatter = Mock(Formatter)
-        mockLogFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> null
-        TestApplicationContext.register(Formatter, mockLogFormatter)
-
         def mockAuthEngine = Mock(AuthEngine)
-        mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "fake token"
-        mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(25, ChronoUnit.SECONDS)
+        def mockCache = Mock(Cache)
+
+        def cachedRsToken = "DogCow goes Moof!"
+        mockCache.get(_ as String) >> cachedRsToken
+
+        //mock the auth engine so that the JWT looks valid
+        mockAuthEngine.getExpirationDate(_) >> LocalDateTime.now().plus(60, ChronoUnit.SECONDS)
+
         TestApplicationContext.register(AuthEngine, mockAuthEngine)
-
-        def mockClient = Mock(HttpClient)
-        mockClient.post(_ as String, _ as Map, _ as String) >> """{"foo":"foo value", "access_token":fake token, "boo":"boo value"}"""
-        TestApplicationContext.register(HttpClient, mockClient)
-
-        def mockSecrets = Mock(Secrets)
-        mockSecrets.getKey(_ as String) >> "fakePrivateKey"
-        TestApplicationContext.register(Secrets, mockSecrets)
+        TestApplicationContext.register(Cache, mockCache)
 
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def token = orderSender.getRsToken()
+        def token = ReportStreamOrderSender.getInstance().getRsToken()
 
         then:
-        token == orderSender.getRsTokenCache()
+        token == cachedRsToken
     }
 
     def "logRsSubmissionId logs submissionId if convertJsonToObject is successful"() {
