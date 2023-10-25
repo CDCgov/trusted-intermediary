@@ -373,33 +373,32 @@ class ReportStreamOrderSenderTest extends Specification {
         token == fakeRsToken
     }
 
-    def "getRsToken when cache token is invalid"() {
+    def "getRsToken when cache token is invalid we call RS to get a new one"() {
         given:
-        def orderSender = ReportStreamOrderSender.getInstance()
         def mockClient = Mock(HttpClient)
         def mockAuthEngine = Mock(AuthEngine)
-        def mockSecrets = Mock(Secrets)
         def mockFormatter = Mock(Formatter)
+        def mockCache = Mock(Cache)
         TestApplicationContext.register(Formatter, mockFormatter)
         TestApplicationContext.register(AuthEngine, mockAuthEngine)
         TestApplicationContext.register(HttpClient, mockClient)
-        TestApplicationContext.register(Secrets, mockSecrets)
-        mockSecrets.getKey(_ as String) >> "fakePrivateKey"
-        TestApplicationContext.register(OrderSender, orderSender)
+        TestApplicationContext.register(Cache, mockCache)
+        mockCache.get(_ as String) >> "shouldn't be returned"
+        TestApplicationContext.register(Secrets, Mock(Secrets))
         TestApplicationContext.injectRegisteredImplementations()
 
-        mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "fake token"
-        mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(10, ChronoUnit.SECONDS)
-        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake token")
-        def responseBody = """{"foo":"foo value", "access_token":fake token, "boo":"boo value"}"""
-        mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
-        orderSender.setRsTokenCache("Invalid Token")
+        //mock the auth engine so that the JWT looks like it is invalid
+        mockAuthEngine.getExpirationDate(_) >> LocalDateTime.now().plus(10, ChronoUnit.SECONDS)
+
+        def tokenFromRS = "new token"
+        mockFormatter.convertJsonToObject(_, _ as TypeReference) >> Map.of("access_token", tokenFromRS)
 
         when:
-        def token = orderSender.getRsToken()
+        def token = ReportStreamOrderSender.getInstance().getRsToken()
 
         then:
-        token == orderSender.getRsTokenCache()
+        1 * mockClient.post(_, _, _)
+        token == tokenFromRS
     }
 
     def "getRsToken when cache token is valid"() {
