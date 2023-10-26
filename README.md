@@ -32,6 +32,16 @@ The additional requirements needed to contribute towards development are...
 - [Python](https://docs.python-guide.org/starting/installation/)
 - [Terraform](https://www.terraform.io)
 
+### Generating .env File
+
+To set up the necessary environment variables, you can use the `generate_env.sh` script. This script will create a `.env` file in the resource folder with the required configuration. Follow these steps:
+
+1. Navigate to the project directory.
+
+2. Run the `generate_env.sh` script:
+
+   ```bash
+   ./generate_env.sh
 ### Compiling
 
 To compile the application, execute...
