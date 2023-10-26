@@ -19,24 +19,24 @@ import io.github.cdimascio.dotenv.Dotenv;
  * @see io.github.cdimascio.dotenv.Dotenv
  */
 class DotEnv {
-    private static Dotenv DOTENV;
+    private static Dotenv dotEnv;
 
     static {
-        DOTENV = Dotenv.configure().ignoreIfMissing().load();
+        dotEnv = Dotenv.configure().ignoreIfMissing().load();
     }
 
     private DotEnv() {}
 
     public static String get(String key) {
-        return DOTENV.get(key);
+        return dotEnv.get(key);
     }
 
     public static String get(String key, String defaultValue) {
-        return DOTENV.get(key, defaultValue);
+        return dotEnv.get(key, defaultValue);
     }
 
     // Leave with default scope
     static void load(Dotenv dotenv) {
-        DOTENV = dotenv;
+        dotEnv = dotenv;
     }
 }
