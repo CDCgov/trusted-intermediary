@@ -37,7 +37,12 @@ public class ReportStreamOrderSender implements OrderSender {
                     .map(urlPrefix -> urlPrefix.replace("https://", "").replace("http://", ""))
                     .orElse("");
 
+    private static final String OUR_PRIVATE_KEY_ID =
+            "trusted-intermediary-private-key-" + ApplicationContext.getEnvironment();
+
     private static final String CLIENT_NAME = "flexion.etor-service-sender";
+    private static final Map<String, String> RS_AUTH_API_HEADERS =
+            Map.of("Content-Type", "application/x-www-form-urlencoded");
 
     private String rsTokenCache;
 
@@ -131,40 +136,51 @@ public class ReportStreamOrderSender implements OrderSender {
     protected String requestToken() throws UnableToSendOrderException {
         logger.logInfo("Requesting token from ReportStream");
 
-        String senderToken = null;
-        String token = "";
-        String body;
-        Map<String, String> headers = Map.of("Content-Type", "application/x-www-form-urlencoded");
+        String ourPrivateKey;
+        String token;
+
         try {
-            senderToken =
+            ourPrivateKey = retrievePrivateKey();
+            String senderToken =
                     jwt.generateToken(
                             CLIENT_NAME,
                             CLIENT_NAME,
                             CLIENT_NAME,
                             RS_DOMAIN_NAME,
                             300,
-                            retrievePrivateKey());
-            body = composeRequestBody(senderToken);
-            String rsResponse = client.post(RS_AUTH_API_URL, headers, body);
+                            ourPrivateKey);
+            String body = composeRequestBody(senderToken);
+            String rsResponse = client.post(RS_AUTH_API_URL, RS_AUTH_API_HEADERS, body);
             token = extractToken(rsResponse);
         } catch (Exception e) {
             throw new UnableToSendOrderException(
                     "Error getting the API token from ReportStream", e);
         }
+
+        // only cache our private key if we successfully authenticate to RS
+        cacheOurPrivateKeyIfNotCachedAlready(ourPrivateKey);
+
         return token;
     }
 
     protected String retrievePrivateKey() throws SecretRetrievalException {
-        var senderPrivateKey =
-                "trusted-intermediary-private-key-" + ApplicationContext.getEnvironment();
-        String key = this.keyCache.get(senderPrivateKey);
+        String key = keyCache.get(OUR_PRIVATE_KEY_ID);
         if (key != null) {
             return key;
         }
 
-        key = secrets.getKey(senderPrivateKey);
-        this.keyCache.put(senderPrivateKey, key);
+        key = secrets.getKey(OUR_PRIVATE_KEY_ID);
+
         return key;
+    }
+
+    void cacheOurPrivateKeyIfNotCachedAlready(String privateKey) {
+        String key = keyCache.get(OUR_PRIVATE_KEY_ID);
+        if (key != null) {
+            return;
+        }
+
+        keyCache.put(OUR_PRIVATE_KEY_ID, privateKey);
     }
 
     protected String extractToken(String responseBody) throws FormatterProcessingException {
