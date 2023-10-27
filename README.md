@@ -42,6 +42,8 @@ To set up the necessary environment variables, you can use the `generate_env.sh`
 
    ```bash
    ./generate_env.sh
+   ```
+
 ### Compiling
 
 To compile the application, execute...
