@@ -8,19 +8,17 @@ import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache
-import gov.hhs.cdc.trustedintermediary.wrappers.Logger
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import spock.lang.Specification
-
-import java.util.concurrent.ConcurrentHashMap
 
 class ReportStreamOrderSenderTest extends Specification {
 
@@ -310,59 +308,17 @@ class ReportStreamOrderSenderTest extends Specification {
     def "ensure jwt that expires 15 seconds from now is valid"() {
         given:
         def mockAuthEngine = Mock(AuthEngine)
-        TestApplicationContext.register(AuthEngine, mockAuthEngine)
+
         mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(20, ChronoUnit.SECONDS)
-        TestApplicationContext.register(OrderSender, ReportStreamOrderSender.getInstance())
+
+        TestApplicationContext.register(AuthEngine, mockAuthEngine)
         TestApplicationContext.injectRegisteredImplementations()
-        ReportStreamOrderSender.getInstance().setRsTokenCache("our token from rs")
 
         when:
-        def isValid = ReportStreamOrderSender.getInstance().isValidToken()
+        def isValid = ReportStreamOrderSender.getInstance().isValidToken("our token from rs")
 
         then:
         isValid
-    }
-
-    def "rsTokenCache getter and setter works, no synchronization"() {
-        given:
-        def rsOrderSender = ReportStreamOrderSender.getInstance()
-        def expected = "fake token"
-
-        when:
-        rsOrderSender.setRsTokenCache(expected)
-        def actual = rsOrderSender.getRsTokenCache()
-
-        then:
-        actual == expected
-    }
-
-    def "rsTokenCache synchronization works"() {
-        given:
-        def orderSender = ReportStreamOrderSender.getInstance()
-        def threadNums = 5
-        def iterations = 25
-        def table = new ConcurrentHashMap<String, Integer>()
-
-        when:
-        List<Thread> threads = []
-        (1..threadNums).each { threadId ->
-            threads.add(new Thread({
-                for(int i=0; i<iterations; i++) {
-                    orderSender.setRsTokenCache("${i}")
-                    if (i == 24) {
-                        table.put("thread"+"${threadId}", i)
-                    }
-                }
-            }))
-        }
-
-        threads*.start()
-        threads*.join()
-
-        then:
-        orderSender.getRsTokenCache() == "${iterations - 1}"
-        table.size() == threadNums
-        table.values().toSet().size() == 1
     }
 
     def "sendRequestBody bombs out due to http exception"() {
@@ -385,97 +341,86 @@ class ReportStreamOrderSenderTest extends Specification {
         exception.getCause().getClass() == HttpClientException
     }
 
-    def "getRsToken when cache is empty"() {
+    def "getRsToken when cache is empty we call RS to get a new one"() {
         given:
-        def orderSender = ReportStreamOrderSender.getInstance()
         def mockClient = Mock(HttpClient)
-        def mockAuthEngine = Mock(AuthEngine)
-        def mockSecrets = Mock(Secrets)
         def mockFormatter = Mock(Formatter)
+        def mockCache = Mock(Cache)
+
+        //make the cache empty
+        mockCache.get(_ as String) >> null
+
+        def freshTokenFromRs = "new token"
+        mockFormatter.convertJsonToObject(_, _ as TypeReference) >> [access_token: freshTokenFromRs]
+
         TestApplicationContext.register(Formatter, mockFormatter)
-        TestApplicationContext.register(AuthEngine, mockAuthEngine)
+        TestApplicationContext.register(AuthEngine, Mock(AuthEngine))
         TestApplicationContext.register(HttpClient, mockClient)
-        TestApplicationContext.register(Secrets, mockSecrets)
-        mockSecrets.getKey(_ as String) >> "fake private key"
-        TestApplicationContext.register(OrderSender, orderSender)
+        TestApplicationContext.register(Cache, mockCache)
+        TestApplicationContext.register(Secrets, Mock(Secrets))
+
         TestApplicationContext.injectRegisteredImplementations()
 
-        mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(10, ChronoUnit.SECONDS)
-        mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "fake token"
-        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake token")
-        def responseBody = """{"foo":"foo value", "access_token":fake token, "boo":"boo value"}"""
-        mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
-
         when:
-        def token = orderSender.getRsToken()
+        def token = ReportStreamOrderSender.getInstance().getRsToken()
 
         then:
-        token == orderSender.getRsTokenCache()
+        1 * mockClient.post(_, _, _)
+        token == freshTokenFromRs
     }
 
-    def "getRsToken when cache token is invalid"() {
+    def "getRsToken when cache token is invalid we call RS to get a new one"() {
         given:
-        def orderSender = ReportStreamOrderSender.getInstance()
         def mockClient = Mock(HttpClient)
         def mockAuthEngine = Mock(AuthEngine)
-        def mockSecrets = Mock(Secrets)
         def mockFormatter = Mock(Formatter)
+        def mockCache = Mock(Cache)
+
+        mockCache.get(_ as String) >> "shouldn't be returned"
+
+        //mock the auth engine so that the JWT looks like it is invalid
+        mockAuthEngine.getExpirationDate(_) >> LocalDateTime.now().plus(10, ChronoUnit.SECONDS)
+
+        def freshTokenFromRs = "new token"
+        mockFormatter.convertJsonToObject(_, _ as TypeReference) >> [access_token: freshTokenFromRs]
+
         TestApplicationContext.register(Formatter, mockFormatter)
         TestApplicationContext.register(AuthEngine, mockAuthEngine)
         TestApplicationContext.register(HttpClient, mockClient)
-        TestApplicationContext.register(Secrets, mockSecrets)
-        mockSecrets.getKey(_ as String) >> "fakePrivateKey"
-        TestApplicationContext.register(OrderSender, orderSender)
+        TestApplicationContext.register(Cache, mockCache)
+        TestApplicationContext.register(Secrets, Mock(Secrets))
+
         TestApplicationContext.injectRegisteredImplementations()
 
-        mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "fake token"
-        mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(10, ChronoUnit.SECONDS)
-        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake token")
-        def responseBody = """{"foo":"foo value", "access_token":fake token, "boo":"boo value"}"""
-        mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
-        orderSender.setRsTokenCache("Invalid Token")
-
         when:
-        def token = orderSender.getRsToken()
+        def token = ReportStreamOrderSender.getInstance().getRsToken()
 
         then:
-        token == orderSender.getRsTokenCache()
+        1 * mockClient.post(_, _, _)
+        token == freshTokenFromRs
     }
 
-    def "getRsToken when cache token is valid"() {
+    def "getRsToken when cache token is valid, return that cached token"() {
         given:
-        def orderSender = ReportStreamOrderSender.getInstance()
-        orderSender.setRsTokenCache("valid Token")
-        TestApplicationContext.register(OrderSender, orderSender)
-
-        def mockFormatter = Mock(Formatter)
-        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake token")
-        TestApplicationContext.register(Formatter, mockFormatter)
-
-        def mockLogFormatter = Mock(Formatter)
-        mockLogFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> null
-        TestApplicationContext.register(Formatter, mockLogFormatter)
-
         def mockAuthEngine = Mock(AuthEngine)
-        mockAuthEngine.generateSenderToken(_ as String, _ as String, _ as String, _ as String, 300) >> "fake token"
-        mockAuthEngine.getExpirationDate(_ as String) >> LocalDateTime.now().plus(25, ChronoUnit.SECONDS)
+        def mockCache = Mock(Cache)
+
+        def cachedRsToken = "DogCow goes Moof!"
+        mockCache.get(_ as String) >> cachedRsToken
+
+        //mock the auth engine so that the JWT looks valid
+        mockAuthEngine.getExpirationDate(_) >> LocalDateTime.now().plus(60, ChronoUnit.SECONDS)
+
         TestApplicationContext.register(AuthEngine, mockAuthEngine)
-
-        def mockClient = Mock(HttpClient)
-        mockClient.post(_ as String, _ as Map, _ as String) >> """{"foo":"foo value", "access_token":fake token, "boo":"boo value"}"""
-        TestApplicationContext.register(HttpClient, mockClient)
-
-        def mockSecrets = Mock(Secrets)
-        mockSecrets.getKey(_ as String) >> "fakePrivateKey"
-        TestApplicationContext.register(Secrets, mockSecrets)
+        TestApplicationContext.register(Cache, mockCache)
 
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def token = orderSender.getRsToken()
+        def token = ReportStreamOrderSender.getInstance().getRsToken()
 
         then:
-        token == orderSender.getRsTokenCache()
+        token == cachedRsToken
     }
 
     def "logRsSubmissionId logs submissionId if convertJsonToObject is successful"() {

@@ -39,20 +39,11 @@ public class ReportStreamOrderSender implements OrderSender {
 
     private static final String OUR_PRIVATE_KEY_ID =
             "trusted-intermediary-private-key-" + ApplicationContext.getEnvironment();
+    private static final String RS_TOKEN_CACHE_ID = "report-stream-token";
 
     private static final String CLIENT_NAME = "flexion.etor-service-sender";
     private static final Map<String, String> RS_AUTH_API_HEADERS =
             Map.of("Content-Type", "application/x-www-form-urlencoded");
-
-    private String rsTokenCache;
-
-    protected synchronized String getRsTokenCache() {
-        return this.rsTokenCache;
-    }
-
-    protected synchronized void setRsTokenCache(String token) {
-        this.rsTokenCache = token;
-    }
 
     @Inject private HttpClient client;
     @Inject private AuthEngine jwt;
@@ -60,7 +51,7 @@ public class ReportStreamOrderSender implements OrderSender {
     @Inject private HapiFhir fhir;
     @Inject private Logger logger;
     @Inject private Secrets secrets;
-    @Inject private Cache keyCache;
+    @Inject private Cache cache;
 
     public static ReportStreamOrderSender getInstance() {
         return INSTANCE;
@@ -93,19 +84,22 @@ public class ReportStreamOrderSender implements OrderSender {
 
     protected String getRsToken() throws UnableToSendOrderException {
         logger.logInfo("Looking up ReportStream token");
-        if (getRsTokenCache() != null && isValidToken()) {
+
+        var token = cache.get(RS_TOKEN_CACHE_ID);
+
+        if (token != null && isValidToken(token)) {
             logger.logDebug("valid cache token");
-            return getRsTokenCache();
+            return token;
         }
 
-        String token = requestToken();
-        setRsTokenCache(token);
+        token = requestToken();
+
+        cache.put(RS_TOKEN_CACHE_ID, token);
 
         return token;
     }
 
-    protected boolean isValidToken() {
-        String token = getRsTokenCache();
+    protected boolean isValidToken(String token) {
         LocalDateTime expirationDate = jwt.getExpirationDate(token);
 
         return LocalDateTime.now().isBefore(expirationDate.minus(15, ChronoUnit.SECONDS));
@@ -164,7 +158,7 @@ public class ReportStreamOrderSender implements OrderSender {
     }
 
     protected String retrievePrivateKey() throws SecretRetrievalException {
-        String key = keyCache.get(OUR_PRIVATE_KEY_ID);
+        String key = cache.get(OUR_PRIVATE_KEY_ID);
         if (key != null) {
             return key;
         }
@@ -175,12 +169,12 @@ public class ReportStreamOrderSender implements OrderSender {
     }
 
     void cacheOurPrivateKeyIfNotCachedAlready(String privateKey) {
-        String key = keyCache.get(OUR_PRIVATE_KEY_ID);
+        String key = cache.get(OUR_PRIVATE_KEY_ID);
         if (key != null) {
             return;
         }
 
-        keyCache.put(OUR_PRIVATE_KEY_ID, privateKey);
+        cache.put(OUR_PRIVATE_KEY_ID, privateKey);
     }
 
     protected String extractToken(String responseBody) throws FormatterProcessingException {
