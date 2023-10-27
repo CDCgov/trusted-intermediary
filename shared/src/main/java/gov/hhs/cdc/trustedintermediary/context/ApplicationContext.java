@@ -147,14 +147,14 @@ public class ApplicationContext {
     }
 
     public static String getProperty(String key) {
-        return System.getenv(key);
+        return DotEnv.get(key);
+    }
+
+    public static String getProperty(String key, String defaultValue) {
+        return DotEnv.get(key, defaultValue);
     }
 
     public static String getEnvironment() {
-        String environment = getProperty("ENV");
-        if (environment == null || environment.isEmpty()) {
-            return "local";
-        }
-        return environment;
+        return getProperty("ENV", "local");
     }
 }
