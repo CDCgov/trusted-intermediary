@@ -4,6 +4,8 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData
 import spock.lang.Specification
 
+import java.nio.file.Paths
+
 class PrivateMetricMetaDataTest extends Specification {
 
     def setup() {
@@ -21,4 +23,14 @@ class PrivateMetricMetaDataTest extends Specification {
         then:
         PrivateMetricMetaData.getInstance().getMetaDataMap().containsKey("Key")
     }
+
+
+    def "we never ever log phi or pii"() {
+        when:
+        PrivateMetricMetaData.getInstance().put("key","{resourceType: 'Patient'}" )
+
+        then:
+        !PrivateMetricMetaData.getInstance().getMetaDataMap().get("key").contains("Patient")
+    }
+
 }
