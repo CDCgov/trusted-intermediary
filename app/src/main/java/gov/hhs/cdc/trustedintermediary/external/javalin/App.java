@@ -10,19 +10,14 @@ import gov.hhs.cdc.trustedintermediary.external.apache.ApacheClient;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureSecrets;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation;
 import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache;
+import gov.hhs.cdc.trustedintermediary.external.inmemory.PrivateMetricMetaData;
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson;
 import gov.hhs.cdc.trustedintermediary.external.jjwt.JjwtEngine;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalSecrets;
 import gov.hhs.cdc.trustedintermediary.external.slf4j.DeployedLogger;
 import gov.hhs.cdc.trustedintermediary.external.slf4j.LocalLogger;
 import gov.hhs.cdc.trustedintermediary.organizations.OrganizationsSettings;
-import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
-import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
-import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
-import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
-import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
-import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombiner;
+import gov.hhs.cdc.trustedintermediary.wrappers.*;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import io.javalin.Javalin;
 import java.util.Set;
@@ -84,5 +79,6 @@ public class App {
                         : AzureSecrets.getInstance());
         ApplicationContext.register(
                 OrganizationsSettings.class, OrganizationsSettings.getInstance());
+        ApplicationContext.register(MetricMetaData.class, PrivateMetricMetaData.getInstance());
     }
 }

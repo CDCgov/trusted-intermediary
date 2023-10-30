@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.localfile
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
+import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import spock.lang.Specification
 
@@ -14,6 +15,7 @@ class LocalFileOrderSenderTest extends Specification{
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
+        TestApplicationContext.register(MetricMetaData, Mock(MetricMetaData))
         TestApplicationContext.register(LocalFileOrderSender, LocalFileOrderSender.getInstance())
     }
 

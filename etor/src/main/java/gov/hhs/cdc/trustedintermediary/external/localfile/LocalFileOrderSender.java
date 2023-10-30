@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.localfile;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
+import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.nio.charset.StandardCharsets;
@@ -19,6 +20,9 @@ public class LocalFileOrderSender implements OrderSender {
     @Inject HapiFhir fhir;
     @Inject Logger logger;
 
+    @Inject
+    MetricMetaData metaData;
+
     public static LocalFileOrderSender getInstance() {
         return INSTANCE;
     }
@@ -31,6 +35,7 @@ public class LocalFileOrderSender implements OrderSender {
         logger.logInfo("Sending the order to the hard drive at {}", fileLocation.toAbsolutePath());
 
         try {
+            metaData.put(order.getPatientId(), fhir.encodeResourceToJson(order.getUnderlyingOrder()));
             String serialized = fhir.encodeResourceToJson(order.getUnderlyingOrder());
             Files.writeString(fileLocation, serialized, StandardCharsets.UTF_8);
         } catch (Exception e) {
