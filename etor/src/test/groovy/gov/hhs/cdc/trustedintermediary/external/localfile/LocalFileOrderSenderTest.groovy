@@ -31,7 +31,7 @@ class LocalFileOrderSenderTest extends Specification{
         def testStringOrder = "Some String"
         fhir.encodeResourceToJson(_ as String) >> testStringOrder
 
-        def mockOrder = new OrderMock(null, null, "Mock String Order")
+        def mockOrder = new OrderMock("ABC", null, "Mock String Order")
 
         TestApplicationContext.register(HapiFhir, fhir)
         TestApplicationContext.injectRegisteredImplementations()

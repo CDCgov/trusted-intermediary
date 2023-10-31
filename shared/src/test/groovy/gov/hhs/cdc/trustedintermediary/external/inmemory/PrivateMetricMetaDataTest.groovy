@@ -25,12 +25,5 @@ class PrivateMetricMetaDataTest extends Specification {
     }
 
 
-    def "we never ever log phi or pii"() {
-        when:
-        PrivateMetricMetaData.getInstance().put("key","{resourceType: 'Patient'}" )
-
-        then:
-        !PrivateMetricMetaData.getInstance().getMetaDataMap().get("key").contains("Patient")
-    }
 
 }

@@ -4,10 +4,13 @@ import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
+import gov.hhs.cdc.trustedintermediary.metadata.MetaDataStep;
 import gov.hhs.cdc.trustedintermediary.wrappers.*;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
+import org.hl7.fhir.r4.model.Bundle;
+
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
@@ -67,7 +70,7 @@ public class ReportStreamOrderSender implements OrderSender {
     @Override
     public void sendOrder(final Order<?> order) throws UnableToSendOrderException {
         logger.logInfo("Sending the order to ReportStream at {}", RS_DOMAIN_NAME);
-        metaData.put(order.getPatientId(), fhir.encodeResourceToJson(order.getUnderlyingOrder()));
+        metaData.put(order.getFhirResourceId(), MetaDataStep.RECEIVED_FROM_REPORT_STREAMS);
         String json = fhir.encodeResourceToJson(order.getUnderlyingOrder());
         String bearerToken = getRsToken();
         String rsResponseBody = sendRequestBody(json, bearerToken);

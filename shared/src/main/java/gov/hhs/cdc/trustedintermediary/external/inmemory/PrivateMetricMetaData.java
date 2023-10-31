@@ -1,5 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.inmemory;
 
+import gov.hhs.cdc.trustedintermediary.metadata.MetaDataEntry;
+import gov.hhs.cdc.trustedintermediary.metadata.MetaDataStep;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData;
 import org.hl7.fhir.r4.model.Bundle;
@@ -21,24 +23,23 @@ public class PrivateMetricMetaData implements MetricMetaData {
 
     private PrivateMetricMetaData(){}
 
-    private static final ConcurrentHashMap<String, String> metadataMap = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, MetaDataEntry> metadataMap = new ConcurrentHashMap<>();
 
-    public void put(String key, Bundle bundle){
-        String sanitizedBundle = extractMetricsFromBundle(bundle);
-        metadataMap.put(key, sanitizedBundle);
+    public void put(String bundleId, MetaDataStep step){
+        MetaDataEntry entry = extractMetricsFromBundle(bundleId, step);
+        metadataMap.put(bundleId, entry);
         logger.logInfo(metadataMap.toString());
     }
 
-    public Map<String, String> getMetaDataMap(){return metadataMap;}
+    public Map<String, MetaDataEntry> getMetaDataMap(){return metadataMap;}
 
-    private String extractMetricsFromBundle(Bundle bundle){
-
+    private MetaDataEntry extractMetricsFromBundle(String bundleId, MetaDataStep step){
+        return new MetaDataEntry(bundleId, step);
 
     }
 
     //TODO: Write extractMetricsFromBundle method
-    //TODO: Create Enum Class for different steps
-    //TODO: Add timestamps for step
     //TODO: Make calls to map wherever in the code a step occurs
+    //TODO: Write test for MetaDataEntry Class
 
 }
