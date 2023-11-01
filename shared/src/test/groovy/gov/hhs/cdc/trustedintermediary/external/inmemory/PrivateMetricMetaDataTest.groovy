@@ -24,7 +24,4 @@ class PrivateMetricMetaDataTest extends Specification {
         then:
         PrivateMetricMetaData.getInstance().getMetaDataMap().containsKey("Key")
     }
-
-
-
 }

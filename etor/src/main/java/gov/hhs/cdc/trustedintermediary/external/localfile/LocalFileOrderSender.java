@@ -4,11 +4,9 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
 import gov.hhs.cdc.trustedintermediary.metadata.MetaDataStep;
-import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import org.hl7.fhir.r4.model.Bundle;
-
+import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -23,8 +21,7 @@ public class LocalFileOrderSender implements OrderSender {
     @Inject HapiFhir fhir;
     @Inject Logger logger;
 
-    @Inject
-    MetricMetaData metaData;
+    @Inject MetricMetaData metaData;
 
     public static LocalFileOrderSender getInstance() {
         return INSTANCE;

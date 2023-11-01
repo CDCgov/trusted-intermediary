@@ -9,8 +9,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.*;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
-import org.hl7.fhir.r4.model.Bundle;
-
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
@@ -58,8 +56,7 @@ public class ReportStreamOrderSender implements OrderSender {
     @Inject private Secrets secrets;
     @Inject private Cache keyCache;
 
-    @Inject
-    MetricMetaData metaData;
+    @Inject MetricMetaData metaData;
 
     public static ReportStreamOrderSender getInstance() {
         return INSTANCE;
@@ -70,11 +67,11 @@ public class ReportStreamOrderSender implements OrderSender {
     @Override
     public void sendOrder(final Order<?> order) throws UnableToSendOrderException {
         logger.logInfo("Sending the order to ReportStream at {}", RS_DOMAIN_NAME);
-        metaData.put(order.getFhirResourceId(), MetaDataStep.RECEIVED_FROM_REPORT_STREAMS);
         String json = fhir.encodeResourceToJson(order.getUnderlyingOrder());
         String bearerToken = getRsToken();
         String rsResponseBody = sendRequestBody(json, bearerToken);
         logRsSubmissionId(rsResponseBody);
+        metaData.put(order.getFhirResourceId(), MetaDataStep.SENT_TO_REPORT_STREAM);
     }
 
     protected void logRsSubmissionId(String rsResponseBody) {
