@@ -2,13 +2,11 @@ package gov.hhs.cdc.trustedintermediary.metadata;
 
 import java.util.Date;
 
-<<<<<<< Updated upstream
-// TODO: Add class doc
-=======
+
 /**
  *  An instance of a metadata event to be used for internal troubleshooting of messages
  */
->>>>>>> Stashed changes
+
 public class MetaDataEntry {
 
     private MetaDataStep entryStep;

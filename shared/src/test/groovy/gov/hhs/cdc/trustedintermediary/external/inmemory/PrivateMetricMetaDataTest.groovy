@@ -5,8 +5,6 @@ import gov.hhs.cdc.trustedintermediary.metadata.MetaDataStep
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData
 import spock.lang.Specification
 
-import java.nio.file.Paths
-
 class PrivateMetricMetaDataTest extends Specification {
 
     def setup() {
@@ -19,7 +17,7 @@ class PrivateMetricMetaDataTest extends Specification {
     def "meta data map is populated"() {
 
         when:
-        PrivateMetricMetaData.getInstance().put("Key", MetaDataStep.RECEIVED_FROM_REPORT_STREAMS)
+        PrivateMetricMetaData.getInstance().put("Key", MetaDataStep.RECEIVED_FROM_REPORT_STREAM)
 
         then:
         PrivateMetricMetaData.getInstance().getMetaDataMap().containsKey("Key")

@@ -6,9 +6,12 @@ package gov.hhs.cdc.trustedintermediary.metadata;
  * List of steps where we log metadata events
  */
 
-//TODO: Double check below steps
 public enum MetaDataStep {
-    RECEIVED_FROM_REPORT_STREAMS,
-    SENT_TO_REPORT_STREAM,
-    SENT_TO_PHL
+    RECEIVED_FROM_REPORT_STREAM,
+
+    ORDER_CONVERTED_TO_OML,
+
+    CONTACT_SECTION_ADDED,
+
+    SENT_TO_REPORT_STREAM
 }

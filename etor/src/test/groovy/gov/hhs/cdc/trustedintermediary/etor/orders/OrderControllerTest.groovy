@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
+import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData
 import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
 
@@ -13,6 +14,7 @@ class OrderControllerTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(OrderController, OrderController.getInstance())
+        TestApplicationContext.register(MetricMetaData, Mock(MetricMetaData))
     }
 
     def "parseOrders happy path works"() {

@@ -41,5 +41,5 @@ public class PrivateMetricMetaData implements MetricMetaData {
         return new MetaDataEntry(bundleId, step);
     }
 
-    //TODO: Make calls to map wherever in the code a step occurs
+    // Make calls to map wherever in the code a step occurs
 }
