@@ -8,7 +8,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 
-/** TODO: UPDATE ME */
+/**
+* Implementation of a class that can be used throughout the project to collect a list of metadata events
+ */
+
 public class PrivateMetricMetaData implements MetricMetaData {
     private static final PrivateMetricMetaData INSTANCE = new PrivateMetricMetaData();
 
@@ -33,12 +36,10 @@ public class PrivateMetricMetaData implements MetricMetaData {
         return metadataMap;
     }
 
+
     private MetaDataEntry extractMetricsFromBundle(String bundleId, MetaDataStep step) {
         return new MetaDataEntry(bundleId, step);
     }
 
-    // TODO: Write extractMetricsFromBundle method
-    // TODO: Make calls to map wherever in the code a step occurs
-    // TODO: Write test for MetaDataEntry Class
-
+    //TODO: Make calls to map wherever in the code a step occurs
 }
