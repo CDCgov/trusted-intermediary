@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.orders
 
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData
 import spock.lang.Specification
 
 class SendOrderUsecaseTest extends Specification {
@@ -10,6 +11,7 @@ class SendOrderUsecaseTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(SendOrderUseCase, SendOrderUseCase.getInstance())
+        TestApplicationContext.register(MetricMetaData, Mock(MetricMetaData))
     }
 
     def "send sends successfully"() {
