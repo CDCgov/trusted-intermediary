@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
+import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
 
 import java.nio.file.Files

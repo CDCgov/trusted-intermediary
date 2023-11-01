@@ -19,7 +19,7 @@ class OrderMock<T> implements Order<T> {
     }
 
     @Override
-    Bundle getUnderlyingOrder() {
+    T getUnderlyingOrder() {
         return underlyingOrders
     }
 
