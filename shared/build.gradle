@@ -28,9 +28,9 @@ dependencies {
 
     //fhir
     api 'ca.uhn.hapi.fhir:hapi-fhir-base:6.8.5'
-    api 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.8.4'
+    api 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.8.5'
     implementation 'ca.uhn.hapi.fhir:hapi-fhir-caching-caffeine:6.8.5'
-    implementation 'ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:6.8.4'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:6.8.5'
     api 'org.fhir:ucum:1.0.8'
 
     // Apache Client
@@ -50,7 +50,7 @@ dependencies {
     testFixturesImplementation 'org.apache.groovy:groovy:4.0.15'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
     testFixturesImplementation 'com.openpojo:openpojo:0.9.1'
-    testFixturesImplementation 'nl.jqno.equalsverifier:equalsverifier:3.15.2'
+    testFixturesImplementation 'nl.jqno.equalsverifier:equalsverifier:3.15.3'
 
     // dotenv-java
     implementation 'io.github.cdimascio:dotenv-java:3.0.0'
