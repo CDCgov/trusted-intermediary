@@ -9,9 +9,9 @@ import java.util.Date;
 
 public class MetaDataEntry {
 
-    private MetaDataStep entryStep;
-    private Date entryTime;
-    private String bundleId;
+    public MetaDataStep entryStep;
+    public Date entryTime;
+    public String bundleId;
 
     public MetaDataEntry(String bundleId, MetaDataStep step) {
         this.entryTime = new Date();

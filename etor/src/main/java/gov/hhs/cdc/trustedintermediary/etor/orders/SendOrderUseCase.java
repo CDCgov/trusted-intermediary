@@ -2,18 +2,14 @@ package gov.hhs.cdc.trustedintermediary.etor.orders;
 
 import gov.hhs.cdc.trustedintermediary.metadata.MetaDataStep;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData;
-
 import javax.inject.Inject;
 
 /** The overall logic to receive, convert to OML, and subsequently send a lab order. */
 public class SendOrderUseCase {
     private static final SendOrderUseCase INSTANCE = new SendOrderUseCase();
-
     @Inject OrderConverter converter;
     @Inject OrderSender sender;
-
-    @Inject
-    MetricMetaData metaData;
+    @Inject MetricMetaData metaData;
 
     private SendOrderUseCase() {}
 

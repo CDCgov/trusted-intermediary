@@ -23,16 +23,19 @@ public class PrivateMetricMetaData implements MetricMetaData {
 
     private PrivateMetricMetaData() {}
 
-    private static final ConcurrentHashMap<String, MetaDataEntry> metadataMap =
+    private static final Map<String, Object> metadataMap =
             new ConcurrentHashMap<>();
 
     public void put(String bundleId, MetaDataStep step) {
         MetaDataEntry entry = extractMetricsFromBundle(bundleId, step);
-        metadataMap.put(bundleId, entry);
-        logger.logInfo(metadataMap.toString());
+        metadataMap.put("BundleId", entry.bundleId);
+        metadataMap.put("Entry Time", entry.entryTime);
+        metadataMap.put("Entry Step", entry.entryStep);
+        logger.logMap("MetaData Event Occured:", metadataMap);
+
     }
 
-    public Map<String, MetaDataEntry> getMetaDataMap() {
+    public Map<String, Object> getMetaDataMap() {
         return metadataMap;
     }
 

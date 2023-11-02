@@ -9,8 +9,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import javax.inject.Inject;
-
-import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;

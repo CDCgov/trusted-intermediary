@@ -13,7 +13,5 @@ public enum MetaDataStep {
 
     CONTACT_SECTION_ADDED_TO_PATIENT,
 
-    CONTACT_SECTION_ADDED,
-
     SENT_TO_REPORT_STREAM
 }
