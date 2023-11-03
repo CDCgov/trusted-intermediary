@@ -28,9 +28,9 @@ public class PrivateMetricMetaData implements MetricMetaData {
     @Override
     public void put(String bundleId, MetaDataStep step) {
         MetaDataEntry entry = extractMetricsFromBundle(bundleId, step);
-        metadataMap.put("BundleId", entry.bundleId);
-        metadataMap.put("Entry Time", entry.entryTime);
-        metadataMap.put("Entry Step", entry.entryStep);
+        metadataMap.put("BundleId", entry.bundleId());
+        metadataMap.put("Entry Time", entry.entryTime());
+        metadataMap.put("Entry Step", entry.entryStep());
         logger.logMap("MetaData Event Occured:", metadataMap);
     }
 

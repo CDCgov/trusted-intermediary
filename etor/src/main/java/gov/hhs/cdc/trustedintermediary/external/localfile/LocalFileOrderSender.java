@@ -35,7 +35,7 @@ public class LocalFileOrderSender implements OrderSender {
         logger.logInfo("Sending the order to the hard drive at {}", fileLocation.toAbsolutePath());
 
         try {
-            metaData.put(order.getFhirResourceId(), MetaDataStep.RECEIVED_FROM_REPORT_STREAM);
+            metaData.put(order.getFhirResourceId(), MetaDataStep.SENT_TO_REPORT_STREAM);
             String serialized = fhir.encodeResourceToJson(order.getUnderlyingOrder());
             Files.writeString(fileLocation, serialized, StandardCharsets.UTF_8);
         } catch (Exception e) {

@@ -1,17 +1,11 @@
 package gov.hhs.cdc.trustedintermediary.metadata;
 
-import java.util.Date;
+import java.time.Instant;
 
 /** An instance of a metadata event to be used for internal troubleshooting of messages */
-public class MetaDataEntry {
+public record MetaDataEntry(String bundleId, MetaDataStep entryStep, Instant entryTime) {
 
-    public MetaDataStep entryStep;
-    public Date entryTime;
-    public String bundleId;
-
-    public MetaDataEntry(String bundleId, MetaDataStep step) {
-        this.entryTime = new Date();
-        this.bundleId = bundleId;
-        this.entryStep = step;
+    public MetaDataEntry(String bundleId, MetaDataStep entryStep) {
+        this(bundleId, entryStep, Instant.now());
     }
 }

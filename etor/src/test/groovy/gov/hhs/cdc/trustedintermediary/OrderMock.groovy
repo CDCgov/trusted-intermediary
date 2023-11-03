@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary
 
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order
-import org.hl7.fhir.r4.model.Bundle
 
 /**
  * A mock implementation of the {@link Order} interface that is easy to use in tests.
