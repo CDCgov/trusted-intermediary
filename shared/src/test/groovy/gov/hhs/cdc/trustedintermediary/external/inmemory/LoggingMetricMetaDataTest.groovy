@@ -17,7 +17,7 @@ class LoggingMetricMetaDataTest extends Specification {
     def "meta data map is populated"() {
 
         when:
-        LoggingMetricMetaData.getInstance().put("Key", MetaDataStep.RECEIVED_FROM_REPORT_STREAM)
+        LoggingMetricMetaData.getInstance().put("Key", _ as MetaDataStep)
 
         then:
         LoggingMetricMetaData.getInstance().getMetaDataMap().containsKey("BundleId")
