@@ -78,10 +78,7 @@ public class LocalLogger implements Logger {
     }
 
     private void logMapFields(LoggingEventBuilder logger, Map<String, Object> map) {
-        map.forEach(
-                (mapKey, value) -> {
-                    logger.addKeyValue(mapKey, value);
-                });
+        map.forEach(logger::addKeyValue);
     }
 
     @Override
