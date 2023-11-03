@@ -2,11 +2,7 @@ package gov.hhs.cdc.trustedintermediary.metadata;
 
 import java.util.Date;
 
-
-/**
- *  An instance of a metadata event to be used for internal troubleshooting of messages
- */
-
+/** An instance of a metadata event to be used for internal troubleshooting of messages */
 public class MetaDataEntry {
 
     public MetaDataStep entryStep;

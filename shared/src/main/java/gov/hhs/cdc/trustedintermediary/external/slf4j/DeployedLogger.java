@@ -3,7 +3,6 @@ package gov.hhs.cdc.trustedintermediary.external.slf4j;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.Arrays;
 import java.util.Map;
-
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 import org.slf4j.spi.LoggingEventBuilder;
@@ -37,25 +36,22 @@ public class DeployedLogger implements Logger {
         logBuilder.log();
     }
 
-
     @Override
-    public void logMap(String baseMessage, Map<String, Object>map){
+    public void logMap(String baseMessage, Map<String, Object> map) {
         Level level = Level.INFO;
-        var logBuilder =
-                LoggerHelper.logMessageAtLevel(
-                        LOGGER,
-                        level,
-                        baseMessage);
+        var logBuilder = LoggerHelper.logMessageAtLevel(LOGGER, level, baseMessage);
 
         logMapFields(logBuilder, map);
         logBuilder.log();
     }
 
-    private void logMapFields(LoggingEventBuilder logger, Map<String, Object>map){
-        map.forEach((mapKey, value) -> {
-            logger.addKeyValue(mapKey, value);
-        });
+    private void logMapFields(LoggingEventBuilder logger, Map<String, Object> map) {
+        map.forEach(
+                (mapKey, value) -> {
+                    logger.addKeyValue(mapKey, value);
+                });
     }
+
     @Override
     public void logWarning(String warningMessage) {
         LoggerHelper.logMessageAtLevel(LOGGER, Level.WARN, warningMessage).log();

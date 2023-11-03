@@ -1,11 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.metadata;
 
-
-
-/**
- * List of steps where we log metadata events
- */
-
+/** List of steps where we log metadata events */
 public enum MetaDataStep {
     RECEIVED_FROM_REPORT_STREAM,
 

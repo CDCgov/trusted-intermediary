@@ -24,7 +24,7 @@ class LoggerHelper {
         return loggingBuilder.addMarker(fatal);
     }
 
-    public static LoggingEventBuilder buildLogBuilder(Logger logger, Level level){
+    public static LoggingEventBuilder buildLogBuilder(Logger logger, Level level) {
         return logger.atLevel(level).setMessage("");
     }
 }

@@ -9,9 +9,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 
 /**
-* Implementation of a class that can be used throughout the project to collect a list of metadata events
+ * Implementation of a class that can be used throughout the project to collect a list of metadata
+ * events
  */
-
 public class PrivateMetricMetaData implements MetricMetaData {
     private static final PrivateMetricMetaData INSTANCE = new PrivateMetricMetaData();
 
@@ -23,8 +23,7 @@ public class PrivateMetricMetaData implements MetricMetaData {
 
     private PrivateMetricMetaData() {}
 
-    private static final Map<String, Object> metadataMap =
-            new ConcurrentHashMap<>();
+    private static final Map<String, Object> metadataMap = new ConcurrentHashMap<>();
 
     public void put(String bundleId, MetaDataStep step) {
         MetaDataEntry entry = extractMetricsFromBundle(bundleId, step);
@@ -32,13 +31,11 @@ public class PrivateMetricMetaData implements MetricMetaData {
         metadataMap.put("Entry Time", entry.entryTime);
         metadataMap.put("Entry Step", entry.entryStep);
         logger.logMap("MetaData Event Occured:", metadataMap);
-
     }
 
     public Map<String, Object> getMetaDataMap() {
         return metadataMap;
     }
-
 
     private MetaDataEntry extractMetricsFromBundle(String bundleId, MetaDataStep step) {
         return new MetaDataEntry(bundleId, step);

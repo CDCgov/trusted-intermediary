@@ -1,8 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.slf4j;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Map;
 import org.slf4j.LoggerFactory;
@@ -67,7 +65,7 @@ public class LocalLogger implements Logger {
     }
 
     @Override
-    public void logMap(String baseMessage, Map<String, Object>map){
+    public void logMap(String baseMessage, Map<String, Object> map) {
         Level level = Level.INFO;
         var logBuilder =
                 LoggerHelper.logMessageAtLevel(
@@ -79,10 +77,11 @@ public class LocalLogger implements Logger {
         logBuilder.log();
     }
 
-    private void logMapFields(LoggingEventBuilder logger, Map<String, Object>map){
-        map.forEach((mapKey, value) -> {
-            logger.addKeyValue(mapKey, value);
-        });
+    private void logMapFields(LoggingEventBuilder logger, Map<String, Object> map) {
+        map.forEach(
+                (mapKey, value) -> {
+                    logger.addKeyValue(mapKey, value);
+                });
     }
 
     @Override
