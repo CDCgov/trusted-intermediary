@@ -41,6 +41,4 @@ public class LoggingMetricMetaData implements MetricMetaData {
     private MetaDataEntry extractMetricsFromBundle(String bundleId, MetaDataStep step) {
         return new MetaDataEntry(bundleId, step);
     }
-
-    // Make calls to map wherever in the code a step occurs
 }
