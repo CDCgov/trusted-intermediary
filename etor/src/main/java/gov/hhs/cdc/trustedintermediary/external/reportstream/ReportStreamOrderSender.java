@@ -1,10 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.external.reportstream;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetaDataStep;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
-import gov.hhs.cdc.trustedintermediary.metadata.MetaDataStep;
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
@@ -70,7 +70,7 @@ public class ReportStreamOrderSender implements OrderSender {
         String bearerToken = getRsToken();
         String rsResponseBody = sendRequestBody(json, bearerToken);
         logRsSubmissionId(rsResponseBody);
-        metaData.put(order.getFhirResourceId(), MetaDataStep.SENT_TO_REPORT_STREAM);
+        metaData.put(order.getFhirResourceId(), EtorMetaDataStep.SENT_TO_REPORT_STREAM);
     }
 
     protected void logRsSubmissionId(String rsResponseBody) {
