@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Map;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
-import org.slf4j.spi.LoggingEventBuilder;
 
 /**
  * Humble object interface for logging. Uses SLF4J behind the scenes. The deployed logger doesn't
