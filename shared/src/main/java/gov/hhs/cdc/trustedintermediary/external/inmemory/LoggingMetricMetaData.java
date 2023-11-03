@@ -5,7 +5,6 @@ import gov.hhs.cdc.trustedintermediary.metadata.MetaDataStep;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 
 /**
@@ -15,27 +14,27 @@ import javax.inject.Inject;
 public class LoggingMetricMetaData implements MetricMetaData {
     private static final LoggingMetricMetaData INSTANCE = new LoggingMetricMetaData();
 
+    @Inject Logger logger;
+
     public static LoggingMetricMetaData getInstance() {
         return INSTANCE;
     }
 
-    @Inject Logger logger;
-
     private LoggingMetricMetaData() {}
-
-    private static final Map<String, Object> metadataMap = new ConcurrentHashMap<>();
 
     @Override
     public void put(String bundleId, MetaDataStep step) {
         MetaDataEntry entry = extractMetricsFromBundle(bundleId, step);
-        metadataMap.put("BundleId", entry.bundleId());
-        metadataMap.put("Entry Time", entry.entryTime());
-        metadataMap.put("Entry Step", entry.entryStep());
-        logger.logMap("MetaData Event Occured:", metadataMap);
-    }
+        var metadataMap =
+                Map.of(
+                        "BundleId",
+                        entry.bundleId(),
+                        "Entry Time",
+                        entry.entryTime(),
+                        "Entry Step",
+                        entry.entryStep());
 
-    public Map<String, Object> getMetaDataMap() {
-        return metadataMap;
+        logger.logMap("MetaData Event Occurred:", metadataMap);
     }
 
     private MetaDataEntry extractMetricsFromBundle(String bundleId, MetaDataStep step) {
