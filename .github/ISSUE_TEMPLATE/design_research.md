@@ -2,7 +2,7 @@
 name: Design or Research Backlog Item
 about: High level design or research work needs to be accomplished
 title: ''
-labels: design/research
+labels: research
 assignees: ''
 
 ---
