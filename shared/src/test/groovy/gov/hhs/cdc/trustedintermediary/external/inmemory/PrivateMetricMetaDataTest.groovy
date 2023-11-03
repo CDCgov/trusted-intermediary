@@ -20,6 +20,6 @@ class PrivateMetricMetaDataTest extends Specification {
         PrivateMetricMetaData.getInstance().put("Key", MetaDataStep.RECEIVED_FROM_REPORT_STREAM)
 
         then:
-        PrivateMetricMetaData.getInstance().getMetaDataMap().containsKey("Key")
+        PrivateMetricMetaData.getInstance().getMetaDataMap().containsKey("BundleId")
     }
 }
