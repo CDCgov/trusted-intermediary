@@ -2,14 +2,13 @@ package gov.hhs.cdc.trustedintermediary.external.localfile
 
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetaDataStep
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
-import gov.hhs.cdc.trustedintermediary.metadata.MetaDataStep
-import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
-import spock.lang.Specification
-
+import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData
 import java.nio.file.Files
 import java.nio.file.Paths
+import spock.lang.Specification
 
 class LocalFileOrderSenderTest extends Specification{
 
@@ -80,6 +79,6 @@ class LocalFileOrderSenderTest extends Specification{
         LocalFileOrderSender.getInstance().sendOrder(mockOrder)
 
         then:
-        1 * LocalFileOrderSender.getInstance().metaData.put(_ as String, _ as MetaDataStep)
+        1 * LocalFileOrderSender.getInstance().metaData.put(_ as String, EtorMetaDataStep.SENT_TO_REPORT_STREAM)
     }
 }

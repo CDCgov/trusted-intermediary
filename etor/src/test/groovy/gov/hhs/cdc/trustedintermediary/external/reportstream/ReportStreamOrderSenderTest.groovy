@@ -2,18 +2,18 @@ package gov.hhs.cdc.trustedintermediary.external.reportstream
 
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetaDataStep
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
 import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
-import gov.hhs.cdc.trustedintermediary.metadata.MetaDataStep
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache
-import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
+import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
@@ -304,7 +304,7 @@ class ReportStreamOrderSenderTest extends Specification {
         ReportStreamOrderSender.getInstance().sendOrder(new OrderMock(null, null, "Mock order"))
 
         then:
-        1 * ReportStreamOrderSender.getInstance().metaData.put(_, _ as MetaDataStep)
+        1 * ReportStreamOrderSender.getInstance().metaData.put(_, EtorMetaDataStep.SENT_TO_REPORT_STREAM)
     }
 
     def "retrievePrivateKey works when cache is empty" () {
