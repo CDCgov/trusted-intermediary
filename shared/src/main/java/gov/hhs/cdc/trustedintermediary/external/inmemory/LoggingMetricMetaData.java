@@ -12,16 +12,16 @@ import javax.inject.Inject;
  * Implementation of a class that can be used throughout the project to collect a list of metadata
  * events
  */
-public class PrivateMetricMetaData implements MetricMetaData {
-    private static final PrivateMetricMetaData INSTANCE = new PrivateMetricMetaData();
+public class LoggingMetricMetaData implements MetricMetaData {
+    private static final LoggingMetricMetaData INSTANCE = new LoggingMetricMetaData();
 
-    public static PrivateMetricMetaData getInstance() {
+    public static LoggingMetricMetaData getInstance() {
         return INSTANCE;
     }
 
     @Inject Logger logger;
 
-    private PrivateMetricMetaData() {}
+    private LoggingMetricMetaData() {}
 
     private static final Map<String, Object> metadataMap = new ConcurrentHashMap<>();
 

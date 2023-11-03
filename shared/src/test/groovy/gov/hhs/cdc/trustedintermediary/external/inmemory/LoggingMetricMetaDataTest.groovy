@@ -5,21 +5,21 @@ import gov.hhs.cdc.trustedintermediary.metadata.MetaDataStep
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData
 import spock.lang.Specification
 
-class PrivateMetricMetaDataTest extends Specification {
+class LoggingMetricMetaDataTest extends Specification {
 
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
-        TestApplicationContext.register(MetricMetaData, PrivateMetricMetaData.getInstance())
+        TestApplicationContext.register(MetricMetaData, LoggingMetricMetaData.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
     }
 
     def "meta data map is populated"() {
 
         when:
-        PrivateMetricMetaData.getInstance().put("Key", MetaDataStep.RECEIVED_FROM_REPORT_STREAM)
+        LoggingMetricMetaData.getInstance().put("Key", MetaDataStep.RECEIVED_FROM_REPORT_STREAM)
 
         then:
-        PrivateMetricMetaData.getInstance().getMetaDataMap().containsKey("BundleId")
+        LoggingMetricMetaData.getInstance().getMetaDataMap().containsKey("BundleId")
     }
 }

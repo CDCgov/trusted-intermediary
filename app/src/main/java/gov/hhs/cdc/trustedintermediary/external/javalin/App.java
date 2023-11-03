@@ -10,7 +10,7 @@ import gov.hhs.cdc.trustedintermediary.external.apache.ApacheClient;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureSecrets;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation;
 import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache;
-import gov.hhs.cdc.trustedintermediary.external.inmemory.PrivateMetricMetaData;
+import gov.hhs.cdc.trustedintermediary.external.inmemory.LoggingMetricMetaData;
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson;
 import gov.hhs.cdc.trustedintermediary.external.jjwt.JjwtEngine;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalSecrets;
@@ -86,6 +86,6 @@ public class App {
                         : AzureSecrets.getInstance());
         ApplicationContext.register(
                 OrganizationsSettings.class, OrganizationsSettings.getInstance());
-        ApplicationContext.register(MetricMetaData.class, PrivateMetricMetaData.getInstance());
+        ApplicationContext.register(MetricMetaData.class, LoggingMetricMetaData.getInstance());
     }
 }
