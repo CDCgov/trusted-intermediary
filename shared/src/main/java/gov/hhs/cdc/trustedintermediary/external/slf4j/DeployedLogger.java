@@ -41,12 +41,8 @@ public class DeployedLogger implements Logger {
         Level level = Level.INFO;
         var logBuilder = LoggerHelper.logMessageAtLevel(LOGGER, level, baseMessage);
 
-        logMapFields(logBuilder, map);
+        map.forEach(logBuilder::addKeyValue);
         logBuilder.log();
-    }
-
-    private void logMapFields(LoggingEventBuilder logger, Map<String, Object> map) {
-        map.forEach(logger::addKeyValue);
     }
 
     @Override

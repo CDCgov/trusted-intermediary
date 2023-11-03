@@ -3,9 +3,9 @@ package gov.hhs.cdc.trustedintermediary.external.localfile
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
+import gov.hhs.cdc.trustedintermediary.metadata.MetaDataStep
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
-import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
 
 import java.nio.file.Files
@@ -62,5 +62,24 @@ class LocalFileOrderSenderTest extends Specification{
         then:
         def exception = thrown(UnableToSendOrderException)
         exception.getCause() == nullException
+    }
+
+    def "log the step to metadata when send order is called"(){
+        given:
+        def fhir = Mock(HapiFhir)
+
+        def testStringOrder = "Some String"
+        fhir.encodeResourceToJson(_ as String) >> testStringOrder
+
+        def mockOrder = new OrderMock("ABC", null, "Mock String Order")
+
+        TestApplicationContext.register(HapiFhir, fhir)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        LocalFileOrderSender.getInstance().sendOrder(mockOrder)
+
+        then:
+        1 * LocalFileOrderSender.getInstance().metaData.put(_ as String, _ as MetaDataStep)
     }
 }

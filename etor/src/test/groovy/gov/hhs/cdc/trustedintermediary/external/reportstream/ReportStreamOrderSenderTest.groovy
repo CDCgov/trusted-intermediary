@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
 import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
+import gov.hhs.cdc.trustedintermediary.metadata.MetaDataStep
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData
@@ -272,6 +273,38 @@ class ReportStreamOrderSenderTest extends Specification {
 
         then:
         noExceptionThrown()
+    }
+    def "log the step to metadata when send order is called"() {
+        given:
+
+        def mockAuthEngine = Mock(AuthEngine)
+        TestApplicationContext.register(AuthEngine, mockAuthEngine)
+
+        def mockSecrets = Mock(Secrets)
+        TestApplicationContext.register(Secrets, mockSecrets)
+
+        def mockClient = Mock(HttpClient)
+        mockClient.post(_ as String, _ as Map, _ as String) >> """{"submissionId": "fake-id", "key": "value"}"""
+        TestApplicationContext.register(HttpClient, mockClient)
+
+        def mockFhir = Mock(HapiFhir)
+        mockFhir.encodeResourceToJson(_ as String) >> "Mock order"
+        TestApplicationContext.register(HapiFhir, mockFhir)
+
+        def mockFormatter = Mock(Formatter)
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake-token")  >> Map.of("submissionId", "fake-id")
+        TestApplicationContext.register(Formatter, mockFormatter)
+
+        def mockCache = Mock(Cache)
+        TestApplicationContext.register(Cache, mockCache)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        ReportStreamOrderSender.getInstance().sendOrder(new OrderMock(null, null, "Mock order"))
+
+        then:
+        1 * ReportStreamOrderSender.getInstance().metaData.put(_, _ as MetaDataStep)
     }
 
     def "retrievePrivateKey works when cache is empty" () {

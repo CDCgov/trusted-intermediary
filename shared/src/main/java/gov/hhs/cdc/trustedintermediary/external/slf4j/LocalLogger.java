@@ -73,12 +73,8 @@ public class LocalLogger implements Logger {
                         level,
                         wrapMessageInColor(LEVEL_COLOR_MAPPING.get(level), baseMessage));
 
-        logMapFields(logBuilder, map);
+        map.forEach(logBuilder::addKeyValue);
         logBuilder.log();
-    }
-
-    private void logMapFields(LoggingEventBuilder logger, Map<String, Object> map) {
-        map.forEach(logger::addKeyValue);
     }
 
     @Override
