@@ -2,18 +2,20 @@ package gov.hhs.cdc.trustedintermediary.external.localfile
 
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetaDataStep
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
-import spock.lang.Specification
-
+import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData
 import java.nio.file.Files
 import java.nio.file.Paths
+import spock.lang.Specification
 
 class LocalFileOrderSenderTest extends Specification{
 
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
+        TestApplicationContext.register(MetricMetaData, Mock(MetricMetaData))
         TestApplicationContext.register(LocalFileOrderSender, LocalFileOrderSender.getInstance())
     }
 
@@ -29,7 +31,7 @@ class LocalFileOrderSenderTest extends Specification{
         def testStringOrder = "Some String"
         fhir.encodeResourceToJson(_ as String) >> testStringOrder
 
-        def mockOrder = new OrderMock(null, null, "Mock String Order")
+        def mockOrder = new OrderMock("ABC", null, "Mock String Order")
 
         TestApplicationContext.register(HapiFhir, fhir)
         TestApplicationContext.injectRegisteredImplementations()
@@ -59,5 +61,24 @@ class LocalFileOrderSenderTest extends Specification{
         then:
         def exception = thrown(UnableToSendOrderException)
         exception.getCause() == nullException
+    }
+
+    def "log the step to metadata when send order is called"(){
+        given:
+        def fhir = Mock(HapiFhir)
+
+        def testStringOrder = "Some String"
+        fhir.encodeResourceToJson(_ as String) >> testStringOrder
+
+        def mockOrder = new OrderMock("ABC", null, "Mock String Order")
+
+        TestApplicationContext.register(HapiFhir, fhir)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        LocalFileOrderSender.getInstance().sendOrder(mockOrder)
+
+        then:
+        1 * LocalFileOrderSender.getInstance().metaData.put(_ as String, EtorMetaDataStep.SENT_TO_REPORT_STREAM)
     }
 }

@@ -64,6 +64,19 @@ public class LocalLogger implements Logger {
     }
 
     @Override
+    public void logMap(String baseMessage, Map<String, Object> map) {
+        Level level = Level.INFO;
+        var logBuilder =
+                LoggerHelper.logMessageAtLevel(
+                        LOGGER,
+                        level,
+                        wrapMessageInColor(LEVEL_COLOR_MAPPING.get(level), baseMessage));
+
+        map.forEach(logBuilder::addKeyValue);
+        logBuilder.log();
+    }
+
+    @Override
     public void logWarning(String warningMessage) {
         Level level = Level.WARN;
         LoggerHelper.logMessageAtLevel(

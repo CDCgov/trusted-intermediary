@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary
 
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order
+
 /**
  * A mock implementation of the {@link Order} interface that is easy to use in tests.
  */

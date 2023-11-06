@@ -2,8 +2,10 @@ package gov.hhs.cdc.trustedintermediary.etor.orders
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
+import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetaDataStep
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
+import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData
 import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
 
@@ -13,6 +15,7 @@ class OrderControllerTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(OrderController, OrderController.getInstance())
+        TestApplicationContext.register(MetricMetaData, Mock(MetricMetaData))
     }
 
     def "parseOrders happy path works"() {
@@ -30,6 +33,21 @@ class OrderControllerTest extends Specification {
 
         then:
         actualBundle == expectedBundle
+    }
+
+    def "parseOrders registers a metadata step"() {
+        given:
+        def fhir = Mock(HapiFhir)
+        fhir.parseResource(_ as String, _ as Class) >> new Bundle()
+        TestApplicationContext.register(HapiFhir, fhir)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        OrderController.getInstance().parseOrders(new DomainRequest())
+
+        then:
+        1 * OrderController.getInstance().metaData.put(_, EtorMetaDataStep.RECEIVED_FROM_REPORT_STREAM)
     }
 
     def "parseOrders throws an exception when unable to parse de request"() {

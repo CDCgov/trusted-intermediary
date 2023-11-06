@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.reportstream;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetaDataStep;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
@@ -10,6 +11,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData;
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
@@ -53,6 +55,8 @@ public class ReportStreamOrderSender implements OrderSender {
     @Inject private Secrets secrets;
     @Inject private Cache cache;
 
+    @Inject MetricMetaData metaData;
+
     public static ReportStreamOrderSender getInstance() {
         return INSTANCE;
     }
@@ -62,11 +66,11 @@ public class ReportStreamOrderSender implements OrderSender {
     @Override
     public void sendOrder(final Order<?> order) throws UnableToSendOrderException {
         logger.logInfo("Sending the order to ReportStream at {}", RS_DOMAIN_NAME);
-
         String json = fhir.encodeResourceToJson(order.getUnderlyingOrder());
         String bearerToken = getRsToken();
         String rsResponseBody = sendRequestBody(json, bearerToken);
         logRsSubmissionId(rsResponseBody);
+        metaData.put(order.getFhirResourceId(), EtorMetaDataStep.SENT_TO_REPORT_STREAM);
     }
 
     protected void logRsSubmissionId(String rsResponseBody) {
