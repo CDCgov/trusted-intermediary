@@ -99,7 +99,7 @@ def get_auth_request_body():
     with open("mock_credentials/report-stream-valid-token.jwt") as f:
         auth_token = f.read()
     params = urllib.parse.urlencode(
-        {"scope": auth_scope, "client_assertion": auth_token}
+        {"scope": auth_scope, "client_assertion": auth_token.strip()}
     )
     return params.encode("utf-8")
 
