@@ -44,7 +44,7 @@ dependencies {
 
     // azure sdk
     implementation 'com.azure:azure-security-keyvault-secrets:4.7.1'
-    implementation 'com.azure:azure-identity:1.10.4'
+    implementation 'com.azure:azure-identity:1.11.0'
 
     testImplementation 'org.apache.groovy:groovy:4.0.15'
     testFixturesImplementation 'org.apache.groovy:groovy:4.0.15'
