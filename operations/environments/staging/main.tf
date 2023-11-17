@@ -28,5 +28,5 @@ module "template" {
   source = "../../template/"
 
   environment = "stg"
-  deployer_id = "d59c2c86-de5e-41b7-a752-0869a73f5a60" //github app registration in Flexion Azure Entra
+  deployer_id = "f5feabe7-5d37-40ba-94f2-e5c0760b4561" //github app registration in Flexion Azure Entra
 }
