@@ -35,9 +35,9 @@ jobs:
       TERRAFORM_INIT_PARAMETERS: -backend-config="key=pr_${{ github.event.number }}.tfstate"
       TERRAFORM_APPLY_PARAMETERS: -var="pr_number=${{ github.event.number }}"
     secrets:
-      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CDC_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_CDC_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_CDC_DMZ_C1_SUBSCRIPTION_ID }}
 
 
   terraform-deploy-skip:  # runs when the PR doesn't have any changes that require the PR deploy; this ensures we get the appropriate required PR checks
@@ -61,9 +61,9 @@ jobs:
       APP: ${{ needs.terraform-deploy.outputs.APP }}
       REGISTRY: ${{ needs.terraform-deploy.outputs.REGISTRY }}
     secrets:
-      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CDC_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_CDC_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_CDC_DMZ_C1_SUBSCRIPTION_ID }}
 
 
   pr-deploy-skip:  # runs when the PR doesn't have any changes that require the PR deploy; this ensures we get the appropriate required PR checks
@@ -82,9 +82,9 @@ jobs:
     if: needs.paths-filter.outputs.operations == 'true' && always()
     runs-on: ubuntu-latest
     env:
-      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CDC_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_CDC_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_CDC_DMZ_C1_SUBSCRIPTION_ID }}
       ARM_USE_OIDC: true
     permissions:
       id-token: write
