@@ -63,6 +63,14 @@ subprojects {
             custom 'Remove commented-out import statements', {
                 it.replaceAll(/\n\/\/ import .*?;.*/, '')
             }
+            custom 'Refuse wildcard imports', {
+                String errorMessage = "Do not use wildcard imports. 'spotlessApply' cannot resolve this issue."
+                if (it.contains(/\nimport .*\*;/)) {
+                    println(errorMessage) // Log the error message
+                    throw new RuntimeException(errorMessage) // Throw a RuntimeException
+                }
+                return it
+            }
             googleJavaFormat().aosp()
             formatAnnotations()
         }
