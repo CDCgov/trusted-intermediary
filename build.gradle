@@ -59,7 +59,9 @@ subprojects {
 
     spotless {
         java {
+            removeUnusedImports()
             googleJavaFormat().aosp()
+            formatAnnotations()
         }
 
         groovy {
