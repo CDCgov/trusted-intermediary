@@ -60,6 +60,9 @@ subprojects {
     spotless {
         java {
             removeUnusedImports()
+            custom 'Remove commented-out import statements', {
+                it.replaceAll(/\n\/\/ import .*?;.*/, '')
+            }
             googleJavaFormat().aosp()
             formatAnnotations()
         }
