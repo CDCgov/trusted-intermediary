@@ -67,8 +67,7 @@ subprojects {
                 String errorMessage = "Do not use wildcard imports. 'spotlessApply' cannot resolve this issue."
                 if (it =~ /\nimport .*\*;/) {
                     println(errorMessage) // Log the error message
-                    println("it: " + it)
-                    // throw new RuntimeException(errorMessage) // Throw a RuntimeException
+                    throw new RuntimeException(errorMessage) // Throw a RuntimeException
                 }
                 return it
             }
