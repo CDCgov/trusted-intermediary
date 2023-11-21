@@ -1,7 +1,7 @@
 locals {
   environment_to_rs_environment_prefix_mapping = {
     dev     = "staging"
-    staging = "stg"
+    stg     = "staging"
     prod    = ""
   }
   selected_rs_environment_prefix = lookup(local.environment_to_rs_environment_prefix_mapping, var.environment, "staging")
