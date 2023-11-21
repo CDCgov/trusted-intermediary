@@ -30,7 +30,7 @@ jobs:
     needs: terraform-deploy
     uses: ./.github/workflows/deploy_reusable.yml
     with:
-      ENVIRONMENT: staging
+      ENVIRONMENT: stg
       REPO: trusted-intermediary-router
       REPO_DOCS: trusted-intermediary-docs
       APP: ${{ needs.terraform-deploy.outputs.APP }}
