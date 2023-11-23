@@ -1,8 +1,8 @@
 locals {
   environment_to_rs_environment_prefix_mapping = {
-    dev     = "staging"
-    staging = "staging"
-    prod    = ""
+    dev  = "staging"
+    stg  = "staging"
+    prod = ""
   }
   selected_rs_environment_prefix = lookup(local.environment_to_rs_environment_prefix_mapping, var.environment, "staging")
   rs_domain_prefix               = "${local.selected_rs_environment_prefix}${length(local.selected_rs_environment_prefix) == 0 ? "" : "."}"
@@ -32,7 +32,7 @@ resource "azurerm_service_plan" "plan" {
 
 # Create the staging App Service
 resource "azurerm_linux_web_app" "api" {
-  name                = "cdcti-${var.environment}-api2"
+  name                = "cdcti-${var.environment}-api"
   resource_group_name = data.azurerm_resource_group.group.name
   location            = azurerm_service_plan.plan.location
   service_plan_id     = azurerm_service_plan.plan.id
@@ -57,7 +57,7 @@ resource "azurerm_linux_web_app" "api" {
 }
 
 resource "azurerm_storage_account" "docs" {
-  name                            = "cdcti${var.environment}docs2"
+  name                            = "cdcti${var.environment}docs"
   resource_group_name             = data.azurerm_resource_group.group.name
   location                        = data.azurerm_resource_group.group.location
   account_tier                    = "Standard"
