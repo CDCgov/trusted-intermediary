@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.inmemory;
 
 import gov.hhs.cdc.trustedintermediary.metadata.MetaDataEntry;
-import gov.hhs.cdc.trustedintermediary.metadata.MetaDataStep;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData;
 import java.util.Map;
@@ -23,8 +22,8 @@ public class LoggingMetricMetaData implements MetricMetaData {
     private LoggingMetricMetaData() {}
 
     @Override
-    public void put(String bundleId, MetaDataStep step) {
-        MetaDataEntry entry = extractMetricsFromBundle(bundleId, step);
+    public <T> void put(String bundleId, T step) {
+        MetaDataEntry<T> entry = extractMetricsFromBundle(bundleId, step);
         var metadataMap =
                 Map.of(
                         "BundleId",
@@ -37,7 +36,7 @@ public class LoggingMetricMetaData implements MetricMetaData {
         logger.logMap("MetaData Event Occurred:", metadataMap);
     }
 
-    private MetaDataEntry extractMetricsFromBundle(String bundleId, MetaDataStep step) {
-        return new MetaDataEntry(bundleId, step);
+    private <T> MetaDataEntry<T> extractMetricsFromBundle(String bundleId, T step) {
+        return new MetaDataEntry<>(bundleId, step);
     }
 }
