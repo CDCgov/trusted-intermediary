@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.inmemory
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.metadata.MetaDataStep
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData
 import spock.lang.Specification
@@ -22,7 +21,7 @@ class LoggingMetricMetaDataTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        LoggingMetricMetaData.getInstance().put("Key", _ as MetaDataStep)
+        LoggingMetricMetaData.getInstance().put("Key", _)
 
         then:
         1 * logger.logMap(_ as String, _ as Map) >> { String message, Map keyValue ->

@@ -1,9 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata;
 
-import gov.hhs.cdc.trustedintermediary.metadata.MetaDataStep;
-
 /** Etor specific steps from the general shared metadata steps */
-public enum EtorMetaDataStep implements MetaDataStep {
+public enum EtorMetaDataStep {
     RECEIVED_FROM_REPORT_STREAM,
 
     ORDER_CONVERTED_TO_OML,
