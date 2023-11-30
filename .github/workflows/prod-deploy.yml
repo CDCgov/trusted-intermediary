@@ -3,7 +3,7 @@ name: Production Deploy
 on:
   release:
     types:
-      - created
+      - published
 
 jobs:
   ci:
