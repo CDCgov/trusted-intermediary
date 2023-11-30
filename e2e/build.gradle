@@ -11,8 +11,8 @@ java {
 
 dependencies {
     //client
-    implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.2'
-    implementation 'org.apache.httpcomponents.client5:httpclient5-fluent:5.2.2'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
+    implementation 'org.apache.httpcomponents.client5:httpclient5-fluent:5.2.1'
 
     //jackson
     implementation 'com.fasterxml.jackson.core:jackson-core:2.16.0'

@@ -34,8 +34,8 @@ dependencies {
     api 'org.fhir:ucum:1.0.8'
 
     // Apache Client
-    implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.2'
-    implementation 'org.apache.httpcomponents.client5:httpclient5-fluent:5.2.2'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
+    implementation 'org.apache.httpcomponents.client5:httpclient5-fluent:5.2.1'
 
     // jjwt
     implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
