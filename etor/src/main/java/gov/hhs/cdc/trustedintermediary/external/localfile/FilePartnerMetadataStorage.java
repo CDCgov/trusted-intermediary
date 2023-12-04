@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,8 +37,14 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
     }
 
     @Override
-    public PartnerMetadata readMetadata(final String uniqueId) {
-        return null;
+    public PartnerMetadata readMetadata(final String uniqueId) throws PartnerMetadataException {
+        Path filePath = getFilePath(uniqueId);
+        try {
+            String content = Files.readString(filePath);
+            return formatter.convertJsonToObject(content, new TypeReference<>() {});
+        } catch (IOException | FormatterProcessingException e) {
+            throw new PartnerMetadataException("Unable to read the metadata file", e);
+        }
     }
 
     @Override
