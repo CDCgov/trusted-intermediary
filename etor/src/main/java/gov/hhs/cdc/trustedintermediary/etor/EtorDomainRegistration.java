@@ -51,7 +51,6 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject Logger logger;
     @Inject DomainResponseHelper domainResponseHelper;
 
-
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
             Map.of(
                     new HttpEndpoint("POST", DEMOGRAPHICS_API_ENDPOINT, true),

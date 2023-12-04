@@ -2,9 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.orders;
 
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
-import gov.hhs.cdc.trustedintermediary.external.database.PostgresConnection;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrder;
-import gov.hhs.cdc.trustedintermediary.wrappers.DbConnection;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;

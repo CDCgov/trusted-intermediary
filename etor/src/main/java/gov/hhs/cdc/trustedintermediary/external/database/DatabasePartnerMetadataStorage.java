@@ -22,6 +22,6 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
 
     @Override
     public void saveMetadata(final PartnerMetadata metadata) {
-        //TODO: extract the meta data into a query here
+        // TODO: extract the meta data into a query here
     }
 }

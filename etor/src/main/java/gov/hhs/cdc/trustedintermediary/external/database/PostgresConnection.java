@@ -14,10 +14,7 @@ public class PostgresConnection implements DbConnection {
     private static final PostgresConnection INSTANCE = new PostgresConnection();
     private Connection conn;
 
-    //If we inject this class we have to remove the connect() call here, but we could call that in some form of execute method
-    private PostgresConnection() {
-      
-    }
+    private PostgresConnection() {}
 
     @Override
     public void connect() {
@@ -33,13 +30,24 @@ public class PostgresConnection implements DbConnection {
         } catch (Exception e) {
             // TODO: More specific exception for the different potential errors?
             logger.logError(e.getMessage());
-        }}
+        }
+    }
 
     public static PostgresConnection getInstance() {
         return INSTANCE;
     }
 
-
+    public synchronized Connection getConnection() {
+        try {
+            if (conn == null || conn.isClosed()) {
+                connect();
+            }
+            return conn;
+        } catch (SQLException e) {
+            logger.logError("Error getting connection: " + e.getMessage());
+            return null;
+        }
+    }
 
     public void closeConnection() {
         if (conn != null) {
