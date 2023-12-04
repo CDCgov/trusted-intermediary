@@ -2,9 +2,9 @@ package gov.hhs.cdc.trustedintermediary.etor.orders
 
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetaDataStep
+import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage
-import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData
+import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import spock.lang.Specification
 
 class SendOrderUsecaseTest extends Specification {
@@ -13,7 +13,7 @@ class SendOrderUsecaseTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(SendOrderUseCase, SendOrderUseCase.getInstance())
-        TestApplicationContext.register(MetricMetaData, Mock(MetricMetaData))
+        TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
         TestApplicationContext.register(PartnerMetadataStorage, Mock(PartnerMetadataStorage))
     }
 
@@ -45,7 +45,7 @@ class SendOrderUsecaseTest extends Specification {
         SendOrderUseCase.getInstance().convertAndSend(new OrderMock(null, null, null))
 
         then:
-        1 * SendOrderUseCase.getInstance().metaData.put(_, EtorMetaDataStep.ORDER_CONVERTED_TO_OML)
+        1 * SendOrderUseCase.getInstance().metadata.put(_, EtorMetadataStep.ORDER_CONVERTED_TO_OML)
     }
 
     def "metadata is registered for adding the contact section to an order"() {
@@ -58,7 +58,7 @@ class SendOrderUsecaseTest extends Specification {
         SendOrderUseCase.getInstance().convertAndSend(new OrderMock(null, null, null))
 
         then:
-        1 * SendOrderUseCase.getInstance().metaData.put(_, EtorMetaDataStep.CONTACT_SECTION_ADDED_TO_PATIENT)
+        1 * SendOrderUseCase.getInstance().metadata.put(_, EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT)
     }
 
     def "send fails to send"() {

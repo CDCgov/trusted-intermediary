@@ -1,9 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders;
 
-import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetaDataStep;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
-import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData;
+import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import java.time.Instant;
 import javax.inject.Inject;
 
@@ -12,7 +12,7 @@ public class SendOrderUseCase {
     private static final SendOrderUseCase INSTANCE = new SendOrderUseCase();
     @Inject OrderConverter converter;
     @Inject OrderSender sender;
-    @Inject MetricMetaData metaData;
+    @Inject MetricMetadata metadata;
     @Inject PartnerMetadataStorage partnerMetadataStorage;
 
     private SendOrderUseCase() {}
@@ -28,9 +28,9 @@ public class SendOrderUseCase {
         partnerMetadataStorage.saveMetadata(partnerMetadata);
 
         var omlOrder = converter.convertMetadataToOmlOrder(order);
-        metaData.put(order.getFhirResourceId(), EtorMetaDataStep.ORDER_CONVERTED_TO_OML);
+        metadata.put(order.getFhirResourceId(), EtorMetadataStep.ORDER_CONVERTED_TO_OML);
         omlOrder = converter.addContactSectionToPatientResource(omlOrder);
-        metaData.put(order.getFhirResourceId(), EtorMetaDataStep.CONTACT_SECTION_ADDED_TO_PATIENT);
+        metadata.put(order.getFhirResourceId(), EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT);
         sender.sendOrder(omlOrder);
     }
 }

@@ -1,12 +1,12 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders;
 
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
-import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetaDataStep;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrder;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData;
+import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
 
@@ -17,7 +17,7 @@ public class OrderController {
 
     @Inject HapiFhir fhir;
     @Inject Logger logger;
-    @Inject MetricMetaData metaData;
+    @Inject MetricMetadata metadata;
 
     private OrderController() {}
 
@@ -28,7 +28,7 @@ public class OrderController {
     public Order<?> parseOrders(DomainRequest request) throws FhirParseException {
         logger.logInfo("Parsing orders");
         var fhirBundle = fhir.parseResource(request.getBody(), Bundle.class);
-        metaData.put(fhirBundle.getId(), EtorMetaDataStep.RECEIVED_FROM_REPORT_STREAM);
+        metadata.put(fhirBundle.getId(), EtorMetadataStep.RECEIVED_FROM_REPORT_STREAM);
         return new HapiOrder(fhirBundle);
     }
 }

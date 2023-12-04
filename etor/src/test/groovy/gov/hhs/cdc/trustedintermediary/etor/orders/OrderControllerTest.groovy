@@ -2,10 +2,10 @@ package gov.hhs.cdc.trustedintermediary.etor.orders
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
-import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetaDataStep
+import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
-import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData
+import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
 
@@ -15,7 +15,7 @@ class OrderControllerTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(OrderController, OrderController.getInstance())
-        TestApplicationContext.register(MetricMetaData, Mock(MetricMetaData))
+        TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
     }
 
     def "parseOrders happy path works"() {
@@ -47,7 +47,7 @@ class OrderControllerTest extends Specification {
         OrderController.getInstance().parseOrders(new DomainRequest())
 
         then:
-        1 * OrderController.getInstance().metaData.put(_, EtorMetaDataStep.RECEIVED_FROM_REPORT_STREAM)
+        1 * OrderController.getInstance().metadata.put(_, EtorMetadataStep.RECEIVED_FROM_REPORT_STREAM)
     }
 
     def "parseOrders throws an exception when unable to parse de request"() {
