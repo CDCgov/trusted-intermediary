@@ -20,10 +20,12 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureStorageAccountPartnerMetadataStorage;
+import gov.hhs.cdc.trustedintermediary.external.database.PostgresConnection;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.FilePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
+import gov.hhs.cdc.trustedintermediary.wrappers.DbConnection;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.io.IOException;
@@ -49,6 +51,7 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject Logger logger;
     @Inject DomainResponseHelper domainResponseHelper;
 
+
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
             Map.of(
                     new HttpEndpoint("POST", DEMOGRAPHICS_API_ENDPOINT, true),
@@ -65,6 +68,8 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(OrderConverter.class, HapiOrderConverter.getInstance());
         ApplicationContext.register(OrderController.class, OrderController.getInstance());
         ApplicationContext.register(SendOrderUseCase.class, SendOrderUseCase.getInstance());
+        //TODO: Figure out if we want this injected or not long term if injected we will potentially have to connect each time we run an operation
+        // ApplicationContext.register(DbConnection.class, PostgresConnection.getInstance());
 
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
             ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
