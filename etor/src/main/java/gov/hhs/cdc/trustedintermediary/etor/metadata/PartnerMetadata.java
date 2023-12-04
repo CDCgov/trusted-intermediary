@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata;
 
-import java.time.LocalTime;
+import java.time.Instant;
 
 /**
  * The partner-facing metadata.
@@ -12,4 +12,4 @@ import java.time.LocalTime;
  * @param hash The hash of the message.
  */
 public record PartnerMetadata(
-        String uniqueId, String sender, String receiver, LocalTime timeReceived, String hash) {}
+        String uniqueId, String sender, String receiver, Instant timeReceived, String hash) {}

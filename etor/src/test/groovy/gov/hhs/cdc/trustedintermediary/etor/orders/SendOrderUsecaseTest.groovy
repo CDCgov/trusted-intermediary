@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.etor.orders
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetaDataStep
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData
 import spock.lang.Specification
 
@@ -13,6 +14,7 @@ class SendOrderUsecaseTest extends Specification {
         TestApplicationContext.init()
         TestApplicationContext.register(SendOrderUseCase, SendOrderUseCase.getInstance())
         TestApplicationContext.register(MetricMetaData, Mock(MetricMetaData))
+        TestApplicationContext.register(PartnerMetadataStorage, Mock(PartnerMetadataStorage))
     }
 
     def "send sends successfully"() {
