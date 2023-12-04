@@ -16,7 +16,7 @@ public class PostgresConnection implements DbConnection {
 
     //If we inject this class we have to remove the connect() call here, but we could call that in some form of execute method
     private PostgresConnection() {
-        connect();
+      
     }
 
     @Override

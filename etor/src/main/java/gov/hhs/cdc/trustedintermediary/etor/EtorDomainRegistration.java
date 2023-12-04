@@ -68,8 +68,8 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(OrderConverter.class, HapiOrderConverter.getInstance());
         ApplicationContext.register(OrderController.class, OrderController.getInstance());
         ApplicationContext.register(SendOrderUseCase.class, SendOrderUseCase.getInstance());
-        //TODO: Figure out if we want this injected or not long term if injected we will potentially have to connect each time we run an operation
-        // ApplicationContext.register(DbConnection.class, PostgresConnection.getInstance());
+
+        ApplicationContext.register(DbConnection.class, PostgresConnection.getInstance());
 
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
             ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
