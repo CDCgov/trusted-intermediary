@@ -1,0 +1,11 @@
+version: "3.3"
+services:
+  postgresql:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: "intermediary"
+      POSTGRES_PASSWORD: "changeIT!"
+      POSTGRES_USER: "intermediary"
+    ports:
+      - 5433:5432
