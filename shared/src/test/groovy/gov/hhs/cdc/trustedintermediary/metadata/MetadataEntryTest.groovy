@@ -3,11 +3,11 @@ package gov.hhs.cdc.trustedintermediary.metadata
 import gov.hhs.cdc.trustedintermediary.PojoTestUtils
 import spock.lang.Specification
 
-class MetaDataEntryTest extends Specification {
+class MetadataEntryTest extends Specification {
 
     def "test getters and setters"() {
         when:
-        PojoTestUtils.validateGettersAndSetters(MetaDataEntry.class)
+        PojoTestUtils.validateGettersAndSetters(MetadataEntry.class)
 
         then:
         noExceptionThrown()

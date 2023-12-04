@@ -2,10 +2,10 @@ package gov.hhs.cdc.trustedintermediary.external.localfile
 
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetaDataStep
+import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
-import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData
+import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import java.nio.file.Files
 import java.nio.file.Paths
 import spock.lang.Specification
@@ -15,7 +15,7 @@ class LocalFileOrderSenderTest extends Specification{
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
-        TestApplicationContext.register(MetricMetaData, Mock(MetricMetaData))
+        TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
         TestApplicationContext.register(LocalFileOrderSender, LocalFileOrderSender.getInstance())
     }
 
@@ -79,6 +79,6 @@ class LocalFileOrderSenderTest extends Specification{
         LocalFileOrderSender.getInstance().sendOrder(mockOrder)
 
         then:
-        1 * LocalFileOrderSender.getInstance().metaData.put(_ as String, EtorMetaDataStep.SENT_TO_REPORT_STREAM)
+        1 * LocalFileOrderSender.getInstance().metadata.put(_ as String, EtorMetadataStep.SENT_TO_REPORT_STREAM)
     }
 }

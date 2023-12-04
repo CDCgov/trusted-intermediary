@@ -2,7 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.reportstream
 
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetaDataStep
+import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
 import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache
@@ -13,7 +13,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
-import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetaData
+import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
@@ -28,7 +28,7 @@ class ReportStreamOrderSenderTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(OrderSender, ReportStreamOrderSender.getInstance())
-        TestApplicationContext.register(MetricMetaData, Mock(MetricMetaData))
+        TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
     }
 
     def "sendRequestBody works"() {
@@ -304,7 +304,7 @@ class ReportStreamOrderSenderTest extends Specification {
         ReportStreamOrderSender.getInstance().sendOrder(new OrderMock(null, null, "Mock order"))
 
         then:
-        1 * ReportStreamOrderSender.getInstance().metaData.put(_, EtorMetaDataStep.SENT_TO_REPORT_STREAM)
+        1 * ReportStreamOrderSender.getInstance().metadata.put(_, EtorMetadataStep.SENT_TO_REPORT_STREAM)
     }
 
     def "retrievePrivateKey works when cache is empty" () {
