@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata;
 
+/** Custom exception class use to catch partner metadata exceptions */
 public class PartnerMetadataException extends Exception {
 
     public PartnerMetadataException(String message, Throwable cause) {
