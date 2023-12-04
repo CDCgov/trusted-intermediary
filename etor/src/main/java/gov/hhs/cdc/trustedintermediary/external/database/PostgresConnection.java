@@ -14,6 +14,7 @@ public class PostgresConnection implements DbConnection {
     private static final PostgresConnection INSTANCE = new PostgresConnection();
     private Connection conn;
 
+    //If we inject this class we have to remove the connect() call here, but we could call that in some form of execute method
     private PostgresConnection() {
         connect();
     }
