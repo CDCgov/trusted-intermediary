@@ -10,5 +10,5 @@ public interface PartnerMetadataStorage {
      *
      * @param metadata The metadata to save.
      */
-    void saveMetadata(PartnerMetadata metadata);
+    void saveMetadata(PartnerMetadata metadata) throws PartnerMetadataException;
 }
