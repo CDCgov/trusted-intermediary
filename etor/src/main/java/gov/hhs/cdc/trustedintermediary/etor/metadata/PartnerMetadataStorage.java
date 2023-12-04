@@ -1,7 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata;
 
 /** Interface to store and retrieve our partner-facing metadata. */
-public interface PartnerMetaDataStorage {
+public interface PartnerMetadataStorage {
     PartnerMetadata readMetadata(String uniqueId);
 
     /**
