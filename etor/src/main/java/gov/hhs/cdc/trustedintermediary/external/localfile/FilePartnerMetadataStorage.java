@@ -10,6 +10,8 @@ import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermissions;
 import javax.inject.Inject;
 
 /** Implements the {@link PartnerMetadataStorage} using local files. */
@@ -24,7 +26,10 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
 
     static {
         try {
-            metadataTempDirectory = Files.createTempDirectory("metadata");
+            FileAttribute<?> onlyOwnerAttrs =
+                    PosixFilePermissions.asFileAttribute(
+                            PosixFilePermissions.fromString("rwx------"));
+            metadataTempDirectory = Files.createTempDirectory("metadata", onlyOwnerAttrs);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
