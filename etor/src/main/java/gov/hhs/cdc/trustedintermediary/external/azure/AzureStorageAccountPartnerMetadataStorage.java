@@ -7,8 +7,10 @@ import com.azure.storage.blob.BlobServiceClientBuilder;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import javax.inject.Inject;
 
 /** Implements the {@link PartnerMetadataStorage} using files stored in an Azure Storage Account. */
 public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadataStorage {
@@ -26,6 +28,8 @@ public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadat
 
     private static final AzureStorageAccountPartnerMetadataStorage INSTANCE =
             new AzureStorageAccountPartnerMetadataStorage();
+
+    @Inject Logger logger;
 
     private AzureStorageAccountPartnerMetadataStorage() {}
 
@@ -45,5 +49,14 @@ public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadat
         ByteArrayInputStream inputStream =
                 new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
         blobClient.upload(inputStream, content.length(), true);
+        logger.logInfo(
+                "Saved metadata for "
+                        + metadata.uniqueId()
+                        + " to "
+                        + METADATA_CONTAINER_NAME
+                        + " container in "
+                        + STORAGE_ACCOUNT_BLOB_ENDPOINT
+                        + " Azure storage account"
+                        + blobClient.getBlobUrl());
     }
 }
