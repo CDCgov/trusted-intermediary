@@ -2,8 +2,8 @@ package gov.hhs.cdc.trustedintermediary.external.database;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.DbDao;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -14,13 +14,15 @@ import javax.inject.Inject;
 public class PostgresDao implements DbDao {
 
     @Inject Logger logger;
+
+    @Inject SqlDriverManager driverManager;
     private static final PostgresDao INSTANCE = new PostgresDao();
     private Connection conn;
 
     private PostgresDao() {}
 
     @Override
-    public void connect() {
+    public void connect() throws SQLException {
         String url = "jdbc:postgresql://localhost:5433/intermediary";
 
         Properties props = new Properties();
@@ -29,13 +31,8 @@ public class PostgresDao implements DbDao {
 
         // TODO: Change this based on env
         props.setProperty("ssl", "false");
-        try {
-            conn = DriverManager.getConnection(url, props);
-            logger.logInfo("DB Connected Successfully");
-        } catch (Exception e) {
-            // TODO: More specific exception for the different potential errors?
-            logger.logError(e.getMessage());
-        }
+        conn = driverManager.getConnection(url, props);
+        logger.logInfo("DB Connected Successfully");
     }
 
     public static PostgresDao getInstance() {

@@ -1,8 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.external.database
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager
 import spock.lang.Specification
 
+import java.sql.Connection
 import java.sql.Driver
 import java.sql.DriverManager
 import java.sql.SQLException
@@ -19,6 +21,11 @@ class PostgresDaoTest extends Specification {
 
         given:
 
+        def mockDriver = Mock(SqlDriverManager)
+        mockDriver.getConnection(_, _) >> {Mock(Connection)}
+
+        TestApplicationContext.register(SqlDriverManager, mockDriver)
+        PostgresDao.getInstance().driverManager.getConnection(_ as String, _ as Properties) >> {Mock(Connection)}
         TestApplicationContext.injectRegisteredImplementations()
         when:
 
@@ -29,19 +36,22 @@ class PostgresDaoTest extends Specification {
         conn != null
     }
 
-    //    def "getting a connection throws an exception"() {
-    //        given:
-    //        def sqlException = new SQLException()
-    //        def driverManager = Mock(DriverManager)
-    //
-    //        driverManager.getConnection(_ as String, _ as Properties) >> { throw new SQLException()}
-    //        //DriverManager.getMetaClass().
-    //        TestApplicationContext.register(DriverManager, driverManager)
-    //        TestApplicationContext.injectRegisteredImplementations()
-    //        when:
-    //        PostgresDao.getInstance().getConnection()
-    //        then:
-    //        thrown(SQLException)
-    //
-    //    }
+        def "getting a connection throws an exception"() {
+            given:
+
+
+            def mockDriver = Mock(SqlDriverManager)
+            mockDriver.getConnection(_ as String, _ as Properties) >> {throw new SQLException()}
+
+            TestApplicationContext.register(SqlDriverManager, mockDriver)
+            TestApplicationContext.injectRegisteredImplementations()
+
+
+            when:
+            PostgresDao.getInstance().connect()
+
+            then:
+            thrown(Exception)
+
+        }
 }
