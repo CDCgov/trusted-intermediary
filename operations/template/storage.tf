@@ -15,7 +15,7 @@ resource "azurerm_storage_container" "metadata" {
 }
 
 resource "azurerm_role_assignment" "allow_api_read_write" {
-  scope                = azurerm_storage_container.metadata.id
+  scope                = azurerm_storage_container.metadata.resource_manager_id
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azurerm_linux_web_app.api.identity.0.principal_id
 }
