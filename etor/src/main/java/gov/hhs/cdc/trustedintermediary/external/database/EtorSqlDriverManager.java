@@ -7,8 +7,17 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class EtorSqlDriverManager implements SqlDriverManager {
+
+    private static final EtorSqlDriverManager INSTANCE = new EtorSqlDriverManager();
+
+    private EtorSqlDriverManager() {}
+
     @Override
     public Connection getConnection(String url, Properties props) throws SQLException {
         return DriverManager.getConnection(url, props);
+    }
+
+    public static EtorSqlDriverManager getInstance() {
+        return INSTANCE;
     }
 }
