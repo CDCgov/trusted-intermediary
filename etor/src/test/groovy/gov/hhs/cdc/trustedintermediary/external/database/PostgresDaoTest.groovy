@@ -5,8 +5,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager
 import spock.lang.Specification
 
 import java.sql.Connection
-import java.sql.Driver
-import java.sql.DriverManager
 import java.sql.SQLException
 
 class PostgresDaoTest extends Specification {
@@ -17,41 +15,47 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.register(PostgresDao, PostgresDao.getInstance())
     }
 
-    def "gets connection"(){
-
+    def "connect happy path works"(){
         given:
-
         def mockDriver = Mock(SqlDriverManager)
-        mockDriver.getConnection(_, _) >> {Mock(Connection)}
+        mockDriver.getConnection(_ as String, _ as Properties) >> {Mock(Connection)}
 
         TestApplicationContext.register(SqlDriverManager, mockDriver)
         PostgresDao.getInstance().driverManager.getConnection(_ as String, _ as Properties) >> {Mock(Connection)}
         TestApplicationContext.injectRegisteredImplementations()
-        when:
 
+        when:
         def conn = PostgresDao.getInstance().getConnection()
 
         then:
-
         conn != null
     }
 
-        def "getting a connection throws an exception"() {
-            given:
+    def "connect unhappy path throws exception"() {
+        given:
+        def mockDriver = Mock(SqlDriverManager)
+        mockDriver.getConnection(_ as String, _ as Properties) >> {throw new SQLException()}
+        TestApplicationContext.register(SqlDriverManager, mockDriver)
+        TestApplicationContext.injectRegisteredImplementations()
 
+        when:
+        PostgresDao.getInstance().connect()
 
-            def mockDriver = Mock(SqlDriverManager)
-            mockDriver.getConnection(_ as String, _ as Properties) >> {throw new SQLException()}
+        then:
+        thrown(SQLException)
+    }
 
-            TestApplicationContext.register(SqlDriverManager, mockDriver)
-            TestApplicationContext.injectRegisteredImplementations()
+    def "getConnection unhappy path throws exception"() {
+        given:
+        def mockDriver = Mock(SqlDriverManager)
+        mockDriver.getConnection(_ as String, _ as Properties) >> {throw new SQLException()}
+        TestApplicationContext.register(SqlDriverManager, mockDriver)
+        TestApplicationContext.injectRegisteredImplementations()
 
+        when:
+        PostgresDao.getInstance().getConnection()
 
-            when:
-            PostgresDao.getInstance().connect()
-
-            then:
-            thrown(Exception)
-
-        }
+        then:
+        thrown(SQLException)
+    }
 }

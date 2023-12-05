@@ -14,15 +14,13 @@ import javax.inject.Inject;
 public class PostgresDao implements DbDao {
 
     @Inject Logger logger;
-
     @Inject SqlDriverManager driverManager;
     private static final PostgresDao INSTANCE = new PostgresDao();
     private Connection conn;
 
     private PostgresDao() {}
 
-    @Override
-    public void connect() throws SQLException {
+    protected void connect() throws SQLException {
         String url = "jdbc:postgresql://localhost:5433/intermediary";
 
         Properties props = new Properties();
@@ -39,7 +37,8 @@ public class PostgresDao implements DbDao {
         return INSTANCE;
     }
 
-    public synchronized Connection getConnection() {
+    @Override
+    public synchronized Connection getConnection() throws SQLException {
         try {
             if (conn == null || conn.isClosed()) {
                 connect();
@@ -47,7 +46,7 @@ public class PostgresDao implements DbDao {
             return conn;
         } catch (SQLException e) {
             logger.logError("Error getting connection: " + e.getMessage());
-            return null;
+            throw new SQLException(e.getMessage());
         }
     }
 
