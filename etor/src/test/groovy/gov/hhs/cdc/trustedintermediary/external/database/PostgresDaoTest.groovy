@@ -27,22 +27,21 @@ class PostgresDaoTest extends Specification {
         then:
 
         conn != null
-
     }
 
-//    def "getting a connection throws an exception"() {
-//        given:
-//        def sqlException = new SQLException()
-//        def driverManager = Mock(DriverManager)
-//
-//        driverManager.getConnection(_ as String, _ as Properties) >> { throw new SQLException()}
-//        //DriverManager.getMetaClass().
-//        TestApplicationContext.register(DriverManager, driverManager)
-//        TestApplicationContext.injectRegisteredImplementations()
-//        when:
-//        PostgresDao.getInstance().getConnection()
-//        then:
-//        thrown(SQLException)
-//
-//    }
+    //    def "getting a connection throws an exception"() {
+    //        given:
+    //        def sqlException = new SQLException()
+    //        def driverManager = Mock(DriverManager)
+    //
+    //        driverManager.getConnection(_ as String, _ as Properties) >> { throw new SQLException()}
+    //        //DriverManager.getMetaClass().
+    //        TestApplicationContext.register(DriverManager, driverManager)
+    //        TestApplicationContext.injectRegisteredImplementations()
+    //        when:
+    //        PostgresDao.getInstance().getConnection()
+    //        then:
+    //        thrown(SQLException)
+    //
+    //    }
 }

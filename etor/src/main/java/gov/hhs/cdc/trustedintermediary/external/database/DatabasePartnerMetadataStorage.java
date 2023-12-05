@@ -8,8 +8,7 @@ import javax.inject.Inject;
 /** Implements the {@link PartnerMetadataStorage} using a database. */
 public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
 
-    @Inject
-    DbDao dao;
+    @Inject DbDao dao;
     private static final DatabasePartnerMetadataStorage INSTANCE =
             new DatabasePartnerMetadataStorage();
 
@@ -23,7 +22,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
     public PartnerMetadata readMetadata(final String uniqueId) {
         return null;
     }
-//TODO: Should this be separate or should we have the DAO stuff happen in here
+    // TODO: Should this be separate or should we have the DAO stuff happen in here
     @Override
     public void saveMetadata(final PartnerMetadata metadata) {
         dao.upsertMetadata(

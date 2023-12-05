@@ -27,7 +27,7 @@ public class PostgresDao implements DbDao {
         props.setProperty("user", "intermediary");
         props.setProperty("password", "changeIT!");
 
-        //TODO: Change this based on env
+        // TODO: Change this based on env
         props.setProperty("ssl", "false");
         try {
             conn = DriverManager.getConnection(url, props);
@@ -58,7 +58,8 @@ public class PostgresDao implements DbDao {
     public void upsertMetadata(
             String id, String sender, String receiver, String hash, Instant timeReceived) {
         try {
-            //TODO: Update the below statement to handle on conflict, after we figure out what that behavior should be
+            // TODO: Update the below statement to handle on conflict, after we figure out what that
+            // behavior should be
             PreparedStatement statement =
                     getConnection().prepareStatement("INSERT INTO metadata VALUES (?, ?, ?, ?, ?)");
             statement.setString(1, id);
@@ -68,14 +69,13 @@ public class PostgresDao implements DbDao {
             statement.setTimestamp(5, Timestamp.from(timeReceived));
 
             int result = statement.executeUpdate();
-            //TODO: Do something if our update returns 0...
+            // TODO: Do something if our update returns 0...
             logger.logInfo(String.valueOf(result));
             statement.close();
 
         } catch (Exception e) {
             logger.logError("Error updating data: " + e.getMessage());
-        }
-        finally {
+        } finally {
             closeConnection();
         }
     }
