@@ -21,6 +21,7 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureStorageAccountPartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.DatabasePartnerMetadataStorage;
+import gov.hhs.cdc.trustedintermediary.external.database.EtorSqlDriverManager;
 import gov.hhs.cdc.trustedintermediary.external.database.PostgresDao;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileOrderSender;
@@ -28,6 +29,7 @@ import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSe
 import gov.hhs.cdc.trustedintermediary.wrappers.DbDao;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -68,6 +70,7 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(OrderController.class, OrderController.getInstance());
         ApplicationContext.register(SendOrderUseCase.class, SendOrderUseCase.getInstance());
 
+        ApplicationContext.register(SqlDriverManager.class, EtorSqlDriverManager.getInstance());
         ApplicationContext.register(DbDao.class, PostgresDao.getInstance());
 
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
