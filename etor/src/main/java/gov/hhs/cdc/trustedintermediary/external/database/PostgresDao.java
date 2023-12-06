@@ -38,7 +38,7 @@ public class PostgresDao implements DbDao {
     }
 
     @Override
-    public synchronized Connection getConnection() throws SQLException {
+    public Connection getConnection() throws SQLException {
         try {
             if (conn == null || conn.isClosed()) {
                 connect();
