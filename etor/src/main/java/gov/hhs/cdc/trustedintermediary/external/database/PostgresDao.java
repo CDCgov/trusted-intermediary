@@ -39,15 +39,11 @@ public class PostgresDao implements DbDao {
 
     @Override
     public Connection getConnection() throws SQLException {
-        try {
-            if (conn == null || conn.isClosed()) {
-                connect();
-            }
-            return conn;
-        } catch (SQLException e) {
-            logger.logError("Error getting connection: " + e.getMessage());
-            throw new SQLException(e.getMessage());
+
+        if (conn == null || conn.isClosed()) {
+            connect();
         }
+        return conn;
     }
 
     @Override
