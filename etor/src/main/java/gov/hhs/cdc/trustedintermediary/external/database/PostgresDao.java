@@ -42,7 +42,6 @@ public class PostgresDao implements DbDao {
 
         if (conn == null || conn.isClosed()) {
             connect();
-            logger.logInfo("Inside if statement in getConnection*********************");
         }
         return conn;
     }
