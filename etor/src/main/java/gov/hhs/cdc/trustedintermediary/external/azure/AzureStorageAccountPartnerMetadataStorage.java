@@ -10,7 +10,11 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import javax.inject.Inject;
 
@@ -31,6 +35,7 @@ public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadat
     private static final AzureStorageAccountPartnerMetadataStorage INSTANCE =
             new AzureStorageAccountPartnerMetadataStorage();
 
+    @Inject Formatter formatter;
     @Inject Logger logger;
 
     private AzureStorageAccountPartnerMetadataStorage() {}
@@ -40,8 +45,19 @@ public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadat
     }
 
     @Override
-    public PartnerMetadata readMetadata(final String uniqueId) {
-        return null;
+    public PartnerMetadata readMetadata(final String uniqueId) throws PartnerMetadataException {
+        String metadataFileName = uniqueId + ".json";
+        try {
+            logger.logDebug("Downloading " + metadataFileName);
+            BlobClient blobClient = CONTAINER_CLIENT.getBlobClient(metadataFileName);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            blobClient.downloadStream(outputStream);
+            String content = outputStream.toString(StandardCharsets.UTF_8);
+            logger.logDebug("Downloaded metadata: " + content);
+            return formatter.convertJsonToObject(content, new TypeReference<>() {});
+        } catch (AzureException | FormatterProcessingException e) {
+            throw new PartnerMetadataException("Unable to download " + metadataFileName, e);
+        }
     }
 
     @Override
@@ -49,7 +65,7 @@ public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadat
         String metadataFileName = metadata.uniqueId() + ".json";
         try {
             BlobClient blobClient = CONTAINER_CLIENT.getBlobClient(metadataFileName);
-            String content = "serialize(metadata)";
+            String content = formatter.convertToJsonString(metadata);
             ByteArrayInputStream inputStream =
                     new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
             blobClient.upload(inputStream, content.length(), true);
@@ -62,7 +78,7 @@ public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadat
                             + STORAGE_ACCOUNT_BLOB_ENDPOINT
                             + " Azure storage account"
                             + blobClient.getBlobUrl());
-        } catch (AzureException e) {
+        } catch (AzureException | FormatterProcessingException e) {
             throw new PartnerMetadataException(
                     "Failed to upload "
                             + metadataFileName
