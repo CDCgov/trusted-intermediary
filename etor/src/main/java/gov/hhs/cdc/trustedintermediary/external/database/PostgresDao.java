@@ -16,11 +16,11 @@ public class PostgresDao implements DbDao {
     @Inject Logger logger;
     @Inject SqlDriverManager driverManager;
     private static final PostgresDao INSTANCE = new PostgresDao();
-    private Connection conn;
 
     private PostgresDao() {}
 
-    protected void connect() throws SQLException {
+    protected Connection connect() throws SQLException {
+        Connection conn;
         String url = "jdbc:postgresql://localhost:5433/intermediary";
 
         Properties props = new Properties();
@@ -31,6 +31,7 @@ public class PostgresDao implements DbDao {
         props.setProperty("ssl", "false");
         conn = driverManager.getConnection(url, props);
         logger.logInfo("DB Connected Successfully");
+        return conn;
     }
 
     public static PostgresDao getInstance() {
@@ -38,23 +39,15 @@ public class PostgresDao implements DbDao {
     }
 
     @Override
-    public synchronized Connection getConnection() throws SQLException {
-
-        if (conn == null || conn.isClosed()) {
-            connect();
-        }
-        return conn;
-    }
-
-    @Override
-    public void upsertMetadata(
+    public synchronized void upsertMetadata(
             String id, String sender, String receiver, String hash, Instant timeReceived)
             throws SQLException {
-        try {
+
+        try (Connection conn = connect()) {
             // TODO: Update the below statement to handle on conflict, after we figure out what that
             // behavior should be
             PreparedStatement statement =
-                    getConnection().prepareStatement("INSERT INTO metadata VALUES (?, ?, ?, ?, ?)");
+                    conn.prepareStatement("INSERT INTO metadata VALUES (?, ?, ?, ?, ?)");
             statement.setString(1, id);
             statement.setString(2, sender);
             statement.setString(3, receiver);
@@ -68,20 +61,7 @@ public class PostgresDao implements DbDao {
 
         } catch (Exception e) {
             logger.logError("Error updating data: " + e.getMessage());
-        } finally {
-            closeConnection();
-        }
-    }
-
-    public void closeConnection() throws SQLException {
-        if (conn != null) {
-            try {
-                conn.close();
-                logger.logInfo("DB Connection Closed Successfully");
-            } catch (SQLException e) {
-                logger.logError(("Error closing connection: " + e.getMessage()));
-                throw new SQLException(e.getMessage());
-            }
+            throw new SQLException();
         }
     }
 }

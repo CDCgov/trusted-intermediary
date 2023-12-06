@@ -4,7 +4,10 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager
 import spock.lang.Specification
 
+import java.time.Instant
+
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.sql.SQLException
 
 class PostgresDaoTest extends Specification {
@@ -14,7 +17,6 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.init()
         TestApplicationContext.register(PostgresDao, PostgresDao.getInstance())
     }
-
 
     def "connect happy path works"(){
         given:
@@ -26,7 +28,7 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def conn = PostgresDao.getInstance().getConnection()
+        def conn = PostgresDao.getInstance().connect()
 
         then:
         conn == mockConn
@@ -46,52 +48,23 @@ class PostgresDaoTest extends Specification {
         thrown(SQLException)
     }
 
-    def "getConnection unhappy path throws exception"() {
+    def "upsertMetadata works"() {
         given:
-        def mockDriver = Mock(SqlDriverManager)
-        mockDriver.getConnection(_ as String, _ as Properties) >> {throw new SQLException()}
-        TestApplicationContext.register(SqlDriverManager, mockDriver)
+        def upsertMockDriver = Mock(SqlDriverManager)
+        Connection upsertMockConn = Mock(Connection)
+        PreparedStatement upsertMockStatement = Mock(PreparedStatement)
+
+
+        upsertMockDriver.getConnection(_ as String, _ as Properties) >>  upsertMockConn
+        upsertMockConn.prepareStatement(_ as String) >> upsertMockStatement
+
+        TestApplicationContext.register(SqlDriverManager, upsertMockDriver)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PostgresDao.getInstance().getConnection()
+        PostgresDao.getInstance().upsertMetadata("mock_id", "mock_sender", "mock_receiver", "mock_hash", Instant.now())
 
         then:
-        thrown(SQLException)
-    }
-
-    def "closeConnection unhappy path throws exception"() {
-        given:
-        def dao = PostgresDao.getInstance()
-        def mockDriver = Mock(SqlDriverManager)
-        def mockConnection = Mock(Connection)
-        mockConnection.close() >> {throw new SQLException()}
-        mockDriver.getConnection(_ as String, _ as Properties) >> mockConnection
-        TestApplicationContext.register(SqlDriverManager, mockDriver)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        dao.getConnection()
-        dao.closeConnection()
-
-        then:
-        thrown(SQLException)
-    }
-
-    def "closeConnection happy path works "() {
-        given:
-        def dao = PostgresDao.getInstance()
-        def mockDriver = Mock(SqlDriverManager)
-        Connection mockConnection
-        mockDriver.getConnection(_ as String, _ as Properties) >> mockConnection
-        TestApplicationContext.register(SqlDriverManager, mockDriver)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        dao.getConnection()
-        dao.closeConnection()
-
-        then:
-        noExceptionThrown()
+        1 * upsertMockStatement.executeUpdate()
     }
 }

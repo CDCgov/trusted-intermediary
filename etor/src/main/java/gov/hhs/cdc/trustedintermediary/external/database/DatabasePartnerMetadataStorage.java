@@ -33,6 +33,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                     metadata.receiver(),
                     metadata.hash(),
                     metadata.timeReceived());
+            // TODO: Put response into the logger
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
