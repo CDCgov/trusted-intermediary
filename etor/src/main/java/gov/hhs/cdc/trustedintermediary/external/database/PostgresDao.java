@@ -52,7 +52,8 @@ public class PostgresDao implements DbDao {
 
     @Override
     public void upsertMetadata(
-            String id, String sender, String receiver, String hash, Instant timeReceived) {
+            String id, String sender, String receiver, String hash, Instant timeReceived)
+            throws SQLException {
         try {
             // TODO: Update the below statement to handle on conflict, after we figure out what that
             // behavior should be
@@ -76,13 +77,14 @@ public class PostgresDao implements DbDao {
         }
     }
 
-    public void closeConnection() {
+    public void closeConnection() throws SQLException {
         if (conn != null) {
             try {
                 conn.close();
                 logger.logInfo("DB Connection Closed Successfully");
             } catch (SQLException e) {
                 logger.logError(("Error closing connection: " + e.getMessage()));
+                throw new SQLException(e.getMessage());
             }
         }
     }

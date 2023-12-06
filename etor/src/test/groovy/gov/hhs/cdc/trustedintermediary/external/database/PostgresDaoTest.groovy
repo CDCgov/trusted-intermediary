@@ -58,4 +58,22 @@ class PostgresDaoTest extends Specification {
         then:
         thrown(SQLException)
     }
+
+    def "closeConnection unhappy path throws exception"() {
+        given:
+        def dao = PostgresDao.getInstance()
+        def mockDriver = Mock(SqlDriverManager)
+        def mockConnection = Mock(Connection)
+        mockConnection.close() >> {throw new SQLException()}
+        mockDriver.getConnection(_ as String, _ as Properties) >> mockConnection
+        TestApplicationContext.register(SqlDriverManager, mockDriver)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        dao.getConnection()
+        dao.closeConnection()
+
+        then:
+        thrown(SQLException)
+    }
 }
