@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.orders;
 
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import java.time.Instant;
@@ -26,7 +27,11 @@ public class SendOrderUseCase {
         var partnerMetadata =
                 new PartnerMetadata(
                         "uniqueId", "senderName", "receiverName", Instant.now(), "abcd");
-        partnerMetadataStorage.saveMetadata(partnerMetadata);
+        try {
+            partnerMetadataStorage.saveMetadata(partnerMetadata);
+        } catch (PartnerMetadataException e) {
+            throw new UnableToSendOrderException("Unable to save metadata for the order", e);
+        }
 
         var omlOrder = converter.convertMetadataToOmlOrder(order);
         metadata.put(order.getFhirResourceId(), EtorMetadataStep.ORDER_CONVERTED_TO_OML);

@@ -3,8 +3,10 @@ package gov.hhs.cdc.trustedintermediary.external.jackson;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombiner;
 import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombinerException;
@@ -29,6 +31,14 @@ public class Jackson implements Formatter, YamlCombiner {
                             .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES));
 
     @Inject Logger logger;
+
+    static {
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        JSON_OBJECT_MAPPER.registerModule(javaTimeModule);
+        YAML_OBJECT_MAPPER.registerModule(javaTimeModule);
+        JSON_OBJECT_MAPPER.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        YAML_OBJECT_MAPPER.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }
 
     private Jackson() {}
 
