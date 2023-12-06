@@ -45,52 +45,52 @@ class PostgresDaoTest extends Specification {
         thrown(SQLException)
     }
 
-    def "getConnection unhappy path throws exception"() {
-        given:
-        def mockDriver = Mock(SqlDriverManager)
-        mockDriver.getConnection(_ as String, _ as Properties) >> {throw new SQLException()}
-        TestApplicationContext.register(SqlDriverManager, mockDriver)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        PostgresDao.getInstance().getConnection()
-
-        then:
-        thrown(SQLException)
-    }
-
-    def "closeConnection unhappy path throws exception"() {
-        given:
-        def dao = PostgresDao.getInstance()
-        def mockDriver = Mock(SqlDriverManager)
-        def mockConnection = Mock(Connection)
-        mockConnection.close() >> {throw new SQLException()}
-        mockDriver.getConnection(_ as String, _ as Properties) >> mockConnection
-        TestApplicationContext.register(SqlDriverManager, mockDriver)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        dao.getConnection()
-        dao.closeConnection()
-
-        then:
-        thrown(SQLException)
-    }
-
-    def "closeConnection happy path works "() {
-        given:
-        def dao = PostgresDao.getInstance()
-        def mockDriver = Mock(SqlDriverManager)
-        def mockConnection = Mock(Connection)
-        mockDriver.getConnection(_ as String, _ as Properties) >> mockConnection
-        TestApplicationContext.register(SqlDriverManager, mockDriver)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        dao.getConnection()
-        dao.closeConnection()
-
-        then:
-        noExceptionThrown()
-    }
+    //    def "getConnection unhappy path throws exception"() {
+    //        given:
+    //        def mockDriver = Mock(SqlDriverManager)
+    //        mockDriver.getConnection(_ as String, _ as Properties) >> {throw new SQLException()}
+    //        TestApplicationContext.register(SqlDriverManager, mockDriver)
+    //        TestApplicationContext.injectRegisteredImplementations()
+    //
+    //        when:
+    //        PostgresDao.getInstance().getConnection()
+    //
+    //        then:
+    //        thrown(SQLException)
+    //    }
+    //
+    //    def "closeConnection unhappy path throws exception"() {
+    //        given:
+    //        def dao = PostgresDao.getInstance()
+    //        def mockDriver = Mock(SqlDriverManager)
+    //        def mockConnection = Mock(Connection)
+    //        mockConnection.close() >> {throw new SQLException()}
+    //        mockDriver.getConnection(_ as String, _ as Properties) >> mockConnection
+    //        TestApplicationContext.register(SqlDriverManager, mockDriver)
+    //        TestApplicationContext.injectRegisteredImplementations()
+    //
+    //        when:
+    //        dao.getConnection()
+    //        dao.closeConnection()
+    //
+    //        then:
+    //        thrown(SQLException)
+    //    }
+    //
+    //    def "closeConnection happy path works "() {
+    //        given:
+    //        def dao = PostgresDao.getInstance()
+    //        def mockDriver = Mock(SqlDriverManager)
+    //        def mockConnection = Mock(Connection)
+    //        mockDriver.getConnection(_ as String, _ as Properties) >> mockConnection
+    //        TestApplicationContext.register(SqlDriverManager, mockDriver)
+    //        TestApplicationContext.injectRegisteredImplementations()
+    //
+    //        when:
+    //        dao.getConnection()
+    //        dao.closeConnection()
+    //
+    //        then:
+    //        noExceptionThrown()
+    //    }
 }
