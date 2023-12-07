@@ -29,25 +29,23 @@ public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadat
     private static final AzureStorageAccountPartnerMetadataStorage INSTANCE =
             new AzureStorageAccountPartnerMetadataStorage();
 
+    AzureStorageAccountPartnerMetadataStorage(BlobContainerClient containerClient) {
+        this.containerClient = containerClient;
+    }
+
     @Inject Formatter formatter;
     @Inject Logger logger;
 
     private AzureStorageAccountPartnerMetadataStorage() {}
 
     public static AzureStorageAccountPartnerMetadataStorage getInstance() {
+        INSTANCE.containerClient =
+                new BlobServiceClientBuilder()
+                        .endpoint(STORAGE_ACCOUNT_BLOB_ENDPOINT)
+                        .credential(new DefaultAzureCredentialBuilder().build())
+                        .buildClient()
+                        .getBlobContainerClient(METADATA_CONTAINER_NAME);
         return INSTANCE;
-    }
-
-    BlobContainerClient getContainerClient() {
-        if (containerClient == null) {
-            containerClient =
-                    new BlobServiceClientBuilder()
-                            .endpoint(STORAGE_ACCOUNT_BLOB_ENDPOINT)
-                            .credential(new DefaultAzureCredentialBuilder().build())
-                            .buildClient()
-                            .getBlobContainerClient(METADATA_CONTAINER_NAME);
-        }
-        return containerClient;
     }
 
     @Override
@@ -55,7 +53,7 @@ public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadat
         String metadataFileName = getMetadataFileName(uniqueId);
         logger.logInfo("Reading metadata for " + metadataFileName);
         try {
-            BlobClient blobClient = getContainerClient().getBlobClient(metadataFileName);
+            BlobClient blobClient = containerClient.getBlobClient(metadataFileName);
             logger.logInfo("Reading metadata from " + blobClient.getBlobUrl());
             String content = blobClient.downloadContent().toString();
             return formatter.convertJsonToObject(content, new TypeReference<>() {});
@@ -69,7 +67,7 @@ public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadat
         String metadataFileName = getMetadataFileName(metadata.uniqueId());
         logger.logInfo("Saving metadata for " + metadataFileName);
         try {
-            BlobClient blobClient = getContainerClient().getBlobClient(metadataFileName);
+            BlobClient blobClient = containerClient.getBlobClient(metadataFileName);
             String content = formatter.convertToJsonString(metadata);
             blobClient.upload(BinaryData.fromString(content));
             logger.logInfo("Saved metadata to " + blobClient.getBlobUrl());

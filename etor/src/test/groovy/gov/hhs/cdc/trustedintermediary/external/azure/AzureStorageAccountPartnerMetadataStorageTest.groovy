@@ -13,9 +13,15 @@ import java.nio.charset.StandardCharsets
 
 class AzureStorageAccountPartnerMetadataStorageTest extends Specification {
 
+    def blobContainerClient
+    def azureMetadataStorage
+
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
+        blobContainerClient = Mock(BlobContainerClient)
+        azureMetadataStorage = new AzureStorageAccountPartnerMetadataStorage(blobContainerClient)
+        TestApplicationContext.register(AzureStorageAccountPartnerMetadataStorage, azureMetadataStorage)
     }
 
     def "successfully read metadata"() {
@@ -34,23 +40,25 @@ class AzureStorageAccountPartnerMetadataStorageTest extends Specification {
             "hash": "${expectedHash}"
         }'''
 
-        def storageService = AzureStorageAccountPartnerMetadataStorage.getInstance()
-        def metadataFileName = storageService.getMetadataFileName(expectedUniqueId)
+        //        def storageService = AzureStorageAccountPartnerMetadataStorage.getInstance()
+        String metadataFileName = azureMetadataStorage.getMetadataFileName(expectedUniqueId)
 
+        //        def mockContainerClient = GroovyMock(BlobContainerClient)
         def mockBlobClient = Mock(BlobClient)
         mockBlobClient.downloadContent() >> content.getBytes(StandardCharsets.UTF_8)
-        TestApplicationContext.register(BlobClient, mockBlobClient)
+        //        TestApplicationContext.register(BlobClient, mockBlobClient)
 
-        def mockContainerClient = GroovyMock(BlobContainerClient)
-        storageService.metaClass.getContainerClient >> { -> mockContainerClient }
-        mockContainerClient.getBlobClient(metadataFileName) >> mockBlobClient
-        TestApplicationContext.register(BlobContainerClient, mockContainerClient)
+        //        def mockContainerClient = GroovyMock(BlobContainerClient)
+        //        storageService.metaClass.getContainerClient >> { -> mockContainerClient }
+        //        azureMetadataStorage.getContainerClient() >> mockContainerClient
+        blobContainerClient.getBlobClient(metadataFileName) >> mockBlobClient
+        //        TestApplicationContext.register(BlobContainerClient, mockContainerClient)
 
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when: "readMetadata is called"
-        PartnerMetadata metadata = storageService.readMetadata(expectedUniqueId)
+        PartnerMetadata metadata = azureMetadataStorage.readMetadata(expectedUniqueId)
 
         then: "The metadata is returned correctly"
         metadata == expectedMetadata
