@@ -48,12 +48,10 @@ public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadat
     public PartnerMetadata readMetadata(final String uniqueId) throws PartnerMetadataException {
         String metadataFileName = uniqueId + ".json";
         try {
-            logger.logDebug("Downloading " + metadataFileName);
             BlobClient blobClient = CONTAINER_CLIENT.getBlobClient(metadataFileName);
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             blobClient.downloadStream(outputStream);
             String content = outputStream.toString(StandardCharsets.UTF_8);
-            logger.logDebug("Downloaded metadata: " + content);
             return formatter.convertJsonToObject(content, new TypeReference<>() {});
         } catch (AzureException | FormatterProcessingException e) {
             throw new PartnerMetadataException("Unable to download " + metadataFileName, e);
@@ -69,20 +67,12 @@ public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadat
             ByteArrayInputStream inputStream =
                     new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
             blobClient.upload(inputStream, content.length(), true);
-            logger.logInfo(
-                    "Saved metadata for "
-                            + metadata.uniqueId()
-                            + " to "
-                            + METADATA_CONTAINER_NAME
-                            + " container in "
-                            + STORAGE_ACCOUNT_BLOB_ENDPOINT
-                            + " Azure storage account"
-                            + blobClient.getBlobUrl());
+            logger.logInfo("Saved metadata to " + blobClient.getBlobUrl());
         } catch (AzureException | FormatterProcessingException e) {
             throw new PartnerMetadataException(
                     "Failed to upload "
                             + metadataFileName
-                            + " in "
+                            + " to "
                             + METADATA_CONTAINER_NAME
                             + " container",
                     e);
