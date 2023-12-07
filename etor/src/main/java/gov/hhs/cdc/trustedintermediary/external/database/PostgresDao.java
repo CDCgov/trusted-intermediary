@@ -43,11 +43,11 @@ public class PostgresDao implements DbDao {
             String id, String sender, String receiver, String hash, Instant timeReceived)
             throws SQLException {
 
-        try (Connection conn = connect()) {
+        try (Connection conn = connect();
+                PreparedStatement statement =
+                        conn.prepareStatement("INSERT INTO metadata VALUES (?, ?, ?, ?, ?)")) {
             // TODO: Update the below statement to handle on conflict, after we figure out what that
             // behavior should be
-            PreparedStatement statement =
-                    conn.prepareStatement("INSERT INTO metadata VALUES (?, ?, ?, ?, ?)");
             statement.setString(1, id);
             statement.setString(2, sender);
             statement.setString(3, receiver);
@@ -57,7 +57,6 @@ public class PostgresDao implements DbDao {
             int result = statement.executeUpdate();
             // TODO: Do something if our update returns 0...
             logger.logInfo(String.valueOf(result));
-            statement.close();
 
         } catch (Exception e) {
             logger.logError("Error updating data: " + e.getMessage());
