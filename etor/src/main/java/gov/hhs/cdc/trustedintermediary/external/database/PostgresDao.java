@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.database;
 
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.wrappers.DbDao;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager;
@@ -21,14 +22,20 @@ public class PostgresDao implements DbDao {
 
     protected Connection connect() throws SQLException {
         Connection conn;
-        String url = "jdbc:postgresql://localhost:5433/intermediary";
+        String url =
+                "jdbc:postgresql://"
+                        + ApplicationContext.getProperty("DB_URL")
+                        + ":"
+                        + ApplicationContext.getProperty("DB_PORT")
+                        + "/"
+                        + ApplicationContext.getProperty("DB_NAME");
 
         Properties props = new Properties();
-        props.setProperty("user", "intermediary");
-        props.setProperty("password", "changeIT!");
+        props.setProperty("user", ApplicationContext.getProperty("DB_USER"));
+        props.setProperty("password", ApplicationContext.getProperty("DB_PASS"));
 
         // TODO: Change this based on env
-        props.setProperty("ssl", "false");
+        props.setProperty("ssl", ApplicationContext.getProperty("DB_SSL"));
         conn = driverManager.getConnection(url, props);
         logger.logInfo("DB Connected Successfully");
         return conn;
