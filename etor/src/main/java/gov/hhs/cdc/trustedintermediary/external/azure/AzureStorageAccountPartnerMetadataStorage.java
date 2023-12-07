@@ -53,8 +53,10 @@ public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadat
     @Override
     public PartnerMetadata readMetadata(final String uniqueId) throws PartnerMetadataException {
         String metadataFileName = getMetadataFileName(uniqueId);
+        logger.logInfo("Reading metadata for " + metadataFileName);
         try {
             BlobClient blobClient = getContainerClient().getBlobClient(metadataFileName);
+            logger.logInfo("Reading metadata from " + blobClient.getBlobUrl());
             String content = blobClient.downloadContent().toString();
             return formatter.convertJsonToObject(content, new TypeReference<>() {});
         } catch (AzureException | FormatterProcessingException e) {
@@ -65,6 +67,7 @@ public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadat
     @Override
     public void saveMetadata(final PartnerMetadata metadata) throws PartnerMetadataException {
         String metadataFileName = getMetadataFileName(metadata.uniqueId());
+        logger.logInfo("Saving metadata for " + metadataFileName);
         try {
             BlobClient blobClient = getContainerClient().getBlobClient(metadataFileName);
             String content = formatter.convertToJsonString(metadata);
