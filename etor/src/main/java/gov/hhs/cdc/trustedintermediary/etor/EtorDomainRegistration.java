@@ -24,6 +24,7 @@ import gov.hhs.cdc.trustedintermediary.external.database.DatabasePartnerMetadata
 import gov.hhs.cdc.trustedintermediary.external.database.EtorSqlDriverManager;
 import gov.hhs.cdc.trustedintermediary.external.database.PostgresDao;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
+import gov.hhs.cdc.trustedintermediary.external.localfile.FilePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.DbDao;
@@ -76,7 +77,9 @@ public class EtorDomainRegistration implements DomainConnector {
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
             ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
             ApplicationContext.register(
-                    PartnerMetadataStorage.class, DatabasePartnerMetadataStorage.getInstance());
+                    PartnerMetadataStorage.class, FilePartnerMetadataStorage.getInstance());
+            //            ApplicationContext.register(
+            //                    PartnerMetadataStorage.class, DatabasePartnerMetadataStorage.getInstance());
         } else {
             ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
             ApplicationContext.register(
