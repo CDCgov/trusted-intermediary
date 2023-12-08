@@ -29,7 +29,7 @@ public class SendOrderUseCase {
                         "uniqueId", "senderName", "receiverName", Instant.now(), "abcd");
         try {
             partnerMetadataStorage.saveMetadata(partnerMetadata);
-            partnerMetadataStorage.readMetadata("BLEGH");
+            partnerMetadataStorage.readMetadata(partnerMetadata.uniqueId());
         } catch (PartnerMetadataException e) {
             throw new UnableToSendOrderException("Unable to save metadata for the order", e);
         }
