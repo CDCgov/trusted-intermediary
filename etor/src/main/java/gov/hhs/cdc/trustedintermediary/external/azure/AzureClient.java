@@ -6,6 +6,7 @@ import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 
+/** This class represents a client for interacting with Azure Blob Storage. */
 public class AzureClient {
 
     private static final String STORAGE_ACCOUNT_BLOB_ENDPOINT =
@@ -19,11 +20,6 @@ public class AzureClient {
 
     private AzureClient() {}
 
-    /**
-     * Retrieves an instance of the AzureClientImpl class.
-     *
-     * @return An instance of the AzureClientImpl class.
-     */
     public static AzureClient getInstance() {
 
         /*
