@@ -1,9 +1,11 @@
 package gov.hhs.cdc.trustedintermediary.external.azure
 
+import com.azure.core.exception.AzureException
 import com.azure.core.util.BinaryData
 import com.azure.storage.blob.BlobClient
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import java.time.Instant
@@ -50,5 +52,24 @@ class AzureStorageAccountPartnerMetadataStorageTest extends Specification {
 
         then:
         actualMetadata == expectedMetadata
+    }
+
+    def "exception path while reading metadata"() {
+        given:
+        String expectedUniqueId = "uniqueId"
+        def mockBlobClient = Mock(BlobClient)
+        mockBlobClient.downloadContent() >> { throw new AzureException("Download error") }
+
+        def azureClient = Mock(AzureClient)
+        azureClient.getBlobClient(_ as String) >> mockBlobClient
+
+        TestApplicationContext.register(AzureClient, azureClient)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        AzureStorageAccountPartnerMetadataStorage.getInstance().readMetadata(expectedUniqueId)
+
+        then:
+        thrown(PartnerMetadataException)
     }
 }
