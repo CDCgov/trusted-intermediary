@@ -3,7 +3,6 @@ package gov.hhs.cdc.trustedintermediary.external.azure;
 import com.azure.core.exception.AzureException;
 import com.azure.core.util.BinaryData;
 import com.azure.storage.blob.BlobClient;
-import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
@@ -15,11 +14,6 @@ import javax.inject.Inject;
 
 /** Implements the {@link PartnerMetadataStorage} using files stored in an Azure Storage Account. */
 public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadataStorage {
-
-    //    private static final String STORAGE_ACCOUNT_BLOB_ENDPOINT =
-    //            ApplicationContext.getProperty("STORAGE_ACCOUNT_BLOB_ENDPOINT");
-    private static final String METADATA_CONTAINER_NAME =
-            ApplicationContext.getProperty("METADATA_CONTAINER_NAME");
 
     private static final AzureStorageAccountPartnerMetadataStorage INSTANCE =
             new AzureStorageAccountPartnerMetadataStorage();
@@ -44,7 +38,8 @@ public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadat
             String content = blobClient.downloadContent().toString();
             return formatter.convertJsonToObject(content, new TypeReference<>() {});
         } catch (AzureException | FormatterProcessingException e) {
-            throw new PartnerMetadataException("Unable to download " + metadataFileName, e);
+            throw new PartnerMetadataException(
+                    "Failed to download metadata file " + metadataFileName, e);
         }
     }
 
@@ -55,16 +50,11 @@ public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadat
         try {
             BlobClient blobClient = client.getBlobClient(metadataFileName);
             String content = formatter.convertToJsonString(metadata);
-            blobClient.upload(BinaryData.fromString(content));
+            blobClient.upload(BinaryData.fromString(content), true);
             logger.logInfo("Saved metadata to " + blobClient.getBlobUrl());
         } catch (AzureException | FormatterProcessingException e) {
             throw new PartnerMetadataException(
-                    "Failed to upload "
-                            + metadataFileName
-                            + " to "
-                            + METADATA_CONTAINER_NAME
-                            + " container",
-                    e);
+                    "Failed to upload metadata file " + metadataFileName, e);
         }
     }
 
