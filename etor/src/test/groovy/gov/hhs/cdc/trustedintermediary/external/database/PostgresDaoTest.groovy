@@ -67,4 +67,25 @@ class PostgresDaoTest extends Specification {
         then:
         1 * upsertMockStatement.executeUpdate()
     }
+
+    def "upsertMetadata unhappy path throws exception"() {
+        given:
+        def upsertMockDriver = Mock(SqlDriverManager)
+        Connection upsertMockConn = Mock(Connection)
+        PreparedStatement upsertMockStatement = Mock(PreparedStatement)
+
+
+        upsertMockDriver.getConnection(_ as String, _ as Properties) >>  upsertMockConn
+        upsertMockConn.prepareStatement(_ as String) >> upsertMockStatement
+        upsertMockStatement.executeUpdate() >> {throw new SQLException()}
+
+        TestApplicationContext.register(SqlDriverManager, upsertMockDriver)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        PostgresDao.getInstance().upsertMetadata("mock_id", "mock_sender", "mock_receiver", "mock_hash", Instant.now())
+
+        then:
+        thrown(SQLException)
+    }
 }
