@@ -34,7 +34,6 @@ public class SendOrderUseCase {
             throw new UnableToSendOrderException("Unable to save metadata for the order", e);
         }
 
-
         var omlOrder = converter.convertMetadataToOmlOrder(order);
         metadata.put(order.getFhirResourceId(), EtorMetadataStep.ORDER_CONVERTED_TO_OML);
         omlOrder = converter.addContactSectionToPatientResource(omlOrder);

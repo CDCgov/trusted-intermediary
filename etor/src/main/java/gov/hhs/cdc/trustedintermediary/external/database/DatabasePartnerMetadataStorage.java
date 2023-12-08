@@ -4,7 +4,6 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.wrappers.DbDao;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -28,22 +27,22 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
     @Override
     public PartnerMetadata readMetadata(final String uniqueId) {
 
-        try  {
+        try {
             ResultSet result = dao.fetchMetadata("receiverName");
-            while(result.next()) {
+            while (result.next()) {
                 logger.logInfo(result.getString(5));
-                return new PartnerMetadata(result.getString(1),
+                return new PartnerMetadata(
+                        result.getString(1),
                         result.getString(2),
                         result.getString(3),
                         Timestamp.valueOf(result.getString(4)).toInstant(),
                         result.getString(5));
             }
 
-        } catch(Exception e){
+        } catch (Exception e) {
             logger.logError("Error reading data: " + e.getMessage());
         }
-    return null;
-
+        return null;
     }
     // TODO: Should this be separate or should we have the DAO stuff happen in here
     @Override

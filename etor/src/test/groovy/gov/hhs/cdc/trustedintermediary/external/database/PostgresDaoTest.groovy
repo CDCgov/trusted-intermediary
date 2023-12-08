@@ -77,8 +77,8 @@ class PostgresDaoTest extends Specification {
 
 
         upsertMockDriver.getConnection(_ as String, _ as Properties) >> upsertMockConn
-        upsertMockConn.prepareStatement(_ as String) >> upsertMockStatement
-        upsertMockStatement.executeUpdate() >> { throw new SQLException() }
+        upsertMockConn.prepareStatement(_ as String) >> { throw new SQLException() }
+
 
         TestApplicationContext.register(SqlDriverManager, upsertMockDriver)
         TestApplicationContext.injectRegisteredImplementations()
@@ -88,7 +88,6 @@ class PostgresDaoTest extends Specification {
 
         then:
         thrown(SQLException)
-
     }
 
     def "select metadata retrieves data"(){
@@ -110,6 +109,5 @@ class PostgresDaoTest extends Specification {
 
         then:
         result != null
-
     }
 }
