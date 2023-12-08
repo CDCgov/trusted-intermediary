@@ -92,7 +92,7 @@ class AzureStorageAccountPartnerMetadataStorageTest extends Specification {
         AzureStorageAccountPartnerMetadataStorage.getInstance().saveMetadata(partnerMetadata)
 
         then:
-        1 * mockBlobClient.upload(_ as BinaryData)
+        1 * mockBlobClient.upload(_ as BinaryData, true)
     }
 
     def "failed to save metadata"() {
@@ -100,7 +100,7 @@ class AzureStorageAccountPartnerMetadataStorageTest extends Specification {
         PartnerMetadata partnerMetadata = new PartnerMetadata("uniqueId", "sender", "receiver", Instant.now(), "abcd")
 
         def mockBlobClient = Mock(BlobClient)
-        mockBlobClient.upload(_ as BinaryData) >> { throw new AzureException("upload failed") }
+        mockBlobClient.upload(_ as BinaryData, true) >> { throw new AzureException("upload failed") }
 
         def azureClient = Mock(AzureClient)
         azureClient.getBlobClient(_ as String) >> mockBlobClient
