@@ -73,8 +73,6 @@ class PostgresDaoTest extends Specification {
         given:
         def upsertMockDriver = Mock(SqlDriverManager)
         Connection upsertMockConn = Mock(Connection)
-        PreparedStatement upsertMockStatement = Mock(PreparedStatement)
-
 
         upsertMockDriver.getConnection(_ as String, _ as Properties) >> upsertMockConn
         upsertMockConn.prepareStatement(_ as String) >> { throw new SQLException() }
