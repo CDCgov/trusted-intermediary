@@ -19,6 +19,8 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
+import gov.hhs.cdc.trustedintermediary.external.azure.AzureClient;
+import gov.hhs.cdc.trustedintermediary.external.azure.AzureClientImpl;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureStorageAccountPartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.FilePartnerMetadataStorage;
@@ -75,6 +77,7 @@ public class EtorDomainRegistration implements DomainConnector {
             ApplicationContext.register(
                     PartnerMetadataStorage.class,
                     AzureStorageAccountPartnerMetadataStorage.getInstance());
+            ApplicationContext.register(AzureClient.class, AzureClientImpl.getInstance());
         }
 
         return endpoints;
