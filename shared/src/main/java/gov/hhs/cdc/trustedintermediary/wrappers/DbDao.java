@@ -8,6 +8,5 @@ public interface DbDao {
             String id, String sender, String receiver, String hash, Instant timeReceived)
             throws SQLException;
 
-
     Object fetchMetadata(String uniqueId) throws SQLException;
 }
