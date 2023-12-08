@@ -94,7 +94,8 @@ ext.jacoco_excludes = [
         '**/hapi/HapiFhirImplementation*',
         '**/jjwt/JjwtEngine*',
         '**/apache/ApacheClient*',
-        '**/azure/AzureSecrets*'
+        '**/azure/AzureSecrets*',
+        '**/azure/AzureClient*'
 ]
 
 tasks.register('allUnitTests') {
