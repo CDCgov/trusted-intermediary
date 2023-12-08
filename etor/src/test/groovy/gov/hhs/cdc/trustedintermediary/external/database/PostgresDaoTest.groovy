@@ -8,6 +8,7 @@ import java.time.Instant
 
 import java.sql.Connection
 import java.sql.PreparedStatement
+import java.sql.ResultSet
 import java.sql.SQLException
 
 class PostgresDaoTest extends Specification {
@@ -54,7 +55,6 @@ class PostgresDaoTest extends Specification {
         Connection upsertMockConn = Mock(Connection)
         PreparedStatement upsertMockStatement = Mock(PreparedStatement)
 
-
         upsertMockDriver.getConnection(_ as String, _ as Properties) >>  upsertMockConn
         upsertMockConn.prepareStatement(_ as String) >> upsertMockStatement
 
@@ -68,6 +68,7 @@ class PostgresDaoTest extends Specification {
         1 * upsertMockStatement.executeUpdate()
     }
 
+
     def "upsertMetadata unhappy path throws exception"() {
         given:
         def upsertMockDriver = Mock(SqlDriverManager)
@@ -75,9 +76,9 @@ class PostgresDaoTest extends Specification {
         PreparedStatement upsertMockStatement = Mock(PreparedStatement)
 
 
-        upsertMockDriver.getConnection(_ as String, _ as Properties) >>  upsertMockConn
+        upsertMockDriver.getConnection(_ as String, _ as Properties) >> upsertMockConn
         upsertMockConn.prepareStatement(_ as String) >> upsertMockStatement
-        upsertMockStatement.executeUpdate() >> {throw new SQLException()}
+        upsertMockStatement.executeUpdate() >> { throw new SQLException() }
 
         TestApplicationContext.register(SqlDriverManager, upsertMockDriver)
         TestApplicationContext.injectRegisteredImplementations()
@@ -87,5 +88,28 @@ class PostgresDaoTest extends Specification {
 
         then:
         thrown(SQLException)
+
+    }
+
+    def "select metadata retrieves data"(){
+        given:
+        def selectMockDriver = Mock(SqlDriverManager)
+        Connection selectMockConn = Mock(Connection)
+        PreparedStatement selectPreparedStatement = Mock(PreparedStatement)
+        ResultSet selectResultSet = Mock(ResultSet)
+
+        selectMockDriver.getConnection(_ as String, _ as Properties) >> selectMockConn
+        selectMockConn.prepareStatement(_ as String) >> selectPreparedStatement
+        selectPreparedStatement.executeQuery() >> selectResultSet
+
+        TestApplicationContext.register(SqlDriverManager, selectMockDriver)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def result = PostgresDao.getInstance().fetchMetadata("mock_sender")
+
+        then:
+        result != null
+
     }
 }

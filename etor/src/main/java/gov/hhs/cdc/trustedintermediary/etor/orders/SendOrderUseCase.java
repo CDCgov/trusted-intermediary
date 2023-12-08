@@ -29,9 +29,11 @@ public class SendOrderUseCase {
                         "uniqueId", "senderName", "receiverName", Instant.now(), "abcd");
         try {
             partnerMetadataStorage.saveMetadata(partnerMetadata);
+            partnerMetadataStorage.readMetadata("BLEGH");
         } catch (PartnerMetadataException e) {
             throw new UnableToSendOrderException("Unable to save metadata for the order", e);
         }
+
 
         var omlOrder = converter.convertMetadataToOmlOrder(order);
         metadata.put(order.getFhirResourceId(), EtorMetadataStep.ORDER_CONVERTED_TO_OML);

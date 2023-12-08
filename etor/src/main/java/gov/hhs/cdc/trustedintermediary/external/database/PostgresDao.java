@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -69,5 +70,20 @@ public class PostgresDao implements DbDao {
             logger.logError("Error updating data: " + e.getMessage());
             throw new SQLException();
         }
+    }
+
+    public synchronized ResultSet fetchMetadata(String lookupValue) {
+        try (Connection conn = connect();
+                PreparedStatement statement =
+                        conn.prepareStatement("SELECT * FROM metadata where receiver = ?")) {
+
+            statement.setString(1, lookupValue);
+
+            return statement.executeQuery();
+        } catch (Exception e) {
+            logger.logError("Error fetching data: " + e.getMessage());
+        }
+
+        return null;
     }
 }
