@@ -31,12 +31,27 @@ public class PostgresDao implements DbDao {
                         + "/"
                         + ApplicationContext.getProperty("DB_NAME");
 
+        // Ternaries prevent NullPointerException during testing since we decided not to mock env
+        // vars.
+        var user =
+                ApplicationContext.getProperty("DB_USER") == null
+                        ? ""
+                        : ApplicationContext.getProperty("DB_USER");
+        var pass =
+                ApplicationContext.getProperty("DB_PASS") == null
+                        ? ""
+                        : ApplicationContext.getProperty("DB_PASS");
+        var ssl =
+                ApplicationContext.getProperty("DB_SSL") == null
+                        ? ""
+                        : ApplicationContext.getProperty("DB_SSL");
+
         Properties props = new Properties();
-        props.setProperty("user", ApplicationContext.getProperty("DB_USER"));
-        props.setProperty("password", ApplicationContext.getProperty("DB_PASS"));
+        props.setProperty("user", user);
+        props.setProperty("password", pass);
 
         // TODO: Change this based on env
-        props.setProperty("ssl", ApplicationContext.getProperty("DB_SSL"));
+        props.setProperty("ssl", ssl);
         conn = driverManager.getConnection(url, props);
         logger.logInfo("DB Connected Successfully");
         return conn;
