@@ -20,7 +20,7 @@ class AzureStorageAccountPartnerMetadataStorageTest extends Specification {
     }
 
     def "successfully read metadata"() {
-        given: "A mock BlobClient and a successful download"
+        given:
         def expectedUniqueId = "uniqueId"
         def expectedSender = "sender"
         def expectedReceiver = "receiver"
@@ -68,6 +68,52 @@ class AzureStorageAccountPartnerMetadataStorageTest extends Specification {
 
         when:
         AzureStorageAccountPartnerMetadataStorage.getInstance().readMetadata(expectedUniqueId)
+
+        then:
+        thrown(PartnerMetadataException)
+    }
+
+    def "successfully save metadata"() {
+        given:
+        PartnerMetadata partnerMetadata = new PartnerMetadata("uniqueId", "sender", "receiver", Instant.now(), "abcd")
+
+        def mockBlobClient = Mock(BlobClient)
+        def azureClient = Mock(AzureClient)
+        azureClient.getBlobClient(_ as String) >> mockBlobClient
+
+        def mockFormatter = Mock(Formatter)
+        mockFormatter.convertToJsonString(partnerMetadata) >> "DogCow"
+
+        TestApplicationContext.register(AzureClient, azureClient)
+        TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        AzureStorageAccountPartnerMetadataStorage.getInstance().saveMetadata(partnerMetadata)
+
+        then:
+        1 * mockBlobClient.upload(_ as BinaryData)
+    }
+
+    def "failed to save metadata"() {
+        given:
+        PartnerMetadata partnerMetadata = new PartnerMetadata("uniqueId", "sender", "receiver", Instant.now(), "abcd")
+
+        def mockBlobClient = Mock(BlobClient)
+        mockBlobClient.upload(_ as BinaryData) >> { throw new AzureException("upload failed") }
+
+        def azureClient = Mock(AzureClient)
+        azureClient.getBlobClient(_ as String) >> mockBlobClient
+
+        def mockFormatter = Mock(Formatter)
+        mockFormatter.convertToJsonString(partnerMetadata) >> "DogCow"
+
+        TestApplicationContext.register(AzureClient, azureClient)
+        TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        AzureStorageAccountPartnerMetadataStorage.getInstance().saveMetadata(partnerMetadata)
 
         then:
         thrown(PartnerMetadataException)
