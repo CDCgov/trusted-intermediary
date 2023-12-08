@@ -9,5 +9,5 @@ public interface DbDao {
             throws SQLException;
 
 
-    Object fetchMetadata(String lookupValue);
+    Object fetchMetadata(String uniqueId) throws SQLException;
 }

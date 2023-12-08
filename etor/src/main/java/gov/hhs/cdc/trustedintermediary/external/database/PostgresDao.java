@@ -89,29 +89,26 @@ public class PostgresDao implements DbDao {
     }
 
     @Override
-    public synchronized PartnerMetadata fetchMetadata(String lookupValue) {
+    public synchronized PartnerMetadata fetchMetadata(String uniqueId) throws SQLException {
         try (Connection conn = connect();
                 PreparedStatement statement =
-                        conn.prepareStatement("SELECT * FROM metadata where receiver = ?")) {
+                        conn.prepareStatement("SELECT * FROM metadata where message_id = ?")) {
 
-            statement.setString(1, lookupValue);
+            statement.setString(1, uniqueId);
 
             ResultSet result = statement.executeQuery();
 
-            while (result.next()) {
-                logger.logInfo(result.getString(5));
-                return new PartnerMetadata(
-                        result.getString("message_id"),
-                        result.getString("sender"),
-                        result.getString("receiver"),
-                        result.getTimestamp("time_received").toInstant(),
-                        result.getString("hash_of_order"));
-            }
+            result.next();
+            return new PartnerMetadata(
+                    result.getString("message_id"),
+                    result.getString("sender"),
+                    result.getString("receiver"),
+                    result.getTimestamp("time_received").toInstant(),
+                    result.getString("hash_of_order"));
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             logger.logError("Error fetching data: " + e.getMessage());
+            throw new SQLException();
         }
-
-        return null;
     }
 }

@@ -112,4 +112,23 @@ class PostgresDaoTest extends Specification {
         then:
         result != null
     }
+
+    def "fetchMetadata unhappy path throws exception"() {
+        given:
+        def selectMockDriver = Mock(SqlDriverManager)
+        Connection selectMockConn = Mock(Connection)
+
+        selectMockDriver.getConnection(_ as String, _ as Properties) >> selectMockConn
+        selectMockConn.prepareStatement(_ as String) >> { throw new SQLException() }
+
+
+        TestApplicationContext.register(SqlDriverManager, selectMockDriver)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        PostgresDao.getInstance().fetchMetadata("mock_lookup")
+
+        then:
+        thrown(SQLException)
+    }
 }

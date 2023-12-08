@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.database;
 
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.wrappers.DbDao;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -23,11 +24,14 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
     }
 
     @Override
-    public PartnerMetadata readMetadata(final String uniqueId) {
-        PartnerMetadata data = (PartnerMetadata) dao.fetchMetadata("receiverName");
-        logger.logInfo(data.uniqueId());
-
-        return data;
+    public PartnerMetadata readMetadata(final String uniqueId) throws PartnerMetadataException {
+        try {
+            PartnerMetadata data = (PartnerMetadata) dao.fetchMetadata(uniqueId);
+            logger.logInfo(data.uniqueId());
+            return data;
+        } catch (SQLException e) {
+            throw new PartnerMetadataException("Error retrieving metadata", e);
+        }
     }
     // TODO: Should this be separate or should we have the DAO stuff happen in here
     @Override
