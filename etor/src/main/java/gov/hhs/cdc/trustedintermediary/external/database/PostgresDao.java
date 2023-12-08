@@ -87,6 +87,7 @@ public class PostgresDao implements DbDao {
         }
     }
 
+    @Override
     public synchronized ResultSet fetchMetadata(String lookupValue) {
         try (Connection conn = connect();
                 PreparedStatement statement =
