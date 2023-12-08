@@ -26,7 +26,7 @@ public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadat
 
     @Inject Formatter formatter;
     @Inject Logger logger;
-    @Inject AzureClientImpl client;
+    @Inject AzureClient client;
 
     private AzureStorageAccountPartnerMetadataStorage() {}
 

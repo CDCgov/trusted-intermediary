@@ -35,7 +35,6 @@ class AzureStorageAccountPartnerMetadataStorageTest extends Specification {
             "hash": "${expectedHash}"
         }"""
 
-
         def mockBlobClient = Mock(BlobClient)
         mockBlobClient.downloadContent() >> BinaryData.fromString(simulatedMetadataJson)
 
