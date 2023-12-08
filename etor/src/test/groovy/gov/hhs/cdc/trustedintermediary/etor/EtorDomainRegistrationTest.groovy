@@ -31,6 +31,7 @@ class EtorDomainRegistrationTest extends Specification {
         def domainRegistration = new EtorDomainRegistration()
         def demographicsEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.DEMOGRAPHICS_API_ENDPOINT, true)
         def ordersEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.ORDERS_API_ENDPOINT, true)
+        def metadataEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.METADATA_API_ENDPOINT, true)
 
         when:
         def endpoints = domainRegistration.domainRegistration()
