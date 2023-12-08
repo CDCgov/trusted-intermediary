@@ -1,9 +1,11 @@
 package gov.hhs.cdc.trustedintermediary.external.database
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager
 import spock.lang.Specification
 
+import java.sql.Timestamp
 import java.time.Instant
 
 import java.sql.Connection
@@ -98,12 +100,14 @@ class PostgresDaoTest extends Specification {
         selectMockDriver.getConnection(_ as String, _ as Properties) >> selectMockConn
         selectMockConn.prepareStatement(_ as String) >> selectPreparedStatement
         selectPreparedStatement.executeQuery() >> selectResultSet
+        selectResultSet.next() >> true
+        selectResultSet.getTimestamp(_ as String) >> Timestamp.from(Instant.now())
 
         TestApplicationContext.register(SqlDriverManager, selectMockDriver)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def result = PostgresDao.getInstance().fetchMetadata("mock_sender")
+        PartnerMetadata result = (PartnerMetadata) PostgresDao.getInstance().fetchMetadata("mock_sender")
 
         then:
         result != null

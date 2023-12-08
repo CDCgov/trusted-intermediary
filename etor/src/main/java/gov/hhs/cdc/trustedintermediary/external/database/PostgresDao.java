@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.database;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.wrappers.DbDao;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager;
@@ -88,14 +89,25 @@ public class PostgresDao implements DbDao {
     }
 
     @Override
-    public synchronized ResultSet fetchMetadata(String lookupValue) {
+    public synchronized PartnerMetadata fetchMetadata(String lookupValue) {
         try (Connection conn = connect();
                 PreparedStatement statement =
                         conn.prepareStatement("SELECT * FROM metadata where receiver = ?")) {
 
             statement.setString(1, lookupValue);
 
-            return statement.executeQuery();
+            ResultSet result = statement.executeQuery();
+
+            while (result.next()) {
+                logger.logInfo(result.getString(5));
+                return new PartnerMetadata(
+                        result.getString("message_id"),
+                        result.getString("sender"),
+                        result.getString("receiver"),
+                        result.getTimestamp("time_received").toInstant(),
+                        result.getString("hash_of_order"));
+            }
+
         } catch (Exception e) {
             logger.logError("Error fetching data: " + e.getMessage());
         }
