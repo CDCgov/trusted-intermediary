@@ -74,6 +74,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedRequestError'
+  /v1/etor/metadata:
+    get:
+      summary: Returns metadata about a specific submission
+      responses:
+        '200':
+          description: The metadata was returned successfully
+          content:
+            string
+        '400':
+          description: Unable to parse metadata request
+          content:
+            application/json:
+            schema:
+              $ref: '#/components/schemas/BadRequestError'
+        '404':
+          description: Unable to find and read requested metadata
+          content:
+            application/json:
+            schema:
+              $ref: '#/components/schemas/NotFoundError'
+        '401':
+          description: Authentication failed due to invalid token or unknown organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedRequestError'
 
 components:
   schemas:
@@ -109,6 +135,13 @@ components:
         error:
           type: string
           example: Authentication failed
+    NotFoundError:
+      description: Not Found
+      type: object
+      properties:
+        error:
+          type: string
+          example: Unable to find requested data
   securitySchemes:
     bearerAuthorization:
       type: http
