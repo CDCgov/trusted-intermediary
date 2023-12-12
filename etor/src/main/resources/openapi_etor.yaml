@@ -81,25 +81,27 @@ paths:
         '200':
           description: The metadata was returned successfully
           content:
-            string
+            application/json:
+            schema:
+              $ref: '#/components/schemas/MetadataResponse'
         '400':
           description: Unable to parse metadata request
           content:
             application/json:
             schema:
               $ref: '#/components/schemas/BadRequestError'
-        '404':
-          description: Unable to find and read requested metadata
-          content:
-            application/json:
-            schema:
-              $ref: '#/components/schemas/NotFoundError'
         '401':
           description: Authentication failed due to invalid token or unknown organization
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedRequestError'
+        '404':
+          description: Unable to find and read requested metadata
+          content:
+            application/json:
+            schema:
+              $ref: '#/components/schemas/NotFoundError'
 
 components:
   schemas:
@@ -121,6 +123,24 @@ components:
         patientId:
           type: string
           example: MRN7465737865
+    MetadataResponse:
+      type: object
+      properties:
+        uniqueId:
+          type: string
+          example: abc123
+        sender:
+          type: string
+          example: simulated-hospital
+        receiver:
+          type: string
+          example: simulated-lab
+        timeReceived:
+          type: string
+          example: 2023-12-01T12:00:00.000000Z
+        hash:
+          type: string
+          example: abc123
     BadRequestError:
       description: Bad Request
       type: object
