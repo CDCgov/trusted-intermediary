@@ -154,8 +154,8 @@ public class EtorDomainRegistration implements DomainConnector {
             return domainResponseHelper.constructOkResponse(
                     formatter.convertToJsonString(metadata.get()));
         } catch (PartnerMetadataException | FormatterProcessingException e) {
-            logger.logError("Unable to read metadata", e);
-            return domainResponseHelper.constructErrorResponse(400, e);
+            logger.logError("Unable to retrieve requested metadata", e);
+            return domainResponseHelper.constructErrorResponse(500, e);
         }
     }
 }

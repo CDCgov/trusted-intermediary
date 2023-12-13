@@ -84,12 +84,6 @@ paths:
             application/json:
             schema:
               $ref: '#/components/schemas/MetadataResponse'
-        '400':
-          description: Unable to parse metadata request
-          content:
-            application/json:
-            schema:
-              $ref: '#/components/schemas/BadRequestError'
         '401':
           description: Authentication failed due to invalid token or unknown organization
           content:
@@ -102,6 +96,12 @@ paths:
             application/json:
             schema:
               $ref: '#/components/schemas/NotFoundError'
+        '500':
+          description: Unable to retrieve requested metadata
+          content:
+            application/json:
+            schema:
+              $ref: '#/components/schemas/InternalServerError'
 
 components:
   schemas:
@@ -162,6 +162,13 @@ components:
         error:
           type: string
           example: Unable to find requested data
+    InternalServerError:
+        description: Internal Server Error
+        type: object
+        properties:
+          error:
+            type: string
+            example: Unable to retrieve requested data
   securitySchemes:
     bearerAuthorization:
       type: http

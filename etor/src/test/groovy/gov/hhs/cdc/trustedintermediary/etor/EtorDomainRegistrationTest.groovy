@@ -265,9 +265,9 @@ class EtorDomainRegistrationTest extends Specification {
         actualStatusCode == expectedStatusCode
     }
 
-    def "metadata endpoint returns a 400 response when there is an exception reading the metadata"() {
+    def "metadata endpoint returns a 500 response when there is an exception reading the metadata"() {
         given:
-        def expectedStatusCode = 400
+        def expectedStatusCode = 500
 
         def connector = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, connector)
@@ -290,9 +290,9 @@ class EtorDomainRegistrationTest extends Specification {
         actualStatusCode == expectedStatusCode
     }
 
-    def "metadata endpoint returns a 400 response when there is an exception formatting the metadata"() {
+    def "metadata endpoint returns a 500 response when there is an exception formatting the metadata"() {
         given:
-        def expectedStatusCode = 400
+        def expectedStatusCode = 500
 
         def connector = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, connector)
