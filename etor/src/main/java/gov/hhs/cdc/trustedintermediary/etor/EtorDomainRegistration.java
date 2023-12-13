@@ -24,6 +24,7 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureClient;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureStorageAccountPartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
+import gov.hhs.cdc.trustedintermediary.external.localfile.FilePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
@@ -34,6 +35,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import javax.inject.Inject;
 
@@ -142,9 +144,15 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleMetadata(DomainRequest request) {
         try {
             String uniqueId = request.getBody();
-            PartnerMetadata metadata = partnerMetadataStorage.readMetadata(uniqueId);
+            Optional<PartnerMetadata> metadata = partnerMetadataStorage.readMetadata(uniqueId);
+
+            if (metadata.isEmpty()) {
+                return domainResponseHelper.constructErrorResponse(
+                        404, "Metadata not found for ID: " + uniqueId);
+            }
+
             return domainResponseHelper.constructOkResponse(
-                    formatter.convertToJsonString(metadata));
+                    formatter.convertToJsonString(metadata.get()));
         } catch (PartnerMetadataException | FormatterProcessingException e) {
             logger.logError("Unable to read metadata", e);
             return domainResponseHelper.constructErrorResponse(400, e);

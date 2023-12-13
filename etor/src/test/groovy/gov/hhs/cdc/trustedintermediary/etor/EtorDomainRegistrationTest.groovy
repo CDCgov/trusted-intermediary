@@ -242,13 +242,12 @@ class EtorDomainRegistrationTest extends Specification {
     def "metadata endpoint happy path"() {
         given:
         def expectedStatusCode = 200
-        def metadataUniqueId = "metadataUniqueId"
 
         def connector = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, connector)
 
         def mockPartnerMetadataStorage = Mock(PartnerMetadataStorage)
-        mockPartnerMetadataStorage.readMetadata(metadataUniqueId) >> new PartnerMetadata(metadataUniqueId, "sender", "receiver", Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd")
+        mockPartnerMetadataStorage.readMetadata(_ as String) >> Optional.ofNullable(new PartnerMetadata("uniqueId", "sender", "receiver", Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd"))
         TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
 
         def mockResponseHelper = Mock(DomainResponseHelper)
@@ -299,7 +298,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.register(EtorDomainRegistration, connector)
 
         def mockPartnerMetadataStorage = Mock(PartnerMetadataStorage)
-        mockPartnerMetadataStorage.readMetadata(_ as String) >> new PartnerMetadata("metadataUniqueId", "sender", "receiver", Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd")
+        mockPartnerMetadataStorage.readMetadata(_ as String) >> Optional.ofNullable(new PartnerMetadata("metadataUniqueId", "sender", "receiver", Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd"))
         TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
 
         def mockFormatter = Mock(Formatter)
