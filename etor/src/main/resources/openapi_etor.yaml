@@ -100,7 +100,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnauthorizedRequestError'
         '404':
-          description: Unable to find and read requested metadata
+          description: Unable to find requested metadata
           content:
             application/json:
             schema:
