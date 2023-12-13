@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Optional;
 import javax.inject.Inject;
 
 /** Implements the {@link PartnerMetadataStorage} using local files. */
@@ -42,9 +43,13 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
     }
 
     @Override
-    public PartnerMetadata readMetadata(final String uniqueId) throws PartnerMetadataException {
+    public Optional<PartnerMetadata> readMetadata(final String uniqueId)
+            throws PartnerMetadataException {
         Path filePath = getFilePath(uniqueId);
         try {
+            if (!Files.exists(filePath)) {
+                return Optional.empty();
+            }
             String content = Files.readString(filePath);
             return formatter.convertJsonToObject(content, new TypeReference<>() {});
         } catch (IOException | FormatterProcessingException e) {
