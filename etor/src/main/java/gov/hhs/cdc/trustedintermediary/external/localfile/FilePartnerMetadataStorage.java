@@ -48,6 +48,7 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
         Path filePath = getFilePath(uniqueId);
         try {
             if (!Files.exists(filePath)) {
+                logger.logInfo("Metadata file not found: " + filePath);
                 return Optional.empty();
             }
             String content = Files.readString(filePath);
