@@ -38,6 +38,7 @@ class AzureStorageAccountPartnerMetadataStorageTest extends Specification {
         }"""
 
         def mockBlobClient = Mock(BlobClient)
+        mockBlobClient.exists() >> true
         mockBlobClient.downloadContent() >> BinaryData.fromString(simulatedMetadataJson)
 
         def azureClient = Mock(AzureClient)
@@ -48,16 +49,17 @@ class AzureStorageAccountPartnerMetadataStorageTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PartnerMetadata actualMetadata = AzureStorageAccountPartnerMetadataStorage.getInstance().readMetadata(expectedUniqueId)
+        def actualMetadata = AzureStorageAccountPartnerMetadataStorage.getInstance().readMetadata(expectedUniqueId)
 
         then:
-        actualMetadata == expectedMetadata
+        actualMetadata.get() == expectedMetadata
     }
 
     def "exception path while reading metadata"() {
         given:
         String expectedUniqueId = "uniqueId"
         def mockBlobClient = Mock(BlobClient)
+        mockBlobClient.exists() >> true
         mockBlobClient.downloadContent() >> { throw new AzureException("Download error") }
 
         def azureClient = Mock(AzureClient)
