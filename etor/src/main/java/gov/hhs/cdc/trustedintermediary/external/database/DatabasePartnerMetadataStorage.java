@@ -18,7 +18,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
 
     @Override
     public Optional<PartnerMetadata> readMetadata(final String uniqueId) {
-        return null;
+        return Optional.empty();
     }
 
     @Override
