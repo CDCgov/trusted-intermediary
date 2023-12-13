@@ -55,6 +55,24 @@ class AzureStorageAccountPartnerMetadataStorageTest extends Specification {
         actualMetadata.get() == expectedMetadata
     }
 
+    def "readMetadata returns empty when blob does not exist"() {
+        given:
+        def mockBlobClient = Mock(BlobClient)
+        mockBlobClient.exists() >> false
+
+        def azureClient = Mock(AzureClient)
+        azureClient.getBlobClient(_ as String) >> mockBlobClient
+
+        TestApplicationContext.register(AzureClient, azureClient)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def actualMetadata = AzureStorageAccountPartnerMetadataStorage.getInstance().readMetadata("nonexistentId")
+
+        then:
+        actualMetadata.isEmpty()
+    }
+
     def "exception path while reading metadata"() {
         given:
         String expectedUniqueId = "uniqueId"

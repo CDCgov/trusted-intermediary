@@ -70,6 +70,6 @@ class FilePartnerMetadataStorageTest extends Specification {
         def actualMetadata = FilePartnerMetadataStorage.getInstance().readMetadata("nonexistentId")
 
         then:
-        !actualMetadata.isPresent()
+        actualMetadata.isEmpty()
     }
 }
