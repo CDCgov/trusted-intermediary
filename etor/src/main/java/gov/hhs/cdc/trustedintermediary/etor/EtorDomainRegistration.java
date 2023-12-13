@@ -47,7 +47,7 @@ public class EtorDomainRegistration implements DomainConnector {
 
     static final String DEMOGRAPHICS_API_ENDPOINT = "/v1/etor/demographics";
     static final String ORDERS_API_ENDPOINT = "/v1/etor/orders";
-    static final String METADATA_API_ENDPOINT = "/v1/etor/metadata";
+    static final String METADATA_API_ENDPOINT = "/v1/etor/metadata/{id}";
 
     @Inject PatientDemographicsController patientDemographicsController;
     @Inject OrderController orderController;
@@ -143,12 +143,12 @@ public class EtorDomainRegistration implements DomainConnector {
 
     DomainResponse handleMetadata(DomainRequest request) {
         try {
-            String uniqueId = request.getBody();
-            Optional<PartnerMetadata> metadata = partnerMetadataStorage.readMetadata(uniqueId);
+            String metadataId = request.getPathParams().get("id");
+            Optional<PartnerMetadata> metadata = partnerMetadataStorage.readMetadata(metadataId);
 
             if (metadata.isEmpty()) {
                 return domainResponseHelper.constructErrorResponse(
-                        404, "Metadata not found for ID: " + uniqueId);
+                        404, "Metadata not found for ID: " + metadataId);
             }
 
             return domainResponseHelper.constructOkResponse(

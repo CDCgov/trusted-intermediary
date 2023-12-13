@@ -8,6 +8,7 @@ public class DomainRequest {
     private String body = "";
     private String url = "";
     private Map<String, String> headers = new HashMap<>();
+    private Map<String, String> pathParams = new HashMap<>();
 
     public String getBody() {
         return body;
@@ -31,5 +32,13 @@ public class DomainRequest {
 
     public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
+    }
+
+    public Map<String, String> getPathParams() {
+        return pathParams;
+    }
+
+    public void setPathParams(Map<String, String> headers) {
+        this.pathParams = headers;
     }
 }

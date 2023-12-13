@@ -74,9 +74,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedRequestError'
-  /v1/etor/metadata:
+  /v1/etor/metadata/{id}:
     get:
       summary: Returns metadata about a specific submission
+      parameters:
+        - name: id
+          in: path
+          description: A valid id for the submission metadata
+          required: true
+          schema:
+            type: string
+      security:
+        - bearerAuthorization: [ ]
       responses:
         '200':
           description: The metadata was returned successfully
