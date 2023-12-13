@@ -11,6 +11,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import javax.inject.Inject;
+import java.util.Optional;
 
 /** Implements the {@link PartnerMetadataStorage} using files stored in an Azure Storage Account. */
 public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadataStorage {
