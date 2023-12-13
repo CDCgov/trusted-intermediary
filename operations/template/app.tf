@@ -34,7 +34,8 @@ resource "azurerm_linux_web_app" "api" {
     ENV                             = var.environment
     REPORT_STREAM_URL_PREFIX        = "https://${local.rs_domain_prefix}prime.cdc.gov"
     KEY_VAULT_NAME                  = azurerm_key_vault.key_storage.name
-
+    STORAGE_ACCOUNT_BLOB_ENDPOINT   = azurerm_storage_account.storage.primary_blob_endpoint
+    METADATA_CONTAINER_NAME         = azurerm_storage_container.metadata.name
   }
 
   identity {
