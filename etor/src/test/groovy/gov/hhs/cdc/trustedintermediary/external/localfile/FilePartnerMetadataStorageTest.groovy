@@ -32,7 +32,7 @@ class FilePartnerMetadataStorageTest extends Specification {
         def actualMetadata = FilePartnerMetadataStorage.getInstance().readMetadata(expectedUniqueId)
 
         then:
-        actualMetadata == metadata
+        actualMetadata.get() == metadata
     }
 
     def "saveMetadata throws PartnerMetadataException when unable to save file"() {
@@ -63,5 +63,13 @@ class FilePartnerMetadataStorageTest extends Specification {
 
         then:
         thrown(PartnerMetadataException)
+    }
+
+    def "readMetadata returns empty when file does not exist"() {
+        when:
+        def actualMetadata = FilePartnerMetadataStorage.getInstance().readMetadata("nonexistentId")
+
+        then:
+        !actualMetadata.isPresent()
     }
 }
