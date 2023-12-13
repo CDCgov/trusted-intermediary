@@ -246,8 +246,11 @@ class EtorDomainRegistrationTest extends Specification {
         def connector = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, connector)
 
+        def request = new DomainRequest()
+        request.setPathParams(["id": "metadataId"])
+
         def mockPartnerMetadataStorage = Mock(PartnerMetadataStorage)
-        mockPartnerMetadataStorage.readMetadata(_ as String) >> Optional.ofNullable(new PartnerMetadata("uniqueId", "sender", "receiver", Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd"))
+        mockPartnerMetadataStorage.readMetadata(_ as String) >> Optional.ofNullable(new PartnerMetadata("metadataId", "sender", "receiver", Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd"))
         TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
 
         def mockResponseHelper = Mock(DomainResponseHelper)
@@ -258,7 +261,35 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def res = connector.handleMetadata(new DomainRequest())
+        def res = connector.handleMetadata(request)
+        def actualStatusCode = res.statusCode
+
+        then:
+        actualStatusCode == expectedStatusCode
+    }
+
+    def "metadata endpoint returns a 404 response when metadata id is not found"() {
+        given:
+        def expectedStatusCode = 404
+
+        def connector = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, connector)
+
+        def request = new DomainRequest()
+        request.setPathParams(["id": "metadataId"])
+
+        def mockPartnerMetadataStorage = Mock(PartnerMetadataStorage)
+        mockPartnerMetadataStorage.readMetadata(_ as String) >> Optional.empty()
+        TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
+
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as String) >> new DomainResponse(expectedStatusCode)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def res = connector.handleMetadata(request)
         def actualStatusCode = res.statusCode
 
         then:
@@ -272,6 +303,9 @@ class EtorDomainRegistrationTest extends Specification {
         def connector = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, connector)
 
+        def request = new DomainRequest()
+        request.setPathParams(["id": "metadataId"])
+
         def mockPartnerMetadataStorage = Mock(PartnerMetadataStorage)
         mockPartnerMetadataStorage.readMetadata(_ as String) >> { throw new PartnerMetadataException("DogCow", new Exception()) }
         TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
@@ -283,7 +317,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def res = connector.handleMetadata(new DomainRequest())
+        def res = connector.handleMetadata(request)
         def actualStatusCode = res.statusCode
 
         then:
@@ -296,6 +330,9 @@ class EtorDomainRegistrationTest extends Specification {
 
         def connector = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, connector)
+
+        def request = new DomainRequest()
+        request.setPathParams(["id": "metadataId"])
 
         def mockPartnerMetadataStorage = Mock(PartnerMetadataStorage)
         mockPartnerMetadataStorage.readMetadata(_ as String) >> Optional.ofNullable(new PartnerMetadata("metadataUniqueId", "sender", "receiver", Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd"))
@@ -312,7 +349,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def res = connector.handleMetadata(new DomainRequest())
+        def res = connector.handleMetadata(request)
         def actualStatusCode = res.statusCode
 
         then:
