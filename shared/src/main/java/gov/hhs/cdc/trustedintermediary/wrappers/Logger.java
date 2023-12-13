@@ -11,7 +11,7 @@ public interface Logger {
 
     void logMap(String key, Map<String, Object> map);
 
-    void logWarning(String warningMessage);
+    void logWarning(String warningMessage, Object... parameters);
 
     void logError(String errorMessage);
 

@@ -77,13 +77,17 @@ public class LocalLogger implements Logger {
     }
 
     @Override
-    public void logWarning(String warningMessage) {
+    public void logWarning(String warningMessage, Object... parameters) {
         Level level = Level.WARN;
-        LoggerHelper.logMessageAtLevel(
+        var logBuilder =
+                LoggerHelper.logMessageAtLevel(
                         LOGGER,
                         level,
-                        wrapMessageInColor(LEVEL_COLOR_MAPPING.get(level), warningMessage))
-                .log();
+                        wrapMessageInColor(LEVEL_COLOR_MAPPING.get(level), warningMessage));
+
+        Arrays.stream(parameters).forEachOrdered(logBuilder::addArgument);
+
+        logBuilder.log();
     }
 
     @Override

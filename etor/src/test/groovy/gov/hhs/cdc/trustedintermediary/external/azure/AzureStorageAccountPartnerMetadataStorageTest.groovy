@@ -1,121 +1,71 @@
-package gov.hhs.cdc.trustedintermediary.external.azure
+package gov.hhs.cdc.trustedintermediary.external.azure;
 
-import com.azure.core.exception.AzureException
-import com.azure.core.util.BinaryData
-import com.azure.storage.blob.BlobClient
-import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata
-import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException
-import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
-import java.time.Instant
-import spock.lang.Specification
+import com.azure.core.exception.AzureException;
+import com.azure.core.util.BinaryData;
+import com.azure.storage.blob.BlobClient;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
+import java.util.Optional;
+import javax.inject.Inject;
 
-class AzureStorageAccountPartnerMetadataStorageTest extends Specification {
+/** Implements the {@link PartnerMetadataStorage} using files stored in an Azure Storage Account. */
+public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadataStorage {
 
-    def setup() {
-        TestApplicationContext.reset()
-        TestApplicationContext.init()
-        TestApplicationContext.register(AzureStorageAccountPartnerMetadataStorage, AzureStorageAccountPartnerMetadataStorage.getInstance())
+    private static final AzureStorageAccountPartnerMetadataStorage INSTANCE =
+            new AzureStorageAccountPartnerMetadataStorage();
+
+    @Inject Formatter formatter;
+    @Inject Logger logger;
+    @Inject AzureClient client;
+
+    private AzureStorageAccountPartnerMetadataStorage() {}
+
+    public static AzureStorageAccountPartnerMetadataStorage getInstance() {
+        return INSTANCE;
     }
 
-    def "successfully read metadata"() {
-        given:
-        def expectedUniqueId = "uniqueId"
-        def expectedSender = "sender"
-        def expectedReceiver = "receiver"
-        def expectedTimestamp = Instant.parse("2023-12-04T18:51:48.941875Z")
-        def expectedHash = "abcd"
-
-        PartnerMetadata expectedMetadata = new PartnerMetadata(expectedUniqueId, expectedSender, expectedReceiver, expectedTimestamp, expectedHash)
-
-        String simulatedMetadataJson = """{
-            "uniqueId": "${expectedUniqueId}",
-            "sender": "${expectedSender}",
-            "receiver": "${expectedReceiver}",
-            "timeReceived": "${expectedTimestamp}",
-            "hash": "${expectedHash}"
-        }"""
-
-        def mockBlobClient = Mock(BlobClient)
-        mockBlobClient.downloadContent() >> BinaryData.fromString(simulatedMetadataJson)
-
-        def azureClient = Mock(AzureClient)
-        azureClient.getBlobClient(_ as String) >> mockBlobClient
-
-        TestApplicationContext.register(AzureClient, azureClient)
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        PartnerMetadata actualMetadata = AzureStorageAccountPartnerMetadataStorage.getInstance().readMetadata(expectedUniqueId)
-
-        then:
-        actualMetadata == expectedMetadata
+    @Override
+    public Optional<PartnerMetadata> readMetadata(final String uniqueId)
+            throws PartnerMetadataException {
+        String metadataFileName = getMetadataFileName(uniqueId);
+        try {
+            BlobClient blobClient = client.getBlobClient(metadataFileName);
+            String blobUrl = blobClient.getBlobUrl();
+            logger.logInfo("Reading metadata from " + blobUrl);
+            if (!blobClient.exists()) {
+                logger.logWarning("Metadata blob not found: {}", blobUrl);
+                return Optional.empty();
+            }
+            String content = blobClient.downloadContent().toString();
+            PartnerMetadata metadata =
+                    formatter.convertJsonToObject(content, new TypeReference<>() {});
+            return Optional.ofNullable(metadata);
+        } catch (AzureException | FormatterProcessingException e) {
+            throw new PartnerMetadataException(
+                    "Failed to download metadata file " + metadataFileName, e);
+        }
     }
 
-    def "exception path while reading metadata"() {
-        given:
-        String expectedUniqueId = "uniqueId"
-        def mockBlobClient = Mock(BlobClient)
-        mockBlobClient.downloadContent() >> { throw new AzureException("Download error") }
-
-        def azureClient = Mock(AzureClient)
-        azureClient.getBlobClient(_ as String) >> mockBlobClient
-
-        TestApplicationContext.register(AzureClient, azureClient)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        AzureStorageAccountPartnerMetadataStorage.getInstance().readMetadata(expectedUniqueId)
-
-        then:
-        thrown(PartnerMetadataException)
+    @Override
+    public void saveMetadata(final PartnerMetadata metadata) throws PartnerMetadataException {
+        String metadataFileName = getMetadataFileName(metadata.uniqueId());
+        try {
+            BlobClient blobClient = client.getBlobClient(metadataFileName);
+            String content = formatter.convertToJsonString(metadata);
+            blobClient.upload(BinaryData.fromString(content), true);
+            logger.logInfo("Saved metadata to " + blobClient.getBlobUrl());
+        } catch (AzureException | FormatterProcessingException e) {
+            throw new PartnerMetadataException(
+                    "Failed to upload metadata file " + metadataFileName, e);
+        }
     }
 
-    def "successfully save metadata"() {
-        given:
-        PartnerMetadata partnerMetadata = new PartnerMetadata("uniqueId", "sender", "receiver", Instant.now(), "abcd")
-
-        def mockBlobClient = Mock(BlobClient)
-        def azureClient = Mock(AzureClient)
-        azureClient.getBlobClient(_ as String) >> mockBlobClient
-
-        def mockFormatter = Mock(Formatter)
-        mockFormatter.convertToJsonString(partnerMetadata) >> "DogCow"
-
-        TestApplicationContext.register(AzureClient, azureClient)
-        TestApplicationContext.register(Formatter, mockFormatter)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        AzureStorageAccountPartnerMetadataStorage.getInstance().saveMetadata(partnerMetadata)
-
-        then:
-        1 * mockBlobClient.upload(_ as BinaryData, true)
-    }
-
-    def "failed to save metadata"() {
-        given:
-        PartnerMetadata partnerMetadata = new PartnerMetadata("uniqueId", "sender", "receiver", Instant.now(), "abcd")
-
-        def mockBlobClient = Mock(BlobClient)
-        mockBlobClient.upload(_ as BinaryData, true) >> { throw new AzureException("upload failed") }
-
-        def azureClient = Mock(AzureClient)
-        azureClient.getBlobClient(_ as String) >> mockBlobClient
-
-        def mockFormatter = Mock(Formatter)
-        mockFormatter.convertToJsonString(partnerMetadata) >> "DogCow"
-
-        TestApplicationContext.register(AzureClient, azureClient)
-        TestApplicationContext.register(Formatter, mockFormatter)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        AzureStorageAccountPartnerMetadataStorage.getInstance().saveMetadata(partnerMetadata)
-
-        then:
-        thrown(PartnerMetadataException)
+    public static String getMetadataFileName(String uniqueId) {
+        return uniqueId + ".json";
     }
 }

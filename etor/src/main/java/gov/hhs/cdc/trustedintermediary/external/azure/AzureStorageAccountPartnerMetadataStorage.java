@@ -10,6 +10,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
+import java.util.Optional;
 import javax.inject.Inject;
 
 /** Implements the {@link PartnerMetadataStorage} using files stored in an Azure Storage Account. */
@@ -29,14 +30,21 @@ public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadat
     }
 
     @Override
-    public PartnerMetadata readMetadata(final String uniqueId) throws PartnerMetadataException {
+    public Optional<PartnerMetadata> readMetadata(final String uniqueId)
+            throws PartnerMetadataException {
         String metadataFileName = getMetadataFileName(uniqueId);
-        logger.logInfo("Reading metadata for " + metadataFileName);
         try {
             BlobClient blobClient = client.getBlobClient(metadataFileName);
-            logger.logInfo("Reading metadata from " + blobClient.getBlobUrl());
+            String blobUrl = blobClient.getBlobUrl();
+            logger.logInfo("Reading metadata from " + blobUrl);
+            if (!blobClient.exists()) {
+                logger.logWarning("Metadata blob not found: {}", blobUrl);
+                return Optional.empty();
+            }
             String content = blobClient.downloadContent().toString();
-            return formatter.convertJsonToObject(content, new TypeReference<>() {});
+            PartnerMetadata metadata =
+                    formatter.convertJsonToObject(content, new TypeReference<>() {});
+            return Optional.ofNullable(metadata);
         } catch (AzureException | FormatterProcessingException e) {
             throw new PartnerMetadataException(
                     "Failed to download metadata file " + metadataFileName, e);
@@ -46,7 +54,6 @@ public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadat
     @Override
     public void saveMetadata(final PartnerMetadata metadata) throws PartnerMetadataException {
         String metadataFileName = getMetadataFileName(metadata.uniqueId());
-        logger.logInfo("Saving metadata for " + metadataFileName);
         try {
             BlobClient blobClient = client.getBlobClient(metadataFileName);
             String content = formatter.convertToJsonString(metadata);
