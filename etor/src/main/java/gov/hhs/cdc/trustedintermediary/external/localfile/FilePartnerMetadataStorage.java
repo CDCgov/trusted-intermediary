@@ -51,7 +51,9 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
                 return Optional.empty();
             }
             String content = Files.readString(filePath);
-            return formatter.convertJsonToObject(content, new TypeReference<>() {});
+            PartnerMetadata metadata =
+                    formatter.convertJsonToObject(content, new TypeReference<>() {});
+            return Optional.ofNullable(metadata);
         } catch (IOException | FormatterProcessingException e) {
             throw new PartnerMetadataException("Unable to read the metadata file", e);
         }
