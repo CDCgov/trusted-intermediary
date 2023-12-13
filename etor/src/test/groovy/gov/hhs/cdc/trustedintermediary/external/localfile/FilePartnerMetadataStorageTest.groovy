@@ -64,4 +64,12 @@ class FilePartnerMetadataStorageTest extends Specification {
         then:
         thrown(PartnerMetadataException)
     }
+
+    def "readMetadata returns empty when file does not exist"() {
+        when:
+        def actualMetadata = FilePartnerMetadataStorage.getInstance().readMetadata("nonexistentId")
+
+        then:
+        !actualMetadata.isPresent()
+    }
 }
