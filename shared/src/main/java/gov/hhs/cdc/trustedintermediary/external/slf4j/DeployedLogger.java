@@ -45,8 +45,10 @@ public class DeployedLogger implements Logger {
     }
 
     @Override
-    public void logWarning(String warningMessage) {
-        LoggerHelper.logMessageAtLevel(LOGGER, Level.WARN, warningMessage).log();
+    public void logWarning(String warningMessage, Object... parameters) {
+        var logBuilder = LoggerHelper.logMessageAtLevel(LOGGER, Level.WARN, warningMessage);
+        Arrays.stream(parameters).forEachOrdered(logBuilder::addArgument);
+        logBuilder.log();
     }
 
     @Override
