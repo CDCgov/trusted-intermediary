@@ -22,10 +22,11 @@ public class SendOrderUseCase {
         return INSTANCE;
     }
 
-    public void convertAndSend(final Order<?> order) throws UnableToSendOrderException {
+    public void convertAndSend(final Order<?> order, String submissionId)
+            throws UnableToSendOrderException {
         var partnerMetadata =
                 new PartnerMetadata(
-                        "uniqueId", "senderName", "receiverName", Instant.now(), "abcd");
+                        submissionId, "senderName", "receiverName", Instant.now(), "abcd");
         try {
             partnerMetadataStorage.saveMetadata(partnerMetadata);
         } catch (PartnerMetadataException e) {
