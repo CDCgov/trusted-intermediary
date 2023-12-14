@@ -75,6 +75,7 @@ public class EtorDomainRegistration implements DomainConnector {
             ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
 
             if (ApplicationContext.getProperty("DB_URL") != null) {
+                logger.logInfo("Registering the database implementation for partner metadata");
                 ApplicationContext.register(
                         PartnerMetadataStorage.class, DatabasePartnerMetadataStorage.getInstance());
                 ApplicationContext.register(

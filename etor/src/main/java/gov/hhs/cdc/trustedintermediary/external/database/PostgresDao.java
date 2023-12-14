@@ -34,6 +34,8 @@ public class PostgresDao implements DbDao {
                         + "/"
                         + ApplicationContext.getProperty("DB_NAME");
 
+        logger.logInfo("going to connect to db url {}", url);
+
         // Ternaries prevent NullPointerException during testing since we decided not to mock env
         // vars.
         var user =
@@ -51,6 +53,7 @@ public class PostgresDao implements DbDao {
 
         Properties props = new Properties();
         props.setProperty("user", user);
+        logger.logInfo("About to get the db password");
         String token =
                 new DefaultAzureCredentialBuilder()
                         .build()
@@ -58,6 +61,8 @@ public class PostgresDao implements DbDao {
                                 new TokenRequestContext()
                                         .addScopes("https://ossrdbms-aad.database.windows.net"))
                         .getToken();
+
+        logger.logInfo("got the db password");
 
         props.setProperty("password", token);
 

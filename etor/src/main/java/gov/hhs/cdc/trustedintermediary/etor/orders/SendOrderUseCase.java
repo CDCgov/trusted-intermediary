@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import java.time.Instant;
 import javax.inject.Inject;
@@ -15,6 +16,7 @@ public class SendOrderUseCase {
     @Inject OrderSender sender;
     @Inject MetricMetadata metadata;
     @Inject PartnerMetadataStorage partnerMetadataStorage;
+    @Inject Logger logger;
 
     private SendOrderUseCase() {}
 
@@ -28,7 +30,9 @@ public class SendOrderUseCase {
                 new PartnerMetadata(
                         "uniqueId", "senderName", "receiverName", Instant.now(), "abcd");
         try {
+            logger.logInfo("Trying to save the metadata");
             partnerMetadataStorage.saveMetadata(partnerMetadata);
+            logger.logInfo("Trying to read the metadata");
             partnerMetadataStorage.readMetadata(partnerMetadata.uniqueId());
         } catch (PartnerMetadataException e) {
             throw new UnableToSendOrderException("Unable to save metadata for the order", e);

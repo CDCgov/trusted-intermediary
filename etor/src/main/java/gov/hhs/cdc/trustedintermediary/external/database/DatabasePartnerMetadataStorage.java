@@ -36,6 +36,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
     // TODO: Should this be separate or should we have the DAO stuff happen in here
     @Override
     public void saveMetadata(final PartnerMetadata metadata) {
+        logger.logInfo("saving the metadata");
         try {
             dao.upsertMetadata(
                     metadata.uniqueId(),
