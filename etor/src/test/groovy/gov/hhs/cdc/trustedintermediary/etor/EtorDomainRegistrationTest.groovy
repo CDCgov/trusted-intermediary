@@ -311,7 +311,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
 
         def mockResponseHelper = Mock(DomainResponseHelper)
-        mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as PartnerMetadataException) >> new DomainResponse(expectedStatusCode)
+        mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as String) >> new DomainResponse(expectedStatusCode)
         TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
 
         TestApplicationContext.injectRegisteredImplementations()
@@ -343,7 +343,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.register(Formatter, mockFormatter)
 
         def mockResponseHelper = Mock(DomainResponseHelper)
-        mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as FormatterProcessingException) >> new DomainResponse(expectedStatusCode)
+        mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as String) >> new DomainResponse(expectedStatusCode)
         TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
 
         TestApplicationContext.injectRegisteredImplementations()
