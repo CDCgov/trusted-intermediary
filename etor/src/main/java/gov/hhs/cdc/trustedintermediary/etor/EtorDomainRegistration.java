@@ -126,8 +126,17 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleOrders(DomainRequest request) {
         Order<?> orders;
 
+        String submissionId = request.getHeaders().get("RecordId");
+        // TODO: need to verify what we should do if we don't receive the RecordId header or if it's
+        // empty
+        // For now, returning a 400 error
+        if (submissionId == null) {
+            String errorMessage = "Missing required header: RecordId";
+            logger.logError(errorMessage);
+            return domainResponseHelper.constructErrorResponse(400, errorMessage);
+        }
+
         try {
-            String submissionId = request.getHeaders().get("RecordId");
             orders = orderController.parseOrders(request);
             sendOrderUseCase.convertAndSend(orders, submissionId);
         } catch (FhirParseException e) {
