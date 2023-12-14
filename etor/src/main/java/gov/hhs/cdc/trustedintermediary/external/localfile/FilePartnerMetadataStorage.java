@@ -10,8 +10,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.PosixFilePermissions;
+import java.nio.file.Paths;
 import java.util.Optional;
 import javax.inject.Inject;
 
@@ -23,14 +22,13 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
     @Inject Formatter formatter;
     @Inject Logger logger;
 
-    private static final Path metadataTempDirectory;
+    private static final Path metadataDirectory;
 
     static {
         try {
-            FileAttribute<?> onlyOwnerAttrs =
-                    PosixFilePermissions.asFileAttribute(
-                            PosixFilePermissions.fromString("rwx------"));
-            metadataTempDirectory = Files.createTempDirectory("metadata", onlyOwnerAttrs);
+            Path projectRoot = Paths.get(System.getProperty("user.dir"));
+            metadataDirectory = projectRoot.getParent().resolve("data/metadata");
+            Files.createDirectories(metadataDirectory);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -73,7 +71,7 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
         }
     }
 
-    private Path getFilePath(String uniqueId) {
-        return metadataTempDirectory.resolve(uniqueId + ".json");
+    private Path getFilePath(String metadataId) {
+        return metadataDirectory.resolve(metadataId + ".json");
     }
 }
