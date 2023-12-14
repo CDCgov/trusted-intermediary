@@ -36,8 +36,8 @@ resource "azurerm_linux_web_app" "api" {
     KEY_VAULT_NAME                  = azurerm_key_vault.key_storage.name
     DB_URL                          = "cdcti-${var.environment}-database.postgres.database.azure.com"
     DB_PORT                         = "5432"
-    DB_NAME                         = "cdcti-internal-api"
-    DB_USER                         = "DOG"
+    DB_NAME                         = "postgres"
+    DB_USER                         = "cdcti-internal-api"
     DB_SSL                          = "true"
   }
 
