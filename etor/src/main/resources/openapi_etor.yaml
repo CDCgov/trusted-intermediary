@@ -105,13 +105,6 @@ paths:
             application/json:
             schema:
               $ref: '#/components/schemas/NotFoundError'
-        '500':
-          description: Unable to retrieve requested metadata
-          content:
-            application/json:
-            schema:
-              $ref: '#/components/schemas/InternalServerError'
-
 components:
   schemas:
     PatientDemographicsResponse:
@@ -171,13 +164,6 @@ components:
         error:
           type: string
           example: Unable to find requested data
-    InternalServerError:
-        description: Internal Server Error
-        type: object
-        properties:
-          error:
-            type: string
-            example: Unable to retrieve requested data
   securitySchemes:
     bearerAuthorization:
       type: http
