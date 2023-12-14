@@ -1,5 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.database;
 
+import com.azure.core.credential.TokenRequestContext;
+import com.azure.identity.DefaultAzureCredentialBuilder;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.wrappers.DbDao;
@@ -38,10 +40,10 @@ public class PostgresDao implements DbDao {
                 ApplicationContext.getProperty("DB_USER") == null
                         ? ""
                         : ApplicationContext.getProperty("DB_USER");
-        var pass =
-                ApplicationContext.getProperty("DB_PASS") == null
-                        ? ""
-                        : ApplicationContext.getProperty("DB_PASS");
+        //        var pass =
+        //                ApplicationContext.getProperty("DB_PASS") == null
+        //                        ? ""
+        //                        : ApplicationContext.getProperty("DB_PASS");
         var ssl =
                 ApplicationContext.getProperty("DB_SSL") == null
                         ? ""
@@ -49,7 +51,15 @@ public class PostgresDao implements DbDao {
 
         Properties props = new Properties();
         props.setProperty("user", user);
-        props.setProperty("password", pass);
+        String token =
+                new DefaultAzureCredentialBuilder()
+                        .build()
+                        .getTokenSync(
+                                new TokenRequestContext()
+                                        .addScopes("https://ossrdbms-aad.database.windows.net"))
+                        .getToken();
+
+        props.setProperty("password", token);
 
         // TODO: Change this based on env
         props.setProperty("ssl", ssl);
