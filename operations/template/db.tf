@@ -6,4 +6,6 @@ resource "azurerm_postgresql_flexible_server" "database" {
   version             = "16"
   storage_mb          = "32768"
   backup_retention_days = "14"
+  administrator_login = "user"
+  administrator_password = "test"
 }
