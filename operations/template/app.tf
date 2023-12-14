@@ -34,11 +34,11 @@ resource "azurerm_linux_web_app" "api" {
     ENV                             = var.environment
     REPORT_STREAM_URL_PREFIX        = "https://${local.rs_domain_prefix}prime.cdc.gov"
     KEY_VAULT_NAME                  = azurerm_key_vault.key_storage.name
-    DB_URL                          = "jdbc:postgresql://cdcti-${var.environment}-database.postgres.database.azure.com"
+    DB_URL                          = "cdcti-${var.environment}-database.postgres.database.azure.com"
     DB_PORT                         = "5432"
     DB_NAME                         = "postgres"
-    DB_USER                         = azurerm_postgresql_flexible_server.database.administrator_login
-    DB_PASS                         = azurerm_postgresql_flexible_server.database.administrator_password
+    DB_USER                         = "DOG"
+    DB_PASS                         = "COW"
     DB_SSL                          = "true"
   }
 
