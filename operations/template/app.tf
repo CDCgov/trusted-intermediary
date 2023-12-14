@@ -38,7 +38,7 @@ resource "azurerm_linux_web_app" "api" {
     DB_PORT                         = "5433"
     DB_NAME                         = "intermediary"
     DB_USER                         = azurerm_postgresql_flexible_server.database.administrator_login
-    DB_PASS                         = azurerm_postgresql_flexible_server.database.administrator_passwordm
+    DB_PASS                         = azurerm_postgresql_flexible_server.database.administrator_password
     DB_SSL                          = "true"
   }
 
