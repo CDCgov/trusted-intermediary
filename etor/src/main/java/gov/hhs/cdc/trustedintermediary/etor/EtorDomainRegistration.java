@@ -19,7 +19,6 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
-import gov.hhs.cdc.trustedintermediary.external.azure.AzureStorageAccountPartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.DatabasePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.EtorSqlDriverManager;
 import gov.hhs.cdc.trustedintermediary.external.database.PostgresDao;
@@ -88,9 +87,11 @@ public class EtorDomainRegistration implements DomainConnector {
 
         } else {
             ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
+            logger.logInfo("Registering the database implementation for partner metadata");
             ApplicationContext.register(
-                    PartnerMetadataStorage.class,
-                    AzureStorageAccountPartnerMetadataStorage.getInstance());
+                    PartnerMetadataStorage.class, DatabasePartnerMetadataStorage.getInstance());
+            ApplicationContext.register(SqlDriverManager.class, EtorSqlDriverManager.getInstance());
+            ApplicationContext.register(DbDao.class, PostgresDao.getInstance());
         }
 
         return endpoints;
