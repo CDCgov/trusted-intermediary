@@ -174,6 +174,7 @@ public class DomainsRegistration {
         request.setBody(ctx.body());
         request.setUrl(ctx.url());
         request.setHeaders(ctx.headerMap());
+        request.setPathParams(ctx.pathParamMap());
 
         return request;
     }

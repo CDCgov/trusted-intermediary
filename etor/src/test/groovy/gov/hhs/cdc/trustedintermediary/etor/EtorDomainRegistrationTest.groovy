@@ -11,13 +11,21 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemograph
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
+import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
 import spock.lang.Specification
+
+import java.time.Instant
 
 class EtorDomainRegistrationTest extends Specification {
 
@@ -31,6 +39,7 @@ class EtorDomainRegistrationTest extends Specification {
         def domainRegistration = new EtorDomainRegistration()
         def demographicsEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.DEMOGRAPHICS_API_ENDPOINT, true)
         def ordersEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.ORDERS_API_ENDPOINT, true)
+        def metadataEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.METADATA_API_ENDPOINT, true)
 
         when:
         def endpoints = domainRegistration.domainRegistration()
@@ -39,6 +48,7 @@ class EtorDomainRegistrationTest extends Specification {
         !endpoints.isEmpty()
         endpoints.get(demographicsEndpoint) != null
         endpoints.get(ordersEndpoint) != null
+        endpoints.get(metadataEndpoint) != null
     }
 
     def "has an OpenAPI specification"() {
@@ -223,6 +233,123 @@ class EtorDomainRegistrationTest extends Specification {
 
         when:
         def res = domainRegistration.handleOrders(new DomainRequest())
+        def actualStatusCode = res.statusCode
+
+        then:
+        actualStatusCode == expectedStatusCode
+    }
+
+    def "metadata endpoint happy path"() {
+        given:
+        def expectedStatusCode = 200
+
+        def connector = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, connector)
+
+        def request = new DomainRequest()
+        request.setPathParams(["id": "metadataId"])
+
+        def mockPartnerMetadataStorage = Mock(PartnerMetadataStorage)
+        mockPartnerMetadataStorage.readMetadata(_ as String) >> Optional.ofNullable(new PartnerMetadata("metadataId", "sender", "receiver", Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd"))
+        TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
+
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        mockResponseHelper.constructOkResponse(_ as String) >> new DomainResponse(expectedStatusCode)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
+
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def res = connector.handleMetadata(request)
+        def actualStatusCode = res.statusCode
+
+        then:
+        actualStatusCode == expectedStatusCode
+    }
+
+    def "metadata endpoint returns a 404 response when metadata id is not found"() {
+        given:
+        def expectedStatusCode = 404
+
+        def connector = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, connector)
+
+        def request = new DomainRequest()
+        request.setPathParams(["id": "metadataId"])
+
+        def mockPartnerMetadataStorage = Mock(PartnerMetadataStorage)
+        mockPartnerMetadataStorage.readMetadata(_ as String) >> Optional.empty()
+        TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
+
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as String) >> new DomainResponse(expectedStatusCode)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def res = connector.handleMetadata(request)
+        def actualStatusCode = res.statusCode
+
+        then:
+        actualStatusCode == expectedStatusCode
+    }
+
+    def "metadata endpoint returns a 500 response when there is an exception reading the metadata"() {
+        given:
+        def expectedStatusCode = 500
+
+        def connector = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, connector)
+
+        def request = new DomainRequest()
+        request.setPathParams(["id": "metadataId"])
+
+        def mockPartnerMetadataStorage = Mock(PartnerMetadataStorage)
+        mockPartnerMetadataStorage.readMetadata(_ as String) >> { throw new PartnerMetadataException("DogCow", new Exception()) }
+        TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
+
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as String) >> new DomainResponse(expectedStatusCode)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def res = connector.handleMetadata(request)
+        def actualStatusCode = res.statusCode
+
+        then:
+        actualStatusCode == expectedStatusCode
+    }
+
+    def "metadata endpoint returns a 500 response when there is an exception formatting the metadata"() {
+        given:
+        def expectedStatusCode = 500
+
+        def connector = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, connector)
+
+        def request = new DomainRequest()
+        request.setPathParams(["id": "metadataId"])
+
+        def mockPartnerMetadataStorage = Mock(PartnerMetadataStorage)
+        mockPartnerMetadataStorage.readMetadata(_ as String) >> Optional.ofNullable(new PartnerMetadata("metadataUniqueId", "sender", "receiver", Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd"))
+        TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
+
+        def mockFormatter = Mock(Formatter)
+        mockFormatter.convertToJsonString(_ as PartnerMetadata) >> { throw new FormatterProcessingException("DogCow", new Exception()) }
+        TestApplicationContext.register(Formatter, mockFormatter)
+
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as String) >> new DomainResponse(expectedStatusCode)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def res = connector.handleMetadata(request)
         def actualStatusCode = res.statusCode
 
         then:
