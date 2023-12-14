@@ -8,4 +8,10 @@ resource "azurerm_postgresql_flexible_server" "database" {
   backup_retention_days = "14"
   administrator_login = "user"
   administrator_password = "test"
+  lifecycle {
+    ignore_changes = [
+      zone,
+      high_availability.0.standby_availability_zone
+    ]
+  }
 }
