@@ -34,7 +34,7 @@ resource "azurerm_linux_web_app" "api" {
     ENV                             = var.environment
     REPORT_STREAM_URL_PREFIX        = "https://${local.rs_domain_prefix}prime.cdc.gov"
     KEY_VAULT_NAME                  = azurerm_key_vault.key_storage.name
-    DB_URL                          = "jdbc:postgresql://${azurerm_postgresql_flexible_server.database.connection}"
+    DB_URL                          = "jdbc:postgresql://"
     DB_PORT                         = "5433"
     DB_NAME                         = "intermediary"
     DB_USER                         = azurerm_postgresql_flexible_server.database.administrator_login
