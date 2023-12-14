@@ -1,3 +1,9 @@
+data "azurerm_client_config" "current" {}
+
+data "azuread_service_principal" "principal" {
+  object_id = data.azurerm_client_config.current.object_id
+}
+
 resource "azurerm_postgresql_flexible_server" "database" {
   name                = "cdcti-${var.environment}-database"
   resource_group_name = data.azurerm_resource_group.group.name
@@ -10,6 +16,7 @@ resource "azurerm_postgresql_flexible_server" "database" {
   authentication {
     password_auth_enabled = "false"
     active_directory_auth_enabled = "true"
+    tenant_id = data.azurerm_client_config.current.tenant_id
   }
 
   lifecycle {
@@ -18,4 +25,13 @@ resource "azurerm_postgresql_flexible_server" "database" {
       high_availability.0.standby_availability_zone
     ]
   }
+}
+
+resource "azurerm_postgresql_flexible_server_active_directory_administrator" "entra" {
+  server_name         = azurerm_postgresql_flexible_server.database.name
+  resource_group_name = data.azurerm_resource_group.group.name
+  tenant_id           = data.azurerm_client_config.current.tenant_id
+  object_id           = data.azuread_service_principal.principal.object_id
+  principal_name      = data.azuread_service_principal.principal.display_name
+  principal_type      = "ServicePrincipal"
 }
