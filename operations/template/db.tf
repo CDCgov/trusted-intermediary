@@ -33,3 +33,12 @@ resource "azurerm_postgresql_flexible_server_active_directory_administrator" "en
   principal_name      = data.azuread_service_principal.principal.display_name
   principal_type      = "ServicePrincipal"
 }
+
+resource "azurerm_postgresql_flexible_server_active_directory_administrator" "admin-for-app" {
+  server_name         = azurerm_postgresql_flexible_server.database.name
+  resource_group_name = data.azurerm_resource_group.group.name
+  tenant_id           = data.azurerm_client_config.current.tenant_id
+  object_id           = azurerm_linux_web_app.api.identity.0.principal_id
+  principal_name      = azurerm_linux_web_app.api.name
+  principal_type      = "ServicePrincipal"
+}
