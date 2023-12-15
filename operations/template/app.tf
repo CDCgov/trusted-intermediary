@@ -38,7 +38,7 @@ resource "azurerm_linux_web_app" "api" {
     DB_PORT                         = "5432"
     DB_NAME                         = "postgres"
     DB_USER                         = "cdcti-internal-api"
-    DB_SSL                          = "true"
+    DB_SSL                          = "require"
   }
 
   identity {

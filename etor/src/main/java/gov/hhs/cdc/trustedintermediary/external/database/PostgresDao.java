@@ -67,7 +67,7 @@ public class PostgresDao implements DbDao {
 
         props.setProperty("password", token);
 
-        props.setProperty("ssl", ssl);
+        props.setProperty("sslmode", ssl);
         conn = driverManager.getConnection(url, props);
         logger.logInfo("DB Connected Successfully");
         return conn;
