@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.wrappers.DbDao;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.sql.SQLException;
+import java.util.Optional;
 import javax.inject.Inject;
 
 /** Implements the {@link PartnerMetadataStorage} using a database. */
@@ -24,11 +25,12 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
     }
 
     @Override
-    public PartnerMetadata readMetadata(final String uniqueId) throws PartnerMetadataException {
+    public Optional<PartnerMetadata> readMetadata(final String uniqueId)
+            throws PartnerMetadataException {
         try {
             PartnerMetadata data = (PartnerMetadata) dao.fetchMetadata(uniqueId);
             logger.logInfo(data.uniqueId());
-            return data;
+            return Optional.of(data);
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error retrieving metadata", e);
         }

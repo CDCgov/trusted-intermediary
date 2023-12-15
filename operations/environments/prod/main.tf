@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "3.83.0"
+      version = "3.84.0"
     }
   }
 
@@ -27,6 +27,6 @@ provider "azurerm" {
 module "template" {
   source = "../../template/"
 
-  environment = "prod"
+  environment = "prd"
   deployer_id = "f5feabe7-5d37-40ba-94f2-e5c0760b4561" //github app registration in CDC Azure Entra
 }

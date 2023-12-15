@@ -11,6 +11,8 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemograph
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController;
@@ -30,10 +32,13 @@ import gov.hhs.cdc.trustedintermediary.wrappers.DbDao;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import javax.inject.Inject;
 
@@ -45,6 +50,7 @@ public class EtorDomainRegistration implements DomainConnector {
 
     static final String DEMOGRAPHICS_API_ENDPOINT = "/v1/etor/demographics";
     static final String ORDERS_API_ENDPOINT = "/v1/etor/orders";
+    static final String METADATA_API_ENDPOINT = "/v1/etor/metadata/{id}";
 
     @Inject PatientDemographicsController patientDemographicsController;
     @Inject OrderController orderController;
@@ -52,12 +58,15 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject SendOrderUseCase sendOrderUseCase;
     @Inject Logger logger;
     @Inject DomainResponseHelper domainResponseHelper;
+    @Inject PartnerMetadataStorage partnerMetadataStorage;
+    @Inject Formatter formatter;
 
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
             Map.of(
                     new HttpEndpoint("POST", DEMOGRAPHICS_API_ENDPOINT, true),
                             this::handleDemographics,
-                    new HttpEndpoint("POST", ORDERS_API_ENDPOINT, true), this::handleOrders);
+                    new HttpEndpoint("POST", ORDERS_API_ENDPOINT, true), this::handleOrders,
+                    new HttpEndpoint("GET", METADATA_API_ENDPOINT, true), this::handleMetadata);
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
@@ -143,5 +152,24 @@ public class EtorDomainRegistration implements DomainConnector {
 
         OrderResponse orderResponse = new OrderResponse(orders);
         return domainResponseHelper.constructOkResponse(orderResponse);
+    }
+
+    DomainResponse handleMetadata(DomainRequest request) {
+        try {
+            String metadataId = request.getPathParams().get("id");
+            Optional<PartnerMetadata> metadata = partnerMetadataStorage.readMetadata(metadataId);
+
+            if (metadata.isEmpty()) {
+                return domainResponseHelper.constructErrorResponse(
+                        404, "Metadata not found for ID: " + metadataId);
+            }
+
+            return domainResponseHelper.constructOkResponse(
+                    formatter.convertToJsonString(metadata.get()));
+        } catch (PartnerMetadataException | FormatterProcessingException e) {
+            String errorMessage = "Unable to retrieve requested metadata";
+            logger.logError(errorMessage, e);
+            return domainResponseHelper.constructErrorResponse(500, errorMessage);
+        }
     }
 }
