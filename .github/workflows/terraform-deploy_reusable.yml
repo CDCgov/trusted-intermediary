@@ -64,6 +64,11 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false ${{ inputs.TERRAFORM_APPLY_PARAMETERS }}
 
+      - name: Run Db migration
+        run: |
+          export PGPASSWORD=$(az account get-access-token --resource-type oss-rdbms --query "[accessToken]" -o tsv)
+          psql "host=cdcti-internal-database.postgres.database.azure.com port=5432 dbname=postgres user=cdcti-github sslmode=require" -c "CREATE TABLE IF NOT EXISTS metadata (message_id varchar(30), sender varchar(30), receiver varchar(30), hash_of_order varchar(1000), time_received date); GRANT SELECT, UPDATE ON metadata TO cdcti-internal-api;"
+
       - id: export-terraform-output
         name: Export Terraform Output
         run: |
