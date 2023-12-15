@@ -4,7 +4,7 @@
 env_content="ENV=local\nKEY_VAULT_NAME=ti-key-vault-name
 \nREPORT_STREAM_URL_PREFIX=http://localhost:7071\nDB_URL=localhost
 \nDB_PORT=5433\nDB_NAME=intermediary\nDB_USER=intermediary
-\nDB_PASS=changeIT!\nDB_SSL=false"
+\nDB_PASS=changeIT!\nDB_SSL=require"
 
 # Get directory of script file
 script_dir="$(dirname "$0")"

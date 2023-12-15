@@ -74,7 +74,6 @@ public class EtorDomainRegistration implements DomainConnector {
             ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
 
             if (ApplicationContext.getProperty("DB_URL") != null) {
-                // logger.logInfo("Registering the database implementation for partner metadata");
                 ApplicationContext.register(
                         PartnerMetadataStorage.class, DatabasePartnerMetadataStorage.getInstance());
                 ApplicationContext.register(
@@ -87,7 +86,6 @@ public class EtorDomainRegistration implements DomainConnector {
 
         } else {
             ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
-            // logger.logInfo("Registering the database implementation for partner metadata");
             ApplicationContext.register(
                     PartnerMetadataStorage.class, DatabasePartnerMetadataStorage.getInstance());
             ApplicationContext.register(SqlDriverManager.class, EtorSqlDriverManager.getInstance());

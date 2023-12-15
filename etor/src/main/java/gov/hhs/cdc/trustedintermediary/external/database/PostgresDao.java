@@ -38,15 +38,15 @@ public class PostgresDao implements DbDao {
 
         // Ternaries prevent NullPointerException during testing since we decided not to mock env
         // vars.
-        var user =
+        String user =
                 ApplicationContext.getProperty("DB_USER") == null
                         ? ""
                         : ApplicationContext.getProperty("DB_USER");
-        //        var pass =
-        //                ApplicationContext.getProperty("DB_PASS") == null
-        //                        ? ""
-        //                        : ApplicationContext.getProperty("DB_PASS");
-        var ssl =
+        String pass =
+                ApplicationContext.getProperty("DB_PASS") == null
+                        ? ""
+                        : ApplicationContext.getProperty("DB_PASS");
+        String ssl =
                 ApplicationContext.getProperty("DB_SSL") == null
                         ? ""
                         : ApplicationContext.getProperty("DB_SSL");
@@ -54,19 +54,24 @@ public class PostgresDao implements DbDao {
         Properties props = new Properties();
         props.setProperty("user", user);
         logger.logInfo("About to get the db password");
+
         String token =
-                new DefaultAzureCredentialBuilder()
-                        .build()
-                        .getTokenSync(
-                                new TokenRequestContext()
-                                        .addScopes(
-                                                "https://ossrdbms-aad.database.windows.net/.default")) // TODO: This string could need to be "https://ossrdbms-aad.database.windows.net/.default"
-                        .getToken();
+                pass.isBlank()
+                        ? new DefaultAzureCredentialBuilder()
+                                .build()
+                                .getTokenSync(
+                                        new TokenRequestContext()
+                                                .addScopes(
+                                                        "https://ossrdbms-aad.database.windows.net/.default"))
+                                .getToken()
+                        : pass;
 
         logger.logInfo("got the db password");
 
         props.setProperty("password", token);
 
+        // If the below prop isn't set to require and we just set ssl=true it will expect a CA cert
+        // in azure which breaks it
         props.setProperty("sslmode", ssl);
         conn = driverManager.getConnection(url, props);
         logger.logInfo("DB Connected Successfully");
