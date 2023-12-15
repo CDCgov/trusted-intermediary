@@ -34,7 +34,7 @@ resource "azurerm_postgresql_flexible_server_active_directory_administrator" "en
   principal_type      = "ServicePrincipal"
 }
 
-resource "azurerm_postgresql_flexible_server_active_directory_administrator" "admin-for-app" {
+resource "azurerm_postgresql_flexible_server_active_directory_administrator" "admin_for_app" {
   server_name         = azurerm_postgresql_flexible_server.database.name
   resource_group_name = data.azurerm_resource_group.group.name
   tenant_id           = data.azurerm_client_config.current.tenant_id
