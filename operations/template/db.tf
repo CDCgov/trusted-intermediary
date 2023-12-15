@@ -10,8 +10,6 @@ resource "azurerm_postgresql_flexible_server" "database" {
   version             = "16"
   storage_mb          = "32768"
   backup_retention_days = "14"
-  public_network_access_enabled = true
-
 
   authentication {
     password_auth_enabled = "false"
@@ -43,4 +41,41 @@ resource "azurerm_postgresql_flexible_server_active_directory_administrator" "ad
   object_id           = azurerm_linux_web_app.api.identity.0.principal_id
   principal_name      = azurerm_linux_web_app.api.name
   principal_type      = "ServicePrincipal"
+}
+
+
+resource "azurerm_postgresql_flexible_server_firewall_rule" "db_firewall_1" {
+  name                = "AllowPeter"
+  server_id           = azurerm_postgresql_flexible_server.database.id
+  start_ip_address    = "45.16.213.131"
+  end_ip_address      = "45.16.213.131"
+}
+
+
+resource "azurerm_postgresql_flexible_server_firewall_rule" "db_firewall_2" {
+  name                = "AllowJeff"
+  server_id           = azurerm_postgresql_flexible_server.database.id
+  start_ip_address    = "50.5.94.248"
+  end_ip_address      = "50.5.94.248"
+}
+
+resource "azurerm_postgresql_flexible_server_firewall_rule" "db_firewall_3" {
+  name                = "AllowTiff"
+  server_id           = azurerm_postgresql_flexible_server.database.id
+  start_ip_address    = "107.15.235.75"
+  end_ip_address      = "107.15.235.75"
+}
+
+resource "azurerm_postgresql_flexible_server_firewall_rule" "db_firewall_4" {
+  name                = "AllowJorge"
+  server_id           = azurerm_postgresql_flexible_server.database.id
+  start_ip_address    = "107.201.135.214"
+  end_ip_address      = "107.201.135.214"
+}
+
+resource "azurerm_postgresql_flexible_server_firewall_rule" "db_firewall_5" {
+  name                = "AllowAzure"
+  server_id           = azurerm_postgresql_flexible_server.database.id
+  start_ip_address    = "0.0.0.0"
+  end_ip_address      = "0.0.0.0"
 }
