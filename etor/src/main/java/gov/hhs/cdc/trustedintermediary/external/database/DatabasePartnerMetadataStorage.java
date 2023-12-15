@@ -37,7 +37,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
     }
     // TODO: Should this be separate or should we have the DAO stuff happen in here
     @Override
-    public void saveMetadata(final PartnerMetadata metadata) {
+    public void saveMetadata(final PartnerMetadata metadata) throws PartnerMetadataException {
         logger.logInfo("saving the metadata");
         try {
             dao.upsertMetadata(
@@ -48,7 +48,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                     metadata.timeReceived());
             // TODO: Put response into the logger
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new PartnerMetadataException("Error saving metadata", e);
         }
     }
 }
