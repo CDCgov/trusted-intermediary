@@ -60,7 +60,7 @@ public class PostgresDao implements DbDao {
                         .getTokenSync(
                                 new TokenRequestContext()
                                         .addScopes(
-                                                "https://ossrdbms-aad.database.windows.net")) // TODO: This string could need to be "https://ossrdbms-aad.database.windows.net/.default"
+                                                "https://ossrdbms-aad.database.windows.net/.default")) // TODO: This string could need to be "https://ossrdbms-aad.database.windows.net/.default"
                         .getToken();
 
         logger.logInfo("got the db password");
