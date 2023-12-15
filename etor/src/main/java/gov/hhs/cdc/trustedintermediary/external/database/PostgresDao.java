@@ -101,10 +101,6 @@ public class PostgresDao implements DbDao {
             int result = statement.executeUpdate();
             // TODO: Do something if our update returns 0...
             logger.logInfo(String.valueOf(result));
-
-        } catch (Exception e) {
-            logger.logError("Error updating data: " + e.getMessage());
-            throw new SQLException();
         }
     }
 
@@ -118,17 +114,17 @@ public class PostgresDao implements DbDao {
 
             ResultSet result = statement.executeQuery();
 
-            result.next();
+            var hasValidData = result.next();
+            if (!hasValidData) {
+                return null;
+            }
+
             return new PartnerMetadata(
                     result.getString("message_id"),
                     result.getString("sender"),
                     result.getString("receiver"),
                     result.getTimestamp("time_received").toInstant(),
                     result.getString("hash_of_order"));
-
-        } catch (SQLException e) {
-            logger.logError("Error fetching data: " + e.getMessage());
-            throw new SQLException();
         }
     }
 }

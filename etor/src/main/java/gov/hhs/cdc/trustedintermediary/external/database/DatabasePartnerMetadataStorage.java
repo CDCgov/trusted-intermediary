@@ -30,7 +30,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
         try {
             PartnerMetadata data = (PartnerMetadata) dao.fetchMetadata(uniqueId);
             logger.logInfo(data.uniqueId());
-            return Optional.of(data);
+            return Optional.ofNullable(data);
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error retrieving metadata", e);
         }
