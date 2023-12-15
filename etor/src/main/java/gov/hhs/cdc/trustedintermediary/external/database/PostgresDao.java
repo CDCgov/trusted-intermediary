@@ -67,7 +67,6 @@ public class PostgresDao implements DbDao {
 
         props.setProperty("password", token);
 
-        // TODO: Change this based on env
         props.setProperty("ssl", ssl);
         conn = driverManager.getConnection(url, props);
         logger.logInfo("DB Connected Successfully");
