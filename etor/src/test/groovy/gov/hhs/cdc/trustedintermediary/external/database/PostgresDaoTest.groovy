@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.database
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata
+import gov.hhs.cdc.trustedintermediary.external.azure.AzureClient
 import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager
 import spock.lang.Specification
 
@@ -18,6 +19,11 @@ class PostgresDaoTest extends Specification {
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
+
+        def mockAzureClient = Mock(AzureClient)
+        mockAzureClient.getScopedToken(_ as String) >> "DogCow password"
+        TestApplicationContext.register(AzureClient, mockAzureClient)
+
         TestApplicationContext.register(PostgresDao, PostgresDao.getInstance())
     }
 

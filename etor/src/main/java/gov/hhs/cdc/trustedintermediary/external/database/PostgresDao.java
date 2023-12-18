@@ -1,9 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.external.database;
 
-import com.azure.core.credential.TokenRequestContext;
-import com.azure.identity.DefaultAzureCredentialBuilder;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
+import gov.hhs.cdc.trustedintermediary.external.azure.AzureClient;
 import gov.hhs.cdc.trustedintermediary.wrappers.DbDao;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager;
@@ -18,9 +17,11 @@ import javax.inject.Inject;
 
 public class PostgresDao implements DbDao {
 
+    private static final PostgresDao INSTANCE = new PostgresDao();
+
     @Inject Logger logger;
     @Inject SqlDriverManager driverManager;
-    private static final PostgresDao INSTANCE = new PostgresDao();
+    @Inject AzureClient azureClient;
 
     private PostgresDao() {}
 
@@ -57,13 +58,8 @@ public class PostgresDao implements DbDao {
 
         String token =
                 pass.isBlank()
-                        ? new DefaultAzureCredentialBuilder()
-                                .build()
-                                .getTokenSync(
-                                        new TokenRequestContext()
-                                                .addScopes(
-                                                        "https://ossrdbms-aad.database.windows.net/.default"))
-                                .getToken()
+                        ? azureClient.getScopedToken(
+                                "https://ossrdbms-aad.database.windows.net/.default")
                         : pass;
 
         logger.logInfo("got the db password");

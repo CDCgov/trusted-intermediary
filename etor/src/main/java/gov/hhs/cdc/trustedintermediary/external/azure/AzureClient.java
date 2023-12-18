@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.azure;
 
+import com.azure.core.credential.TokenRequestContext;
 import com.azure.identity.DefaultAzureCredentialBuilder;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
@@ -39,5 +40,12 @@ public class AzureClient {
 
     public BlobClient getBlobClient(String blobName) {
         return BLOB_CONTAINER_CLIENT.getBlobClient(blobName);
+    }
+
+    public String getScopedToken(String scope) {
+        return new DefaultAzureCredentialBuilder()
+                .build()
+                .getTokenSync(new TokenRequestContext().addScopes(scope))
+                .getToken();
     }
 }
