@@ -21,11 +21,11 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
-import spock.lang.Specification
-
 import java.time.Instant
+import spock.lang.Specification
 
 class EtorDomainRegistrationTest extends Specification {
 
@@ -246,6 +246,38 @@ class EtorDomainRegistrationTest extends Specification {
 
         then:
         actualStatusCode == expectedStatusCode
+    }
+
+    def "handleOrders logs an error and continues the usecase like normal when the metadata unique ID is missing because we want to know when our integration with RS is broken"() {
+        given:
+
+        def request = new DomainRequest()
+        request.headers["RecordId"] = null  //no metadata unique ID
+
+        def domainRegistration = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
+
+        def mockController = Mock(OrderController)
+        TestApplicationContext.register(OrderController, mockController)
+
+        def mockUseCase = Mock(SendOrderUseCase)
+        TestApplicationContext.register(SendOrderUseCase, mockUseCase)
+
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
+
+        def mockLogger = Mock(Logger)
+        TestApplicationContext.register(Logger, mockLogger)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        domainRegistration.handleOrders(request)
+
+        then:
+        1 * mockLogger.logError(_ as String)
+        1 * mockController.parseOrders(_ as DomainRequest) >> new OrderMock<?>("DogCow", "Moof", "Clarus")
+        1 * mockUseCase.convertAndSend(_, null)
     }
 
     def "metadata endpoint happy path"() {
