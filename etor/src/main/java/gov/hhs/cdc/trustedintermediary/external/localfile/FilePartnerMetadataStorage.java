@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Optional;
 import javax.inject.Inject;
 
@@ -26,9 +28,12 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
 
     static {
         try {
-            Path projectRoot = Paths.get(System.getProperty("user.dir"));
-            metadataDirectory = projectRoot.getParent().resolve("data/metadata");
-            Files.createDirectories(metadataDirectory);
+            Path projectRoot = Paths.get(System.getProperty("java.io.tmpdir"));
+            metadataDirectory = projectRoot.resolve("cdctimetadata");
+            FileAttribute<?> onlyOwnerAttrs =
+                    PosixFilePermissions.asFileAttribute(
+                            PosixFilePermissions.fromString("rwx------"));
+            Files.createDirectories(metadataDirectory, onlyOwnerAttrs);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

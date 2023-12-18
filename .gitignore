@@ -7,9 +7,6 @@ build
 # Ignore VSCode Extension Pack for Java output
 bin
 
-# Ignore data directory
-data
-
 # Ignore environment file
 .env
 
