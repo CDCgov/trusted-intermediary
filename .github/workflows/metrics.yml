@@ -56,7 +56,7 @@ jobs:
         run: poetry run devops-deployment-metrics -c config.toml
 
       - name: Upload output metric files
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dora-metrics
           path: devops-deployment-metrics/data/*.csv
