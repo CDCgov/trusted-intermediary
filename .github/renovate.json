@@ -26,7 +26,13 @@
         {
             "matchPackageNames": ["amazoncorretto"],
             "allowedVersions": "/17.*/"
-        }
-    ],
+        },
+        {
+            "matchPackageNames": [
+                "org.apache.httpcomponents.client5:httpclient5",
+                "org.apache.httpcomponents.client5:httpclient5-fluent"
+            ],
+            "allowedVersions": "!/^5\\.3$/"
+        }],
     "pinDigests": false
 }
