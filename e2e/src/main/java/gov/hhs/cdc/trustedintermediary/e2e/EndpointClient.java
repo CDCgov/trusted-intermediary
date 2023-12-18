@@ -29,7 +29,8 @@ public class EndpointClient {
         }
     }
 
-    public ClassicHttpResponse submit(String fhirBody, boolean loginFirst) throws IOException {
+    public ClassicHttpResponse submit(String fhirBody, String submissionId, boolean loginFirst)
+            throws IOException {
 
         Map<String, String> headers = new HashMap<>();
 
@@ -37,6 +38,7 @@ public class EndpointClient {
             var accessToken = AuthClient.requestAccessToken("report-stream", token);
             headers.put("Authorization", "Bearer " + accessToken);
         }
+        headers.put("RecordId", submissionId);
 
         return HttpClient.post(endpoint, fhirBody, ContentType.APPLICATION_JSON, headers);
     }
