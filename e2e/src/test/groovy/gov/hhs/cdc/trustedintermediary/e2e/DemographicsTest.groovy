@@ -9,7 +9,6 @@ class DemographicsTest extends Specification {
 
     def demographicsClient = new EndpointClient("/v1/etor/demographics")
     def newbornPatientJsonFileString = Files.readString(Path.of("../examples/fhir/newborn_patient.json"))
-    def submissionId = "submissionId"
 
     def setup() {
         SentPayloadReader.delete()
@@ -21,7 +20,7 @@ class DemographicsTest extends Specification {
         def expectedPatientId  = "MRN7465737865"
 
         when:
-        def response = demographicsClient.submit(newbornPatientJsonFileString, submissionId, true)
+        def response = demographicsClient.submit(newbornPatientJsonFileString, true)
         def parsedJsonBody = JsonParsing.parseContent(response)
 
         then:
@@ -32,7 +31,7 @@ class DemographicsTest extends Specification {
 
     def "payload file check"() {
         when:
-        def response = demographicsClient.submit(newbornPatientJsonFileString, submissionId, true)
+        def response = demographicsClient.submit(newbornPatientJsonFileString, true)
         def parsedResponseBody = JsonParsing.parseContent(response)
         def sentPayload = SentPayloadReader.read()
         def parsedSentPayload = JsonParsing.parse(sentPayload)
@@ -54,7 +53,7 @@ class DemographicsTest extends Specification {
         def invalidJsonRequest = newbornPatientJsonFileString.substring(1)
 
         when:
-        def response = demographicsClient.submit(invalidJsonRequest, submissionId, true)
+        def response = demographicsClient.submit(invalidJsonRequest, true)
         def parsedJsonBody = JsonParsing.parseContent(response)
 
         then:
@@ -64,7 +63,7 @@ class DemographicsTest extends Specification {
 
     def "return a 401 response when making an unauthenticated request"() {
         when:
-        def response = demographicsClient.submit(newbornPatientJsonFileString, submissionId, false)
+        def response = demographicsClient.submit(newbornPatientJsonFileString, false)
         def parsedJsonBody = JsonParsing.parseContent(response)
 
         then:
