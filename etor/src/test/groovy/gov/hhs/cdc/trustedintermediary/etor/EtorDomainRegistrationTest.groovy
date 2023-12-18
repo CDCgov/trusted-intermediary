@@ -157,6 +157,9 @@ class EtorDomainRegistrationTest extends Specification {
         given:
         def expectedStatusCode = 200
 
+        def request = new DomainRequest()
+        request.headers["RecordId"] = "recordId"
+
         def connector = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, connector)
 
@@ -176,7 +179,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def res = connector.handleOrders(new DomainRequest())
+        def res = connector.handleOrders(request)
         def actualStatusCode = res.statusCode
 
         then:
@@ -187,6 +190,9 @@ class EtorDomainRegistrationTest extends Specification {
         given:
         def expectedStatusCode = 400
 
+        def request = new DomainRequest()
+        request.headers["RecordId"] = "recordId"
+
         def domainRegistration = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
 
@@ -195,7 +201,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.register(OrderController, mockController)
 
         def mockUseCase = Mock(SendOrderUseCase)
-        mockUseCase.convertAndSend(_ as Order<?>) >> {
+        mockUseCase.convertAndSend(_ as Order<?>, _ as String) >> {
             throw new UnableToSendOrderException("error", new NullPointerException())
         }
         TestApplicationContext.register(SendOrderUseCase, mockUseCase)
@@ -207,7 +213,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def res = domainRegistration.handleOrders(new DomainRequest())
+        def res = domainRegistration.handleOrders(request)
         def actualStatusCode = res.statusCode
 
         then:
@@ -217,6 +223,9 @@ class EtorDomainRegistrationTest extends Specification {
     def "handleOrders returns a 400 response when the request is not parseable"() {
         given:
         def expectedStatusCode = 400
+
+        def request = new DomainRequest()
+        request.headers["RecordId"] = "recordId"
 
         def domainRegistration = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
@@ -232,7 +241,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def res = domainRegistration.handleOrders(new DomainRequest())
+        def res = domainRegistration.handleOrders(request)
         def actualStatusCode = res.statusCode
 
         then:

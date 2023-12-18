@@ -28,7 +28,7 @@ class SendOrderUsecaseTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        SendOrderUseCase.getInstance().convertAndSend(mockOrder)
+        SendOrderUseCase.getInstance().convertAndSend(mockOrder, _ as String)
 
         then:
         1 * mockConverter.convertMetadataToOmlOrder(mockOrder)
@@ -42,7 +42,7 @@ class SendOrderUsecaseTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        SendOrderUseCase.getInstance().convertAndSend(new OrderMock(null, null, null))
+        SendOrderUseCase.getInstance().convertAndSend(new OrderMock(null, null, null), _ as String)
 
         then:
         1 * SendOrderUseCase.getInstance().metadata.put(_, EtorMetadataStep.ORDER_CONVERTED_TO_OML)
@@ -55,7 +55,7 @@ class SendOrderUsecaseTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        SendOrderUseCase.getInstance().convertAndSend(new OrderMock(null, null, null))
+        SendOrderUseCase.getInstance().convertAndSend(new OrderMock(null, null, null), _ as String)
 
         then:
         1 * SendOrderUseCase.getInstance().metadata.put(_, EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT)
@@ -73,7 +73,7 @@ class SendOrderUsecaseTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        SendOrderUseCase.getInstance().convertAndSend(mockOrder)
+        SendOrderUseCase.getInstance().convertAndSend(mockOrder, _ as String)
 
         then:
         thrown(UnableToSendOrderException)
