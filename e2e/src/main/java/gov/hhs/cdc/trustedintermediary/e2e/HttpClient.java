@@ -18,9 +18,14 @@ public class HttpClient {
     private static final String DEFAULT_PROTOCOL_DOMAIN = "http://localhost:8080";
     private static String protocolDomain = DEFAULT_PROTOCOL_DOMAIN;
 
-    public static ClassicHttpResponse get(String path) throws IOException {
+    public static ClassicHttpResponse get(String path, Map<String, String> headers)
+            throws IOException {
         System.out.println("Calling the backend at GET " + path);
-        var response = Request.get(protocolDomain + path).execute();
+        var request = Request.get(protocolDomain + path);
+        if (headers != null) {
+            headers.forEach(request::addHeader);
+        }
+        var response = request.execute();
         return handleResponseAndSetEntity(response);
     }
 
