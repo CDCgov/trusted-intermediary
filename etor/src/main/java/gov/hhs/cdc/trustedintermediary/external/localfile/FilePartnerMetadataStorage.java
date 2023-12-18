@@ -24,16 +24,16 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
     @Inject Formatter formatter;
     @Inject Logger logger;
 
-    private static final Path metadataDirectory;
+    private static final Path METADATA_DIRECTORY;
 
     static {
         try {
-            Path projectRoot = Paths.get(System.getProperty("java.io.tmpdir"));
-            metadataDirectory = projectRoot.resolve("cdctimetadata");
+            Path userTempPath = Paths.get(System.getProperty("java.io.tmpdir"));
+            METADATA_DIRECTORY = userTempPath.resolve("cdctimetadata");
             FileAttribute<?> onlyOwnerAttrs =
                     PosixFilePermissions.asFileAttribute(
                             PosixFilePermissions.fromString("rwx------"));
-            Files.createDirectories(metadataDirectory, onlyOwnerAttrs);
+            Files.createDirectories(METADATA_DIRECTORY, onlyOwnerAttrs);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -77,6 +77,6 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
     }
 
     private Path getFilePath(String metadataId) {
-        return metadataDirectory.resolve(metadataId + ".json");
+        return METADATA_DIRECTORY.resolve(metadataId + ".json");
     }
 }
