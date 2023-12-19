@@ -9,7 +9,7 @@ import org.apache.hc.core5.http.ClassicHttpResponse;
 
 public class MetadataClient {
 
-    private String token;
+    private final String token;
 
     private static final String METADATA_ENDPOINT_PATH = "/v1/etor/metadata/";
 

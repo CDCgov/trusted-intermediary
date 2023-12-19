@@ -9,8 +9,8 @@ import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ContentType;
 
 public class EndpointClient {
-    private String endpoint;
-    private String token;
+    private final String endpoint;
+    private final String token;
 
     // constructor
     public EndpointClient(String endpoint) {
