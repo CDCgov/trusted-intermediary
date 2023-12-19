@@ -9,6 +9,7 @@ class OrderTest extends Specification {
 
     def orderClient = new EndpointClient("/v1/etor/orders")
     def labOrderJsonFileString = Files.readString(Path.of("../examples/fhir/MN NBS FHIR Order Message.json"))
+    def submissionId = "submissionId"
 
     def setup() {
         SentPayloadReader.delete()
@@ -20,7 +21,7 @@ class OrderTest extends Specification {
         def expectedPatientId  = "11102779"
 
         when:
-        def response = orderClient.submit(labOrderJsonFileString, true)
+        def response = orderClient.submit(labOrderJsonFileString, submissionId, true)
         def parsedJsonBody = JsonParsing.parseContent(response)
 
         then:
@@ -31,7 +32,7 @@ class OrderTest extends Specification {
 
     def "check that contact info is added to order before sending to report stream"() {
         when:
-        orderClient.submit(labOrderJsonFileString, true)
+        orderClient.submit(labOrderJsonFileString, submissionId, true)
         def sentPayload = SentPayloadReader.read()
         def parsedSentPayload = JsonParsing.parse(sentPayload)
 
@@ -41,7 +42,7 @@ class OrderTest extends Specification {
 
     def "check that the rest of the message is unchanged except the parts we changed"() {
         when:
-        orderClient.submit(labOrderJsonFileString, true)
+        orderClient.submit(labOrderJsonFileString, submissionId, true)
         def sentPayload = SentPayloadReader.read()
         def parsedSentPayload = JsonParsing.parse(sentPayload)
         def parsedLabOrderJsonFile = JsonParsing.parse(labOrderJsonFileString)
@@ -57,7 +58,7 @@ class OrderTest extends Specification {
 
     def "check that message type is converted to OML_O21"() {
         when:
-        orderClient.submit(labOrderJsonFileString, true)
+        orderClient.submit(labOrderJsonFileString, submissionId, true)
         def sentPayload = SentPayloadReader.read()
         def parsedSentPayload = JsonParsing.parse(sentPayload)
 
@@ -74,7 +75,7 @@ class OrderTest extends Specification {
         def invalidJsonRequest = labOrderJsonFileString.substring(1)
 
         when:
-        def response = orderClient.submit(invalidJsonRequest, true)
+        def response = orderClient.submit(invalidJsonRequest, submissionId, true)
         def parsedJsonBody = JsonParsing.parseContent(response)
 
         then:
@@ -84,7 +85,7 @@ class OrderTest extends Specification {
 
     def "return a 401 response when making an unauthenticated request"() {
         when:
-        def response = orderClient.submit(labOrderJsonFileString, false)
+        def response = orderClient.submit(labOrderJsonFileString, submissionId, false)
         def parsedJsonBody = JsonParsing.parseContent(response)
 
         then:
