@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import java.time.Instant;
 import javax.inject.Inject;
@@ -15,6 +16,7 @@ public class SendOrderUseCase {
     @Inject OrderSender sender;
     @Inject MetricMetadata metadata;
     @Inject PartnerMetadataStorage partnerMetadataStorage;
+    @Inject Logger logger;
 
     private SendOrderUseCase() {}
 
@@ -24,13 +26,11 @@ public class SendOrderUseCase {
 
     public void convertAndSend(final Order<?> order, String submissionId)
             throws UnableToSendOrderException {
-        var partnerMetadata =
-                new PartnerMetadata(
-                        submissionId, "senderName", "receiverName", Instant.now(), "abcd");
+
         try {
-            partnerMetadataStorage.saveMetadata(partnerMetadata);
+            savePartnerMetadata(submissionId);
         } catch (PartnerMetadataException e) {
-            throw new UnableToSendOrderException("Unable to save metadata for the order", e);
+            logger.logError("Unable to save metadata for submissionId " + submissionId, e);
         }
 
         var omlOrder = converter.convertMetadataToOmlOrder(order);
@@ -38,5 +38,17 @@ public class SendOrderUseCase {
         omlOrder = converter.addContactSectionToPatientResource(omlOrder);
         metadata.put(order.getFhirResourceId(), EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT);
         sender.sendOrder(omlOrder);
+    }
+
+    private void savePartnerMetadata(String submissionId) throws PartnerMetadataException {
+        if (submissionId == null) {
+            return;
+        }
+
+        // TODO: still need to get metadata from the order: sender, receiver, timeReceived, hash
+        PartnerMetadata partnerMetadata =
+                new PartnerMetadata(
+                        submissionId, "senderName", "receiverName", Instant.now(), "abcd");
+        partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 }

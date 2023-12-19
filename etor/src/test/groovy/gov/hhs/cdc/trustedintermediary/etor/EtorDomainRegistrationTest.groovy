@@ -280,6 +280,37 @@ class EtorDomainRegistrationTest extends Specification {
         1 * mockUseCase.convertAndSend(_, null)
     }
 
+    def "handleOrders logs an error and continues the usecase like normal when the metadata unique ID is empty because we want to know when our integration with RS is broken"() {
+        given:
+        def request = new DomainRequest()
+        request.headers["RecordId"] = ""  // empty metadata unique ID
+
+        def domainRegistration = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
+
+        def mockController = Mock(OrderController)
+        TestApplicationContext.register(OrderController, mockController)
+
+        def mockUseCase = Mock(SendOrderUseCase)
+        TestApplicationContext.register(SendOrderUseCase, mockUseCase)
+
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
+
+        def mockLogger = Mock(Logger)
+        TestApplicationContext.register(Logger, mockLogger)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        domainRegistration.handleOrders(request)
+
+        then:
+        1 * mockLogger.logError(_ as String)
+        1 * mockController.parseOrders(_ as DomainRequest) >> new OrderMock<?>("DogCow", "Moof", "Clarus")
+        1 * mockUseCase.convertAndSend(_, null)
+    }
+
     def "metadata endpoint happy path"() {
         given:
         def expectedStatusCode = 200
