@@ -24,6 +24,7 @@ public class SendOrderUseCase {
         return INSTANCE;
     }
 
+
     public void convertAndSend(final Order<?> order) throws UnableToSendOrderException {
 
         var partnerMetadata =
