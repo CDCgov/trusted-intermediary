@@ -34,6 +34,16 @@ class MetadataTest extends Specification {
         parsedJsonBody.uniqueId == submissionId
     }
 
+    def "a 404 is returned when there is no metadata for a given ID"() {
+        when:
+        def metadataResponse = metadataClient.get(UUID.randomUUID().toString(), true)
+        def parsedJsonBody = JsonParsing.parseContent(metadataResponse)
+
+        then:
+        metadataResponse.getCode() == 404
+        !(parsedJsonBody.error as String).isEmpty()
+    }
+
     def "metadata endpoint fails when called un an unauthenticated manner"() {
         when:
         def metadataResponse = metadataClient.get("DogCow", false)
