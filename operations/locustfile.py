@@ -11,6 +11,7 @@ HEALTH_ENDPOINT = "/health"
 AUTH_ENDPOINT = "/v1/auth/token"
 DEMOGRAPHICS_ENDPOINT = "/v1/etor/demographics"
 ORDERS_ENDPOINT = "/v1/etor/orders"
+METADATA_ENDPOINT = "/v1/etor/metadata"
 
 demographics_request_body = None
 order_request_body = None
@@ -63,6 +64,10 @@ class SampleUser(FastHttpUser):
             data=order_request_body,
             headers={"Authorization": self.access_token},
         )
+
+    @task(5)
+    def get_v1_etor_metadata(self):
+        self.client.get(METADATA_ENDPOINT,)
 
 
 @events.test_start.add_listener
