@@ -33,4 +33,14 @@ class MetadataTest extends Specification {
         metadataResponse.getCode() == 200
         parsedJsonBody.uniqueId == submissionId
     }
+
+    def "metadata endpoint fails when called un an unauthenticated manner"() {
+        when:
+        def metadataResponse = metadataClient.get("DogCow", false)
+        def parsedJsonBody = JsonParsing.parseContent(metadataResponse)
+
+        then:
+        metadataResponse.getCode() == 401
+        !(parsedJsonBody.error as String).isEmpty()
+    }
 }
