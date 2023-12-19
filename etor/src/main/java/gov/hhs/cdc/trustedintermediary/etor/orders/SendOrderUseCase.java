@@ -25,7 +25,7 @@ public class SendOrderUseCase {
     }
 
 
-    public void convertAndSend(final Order<?> order) throws UnableToSendOrderException {
+    public void convertAndSend(final Order<?> order, String submissionId) throws UnableToSendOrderException {
 
         var partnerMetadata =
                 new PartnerMetadata(
@@ -38,7 +38,7 @@ public class SendOrderUseCase {
 
         } catch (PartnerMetadataException e) {
             logger.logError(
-                    "Unable to save metadata for submissionId " + partnerMetadata.uniqueId(), e);
+                    "Unable to save metadata for submissionId " + submissionId, e);
         }
 
         var omlOrder = converter.convertMetadataToOmlOrder(order);
