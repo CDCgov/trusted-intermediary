@@ -45,6 +45,7 @@ public class SendOrderUseCase {
             return;
         }
 
+        // TODO: still need to get metadata from the order: sender, receiver, timeReceived, hash
         PartnerMetadata partnerMetadata =
                 new PartnerMetadata(
                         submissionId, "senderName", "receiverName", Instant.now(), "abcd");
