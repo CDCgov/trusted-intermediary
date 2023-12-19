@@ -30,12 +30,21 @@ public class EndpointClient {
     }
 
     public ClassicHttpResponse submit(String fhirBody, boolean loginFirst) throws IOException {
+        return submit(fhirBody, null, loginFirst);
+    }
+
+    public ClassicHttpResponse submit(String fhirBody, String submissionId, boolean loginFirst)
+            throws IOException {
 
         Map<String, String> headers = new HashMap<>();
 
         if (loginFirst) {
             var accessToken = AuthClient.requestAccessToken("report-stream", token);
             headers.put("Authorization", "Bearer " + accessToken);
+        }
+
+        if (submissionId != null) {
+            headers.put("RecordId", submissionId);
         }
 
         return HttpClient.post(endpoint, fhirBody, ContentType.APPLICATION_JSON, headers);

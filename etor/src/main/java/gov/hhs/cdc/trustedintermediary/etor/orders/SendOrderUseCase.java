@@ -34,8 +34,10 @@ public class SendOrderUseCase {
             partnerMetadataStorage.saveMetadata(partnerMetadata);
             logger.logInfo("Trying to read the metadata");
             partnerMetadataStorage.readMetadata(partnerMetadata.uniqueId());
+
         } catch (PartnerMetadataException e) {
-            throw new UnableToSendOrderException("Unable to save metadata for the order", e);
+            logger.logError(
+                    "Unable to save metadata for submissionId " + partnerMetadata.uniqueId(), e);
         }
 
         var omlOrder = converter.convertMetadataToOmlOrder(order);
@@ -43,5 +45,17 @@ public class SendOrderUseCase {
         omlOrder = converter.addContactSectionToPatientResource(omlOrder);
         metadata.put(order.getFhirResourceId(), EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT);
         sender.sendOrder(omlOrder);
+    }
+
+    private void savePartnerMetadata(String submissionId) throws PartnerMetadataException {
+        if (submissionId == null) {
+            return;
+        }
+
+        // TODO: still need to get metadata from the order: sender, receiver, timeReceived, hash
+        PartnerMetadata partnerMetadata =
+                new PartnerMetadata(
+                        submissionId, "senderName", "receiverName", Instant.now(), "abcd");
+        partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 }
