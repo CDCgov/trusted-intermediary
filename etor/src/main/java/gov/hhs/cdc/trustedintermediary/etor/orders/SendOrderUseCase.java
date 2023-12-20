@@ -33,7 +33,10 @@ public class SendOrderUseCase {
         metadata.put(order.getFhirResourceId(), EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT);
         sender.sendOrder(omlOrder);
 
-        saveSentOrderSubmissionId(submissionId, "DogCow", order);
+        saveSentOrderSubmissionId(
+                submissionId,
+                "TBD, need to be filled in from the sender.sendOrder(omlOrder) call",
+                order);
     }
 
     private void savePartnerMetadataForReceivedOrder(String submissionId, final Order<?> order) {

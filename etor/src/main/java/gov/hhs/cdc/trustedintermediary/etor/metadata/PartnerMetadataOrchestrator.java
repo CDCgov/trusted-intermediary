@@ -37,6 +37,8 @@ public class PartnerMetadataOrchestrator {
             throws PartnerMetadataException {
         // call the metadata storage and add the sent order's submission ID to the existing metadata
         // entry
+        // PartnerMetadata may need to be updated to store both the received order's submission ID
+        // _and_ the sent order's submission ID.
     }
 
     public Optional<PartnerMetadata> getMetadata(String submissionId)
