@@ -177,8 +177,7 @@ public class DomainsRegistration {
                         .collect(
                                 Collectors.toMap(
                                         entry -> entry.getKey().toLowerCase(),
-                                        Map.Entry::getValue,
-                                        (oldValue, newValue) -> newValue));
+                                        Map.Entry::getValue));
 
         request.setBody(ctx.body());
         request.setUrl(ctx.url());
