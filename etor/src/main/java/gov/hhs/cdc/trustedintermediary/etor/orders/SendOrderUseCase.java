@@ -25,16 +25,18 @@ public class SendOrderUseCase {
     public void convertAndSend(final Order<?> order, String submissionId)
             throws UnableToSendOrderException {
 
-        savePartnerMetadata(submissionId, order);
+        savePartnerMetadataForReceivedOrder(submissionId, order);
 
         var omlOrder = converter.convertMetadataToOmlOrder(order);
         metadata.put(order.getFhirResourceId(), EtorMetadataStep.ORDER_CONVERTED_TO_OML);
         omlOrder = converter.addContactSectionToPatientResource(omlOrder);
         metadata.put(order.getFhirResourceId(), EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT);
         sender.sendOrder(omlOrder);
+
+        saveSentOrderSubmissionId(submissionId, "DogCow", order);
     }
 
-    private void savePartnerMetadata(String submissionId, final Order<?> order) {
+    private void savePartnerMetadataForReceivedOrder(String submissionId, final Order<?> order) {
         if (submissionId == null) {
             return;
         }
@@ -43,6 +45,25 @@ public class SendOrderUseCase {
             partnerMetadataOrchestrator.updateMetadataForReceivedOrder(submissionId, order);
         } catch (PartnerMetadataException e) {
             logger.logError("Unable to save metadata for submissionId " + submissionId, e);
+        }
+    }
+
+    private void saveSentOrderSubmissionId(
+            String receivedSubmissionId, String sentSubmissionId, final Order<?> order) {
+        if (sentSubmissionId == null || receivedSubmissionId == null) {
+            return;
+        }
+
+        try {
+            partnerMetadataOrchestrator.updateMetadataForSentOrder(
+                    receivedSubmissionId, sentSubmissionId, order);
+        } catch (PartnerMetadataException e) {
+            logger.logError(
+                    "Unable to update metadata for received submissionId "
+                            + receivedSubmissionId
+                            + " and sent submissionId "
+                            + sentSubmissionId,
+                    e);
         }
     }
 }
