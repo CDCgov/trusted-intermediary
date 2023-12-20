@@ -56,7 +56,7 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject SendOrderUseCase sendOrderUseCase;
     @Inject Logger logger;
     @Inject DomainResponseHelper domainResponseHelper;
-    @Inject PartnerMetadataStorage partnerMetadataStorage;
+    @Inject PartnerMetadataOrchestrator partnerMetadataOrchestrator;
     @Inject Formatter formatter;
 
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
@@ -153,7 +153,8 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleMetadata(DomainRequest request) {
         try {
             String metadataId = request.getPathParams().get("id");
-            Optional<PartnerMetadata> metadata = partnerMetadataStorage.readMetadata(metadataId);
+            Optional<PartnerMetadata> metadata =
+                    partnerMetadataOrchestrator.getMetadata(metadataId);
 
             if (metadata.isEmpty()) {
                 return domainResponseHelper.constructErrorResponse(

@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.metadata;
 
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import java.time.Instant;
+import java.util.Optional;
 import javax.inject.Inject;
 
 public class PartnerMetadataOrchestrator {
@@ -38,13 +39,14 @@ public class PartnerMetadataOrchestrator {
         // entry
     }
 
-    public PartnerMetadata getMetadata(String submissionId) throws PartnerMetadataException {
+    public Optional<PartnerMetadata> getMetadata(String submissionId)
+            throws PartnerMetadataException {
         // call the metadata storage to get the metadata.
         // check if the receiver is filled out, and if it isn't, call the RS history API to get the
         // receiver.
         // if had to call the history API, extract the receiver and call the metadata storage to
         // save the metadata with the receiver added.
         // return the metadata.
-        return null;
+        return partnerMetadataStorage.readMetadata(submissionId);
     }
 }
