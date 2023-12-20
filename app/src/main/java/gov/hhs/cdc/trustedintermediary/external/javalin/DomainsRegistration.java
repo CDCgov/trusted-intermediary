@@ -18,10 +18,8 @@ import io.javalin.http.HandlerType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Registers the available domains to the application context and their specific handlers for the
@@ -172,17 +170,10 @@ public class DomainsRegistration {
 
     static DomainRequest javalinContextToDomainRequest(Context ctx) {
         var request = new DomainRequest();
-        var caseInsensitiveHeaderMap =
-                ctx.headerMap().entrySet().stream()
-                        .collect(
-                                Collectors.toMap(
-                                        entry -> entry.getKey().toLowerCase(),
-                                        Map.Entry::getValue,
-                                        (oldValue, newValue) -> newValue));
 
         request.setBody(ctx.body());
         request.setUrl(ctx.url());
-        request.setHeaders(caseInsensitiveHeaderMap);
+        request.setHeaders(ctx.headerMap());
         request.setPathParams(ctx.pathParamMap());
 
         return request;

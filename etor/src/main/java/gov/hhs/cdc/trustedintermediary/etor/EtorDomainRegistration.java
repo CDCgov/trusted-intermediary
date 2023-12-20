@@ -123,7 +123,7 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleOrders(DomainRequest request) {
         Order<?> orders;
 
-        String submissionId = request.getHeaders().get("recordid");
+        String submissionId = request.getHeaders().get("RecordId");
         if (submissionId == null || submissionId.isEmpty()) {
             submissionId = null;
             logger.logError("Missing required header or empty: RecordId");
