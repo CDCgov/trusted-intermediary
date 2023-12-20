@@ -1,12 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders;
 
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
-import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
-import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
-import java.time.Instant;
 import javax.inject.Inject;
 
 /** The overall logic to receive, convert to OML, and subsequently send a lab order. */
@@ -15,7 +13,7 @@ public class SendOrderUseCase {
     @Inject OrderConverter converter;
     @Inject OrderSender sender;
     @Inject MetricMetadata metadata;
-    @Inject PartnerMetadataStorage partnerMetadataStorage;
+    @Inject PartnerMetadataOrchestrator partnerMetadataOrchestrator;
     @Inject Logger logger;
 
     private SendOrderUseCase() {}
@@ -27,11 +25,7 @@ public class SendOrderUseCase {
     public void convertAndSend(final Order<?> order, String submissionId)
             throws UnableToSendOrderException {
 
-        try {
-            savePartnerMetadata(submissionId);
-        } catch (PartnerMetadataException e) {
-            logger.logError("Unable to save metadata for submissionId " + submissionId, e);
-        }
+        savePartnerMetadata(submissionId, order);
 
         var omlOrder = converter.convertMetadataToOmlOrder(order);
         metadata.put(order.getFhirResourceId(), EtorMetadataStep.ORDER_CONVERTED_TO_OML);
@@ -40,15 +34,15 @@ public class SendOrderUseCase {
         sender.sendOrder(omlOrder);
     }
 
-    private void savePartnerMetadata(String submissionId) throws PartnerMetadataException {
+    private void savePartnerMetadata(String submissionId, final Order<?> order) {
         if (submissionId == null) {
             return;
         }
 
-        // TODO: still need to get metadata from the order: sender, receiver, timeReceived, hash
-        PartnerMetadata partnerMetadata =
-                new PartnerMetadata(
-                        submissionId, "senderName", "receiverName", Instant.now(), "abcd");
-        partnerMetadataStorage.saveMetadata(partnerMetadata);
+        try {
+            partnerMetadataOrchestrator.updateMetadataForReceivedOrder(submissionId, order);
+        } catch (PartnerMetadataException e) {
+            logger.logError("Unable to save metadata for submissionId " + submissionId, e);
+        }
     }
 }

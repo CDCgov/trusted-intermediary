@@ -13,6 +13,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsCont
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController;
@@ -75,6 +76,8 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(OrderConverter.class, HapiOrderConverter.getInstance());
         ApplicationContext.register(OrderController.class, OrderController.getInstance());
         ApplicationContext.register(SendOrderUseCase.class, SendOrderUseCase.getInstance());
+        ApplicationContext.register(
+                PartnerMetadataOrchestrator.class, PartnerMetadataOrchestrator.getInstance());
 
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
             ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
