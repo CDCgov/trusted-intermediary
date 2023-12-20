@@ -13,7 +13,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsCont
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException
-import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse
@@ -321,9 +321,9 @@ class EtorDomainRegistrationTest extends Specification {
         def request = new DomainRequest()
         request.setPathParams(["id": "metadataId"])
 
-        def mockPartnerMetadataStorage = Mock(PartnerMetadataStorage)
-        mockPartnerMetadataStorage.readMetadata(_ as String) >> Optional.ofNullable(new PartnerMetadata("metadataId", "sender", "receiver", Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd"))
-        TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
+        def mockPartnerMetadataOrchestrator = Mock(PartnerMetadataOrchestrator)
+        mockPartnerMetadataOrchestrator.getMetadata(_ as String) >> Optional.ofNullable(new PartnerMetadata("metadataId", "sender", "receiver", Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd"))
+        TestApplicationContext.register(PartnerMetadataOrchestrator, mockPartnerMetadataOrchestrator)
 
         def mockResponseHelper = Mock(DomainResponseHelper)
         mockResponseHelper.constructOkResponse(_ as String) >> new DomainResponse(expectedStatusCode)
@@ -350,9 +350,9 @@ class EtorDomainRegistrationTest extends Specification {
         def request = new DomainRequest()
         request.setPathParams(["id": "metadataId"])
 
-        def mockPartnerMetadataStorage = Mock(PartnerMetadataStorage)
-        mockPartnerMetadataStorage.readMetadata(_ as String) >> Optional.empty()
-        TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
+        def mockPartnerMetadataOrchestrator = Mock(PartnerMetadataOrchestrator)
+        mockPartnerMetadataOrchestrator.getMetadata(_ as String) >> Optional.empty()
+        TestApplicationContext.register(PartnerMetadataOrchestrator, mockPartnerMetadataOrchestrator)
 
         def mockResponseHelper = Mock(DomainResponseHelper)
         mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as String) >> new DomainResponse(expectedStatusCode)
@@ -378,9 +378,9 @@ class EtorDomainRegistrationTest extends Specification {
         def request = new DomainRequest()
         request.setPathParams(["id": "metadataId"])
 
-        def mockPartnerMetadataStorage = Mock(PartnerMetadataStorage)
-        mockPartnerMetadataStorage.readMetadata(_ as String) >> { throw new PartnerMetadataException("DogCow", new Exception()) }
-        TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
+        def mockPartnerMetadataOrchestrator = Mock(PartnerMetadataOrchestrator)
+        mockPartnerMetadataOrchestrator.getMetadata(_ as String) >> { throw new PartnerMetadataException("DogCow", new Exception()) }
+        TestApplicationContext.register(PartnerMetadataOrchestrator, mockPartnerMetadataOrchestrator)
 
         def mockResponseHelper = Mock(DomainResponseHelper)
         mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as String) >> new DomainResponse(expectedStatusCode)
@@ -406,9 +406,9 @@ class EtorDomainRegistrationTest extends Specification {
         def request = new DomainRequest()
         request.setPathParams(["id": "metadataId"])
 
-        def mockPartnerMetadataStorage = Mock(PartnerMetadataStorage)
-        mockPartnerMetadataStorage.readMetadata(_ as String) >> Optional.ofNullable(new PartnerMetadata("metadataUniqueId", "sender", "receiver", Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd"))
-        TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
+        def mockPartnerMetadataOrchestrator = Mock(PartnerMetadataOrchestrator)
+        mockPartnerMetadataOrchestrator.getMetadata(_ as String) >> Optional.ofNullable(new PartnerMetadata("metadataUniqueId", "sender", "receiver", Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd"))
+        TestApplicationContext.register(PartnerMetadataOrchestrator, mockPartnerMetadataOrchestrator)
 
         def mockFormatter = Mock(Formatter)
         mockFormatter.convertToJsonString(_ as PartnerMetadata) >> { throw new FormatterProcessingException("DogCow", new Exception()) }
