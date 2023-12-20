@@ -38,7 +38,7 @@ class DomainsRegistrationTest extends Specification {
         def bodyString = "DogCow"
         def urlString = "Moof"
         def headerMap = [
-            "Clarus": "is a DogCow"
+            "clarus": "is a DogCow"
         ]
 
         def javalinContext = Mock(Context)
@@ -101,6 +101,7 @@ class DomainsRegistrationTest extends Specification {
         }
         def javalinContext = Mock(Context)
         javalinContext.method() >> HandlerType.POST
+        javalinContext.headerMap() >> [:]
 
         when:
         def javalinHandler = DomainsRegistration.createHandler(rawHandler, false)
@@ -242,6 +243,7 @@ class DomainsRegistrationTest extends Specification {
 
         def mockContext = Mock(Context)
         mockContext.method() >> HandlerType.POST
+        mockContext.headerMap() >> [:]
 
         def mockAuthValidator = Mock(AuthRequestValidator)
         mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> false
@@ -321,6 +323,27 @@ class DomainsRegistrationTest extends Specification {
             handler.handle(context)
         }
         contentType == "application/x-yaml"
+    }
+
+    def "javalinContextToDomainRequest transforms ctx.headerMap so the keys are always lowercase"() {
+        given:
+        def headerMap = [
+            "testkey1": "testvalue1",
+            "TestKey2": "testvalue2",
+            "TESTKEY3": "testvalue3",
+        ]
+
+        def javalinContext = Mock(Context)
+        javalinContext.headerMap() >> headerMap
+
+        when:
+        def domainRequest = DomainsRegistration.javalinContextToDomainRequest(javalinContext)
+        def transformedHeaderMap = domainRequest.getHeaders()
+
+        then:
+        transformedHeaderMap.get("testkey1") == "testvalue1"
+        transformedHeaderMap.get("testkey2") == "testvalue2"
+        transformedHeaderMap.get("testkey3") == "testvalue3"
     }
 
     static class Example1DomainConnector implements DomainConnector {

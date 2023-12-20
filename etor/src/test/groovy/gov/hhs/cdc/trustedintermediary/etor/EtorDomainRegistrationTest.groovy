@@ -158,7 +158,7 @@ class EtorDomainRegistrationTest extends Specification {
         def expectedStatusCode = 200
 
         def request = new DomainRequest()
-        request.headers["RecordId"] = "recordId"
+        request.headers["recordid"] = "recordId"
 
         def connector = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, connector)
@@ -191,7 +191,7 @@ class EtorDomainRegistrationTest extends Specification {
         def expectedStatusCode = 400
 
         def request = new DomainRequest()
-        request.headers["RecordId"] = "recordId"
+        request.headers["recordid"] = "recordId"
 
         def domainRegistration = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
@@ -225,7 +225,7 @@ class EtorDomainRegistrationTest extends Specification {
         def expectedStatusCode = 400
 
         def request = new DomainRequest()
-        request.headers["RecordId"] = "recordId"
+        request.headers["recordid"] = "recordId"
 
         def domainRegistration = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
@@ -252,7 +252,7 @@ class EtorDomainRegistrationTest extends Specification {
         given:
 
         def request = new DomainRequest()
-        request.headers["RecordId"] = null  //no metadata unique ID
+        request.headers["recordid"] = null  //no metadata unique ID
 
         def domainRegistration = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
@@ -283,7 +283,7 @@ class EtorDomainRegistrationTest extends Specification {
     def "handleOrders logs an error and continues the usecase like normal when the metadata unique ID is empty because we want to know when our integration with RS is broken"() {
         given:
         def request = new DomainRequest()
-        request.headers["RecordId"] = ""  // empty metadata unique ID
+        request.headers["recordid"] = ""  // empty metadata unique ID
 
         def domainRegistration = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, domainRegistration)

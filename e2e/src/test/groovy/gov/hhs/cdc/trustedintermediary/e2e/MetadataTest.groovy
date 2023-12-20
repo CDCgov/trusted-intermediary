@@ -15,22 +15,24 @@ class MetadataTest extends Specification {
 
     def "a metadata response is returned from the ETOR metadata endpoint"() {
         given:
+        def expectedStatusCode = 200
         def submissionId = UUID.randomUUID().toString()
         def orderClient = new EndpointClient("/v1/etor/orders")
         def labOrderJsonFileString = Files.readString(Path.of("../examples/fhir/MN NBS FHIR Order Message.json"))
 
         when:
+
         def orderResponse = orderClient.submit(labOrderJsonFileString, submissionId, true)
 
         then:
-        orderResponse.getCode() == 200
+        orderResponse.getCode() == expectedStatusCode
 
         when:
         def metadataResponse = metadataClient.get(submissionId, true)
         def parsedJsonBody = JsonParsing.parseContent(metadataResponse)
 
         then:
-        metadataResponse.getCode() == 200
+        metadataResponse.getCode() == expectedStatusCode
         parsedJsonBody.uniqueId == submissionId
     }
 
