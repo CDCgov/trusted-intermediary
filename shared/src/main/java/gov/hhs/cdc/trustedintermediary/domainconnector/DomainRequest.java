@@ -26,6 +26,12 @@ public class DomainRequest {
         this.url = url;
     }
 
+    /**
+     * Returns the headers for the request. Please note that the keys (header names) are always
+     * lowercase.
+     *
+     * @return the headers Map for this request, with lowercase keys
+     */
     public Map<String, String> getHeaders() {
         return headers;
     }
