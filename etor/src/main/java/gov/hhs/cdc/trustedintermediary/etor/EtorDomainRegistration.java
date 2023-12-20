@@ -30,8 +30,6 @@ import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -57,7 +55,6 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject Logger logger;
     @Inject DomainResponseHelper domainResponseHelper;
     @Inject PartnerMetadataOrchestrator partnerMetadataOrchestrator;
-    @Inject Formatter formatter;
 
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
             Map.of(
@@ -161,9 +158,8 @@ public class EtorDomainRegistration implements DomainConnector {
                         404, "Metadata not found for ID: " + metadataId);
             }
 
-            return domainResponseHelper.constructOkResponse(
-                    formatter.convertToJsonString(metadata.get()));
-        } catch (PartnerMetadataException | FormatterProcessingException e) {
+            return domainResponseHelper.constructOkResponse(metadata.get());
+        } catch (PartnerMetadataException e) {
             String errorMessage = "Unable to retrieve requested metadata";
             logger.logError(errorMessage, e);
             return domainResponseHelper.constructErrorResponse(500, errorMessage);
