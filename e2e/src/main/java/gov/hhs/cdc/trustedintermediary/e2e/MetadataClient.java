@@ -6,16 +6,14 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.hc.core5.http.ClassicHttpResponse;
-import org.apache.hc.core5.http.ContentType;
 
-public class EndpointClient {
-    private final String endpoint;
+public class MetadataClient {
+
     private final String token;
 
-    // constructor
-    public EndpointClient(String endpoint) {
-        this.endpoint = endpoint;
+    private static final String METADATA_ENDPOINT_PATH = "/v1/etor/metadata/";
 
+    public MetadataClient() {
         try {
             this.token =
                     Files.readString(
@@ -29,13 +27,7 @@ public class EndpointClient {
         }
     }
 
-    public ClassicHttpResponse submit(String fhirBody, boolean loginFirst) throws IOException {
-        return submit(fhirBody, null, loginFirst);
-    }
-
-    public ClassicHttpResponse submit(String fhirBody, String submissionId, boolean loginFirst)
-            throws IOException {
-
+    public ClassicHttpResponse get(String submissionId, boolean loginFirst) throws IOException {
         Map<String, String> headers = new HashMap<>();
 
         if (loginFirst) {
@@ -43,16 +35,8 @@ public class EndpointClient {
             headers.put("Authorization", "Bearer " + accessToken);
         }
 
-        if (submissionId != null) {
-            headers.put("RecordId", submissionId);
-        }
+        String endpointPath = METADATA_ENDPOINT_PATH + submissionId;
 
-        return HttpClient.post(endpoint, fhirBody, ContentType.APPLICATION_JSON, headers);
-    }
-
-    public static Object getResponseBodyValue(ClassicHttpResponse response, String key)
-            throws IOException {
-        var responseBody = JsonParsing.parseContent(response);
-        return responseBody.get(key);
+        return HttpClient.get(endpointPath, headers);
     }
 }

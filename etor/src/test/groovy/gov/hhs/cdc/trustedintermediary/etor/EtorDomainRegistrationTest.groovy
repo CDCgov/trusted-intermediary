@@ -326,7 +326,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
 
         def mockResponseHelper = Mock(DomainResponseHelper)
-        mockResponseHelper.constructOkResponse(_ as String) >> new DomainResponse(expectedStatusCode)
+        mockResponseHelper.constructOkResponse(_ as PartnerMetadata) >> new DomainResponse(expectedStatusCode)
         TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
 
         TestApplicationContext.register(Formatter, Jackson.getInstance())
@@ -381,38 +381,6 @@ class EtorDomainRegistrationTest extends Specification {
         def mockPartnerMetadataStorage = Mock(PartnerMetadataStorage)
         mockPartnerMetadataStorage.readMetadata(_ as String) >> { throw new PartnerMetadataException("DogCow", new Exception()) }
         TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
-
-        def mockResponseHelper = Mock(DomainResponseHelper)
-        mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as String) >> new DomainResponse(expectedStatusCode)
-        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
-
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        def res = connector.handleMetadata(request)
-        def actualStatusCode = res.statusCode
-
-        then:
-        actualStatusCode == expectedStatusCode
-    }
-
-    def "metadata endpoint returns a 500 response when there is an exception formatting the metadata"() {
-        given:
-        def expectedStatusCode = 500
-
-        def connector = new EtorDomainRegistration()
-        TestApplicationContext.register(EtorDomainRegistration, connector)
-
-        def request = new DomainRequest()
-        request.setPathParams(["id": "metadataId"])
-
-        def mockPartnerMetadataStorage = Mock(PartnerMetadataStorage)
-        mockPartnerMetadataStorage.readMetadata(_ as String) >> Optional.ofNullable(new PartnerMetadata("metadataUniqueId", "sender", "receiver", Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd"))
-        TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
-
-        def mockFormatter = Mock(Formatter)
-        mockFormatter.convertToJsonString(_ as PartnerMetadata) >> { throw new FormatterProcessingException("DogCow", new Exception()) }
-        TestApplicationContext.register(Formatter, mockFormatter)
 
         def mockResponseHelper = Mock(DomainResponseHelper)
         mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as String) >> new DomainResponse(expectedStatusCode)
