@@ -60,18 +60,20 @@ class SampleUser(FastHttpUser):
 
     @task(5)
     def post_v1_etor_orders(self):
-        headers={"Authorization": self.access_token, "RecordId": self.submission_id},
         self.client.post(
             ORDERS_ENDPOINT,
-            headers,
+            headers={
+                "Authorization": self.access_token,
+                "RecordId": self.submission_id,
+            },
             data=order_request_body,
         )
 
     @task(5)
     def get_v1_etor_metadata(self):
         self.client.get(
-        f"{METADATA_ENDPOINT}/{self.submission_id}",
-        headers={"Authorization": self.access_token},
+            f"{METADATA_ENDPOINT}/{self.submission_id}",
+            headers={"Authorization": self.access_token},
         )
 
 
