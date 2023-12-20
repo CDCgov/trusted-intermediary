@@ -11,7 +11,6 @@ HEALTH_ENDPOINT = "/health"
 AUTH_ENDPOINT = "/v1/auth/token"
 DEMOGRAPHICS_ENDPOINT = "/v1/etor/demographics"
 ORDERS_ENDPOINT = "/v1/etor/orders"
-METADATA_ENDPOINT = "/v1/etor/metadata"
 
 demographics_request_body = None
 order_request_body = None
@@ -25,7 +24,6 @@ class SampleUser(FastHttpUser):
 
     token_refresh_interval = 280
     access_token = None
-    submission_id = "1a2b3c"
 
     def on_start(self):
         self.authenticate()
@@ -62,17 +60,7 @@ class SampleUser(FastHttpUser):
     def post_v1_etor_orders(self):
         self.client.post(
             ORDERS_ENDPOINT,
-            headers={
-                "Authorization": self.access_token,
-                "RecordId": self.submission_id,
-            },
             data=order_request_body,
-        )
-
-    @task(5)
-    def get_v1_etor_metadata(self):
-        self.client.get(
-            f"{METADATA_ENDPOINT}/{self.submission_id}",
             headers={"Authorization": self.access_token},
         )
 
