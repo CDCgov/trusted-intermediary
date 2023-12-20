@@ -6,7 +6,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_DB: "intermediary"
-      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_PASSWORD: "changeIT!"
       POSTGRES_USER: "intermediary"
     ports:
       - 5433:5432
