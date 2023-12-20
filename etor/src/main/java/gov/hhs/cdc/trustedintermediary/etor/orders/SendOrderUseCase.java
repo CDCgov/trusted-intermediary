@@ -29,11 +29,14 @@ public class SendOrderUseCase {
 
         var partnerMetadata =
                 new PartnerMetadata(
-                        "uniqueId", "senderName", "receiverName", Instant.now(), "abcd");
+                        "uniqueId",
+                        "senderName",
+                        "receiverName",
+                        Instant.now(),
+                        "abcd"); // For testing, delete when done
         try {
             logger.logInfo("Trying to save the metadata");
             savePartnerMetadata(submissionId);
-            partnerMetadataStorage.saveMetadata(partnerMetadata);
             logger.logInfo("Trying to read the metadata");
             partnerMetadataStorage.readMetadata(partnerMetadata.uniqueId());
 
