@@ -60,18 +60,16 @@ class AuthRequestValidatorTest extends Specification{
     def "extractToken happy path works"() {
         given:
         def token = "fake-token-here"
-        def header = Map.of("Authorization", "Bearer " + token)
-        def expected = token
+        def header = Map.of("authorization", "Bearer " + token)
         def request = new DomainRequest()
-        def validator = AuthRequestValidator.getInstance()
+        request.setHeaders(header)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        request.setHeaders(header)
-        def actual = validator.extractToken(request)
+        def actual = AuthRequestValidator.getInstance().extractToken(request)
 
         then:
-        actual == expected
+        actual == token
     }
 
     def "extractToken unhappy path works"() {
@@ -150,19 +148,21 @@ class AuthRequestValidatorTest extends Specification{
         given:
         def validator = AuthRequestValidator.getInstance()
         def token = "fake-token-here"
-        def header = Map.of("Authorization", "Bearer " + token)
+        def header = Map.of("authorization", "Bearer " + token)
         def mockEngine = Mock(JjwtEngine)
         def mockCache = Mock(KeyCache)
         def request = new DomainRequest()
         def expected = true
+
+        request.setHeaders(header)
+        mockCache.get(_ as String) >> "my-fake-private-key"
+        mockEngine.validateToken(_ as String, _ as String)
+
         TestApplicationContext.register(Cache, mockCache)
         TestApplicationContext.register(AuthEngine, mockEngine)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        request.setHeaders(header)
-        mockCache.get(_ as String) >> {"my-fake-private-key"}
-        mockEngine.validateToken(_ as String, _ as String)
         def actual = validator.isValidAuthenticatedRequest(request)
 
         then:
