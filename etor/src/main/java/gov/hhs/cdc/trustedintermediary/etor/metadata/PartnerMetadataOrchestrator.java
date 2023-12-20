@@ -5,6 +5,11 @@ import java.time.Instant;
 import java.util.Optional;
 import javax.inject.Inject;
 
+/**
+ * The PartnerMetadataOrchestrator class is responsible for updating and retrieving partner-facing
+ * metadata. It interacts with the metadata storage and the history API to create, update, and store
+ * metadata.
+ */
 public class PartnerMetadataOrchestrator {
 
     private static final PartnerMetadataOrchestrator INSTANCE = new PartnerMetadataOrchestrator();
