@@ -26,6 +26,7 @@ class SampleUser(FastHttpUser):
     token_refresh_interval = 280
     access_token = None
     submission_id = "1a2b3c"
+    orders_api_called = False
 
     def on_start(self):
         self.authenticate()
@@ -60,7 +61,7 @@ class SampleUser(FastHttpUser):
 
     @task(5)
     def post_v1_etor_orders(self):
-        self.client.post(
+        response = self.client.post(
             ORDERS_ENDPOINT,
             headers={
                 "Authorization": self.access_token,
@@ -68,13 +69,16 @@ class SampleUser(FastHttpUser):
             },
             data=order_request_body,
         )
+        if response.status_code == 200:
+            self.orders_api_called = True
 
     @task(5)
     def get_v1_etor_metadata(self):
-        self.client.get(
-            f"{METADATA_ENDPOINT}/{self.submission_id}",
-            headers={"Authorization": self.access_token},
-        )
+        if self.orders_api_called:
+            self.client.get(
+                f"{METADATA_ENDPOINT}/{self.submission_id}",
+                headers={"Authorization": self.access_token},
+            )
 
 
 @events.test_start.add_listener
