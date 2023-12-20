@@ -33,12 +33,13 @@ public class SendOrderUseCase {
                         "senderName",
                         "receiverName",
                         Instant.now(),
-                        "abcd"); // For testing, delete when done
+                        "abcd"); // TODO: delete once PR is ready
         try {
             logger.logInfo("Trying to save the metadata");
             savePartnerMetadata(submissionId);
-            logger.logInfo("Trying to read the metadata");
-            partnerMetadataStorage.readMetadata(partnerMetadata.uniqueId());
+            logger.logInfo("Trying to read the metadata"); // TODO: delete once PR is ready
+            partnerMetadataStorage.readMetadata(
+                    partnerMetadata.uniqueId()); // TODO: delete once PR is ready
 
         } catch (PartnerMetadataException e) {
             logger.logError("Unable to save metadata for submissionId " + submissionId, e);
