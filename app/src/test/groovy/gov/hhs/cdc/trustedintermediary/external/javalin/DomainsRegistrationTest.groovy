@@ -101,6 +101,7 @@ class DomainsRegistrationTest extends Specification {
         }
         def javalinContext = Mock(Context)
         javalinContext.method() >> HandlerType.POST
+        javalinContext.headerMap() >> [:]
 
         when:
         def javalinHandler = DomainsRegistration.createHandler(rawHandler, false)
@@ -242,6 +243,7 @@ class DomainsRegistrationTest extends Specification {
 
         def mockContext = Mock(Context)
         mockContext.method() >> HandlerType.POST
+        mockContext.headerMap() >> [:]
 
         def mockAuthValidator = Mock(AuthRequestValidator)
         mockAuthValidator.isValidAuthenticatedRequest(_ as DomainRequest) >> false
