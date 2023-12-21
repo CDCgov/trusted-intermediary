@@ -1,4 +1,5 @@
 import time
+import uuid
 import logging
 import threading
 import urllib.parse
@@ -25,11 +26,12 @@ class SampleUser(FastHttpUser):
 
     token_refresh_interval = 280
     access_token = None
-    submission_id = "1a2b3c"
     orders_api_called = False
 
     def on_start(self):
         self.authenticate()
+
+        self.submission_id = str(uuid.uuid4())
 
         # Start the token refreshing thread
         threading.Thread(
@@ -72,7 +74,7 @@ class SampleUser(FastHttpUser):
         if response.status_code == 200:
             self.orders_api_called = True
 
-    @task(5)
+    @task(2)
     def get_v1_etor_metadata(self):
         if self.orders_api_called:
             self.client.get(
