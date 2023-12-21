@@ -26,12 +26,12 @@ class SampleUser(FastHttpUser):
 
     token_refresh_interval = 280
     access_token = None
-    orders_api_called = False
 
     def on_start(self):
         self.authenticate()
 
         self.submission_id = str(uuid.uuid4())
+        self.orders_api_called = False
 
         # Start the token refreshing thread
         threading.Thread(
