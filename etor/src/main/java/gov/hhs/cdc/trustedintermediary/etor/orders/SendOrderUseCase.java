@@ -1,10 +1,12 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders;
 
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
+import java.time.Instant;
 import javax.inject.Inject;
 
 /** The overall logic to receive, convert to OML, and subsequently send a lab order. */
@@ -34,9 +36,9 @@ public class SendOrderUseCase {
                         "abcd"); // TODO: delete once PR is ready
         try {
             logger.logInfo("Trying to save the metadata");
-            savePartnerMetadata(submissionId);
+            savePartnerMetadataForReceivedOrder(submissionId, order);
             logger.logInfo("Trying to read the metadata"); // TODO: delete once PR is ready
-            partnerMetadataStorage.readMetadata(
+            partnerMetadataOrchestrator.getMetadata(
                     partnerMetadata.uniqueId()); // TODO: delete once PR is ready
 
         } catch (PartnerMetadataException e) {
