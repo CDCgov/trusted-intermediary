@@ -13,6 +13,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsCont
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController;
@@ -53,7 +54,7 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject SendOrderUseCase sendOrderUseCase;
     @Inject Logger logger;
     @Inject DomainResponseHelper domainResponseHelper;
-    @Inject PartnerMetadataStorage partnerMetadataStorage;
+    @Inject PartnerMetadataOrchestrator partnerMetadataOrchestrator;
 
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
             Map.of(
@@ -72,6 +73,8 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(OrderConverter.class, HapiOrderConverter.getInstance());
         ApplicationContext.register(OrderController.class, OrderController.getInstance());
         ApplicationContext.register(SendOrderUseCase.class, SendOrderUseCase.getInstance());
+        ApplicationContext.register(
+                PartnerMetadataOrchestrator.class, PartnerMetadataOrchestrator.getInstance());
 
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
             ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
@@ -147,7 +150,8 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleMetadata(DomainRequest request) {
         try {
             String metadataId = request.getPathParams().get("id");
-            Optional<PartnerMetadata> metadata = partnerMetadataStorage.readMetadata(metadataId);
+            Optional<PartnerMetadata> metadata =
+                    partnerMetadataOrchestrator.getMetadata(metadataId);
 
             if (metadata.isEmpty()) {
                 return domainResponseHelper.constructErrorResponse(

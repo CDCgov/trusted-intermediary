@@ -1,7 +1,11 @@
 #!/bin/bash
 
 # Define the content of the .env file
-env_content="ENV=local\nKEY_VAULT-NAME=ti-key-vault-name\nREPORT_STREAM_URL_PREFIX=http://localhost:7071"
+env_content="ENV=local
+KEY_VAULT-NAME=ti-key-vault-name
+REPORT_STREAM_URL_PREFIX=http://localhost:7071
+STORAGE_ACCOUNT_BLOB_ENDPOINT=https://cdctiinternal.blob.core.windows.net
+METADATA_CONTAINER_NAME=metadata"
 
 # Get directory of script file
 script_dir="$(dirname "$0")"
