@@ -13,7 +13,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsCont
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException
-import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse
@@ -23,7 +23,6 @@ import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
 import java.time.Instant
 import spock.lang.Specification
 
@@ -158,7 +157,7 @@ class EtorDomainRegistrationTest extends Specification {
         def expectedStatusCode = 200
 
         def request = new DomainRequest()
-        request.headers["RecordId"] = "recordId"
+        request.headers["recordid"] = "recordId"
 
         def connector = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, connector)
@@ -191,7 +190,7 @@ class EtorDomainRegistrationTest extends Specification {
         def expectedStatusCode = 400
 
         def request = new DomainRequest()
-        request.headers["RecordId"] = "recordId"
+        request.headers["recordid"] = "recordId"
 
         def domainRegistration = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
@@ -225,7 +224,7 @@ class EtorDomainRegistrationTest extends Specification {
         def expectedStatusCode = 400
 
         def request = new DomainRequest()
-        request.headers["RecordId"] = "recordId"
+        request.headers["recordid"] = "recordId"
 
         def domainRegistration = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
@@ -252,7 +251,7 @@ class EtorDomainRegistrationTest extends Specification {
         given:
 
         def request = new DomainRequest()
-        request.headers["RecordId"] = null  //no metadata unique ID
+        request.headers["recordid"] = null  //no metadata unique ID
 
         def domainRegistration = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
@@ -283,7 +282,7 @@ class EtorDomainRegistrationTest extends Specification {
     def "handleOrders logs an error and continues the usecase like normal when the metadata unique ID is empty because we want to know when our integration with RS is broken"() {
         given:
         def request = new DomainRequest()
-        request.headers["RecordId"] = ""  // empty metadata unique ID
+        request.headers["recordid"] = ""  // empty metadata unique ID
 
         def domainRegistration = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
@@ -321,12 +320,12 @@ class EtorDomainRegistrationTest extends Specification {
         def request = new DomainRequest()
         request.setPathParams(["id": "metadataId"])
 
-        def mockPartnerMetadataStorage = Mock(PartnerMetadataStorage)
-        mockPartnerMetadataStorage.readMetadata(_ as String) >> Optional.ofNullable(new PartnerMetadata("metadataId", "sender", "receiver", Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd"))
-        TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
+        def mockPartnerMetadataOrchestrator = Mock(PartnerMetadataOrchestrator)
+        mockPartnerMetadataOrchestrator.getMetadata(_ as String) >> Optional.ofNullable(new PartnerMetadata("metadataId", "sender", "receiver", Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd"))
+        TestApplicationContext.register(PartnerMetadataOrchestrator, mockPartnerMetadataOrchestrator)
 
         def mockResponseHelper = Mock(DomainResponseHelper)
-        mockResponseHelper.constructOkResponse(_ as String) >> new DomainResponse(expectedStatusCode)
+        mockResponseHelper.constructOkResponse(_ as PartnerMetadata) >> new DomainResponse(expectedStatusCode)
         TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
 
         TestApplicationContext.register(Formatter, Jackson.getInstance())
@@ -350,9 +349,9 @@ class EtorDomainRegistrationTest extends Specification {
         def request = new DomainRequest()
         request.setPathParams(["id": "metadataId"])
 
-        def mockPartnerMetadataStorage = Mock(PartnerMetadataStorage)
-        mockPartnerMetadataStorage.readMetadata(_ as String) >> Optional.empty()
-        TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
+        def mockPartnerMetadataOrchestrator = Mock(PartnerMetadataOrchestrator)
+        mockPartnerMetadataOrchestrator.getMetadata(_ as String) >> Optional.empty()
+        TestApplicationContext.register(PartnerMetadataOrchestrator, mockPartnerMetadataOrchestrator)
 
         def mockResponseHelper = Mock(DomainResponseHelper)
         mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as String) >> new DomainResponse(expectedStatusCode)
@@ -378,41 +377,9 @@ class EtorDomainRegistrationTest extends Specification {
         def request = new DomainRequest()
         request.setPathParams(["id": "metadataId"])
 
-        def mockPartnerMetadataStorage = Mock(PartnerMetadataStorage)
-        mockPartnerMetadataStorage.readMetadata(_ as String) >> { throw new PartnerMetadataException("DogCow", new Exception()) }
-        TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
-
-        def mockResponseHelper = Mock(DomainResponseHelper)
-        mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as String) >> new DomainResponse(expectedStatusCode)
-        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
-
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        def res = connector.handleMetadata(request)
-        def actualStatusCode = res.statusCode
-
-        then:
-        actualStatusCode == expectedStatusCode
-    }
-
-    def "metadata endpoint returns a 500 response when there is an exception formatting the metadata"() {
-        given:
-        def expectedStatusCode = 500
-
-        def connector = new EtorDomainRegistration()
-        TestApplicationContext.register(EtorDomainRegistration, connector)
-
-        def request = new DomainRequest()
-        request.setPathParams(["id": "metadataId"])
-
-        def mockPartnerMetadataStorage = Mock(PartnerMetadataStorage)
-        mockPartnerMetadataStorage.readMetadata(_ as String) >> Optional.ofNullable(new PartnerMetadata("metadataUniqueId", "sender", "receiver", Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd"))
-        TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
-
-        def mockFormatter = Mock(Formatter)
-        mockFormatter.convertToJsonString(_ as PartnerMetadata) >> { throw new FormatterProcessingException("DogCow", new Exception()) }
-        TestApplicationContext.register(Formatter, mockFormatter)
+        def mockPartnerMetadataOrchestrator = Mock(PartnerMetadataOrchestrator)
+        mockPartnerMetadataOrchestrator.getMetadata(_ as String) >> { throw new PartnerMetadataException("DogCow", new Exception()) }
+        TestApplicationContext.register(PartnerMetadataOrchestrator, mockPartnerMetadataOrchestrator)
 
         def mockResponseHelper = Mock(DomainResponseHelper)
         mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as String) >> new DomainResponse(expectedStatusCode)

@@ -1,12 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders;
 
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
-import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
-import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
-import java.time.Instant;
 import javax.inject.Inject;
 
 /** The overall logic to receive, convert to OML, and subsequently send a lab order. */
@@ -15,7 +13,7 @@ public class SendOrderUseCase {
     @Inject OrderConverter converter;
     @Inject OrderSender sender;
     @Inject MetricMetadata metadata;
-    @Inject PartnerMetadataStorage partnerMetadataStorage;
+    @Inject PartnerMetadataOrchestrator partnerMetadataOrchestrator;
     @Inject Logger logger;
 
     private SendOrderUseCase() {}
@@ -50,17 +48,41 @@ public class SendOrderUseCase {
         omlOrder = converter.addContactSectionToPatientResource(omlOrder);
         metadata.put(order.getFhirResourceId(), EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT);
         sender.sendOrder(omlOrder);
+
+        saveSentOrderSubmissionId(
+                submissionId,
+                "TBD, need to be filled in from the sender.sendOrder(omlOrder) call",
+                order);
     }
 
-    private void savePartnerMetadata(String submissionId) throws PartnerMetadataException {
+    private void savePartnerMetadataForReceivedOrder(String submissionId, final Order<?> order) {
         if (submissionId == null) {
             return;
         }
 
-        // TODO: still need to get metadata from the order: sender, receiver, timeReceived, hash
-        PartnerMetadata partnerMetadata =
-                new PartnerMetadata(
-                        submissionId, "senderName", "receiverName", Instant.now(), "abcd");
-        partnerMetadataStorage.saveMetadata(partnerMetadata);
+        try {
+            partnerMetadataOrchestrator.updateMetadataForReceivedOrder(submissionId, order);
+        } catch (PartnerMetadataException e) {
+            logger.logError("Unable to save metadata for submissionId " + submissionId, e);
+        }
+    }
+
+    private void saveSentOrderSubmissionId(
+            String receivedSubmissionId, String sentSubmissionId, final Order<?> order) {
+        if (sentSubmissionId == null || receivedSubmissionId == null) {
+            return;
+        }
+
+        try {
+            partnerMetadataOrchestrator.updateMetadataForSentOrder(
+                    receivedSubmissionId, sentSubmissionId, order);
+        } catch (PartnerMetadataException e) {
+            logger.logError(
+                    "Unable to update metadata for received submissionId "
+                            + receivedSubmissionId
+                            + " and sent submissionId "
+                            + sentSubmissionId,
+                    e);
+        }
     }
 }

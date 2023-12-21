@@ -13,6 +13,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsCont
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController;
@@ -32,8 +33,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.DbDao;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager;
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -58,8 +57,7 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject SendOrderUseCase sendOrderUseCase;
     @Inject Logger logger;
     @Inject DomainResponseHelper domainResponseHelper;
-    @Inject PartnerMetadataStorage partnerMetadataStorage;
-    @Inject Formatter formatter;
+    @Inject PartnerMetadataOrchestrator partnerMetadataOrchestrator;
 
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
             Map.of(
@@ -78,6 +76,8 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(OrderConverter.class, HapiOrderConverter.getInstance());
         ApplicationContext.register(OrderController.class, OrderController.getInstance());
         ApplicationContext.register(SendOrderUseCase.class, SendOrderUseCase.getInstance());
+        ApplicationContext.register(
+                PartnerMetadataOrchestrator.class, PartnerMetadataOrchestrator.getInstance());
 
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
             ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
@@ -139,7 +139,7 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleOrders(DomainRequest request) {
         Order<?> orders;
 
-        String submissionId = request.getHeaders().get("RecordId");
+        String submissionId = request.getHeaders().get("recordid");
         if (submissionId == null || submissionId.isEmpty()) {
             submissionId = null;
             logger.logError("Missing required header or empty: RecordId");
@@ -163,16 +163,16 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleMetadata(DomainRequest request) {
         try {
             String metadataId = request.getPathParams().get("id");
-            Optional<PartnerMetadata> metadata = partnerMetadataStorage.readMetadata(metadataId);
+            Optional<PartnerMetadata> metadata =
+                    partnerMetadataOrchestrator.getMetadata(metadataId);
 
             if (metadata.isEmpty()) {
                 return domainResponseHelper.constructErrorResponse(
                         404, "Metadata not found for ID: " + metadataId);
             }
 
-            return domainResponseHelper.constructOkResponse(
-                    formatter.convertToJsonString(metadata.get()));
-        } catch (PartnerMetadataException | FormatterProcessingException e) {
+            return domainResponseHelper.constructOkResponse(metadata.get());
+        } catch (PartnerMetadataException e) {
             String errorMessage = "Unable to retrieve requested metadata";
             logger.logError(errorMessage, e);
             return domainResponseHelper.constructErrorResponse(500, errorMessage);
