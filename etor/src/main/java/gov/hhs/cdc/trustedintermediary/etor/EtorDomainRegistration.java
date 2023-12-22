@@ -79,11 +79,12 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(SendOrderUseCase.class, SendOrderUseCase.getInstance());
         ApplicationContext.register(
                 PartnerMetadataOrchestrator.class, PartnerMetadataOrchestrator.getInstance());
-        ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
+
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
             ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
 
             if (ApplicationContext.getProperty("DB_URL") != null) {
+                ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
                 ApplicationContext.register(
                         PartnerMetadataStorage.class, DatabasePartnerMetadataStorage.getInstance());
                 ApplicationContext.register(
@@ -95,6 +96,7 @@ public class EtorDomainRegistration implements DomainConnector {
             }
 
         } else {
+            ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
             ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
             ApplicationContext.register(
                     PartnerMetadataStorage.class, DatabasePartnerMetadataStorage.getInstance());
