@@ -23,11 +23,11 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureClient;
+import gov.hhs.cdc.trustedintermediary.external.azure.AzureStorageAccountPartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.DatabasePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.EtorSqlDriverManager;
 import gov.hhs.cdc.trustedintermediary.external.database.PostgresDao;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
-import gov.hhs.cdc.trustedintermediary.external.localfile.FilePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.DbDao;
@@ -82,20 +82,18 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
             ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
-
-            if (ApplicationContext.getProperty("DB_URL") != null) {
-                ApplicationContext.register(
-                        PartnerMetadataStorage.class, DatabasePartnerMetadataStorage.getInstance());
-                ApplicationContext.register(
-                        SqlDriverManager.class, EtorSqlDriverManager.getInstance());
-                ApplicationContext.register(DbDao.class, PostgresDao.getInstance());
-            } else {
-                ApplicationContext.register(
-                        PartnerMetadataStorage.class, FilePartnerMetadataStorage.getInstance());
-            }
+            //            ApplicationContext.register(
+            //                    PartnerMetadataStorage.class,
+            // FilePartnerMetadataStorage.getInstance());
 
         } else {
             ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
+            ApplicationContext.register(
+                    PartnerMetadataStorage.class,
+                    AzureStorageAccountPartnerMetadataStorage.getInstance());
+        }
+
+        if (ApplicationContext.getProperty("DB_URL") != null) {
             ApplicationContext.register(
                     PartnerMetadataStorage.class, DatabasePartnerMetadataStorage.getInstance());
             ApplicationContext.register(SqlDriverManager.class, EtorSqlDriverManager.getInstance());
