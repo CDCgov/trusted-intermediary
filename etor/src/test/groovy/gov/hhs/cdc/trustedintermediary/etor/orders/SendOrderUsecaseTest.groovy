@@ -25,7 +25,6 @@ class SendOrderUsecaseTest extends Specification {
         TestApplicationContext.register(OrderConverter, mockConverter)
 
         def mockSender = Mock(OrderSender)
-        mockSender.sendOrder(_) >> Optional.empty()
         TestApplicationContext.register(OrderSender, mockSender)
 
         TestApplicationContext.injectRegisteredImplementations()
@@ -35,7 +34,8 @@ class SendOrderUsecaseTest extends Specification {
 
         then:
         1 * mockConverter.convertMetadataToOmlOrder(mockOrder)
-        1 * mockSender.sendOrder(_)
+        1 * mockConverter.addContactSectionToPatientResource(_)
+        1 * mockSender.sendOrder(_) >> Optional.empty()
     }
 
     def "metadata is registered for converting to OML and for adding the contact section to an order"() {
