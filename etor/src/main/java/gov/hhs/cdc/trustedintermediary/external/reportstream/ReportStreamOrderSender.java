@@ -64,26 +64,28 @@ public class ReportStreamOrderSender implements OrderSender {
     private ReportStreamOrderSender() {}
 
     @Override
-    public void sendOrder(final Order<?> order) throws UnableToSendOrderException {
+    public Optional<String> sendOrder(final Order<?> order) throws UnableToSendOrderException {
         logger.logInfo("Sending the order to ReportStream at {}", RS_DOMAIN_NAME);
         String json = fhir.encodeResourceToJson(order.getUnderlyingOrder());
         String bearerToken = getRsToken();
         String rsResponseBody = sendRequestBody(json, bearerToken);
-        logRsSubmissionId(rsResponseBody);
+        Optional<String> submissionId = getSubmissionId(rsResponseBody);
+        logger.logInfo("Order successfully sent, ReportStream submissionId={}", submissionId);
         metadata.put(order.getFhirResourceId(), EtorMetadataStep.SENT_TO_REPORT_STREAM);
+        return submissionId;
     }
 
-    protected void logRsSubmissionId(String rsResponseBody) {
+    protected Optional<String> getSubmissionId(String rsResponseBody) {
         try {
             var rsResponse =
                     formatter.convertJsonToObject(
                             rsResponseBody, new TypeReference<Map<String, Object>>() {});
-            logger.logInfo(
-                    "Order successfully sent, ReportStream submissionId={}",
-                    rsResponse.get("submissionId"));
+            return Optional.ofNullable((String) rsResponse.get("submissionId"));
         } catch (FormatterProcessingException e) {
-            logger.logError("Unable to log RS response", e);
+            logger.logError("Unable to get the submissionId", e);
         }
+
+        return Optional.empty();
     }
 
     protected String getRsToken() throws UnableToSendOrderException {
