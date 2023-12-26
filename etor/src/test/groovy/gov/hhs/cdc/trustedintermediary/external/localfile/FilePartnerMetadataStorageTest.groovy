@@ -21,15 +21,16 @@ class FilePartnerMetadataStorageTest extends Specification {
 
     def "save and read metadata successfully"() {
         given:
-        def expectedUniqueId = "uniqueId"
-        PartnerMetadata metadata = new PartnerMetadata(expectedUniqueId, "sender", "receiver", Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd")
+        def expectedReceivedSubmissionId = "receivedSubmissionId"
+        def expectedSentSubmissionId = "receivedSubmissionId"
+        PartnerMetadata metadata = new PartnerMetadata(expectedReceivedSubmissionId, expectedSentSubmissionId, "sender", "receiver", Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd")
 
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
         FilePartnerMetadataStorage.getInstance().saveMetadata(metadata)
-        def actualMetadata = FilePartnerMetadataStorage.getInstance().readMetadata(expectedUniqueId)
+        def actualMetadata = FilePartnerMetadataStorage.getInstance().readMetadata(expectedReceivedSubmissionId)
 
         then:
         actualMetadata.get() == metadata
@@ -37,7 +38,7 @@ class FilePartnerMetadataStorageTest extends Specification {
 
     def "saveMetadata throws PartnerMetadataException when unable to save file"() {
         given:
-        PartnerMetadata metadata = new PartnerMetadata("uniqueId", "sender", "receiver", Instant.now(), "abcd")
+        PartnerMetadata metadata = new PartnerMetadata("receivedSubmissionId", "sentSubmissionId","sender", "receiver", Instant.now(), "abcd")
 
         def mockFormatter = Mock(Formatter)
         mockFormatter.convertToJsonString(_ as PartnerMetadata) >> {throw new FormatterProcessingException("error", new Exception())}
@@ -59,7 +60,7 @@ class FilePartnerMetadataStorageTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        FilePartnerMetadataStorage.getInstance().readMetadata("uniqueId")
+        FilePartnerMetadataStorage.getInstance().readMetadata("receivedSubmissionId")
 
         then:
         thrown(PartnerMetadataException)

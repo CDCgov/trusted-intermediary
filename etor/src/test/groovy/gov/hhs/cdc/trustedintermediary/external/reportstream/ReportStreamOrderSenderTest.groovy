@@ -458,7 +458,7 @@ class ReportStreamOrderSenderTest extends Specification {
         token == cachedRsToken
     }
 
-    def "logRsSubmissionId logs submissionId if convertJsonToObject is successful"() {
+    def "getSubmissionId logs submissionId if convertJsonToObject is successful"() {
         given:
         def mockSubmissionId = "fake-id"
         def mockResponseBody = """{"submissionId": "${mockSubmissionId}", "key": "value"}"""
@@ -471,13 +471,13 @@ class ReportStreamOrderSenderTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        ReportStreamOrderSender.getInstance().logRsSubmissionId(mockResponseBody)
+        def submissionId = ReportStreamOrderSender.getInstance().getSubmissionId(mockResponseBody)
 
         then:
-        1 * mockLogger.logInfo(_ as String, mockSubmissionId)
+        submissionId.get() == mockSubmissionId
     }
 
-    def "logRsSubmissionId logs error if convertJsonToObject fails"() {
+    def "getSubmissionId logs error if convertJsonToObject fails"() {
         given:
         def mockResponseBody = '{"submissionId": "fake-id", "key": "value"}'
         def exception = new FormatterProcessingException("couldn't convert json", new Exception())
@@ -492,7 +492,7 @@ class ReportStreamOrderSenderTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        ReportStreamOrderSender.getInstance().logRsSubmissionId(mockResponseBody)
+        ReportStreamOrderSender.getInstance().getSubmissionId(mockResponseBody)
 
         then:
         1 * mockLogger.logError(_ as String, exception)
