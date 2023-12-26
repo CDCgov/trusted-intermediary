@@ -65,14 +65,18 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
 
     @Override
     public void saveMetadata(final PartnerMetadata metadata) throws PartnerMetadataException {
-        Path metadataFilePath = getFilePath(metadata.uniqueId());
+        Path metadataFilePath = getFilePath(metadata.receivedSubmissionId());
         try {
             String content = formatter.convertToJsonString(metadata);
             Files.writeString(metadataFilePath, content);
-            logger.logInfo("Saved metadata for " + metadata.uniqueId() + " to " + metadataFilePath);
+            logger.logInfo(
+                    "Saved metadata for "
+                            + metadata.receivedSubmissionId()
+                            + " to "
+                            + metadataFilePath);
         } catch (IOException | FormatterProcessingException e) {
             throw new PartnerMetadataException(
-                    "Error saving metadata for " + metadata.uniqueId(), e);
+                    "Error saving metadata for " + metadata.receivedSubmissionId(), e);
         }
     }
 

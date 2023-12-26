@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata;
 
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
-import java.time.Instant;
 import java.util.Optional;
 import javax.inject.Inject;
 
@@ -31,9 +30,7 @@ public class PartnerMetadataOrchestrator {
         // we will calculate the hash.
         // then we call the metadata storage to save this stuff.
 
-        PartnerMetadata partnerMetadata =
-                new PartnerMetadata(
-                        submissionId, "senderName", "receiverName", Instant.now(), "abcd");
+        PartnerMetadata partnerMetadata = new PartnerMetadata(submissionId);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
