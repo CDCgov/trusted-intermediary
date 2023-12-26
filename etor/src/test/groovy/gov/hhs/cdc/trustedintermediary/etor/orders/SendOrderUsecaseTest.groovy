@@ -20,12 +20,14 @@ class SendOrderUsecaseTest extends Specification {
     def "send sends successfully"() {
         given:
         def mockOrder = new OrderMock(null, null, null)
-        def mockConverter = Mock(OrderConverter)
-        def mockSender = Mock(OrderSender)
-        mockSender.sendOrder(_ as Order<?>) >> Optional.empty()
 
+        def mockConverter = Mock(OrderConverter)
         TestApplicationContext.register(OrderConverter, mockConverter)
+
+        def mockSender = Mock(OrderSender)
+        mockSender.sendOrder(_) >> Optional.empty()
         TestApplicationContext.register(OrderSender, mockSender)
+
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -33,13 +35,17 @@ class SendOrderUsecaseTest extends Specification {
 
         then:
         1 * mockConverter.convertMetadataToOmlOrder(mockOrder)
-        //        1 * mockSender.sendOrder(_ as Order<?>)
+        1 * mockSender.sendOrder(_)
     }
 
-    def "metadata is registered for converting to OML"() {
+    def "metadata is registered for converting to OML and for adding the contact section to an order"() {
         given:
         TestApplicationContext.register(OrderConverter, Mock(OrderConverter))
-        TestApplicationContext.register(OrderSender, Mock(OrderSender))
+
+        def mockSender = Mock(OrderSender)
+        mockSender.sendOrder(_) >> Optional.empty()
+        TestApplicationContext.register(OrderSender, mockSender)
+
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -47,18 +53,6 @@ class SendOrderUsecaseTest extends Specification {
 
         then:
         1 * SendOrderUseCase.getInstance().metadata.put(_, EtorMetadataStep.ORDER_CONVERTED_TO_OML)
-    }
-
-    def "metadata is registered for adding the contact section to an order"() {
-        given:
-        TestApplicationContext.register(OrderConverter, Mock(OrderConverter))
-        TestApplicationContext.register(OrderSender, Mock(OrderSender))
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        SendOrderUseCase.getInstance().convertAndSend(new OrderMock(null, null, null), _ as String)
-
-        then:
         1 * SendOrderUseCase.getInstance().metadata.put(_, EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT)
     }
 
