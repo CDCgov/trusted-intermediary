@@ -1,4 +1,5 @@
 import time
+import uuid
 import logging
 import threading
 import urllib.parse
@@ -11,6 +12,7 @@ HEALTH_ENDPOINT = "/health"
 AUTH_ENDPOINT = "/v1/auth/token"
 DEMOGRAPHICS_ENDPOINT = "/v1/etor/demographics"
 ORDERS_ENDPOINT = "/v1/etor/orders"
+METADATA_ENDPOINT = "/v1/etor/metadata"
 
 demographics_request_body = None
 order_request_body = None
@@ -27,6 +29,9 @@ class SampleUser(FastHttpUser):
 
     def on_start(self):
         self.authenticate()
+
+        self.submission_id = str(uuid.uuid4())
+        self.orders_api_called = False
 
         # Start the token refreshing thread
         threading.Thread(
@@ -58,11 +63,24 @@ class SampleUser(FastHttpUser):
 
     @task(5)
     def post_v1_etor_orders(self):
-        self.client.post(
+        response = self.client.post(
             ORDERS_ENDPOINT,
+            headers={
+                "Authorization": self.access_token,
+                "RecordId": self.submission_id,
+            },
             data=order_request_body,
-            headers={"Authorization": self.access_token},
         )
+        if response.status_code == 200:
+            self.orders_api_called = True
+
+    @task(2)
+    def get_v1_etor_metadata(self):
+        if self.orders_api_called:
+            self.client.get(
+                f"{METADATA_ENDPOINT}/{self.submission_id}",
+                headers={"Authorization": self.access_token},
+            )
 
 
 @events.test_start.add_listener
