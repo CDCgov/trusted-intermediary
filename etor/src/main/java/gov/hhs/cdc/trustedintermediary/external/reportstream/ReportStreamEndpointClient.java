@@ -60,27 +60,6 @@ public class ReportStreamEndpointClient {
 
     private ReportStreamEndpointClient() {}
 
-    protected String requestWatersEndpoint(@Nonnull String body, @Nonnull String bearerToken)
-            throws ReportStreamEndpointClientException {
-        logger.logInfo("Sending payload to ReportStream");
-
-        Map<String, String> headers =
-                Map.of(
-                        "Authorization",
-                        "Bearer " + bearerToken,
-                        "client",
-                        CLIENT_NAME,
-                        "Content-Type",
-                        "application/fhir+ndjson");
-
-        try {
-            return client.post(RS_WATERS_API_URL, headers, body);
-        } catch (HttpClientException e) {
-            throw new ReportStreamEndpointClientException(
-                    "Error POSTing the payload to ReportStream", e);
-        }
-    }
-
     protected String requestAuthEndpoint() throws ReportStreamEndpointClientException {
         logger.logInfo("Requesting token from ReportStream");
         String ourPrivateKey;
@@ -107,19 +86,57 @@ public class ReportStreamEndpointClient {
         return response;
     }
 
+    public String requestWatersEndpoint(@Nonnull String body, @Nonnull String bearerToken)
+            throws ReportStreamEndpointClientException {
+        logger.logInfo("Sending payload to ReportStream");
+
+        Map<String, String> headers =
+                Map.of(
+                        "Authorization",
+                        "Bearer " + bearerToken,
+                        "client",
+                        CLIENT_NAME,
+                        "Content-Type",
+                        "application/fhir+ndjson");
+
+        try {
+            return client.post(RS_WATERS_API_URL, headers, body);
+        } catch (HttpClientException e) {
+            throw new ReportStreamEndpointClientException(
+                    "Error POSTing the payload to ReportStream", e);
+        }
+    }
+
+    public String requestHistoryEndpoint(@Nonnull String submissionId, @Nonnull String bearerToken)
+            throws ReportStreamEndpointClientException {
+        logger.logInfo("Requesting history API from ReportStream");
+
+        Map<String, String> headers = Map.of("Authorization", "Bearer " + bearerToken);
+
+        try {
+            var url = RS_HISTORY_API_URL.replace("{id}", submissionId);
+            return client.get(url, headers);
+        } catch (HttpClientException e) {
+            throw new ReportStreamEndpointClientException(
+                    "Error GETing the history from ReportStream", e);
+        }
+    }
+
     protected String requestToken() throws ReportStreamEndpointClientException {
         logger.logInfo("Requesting token from ReportStream");
 
-        String rsResponse = requestAuthEndpoint();
+        String response = requestAuthEndpoint();
         try {
-            return extractResponseValue(rsResponse, "access_token");
+            Map<String, String> responseObject =
+                    formatter.convertJsonToObject(response, new TypeReference<>() {});
+            return responseObject.get("access_token");
         } catch (FormatterProcessingException e) {
             throw new ReportStreamEndpointClientException(
                     "Unable to extract access_token from response", e);
         }
     }
 
-    protected String getRsToken() throws ReportStreamEndpointClientException {
+    public String getRsToken() throws ReportStreamEndpointClientException {
         logger.logInfo("Looking up ReportStream token");
 
         var token = cache.get(RS_TOKEN_CACHE_ID);
@@ -160,14 +177,6 @@ public class ReportStreamEndpointClient {
         }
 
         cache.put(OUR_PRIVATE_KEY_ID, privateKey);
-    }
-
-    protected String extractResponseValue(String responseBody, String key)
-            throws FormatterProcessingException {
-        var value =
-                formatter.convertJsonToObject(
-                        responseBody, new TypeReference<Map<String, String>>() {});
-        return value.get(key);
     }
 
     protected String composeAuthRequestBody(String senderToken) {

@@ -162,21 +162,6 @@ class ReportStreamEndpointClientTest extends Specification {
         1 * mockCache.put(_, _)
     }
 
-    def "extractResponseValue works"() {
-        given:
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.injectRegisteredImplementations()
-
-        def expected = "IaMAfaKEt0keNN"
-        def responseBody = """{"foo":"foo value", "access_token":"${expected}", "boo":"boo value"}"""
-
-        when:
-        def actual = ReportStreamEndpointClient.getInstance().extractResponseValue(responseBody, "access_token")
-
-        then:
-        actual == expected
-    }
-
     def "extractToken works when access_token is a number"() {
         given:
         def mockClient = Mock(HttpClient)

@@ -54,7 +54,7 @@ public class ReportStreamOrderSender implements OrderSender {
             var rsResponse =
                     formatter.convertJsonToObject(
                             rsResponseBody, new TypeReference<Map<String, Object>>() {});
-            return Optional.ofNullable((String) rsResponse.get("submissionId"));
+            return Optional.ofNullable(rsResponse.get("submissionId").toString());
         } catch (FormatterProcessingException e) {
             logger.logError("Unable to get the submissionId", e);
         }
