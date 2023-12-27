@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.reportstream;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
-import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
@@ -61,7 +60,7 @@ public class ReportStreamEndpointClient {
 
     private ReportStreamEndpointClient() {}
 
-    protected String getRsToken() throws UnableToSendOrderException {
+    protected String getRsToken() throws ReportStreamEndpointClientException {
         logger.logInfo("Looking up ReportStream token");
 
         var token = cache.get(RS_TOKEN_CACHE_ID);
@@ -85,7 +84,7 @@ public class ReportStreamEndpointClient {
     }
 
     protected String sendRequestBody(@Nonnull String json, @Nonnull String bearerToken)
-            throws UnableToSendOrderException {
+            throws ReportStreamEndpointClientException {
         logger.logInfo("Sending payload to ReportStream");
 
         String res = "";
@@ -100,13 +99,14 @@ public class ReportStreamEndpointClient {
         try {
             res = client.post(RS_WATERS_API_URL, headers, json);
         } catch (HttpClientException e) {
-            throw new UnableToSendOrderException("Error POSTing the payload to ReportStream", e);
+            throw new ReportStreamEndpointClientException(
+                    "Error POSTing the payload to ReportStream", e);
         }
 
         return res;
     }
 
-    protected String requestToken() throws UnableToSendOrderException {
+    protected String requestToken() throws ReportStreamEndpointClientException {
         logger.logInfo("Requesting token from ReportStream");
 
         String ourPrivateKey;
@@ -126,7 +126,7 @@ public class ReportStreamEndpointClient {
             String rsResponse = client.post(RS_AUTH_API_URL, RS_AUTH_API_HEADERS, body);
             token = extractToken(rsResponse);
         } catch (Exception e) {
-            throw new UnableToSendOrderException(
+            throw new ReportStreamEndpointClientException(
                     "Error getting the API token from ReportStream", e);
         }
 

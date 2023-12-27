@@ -2,7 +2,6 @@ package gov.hhs.cdc.trustedintermediary.external.reportstream
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender
-import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
 import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
@@ -127,7 +126,7 @@ class ReportStreamEndpointClientTest extends Specification {
         ReportStreamEndpointClient.getInstance().requestToken()
 
         then:
-        thrown(UnableToSendOrderException)
+        thrown(ReportStreamEndpointClientException)
         0 * mockCache.put(_ , _)
     }
 
@@ -217,7 +216,7 @@ class ReportStreamEndpointClientTest extends Specification {
         ReportStreamEndpointClient.getInstance().requestToken()
 
         then:
-        def exception = thrown(UnableToSendOrderException)
+        def exception = thrown(ReportStreamEndpointClientException)
         exception.getCause().getClass() == FormatterProcessingException
     }
 
@@ -299,7 +298,7 @@ class ReportStreamEndpointClientTest extends Specification {
         orderSender.sendRequestBody("json", "bearerToken")
 
         then:
-        def exception = thrown(UnableToSendOrderException)
+        def exception = thrown(ReportStreamEndpointClientException)
         exception.getCause().getClass() == HttpClientException
     }
 

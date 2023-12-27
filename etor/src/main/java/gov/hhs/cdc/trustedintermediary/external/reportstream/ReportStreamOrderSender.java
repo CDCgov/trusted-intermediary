@@ -35,8 +35,14 @@ public class ReportStreamOrderSender implements OrderSender {
     public Optional<String> sendOrder(final Order<?> order) throws UnableToSendOrderException {
         //        logger.logInfo("Sending the order to ReportStream at {}", RS_DOMAIN_NAME);
         String json = fhir.encodeResourceToJson(order.getUnderlyingOrder());
-        String bearerToken = rsclient.getRsToken();
-        String rsResponseBody = rsclient.sendRequestBody(json, bearerToken);
+        String bearerToken;
+        String rsResponseBody;
+        try {
+            bearerToken = rsclient.getRsToken();
+            rsResponseBody = rsclient.sendRequestBody(json, bearerToken);
+        } catch (ReportStreamEndpointClientException e) {
+            throw new UnableToSendOrderException("Unable to send order to ReportStream", e);
+        }
         Optional<String> submissionId = getSubmissionId(rsResponseBody);
         logger.logInfo("Order successfully sent, ReportStream submissionId={}", submissionId);
         metadata.put(order.getFhirResourceId(), EtorMetadataStep.SENT_TO_REPORT_STREAM);
