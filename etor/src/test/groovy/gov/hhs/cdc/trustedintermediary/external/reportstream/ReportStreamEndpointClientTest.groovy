@@ -32,8 +32,8 @@ class ReportStreamEndpointClientTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        ReportStreamEndpointClient.getInstance().sendRequestBody("message_1", "fake token")
-        ReportStreamEndpointClient.getInstance().sendRequestBody("message_2", "fake token")
+        ReportStreamEndpointClient.getInstance().requestWatersEndpoint("message_1", "fake token")
+        ReportStreamEndpointClient.getInstance().requestWatersEndpoint("message_2", "fake token")
 
         then:
         2 * mockClient.post(_ as String, _ as Map<String, String>, _ as String) >> "200"
@@ -47,8 +47,8 @@ class ReportStreamEndpointClientTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        ReportStreamEndpointClient.getInstance().sendRequestBody("message_1", "fake token")
-        ReportStreamEndpointClient.getInstance().sendRequestBody("message_2", "fake token")
+        ReportStreamEndpointClient.getInstance().requestWatersEndpoint("message_1", "fake token")
+        ReportStreamEndpointClient.getInstance().requestWatersEndpoint("message_2", "fake token")
 
         then:
         def exception = thrown(Exception)
@@ -162,7 +162,7 @@ class ReportStreamEndpointClientTest extends Specification {
         1 * mockCache.put(_, _)
     }
 
-    def "extractToken works"() {
+    def "extractResponseValue works"() {
         given:
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
@@ -171,7 +171,7 @@ class ReportStreamEndpointClientTest extends Specification {
         def responseBody = """{"foo":"foo value", "access_token":"${expected}", "boo":"boo value"}"""
 
         when:
-        def actual = ReportStreamEndpointClient.getInstance().extractToken(responseBody)
+        def actual = ReportStreamEndpointClient.getInstance().extractResponseValue(responseBody, "access_token")
 
         then:
         actual == expected
@@ -229,7 +229,7 @@ class ReportStreamEndpointClientTest extends Specification {
                 "&client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer" +
                 "&client_assertion=${fakeToken}"
         when:
-        def actual = ReportStreamEndpointClient.composeRequestBody(fakeToken)
+        def actual = ReportStreamEndpointClient.composeAuthRequestBody(fakeToken)
         then:
         actual == expected
     }
@@ -295,7 +295,7 @@ class ReportStreamEndpointClientTest extends Specification {
         }
 
         when:
-        orderSender.sendRequestBody("json", "bearerToken")
+        orderSender.requestWatersEndpoint("json", "bearerToken")
 
         then:
         def exception = thrown(ReportStreamEndpointClientException)

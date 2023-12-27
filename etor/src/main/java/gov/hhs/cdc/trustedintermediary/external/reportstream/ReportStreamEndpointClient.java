@@ -60,6 +60,65 @@ public class ReportStreamEndpointClient {
 
     private ReportStreamEndpointClient() {}
 
+    protected String requestWatersEndpoint(@Nonnull String body, @Nonnull String bearerToken)
+            throws ReportStreamEndpointClientException {
+        logger.logInfo("Sending payload to ReportStream");
+
+        Map<String, String> headers =
+                Map.of(
+                        "Authorization",
+                        "Bearer " + bearerToken,
+                        "client",
+                        CLIENT_NAME,
+                        "Content-Type",
+                        "application/fhir+ndjson");
+
+        try {
+            return client.post(RS_WATERS_API_URL, headers, body);
+        } catch (HttpClientException e) {
+            throw new ReportStreamEndpointClientException(
+                    "Error POSTing the payload to ReportStream", e);
+        }
+    }
+
+    protected String requestAuthEndpoint() throws ReportStreamEndpointClientException {
+        logger.logInfo("Requesting token from ReportStream");
+        String ourPrivateKey;
+        String response;
+        try {
+            ourPrivateKey = retrievePrivateKey();
+            String senderToken =
+                    jwt.generateToken(
+                            CLIENT_NAME,
+                            CLIENT_NAME,
+                            CLIENT_NAME,
+                            RS_DOMAIN_NAME,
+                            300,
+                            ourPrivateKey);
+            String body = composeAuthRequestBody(senderToken);
+            response = client.post(RS_AUTH_API_URL, RS_AUTH_API_HEADERS, body);
+        } catch (Exception e) {
+            throw new ReportStreamEndpointClientException(
+                    "Error getting the API token from ReportStream", e);
+        }
+        // only cache our private key if we successfully authenticate to RS
+        cacheOurPrivateKeyIfNotCachedAlready(ourPrivateKey);
+
+        return response;
+    }
+
+    protected String requestToken() throws ReportStreamEndpointClientException {
+        logger.logInfo("Requesting token from ReportStream");
+
+        String rsResponse = requestAuthEndpoint();
+        try {
+            return extractResponseValue(rsResponse, "access_token");
+        } catch (FormatterProcessingException e) {
+            throw new ReportStreamEndpointClientException(
+                    "Unable to extract access_token from response", e);
+        }
+    }
+
     protected String getRsToken() throws ReportStreamEndpointClientException {
         logger.logInfo("Looking up ReportStream token");
 
@@ -83,59 +142,6 @@ public class ReportStreamEndpointClient {
         return LocalDateTime.now().isBefore(expirationDate.minus(15, ChronoUnit.SECONDS));
     }
 
-    protected String sendRequestBody(@Nonnull String json, @Nonnull String bearerToken)
-            throws ReportStreamEndpointClientException {
-        logger.logInfo("Sending payload to ReportStream");
-
-        String res = "";
-        Map<String, String> headers =
-                Map.of(
-                        "Authorization",
-                        "Bearer " + bearerToken,
-                        "client",
-                        CLIENT_NAME,
-                        "Content-Type",
-                        "application/fhir+ndjson");
-        try {
-            res = client.post(RS_WATERS_API_URL, headers, json);
-        } catch (HttpClientException e) {
-            throw new ReportStreamEndpointClientException(
-                    "Error POSTing the payload to ReportStream", e);
-        }
-
-        return res;
-    }
-
-    protected String requestToken() throws ReportStreamEndpointClientException {
-        logger.logInfo("Requesting token from ReportStream");
-
-        String ourPrivateKey;
-        String token;
-
-        try {
-            ourPrivateKey = retrievePrivateKey();
-            String senderToken =
-                    jwt.generateToken(
-                            CLIENT_NAME,
-                            CLIENT_NAME,
-                            CLIENT_NAME,
-                            RS_DOMAIN_NAME,
-                            300,
-                            ourPrivateKey);
-            String body = composeRequestBody(senderToken);
-            String rsResponse = client.post(RS_AUTH_API_URL, RS_AUTH_API_HEADERS, body);
-            token = extractToken(rsResponse);
-        } catch (Exception e) {
-            throw new ReportStreamEndpointClientException(
-                    "Error getting the API token from ReportStream", e);
-        }
-
-        // only cache our private key if we successfully authenticate to RS
-        cacheOurPrivateKeyIfNotCachedAlready(ourPrivateKey);
-
-        return token;
-    }
-
     protected String retrievePrivateKey() throws SecretRetrievalException {
         String key = cache.get(OUR_PRIVATE_KEY_ID);
         if (key != null) {
@@ -156,14 +162,15 @@ public class ReportStreamEndpointClient {
         cache.put(OUR_PRIVATE_KEY_ID, privateKey);
     }
 
-    protected String extractToken(String responseBody) throws FormatterProcessingException {
+    protected String extractResponseValue(String responseBody, String key)
+            throws FormatterProcessingException {
         var value =
                 formatter.convertJsonToObject(
                         responseBody, new TypeReference<Map<String, String>>() {});
-        return value.get("access_token");
+        return value.get(key);
     }
 
-    protected String composeRequestBody(String senderToken) {
+    protected String composeAuthRequestBody(String senderToken) {
         String scope = "flexion.*.report";
         String grantType = "client_credentials";
         String clientAssertionType = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";

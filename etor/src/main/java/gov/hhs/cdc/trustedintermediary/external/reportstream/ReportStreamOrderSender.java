@@ -39,7 +39,7 @@ public class ReportStreamOrderSender implements OrderSender {
         String rsResponseBody;
         try {
             bearerToken = rsclient.getRsToken();
-            rsResponseBody = rsclient.sendRequestBody(json, bearerToken);
+            rsResponseBody = rsclient.requestWatersEndpoint(json, bearerToken);
         } catch (ReportStreamEndpointClientException e) {
             throw new UnableToSendOrderException("Unable to send order to ReportStream", e);
         }
