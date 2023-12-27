@@ -32,10 +32,9 @@ public class PartnerMetadataOrchestrator {
 
     public void updateMetadataForReceivedOrder(String submissionId, Order<?> order)
             throws PartnerMetadataException {
-        // will call the RS history API given the submissionId (albeit, right now this won't work
-        // given the way RS works).
-        // from the history API response, extract the sender (organization + sender client), and
-        // time received.
+        // will call the RS history API given the submissionId, currently blocked by:
+        // https://github.com/CDCgov/prime-reportstream/issues/12624
+        // from the response, extract the "sender" and "timestamp" (timeReceived)
         // we will calculate the hash.
         // then we call the metadata storage to save this stuff.
 
