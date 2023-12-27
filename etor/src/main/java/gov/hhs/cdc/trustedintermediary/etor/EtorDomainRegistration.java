@@ -27,6 +27,7 @@ import gov.hhs.cdc.trustedintermediary.external.azure.AzureStorageAccountPartner
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.FilePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileOrderSender;
+import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
