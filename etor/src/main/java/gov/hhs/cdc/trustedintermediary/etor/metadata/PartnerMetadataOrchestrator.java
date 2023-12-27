@@ -1,6 +1,13 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata;
 
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
+import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClient;
+import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.Optional;
 import javax.inject.Inject;
 
@@ -14,6 +21,8 @@ public class PartnerMetadataOrchestrator {
     private static final PartnerMetadataOrchestrator INSTANCE = new PartnerMetadataOrchestrator();
 
     @Inject PartnerMetadataStorage partnerMetadataStorage;
+    @Inject private ReportStreamEndpointClient rsclient;
+    @Inject private Formatter formatter;
 
     public static PartnerMetadataOrchestrator getInstance() {
         return INSTANCE;
@@ -37,10 +46,23 @@ public class PartnerMetadataOrchestrator {
     public void updateMetadataForSentOrder(
             String receivedSubmissionId, String sentSubmissionId, Order<?> order)
             throws PartnerMetadataException {
-        // call the metadata storage and add the sent order's submission ID to the existing metadata
-        // entry
-        // PartnerMetadata may need to be updated to store both the received order's submission ID
-        // _and_ the sent order's submission ID.
+
+        String receiver;
+        try {
+            String bearerToken = rsclient.getRsToken();
+            String responseBody = rsclient.requestHistoryEndpoint(sentSubmissionId, bearerToken);
+            Map<String, Object> responseObject =
+                    formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
+            receiver = getReceiverName(responseBody);
+        } catch (ReportStreamEndpointClientException | FormatterProcessingException e) {
+            throw new PartnerMetadataException(
+                    "Unable to retrieve metadata from RS history API", e);
+        }
+
+        PartnerMetadata partnerMetadata =
+                new PartnerMetadata(
+                        receivedSubmissionId, sentSubmissionId, null, receiver, null, null);
+        partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
     public Optional<PartnerMetadata> getMetadata(String submissionId)
@@ -52,5 +74,31 @@ public class PartnerMetadataOrchestrator {
         // save the metadata with the receiver added.
         // return the metadata.
         return partnerMetadataStorage.readMetadata(submissionId);
+    }
+
+    private String getReceiverName(String clientResponse) throws FormatterProcessingException {
+        Map<String, Object> responseObject =
+                formatter.convertJsonToObject(clientResponse, new TypeReference<>() {});
+        Object destinationsObj = responseObject.get("destinations");
+        if (!(destinationsObj instanceof ArrayList<?> destinationsList)) {
+            throw new FormatterProcessingException(
+                    "destinations is not an ArrayList", new Exception());
+        }
+
+        if (destinationsList.isEmpty()
+                || !(destinationsList.get(0) instanceof Map<?, ?> destination)) {
+            throw new FormatterProcessingException(
+                    "First item in destinations is not a Map", new Exception());
+        }
+
+        var organizationId = destination.get("organization_id");
+        var service = destination.get("service");
+
+        if (organizationId == null || service == null) {
+            throw new FormatterProcessingException(
+                    "organization_id or service is null", new Exception());
+        }
+
+        return organizationId + "." + service;
     }
 }
