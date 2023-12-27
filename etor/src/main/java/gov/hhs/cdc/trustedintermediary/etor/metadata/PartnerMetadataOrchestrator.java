@@ -51,8 +51,6 @@ public class PartnerMetadataOrchestrator {
         try {
             String bearerToken = rsclient.getRsToken();
             String responseBody = rsclient.requestHistoryEndpoint(sentSubmissionId, bearerToken);
-            Map<String, Object> responseObject =
-                    formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
             receiver = getReceiverName(responseBody);
         } catch (ReportStreamEndpointClientException | FormatterProcessingException e) {
             throw new PartnerMetadataException(
