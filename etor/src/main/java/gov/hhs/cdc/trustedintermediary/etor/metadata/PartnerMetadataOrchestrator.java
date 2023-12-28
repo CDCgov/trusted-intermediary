@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpoin
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
@@ -38,7 +39,11 @@ public class PartnerMetadataOrchestrator {
         // we will calculate the hash.
         // then we call the metadata storage to save this stuff.
 
-        PartnerMetadata partnerMetadata = new PartnerMetadata(submissionId);
+        String sender = "unknown";
+        Instant timeReceived = Instant.now();
+        String hash = String.valueOf(order.hashCode());
+        PartnerMetadata partnerMetadata =
+                new PartnerMetadata(submissionId, sender, timeReceived, hash);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
@@ -57,8 +62,8 @@ public class PartnerMetadataOrchestrator {
         }
 
         PartnerMetadata partnerMetadata =
-                new PartnerMetadata(
-                        receivedSubmissionId, sentSubmissionId, null, receiver, null, null);
+                partnerMetadataStorage.readMetadata(receivedSubmissionId).orElseThrow();
+        partnerMetadata = partnerMetadata.withSentSubmissionFields(sentSubmissionId, receiver);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
