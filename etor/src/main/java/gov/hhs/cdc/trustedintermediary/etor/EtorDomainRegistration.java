@@ -129,15 +129,15 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleOrders(DomainRequest request) {
         Order<?> orders;
 
-        String submissionId = request.getHeaders().get("recordid");
-        if (submissionId == null || submissionId.isEmpty()) {
-            submissionId = null;
+        String receivedSubmissionId = request.getHeaders().get("recordid");
+        if (receivedSubmissionId == null || receivedSubmissionId.isEmpty()) {
+            receivedSubmissionId = null;
             logger.logError("Missing required header or empty: RecordId");
         }
 
         try {
             orders = orderController.parseOrders(request);
-            sendOrderUseCase.convertAndSend(orders, submissionId);
+            sendOrderUseCase.convertAndSend(orders, receivedSubmissionId);
         } catch (FhirParseException e) {
             logger.logError("Unable to parse order request", e);
             return domainResponseHelper.constructErrorResponse(400, e);

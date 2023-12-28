@@ -31,7 +31,7 @@ public class PartnerMetadataOrchestrator {
 
     private PartnerMetadataOrchestrator() {}
 
-    public void updateMetadataForReceivedOrder(String submissionId, Order<?> order)
+    public void updateMetadataForReceivedOrder(String receivedSubmissionId, Order<?> order)
             throws PartnerMetadataException {
         // will call the RS history API given the submissionId, currently blocked by:
         // https://github.com/CDCgov/prime-reportstream/issues/12624
@@ -43,7 +43,7 @@ public class PartnerMetadataOrchestrator {
         Instant timeReceived = Instant.now();
         String hash = String.valueOf(order.hashCode());
         PartnerMetadata partnerMetadata =
-                new PartnerMetadata(submissionId, sender, timeReceived, hash);
+                new PartnerMetadata(receivedSubmissionId, sender, timeReceived, hash);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
@@ -66,7 +66,7 @@ public class PartnerMetadataOrchestrator {
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
-    public Optional<PartnerMetadata> getMetadata(String submissionId)
+    public Optional<PartnerMetadata> getMetadata(String receivedSubmissionId)
             throws PartnerMetadataException {
         // call the metadata storage to get the metadata.
         // check if the receiver is filled out, and if it isn't, call the RS history API to get the
@@ -74,12 +74,12 @@ public class PartnerMetadataOrchestrator {
         // if had to call the history API, extract the receiver and call the metadata storage to
         // save the metadata with the receiver added.
         // return the metadata.
-        return partnerMetadataStorage.readMetadata(submissionId);
+        return partnerMetadataStorage.readMetadata(receivedSubmissionId);
     }
 
-    String getReceiverName(String clientResponse) throws FormatterProcessingException {
+    String getReceiverName(String responseBody) throws FormatterProcessingException {
         Map<String, Object> responseObject =
-                formatter.convertJsonToObject(clientResponse, new TypeReference<>() {});
+                formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
         Object destinationsObj = responseObject.get("destinations");
         if (!(destinationsObj instanceof ArrayList<?> destinationsList)) {
             throw new FormatterProcessingException(

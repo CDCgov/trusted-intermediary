@@ -38,15 +38,17 @@ public class SendOrderUseCase {
         saveSentOrderSubmissionId(receivedSubmissionId, sentSubmissionId);
     }
 
-    private void savePartnerMetadataForReceivedOrder(String submissionId, final Order<?> order) {
-        if (submissionId == null) {
+    private void savePartnerMetadataForReceivedOrder(
+            String receivedSubmissionId, final Order<?> order) {
+        if (receivedSubmissionId == null) {
             return;
         }
 
         try {
-            partnerMetadataOrchestrator.updateMetadataForReceivedOrder(submissionId, order);
+            partnerMetadataOrchestrator.updateMetadataForReceivedOrder(receivedSubmissionId, order);
         } catch (PartnerMetadataException e) {
-            logger.logError("Unable to save metadata for submissionId " + submissionId, e);
+            logger.logError(
+                    "Unable to save metadata for receivedSubmissionId " + receivedSubmissionId, e);
         }
     }
 
