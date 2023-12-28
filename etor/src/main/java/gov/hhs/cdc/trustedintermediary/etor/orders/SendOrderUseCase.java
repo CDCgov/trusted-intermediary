@@ -35,7 +35,7 @@ public class SendOrderUseCase {
 
         String sentSubmissionId = sender.sendOrder(omlOrder).orElse(null);
 
-        saveSentOrderSubmissionId(receivedSubmissionId, sentSubmissionId, order);
+        saveSentOrderSubmissionId(receivedSubmissionId, sentSubmissionId);
     }
 
     private void savePartnerMetadataForReceivedOrder(String submissionId, final Order<?> order) {
@@ -50,15 +50,14 @@ public class SendOrderUseCase {
         }
     }
 
-    private void saveSentOrderSubmissionId(
-            String receivedSubmissionId, String sentSubmissionId, final Order<?> order) {
+    private void saveSentOrderSubmissionId(String receivedSubmissionId, String sentSubmissionId) {
         if (sentSubmissionId == null || receivedSubmissionId == null) {
             return;
         }
 
         try {
             partnerMetadataOrchestrator.updateMetadataForSentOrder(
-                    receivedSubmissionId, sentSubmissionId, order);
+                    receivedSubmissionId, sentSubmissionId);
         } catch (PartnerMetadataException e) {
             logger.logError(
                     "Unable to update metadata for received submissionId "

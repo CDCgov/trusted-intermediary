@@ -22,8 +22,8 @@ public class PartnerMetadataOrchestrator {
     private static final PartnerMetadataOrchestrator INSTANCE = new PartnerMetadataOrchestrator();
 
     @Inject PartnerMetadataStorage partnerMetadataStorage;
-    @Inject private ReportStreamEndpointClient rsclient;
-    @Inject private Formatter formatter;
+    @Inject ReportStreamEndpointClient rsclient;
+    @Inject Formatter formatter;
 
     public static PartnerMetadataOrchestrator getInstance() {
         return INSTANCE;
@@ -47,8 +47,7 @@ public class PartnerMetadataOrchestrator {
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
-    public void updateMetadataForSentOrder(
-            String receivedSubmissionId, String sentSubmissionId, Order<?> order)
+    public void updateMetadataForSentOrder(String receivedSubmissionId, String sentSubmissionId)
             throws PartnerMetadataException {
 
         String receiver;
@@ -78,7 +77,7 @@ public class PartnerMetadataOrchestrator {
         return partnerMetadataStorage.readMetadata(submissionId);
     }
 
-    private String getReceiverName(String clientResponse) throws FormatterProcessingException {
+    String getReceiverName(String clientResponse) throws FormatterProcessingException {
         Map<String, Object> responseObject =
                 formatter.convertJsonToObject(clientResponse, new TypeReference<>() {});
         Object destinationsObj = responseObject.get("destinations");

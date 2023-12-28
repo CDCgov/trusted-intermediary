@@ -46,9 +46,9 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
     }
 
     @Override
-    public Optional<PartnerMetadata> readMetadata(final String uniqueId)
+    public Optional<PartnerMetadata> readMetadata(final String receivedSubmissionId)
             throws PartnerMetadataException {
-        Path filePath = getFilePath(uniqueId);
+        Path filePath = getFilePath(receivedSubmissionId);
         try {
             if (!Files.exists(filePath)) {
                 logger.logWarning("Metadata file not found: {}", filePath);
