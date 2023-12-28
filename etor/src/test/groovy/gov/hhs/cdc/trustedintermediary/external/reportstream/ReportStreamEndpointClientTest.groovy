@@ -25,7 +25,7 @@ class ReportStreamEndpointClientTest extends Specification {
         TestApplicationContext.register(ReportStreamEndpointClient, ReportStreamEndpointClient.getInstance())
     }
 
-    def "sendRequestBody works"() {
+    def "requestWatersEndpoint works"() {
         given:
         def mockClient = Mock(HttpClient)
         TestApplicationContext.register(HttpClient, mockClient)
@@ -39,7 +39,7 @@ class ReportStreamEndpointClientTest extends Specification {
         2 * mockClient.post(_ as String, _ as Map<String, String>, _ as String) >> "200"
     }
 
-    def "sendRequestBody fails from an IOException from the client"() {
+    def "requestWatersEndpoint fails from an IOException from the client"() {
         given:
         def mockClient = Mock(HttpClient)
         mockClient.post(_ as String, _ as Map<String, String>, _ as String) >> { throw new IOException("oops") }
@@ -53,6 +53,54 @@ class ReportStreamEndpointClientTest extends Specification {
         then:
         def exception = thrown(Exception)
         exception.getCause().getClass() == IOException
+    }
+
+    def "requestWatersEndpoint bombs out due to http exception"() {
+        given:
+        def orderSender = ReportStreamEndpointClient.getInstance()
+        def mockClient = Mock(HttpClient)
+        TestApplicationContext.register(HttpClient, mockClient)
+        TestApplicationContext.register(OrderSender, orderSender)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        mockClient.post(_ as String, _ as Map<String,String>, _ as String) >> {
+            throw new HttpClientException("404",new IOException())
+        }
+
+        when:
+        orderSender.requestWatersEndpoint("json", "bearerToken")
+
+        then:
+        def exception = thrown(ReportStreamEndpointClientException)
+        exception.getCause().getClass() == HttpClientException
+    }
+
+    def "requestHistoryEndpoint works"() {
+        given:
+        def mockClient = Mock(HttpClient)
+        TestApplicationContext.register(HttpClient, mockClient)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        ReportStreamEndpointClient.getInstance().requestHistoryEndpoint("submission_id_1", "fake token")
+        ReportStreamEndpointClient.getInstance().requestHistoryEndpoint("submission_id_2", "fake token")
+
+        then:
+        2 * mockClient.get(_ as String, _ as Map<String, String>) >> "200"
+    }
+
+    def "requestHistoryEndpoint fails due to HttpClientException"() {
+        given:
+        def mockClient = Mock(HttpClient)
+        mockClient.get(_ as String, _ as Map<String,String>) >> { throw new HttpClientException("404", new Exception()) }
+        TestApplicationContext.register(HttpClient, mockClient)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        ReportStreamEndpointClient.getInstance().requestHistoryEndpoint("submission_id", "fake token")
+
+        then:
+        thrown(ReportStreamEndpointClientException)
     }
 
     def "requestToken works"() {
@@ -77,6 +125,49 @@ class ReportStreamEndpointClientTest extends Specification {
         1 * mockAuthEngine.generateToken(_ as String, _ as String, _ as String, _ as String, 300, _ as String) >> "sender fake token"
         1 * mockClient.post(_ as String, _ as Map<String, String>, _ as String) >> """{"access_token":"${expected}", "token_type":"bearer"}"""
         actual == expected
+    }
+
+    def "requestToken works when access_token is a number"() {
+        given:
+        def mockClient = Mock(HttpClient)
+        def mockCache = Mock(Cache)
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.register(HttpClient, mockClient)
+        TestApplicationContext.register(Secrets, Mock(Secrets))
+        TestApplicationContext.register(AuthEngine, Mock(AuthEngine))
+        TestApplicationContext.register(Cache, mockCache)
+        TestApplicationContext.injectRegisteredImplementations()
+        def expectedTokenValue = "3"
+
+        def responseBody = """{"foo":"foo value", "access_token": 3, "boo":"boo value"}"""
+        mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
+
+        when:
+        def actualTokenValue = ReportStreamEndpointClient.getInstance().requestToken()
+
+        then:
+        actualTokenValue == expectedTokenValue
+    }
+
+    def "requestToken fails from not getting valid JSON from the auth token endpoint"() {
+        given:
+        def clientMock = Mock(HttpClient)
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.register(HttpClient, clientMock)
+        TestApplicationContext.register(Secrets, Mock(Secrets))
+        TestApplicationContext.register(AuthEngine, Mock(AuthEngine))
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+
+        def responseBody = """{"foo":"foo value", "access_token":"""
+        clientMock.post(_ as String, _ as Map, _ as String) >> responseBody
+
+        when:
+        ReportStreamEndpointClient.getInstance().requestToken()
+
+        then:
+        def exception = thrown(ReportStreamEndpointClientException)
+        exception.getCause().getClass() == FormatterProcessingException
     }
 
     def "requestToken saves our private key only after successful call to RS"() {
@@ -162,50 +253,7 @@ class ReportStreamEndpointClientTest extends Specification {
         1 * mockCache.put(_, _)
     }
 
-    def "extractToken works when access_token is a number"() {
-        given:
-        def mockClient = Mock(HttpClient)
-        def mockCache = Mock(Cache)
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.register(HttpClient, mockClient)
-        TestApplicationContext.register(Secrets, Mock(Secrets))
-        TestApplicationContext.register(AuthEngine, Mock(AuthEngine))
-        TestApplicationContext.register(Cache, mockCache)
-        TestApplicationContext.injectRegisteredImplementations()
-        def expectedTokenValue = "3"
-
-        def responseBody = """{"foo":"foo value", "access_token": 3, "boo":"boo value"}"""
-        mockClient.post(_ as String, _ as Map, _ as String) >> responseBody
-
-        when:
-        def actualTokenValue = ReportStreamEndpointClient.getInstance().requestToken()
-
-        then:
-        actualTokenValue == expectedTokenValue
-    }
-
-    def "extractToken fails from not getting valid JSON from the auth token endpoint"() {
-        given:
-        def clientMock = Mock(HttpClient)
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.register(HttpClient, clientMock)
-        TestApplicationContext.register(Secrets, Mock(Secrets))
-        TestApplicationContext.register(AuthEngine, Mock(AuthEngine))
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.injectRegisteredImplementations()
-
-        def responseBody = """{"foo":"foo value", "access_token":"""
-        clientMock.post(_ as String, _ as Map, _ as String) >> responseBody
-
-        when:
-        ReportStreamEndpointClient.getInstance().requestToken()
-
-        then:
-        def exception = thrown(ReportStreamEndpointClientException)
-        exception.getCause().getClass() == FormatterProcessingException
-    }
-
-    def "composeRequestBody works"() {
+    def "composeAuthRequestBody works"() {
         given:
         def ReportStreamEndpointClient = ReportStreamEndpointClient.getInstance()
         def fakeToken = "rsFakeToken"
@@ -218,6 +266,7 @@ class ReportStreamEndpointClientTest extends Specification {
         then:
         actual == expected
     }
+
     def "retrievePrivateKey works when cache is empty" () {
         given:
         def mockSecret = Mock(Secrets)
@@ -265,26 +314,6 @@ class ReportStreamEndpointClientTest extends Specification {
 
         then:
         isValid
-    }
-
-    def "sendRequestBody bombs out due to http exception"() {
-        given:
-        def orderSender = ReportStreamEndpointClient.getInstance()
-        def mockClient = Mock(HttpClient)
-        TestApplicationContext.register(HttpClient, mockClient)
-        TestApplicationContext.register(OrderSender, orderSender)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        mockClient.post(_ as String, _ as Map<String,String>, _ as String) >> {
-            throw new HttpClientException("404",new IOException())
-        }
-
-        when:
-        orderSender.requestWatersEndpoint("json", "bearerToken")
-
-        then:
-        def exception = thrown(ReportStreamEndpointClientException)
-        exception.getCause().getClass() == HttpClientException
     }
 
     def "getRsToken when cache is empty we call RS to get a new one"() {
