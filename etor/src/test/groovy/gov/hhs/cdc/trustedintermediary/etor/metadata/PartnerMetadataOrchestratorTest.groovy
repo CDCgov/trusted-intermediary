@@ -224,6 +224,46 @@ class PartnerMetadataOrchestratorTest extends Specification {
         1 * partnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(metadata)
     }
 
+    def "getMetadata gets receiver if missing from metadata"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def sentSubmissionId = "sentSubmissionId"
+        def sender = "senderName"
+        def timestamp = Instant.now()
+        def hashCode = "123"
+        def bearerToken = "token"
+        def rsHistoryApiResponse = "{\"destinations\": [{\"organization_id\": \"org\", \"service\": \"service\"}]}"
+
+        PartnerMetadata missingReceiverMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, null, timestamp, hashCode)
+        PartnerMetadata expectedMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, "org.service", timestamp, hashCode)
+
+        def partnerMetadataStorage = Mock(PartnerMetadataStorage)
+        TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
+
+        def mockClient = Mock(ReportStreamEndpointClient)
+        mockClient.getRsToken() >> bearerToken
+        mockClient.requestHistoryEndpoint(sentSubmissionId, bearerToken) >> rsHistoryApiResponse
+        TestApplicationContext.register(ReportStreamEndpointClient, mockClient)
+
+        def mockFormatter = Mock(Formatter)
+        mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> [destinations: [
+                [organization_id: "org", service: "service"]
+            ]]
+        TestApplicationContext.register(Formatter, mockFormatter)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        Optional<PartnerMetadata> result = PartnerMetadataOrchestrator.getInstance().getMetadata(receivedSubmissionId)
+
+        then:
+        result.isPresent()
+        result.get() == expectedMetadata
+        2 * partnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(missingReceiverMetadata)
+        1 * partnerMetadataStorage.saveMetadata(expectedMetadata)
+        1 * partnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(expectedMetadata)
+    }
+
     def "getReceiverName returns correct receiver name from valid JSON response"() {
         given:
         String validJson = "{\"destinations\": [{\"organization_id\": \"org_id\", \"service\": \"service_name\"}]}"
