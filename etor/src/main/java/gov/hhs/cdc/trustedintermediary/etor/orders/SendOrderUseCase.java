@@ -3,18 +3,24 @@ package gov.hhs.cdc.trustedintermediary.etor.orders;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator;
+import gov.hhs.cdc.trustedintermediary.utils.RetryTask;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import javax.inject.Inject;
 
 /** The overall logic to receive, convert to OML, and subsequently send a lab order. */
 public class SendOrderUseCase {
     private static final SendOrderUseCase INSTANCE = new SendOrderUseCase();
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     @Inject OrderConverter converter;
     @Inject OrderSender sender;
     @Inject MetricMetadata metadata;
     @Inject PartnerMetadataOrchestrator partnerMetadataOrchestrator;
     @Inject Logger logger;
+    @Inject RetryTask retryTask;
 
     private SendOrderUseCase() {}
 
@@ -35,8 +41,6 @@ public class SendOrderUseCase {
 
         String sentSubmissionId = sender.sendOrder(omlOrder).orElse(null);
 
-        // TODO: may need to either wait or add a re-try mechanism if the receiver info
-        //  is not yet available from the RS history API
         saveSentOrderSubmissionId(receivedSubmissionId, sentSubmissionId);
     }
 
@@ -58,17 +62,12 @@ public class SendOrderUseCase {
         if (sentSubmissionId == null || receivedSubmissionId == null) {
             return;
         }
-
-        try {
-            partnerMetadataOrchestrator.updateMetadataForSentOrder(
-                    receivedSubmissionId, sentSubmissionId);
-        } catch (PartnerMetadataException e) {
-            logger.logError(
-                    "Unable to update metadata for received submissionId "
-                            + receivedSubmissionId
-                            + " and sent submissionId "
-                            + sentSubmissionId,
-                    e);
-        }
+        Callable<Void> task =
+                () -> {
+                    partnerMetadataOrchestrator.updateMetadataForSentOrder(
+                            receivedSubmissionId, sentSubmissionId);
+                    return null;
+                };
+        retryTask.scheduleRetry(task, 0, 1000);
     }
 }
