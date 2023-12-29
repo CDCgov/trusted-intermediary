@@ -29,7 +29,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
         def partnerMetadataStorage = Mock(PartnerMetadataStorage)
         def partnerMetadata = new PartnerMetadata(receivedSubmissionId, "sender", Instant.now(), "hash")
-        def updatedPartnerMetadata = partnerMetadata.withSentSubmissionFields(sentSubmissionId, receiver)
+        def updatedPartnerMetadata = partnerMetadata.withSentSubmissionId(sentSubmissionId).withReceiver(receiver)
         TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
 
         def mockClient = Mock(ReportStreamEndpointClient)
@@ -55,14 +55,23 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
     def "updateMetadataForSentOrder throws PartnerMetadataException on client error"() {
         given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def sentSubmissionId = "sentSubmissionId"
+
+        def partnerMetadataStorage = Mock(PartnerMetadataStorage)
+        PartnerMetadata partnerMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, "sender", "receiver", Instant.now(), "hash")
+        partnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(partnerMetadata)
+        TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
+
         def mockClient = Mock(ReportStreamEndpointClient)
         mockClient.getRsToken() >> "token"
         mockClient.requestHistoryEndpoint(_ as String, _ as String) >> { throw new ReportStreamEndpointClientException("Client error", new Exception()) }
         TestApplicationContext.register(ReportStreamEndpointClient, mockClient)
+
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentOrder("receivedSubmissionId", "sentSubmissionId")
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentOrder(receivedSubmissionId, sentSubmissionId)
 
         then:
         thrown(PartnerMetadataException)
@@ -70,13 +79,19 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
     def "updateMetadataForSentOrder throws PartnerMetadataException on formatter error"() {
         given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def sentSubmissionId = "sentSubmissionId"
         def rsHistoryApiResponse = "{\"destinations\": [{\"organization_id\": \"org\", \"service\": \"service\"}]}"
+
+        def partnerMetadataStorage = Mock(PartnerMetadataStorage)
+        PartnerMetadata partnerMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, "sender", "receiver", Instant.now(), "hash")
+        partnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(partnerMetadata)
+        TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
 
         def mockClient = Mock(ReportStreamEndpointClient)
         mockClient.getRsToken() >> "token"
         mockClient.requestHistoryEndpoint(_ as String, _ as String) >> rsHistoryApiResponse
         TestApplicationContext.register(ReportStreamEndpointClient, mockClient)
-
 
         def mockFormatter = Mock(Formatter)
         mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> { throw new FormatterProcessingException("Formatter error", new Exception()) }
@@ -85,7 +100,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentOrder("receivedSubmissionId", "sentSubmissionId")
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentOrder(receivedSubmissionId, sentSubmissionId)
 
         then:
         thrown(PartnerMetadataException)

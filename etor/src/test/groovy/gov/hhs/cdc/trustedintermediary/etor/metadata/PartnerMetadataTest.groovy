@@ -54,7 +54,7 @@ class PartnerMetadataTest extends Specification {
         metadata.hash() == hash
     }
 
-    def "test withSentSubmissionFields to update PartnerMetadata"() {
+    def "test withSentSubmissionId and withReceiver to update PartnerMetadata"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
         def sentSubmissionId = "sentSubmissionId"
@@ -65,7 +65,7 @@ class PartnerMetadataTest extends Specification {
         def metadata = new PartnerMetadata(receivedSubmissionId, sender, timeReceived, hash)
 
         when:
-        def updatedMetadata = metadata.withSentSubmissionFields(sentSubmissionId, receiver)
+        def updatedMetadata = metadata.withSentSubmissionId(sentSubmissionId).withReceiver(receiver)
 
         then:
         updatedMetadata.receivedSubmissionId() == receivedSubmissionId

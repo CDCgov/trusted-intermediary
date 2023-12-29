@@ -9,6 +9,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import javax.inject.Inject;
 
@@ -59,6 +60,13 @@ public class PartnerMetadataOrchestrator {
     public void updateMetadataForSentOrder(String receivedSubmissionId, String sentSubmissionId)
             throws PartnerMetadataException {
 
+        PartnerMetadata partnerMetadata =
+                partnerMetadataStorage.readMetadata(receivedSubmissionId).orElseThrow();
+        if (!Objects.equals(partnerMetadata.sentSubmissionId(), sentSubmissionId)) {
+            partnerMetadata = partnerMetadata.withSentSubmissionId(sentSubmissionId);
+            partnerMetadataStorage.saveMetadata(partnerMetadata);
+        }
+
         String receiver;
         try {
             String bearerToken = rsclient.getRsToken();
@@ -69,9 +77,7 @@ public class PartnerMetadataOrchestrator {
                     "Unable to retrieve metadata from RS history API", e);
         }
 
-        PartnerMetadata partnerMetadata =
-                partnerMetadataStorage.readMetadata(receivedSubmissionId).orElseThrow();
-        partnerMetadata = partnerMetadata.withSentSubmissionFields(sentSubmissionId, receiver);
+        partnerMetadata = partnerMetadata.withReceiver(receiver);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
