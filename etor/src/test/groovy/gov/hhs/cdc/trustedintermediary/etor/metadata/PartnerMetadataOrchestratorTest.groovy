@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.orders.Order
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClient
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException
@@ -17,6 +18,104 @@ class PartnerMetadataOrchestratorTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(PartnerMetadataOrchestrator, PartnerMetadataOrchestrator.getInstance())
+    }
+
+    def "updateMetadataForReceivedOrder updates metadata successfully"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def sentSubmissionId = "sentSubmissionId"
+        def sender = "senderName"
+        def timestamp = "2020-01-01T00:00:00.000Z"
+        def hashCode = 123
+        def bearerToken = "token"
+        def rsHistoryApiResponse = "{\"sender\": \"${sender}\", \"timestamp\": \"${timestamp}\"}"
+
+        def mockOrder = Mock(Order)
+        mockOrder.hashCode() >> hashCode
+
+        def partnerMetadataStorage = Mock(PartnerMetadataStorage)
+        TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
+
+        def mockClient = Mock(ReportStreamEndpointClient)
+        TestApplicationContext.register(ReportStreamEndpointClient, mockClient)
+
+        def mockFormatter = Mock(Formatter)
+        mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> [sender: sender, timestamp: timestamp]
+        TestApplicationContext.register(Formatter, mockFormatter)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, mockOrder)
+
+        then:
+        1 * mockClient.getRsToken() >> bearerToken
+        1 * mockClient.requestHistoryEndpoint(receivedSubmissionId, bearerToken) >> rsHistoryApiResponse
+        1 * partnerMetadataStorage.saveMetadata(new PartnerMetadata(receivedSubmissionId, sender, Instant.parse(timestamp), hashCode.toString()))
+    }
+
+    def "updateMetadataForReceivedOrder throws PartnerMetadataException on client error"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+
+        def mockClient = Mock(ReportStreamEndpointClient)
+        mockClient.getRsToken() >> "token"
+        mockClient.requestHistoryEndpoint(_ as String, _ as String) >> { throw new ReportStreamEndpointClientException("Client error", new Exception()) }
+        TestApplicationContext.register(ReportStreamEndpointClient, mockClient)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, Mock(Order))
+
+        then:
+        thrown(PartnerMetadataException)
+    }
+
+    def "updateMetadataForReceivedOrder throws PartnerMetadataException on formatter error"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def rsHistoryApiResponse = "{\"sender\": \"responseName\", \"timestamp\": \"2020-01-01T00:00:00.000Z\"}"
+
+        def mockClient = Mock(ReportStreamEndpointClient)
+        mockClient.getRsToken() >> "token"
+        mockClient.requestHistoryEndpoint(_ as String, _ as String) >> rsHistoryApiResponse
+        TestApplicationContext.register(ReportStreamEndpointClient, mockClient)
+
+        def mockFormatter = Mock(Formatter)
+        mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> { throw new FormatterProcessingException("Formatter error", new Exception()) }
+        TestApplicationContext.register(Formatter, mockFormatter)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, Mock(Order))
+
+        then:
+        thrown(PartnerMetadataException)
+    }
+
+    def "updateMetadataForReceivedOrder throws PartnerMetadataException on formatter error due to unexpected response format"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def wrongFormatResponse = "{\"someotherkey\": \"value\"}"
+
+        def mockClient = Mock(ReportStreamEndpointClient)
+        mockClient.getRsToken() >> "token"
+        mockClient.requestHistoryEndpoint(_ as String, _ as String) >> wrongFormatResponse
+        TestApplicationContext.register(ReportStreamEndpointClient, mockClient)
+
+        def mockFormatter = Mock(Formatter)
+        mockFormatter.convertJsonToObject(wrongFormatResponse, _ as TypeReference) >> [someotherkey: "value"]
+        TestApplicationContext.register(Formatter, mockFormatter)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, Mock(Order))
+
+        then:
+        thrown(PartnerMetadataException)
     }
 
     def "updateMetadataForSentOrder updates metadata successfully"() {
@@ -139,70 +238,48 @@ class PartnerMetadataOrchestratorTest extends Specification {
         receiverName == "org_id.service_name"
     }
 
-    def "getReceiverName throws FormatterProcessingException for invalid JSON response"() {
+    def "getReceiverName throws FormatterProcessingException for unexpected format response"() {
         given:
-        String invalidJson = "invalid JSON"
-
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
+        String invalidJson = "invalid JSON"
         PartnerMetadataOrchestrator.getInstance().getReceiverName(invalidJson)
 
         then:
         thrown(FormatterProcessingException)
-    }
-
-    def "getReceiverName throws FormatterProcessingException for JSON without destinations"() {
-        given:
-        String jsonWithoutDestinations = "{\"someotherkey\": \"value\"}"
-
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.injectRegisteredImplementations()
 
         when:
+        String emptyJson = "{}"
+        PartnerMetadataOrchestrator.getInstance().getReceiverName(emptyJson)
+
+        then:
+        thrown(FormatterProcessingException)
+
+        when:
+        String jsonWithoutDestinations = "{\"someotherkey\": \"value\"}"
         PartnerMetadataOrchestrator.getInstance().getReceiverName(jsonWithoutDestinations)
 
         then:
         thrown(FormatterProcessingException)
-    }
-
-    def "getReceiverName throws FormatterProcessingException for JSON with empty destinations"() {
-        given:
-        String jsonWithEmptyDestinations = "{\"destinations\": []}"
-
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.injectRegisteredImplementations()
 
         when:
+        String jsonWithEmptyDestinations = "{\"destinations\": []}"
         PartnerMetadataOrchestrator.getInstance().getReceiverName(jsonWithEmptyDestinations)
 
         then:
         thrown(FormatterProcessingException)
-    }
-
-    def "getReceiverName throws FormatterProcessingException for JSON without organization_id"() {
-        given:
-        String jsonWithoutOrgId = "{\"destinations\":[{\"service\":\"service\"}]}"
-
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.injectRegisteredImplementations()
 
         when:
+        String jsonWithoutOrgId = "{\"destinations\":[{\"service\":\"service\"}]}"
         PartnerMetadataOrchestrator.getInstance().getReceiverName(jsonWithoutOrgId)
 
         then:
         thrown(FormatterProcessingException)
-    }
-
-    def "getReceiverName throws FormatterProcessingException for JSON without service"() {
-        given:
-        String jsonWithoutService = "{\"destinations\":[{\"organization_id\":\"org_id\"}]}"
-
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.injectRegisteredImplementations()
 
         when:
+        String jsonWithoutService = "{\"destinations\":[{\"organization_id\":\"org_id\"}]}"
         PartnerMetadataOrchestrator.getInstance().getReceiverName(jsonWithoutService)
 
         then:

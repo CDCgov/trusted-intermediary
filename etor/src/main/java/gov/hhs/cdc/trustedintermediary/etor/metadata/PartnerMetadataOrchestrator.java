@@ -37,21 +37,31 @@ public class PartnerMetadataOrchestrator {
         // currently blocked by: https://github.com/CDCgov/prime-reportstream/issues/12624
         // once we get the right receivedSubmissionId from RS, this method should work
 
-        Map<String, Object> responseObject;
+        String sender;
+        Instant timeReceived;
+        String hash;
         try {
             String bearerToken = rsclient.getRsToken();
             String responseBody =
                     rsclient.requestHistoryEndpoint(receivedSubmissionId, bearerToken);
-            responseObject = formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
+            Map<String, Object> responseObject =
+                    formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
+
+            var senderObj = responseObject.get("sender");
+            var timestampObj = responseObject.get("timestamp");
+            if (senderObj == null || timestampObj == null) {
+                throw new FormatterProcessingException(
+                        "sender or timestamp is null", new Exception());
+            }
+            sender = senderObj.toString();
+            timeReceived = Instant.parse(timestampObj.toString());
+            hash = String.valueOf(order.hashCode());
 
         } catch (ReportStreamEndpointClientException | FormatterProcessingException e) {
             throw new PartnerMetadataException(
                     "Unable to retrieve metadata from RS history API", e);
         }
 
-        String sender = responseObject.get("sender").toString();
-        Instant timeReceived = Instant.parse(responseObject.get("timestamp").toString());
-        String hash = String.valueOf(order.hashCode());
         PartnerMetadata partnerMetadata =
                 new PartnerMetadata(receivedSubmissionId, sender, timeReceived, hash);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
