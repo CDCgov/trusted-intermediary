@@ -9,8 +9,8 @@ import javax.inject.Inject;
 
 public class RetryTask {
     private static final RetryTask INSTANCE = new RetryTask();
-    private static final int MAX_RETRIES = 5;
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    static int MAX_RETRIES = 5;
+    static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     @Inject Logger logger;
 
     public static RetryTask getInstance() {

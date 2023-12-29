@@ -68,6 +68,6 @@ public class SendOrderUseCase {
                             receivedSubmissionId, sentSubmissionId);
                     return null;
                 };
-        retryTask.scheduleRetry(task, 0, 1000);
+        retryTask.scheduleRetry(task, 1, 1000);
     }
 }
