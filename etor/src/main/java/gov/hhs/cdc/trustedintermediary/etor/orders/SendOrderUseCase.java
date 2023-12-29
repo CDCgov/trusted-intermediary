@@ -35,6 +35,8 @@ public class SendOrderUseCase {
 
         String sentSubmissionId = sender.sendOrder(omlOrder).orElse(null);
 
+        // TODO: may need to either wait or add a re-try mechanism if the receiver info
+        //  is not yet available from the RS history API
         saveSentOrderSubmissionId(receivedSubmissionId, sentSubmissionId);
     }
 
