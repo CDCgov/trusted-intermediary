@@ -29,7 +29,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
         def partnerMetadataStorage = Mock(PartnerMetadataStorage)
         def partnerMetadata = new PartnerMetadata(receivedSubmissionId, "sender", Instant.now(), "hash")
-        def updatedPartnerMetadata = partnerMetadata.withSentSubmissionFields(sentSubmissionId, receiver)
+        def updatedPartnerMetadata = partnerMetadata.withSentSubmissionId(sentSubmissionId).withReceiver(receiver)
         TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
 
         def mockClient = Mock(ReportStreamEndpointClient)
