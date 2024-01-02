@@ -73,10 +73,13 @@ public class PartnerMetadataOrchestrator {
     public void updateMetadataForSentOrder(String receivedSubmissionId, String sentSubmissionId)
             throws PartnerMetadataException {
 
+        if (sentSubmissionId == null) {
+            return;
+        }
+
         PartnerMetadata partnerMetadata =
                 partnerMetadataStorage.readMetadata(receivedSubmissionId).orElseThrow();
-        if (sentSubmissionId != null
-                && !sentSubmissionId.equals(partnerMetadata.sentSubmissionId())) {
+        if (!sentSubmissionId.equals(partnerMetadata.sentSubmissionId())) {
             logger.logInfo("Updating metadata with sentSubmissionId: {}", sentSubmissionId);
             partnerMetadata = partnerMetadata.withSentSubmissionId(sentSubmissionId);
             partnerMetadataStorage.saveMetadata(partnerMetadata);
