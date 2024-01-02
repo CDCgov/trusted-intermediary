@@ -51,17 +51,12 @@ public class PartnerMetadataOrchestrator {
             Map<String, Object> responseObject =
                     formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
 
-            var senderObj = responseObject.get("sender");
-            var timestampObj = responseObject.get("timestamp");
-            if (senderObj == null || timestampObj == null) {
-                throw new FormatterProcessingException(
-                        "sender or timestamp is null", new Exception());
-            }
-            sender = senderObj.toString();
-            timeReceived = Instant.parse(timestampObj.toString());
+            sender = responseObject.get("sender").toString();
+            String timestamp = responseObject.get("timestamp").toString();
+            timeReceived = Instant.parse(timestamp);
             hash = String.valueOf(order.hashCode());
 
-        } catch (ReportStreamEndpointClientException | FormatterProcessingException e) {
+        } catch (Exception e) {
             throw new PartnerMetadataException(
                     "Unable to retrieve metadata from RS history API", e);
         }
