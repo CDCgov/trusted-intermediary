@@ -83,9 +83,7 @@ public class PartnerMetadataOrchestrator {
     }
 
     String getReceiverName(String responseBody) throws FormatterProcessingException {
-        // Before we can get the organization_id and service from the response,
-        // we need to validate that the response has the correct structure
-        // the expected json structure is:
+        // the expected json structure for the response is:
         // {
         //    ...
         //    "destinations" : [ {
@@ -97,26 +95,18 @@ public class PartnerMetadataOrchestrator {
         //    ...
         // }
 
-        Map<String, Object> responseObject =
-                formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
-        Object destinationsObj = responseObject.get("destinations");
-        if (!(destinationsObj instanceof ArrayList<?> destinationsList)) {
+        String organizationId;
+        String service;
+        try {
+            Map<String, Object> responseObject =
+                    formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
+            ArrayList<?> destinations = (ArrayList<?>) responseObject.get("destinations");
+            Map<?, ?> destination = (Map<?, ?>) destinations.get(0);
+            organizationId = destination.get("organization_id").toString();
+            service = destination.get("service").toString();
+        } catch (Exception e) {
             throw new FormatterProcessingException(
-                    "destinations is not an ArrayList", new Exception());
-        }
-
-        if (destinationsList.isEmpty()
-                || !(destinationsList.get(0) instanceof Map<?, ?> destination)) {
-            throw new FormatterProcessingException(
-                    "First item in destinations is not a Map", new Exception());
-        }
-
-        String organizationId = destination.get("organization_id").toString();
-        String service = destination.get("service").toString();
-
-        if (organizationId == null || service == null) {
-            throw new FormatterProcessingException(
-                    "organization_id or service is null", new Exception());
+                    "Unable to extract receiver name from response due to unexpected format", e);
         }
 
         return organizationId + "." + service;
