@@ -52,7 +52,8 @@ public class PartnerMetadataOrchestrator {
 
         PartnerMetadata partnerMetadata =
                 partnerMetadataStorage.readMetadata(receivedSubmissionId).orElseThrow();
-        if (!sentSubmissionId.equals(partnerMetadata.sentSubmissionId())) {
+        if (sentSubmissionId != null
+                && !sentSubmissionId.equals(partnerMetadata.sentSubmissionId())) {
             partnerMetadata = partnerMetadata.withSentSubmissionId(sentSubmissionId);
             partnerMetadataStorage.saveMetadata(partnerMetadata);
         }
