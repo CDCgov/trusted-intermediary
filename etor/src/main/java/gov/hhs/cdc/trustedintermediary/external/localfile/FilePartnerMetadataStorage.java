@@ -70,10 +70,9 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
             String content = formatter.convertToJsonString(metadata);
             Files.writeString(metadataFilePath, content);
             logger.logInfo(
-                    "Saved metadata for "
-                            + metadata.receivedSubmissionId()
-                            + " to "
-                            + metadataFilePath);
+                    "Saved metadata for {} to {}",
+                    metadata.receivedSubmissionId(),
+                    metadataFilePath);
         } catch (IOException | FormatterProcessingException e) {
             throw new PartnerMetadataException(
                     "Error saving metadata for " + metadata.receivedSubmissionId(), e);
