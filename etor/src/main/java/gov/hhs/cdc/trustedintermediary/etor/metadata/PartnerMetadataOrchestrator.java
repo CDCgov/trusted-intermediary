@@ -83,6 +83,20 @@ public class PartnerMetadataOrchestrator {
     }
 
     String getReceiverName(String responseBody) throws FormatterProcessingException {
+        // Before we can get the organization_id and service from the response,
+        // we need to validate that the response has the correct structure
+        // the expected json structure is:
+        // {
+        //    ...
+        //    "destinations" : [ {
+        //        ...
+        //        "organization_id" : "flexion",
+        //        "service" : "simulated-lab",
+        //        ...
+        //    } ],
+        //    ...
+        // }
+
         Map<String, Object> responseObject =
                 formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
         Object destinationsObj = responseObject.get("destinations");
@@ -97,8 +111,8 @@ public class PartnerMetadataOrchestrator {
                     "First item in destinations is not a Map", new Exception());
         }
 
-        var organizationId = destination.get("organization_id");
-        var service = destination.get("service");
+        String organizationId = destination.get("organization_id").toString();
+        String service = destination.get("service").toString();
 
         if (organizationId == null || service == null) {
             throw new FormatterProcessingException(
