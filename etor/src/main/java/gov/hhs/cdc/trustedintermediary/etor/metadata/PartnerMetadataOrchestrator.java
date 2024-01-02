@@ -1,149 +1,193 @@
-package gov.hhs.cdc.trustedintermediary.etor.metadata;
+package gov.hhs.cdc.trustedintermediary.external.reportstream;
 
-import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
-import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClient;
-import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException;
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
+import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
+import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
+import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
+import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
+import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
+import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
+import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
-import java.time.Instant;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.Optional;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-/**
- * The PartnerMetadataOrchestrator class is responsible for updating and retrieving partner-facing
- * metadata. It interacts with the metadata storage and the history API to create, update, and store
- * metadata.
- */
-public class PartnerMetadataOrchestrator {
+public class ReportStreamEndpointClient {
+    private static final String RS_URL_PREFIX =
+            ApplicationContext.getProperty("REPORT_STREAM_URL_PREFIX");
+    private static final String RS_DOMAIN_NAME =
+            Optional.ofNullable(RS_URL_PREFIX)
+                    .map(urlPrefix -> urlPrefix.replace("https://", "").replace("http://", ""))
+                    .orElse("");
+    private static final String RS_WATERS_API_URL = RS_URL_PREFIX + "/api/waters";
+    private static final String RS_AUTH_API_URL = RS_URL_PREFIX + "/api/token";
+    private static final String RS_HISTORY_API_URL =
+            RS_URL_PREFIX + "/api/waters/report/{id}/history";
 
-    private static final PartnerMetadataOrchestrator INSTANCE = new PartnerMetadataOrchestrator();
+    private static final String OUR_PRIVATE_KEY_ID =
+            "trusted-intermediary-private-key-" + ApplicationContext.getEnvironment();
+    private static final String RS_TOKEN_CACHE_ID = "report-stream-token";
 
-    @Inject PartnerMetadataStorage partnerMetadataStorage;
-    @Inject ReportStreamEndpointClient rsclient;
-    @Inject Formatter formatter;
-    @Inject Logger logger;
+    private static final String CLIENT_NAME = "flexion.etor-service-sender";
+    private static final Map<String, String> RS_AUTH_API_HEADERS =
+            Map.of("Content-Type", "application/x-www-form-urlencoded");
 
-    public static PartnerMetadataOrchestrator getInstance() {
+    @Inject private HttpClient client;
+    @Inject private AuthEngine jwt;
+    @Inject private Formatter formatter;
+    @Inject private HapiFhir fhir;
+    @Inject private Logger logger;
+    @Inject private Secrets secrets;
+    @Inject private Cache cache;
+
+    @Inject MetricMetadata metadata;
+
+    private static final ReportStreamEndpointClient INSTANCE = new ReportStreamEndpointClient();
+
+    public static ReportStreamEndpointClient getInstance() {
         return INSTANCE;
     }
 
-    private PartnerMetadataOrchestrator() {}
+    private ReportStreamEndpointClient() {}
 
-    public void updateMetadataForReceivedOrder(String receivedSubmissionId, Order<?> order)
-            throws PartnerMetadataException {
-        // currently blocked by: https://github.com/CDCgov/prime-reportstream/issues/12624
-        // once we get the right receivedSubmissionId from RS, this method should work
-        logger.logInfo(
-                "Looking up sender name and timeReceived from RS history API for receivedSubmissionId: {}",
-                receivedSubmissionId);
-
-        String sender;
-        Instant timeReceived;
-        String hash;
+    protected String requestAuthEndpoint() throws ReportStreamEndpointClientException {
+        logger.logInfo("Requesting token from ReportStream");
+        String ourPrivateKey;
+        String response;
         try {
-            String bearerToken = rsclient.getRsToken();
-            String responseBody =
-                    rsclient.requestHistoryEndpoint(receivedSubmissionId, bearerToken);
-            Map<String, Object> responseObject =
-                    formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
-
-            sender = responseObject.get("sender").toString();
-            String timestamp = responseObject.get("timestamp").toString();
-            timeReceived = Instant.parse(timestamp);
-            hash = String.valueOf(order.hashCode());
-
+            ourPrivateKey = retrievePrivateKey();
+            String senderToken =
+                    jwt.generateToken(
+                            CLIENT_NAME,
+                            CLIENT_NAME,
+                            CLIENT_NAME,
+                            RS_DOMAIN_NAME,
+                            300,
+                            ourPrivateKey);
+            String body = composeAuthRequestBody(senderToken);
+            response = client.post(RS_AUTH_API_URL, RS_AUTH_API_HEADERS, body);
         } catch (Exception e) {
-            throw new PartnerMetadataException(
-                    "Unable to retrieve metadata from RS history API", e);
+            throw new ReportStreamEndpointClientException(
+                    "Error getting the API token from ReportStream", e);
         }
+        // only cache our private key if we successfully authenticate to RS
+        cacheOurPrivateKeyIfNotCachedAlready(ourPrivateKey);
 
-        logger.logInfo(
-                "Updating metadata with sender: {}, timeReceived: {} and hash",
-                sender,
-                timeReceived);
-        PartnerMetadata partnerMetadata =
-                new PartnerMetadata(receivedSubmissionId, sender, timeReceived, hash);
-        partnerMetadataStorage.saveMetadata(partnerMetadata);
+        return response;
     }
 
-    public void updateMetadataForSentOrder(String receivedSubmissionId, String sentSubmissionId)
-            throws PartnerMetadataException {
+    public String requestWatersEndpoint(@Nonnull String body, @Nonnull String bearerToken)
+            throws ReportStreamEndpointClientException {
+        logger.logInfo("Sending payload to ReportStream");
 
-        if (sentSubmissionId == null) {
+        Map<String, String> headers =
+                Map.of(
+                        "Authorization",
+                        "Bearer " + bearerToken,
+                        "client",
+                        CLIENT_NAME,
+                        "Content-Type",
+                        "application/fhir+ndjson");
+
+        try {
+            return client.post(RS_WATERS_API_URL, headers, body);
+        } catch (HttpClientException e) {
+            throw new ReportStreamEndpointClientException(
+                    "Error POSTing the payload to ReportStream", e);
+        }
+    }
+
+    public String requestHistoryEndpoint(@Nonnull String submissionId, @Nonnull String bearerToken)
+            throws ReportStreamEndpointClientException {
+        logger.logInfo("Requesting history API from ReportStream");
+
+        Map<String, String> headers = Map.of("Authorization", "Bearer " + bearerToken);
+
+        try {
+            String url = RS_HISTORY_API_URL.replace("{id}", submissionId);
+            return client.get(url, headers);
+        } catch (HttpClientException e) {
+            throw new ReportStreamEndpointClientException(
+                    "Error GETting the history from ReportStream", e);
+        }
+    }
+
+    protected String requestToken() throws ReportStreamEndpointClientException {
+        logger.logInfo("Requesting token from ReportStream");
+
+        String response = requestAuthEndpoint();
+        try {
+            Map<String, String> responseObject =
+                    formatter.convertJsonToObject(response, new TypeReference<>() {});
+            return responseObject.get("access_token");
+        } catch (FormatterProcessingException e) {
+            throw new ReportStreamEndpointClientException(
+                    "Unable to extract access_token from response", e);
+        }
+    }
+
+    public String getRsToken() throws ReportStreamEndpointClientException {
+        logger.logInfo("Looking up ReportStream token");
+
+        var token = cache.get(RS_TOKEN_CACHE_ID);
+
+        if (token != null && isValidToken(token)) {
+            logger.logDebug("valid cache token");
+            return token;
+        }
+
+        token = requestToken();
+
+        cache.put(RS_TOKEN_CACHE_ID, token);
+
+        return token;
+    }
+
+    protected boolean isValidToken(String token) {
+        LocalDateTime expirationDate = jwt.getExpirationDate(token);
+
+        return LocalDateTime.now().isBefore(expirationDate.minus(15, ChronoUnit.SECONDS));
+    }
+
+    protected String retrievePrivateKey() throws SecretRetrievalException {
+        String key = cache.get(OUR_PRIVATE_KEY_ID);
+        if (key != null) {
+            return key;
+        }
+
+        key = secrets.getKey(OUR_PRIVATE_KEY_ID);
+
+        return key;
+    }
+
+    void cacheOurPrivateKeyIfNotCachedAlready(String privateKey) {
+        String key = cache.get(OUR_PRIVATE_KEY_ID);
+        if (key != null) {
             return;
         }
 
-        PartnerMetadata partnerMetadata =
-                partnerMetadataStorage.readMetadata(receivedSubmissionId).orElseThrow();
-        if (!sentSubmissionId.equals(partnerMetadata.sentSubmissionId())) {
-            logger.logInfo("Updating metadata with sentSubmissionId: {}", sentSubmissionId);
-            partnerMetadata = partnerMetadata.withSentSubmissionId(sentSubmissionId);
-            partnerMetadataStorage.saveMetadata(partnerMetadata);
-        }
-
-        logger.logInfo(
-                "Looking up receiver name from RS history API for sentSubmissionId: {}",
-                sentSubmissionId);
-        String receiver;
-        try {
-            String bearerToken = rsclient.getRsToken();
-            String responseBody = rsclient.requestHistoryEndpoint(sentSubmissionId, bearerToken);
-            receiver = getReceiverName(responseBody);
-        } catch (ReportStreamEndpointClientException | FormatterProcessingException e) {
-            throw new PartnerMetadataException(
-                    "Unable to retrieve metadata from RS history API", e);
-        }
-
-        logger.logInfo("Updating metadata with receiver: {}", receiver);
-        partnerMetadata = partnerMetadata.withReceiver(receiver);
-        partnerMetadataStorage.saveMetadata(partnerMetadata);
+        cache.put(OUR_PRIVATE_KEY_ID, privateKey);
     }
 
-    public Optional<PartnerMetadata> getMetadata(String receivedSubmissionId)
-            throws PartnerMetadataException {
-        PartnerMetadata partnerMetadata =
-                partnerMetadataStorage.readMetadata(receivedSubmissionId).orElseThrow();
-
-        if (partnerMetadata.receiver() == null && partnerMetadata.sentSubmissionId() != null) {
-            logger.logInfo("Receiver name not found in metadata, looking up from RS history API");
-            updateMetadataForSentOrder(receivedSubmissionId, partnerMetadata.sentSubmissionId());
-            return partnerMetadataStorage.readMetadata(receivedSubmissionId);
-        }
-
-        return Optional.of(partnerMetadata);
-    }
-
-    String getReceiverName(String responseBody) throws FormatterProcessingException {
-        // the expected json structure for the response is:
-        // {
-        //    ...
-        //    "destinations" : [ {
-        //        ...
-        //        "organization_id" : "flexion",
-        //        "service" : "simulated-lab",
-        //        ...
-        //    } ],
-        //    ...
-        // }
-
-        String organizationId;
-        String service;
-        try {
-            Map<String, Object> responseObject =
-                    formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
-            ArrayList<?> destinations = (ArrayList<?>) responseObject.get("destinations");
-            Map<?, ?> destination = (Map<?, ?>) destinations.get(0);
-            organizationId = destination.get("organization_id").toString();
-            service = destination.get("service").toString();
-        } catch (Exception e) {
-            throw new FormatterProcessingException(
-                    "Unable to extract receiver name from response due to unexpected format", e);
-        }
-
-        return organizationId + "." + service;
+    protected String composeAuthRequestBody(String senderToken) {
+        String scope = "flexion.*.report";
+        String grantType = "client_credentials";
+        String clientAssertionType = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
+        return "scope="
+                + scope
+                + "&grant_type="
+                + grantType
+                + "&client_assertion_type="
+                + clientAssertionType
+                + "&client_assertion="
+                + senderToken;
     }
 }
