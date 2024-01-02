@@ -22,44 +22,48 @@ public class SendOrderUseCase {
         return INSTANCE;
     }
 
-    public void convertAndSend(final Order<?> order, String submissionId)
+    public void convertAndSend(final Order<?> order, String receivedSubmissionId)
             throws UnableToSendOrderException {
 
-        savePartnerMetadataForReceivedOrder(submissionId, order);
+        savePartnerMetadataForReceivedOrder(receivedSubmissionId, order);
 
         var omlOrder = converter.convertMetadataToOmlOrder(order);
         metadata.put(order.getFhirResourceId(), EtorMetadataStep.ORDER_CONVERTED_TO_OML);
+
         omlOrder = converter.addContactSectionToPatientResource(omlOrder);
         metadata.put(order.getFhirResourceId(), EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT);
-        sender.sendOrder(omlOrder);
 
-        saveSentOrderSubmissionId(
-                submissionId,
-                "TBD, need to be filled in from the sender.sendOrder(omlOrder) call",
-                order);
+        String sentSubmissionId = sender.sendOrder(omlOrder).orElse(null);
+
+        saveSentOrderSubmissionId(receivedSubmissionId, sentSubmissionId);
     }
 
-    private void savePartnerMetadataForReceivedOrder(String submissionId, final Order<?> order) {
-        if (submissionId == null) {
+    private void savePartnerMetadataForReceivedOrder(
+            String receivedSubmissionId, final Order<?> order) {
+        if (receivedSubmissionId == null) {
+            logger.logWarning(
+                    "Received submissionId is null so not saving metadata for received order");
             return;
         }
 
         try {
-            partnerMetadataOrchestrator.updateMetadataForReceivedOrder(submissionId, order);
+            partnerMetadataOrchestrator.updateMetadataForReceivedOrder(receivedSubmissionId, order);
         } catch (PartnerMetadataException e) {
-            logger.logError("Unable to save metadata for submissionId " + submissionId, e);
+            logger.logError(
+                    "Unable to save metadata for receivedSubmissionId " + receivedSubmissionId, e);
         }
     }
 
-    private void saveSentOrderSubmissionId(
-            String receivedSubmissionId, String sentSubmissionId, final Order<?> order) {
+    private void saveSentOrderSubmissionId(String receivedSubmissionId, String sentSubmissionId) {
         if (sentSubmissionId == null || receivedSubmissionId == null) {
+            logger.logWarning(
+                    "Received and/or sent submissionId is null so not saving metadata for sent order");
             return;
         }
 
         try {
             partnerMetadataOrchestrator.updateMetadataForSentOrder(
-                    receivedSubmissionId, sentSubmissionId, order);
+                    receivedSubmissionId, sentSubmissionId);
         } catch (PartnerMetadataException e) {
             logger.logError(
                     "Unable to update metadata for received submissionId "

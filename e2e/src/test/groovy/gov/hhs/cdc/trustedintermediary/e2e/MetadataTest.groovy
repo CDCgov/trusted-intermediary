@@ -33,7 +33,7 @@ class MetadataTest extends Specification {
 
         then:
         metadataResponse.getCode() == expectedStatusCode
-        parsedJsonBody.uniqueId == submissionId
+        parsedJsonBody.receivedSubmissionId == submissionId
     }
 
     def "a 404 is returned when there is no metadata for a given ID"() {

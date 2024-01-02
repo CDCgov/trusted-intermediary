@@ -46,9 +46,9 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
     }
 
     @Override
-    public Optional<PartnerMetadata> readMetadata(final String uniqueId)
+    public Optional<PartnerMetadata> readMetadata(final String receivedSubmissionId)
             throws PartnerMetadataException {
-        Path filePath = getFilePath(uniqueId);
+        Path filePath = getFilePath(receivedSubmissionId);
         try {
             if (!Files.exists(filePath)) {
                 logger.logWarning("Metadata file not found: {}", filePath);
@@ -65,14 +65,17 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
 
     @Override
     public void saveMetadata(final PartnerMetadata metadata) throws PartnerMetadataException {
-        Path metadataFilePath = getFilePath(metadata.uniqueId());
+        Path metadataFilePath = getFilePath(metadata.receivedSubmissionId());
         try {
             String content = formatter.convertToJsonString(metadata);
             Files.writeString(metadataFilePath, content);
-            logger.logInfo("Saved metadata for " + metadata.uniqueId() + " to " + metadataFilePath);
+            logger.logInfo(
+                    "Saved metadata for {} to {}",
+                    metadata.receivedSubmissionId(),
+                    metadataFilePath);
         } catch (IOException | FormatterProcessingException e) {
             throw new PartnerMetadataException(
-                    "Error saving metadata for " + metadata.uniqueId(), e);
+                    "Error saving metadata for " + metadata.receivedSubmissionId(), e);
         }
     }
 

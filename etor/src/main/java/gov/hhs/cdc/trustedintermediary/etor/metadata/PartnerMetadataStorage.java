@@ -6,12 +6,13 @@ import java.util.Optional;
 public interface PartnerMetadataStorage {
 
     /**
-     * This method will retrieve and return the metadata for the given uniqueId, if it exists.
+     * This method will retrieve and return the metadata for the given submissionId, if it exists.
      *
-     * @param uniqueId The uniqueId to read the metadata for.
+     * @param receivedSubmissionId The submission Id to read the metadata for.
      * @return The metadata, if it exists. Otherwise, an empty Optional.
      */
-    Optional<PartnerMetadata> readMetadata(String uniqueId) throws PartnerMetadataException;
+    Optional<PartnerMetadata> readMetadata(String receivedSubmissionId)
+            throws PartnerMetadataException;
 
     /**
      * This method will do "upserts". If the record doesn't exist, it is created. If the record

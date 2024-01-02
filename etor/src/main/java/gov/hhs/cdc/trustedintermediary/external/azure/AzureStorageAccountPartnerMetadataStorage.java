@@ -53,7 +53,7 @@ public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadat
 
     @Override
     public void saveMetadata(final PartnerMetadata metadata) throws PartnerMetadataException {
-        String metadataFileName = getMetadataFileName(metadata.uniqueId());
+        String metadataFileName = getMetadataFileName(metadata.receivedSubmissionId());
         try {
             BlobClient blobClient = client.getBlobClient(metadataFileName);
             String content = formatter.convertToJsonString(metadata);

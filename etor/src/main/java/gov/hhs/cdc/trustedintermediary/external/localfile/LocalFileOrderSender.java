@@ -10,6 +10,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Optional;
 import javax.inject.Inject;
 
 /** Accepts a {@link Order} and writes it to a local file. */
@@ -30,7 +31,7 @@ public class LocalFileOrderSender implements OrderSender {
     private LocalFileOrderSender() {}
 
     @Override
-    public void sendOrder(final Order<?> order) throws UnableToSendOrderException {
+    public Optional<String> sendOrder(final Order<?> order) throws UnableToSendOrderException {
         var fileLocation = Paths.get(LOCAL_FILE_NAME);
         logger.logInfo("Sending the order to the hard drive at {}", fileLocation.toAbsolutePath());
 
@@ -41,5 +42,7 @@ public class LocalFileOrderSender implements OrderSender {
         } catch (Exception e) {
             throw new UnableToSendOrderException("Error writing the lab order", e);
         }
+
+        return Optional.empty();
     }
 }
