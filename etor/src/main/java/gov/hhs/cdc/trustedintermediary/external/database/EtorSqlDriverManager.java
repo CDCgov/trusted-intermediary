@@ -6,9 +6,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-/**
- * Wrapper class for SqlDriverManager
- */
+/** Wrapper class for SqlDriverManager */
 public class EtorSqlDriverManager implements SqlDriverManager {
 
     private static final EtorSqlDriverManager INSTANCE = new EtorSqlDriverManager();
