@@ -15,6 +15,9 @@ import java.time.Instant;
 import java.util.Properties;
 import javax.inject.Inject;
 
+/**
+ * Class for accessing and managing data for the postgres Database
+ */
 public class PostgresDao implements DbDao {
 
     private static final PostgresDao INSTANCE = new PostgresDao();
