@@ -21,18 +21,16 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 public class ReportStreamEndpointClient {
-    private static final String RS_URL_PREFIX_PROPERTY = "REPORT_STREAM_URL_PREFIX";
+    private static final String RS_URL_PREFIX =
+            ApplicationContext.getProperty("REPORT_STREAM_URL_PREFIX");
     private static final String RS_DOMAIN_NAME =
-            Optional.ofNullable(ApplicationContext.getProperty(RS_URL_PREFIX_PROPERTY))
+            Optional.ofNullable(RS_URL_PREFIX)
                     .map(urlPrefix -> urlPrefix.replace("https://", "").replace("http://", ""))
                     .orElse("");
-    private static final String RS_WATERS_API_URL =
-            ApplicationContext.getProperty(RS_URL_PREFIX_PROPERTY) + "/api/waters";
-    private static final String RS_AUTH_API_URL =
-            ApplicationContext.getProperty(RS_URL_PREFIX_PROPERTY) + "/api/token";
+    private static final String RS_WATERS_API_URL = RS_URL_PREFIX + "/api/waters";
+    private static final String RS_AUTH_API_URL = RS_URL_PREFIX + "/api/token";
     private static final String RS_HISTORY_API_URL =
-            ApplicationContext.getProperty(RS_URL_PREFIX_PROPERTY)
-                    + "/api/waters/report/{id}/history";
+            RS_URL_PREFIX + "/api/waters/report/{id}/history";
 
     private static final String OUR_PRIVATE_KEY_ID =
             "trusted-intermediary-private-key-" + ApplicationContext.getEnvironment();
@@ -114,11 +112,11 @@ public class ReportStreamEndpointClient {
         Map<String, String> headers = Map.of("Authorization", "Bearer " + bearerToken);
 
         try {
-            var url = RS_HISTORY_API_URL.replace("{id}", submissionId);
+            String url = RS_HISTORY_API_URL.replace("{id}", submissionId);
             return client.get(url, headers);
         } catch (HttpClientException e) {
             throw new ReportStreamEndpointClientException(
-                    "Error GETing the history from ReportStream", e);
+                    "Error GETting the history from ReportStream", e);
         }
     }
 

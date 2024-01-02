@@ -47,6 +47,8 @@ public class SendOrderUseCase {
     private void savePartnerMetadataForReceivedOrder(
             String receivedSubmissionId, final Order<?> order) {
         if (receivedSubmissionId == null) {
+            logger.logWarning(
+                    "Received submissionId is null so not saving metadata for received order");
             return;
         }
 
@@ -60,6 +62,8 @@ public class SendOrderUseCase {
 
     private void saveSentOrderSubmissionId(String receivedSubmissionId, String sentSubmissionId) {
         if (sentSubmissionId == null || receivedSubmissionId == null) {
+            logger.logWarning(
+                    "Received and/or sent submissionId is null so not saving metadata for sent order");
             return;
         }
         Callable<Void> task =

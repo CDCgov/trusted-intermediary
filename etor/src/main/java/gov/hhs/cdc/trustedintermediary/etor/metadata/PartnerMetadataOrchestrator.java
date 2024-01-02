@@ -51,17 +51,12 @@ public class PartnerMetadataOrchestrator {
             Map<String, Object> responseObject =
                     formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
 
-            var senderObj = responseObject.get("sender");
-            var timestampObj = responseObject.get("timestamp");
-            if (senderObj == null || timestampObj == null) {
-                throw new FormatterProcessingException(
-                        "sender or timestamp is null", new Exception());
-            }
-            sender = senderObj.toString();
-            timeReceived = Instant.parse(timestampObj.toString());
+            sender = responseObject.get("sender").toString();
+            String timestamp = responseObject.get("timestamp").toString();
+            timeReceived = Instant.parse(timestamp);
             hash = String.valueOf(order.hashCode());
 
-        } catch (ReportStreamEndpointClientException | FormatterProcessingException e) {
+        } catch (Exception e) {
             throw new PartnerMetadataException(
                     "Unable to retrieve metadata from RS history API", e);
         }
@@ -77,6 +72,10 @@ public class PartnerMetadataOrchestrator {
 
     public void updateMetadataForSentOrder(String receivedSubmissionId, String sentSubmissionId)
             throws PartnerMetadataException {
+
+        if (sentSubmissionId == null) {
+            return;
+        }
 
         PartnerMetadata partnerMetadata =
                 partnerMetadataStorage.readMetadata(receivedSubmissionId).orElseThrow();
@@ -119,26 +118,30 @@ public class PartnerMetadataOrchestrator {
     }
 
     String getReceiverName(String responseBody) throws FormatterProcessingException {
-        Map<String, Object> responseObject =
-                formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
-        Object destinationsObj = responseObject.get("destinations");
-        if (!(destinationsObj instanceof ArrayList<?> destinationsList)) {
-            throw new FormatterProcessingException(
-                    "destinations is not an ArrayList", new Exception());
-        }
+        // the expected json structure for the response is:
+        // {
+        //    ...
+        //    "destinations" : [ {
+        //        ...
+        //        "organization_id" : "flexion",
+        //        "service" : "simulated-lab",
+        //        ...
+        //    } ],
+        //    ...
+        // }
 
-        if (destinationsList.isEmpty()
-                || !(destinationsList.get(0) instanceof Map<?, ?> destination)) {
+        String organizationId;
+        String service;
+        try {
+            Map<String, Object> responseObject =
+                    formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
+            ArrayList<?> destinations = (ArrayList<?>) responseObject.get("destinations");
+            Map<?, ?> destination = (Map<?, ?>) destinations.get(0);
+            organizationId = destination.get("organization_id").toString();
+            service = destination.get("service").toString();
+        } catch (Exception e) {
             throw new FormatterProcessingException(
-                    "First item in destinations is not a Map", new Exception());
-        }
-
-        var organizationId = destination.get("organization_id");
-        var service = destination.get("service");
-
-        if (organizationId == null || service == null) {
-            throw new FormatterProcessingException(
-                    "organization_id or service is null", new Exception());
+                    "Unable to extract receiver name from response due to unexpected format", e);
         }
 
         return organizationId + "." + service;
