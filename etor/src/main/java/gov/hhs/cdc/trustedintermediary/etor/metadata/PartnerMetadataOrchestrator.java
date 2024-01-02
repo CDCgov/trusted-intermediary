@@ -9,7 +9,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import javax.inject.Inject;
 
@@ -53,7 +52,7 @@ public class PartnerMetadataOrchestrator {
 
         PartnerMetadata partnerMetadata =
                 partnerMetadataStorage.readMetadata(receivedSubmissionId).orElseThrow();
-        if (!Objects.equals(partnerMetadata.sentSubmissionId(), sentSubmissionId)) {
+        if (!sentSubmissionId.equals(partnerMetadata.sentSubmissionId())) {
             partnerMetadata = partnerMetadata.withSentSubmissionId(sentSubmissionId);
             partnerMetadataStorage.saveMetadata(partnerMetadata);
         }
