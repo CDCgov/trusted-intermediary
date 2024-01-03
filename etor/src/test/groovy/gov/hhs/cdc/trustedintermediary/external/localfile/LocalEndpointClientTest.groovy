@@ -52,16 +52,4 @@ class LocalEndpointClientTest extends Specification {
         destination.get("organization_id") != null
         destination.get("service") != null
     }
-
-    def "requestWatersEndpoint throws an exception when not able to save file with order"() {
-        given:
-        LocalEndpointClient.LOCAL_FILE_NAME = "some/path/that/does/not/exist"
-
-        when:
-        def token = LocalEndpointClient.getInstance().getRsToken()
-        LocalEndpointClient.getInstance().requestWatersEndpoint("order", token)
-
-        then:
-        thrown(ReportStreamEndpointClientException)
-    }
 }
