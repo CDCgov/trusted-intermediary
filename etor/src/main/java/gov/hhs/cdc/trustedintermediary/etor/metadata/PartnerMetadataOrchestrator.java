@@ -1,7 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata;
 
+import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
-import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
@@ -22,7 +22,7 @@ public class PartnerMetadataOrchestrator {
     private static final PartnerMetadataOrchestrator INSTANCE = new PartnerMetadataOrchestrator();
 
     @Inject PartnerMetadataStorage partnerMetadataStorage;
-    @Inject ReportStreamEndpointClient rsclient;
+    @Inject RSEndpointClient rsclient;
     @Inject Formatter formatter;
 
     public static PartnerMetadataOrchestrator getInstance() {
