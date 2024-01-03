@@ -84,7 +84,7 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(
                 ReportStreamEndpointClient.class, ReportStreamEndpointClient.getInstance());
 
-        ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
+
 
         if (ApplicationContext.getProperty("DB_URL") != null) {
             ApplicationContext.register(SqlDriverManager.class, EtorSqlDriverManager.getInstance());
@@ -104,6 +104,7 @@ public class EtorDomainRegistration implements DomainConnector {
             ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
         } else {
             ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
+            ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
         }
 
         return endpoints;
