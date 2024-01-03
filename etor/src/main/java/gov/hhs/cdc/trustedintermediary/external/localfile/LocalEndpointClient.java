@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 
 public class LocalEndpointClient implements RSEndpointClient {
 
-    static final String LOCAL_FILE_NAME = "localfileorder.json";
+    static String LOCAL_FILE_NAME = "localfileorder.json";
 
     private static final LocalEndpointClient INSTANCE = new LocalEndpointClient();
 
