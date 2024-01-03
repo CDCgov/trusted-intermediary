@@ -21,6 +21,11 @@ public class LocalFileEndpointClient implements RSEndpointClient {
     private LocalFileEndpointClient() {}
 
     @Override
+    public String getRsToken() {
+        return "token";
+    }
+
+    @Override
     public String requestWatersEndpoint(@Nonnull String body, @Nonnull String bearerToken)
             throws ReportStreamEndpointClientException {
         var fileLocation = Paths.get(LOCAL_FILE_NAME);
@@ -35,11 +40,12 @@ public class LocalFileEndpointClient implements RSEndpointClient {
     @Override
     public String requestHistoryEndpoint(@Nonnull String submissionId, @Nonnull String bearerToken)
             throws ReportStreamEndpointClientException {
-        return null;
-    }
-
-    @Override
-    public String getRsToken() throws ReportStreamEndpointClientException {
-        return "token";
+        return """
+{
+    "destinations" : [{
+        "organization_id" : "flexion",
+        "service" : "simulated-lab",
+    }]
+ }""";
     }
 }

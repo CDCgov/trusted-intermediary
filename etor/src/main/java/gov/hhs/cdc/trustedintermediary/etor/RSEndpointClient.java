@@ -5,11 +5,11 @@ import javax.annotation.Nonnull;
 
 public interface RSEndpointClient {
 
+    String getRsToken() throws ReportStreamEndpointClientException;
+
     String requestWatersEndpoint(@Nonnull String body, @Nonnull String bearerToken)
             throws ReportStreamEndpointClientException;
 
     String requestHistoryEndpoint(@Nonnull String submissionId, @Nonnull String bearerToken)
             throws ReportStreamEndpointClientException;
-
-    String getRsToken() throws ReportStreamEndpointClientException;
 }
