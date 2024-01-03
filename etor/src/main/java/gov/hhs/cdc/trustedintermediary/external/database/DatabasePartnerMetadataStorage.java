@@ -29,7 +29,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
             throws PartnerMetadataException {
         try {
             PartnerMetadata data = (PartnerMetadata) dao.fetchMetadata(uniqueId);
-            logger.logInfo(data.uniqueId());
+            logger.logInfo(data.receivedSubmissionId());
             return Optional.ofNullable(data);
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error retrieving metadata", e);
@@ -41,7 +41,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
         logger.logInfo("saving the metadata");
         try {
             dao.upsertMetadata(
-                    metadata.uniqueId(),
+                    metadata.receivedSubmissionId(),
                     metadata.sender(),
                     metadata.receiver(),
                     metadata.hash(),
