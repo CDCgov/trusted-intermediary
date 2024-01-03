@@ -42,9 +42,9 @@ public class LocalEndpointClient implements RSEndpointClient {
             @Nonnull String submissionId, @Nonnull String bearerToken) {
         return """
 {
-    "destinations" : [{
-        "organization_id" : "flexion",
-        "service" : "simulated-lab",
+    "destinations": [{
+        "organization_id": "flexion",
+        "service": "simulated-lab"
     }]
  }""";
     }
