@@ -29,13 +29,12 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
             throws PartnerMetadataException {
         try {
             PartnerMetadata data = (PartnerMetadata) dao.fetchMetadata(uniqueId);
-            logger.logInfo(data.receivedSubmissionId());
             return Optional.ofNullable(data);
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error retrieving metadata", e);
         }
     }
-    // TODO: Should this be separate or should we have the DAO stuff happen in here
+
     @Override
     public void saveMetadata(final PartnerMetadata metadata) throws PartnerMetadataException {
         logger.logInfo("saving the metadata");
@@ -46,7 +45,6 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                     metadata.receiver(),
                     metadata.hash(),
                     metadata.timeReceived());
-            // TODO: Put response into the logger
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error saving metadata", e);
         }

@@ -81,7 +81,11 @@ public class PostgresDao implements DbDao {
 
     @Override
     public synchronized void upsertMetadata(
-            String id, String sender, String receiver, String hash, Instant timeReceived)
+            String receivedSubmissionId,
+            String sender,
+            String receiver,
+            String hash,
+            Instant timeReceived)
             throws SQLException {
 
         try (Connection conn = connect();
@@ -89,25 +93,24 @@ public class PostgresDao implements DbDao {
                         conn.prepareStatement("INSERT INTO metadata VALUES (?, ?, ?, ?, ?)")) {
             // TODO: Update the below statement to handle on conflict, after we figure out what that
             // behavior should be
-            statement.setString(1, id);
+            statement.setString(1, receivedSubmissionId);
             statement.setString(2, sender);
             statement.setString(3, receiver);
             statement.setString(4, hash);
             statement.setTimestamp(5, Timestamp.from(timeReceived));
 
-            int result = statement.executeUpdate();
-            // TODO: Do something if our update returns 0...
-            logger.logInfo(String.valueOf(result));
+            statement.executeUpdate();
         }
     }
 
     @Override
-    public synchronized PartnerMetadata fetchMetadata(String uniqueId) throws SQLException {
+    public synchronized PartnerMetadata fetchMetadata(String receivedSubmissionId)
+            throws SQLException {
         try (Connection conn = connect();
                 PreparedStatement statement =
                         conn.prepareStatement("SELECT * FROM metadata where message_id = ?")) {
 
-            statement.setString(1, uniqueId);
+            statement.setString(1, receivedSubmissionId);
 
             ResultSet result = statement.executeQuery();
 
