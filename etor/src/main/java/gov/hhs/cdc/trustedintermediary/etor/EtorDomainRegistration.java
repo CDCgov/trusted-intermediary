@@ -29,6 +29,7 @@ import gov.hhs.cdc.trustedintermediary.external.database.PostgresDao;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.FilePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileOrderSender;
+import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.DbDao;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
@@ -79,6 +80,8 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(SendOrderUseCase.class, SendOrderUseCase.getInstance());
         ApplicationContext.register(
                 PartnerMetadataOrchestrator.class, PartnerMetadataOrchestrator.getInstance());
+        ApplicationContext.register(
+                ReportStreamEndpointClient.class, ReportStreamEndpointClient.getInstance());
 
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
             ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
@@ -142,15 +145,15 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleOrders(DomainRequest request) {
         Order<?> orders;
 
-        String submissionId = request.getHeaders().get("recordid");
-        if (submissionId == null || submissionId.isEmpty()) {
-            submissionId = null;
+        String receivedSubmissionId = request.getHeaders().get("recordid");
+        if (receivedSubmissionId == null || receivedSubmissionId.isEmpty()) {
+            receivedSubmissionId = null;
             logger.logError("Missing required header or empty: RecordId");
         }
 
         try {
             orders = orderController.parseOrders(request);
-            sendOrderUseCase.convertAndSend(orders, submissionId);
+            sendOrderUseCase.convertAndSend(orders, receivedSubmissionId);
         } catch (FhirParseException e) {
             logger.logError("Unable to parse order request", e);
             return domainResponseHelper.constructErrorResponse(400, e);

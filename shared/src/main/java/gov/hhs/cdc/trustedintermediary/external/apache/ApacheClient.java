@@ -38,7 +38,19 @@ public class ApacheClient implements HttpClient {
                     .asString();
         } catch (IOException e) {
             throw new HttpClientException(
-                    "Error occurred while making HTTP request to [" + url + "]", e);
+                    "Error occurred while making HTTP POST request to [" + url + "]", e);
+        }
+    }
+
+    @Override
+    public String get(String url, Map<String, String> headerMap) throws HttpClientException {
+        Header[] headers = convertMapToHeader(headerMap);
+
+        try {
+            return Request.get(url).setHeaders(headers).execute().returnContent().asString();
+        } catch (IOException e) {
+            throw new HttpClientException(
+                    "Error occurred while making HTTP GET request to [" + url + "]", e);
         }
     }
 
