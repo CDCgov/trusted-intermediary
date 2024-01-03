@@ -5,3 +5,7 @@ output "registry" {
 output "publish_app" {
   value = azurerm_linux_web_app.api.name
 }
+
+output "database_hostname" {
+  value = azurerm_postgresql_flexible_server.database.fqdn
+}

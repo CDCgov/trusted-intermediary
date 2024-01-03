@@ -24,14 +24,19 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureClient;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureStorageAccountPartnerMetadataStorage;
+import gov.hhs.cdc.trustedintermediary.external.database.DatabasePartnerMetadataStorage;
+import gov.hhs.cdc.trustedintermediary.external.database.EtorSqlDriverManager;
+import gov.hhs.cdc.trustedintermediary.external.database.PostgresDao;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.FilePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
 import gov.hhs.cdc.trustedintermediary.utils.RetryTask;
+import gov.hhs.cdc.trustedintermediary.wrappers.DbDao;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -81,15 +86,24 @@ public class EtorDomainRegistration implements DomainConnector {
                 ReportStreamEndpointClient.class, ReportStreamEndpointClient.getInstance());
         ApplicationContext.register(RetryTask.class, RetryTask.getInstance());
 
-        if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
-            ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
+        if (ApplicationContext.getProperty("DB_URL") != null) {
+            ApplicationContext.register(SqlDriverManager.class, EtorSqlDriverManager.getInstance());
+            ApplicationContext.register(DbDao.class, PostgresDao.getInstance());
+            ApplicationContext.register(
+                    PartnerMetadataStorage.class, DatabasePartnerMetadataStorage.getInstance());
+        } else if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
             ApplicationContext.register(
                     PartnerMetadataStorage.class, FilePartnerMetadataStorage.getInstance());
         } else {
-            ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
             ApplicationContext.register(
                     PartnerMetadataStorage.class,
                     AzureStorageAccountPartnerMetadataStorage.getInstance());
+        }
+
+        if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
+            ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
+        } else {
+            ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
             ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
         }
 

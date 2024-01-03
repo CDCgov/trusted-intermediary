@@ -64,6 +64,18 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false ${{ inputs.TERRAFORM_APPLY_PARAMETERS }}
 
+      - name: Login via Azure CLI
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Run Db migration
+        run: |
+          export PGPASSWORD=$(az account get-access-token --resource-type oss-rdbms --query "[accessToken]" -o tsv)
+          psql "host=$(terraform output -raw database_hostname) port=5432 dbname=postgres user=cdcti-github sslmode=require" -c "CREATE TABLE IF NOT EXISTS metadata (message_id varchar(30), sender varchar(30), receiver varchar(30), hash_of_order varchar(1000), time_received timestamptz); GRANT ALL ON metadata TO azure_pg_admin; ALTER TABLE metadata OWNER TO azure_pg_admin;"
+
       - id: export-terraform-output
         name: Export Terraform Output
         run: |
