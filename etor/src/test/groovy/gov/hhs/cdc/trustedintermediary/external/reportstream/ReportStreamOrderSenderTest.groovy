@@ -6,7 +6,7 @@ import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
-import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileEndpointClient
+import gov.hhs.cdc.trustedintermediary.external.localfile.LocalEndpointClient
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
@@ -25,7 +25,7 @@ class ReportStreamOrderSenderTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(OrderSender, ReportStreamOrderSender.getInstance())
-        TestApplicationContext.register(RSEndpointClient, LocalFileEndpointClient.getInstance())
+        TestApplicationContext.register(RSEndpointClient, LocalEndpointClient.getInstance())
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
     }
 

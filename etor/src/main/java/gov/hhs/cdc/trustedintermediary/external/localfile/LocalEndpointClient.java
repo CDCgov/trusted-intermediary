@@ -8,17 +8,17 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import javax.annotation.Nonnull;
 
-public class LocalFileEndpointClient implements RSEndpointClient {
+public class LocalEndpointClient implements RSEndpointClient {
 
     static final String LOCAL_FILE_NAME = "localfileorder.json";
 
-    private static final LocalFileEndpointClient INSTANCE = new LocalFileEndpointClient();
+    private static final LocalEndpointClient INSTANCE = new LocalEndpointClient();
 
-    public static LocalFileEndpointClient getInstance() {
+    public static LocalEndpointClient getInstance() {
         return INSTANCE;
     }
 
-    private LocalFileEndpointClient() {}
+    private LocalEndpointClient() {}
 
     @Override
     public String getRsToken() {
@@ -38,8 +38,7 @@ public class LocalFileEndpointClient implements RSEndpointClient {
     }
 
     @Override
-    public String requestHistoryEndpoint(@Nonnull String submissionId, @Nonnull String bearerToken)
-            throws ReportStreamEndpointClientException {
+    public String requestHistoryEndpoint(@Nonnull String submissionId, @Nonnull String bearerToken) {
         return """
 {
     "destinations" : [{
