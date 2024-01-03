@@ -1,14 +1,12 @@
 package gov.hhs.cdc.trustedintermediary.external.localfile;
 
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
-import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException;
-
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import javax.annotation.Nonnull;
 
 public class LocalFileEndpointClient implements RSEndpointClient {
 
@@ -23,7 +21,8 @@ public class LocalFileEndpointClient implements RSEndpointClient {
     private LocalFileEndpointClient() {}
 
     @Override
-    public String requestWatersEndpoint(@Nonnull String body, @Nonnull String bearerToken) throws ReportStreamEndpointClientException {
+    public String requestWatersEndpoint(@Nonnull String body, @Nonnull String bearerToken)
+            throws ReportStreamEndpointClientException {
         var fileLocation = Paths.get(LOCAL_FILE_NAME);
         try {
             Files.writeString(fileLocation, body, StandardCharsets.UTF_8);
@@ -34,7 +33,8 @@ public class LocalFileEndpointClient implements RSEndpointClient {
     }
 
     @Override
-    public String requestHistoryEndpoint(@Nonnull String submissionId, @Nonnull String bearerToken) throws ReportStreamEndpointClientException {
+    public String requestHistoryEndpoint(@Nonnull String submissionId, @Nonnull String bearerToken)
+            throws ReportStreamEndpointClientException {
         return null;
     }
 

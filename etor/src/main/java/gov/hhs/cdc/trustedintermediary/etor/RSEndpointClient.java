@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor;
 
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException;
-
 import javax.annotation.Nonnull;
 
 public interface RSEndpointClient {
