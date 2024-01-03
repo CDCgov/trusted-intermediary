@@ -44,7 +44,7 @@ class LocalEndpointClientTest extends Specification {
         def token = LocalEndpointClient.getInstance().getRsToken()
         def response = LocalEndpointClient.getInstance().requestHistoryEndpoint("order", token)
         def responseObject =
-                Jackson.getInstance().convertJsonToObject(response, new TypeReference<Map<String, Object>>() {});
+                Jackson.getInstance().convertJsonToObject(response, new TypeReference<Map<String, Object>>() {})
         def destination = responseObject.get("destinations").get(0)
 
         then:
