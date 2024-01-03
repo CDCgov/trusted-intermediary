@@ -1,0 +1,17 @@
+version: "3.7"
+
+services:
+  postgresql:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: "intermediary"
+      POSTGRES_PASSWORD: "changeIT!"
+      POSTGRES_USER: "intermediary"
+    ports:
+      - 5433:5432
+    volumes:
+      - ti_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  ti_postgres_data:
