@@ -38,7 +38,8 @@ public class LocalEndpointClient implements RSEndpointClient {
     }
 
     @Override
-    public String requestHistoryEndpoint(@Nonnull String submissionId, @Nonnull String bearerToken) {
+    public String requestHistoryEndpoint(
+            @Nonnull String submissionId, @Nonnull String bearerToken) {
         return """
 {
     "destinations" : [{

@@ -98,8 +98,7 @@ public class EtorDomainRegistration implements DomainConnector {
         }
 
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
-            ApplicationContext.register(
-                    RSEndpointClient.class, LocalEndpointClient.getInstance());
+            ApplicationContext.register(RSEndpointClient.class, LocalEndpointClient.getInstance());
         } else {
             ApplicationContext.register(
                     RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
