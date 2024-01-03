@@ -11,3 +11,5 @@ locals {
 data "azurerm_resource_group" "group" {
   name = "csels-rsti-${var.environment}-moderate-rg"
 }
+
+data "azurerm_client_config" "current" {}
