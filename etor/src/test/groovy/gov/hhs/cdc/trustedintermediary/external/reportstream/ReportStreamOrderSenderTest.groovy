@@ -2,9 +2,11 @@ package gov.hhs.cdc.trustedintermediary.external.reportstream
 
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
+import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileEndpointClient
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
@@ -23,7 +25,7 @@ class ReportStreamOrderSenderTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(OrderSender, ReportStreamOrderSender.getInstance())
-        TestApplicationContext.register(ReportStreamEndpointClient, ReportStreamEndpointClient.getInstance())
+        TestApplicationContext.register(RSEndpointClient, LocalFileEndpointClient.getInstance())
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
     }
 
@@ -44,7 +46,7 @@ class ReportStreamOrderSenderTest extends Specification {
         TestApplicationContext.register(HapiFhir, mockFhir)
 
         def mockFormatter = Mock(Formatter)
-        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake-token")  >> Map.of("submissionId", "fake-id")
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("submissionId", "fake-id")
         TestApplicationContext.register(Formatter, mockFormatter)
 
         def mockCache = Mock(Cache)
@@ -77,7 +79,7 @@ class ReportStreamOrderSenderTest extends Specification {
         TestApplicationContext.register(HapiFhir, mockFhir)
 
         def mockFormatter = Mock(Formatter)
-        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("access_token", "fake-token")  >> Map.of("submissionId", "fake-id")
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("submissionId", "fake-id")
         TestApplicationContext.register(Formatter, mockFormatter)
 
         def mockCache = Mock(Cache)
