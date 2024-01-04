@@ -49,6 +49,57 @@ class PartnerMetadataOrchestratorTest extends Specification {
         1 * partnerMetadataStorage.saveMetadata(new PartnerMetadata(receivedSubmissionId, sender, Instant.parse(timestamp), hashCode))
     }
 
+    def "updateMetadataForSentOrder test case when sentSubmissionId is null"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def sentSubmissionId = null
+        def partnerMetadataStorage = Mock(PartnerMetadataStorage)
+
+        TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentOrder(receivedSubmissionId, sentSubmissionId)
+
+        then:
+        0 * partnerMetadataStorage.readMetadata(receivedSubmissionId)
+    }
+
+    def "updateMetadataForSentOrder test case when PartnerMetadata returns no data"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def sentSubmissionId = "sentSubmissionId"
+
+        def partnerMetadataStorage = Mock(PartnerMetadataStorage)
+        partnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.empty()
+
+        TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentOrder(receivedSubmissionId, sentSubmissionId)
+
+        then:
+        0 * partnerMetadataStorage.saveMetadata(_ as PartnerMetadata)
+    }
+
+    def "getMetadata returns empty Optional when data is not found"() {
+        given:
+        String receivedSubmissionId = "receivedSubmissionId"
+        def mockMetadata = Optional.empty()
+        def partnerMetadataStorage = Mock(PartnerMetadataStorage)
+
+        TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        Optional<PartnerMetadata> result = PartnerMetadataOrchestrator.getInstance().getMetadata(receivedSubmissionId)
+
+        then:
+        !result.isPresent()
+        1 * partnerMetadataStorage.readMetadata(receivedSubmissionId) >> mockMetadata
+    }
+
     def "updateMetadataForReceivedOrder throws PartnerMetadataException on client error"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
