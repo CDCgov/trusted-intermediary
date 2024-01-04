@@ -151,12 +151,10 @@ class PostgresDaoTest extends Specification {
         mockResultSet.next() >> false
         mockPreparedStatement.executeQuery() >> mockResultSet
 
-
         TestApplicationContext.register(SqlDriverManager, mockDriver)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-
         def actual = PostgresDao.getInstance().fetchMetadata("mock_lookup")
 
         then:
@@ -173,9 +171,9 @@ class PostgresDaoTest extends Specification {
         Timestamp timestampForMock = Timestamp.from(Instant.parse("2024-01-03T15:45:33.30Z"))
         Instant timeReceived = timestampForMock.toInstant()
         def hash = receiver.hashCode().toString()
+        def expected = new PartnerMetadata(messageId, receiver, timeReceived, hash)
 
         Connection MockConn = Mock(Connection)
-
         mockDriver.getConnection(_ as String, _ as Properties) >> MockConn
         MockConn.prepareStatement(_ as String) >>  mockPreparedStatement
         mockResultSet.next() >> true
@@ -183,16 +181,12 @@ class PostgresDaoTest extends Specification {
         mockResultSet.getString("receiver") >> receiver
         mockResultSet.getTimestamp("time_received") >> timestampForMock
         mockResultSet.getString("hash_of_order") >> hash
-
-        def expected = new PartnerMetadata(messageId, receiver, timeReceived, hash)
         mockPreparedStatement.executeQuery() >> mockResultSet
-
 
         TestApplicationContext.register(SqlDriverManager, mockDriver)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-
         def actual = PostgresDao.getInstance().fetchMetadata("mock_lookup")
 
         then:
