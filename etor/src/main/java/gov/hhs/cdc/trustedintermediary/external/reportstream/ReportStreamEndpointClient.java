@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 import javax.inject.Inject;
 
+/** Implementation of the RSEndpointClient interface for interacting with ReportStream endpoints */
 public class ReportStreamEndpointClient implements RSEndpointClient {
     private static final String RS_URL_PREFIX =
             ApplicationContext.getProperty("REPORT_STREAM_URL_PREFIX");

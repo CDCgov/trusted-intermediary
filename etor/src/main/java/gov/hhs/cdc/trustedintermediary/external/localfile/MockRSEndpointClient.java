@@ -7,6 +7,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+/**
+ * A mock implementation of the RSEndpointClient interface that doesn't require a connection to
+ * ReportStream
+ */
 public class MockRSEndpointClient implements RSEndpointClient {
 
     static final String LOCAL_FILE_NAME = "localfileorder.json";
@@ -39,11 +43,11 @@ public class MockRSEndpointClient implements RSEndpointClient {
     @Override
     public String requestHistoryEndpoint(String submissionId, String bearerToken) {
         return """
-{
-    "destinations": [{
-        "organization_id": "flexion",
-        "service": "simulated-lab"
-    }]
- }""";
+                {
+                    "destinations": [{
+                        "organization_id": "flexion",
+                        "service": "simulated-lab"
+                    }]
+                 }""";
     }
 }
