@@ -21,7 +21,6 @@ class MetadataTest extends Specification {
         def labOrderJsonFileString = Files.readString(Path.of("../examples/fhir/MN NBS FHIR Order Message.json"))
 
         when:
-
         def orderResponse = orderClient.submit(labOrderJsonFileString, submissionId, true)
 
         then:

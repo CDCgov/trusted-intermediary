@@ -6,4 +6,8 @@ public class PartnerMetadataException extends Exception {
     public PartnerMetadataException(String message, Throwable cause) {
         super(message, cause);
     }
+
+    public PartnerMetadataException(String message) {
+        super(message);
+    }
 }

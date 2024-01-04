@@ -47,7 +47,9 @@ public class SendOrderUseCase {
         }
 
         try {
-            partnerMetadataOrchestrator.updateMetadataForReceivedOrder(receivedSubmissionId, order);
+            String orderHash = String.valueOf(order.hashCode());
+            partnerMetadataOrchestrator.updateMetadataForReceivedOrder(
+                    receivedSubmissionId, orderHash);
         } catch (PartnerMetadataException e) {
             logger.logError(
                     "Unable to save metadata for receivedSubmissionId " + receivedSubmissionId, e);
