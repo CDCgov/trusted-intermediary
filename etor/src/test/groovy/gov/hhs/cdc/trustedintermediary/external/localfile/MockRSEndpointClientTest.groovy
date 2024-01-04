@@ -10,7 +10,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
-class LocalEndpointClientTest extends Specification {
+class MockRSEndpointClientTest extends Specification {
 
     def setup() {
         TestApplicationContext.reset()
@@ -18,12 +18,12 @@ class LocalEndpointClientTest extends Specification {
     }
 
     def cleanup() {
-        Files.deleteIfExists(Paths.get(LocalEndpointClient.LOCAL_FILE_NAME))
+        Files.deleteIfExists(Paths.get(MockRSEndpointClient.LOCAL_FILE_NAME))
     }
 
     def "getRsToken happy path"() {
         when:
-        def token = LocalEndpointClient.getInstance().getRsToken()
+        def token = MockRSEndpointClient.getInstance().getRsToken()
 
         then:
         token != null
@@ -34,16 +34,16 @@ class LocalEndpointClientTest extends Specification {
         def testStringOrder = "Some String"
 
         when:
-        LocalEndpointClient.getInstance().requestWatersEndpoint(testStringOrder, "token")
+        MockRSEndpointClient.getInstance().requestWatersEndpoint(testStringOrder, "token")
 
         then:
-        Files.readString(Paths.get(LocalEndpointClient.LOCAL_FILE_NAME)) == testStringOrder
+        Files.readString(Paths.get(MockRSEndpointClient.LOCAL_FILE_NAME)) == testStringOrder
     }
 
     def "requestHistoryEndpoint happy path"() {
         when:
-        def token = LocalEndpointClient.getInstance().getRsToken()
-        def response = LocalEndpointClient.getInstance().requestHistoryEndpoint("order", token)
+        def token = MockRSEndpointClient.getInstance().getRsToken()
+        def response = MockRSEndpointClient.getInstance().requestHistoryEndpoint("order", token)
         def responseObject =
                 Jackson.getInstance().convertJsonToObject(response, new TypeReference<Map<String, Object>>() {})
         def destination = responseObject.get("destinations").get(0)
@@ -55,12 +55,12 @@ class LocalEndpointClientTest extends Specification {
 
     def "requestWatersEndpoint throws an exception when not able to save file with order"() {
         given:
-        Path readonlyLocalFile = Paths.get(LocalEndpointClient.LOCAL_FILE_NAME)
+        Path readonlyLocalFile = Paths.get(MockRSEndpointClient.LOCAL_FILE_NAME)
         Files.createFile(readonlyLocalFile)
         readonlyLocalFile.toFile().setReadOnly()
 
         when:
-        LocalEndpointClient.getInstance().requestWatersEndpoint("order", "token")
+        MockRSEndpointClient.getInstance().requestWatersEndpoint("order", "token")
 
         then:
         thrown(ReportStreamEndpointClientException)

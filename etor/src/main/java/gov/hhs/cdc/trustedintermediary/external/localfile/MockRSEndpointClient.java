@@ -7,17 +7,17 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class LocalEndpointClient implements RSEndpointClient {
+public class MockRSEndpointClient implements RSEndpointClient {
 
     static final String LOCAL_FILE_NAME = "localfileorder.json";
 
-    private static final LocalEndpointClient INSTANCE = new LocalEndpointClient();
+    private static final MockRSEndpointClient INSTANCE = new MockRSEndpointClient();
 
-    public static LocalEndpointClient getInstance() {
+    public static MockRSEndpointClient getInstance() {
         return INSTANCE;
     }
 
-    private LocalEndpointClient() {}
+    private MockRSEndpointClient() {}
 
     @Override
     public String getRsToken() {
