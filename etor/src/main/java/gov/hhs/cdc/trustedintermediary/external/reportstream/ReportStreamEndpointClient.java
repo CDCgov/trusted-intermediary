@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.reportstream;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
+import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
@@ -17,10 +18,10 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-public class ReportStreamEndpointClient {
+/** Implementation of the RSEndpointClient interface for interacting with ReportStream endpoints */
+public class ReportStreamEndpointClient implements RSEndpointClient {
     private static final String RS_URL_PREFIX =
             ApplicationContext.getProperty("REPORT_STREAM_URL_PREFIX");
     private static final String RS_DOMAIN_NAME =
@@ -84,7 +85,8 @@ public class ReportStreamEndpointClient {
         return response;
     }
 
-    public String requestWatersEndpoint(@Nonnull String body, @Nonnull String bearerToken)
+    @Override
+    public String requestWatersEndpoint(String body, String bearerToken)
             throws ReportStreamEndpointClientException {
         logger.logInfo("Sending payload to ReportStream");
 
@@ -105,7 +107,8 @@ public class ReportStreamEndpointClient {
         }
     }
 
-    public String requestHistoryEndpoint(@Nonnull String submissionId, @Nonnull String bearerToken)
+    @Override
+    public String requestHistoryEndpoint(String submissionId, String bearerToken)
             throws ReportStreamEndpointClientException {
         logger.logInfo("Requesting history API from ReportStream");
 
@@ -134,6 +137,7 @@ public class ReportStreamEndpointClient {
         }
     }
 
+    @Override
     public String getRsToken() throws ReportStreamEndpointClientException {
         logger.logInfo("Looking up ReportStream token");
 
