@@ -36,8 +36,8 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def partnerMetadataStorage = Mock(PartnerMetadataStorage)
         TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
 
-        def mockClient = Mock(ReportStreamEndpointClient)
-        TestApplicationContext.register(ReportStreamEndpointClient, mockClient)
+        def mockClient = Mock(RSEndpointClient)
+        TestApplicationContext.register(RSEndpointClient, mockClient)
 
         def mockFormatter = Mock(Formatter)
         mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> [sender: sender, timestamp: timestamp]
@@ -58,10 +58,10 @@ class PartnerMetadataOrchestratorTest extends Specification {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
 
-        def mockClient = Mock(ReportStreamEndpointClient)
+        def mockClient = Mock(RSEndpointClient)
         mockClient.getRsToken() >> "token"
         mockClient.requestHistoryEndpoint(_ as String, _ as String) >> { throw new ReportStreamEndpointClientException("Client error", new Exception()) }
-        TestApplicationContext.register(ReportStreamEndpointClient, mockClient)
+        TestApplicationContext.register(RSEndpointClient, mockClient)
 
         TestApplicationContext.injectRegisteredImplementations()
 
@@ -77,10 +77,10 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def receivedSubmissionId = "receivedSubmissionId"
         def rsHistoryApiResponse = "{\"sender\": \"responseName\", \"timestamp\": \"2020-01-01T00:00:00.000Z\"}"
 
-        def mockClient = Mock(ReportStreamEndpointClient)
+        def mockClient = Mock(RSEndpointClient)
         mockClient.getRsToken() >> "token"
         mockClient.requestHistoryEndpoint(_ as String, _ as String) >> rsHistoryApiResponse
-        TestApplicationContext.register(ReportStreamEndpointClient, mockClient)
+        TestApplicationContext.register(RSEndpointClient, mockClient)
 
         def mockFormatter = Mock(Formatter)
         mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> { throw new FormatterProcessingException("Formatter error", new Exception()) }
@@ -100,10 +100,10 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def receivedSubmissionId = "receivedSubmissionId"
         def wrongFormatResponse = "{\"someotherkey\": \"value\"}"
 
-        def mockClient = Mock(ReportStreamEndpointClient)
+        def mockClient = Mock(RSEndpointClient)
         mockClient.getRsToken() >> "token"
         mockClient.requestHistoryEndpoint(_ as String, _ as String) >> wrongFormatResponse
-        TestApplicationContext.register(ReportStreamEndpointClient, mockClient)
+        TestApplicationContext.register(RSEndpointClient, mockClient)
 
         def mockFormatter = Mock(Formatter)
         mockFormatter.convertJsonToObject(wrongFormatResponse, _ as TypeReference) >> [someotherkey: "value"]
@@ -240,10 +240,10 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def partnerMetadataStorage = Mock(PartnerMetadataStorage)
         TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
 
-        def mockClient = Mock(ReportStreamEndpointClient)
+        def mockClient = Mock(RSEndpointClient)
         mockClient.getRsToken() >> bearerToken
         mockClient.requestHistoryEndpoint(sentSubmissionId, bearerToken) >> rsHistoryApiResponse
-        TestApplicationContext.register(ReportStreamEndpointClient, mockClient)
+        TestApplicationContext.register(RSEndpointClient, mockClient)
 
         def mockFormatter = Mock(Formatter)
         mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> [destinations: [
