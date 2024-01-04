@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.orders.Order
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException
@@ -23,15 +22,11 @@ class PartnerMetadataOrchestratorTest extends Specification {
     def "updateMetadataForReceivedOrder updates metadata successfully"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
-        def sentSubmissionId = "sentSubmissionId"
         def sender = "senderName"
         def timestamp = "2020-01-01T00:00:00.000Z"
-        def hashCode = 123
+        def hashCode = "123"
         def bearerToken = "token"
         def rsHistoryApiResponse = "{\"sender\": \"${sender}\", \"timestamp\": \"${timestamp}\"}"
-
-        def mockOrder = Mock(Order)
-        mockOrder.hashCode() >> hashCode
 
         def partnerMetadataStorage = Mock(PartnerMetadataStorage)
         TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
@@ -46,12 +41,12 @@ class PartnerMetadataOrchestratorTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, mockOrder)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, hashCode)
 
         then:
         1 * mockClient.getRsToken() >> bearerToken
         1 * mockClient.requestHistoryEndpoint(receivedSubmissionId, bearerToken) >> rsHistoryApiResponse
-        1 * partnerMetadataStorage.saveMetadata(new PartnerMetadata(receivedSubmissionId, sender, Instant.parse(timestamp), hashCode.toString()))
+        1 * partnerMetadataStorage.saveMetadata(new PartnerMetadata(receivedSubmissionId, sender, Instant.parse(timestamp), hashCode))
     }
 
     def "updateMetadataForReceivedOrder throws PartnerMetadataException on client error"() {
@@ -66,7 +61,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, Mock(Order))
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, "hash")
 
         then:
         thrown(PartnerMetadataException)
@@ -89,7 +84,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, Mock(Order))
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, "hash")
 
         then:
         thrown(PartnerMetadataException)
@@ -112,7 +107,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, Mock(Order))
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, "hash")
 
         then:
         thrown(PartnerMetadataException)
