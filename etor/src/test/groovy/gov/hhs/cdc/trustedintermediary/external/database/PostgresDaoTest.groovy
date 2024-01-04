@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.external.azure.AzureClient
 import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager
 import spock.lang.Specification
 
+import java.sql.Statement
 import java.sql.Timestamp
 import java.time.Instant
 
@@ -13,6 +14,7 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
+import java.time.LocalDateTime
 
 class PostgresDaoTest extends Specification {
 
@@ -136,5 +138,66 @@ class PostgresDaoTest extends Specification {
 
         then:
         thrown(SQLException)
+    }
+
+    def "fetchMetadata happy path with hasValidData:true works"() {
+        given:
+        def mockDriver = Mock(SqlDriverManager)
+        def mockPreparedStatement = Mock(PreparedStatement)
+        def mockResultSet = Mock(ResultSet)
+        def expected = null
+        Connection MockConn = Mock(Connection)
+
+        mockDriver.getConnection(_ as String, _ as Properties) >> MockConn
+        MockConn.prepareStatement(_ as String) >>  mockPreparedStatement
+        mockResultSet.next() >> false
+        mockPreparedStatement.executeQuery() >> mockResultSet
+
+
+        TestApplicationContext.register(SqlDriverManager, mockDriver)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+
+        def actual = PostgresDao.getInstance().fetchMetadata("mock_lookup")
+
+        then:
+        actual == expected
+    }
+
+    def "fetchMetadata happy path with hasValidData:false works"() {
+        given:
+        def mockDriver = Mock(SqlDriverManager)
+        def mockPreparedStatement = Mock(PreparedStatement)
+        def mockResultSet = Mock(ResultSet)
+        def messageId = "12345"
+        def receiver = "DogCow"
+        Timestamp timestampForMock = Timestamp.from(Instant.parse("2024-01-03T15:45:33.30Z"))
+        Instant timeReceived = timestampForMock.toInstant()
+        def hash = receiver.hashCode().toString()
+
+        Connection MockConn = Mock(Connection)
+
+        mockDriver.getConnection(_ as String, _ as Properties) >> MockConn
+        MockConn.prepareStatement(_ as String) >>  mockPreparedStatement
+        mockResultSet.next() >> true
+        mockResultSet.getString("message_id") >> messageId
+        mockResultSet.getString("receiver") >> receiver
+        mockResultSet.getTimestamp("time_received") >> timestampForMock
+        mockResultSet.getString("hash_of_order") >> hash
+
+        def expected = new PartnerMetadata(messageId, receiver, timeReceived, hash)
+        mockPreparedStatement.executeQuery() >> mockResultSet
+
+
+        TestApplicationContext.register(SqlDriverManager, mockDriver)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+
+        def actual = PostgresDao.getInstance().fetchMetadata("mock_lookup")
+
+        then:
+        actual == expected
     }
 }
