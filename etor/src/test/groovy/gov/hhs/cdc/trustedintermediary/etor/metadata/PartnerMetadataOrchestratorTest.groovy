@@ -2,6 +2,9 @@ package gov.hhs.cdc.trustedintermediary.etor.metadata
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient
+import gov.hhs.cdc.trustedintermediary.etor.orders.Order
+import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
@@ -17,6 +20,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(PartnerMetadataOrchestrator, PartnerMetadataOrchestrator.getInstance())
+        TestApplicationContext.register(OrderConverter, HapiOrderConverter.getInstance())
     }
 
     def "updateMetadataForReceivedOrder updates metadata successfully"() {

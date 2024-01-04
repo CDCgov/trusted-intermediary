@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata;
 
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
+import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 import javax.inject.Inject;
+import org.hl7.fhir.r4.model.OperationOutcome;
 
 /**
  * The PartnerMetadataOrchestrator class is responsible for updating and retrieving partner-facing
@@ -25,6 +27,8 @@ public class PartnerMetadataOrchestrator {
     @Inject RSEndpointClient rsclient;
     @Inject Formatter formatter;
     @Inject Logger logger;
+
+    @Inject OrderConverter orderConverter;
 
     public static PartnerMetadataOrchestrator getInstance() {
         return INSTANCE;
@@ -107,7 +111,7 @@ public class PartnerMetadataOrchestrator {
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
-    public Optional<PartnerMetadata> getMetadata(String receivedSubmissionId)
+    public Optional<OperationOutcome> getMetadata(String receivedSubmissionId)
             throws PartnerMetadataException {
         Optional<PartnerMetadata> optionalPartnerMetadata =
                 partnerMetadataStorage.readMetadata(receivedSubmissionId);
@@ -120,10 +124,15 @@ public class PartnerMetadataOrchestrator {
         if (partnerMetadata.receiver() == null && partnerMetadata.sentSubmissionId() != null) {
             logger.logInfo("Receiver name not found in metadata, looking up from RS history API");
             updateMetadataForSentOrder(receivedSubmissionId, partnerMetadata.sentSubmissionId());
-            return partnerMetadataStorage.readMetadata(receivedSubmissionId);
+            return Optional.of(
+                    orderConverter.extractPublicMetadataToOperationOutcome(
+                            partnerMetadataStorage.readMetadata(receivedSubmissionId).get(),
+                            receivedSubmissionId));
         }
 
-        return Optional.of(partnerMetadata);
+        return Optional.of(
+                orderConverter.extractPublicMetadataToOperationOutcome(
+                        partnerMetadata, receivedSubmissionId));
     }
 
     String getReceiverName(String responseBody) throws FormatterProcessingException {

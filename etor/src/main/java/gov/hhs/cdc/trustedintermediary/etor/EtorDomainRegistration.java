@@ -11,7 +11,6 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemograph
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
-import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
@@ -43,6 +42,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import javax.inject.Inject;
+import org.hl7.fhir.r4.model.OperationOutcome;
 
 /**
  * The domain connector for the ETOR domain. It connects it with the larger trusted intermediary. It
@@ -167,7 +167,7 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleMetadata(DomainRequest request) {
         try {
             String metadataId = request.getPathParams().get("id");
-            Optional<PartnerMetadata> metadata =
+            Optional<OperationOutcome> metadata =
                     partnerMetadataOrchestrator.getMetadata(metadataId);
 
             if (metadata.isEmpty()) {
