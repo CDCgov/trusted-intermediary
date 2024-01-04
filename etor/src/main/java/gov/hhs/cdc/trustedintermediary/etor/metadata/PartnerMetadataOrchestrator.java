@@ -52,6 +52,7 @@ public class PartnerMetadataOrchestrator {
             sender = responseObject.get("sender").toString();
             String timestamp = responseObject.get("timestamp").toString();
             timeReceived = Instant.parse(timestamp);
+
         } catch (Exception e) {
             throw new PartnerMetadataException(
                     "Unable to retrieve metadata from RS history API", e);
