@@ -16,10 +16,15 @@ import java.sql.SQLException
 
 class PostgresDaoTest extends Specification {
 
+    private def mockDriver
+    private def mockConn
+
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
 
+        mockDriver = Mock(SqlDriverManager)
+        mockConn = Mock(Connection)
         def mockAzureClient = Mock(AzureClient)
         mockAzureClient.getScopedToken(_ as String) >> "DogCow password"
         TestApplicationContext.register(AzureClient, mockAzureClient)
@@ -29,8 +34,6 @@ class PostgresDaoTest extends Specification {
 
     def "connect happy path works"(){
         given:
-        def mockDriver = Mock(SqlDriverManager)
-        Connection mockConn
         mockDriver.getConnection(_ as String, _ as Properties) >> {mockConn}
 
         TestApplicationContext.register(SqlDriverManager, mockDriver)
@@ -45,7 +48,6 @@ class PostgresDaoTest extends Specification {
 
     def "connect unhappy path throws exception"() {
         given:
-        def mockDriver = Mock(SqlDriverManager)
         mockDriver.getConnection(_ as String, _ as Properties) >> {throw new SQLException()}
         TestApplicationContext.register(SqlDriverManager, mockDriver)
         TestApplicationContext.injectRegisteredImplementations()
@@ -59,14 +61,12 @@ class PostgresDaoTest extends Specification {
 
     def "upsertMetadata works"() {
         given:
-        def upsertMockDriver = Mock(SqlDriverManager)
-        Connection upsertMockConn = Mock(Connection)
         PreparedStatement upsertMockStatement = Mock(PreparedStatement)
 
-        upsertMockDriver.getConnection(_ as String, _ as Properties) >>  upsertMockConn
-        upsertMockConn.prepareStatement(_ as String) >> upsertMockStatement
+        mockDriver.getConnection(_ as String, _ as Properties) >>  mockConn
+        mockConn.prepareStatement(_ as String) >> upsertMockStatement
 
-        TestApplicationContext.register(SqlDriverManager, upsertMockDriver)
+        TestApplicationContext.register(SqlDriverManager, mockDriver)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -79,14 +79,10 @@ class PostgresDaoTest extends Specification {
 
     def "upsertMetadata unhappy path throws exception"() {
         given:
-        def upsertMockDriver = Mock(SqlDriverManager)
-        Connection upsertMockConn = Mock(Connection)
+        mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
+        mockConn.prepareStatement(_ as String) >> { throw new SQLException() }
 
-        upsertMockDriver.getConnection(_ as String, _ as Properties) >> upsertMockConn
-        upsertMockConn.prepareStatement(_ as String) >> { throw new SQLException() }
-
-
-        TestApplicationContext.register(SqlDriverManager, upsertMockDriver)
+        TestApplicationContext.register(SqlDriverManager, mockDriver)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -98,18 +94,16 @@ class PostgresDaoTest extends Specification {
 
     def "select metadata retrieves data"(){
         given:
-        def selectMockDriver = Mock(SqlDriverManager)
-        Connection selectMockConn = Mock(Connection)
         PreparedStatement selectPreparedStatement = Mock(PreparedStatement)
         ResultSet selectResultSet = Mock(ResultSet)
 
-        selectMockDriver.getConnection(_ as String, _ as Properties) >> selectMockConn
-        selectMockConn.prepareStatement(_ as String) >> selectPreparedStatement
+        mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
+        mockConn.prepareStatement(_ as String) >> selectPreparedStatement
         selectPreparedStatement.executeQuery() >> selectResultSet
         selectResultSet.next() >> true
         selectResultSet.getTimestamp(_ as String) >> Timestamp.from(Instant.now())
 
-        TestApplicationContext.register(SqlDriverManager, selectMockDriver)
+        TestApplicationContext.register(SqlDriverManager, mockDriver)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -121,14 +115,10 @@ class PostgresDaoTest extends Specification {
 
     def "fetchMetadata unhappy path throws exception"() {
         given:
-        def selectMockDriver = Mock(SqlDriverManager)
-        Connection selectMockConn = Mock(Connection)
+        mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
+        mockConn.prepareStatement(_ as String) >> { throw new SQLException() }
 
-        selectMockDriver.getConnection(_ as String, _ as Properties) >> selectMockConn
-        selectMockConn.prepareStatement(_ as String) >> { throw new SQLException() }
-
-
-        TestApplicationContext.register(SqlDriverManager, selectMockDriver)
+        TestApplicationContext.register(SqlDriverManager, mockDriver)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -140,11 +130,9 @@ class PostgresDaoTest extends Specification {
 
     def "fetchMetadata returns null when rows  do not exist"() {
         given:
-        def mockDriver = Mock(SqlDriverManager)
         def mockPreparedStatement = Mock(PreparedStatement)
         def mockResultSet = Mock(ResultSet)
         def expected = null
-        Connection mockConn = Mock(Connection)
 
         mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
@@ -163,7 +151,6 @@ class PostgresDaoTest extends Specification {
 
     def "fetchMetadata returns partnermetadata when rows exist"() {
         given:
-        def mockDriver = Mock(SqlDriverManager)
         def mockPreparedStatement = Mock(PreparedStatement)
         def mockResultSet = Mock(ResultSet)
         def messageId = "12345"
@@ -173,9 +160,8 @@ class PostgresDaoTest extends Specification {
         def hash = receiver.hashCode().toString()
         def expected = new PartnerMetadata(messageId, receiver, timeReceived, hash)
 
-        Connection MockConn = Mock(Connection)
-        mockDriver.getConnection(_ as String, _ as Properties) >> MockConn
-        MockConn.prepareStatement(_ as String) >>  mockPreparedStatement
+        mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
+        mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
         mockResultSet.next() >> true
         mockResultSet.getString("message_id") >> messageId
         mockResultSet.getString("receiver") >> receiver
