@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata;
 
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
-import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
@@ -33,7 +32,7 @@ public class PartnerMetadataOrchestrator {
 
     private PartnerMetadataOrchestrator() {}
 
-    public void updateMetadataForReceivedOrder(String receivedSubmissionId, Order<?> order)
+    public void updateMetadataForReceivedOrder(String receivedSubmissionId, String orderHash)
             throws PartnerMetadataException {
         // currently blocked by: https://github.com/CDCgov/prime-reportstream/issues/12624
         // once we get the right receivedSubmissionId from RS, this method should work
@@ -43,7 +42,6 @@ public class PartnerMetadataOrchestrator {
 
         String sender;
         Instant timeReceived;
-        String hash;
         try {
             String bearerToken = rsclient.getRsToken();
             String responseBody =
@@ -54,8 +52,6 @@ public class PartnerMetadataOrchestrator {
             sender = responseObject.get("sender").toString();
             String timestamp = responseObject.get("timestamp").toString();
             timeReceived = Instant.parse(timestamp);
-            hash = String.valueOf(order.hashCode());
-
         } catch (Exception e) {
             throw new PartnerMetadataException(
                     "Unable to retrieve metadata from RS history API", e);
@@ -66,7 +62,7 @@ public class PartnerMetadataOrchestrator {
                 sender,
                 timeReceived);
         PartnerMetadata partnerMetadata =
-                new PartnerMetadata(receivedSubmissionId, sender, timeReceived, hash);
+                new PartnerMetadata(receivedSubmissionId, sender, timeReceived, orderHash);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 

@@ -23,15 +23,11 @@ class PartnerMetadataOrchestratorTest extends Specification {
     def "updateMetadataForReceivedOrder updates metadata successfully"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
-        def sentSubmissionId = "sentSubmissionId"
         def sender = "senderName"
         def timestamp = "2020-01-01T00:00:00.000Z"
-        def hashCode = 123
+        def hashCode = "123"
         def bearerToken = "token"
         def rsHistoryApiResponse = "{\"sender\": \"${sender}\", \"timestamp\": \"${timestamp}\"}"
-
-        def mockOrder = Mock(Order)
-        mockOrder.hashCode() >> hashCode
 
         def partnerMetadataStorage = Mock(PartnerMetadataStorage)
         TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
@@ -46,12 +42,12 @@ class PartnerMetadataOrchestratorTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, mockOrder)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, hashCode)
 
         then:
         1 * mockClient.getRsToken() >> bearerToken
         1 * mockClient.requestHistoryEndpoint(receivedSubmissionId, bearerToken) >> rsHistoryApiResponse
-        1 * partnerMetadataStorage.saveMetadata(new PartnerMetadata(receivedSubmissionId, sender, Instant.parse(timestamp), hashCode.toString()))
+        1 * partnerMetadataStorage.saveMetadata(new PartnerMetadata(receivedSubmissionId, sender, Instant.parse(timestamp), hashCode))
     }
 
     def "updateMetadataForReceivedOrder throws PartnerMetadataException on client error"() {
@@ -66,7 +62,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, Mock(Order))
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, "hash")
 
         then:
         thrown(PartnerMetadataException)
@@ -89,7 +85,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, Mock(Order))
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, "hash")
 
         then:
         thrown(PartnerMetadataException)
@@ -112,7 +108,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, Mock(Order))
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, "hash")
 
         then:
         thrown(PartnerMetadataException)
@@ -150,6 +146,22 @@ class PartnerMetadataOrchestratorTest extends Specification {
         1 * mockClient.requestHistoryEndpoint(sentSubmissionId, bearerToken) >> rsHistoryApiResponse
         1 * partnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(partnerMetadata)
         1 * partnerMetadataStorage.saveMetadata(updatedPartnerMetadata)
+    }
+
+    def "updateMetadataForSentOrder test case when sentSubmissionId is null"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def sentSubmissionId = null
+        def partnerMetadataStorage = Mock(PartnerMetadataStorage)
+
+        TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentOrder(receivedSubmissionId, sentSubmissionId)
+
+        then:
+        0 * partnerMetadataStorage.readMetadata(receivedSubmissionId)
     }
 
     def "updateMetadataForSentOrder throws PartnerMetadataException on client error"() {
