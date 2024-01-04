@@ -1,8 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata;
 
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
-import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
@@ -24,6 +24,7 @@ public class PartnerMetadataOrchestrator {
     @Inject PartnerMetadataStorage partnerMetadataStorage;
     @Inject RSEndpointClient rsclient;
     @Inject Formatter formatter;
+    @Inject Logger logger;
 
     public static PartnerMetadataOrchestrator getInstance() {
         return INSTANCE;
@@ -31,19 +32,38 @@ public class PartnerMetadataOrchestrator {
 
     private PartnerMetadataOrchestrator() {}
 
-    public void updateMetadataForReceivedOrder(String receivedSubmissionId, Order<?> order)
+    public void updateMetadataForReceivedOrder(String receivedSubmissionId, String orderHash)
             throws PartnerMetadataException {
-        // will call the RS history API given the submissionId, currently blocked by:
-        // https://github.com/CDCgov/prime-reportstream/issues/12624
-        // from the response, extract the "sender" and "timestamp" (timeReceived)
-        // we will calculate the hash.
-        // then we call the metadata storage to save this stuff.
+        // currently blocked by: https://github.com/CDCgov/prime-reportstream/issues/12624
+        // once we get the right receivedSubmissionId from RS, this method should work
+        logger.logInfo(
+                "Looking up sender name and timeReceived from RS history API for receivedSubmissionId: {}",
+                receivedSubmissionId);
 
-        String sender = "unknown";
-        Instant timeReceived = Instant.now();
-        String hash = String.valueOf(order.hashCode());
+        String sender;
+        Instant timeReceived;
+        try {
+            String bearerToken = rsclient.getRsToken();
+            String responseBody =
+                    rsclient.requestHistoryEndpoint(receivedSubmissionId, bearerToken);
+            Map<String, Object> responseObject =
+                    formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
+
+            sender = responseObject.get("sender").toString();
+            String timestamp = responseObject.get("timestamp").toString();
+            timeReceived = Instant.parse(timestamp);
+
+        } catch (Exception e) {
+            throw new PartnerMetadataException(
+                    "Unable to retrieve metadata from RS history API", e);
+        }
+
+        logger.logInfo(
+                "Updating metadata with sender: {}, timeReceived: {} and hash",
+                sender,
+                timeReceived);
         PartnerMetadata partnerMetadata =
-                new PartnerMetadata(receivedSubmissionId, sender, timeReceived, hash);
+                new PartnerMetadata(receivedSubmissionId, sender, timeReceived, orderHash);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
@@ -54,13 +74,24 @@ public class PartnerMetadataOrchestrator {
             return;
         }
 
-        PartnerMetadata partnerMetadata =
-                partnerMetadataStorage.readMetadata(receivedSubmissionId).orElseThrow();
+        Optional<PartnerMetadata> optionalPartnerMetadata =
+                partnerMetadataStorage.readMetadata(receivedSubmissionId);
+        if (optionalPartnerMetadata.isEmpty()) {
+            logger.logWarning(
+                    "Metadata not found for receivedSubmissionId: {}", receivedSubmissionId);
+            return;
+        }
+
+        PartnerMetadata partnerMetadata = optionalPartnerMetadata.get();
         if (!sentSubmissionId.equals(partnerMetadata.sentSubmissionId())) {
+            logger.logInfo("Updating metadata with sentSubmissionId: {}", sentSubmissionId);
             partnerMetadata = partnerMetadata.withSentSubmissionId(sentSubmissionId);
             partnerMetadataStorage.saveMetadata(partnerMetadata);
         }
 
+        logger.logInfo(
+                "Looking up receiver name from RS history API for sentSubmissionId: {}",
+                sentSubmissionId);
         String receiver;
         try {
             String bearerToken = rsclient.getRsToken();
@@ -71,19 +102,28 @@ public class PartnerMetadataOrchestrator {
                     "Unable to retrieve metadata from RS history API", e);
         }
 
+        logger.logInfo("Updating metadata with receiver: {}", receiver);
         partnerMetadata = partnerMetadata.withReceiver(receiver);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
     public Optional<PartnerMetadata> getMetadata(String receivedSubmissionId)
             throws PartnerMetadataException {
-        // call the metadata storage to get the metadata.
-        // check if the receiver is filled out, and if it isn't, call the RS history API to get the
-        // receiver.
-        // if had to call the history API, extract the receiver and call the metadata storage to
-        // save the metadata with the receiver added.
-        // return the metadata.
-        return partnerMetadataStorage.readMetadata(receivedSubmissionId);
+        Optional<PartnerMetadata> optionalPartnerMetadata =
+                partnerMetadataStorage.readMetadata(receivedSubmissionId);
+        if (optionalPartnerMetadata.isEmpty()) {
+            logger.logInfo("Metadata not found for receivedSubmissionId: {}", receivedSubmissionId);
+            return Optional.empty();
+        }
+
+        PartnerMetadata partnerMetadata = optionalPartnerMetadata.get();
+        if (partnerMetadata.receiver() == null && partnerMetadata.sentSubmissionId() != null) {
+            logger.logInfo("Receiver name not found in metadata, looking up from RS history API");
+            updateMetadataForSentOrder(receivedSubmissionId, partnerMetadata.sentSubmissionId());
+            return partnerMetadataStorage.readMetadata(receivedSubmissionId);
+        }
+
+        return Optional.of(partnerMetadata);
     }
 
     String getReceiverName(String responseBody) throws FormatterProcessingException {

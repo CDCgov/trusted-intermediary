@@ -44,6 +44,8 @@ public class MockRSEndpointClient implements RSEndpointClient {
     public String requestHistoryEndpoint(String submissionId, String bearerToken) {
         return """
                 {
+                    "timestamp" : "2020-01-01T00:00:00.000Z",
+                    "sender" : "flexion.simulated-hospital",
                     "destinations": [{
                         "organization_id": "flexion",
                         "service": "simulated-lab"
