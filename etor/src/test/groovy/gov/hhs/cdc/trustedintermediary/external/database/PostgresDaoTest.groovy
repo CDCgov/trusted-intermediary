@@ -18,6 +18,8 @@ class PostgresDaoTest extends Specification {
 
     private def mockDriver
     private def mockConn
+    private def mockPreparedStatement
+    private def mockResultSet
 
     def setup() {
         TestApplicationContext.reset()
@@ -25,6 +27,8 @@ class PostgresDaoTest extends Specification {
 
         mockDriver = Mock(SqlDriverManager)
         mockConn = Mock(Connection)
+        mockPreparedStatement = Mock(PreparedStatement)
+        mockResultSet = Mock(ResultSet)
         def mockAzureClient = Mock(AzureClient)
         mockAzureClient.getScopedToken(_ as String) >> "DogCow password"
         TestApplicationContext.register(AzureClient, mockAzureClient)
@@ -61,10 +65,8 @@ class PostgresDaoTest extends Specification {
 
     def "upsertMetadata works"() {
         given:
-        PreparedStatement upsertMockStatement = Mock(PreparedStatement)
-
         mockDriver.getConnection(_ as String, _ as Properties) >>  mockConn
-        mockConn.prepareStatement(_ as String) >> upsertMockStatement
+        mockConn.prepareStatement(_ as String) >> mockPreparedStatement
 
         TestApplicationContext.register(SqlDriverManager, mockDriver)
         TestApplicationContext.injectRegisteredImplementations()
@@ -73,7 +75,7 @@ class PostgresDaoTest extends Specification {
         PostgresDao.getInstance().upsertMetadata("mock_id", "mock_sender", "mock_receiver", "mock_hash", Instant.now())
 
         then:
-        1 * upsertMockStatement.executeUpdate()
+        1 * mockPreparedStatement.executeUpdate()
     }
 
 
@@ -94,14 +96,11 @@ class PostgresDaoTest extends Specification {
 
     def "select metadata retrieves data"(){
         given:
-        PreparedStatement selectPreparedStatement = Mock(PreparedStatement)
-        ResultSet selectResultSet = Mock(ResultSet)
-
         mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
-        mockConn.prepareStatement(_ as String) >> selectPreparedStatement
-        selectPreparedStatement.executeQuery() >> selectResultSet
-        selectResultSet.next() >> true
-        selectResultSet.getTimestamp(_ as String) >> Timestamp.from(Instant.now())
+        mockConn.prepareStatement(_ as String) >> mockPreparedStatement
+        mockPreparedStatement.executeQuery() >> mockResultSet
+        mockResultSet.next() >> true
+        mockResultSet.getTimestamp(_ as String) >> Timestamp.from(Instant.now())
 
         TestApplicationContext.register(SqlDriverManager, mockDriver)
         TestApplicationContext.injectRegisteredImplementations()
@@ -130,8 +129,6 @@ class PostgresDaoTest extends Specification {
 
     def "fetchMetadata returns null when rows  do not exist"() {
         given:
-        def mockPreparedStatement = Mock(PreparedStatement)
-        def mockResultSet = Mock(ResultSet)
         def expected = null
 
         mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
@@ -151,8 +148,6 @@ class PostgresDaoTest extends Specification {
 
     def "fetchMetadata returns partnermetadata when rows exist"() {
         given:
-        def mockPreparedStatement = Mock(PreparedStatement)
-        def mockResultSet = Mock(ResultSet)
         def messageId = "12345"
         def receiver = "DogCow"
         Timestamp timestampForMock = Timestamp.from(Instant.parse("2024-01-03T15:45:33.30Z"))
