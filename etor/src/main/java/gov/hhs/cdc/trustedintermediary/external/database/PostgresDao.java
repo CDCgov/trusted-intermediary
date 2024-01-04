@@ -114,8 +114,7 @@ public class PostgresDao implements DbDao {
 
             ResultSet result = statement.executeQuery();
 
-            var hasValidData = result.next();
-            if (!hasValidData) {
+            if (!result.next()) {
                 return null;
             }
 
