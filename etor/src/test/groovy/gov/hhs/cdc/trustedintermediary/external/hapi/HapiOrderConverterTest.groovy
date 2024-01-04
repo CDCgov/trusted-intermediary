@@ -3,11 +3,13 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 import gov.hhs.cdc.trustedintermediary.DemographicsMock
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.StringType
 
 import java.time.Instant
@@ -242,6 +244,27 @@ class HapiOrderConverterTest extends Specification {
         !contactSection.hasName()
     }
 
+    def "extract public metadata to operation outcome returns operation outcome" () {
+        given:
+        def mockMetadata = new PartnerMetadata("123456", "7890", "test_sender", "test_receiver", Instant.now(), "test_hash")
+        when:
+        def metadataOutput = HapiOrderConverter.getInstance().extractPublicMetadataToOperationOutcome(mockMetadata, "7890")
+        then:
+        metadataOutput != null
+        metadataOutput.getId() == "7890"
+        metadataOutput.getIssue().size() == 4
+    }
+
+    def "creating an issue returns a valid OperationOutcomeIssueComponent with Information level severity and code" () {
+        when:
+        def output = HapiOrderConverter.getInstance().createInformationIssueComponent("test_details", "test_diagnostics")
+        then:
+        output.getSeverity() == OperationOutcome.IssueSeverity.INFORMATION
+        output.getCode() == OperationOutcome.IssueType.INFORMATIONAL
+        output.getDetails().getText() == "test_details"
+        output.getDiagnostics() == "test_diagnostics"
+    }
+
     Patient fakePatientResource(boolean addHumanName) {
 
         def patient = new Patient()
@@ -284,4 +307,5 @@ class HapiOrderConverterTest extends Specification {
 
         return patient
     }
+
 }

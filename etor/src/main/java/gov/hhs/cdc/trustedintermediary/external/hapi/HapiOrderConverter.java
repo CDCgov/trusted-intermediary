@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -15,6 +16,7 @@ import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.OperationOutcome;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Provenance;
 import org.hl7.fhir.r4.model.Reference;
@@ -199,5 +201,37 @@ public class HapiOrderConverter implements OrderConverter {
         provenance.setActivity(new CodeableConcept(OML_CODING));
 
         return provenance;
+    }
+
+    public OperationOutcome extractPublicMetadataToOperationOutcome(
+            PartnerMetadata metadata, String submissionKey) {
+        var operation = new OperationOutcome();
+
+        operation.setId(submissionKey);
+        operation.getIssue().add(createInformationIssueComponent("sender name", metadata.sender()));
+        operation
+                .getIssue()
+                .add(createInformationIssueComponent("receiver name", metadata.receiver()));
+        operation
+                .getIssue()
+                .add(
+                        createInformationIssueComponent(
+                                "order ingestion", metadata.timeReceived().toString()));
+        operation.getIssue().add(createInformationIssueComponent("payload hash", metadata.hash()));
+
+        return operation;
+    }
+
+    protected OperationOutcome.OperationOutcomeIssueComponent createInformationIssueComponent(
+            String details, String diagnostics) {
+        OperationOutcome.OperationOutcomeIssueComponent issue =
+                new OperationOutcome.OperationOutcomeIssueComponent();
+
+        issue.setSeverity(OperationOutcome.IssueSeverity.INFORMATION);
+        issue.setCode(OperationOutcome.IssueType.INFORMATIONAL);
+        issue.getDetails().setText(details);
+        issue.setDiagnostics(diagnostics);
+
+        return issue;
     }
 }
