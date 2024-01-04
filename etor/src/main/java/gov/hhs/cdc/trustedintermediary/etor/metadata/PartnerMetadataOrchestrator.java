@@ -77,14 +77,15 @@ public class PartnerMetadataOrchestrator {
             return;
         }
 
-        PartnerMetadata partnerMetadata =
-                partnerMetadataStorage
-                        .readMetadata(receivedSubmissionId)
-                        .orElseThrow(
-                                () ->
-                                        new PartnerMetadataException(
-                                                "Couldn't find metadata for receivedSubmissionId: "
-                                                        + receivedSubmissionId));
+        Optional<PartnerMetadata> optionalPartnerMetadata =
+                partnerMetadataStorage.readMetadata(receivedSubmissionId);
+        if (optionalPartnerMetadata.isEmpty()) {
+            logger.logWarning(
+                    "Metadata not found for receivedSubmissionId: {}", receivedSubmissionId);
+            return;
+        }
+
+        PartnerMetadata partnerMetadata = optionalPartnerMetadata.get();
         if (!sentSubmissionId.equals(partnerMetadata.sentSubmissionId())) {
             logger.logInfo("Updating metadata with sentSubmissionId: {}", sentSubmissionId);
             partnerMetadata = partnerMetadata.withSentSubmissionId(sentSubmissionId);
@@ -111,15 +112,14 @@ public class PartnerMetadataOrchestrator {
 
     public Optional<PartnerMetadata> getMetadata(String receivedSubmissionId)
             throws PartnerMetadataException {
-        PartnerMetadata partnerMetadata =
-                partnerMetadataStorage
-                        .readMetadata(receivedSubmissionId)
-                        .orElseThrow(
-                                () ->
-                                        new PartnerMetadataException(
-                                                "Couldn't find metadata for receivedSubmissionId: "
-                                                        + receivedSubmissionId));
+        Optional<PartnerMetadata> optionalPartnerMetadata =
+                partnerMetadataStorage.readMetadata(receivedSubmissionId);
+        if (optionalPartnerMetadata.isEmpty()) {
+            logger.logInfo("Metadata not found for receivedSubmissionId: {}", receivedSubmissionId);
+            return Optional.empty();
+        }
 
+        PartnerMetadata partnerMetadata = optionalPartnerMetadata.get();
         if (partnerMetadata.receiver() == null && partnerMetadata.sentSubmissionId() != null) {
             logger.logInfo("Receiver name not found in metadata, looking up from RS history API");
             updateMetadataForSentOrder(receivedSubmissionId, partnerMetadata.sentSubmissionId());
