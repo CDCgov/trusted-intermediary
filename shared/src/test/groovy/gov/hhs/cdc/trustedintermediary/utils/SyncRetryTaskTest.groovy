@@ -21,11 +21,12 @@ class SyncRetryTaskTest extends Specification {
         Callable<Void> mockTask = Mock(Callable)
 
         when:
-        SyncRetryTask.getInstance().retry(mockTask, maxRetries, waitTime)
+        def taskExecutedSuccessfully = SyncRetryTask.getInstance().retry(mockTask, maxRetries, waitTime)
 
         then:
         (1..maxRetries - 1) * mockTask.call() >> { throw new Exception("Fail") }
         1 * mockTask.call() >> null // Succeeds on the last attempt
+        taskExecutedSuccessfully
     }
 
     def "scheduleRetry should give up after max retries"() {
@@ -35,9 +36,10 @@ class SyncRetryTaskTest extends Specification {
         Callable<Void> mockTask = Mock(Callable)
 
         when:
-        SyncRetryTask.getInstance().retry(mockTask, maxRetries, waitTime)
+        def taskExecutedSuccessfully = SyncRetryTask.getInstance().retry(mockTask, maxRetries, waitTime)
 
         then:
         maxRetries * mockTask.call() >> { throw new Exception("Fail") }
+        !taskExecutedSuccessfully
     }
 }
