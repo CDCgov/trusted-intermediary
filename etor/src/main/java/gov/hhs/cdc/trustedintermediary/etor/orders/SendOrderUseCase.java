@@ -74,6 +74,13 @@ public class SendOrderUseCase {
                             receivedSubmissionId, sentSubmissionId);
                     return null;
                 };
-        retryTask.retry(task, 3, 1000);
+        boolean taskExecutedSuccessfully = retryTask.retry(task, 3, 1000);
+        if (!taskExecutedSuccessfully) {
+            logger.logError(
+                    "Unable to save metadata for sentSubmissionId "
+                            + sentSubmissionId
+                            + " and receivedSubmissionId "
+                            + receivedSubmissionId);
+        }
     }
 }
