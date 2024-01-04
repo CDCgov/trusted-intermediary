@@ -138,16 +138,16 @@ class PostgresDaoTest extends Specification {
         thrown(SQLException)
     }
 
-    def "fetchMetadata happy path with hasValidData:true works"() {
+    def "fetchMetadata returns null when rows  do not exist"() {
         given:
         def mockDriver = Mock(SqlDriverManager)
         def mockPreparedStatement = Mock(PreparedStatement)
         def mockResultSet = Mock(ResultSet)
         def expected = null
-        Connection MockConn = Mock(Connection)
+        Connection mockConn = Mock(Connection)
 
-        mockDriver.getConnection(_ as String, _ as Properties) >> MockConn
-        MockConn.prepareStatement(_ as String) >>  mockPreparedStatement
+        mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
+        mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
         mockResultSet.next() >> false
         mockPreparedStatement.executeQuery() >> mockResultSet
 
@@ -161,7 +161,7 @@ class PostgresDaoTest extends Specification {
         actual == expected
     }
 
-    def "fetchMetadata happy path with hasValidData:false works"() {
+    def "fetchMetadata returns partnermetadata when rows exist"() {
         given:
         def mockDriver = Mock(SqlDriverManager)
         def mockPreparedStatement = Mock(PreparedStatement)
