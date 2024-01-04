@@ -8,6 +8,6 @@ public class PartnerMetadataException extends Exception {
     }
 
     public PartnerMetadataException(String message) {
-        super(message, new Exception());
+        super(message);
     }
 }
