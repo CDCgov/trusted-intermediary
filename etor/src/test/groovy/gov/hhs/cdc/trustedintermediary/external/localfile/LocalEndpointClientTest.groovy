@@ -7,6 +7,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
 import spock.lang.Specification
 
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 
 class LocalEndpointClientTest extends Specification {
@@ -33,8 +34,7 @@ class LocalEndpointClientTest extends Specification {
         def testStringOrder = "Some String"
 
         when:
-        def token = LocalEndpointClient.getInstance().getRsToken()
-        LocalEndpointClient.getInstance().requestWatersEndpoint(testStringOrder, token)
+        LocalEndpointClient.getInstance().requestWatersEndpoint(testStringOrder, "token")
 
         then:
         Files.readString(Paths.get(LocalEndpointClient.LOCAL_FILE_NAME)) == testStringOrder
@@ -51,5 +51,21 @@ class LocalEndpointClientTest extends Specification {
         then:
         destination.get("organization_id") != null
         destination.get("service") != null
+    }
+
+    def "requestWatersEndpoint throws an exception when not able to save file with order"() {
+        given:
+        Path readonlyLocalFile = Paths.get(LocalEndpointClient.LOCAL_FILE_NAME)
+        Files.createFile(readonlyLocalFile)
+        readonlyLocalFile.toFile().setReadOnly()
+
+        when:
+        LocalEndpointClient.getInstance().requestWatersEndpoint("order", "token")
+
+        then:
+        thrown(ReportStreamEndpointClientException)
+
+        cleanup:
+        readonlyLocalFile.toFile().delete()
     }
 }
