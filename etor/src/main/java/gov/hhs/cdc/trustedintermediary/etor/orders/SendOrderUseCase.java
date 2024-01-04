@@ -3,7 +3,7 @@ package gov.hhs.cdc.trustedintermediary.etor.orders;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator;
-import gov.hhs.cdc.trustedintermediary.utils.RetryTask;
+import gov.hhs.cdc.trustedintermediary.utils.SyncRetryTask;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import java.util.concurrent.Callable;
@@ -20,7 +20,7 @@ public class SendOrderUseCase {
     @Inject MetricMetadata metadata;
     @Inject PartnerMetadataOrchestrator partnerMetadataOrchestrator;
     @Inject Logger logger;
-    @Inject RetryTask retryTask;
+    @Inject SyncRetryTask retryTask;
 
     private SendOrderUseCase() {}
 
@@ -74,6 +74,6 @@ public class SendOrderUseCase {
                             receivedSubmissionId, sentSubmissionId);
                     return null;
                 };
-        retryTask.scheduleRetry(task, 1, 1000);
+        retryTask.retry(task, 3, 1000);
     }
 }
