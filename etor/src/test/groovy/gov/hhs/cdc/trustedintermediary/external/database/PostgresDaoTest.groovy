@@ -6,7 +6,6 @@ import gov.hhs.cdc.trustedintermediary.external.azure.AzureClient
 import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager
 import spock.lang.Specification
 
-import java.sql.Statement
 import java.sql.Timestamp
 import java.time.Instant
 
@@ -14,7 +13,6 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
-import java.time.LocalDateTime
 
 class PostgresDaoTest extends Specification {
 
