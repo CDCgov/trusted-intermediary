@@ -29,7 +29,7 @@ import gov.hhs.cdc.trustedintermediary.external.database.EtorSqlDriverManager;
 import gov.hhs.cdc.trustedintermediary.external.database.PostgresDao;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.FilePartnerMetadataStorage;
-import gov.hhs.cdc.trustedintermediary.external.localfile.LocalFileOrderSender;
+import gov.hhs.cdc.trustedintermediary.external.localfile.MockRSEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.DbDao;
@@ -79,10 +79,9 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(OrderConverter.class, HapiOrderConverter.getInstance());
         ApplicationContext.register(OrderController.class, OrderController.getInstance());
         ApplicationContext.register(SendOrderUseCase.class, SendOrderUseCase.getInstance());
+        ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
         ApplicationContext.register(
                 PartnerMetadataOrchestrator.class, PartnerMetadataOrchestrator.getInstance());
-        ApplicationContext.register(
-                ReportStreamEndpointClient.class, ReportStreamEndpointClient.getInstance());
 
         if (ApplicationContext.getProperty("DB_URL") != null) {
             ApplicationContext.register(SqlDriverManager.class, EtorSqlDriverManager.getInstance());
@@ -99,9 +98,10 @@ public class EtorDomainRegistration implements DomainConnector {
         }
 
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
-            ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
+            ApplicationContext.register(RSEndpointClient.class, MockRSEndpointClient.getInstance());
         } else {
-            ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
+            ApplicationContext.register(
+                    RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
             ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
         }
 

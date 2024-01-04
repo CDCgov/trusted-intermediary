@@ -2,8 +2,8 @@ package gov.hhs.cdc.trustedintermediary.etor.metadata
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order
+import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
-import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClient
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
@@ -131,8 +131,8 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def updatedPartnerMetadata = partnerMetadata.withSentSubmissionId(sentSubmissionId).withReceiver(receiver)
         TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
 
-        def mockClient = Mock(ReportStreamEndpointClient)
-        TestApplicationContext.register(ReportStreamEndpointClient, mockClient)
+        def mockClient = Mock(RSEndpointClient)
+        TestApplicationContext.register(RSEndpointClient, mockClient)
 
         def mockFormatter = Mock(Formatter)
         mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> [destinations: [
@@ -162,10 +162,10 @@ class PartnerMetadataOrchestratorTest extends Specification {
         partnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(partnerMetadata)
         TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
 
-        def mockClient = Mock(ReportStreamEndpointClient)
+        def mockClient = Mock(RSEndpointClient)
         mockClient.getRsToken() >> "token"
         mockClient.requestHistoryEndpoint(_ as String, _ as String) >> { throw new ReportStreamEndpointClientException("Client error", new Exception()) }
-        TestApplicationContext.register(ReportStreamEndpointClient, mockClient)
+        TestApplicationContext.register(RSEndpointClient, mockClient)
 
         TestApplicationContext.injectRegisteredImplementations()
 
@@ -187,10 +187,10 @@ class PartnerMetadataOrchestratorTest extends Specification {
         partnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(partnerMetadata)
         TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
 
-        def mockClient = Mock(ReportStreamEndpointClient)
+        def mockClient = Mock(RSEndpointClient)
         mockClient.getRsToken() >> "token"
         mockClient.requestHistoryEndpoint(_ as String, _ as String) >> rsHistoryApiResponse
-        TestApplicationContext.register(ReportStreamEndpointClient, mockClient)
+        TestApplicationContext.register(RSEndpointClient, mockClient)
 
         def mockFormatter = Mock(Formatter)
         mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> { throw new FormatterProcessingException("Formatter error", new Exception()) }
