@@ -106,7 +106,7 @@ public class PartnerMetadataOrchestrator {
     public Optional<PartnerMetadata> getMetadata(String receivedSubmissionId)
             throws PartnerMetadataException {
         PartnerMetadata partnerMetadata =
-                partnerMetadataStorage.readMetadata(receivedSubmissionId).orElseThrow();
+                partnerMetadataStorage.readMetadata(receivedSubmissionId).orElseThrow(() -> new PartnerMetadataException("Can't update metadata for sent order, no metadata exists for ID " + receivedSubmissionId));
 
         if (partnerMetadata.receiver() == null && partnerMetadata.sentSubmissionId() != null) {
             logger.logInfo("Receiver name not found in metadata, looking up from RS history API");
