@@ -31,8 +31,8 @@ class PostgresDaoTest extends Specification {
         mockResultSet = Mock(ResultSet)
         def mockAzureClient = Mock(AzureClient)
         mockAzureClient.getScopedToken(_ as String) >> "DogCow password"
-        TestApplicationContext.register(AzureClient, mockAzureClient)
 
+        TestApplicationContext.register(AzureClient, mockAzureClient)
         TestApplicationContext.register(PostgresDao, PostgresDao.getInstance())
     }
 
@@ -77,7 +77,6 @@ class PostgresDaoTest extends Specification {
         then:
         1 * mockPreparedStatement.executeUpdate()
     }
-
 
     def "upsertMetadata unhappy path throws exception"() {
         given:
@@ -127,7 +126,7 @@ class PostgresDaoTest extends Specification {
         thrown(SQLException)
     }
 
-    def "fetchMetadata returns null when rows  do not exist"() {
+    def "fetchMetadata returns null when rows do not exist"() {
         given:
         def expected = null
 
