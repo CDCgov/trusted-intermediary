@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.reportstream;
 
+import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
@@ -19,7 +20,7 @@ public class ReportStreamOrderSender implements OrderSender {
 
     private static final ReportStreamOrderSender INSTANCE = new ReportStreamOrderSender();
 
-    @Inject private ReportStreamEndpointClient rsclient;
+    @Inject private RSEndpointClient rsclient;
     @Inject private Formatter formatter;
     @Inject private HapiFhir fhir;
     @Inject private Logger logger;
