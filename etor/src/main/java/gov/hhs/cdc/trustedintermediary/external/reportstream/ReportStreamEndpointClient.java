@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 public class ReportStreamEndpointClient implements RSEndpointClient {
@@ -86,7 +85,7 @@ public class ReportStreamEndpointClient implements RSEndpointClient {
     }
 
     @Override
-    public String requestWatersEndpoint(@Nonnull String body, @Nonnull String bearerToken)
+    public String requestWatersEndpoint(String body, String bearerToken)
             throws ReportStreamEndpointClientException {
         logger.logInfo("Sending payload to ReportStream");
 
@@ -108,7 +107,7 @@ public class ReportStreamEndpointClient implements RSEndpointClient {
     }
 
     @Override
-    public String requestHistoryEndpoint(@Nonnull String submissionId, @Nonnull String bearerToken)
+    public String requestHistoryEndpoint(String submissionId, String bearerToken)
             throws ReportStreamEndpointClientException {
         logger.logInfo("Requesting history API from ReportStream");
 

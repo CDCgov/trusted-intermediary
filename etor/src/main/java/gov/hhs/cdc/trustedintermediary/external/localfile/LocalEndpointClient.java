@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import javax.annotation.Nonnull;
 
 public class LocalEndpointClient implements RSEndpointClient {
 
@@ -26,7 +25,7 @@ public class LocalEndpointClient implements RSEndpointClient {
     }
 
     @Override
-    public String requestWatersEndpoint(@Nonnull String body, @Nonnull String bearerToken)
+    public String requestWatersEndpoint(String body, String bearerToken)
             throws ReportStreamEndpointClientException {
         var fileLocation = Paths.get(LOCAL_FILE_NAME);
         try {
@@ -38,8 +37,7 @@ public class LocalEndpointClient implements RSEndpointClient {
     }
 
     @Override
-    public String requestHistoryEndpoint(
-            @Nonnull String submissionId, @Nonnull String bearerToken) {
+    public String requestHistoryEndpoint(String submissionId, String bearerToken) {
         return """
 {
     "destinations": [{
