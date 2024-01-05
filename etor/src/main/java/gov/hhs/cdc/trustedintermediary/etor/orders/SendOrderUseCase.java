@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.etor.orders;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator;
+import gov.hhs.cdc.trustedintermediary.utils.RetryFailedException;
 import gov.hhs.cdc.trustedintermediary.utils.SyncRetryTask;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
@@ -71,8 +72,9 @@ public class SendOrderUseCase {
                             receivedSubmissionId, sentSubmissionId);
                     return null;
                 };
-        boolean taskExecutedSuccessfully = retryTask.retry(task, 3, 1000);
-        if (!taskExecutedSuccessfully) {
+        try {
+            retryTask.retry(task, 3, 1000);
+        } catch (RetryFailedException e) {
             logger.logError(
                     "Unable to save metadata for sentSubmissionId "
                             + sentSubmissionId
