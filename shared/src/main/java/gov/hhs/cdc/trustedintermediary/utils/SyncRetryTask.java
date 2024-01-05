@@ -18,13 +18,16 @@ public class SyncRetryTask {
 
     private SyncRetryTask() {}
 
-    public <T> boolean retry(Callable<T> task, int maxRetries, long waitTime) {
+    public <T> T retry(Callable<T> task, int maxRetries, long waitTime)
+            throws RetryFailedException {
+        Exception lastException = null;
         int attempt = 0;
+
         while (attempt < maxRetries) {
             try {
-                task.call();
-                return true;
+                return task.call();
             } catch (Exception e) {
+                lastException = e;
                 attempt++;
 
                 logger.logWarning("Attempt {}: Retrying in {}s", attempt, waitTime * 2 / 1000);
@@ -33,15 +36,13 @@ public class SyncRetryTask {
                     Thread.sleep(waitTime);
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt(); // Restore interrupted status
-                    logger.logError("Thread interrupted during wait before retry", ie);
-                    break;
+                    throw new RetryFailedException("Thread interrupted during retries", ie);
                 }
 
                 waitTime *= 2;
             }
         }
 
-        logger.logError("Max retries reached, aborting operation.");
-        return false;
+        throw new RetryFailedException("Failed after " + maxRetries + " retries", lastException);
     }
 }
