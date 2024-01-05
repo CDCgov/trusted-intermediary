@@ -79,7 +79,8 @@ public class SendOrderUseCase {
                     "Unable to save metadata for sentSubmissionId "
                             + sentSubmissionId
                             + " and receivedSubmissionId "
-                            + receivedSubmissionId);
+                            + receivedSubmissionId,
+                    e);
         }
     }
 }
