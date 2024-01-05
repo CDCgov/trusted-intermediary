@@ -42,7 +42,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import javax.inject.Inject;
-import org.hl7.fhir.r4.model.OperationOutcome;
 
 /**
  * The domain connector for the ETOR domain. It connects it with the larger trusted intermediary. It
@@ -82,6 +81,7 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
         ApplicationContext.register(
                 PartnerMetadataOrchestrator.class, PartnerMetadataOrchestrator.getInstance());
+        ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
 
         if (ApplicationContext.getProperty("DB_URL") != null) {
             ApplicationContext.register(SqlDriverManager.class, EtorSqlDriverManager.getInstance());
@@ -102,7 +102,6 @@ public class EtorDomainRegistration implements DomainConnector {
         } else {
             ApplicationContext.register(
                     RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
-            ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
         }
 
         return endpoints;
@@ -167,15 +166,17 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleMetadata(DomainRequest request) {
         try {
             String metadataId = request.getPathParams().get("id");
-            Optional<OperationOutcome> metadata =
-                    partnerMetadataOrchestrator.getMetadata(metadataId);
+            Optional<String> metadata = partnerMetadataOrchestrator.getMetadata(metadataId);
 
             if (metadata.isEmpty()) {
                 return domainResponseHelper.constructErrorResponse(
                         404, "Metadata not found for ID: " + metadataId);
             }
 
-            return domainResponseHelper.constructOkResponse(metadata.get());
+            // Convert to FHIR object
+            // Call domainResponseHelper to use the HAPI library to stringify it?
+
+            return domainResponseHelper.constructOkResponseFromString(metadata.get());
         } catch (PartnerMetadataException e) {
             String errorMessage = "Unable to retrieve requested metadata";
             logger.logError(errorMessage, e);

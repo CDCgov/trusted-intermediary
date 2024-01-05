@@ -69,7 +69,7 @@ public class PostgresDao implements DbDao {
 
         // If the below prop isn't set to require and we just set ssl=true it will expect a CA cert
         // in azure which breaks it
-        props.setProperty("sslmode", ssl);
+        props.setProperty("ssl", ssl);
         conn = driverManager.getConnection(url, props);
         logger.logInfo("DB Connected Successfully");
         return conn;
@@ -90,9 +90,12 @@ public class PostgresDao implements DbDao {
 
         try (Connection conn = connect();
                 PreparedStatement statement =
-                        conn.prepareStatement("INSERT INTO metadata VALUES (?, ?, ?, ?, ?)")) {
-            // TODO: Update the below statement to handle on conflict, after we figure out what that
-            // behavior should be
+                        conn.prepareStatement(
+                                """
+                                INSERT INTO metadata VALUES (?, ?, ?, ?, ?)
+                                ON CONFLICT (message_id) DO UPDATE SET receiver = EXCLUDED.receiver
+                                """)) {
+
             statement.setString(1, receivedSubmissionId);
             statement.setString(2, sender);
             statement.setString(3, receiver);
@@ -121,6 +124,7 @@ public class PostgresDao implements DbDao {
 
             return new PartnerMetadata(
                     result.getString("message_id"),
+                    result.getString("sender"),
                     result.getString("receiver"),
                     result.getTimestamp("time_received").toInstant(),
                     result.getString("hash_of_order"));
