@@ -4,6 +4,10 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.concurrent.Callable;
 import javax.inject.Inject;
 
+/**
+ * Provides a reusable utility for retrying a task with a specified number of retries and wait time
+ * between retries.
+ */
 public class SyncRetryTask {
     private static final SyncRetryTask INSTANCE = new SyncRetryTask();
     @Inject Logger logger;
