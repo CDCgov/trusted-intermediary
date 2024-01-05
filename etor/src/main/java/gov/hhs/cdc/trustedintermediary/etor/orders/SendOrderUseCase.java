@@ -76,10 +76,10 @@ public class SendOrderUseCase {
             retryTask.retry(task, 3, 1000);
         } catch (RetryFailedException e) {
             logger.logError(
-                    "Unable to save metadata for sentSubmissionId "
-                            + sentSubmissionId
-                            + " and receivedSubmissionId "
-                            + receivedSubmissionId,
+                    "Unable to update metadata for received submissionId "
+                            + receivedSubmissionId
+                            + " and sent submissionId "
+                            + sentSubmissionId,
                     e);
         }
     }
