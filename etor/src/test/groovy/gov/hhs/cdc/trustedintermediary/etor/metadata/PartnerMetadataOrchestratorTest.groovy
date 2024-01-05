@@ -83,7 +83,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def mockMetadata = Optional.empty()
 
         when:
-        Optional<PartnerMetadata> result = PartnerMetadataOrchestrator.getInstance().getMetadata(receivedSubmissionId)
+        def result = PartnerMetadataOrchestrator.getInstance().getMetadata(receivedSubmissionId)
 
         then:
         !result.isPresent()
