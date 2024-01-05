@@ -32,7 +32,6 @@ import gov.hhs.cdc.trustedintermediary.external.localfile.FilePartnerMetadataSto
 import gov.hhs.cdc.trustedintermediary.external.localfile.MockRSEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
-import gov.hhs.cdc.trustedintermediary.utils.SyncRetryTask;
 import gov.hhs.cdc.trustedintermediary.wrappers.DbDao;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -83,7 +82,6 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
         ApplicationContext.register(
                 PartnerMetadataOrchestrator.class, PartnerMetadataOrchestrator.getInstance());
-        ApplicationContext.register(SyncRetryTask.class, SyncRetryTask.getInstance());
 
         if (ApplicationContext.getProperty("DB_URL") != null) {
             ApplicationContext.register(SqlDriverManager.class, EtorSqlDriverManager.getInstance());

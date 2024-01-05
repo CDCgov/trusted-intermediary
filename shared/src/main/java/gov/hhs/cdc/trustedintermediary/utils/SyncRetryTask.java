@@ -27,8 +27,7 @@ public class SyncRetryTask {
             } catch (Exception e) {
                 attempt++;
 
-                logger.logWarning(
-                        "Attempt " + attempt + ": Retrying in " + (waitTime * 2) / 1000 + "s");
+                logger.logWarning("Attempt {}: Retrying in {}s", attempt, waitTime * 2 / 1000);
 
                 try {
                     Thread.sleep(waitTime);

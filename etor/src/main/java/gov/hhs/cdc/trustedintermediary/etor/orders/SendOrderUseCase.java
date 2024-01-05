@@ -7,14 +7,11 @@ import gov.hhs.cdc.trustedintermediary.utils.SyncRetryTask;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import javax.inject.Inject;
 
 /** The overall logic to receive, convert to OML, and subsequently send a lab order. */
 public class SendOrderUseCase {
     private static final SendOrderUseCase INSTANCE = new SendOrderUseCase();
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     @Inject OrderConverter converter;
     @Inject OrderSender sender;
     @Inject MetricMetadata metadata;
