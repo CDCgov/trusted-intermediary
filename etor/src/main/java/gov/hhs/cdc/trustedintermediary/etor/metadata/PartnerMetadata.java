@@ -25,6 +25,15 @@ public record PartnerMetadata(
         this(receivedSubmissionId, null, sender, null, timeReceived, hash);
     }
 
+    public PartnerMetadata(
+            String receivedSubmissionId,
+            String sender,
+            String receiver,
+            Instant timeReceived,
+            String hash) {
+        this(receivedSubmissionId, null, sender, receiver, timeReceived, hash);
+    }
+
     public PartnerMetadata withSentSubmissionId(String sentSubmissionId) {
         return new PartnerMetadata(
                 this.receivedSubmissionId,
