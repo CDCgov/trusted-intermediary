@@ -16,11 +16,26 @@ import spock.lang.Specification
 
 class PartnerMetadataOrchestratorTest extends Specification {
 
+    private def mockPartnerMetadataStorage
+    private def mockClient
+    private def mockFormatter
+
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
+        mockPartnerMetadataStorage = Mock(PartnerMetadataStorage)
+        mockFormatter = Mock(Formatter)
+        mockClient = Mock(RSEndpointClient)
+
         TestApplicationContext.register(PartnerMetadataOrchestrator, PartnerMetadataOrchestrator.getInstance())
         TestApplicationContext.register(OrderConverter, HapiOrderConverter.getInstance())
+        TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
+      
+        TestApplicationContext.register(RSEndpointClient, mockClient)
+        TestApplicationContext.register(Formatter, mockFormatter)
+      
+        TestApplicationContext.injectRegisteredImplementations()
+
     }
 
     def "updateMetadataForReceivedOrder updates metadata successfully"() {
@@ -32,17 +47,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def bearerToken = "token"
         def rsHistoryApiResponse = "{\"sender\": \"${sender}\", \"timestamp\": \"${timestamp}\"}"
 
-        def partnerMetadataStorage = Mock(PartnerMetadataStorage)
-        TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
-
-        def mockClient = Mock(RSEndpointClient)
-        TestApplicationContext.register(RSEndpointClient, mockClient)
-
-        def mockFormatter = Mock(Formatter)
         mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> [sender: sender, timestamp: timestamp]
-        TestApplicationContext.register(Formatter, mockFormatter)
-
-        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, hashCode)
@@ -50,19 +55,54 @@ class PartnerMetadataOrchestratorTest extends Specification {
         then:
         1 * mockClient.getRsToken() >> bearerToken
         1 * mockClient.requestHistoryEndpoint(receivedSubmissionId, bearerToken) >> rsHistoryApiResponse
-        1 * partnerMetadataStorage.saveMetadata(new PartnerMetadata(receivedSubmissionId, sender, Instant.parse(timestamp), hashCode))
+        1 * mockPartnerMetadataStorage.saveMetadata(new PartnerMetadata(receivedSubmissionId, sender, Instant.parse(timestamp), hashCode))
+    }
+
+    def "updateMetadataForSentOrder test case when sentSubmissionId is null"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def sentSubmissionId = null
+
+        when:
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentOrder(receivedSubmissionId, sentSubmissionId)
+
+        then:
+        0 * mockPartnerMetadataStorage.readMetadata(receivedSubmissionId)
+    }
+
+    def "updateMetadataForSentOrder test case when PartnerMetadata returns no data"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def sentSubmissionId = "sentSubmissionId"
+
+        mockPartnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.empty()
+
+        when:
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentOrder(receivedSubmissionId, sentSubmissionId)
+
+        then:
+        0 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata)
+    }
+
+    def "getMetadata returns empty Optional when data is not found"() {
+        given:
+        String receivedSubmissionId = "receivedSubmissionId"
+        def mockMetadata = Optional.empty()
+
+        when:
+        def result = PartnerMetadataOrchestrator.getInstance().getMetadata(receivedSubmissionId)
+
+        then:
+        !result.isPresent()
+        1 * mockPartnerMetadataStorage.readMetadata(receivedSubmissionId) >> mockMetadata
     }
 
     def "updateMetadataForReceivedOrder throws PartnerMetadataException on client error"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
 
-        def mockClient = Mock(RSEndpointClient)
         mockClient.getRsToken() >> "token"
         mockClient.requestHistoryEndpoint(_ as String, _ as String) >> { throw new ReportStreamEndpointClientException("Client error", new Exception()) }
-        TestApplicationContext.register(RSEndpointClient, mockClient)
-
-        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, "hash")
@@ -76,16 +116,9 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def receivedSubmissionId = "receivedSubmissionId"
         def rsHistoryApiResponse = "{\"sender\": \"responseName\", \"timestamp\": \"2020-01-01T00:00:00.000Z\"}"
 
-        def mockClient = Mock(RSEndpointClient)
         mockClient.getRsToken() >> "token"
         mockClient.requestHistoryEndpoint(_ as String, _ as String) >> rsHistoryApiResponse
-        TestApplicationContext.register(RSEndpointClient, mockClient)
-
-        def mockFormatter = Mock(Formatter)
         mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> { throw new FormatterProcessingException("Formatter error", new Exception()) }
-        TestApplicationContext.register(Formatter, mockFormatter)
-
-        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, "hash")
@@ -99,16 +132,9 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def receivedSubmissionId = "receivedSubmissionId"
         def wrongFormatResponse = "{\"someotherkey\": \"value\"}"
 
-        def mockClient = Mock(RSEndpointClient)
         mockClient.getRsToken() >> "token"
         mockClient.requestHistoryEndpoint(_ as String, _ as String) >> wrongFormatResponse
-        TestApplicationContext.register(RSEndpointClient, mockClient)
-
-        def mockFormatter = Mock(Formatter)
         mockFormatter.convertJsonToObject(wrongFormatResponse, _ as TypeReference) >> [someotherkey: "value"]
-        TestApplicationContext.register(Formatter, mockFormatter)
-
-        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, "hash")
@@ -124,22 +150,12 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def bearerToken = "token"
         def receiver = "org.service"
         def rsHistoryApiResponse = "{\"destinations\": [{\"organization_id\": \"org\", \"service\": \"service\"}]}"
-
-        def partnerMetadataStorage = Mock(PartnerMetadataStorage)
         def partnerMetadata = new PartnerMetadata(receivedSubmissionId, "sender", Instant.now(), "hash")
         def updatedPartnerMetadata = partnerMetadata.withSentSubmissionId(sentSubmissionId).withReceiver(receiver)
-        TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
 
-        def mockClient = Mock(RSEndpointClient)
-        TestApplicationContext.register(RSEndpointClient, mockClient)
-
-        def mockFormatter = Mock(Formatter)
         mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> [destinations: [
                 [organization_id: "org", service: "service"]
             ]]
-        TestApplicationContext.register(Formatter, mockFormatter)
-
-        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         PartnerMetadataOrchestrator.getInstance().updateMetadataForSentOrder(receivedSubmissionId, sentSubmissionId)
@@ -147,42 +163,31 @@ class PartnerMetadataOrchestratorTest extends Specification {
         then:
         1 * mockClient.getRsToken() >> bearerToken
         1 * mockClient.requestHistoryEndpoint(sentSubmissionId, bearerToken) >> rsHistoryApiResponse
-        1 * partnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(partnerMetadata)
-        1 * partnerMetadataStorage.saveMetadata(updatedPartnerMetadata)
+        1 * mockPartnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(partnerMetadata)
+        1 * mockPartnerMetadataStorage.saveMetadata(updatedPartnerMetadata)
     }
 
     def "updateMetadataForSentOrder test case when sentSubmissionId is null"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
         def sentSubmissionId = null
-        def partnerMetadataStorage = Mock(PartnerMetadataStorage)
-
-        TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
-        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         PartnerMetadataOrchestrator.getInstance().updateMetadataForSentOrder(receivedSubmissionId, sentSubmissionId)
 
         then:
-        0 * partnerMetadataStorage.readMetadata(receivedSubmissionId)
+        0 * mockPartnerMetadataStorage.readMetadata(receivedSubmissionId)
     }
 
     def "updateMetadataForSentOrder throws PartnerMetadataException on client error"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
         def sentSubmissionId = "sentSubmissionId"
+        def partnerMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, "sender", "receiver", Instant.now(), "hash")
 
-        def partnerMetadataStorage = Mock(PartnerMetadataStorage)
-        PartnerMetadata partnerMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, "sender", "receiver", Instant.now(), "hash")
-        partnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(partnerMetadata)
-        TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
-
-        def mockClient = Mock(RSEndpointClient)
+        mockPartnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(partnerMetadata)
         mockClient.getRsToken() >> "token"
         mockClient.requestHistoryEndpoint(_ as String, _ as String) >> { throw new ReportStreamEndpointClientException("Client error", new Exception()) }
-        TestApplicationContext.register(RSEndpointClient, mockClient)
-
-        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         PartnerMetadataOrchestrator.getInstance().updateMetadataForSentOrder(receivedSubmissionId, sentSubmissionId)
@@ -196,22 +201,12 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def receivedSubmissionId = "receivedSubmissionId"
         def sentSubmissionId = "sentSubmissionId"
         def rsHistoryApiResponse = "{\"destinations\": [{\"organization_id\": \"org\", \"service\": \"service\"}]}"
+        def partnerMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, "sender", "receiver", Instant.now(), "hash")
 
-        def partnerMetadataStorage = Mock(PartnerMetadataStorage)
-        PartnerMetadata partnerMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, "sender", "receiver", Instant.now(), "hash")
-        partnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(partnerMetadata)
-        TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
-
-        def mockClient = Mock(RSEndpointClient)
+        mockPartnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(partnerMetadata)
         mockClient.getRsToken() >> "token"
         mockClient.requestHistoryEndpoint(_ as String, _ as String) >> rsHistoryApiResponse
-        TestApplicationContext.register(RSEndpointClient, mockClient)
-
-        def mockFormatter = Mock(Formatter)
         mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> { throw new FormatterProcessingException("Formatter error", new Exception()) }
-        TestApplicationContext.register(Formatter, mockFormatter)
-
-        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         PartnerMetadataOrchestrator.getInstance().updateMetadataForSentOrder(receivedSubmissionId, sentSubmissionId)
@@ -223,20 +218,15 @@ class PartnerMetadataOrchestratorTest extends Specification {
     def "getMetadata retrieves metadata successfully"() {
         given:
         String receivedSubmissionId = "receivedSubmissionId"
-        PartnerMetadata metadata = new PartnerMetadata(receivedSubmissionId, "sentSubmissionId", "sender", "receiver", Instant.now(), "hash")
-
-        def partnerMetadataStorage = Mock(PartnerMetadataStorage)
-        TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
-
-        TestApplicationContext.injectRegisteredImplementations()
+        def metadata = new PartnerMetadata(receivedSubmissionId, "sentSubmissionId", "sender", "receiver", Instant.now(), "hash")
 
         when:
-        Optional<PartnerMetadata> result = PartnerMetadataOrchestrator.getInstance().getMetadata(receivedSubmissionId)
+        def result = PartnerMetadataOrchestrator.getInstance().getMetadata(receivedSubmissionId)
 
         then:
         result.isPresent()
         result.get() == metadata
-        1 * partnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(metadata)
+        1 * mockPartnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(metadata)
     }
 
     def "getMetadata gets receiver if missing from metadata"() {
@@ -248,25 +238,14 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def hashCode = "123"
         def bearerToken = "token"
         def rsHistoryApiResponse = "{\"destinations\": [{\"organization_id\": \"org\", \"service\": \"service\"}]}"
+        def missingReceiverMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, null, timestamp, hashCode)
+        def expectedMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, "org.service", timestamp, hashCode)
 
-        PartnerMetadata missingReceiverMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, null, timestamp, hashCode)
-        PartnerMetadata expectedMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, "org.service", timestamp, hashCode)
-
-        def partnerMetadataStorage = Mock(PartnerMetadataStorage)
-        TestApplicationContext.register(PartnerMetadataStorage, partnerMetadataStorage)
-
-        def mockClient = Mock(RSEndpointClient)
         mockClient.getRsToken() >> bearerToken
         mockClient.requestHistoryEndpoint(sentSubmissionId, bearerToken) >> rsHistoryApiResponse
-        TestApplicationContext.register(RSEndpointClient, mockClient)
-
-        def mockFormatter = Mock(Formatter)
         mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> [destinations: [
                 [organization_id: "org", service: "service"]
             ]]
-        TestApplicationContext.register(Formatter, mockFormatter)
-
-        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         Optional<PartnerMetadata> result = PartnerMetadataOrchestrator.getInstance().getMetadata(receivedSubmissionId)
@@ -274,9 +253,9 @@ class PartnerMetadataOrchestratorTest extends Specification {
         then:
         result.isPresent()
         result.get() == expectedMetadata
-        2 * partnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(missingReceiverMetadata)
-        1 * partnerMetadataStorage.saveMetadata(expectedMetadata)
-        1 * partnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(expectedMetadata)
+        2 * mockPartnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(missingReceiverMetadata)
+        1 * mockPartnerMetadataStorage.saveMetadata(expectedMetadata)
+        1 * mockPartnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(expectedMetadata)
     }
 
     def "getReceiverName returns correct receiver name from valid JSON response"() {
