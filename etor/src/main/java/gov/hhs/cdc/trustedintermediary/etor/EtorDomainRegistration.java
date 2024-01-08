@@ -89,7 +89,7 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(
                 PartnerMetadataOrchestrator.class, PartnerMetadataOrchestrator.getInstance());
 
-        ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
+
 
         if (ApplicationContext.getProperty("DB_URL") != null) {
             ApplicationContext.register(SqlDriverManager.class, EtorSqlDriverManager.getInstance());
@@ -110,6 +110,7 @@ public class EtorDomainRegistration implements DomainConnector {
         } else {
             ApplicationContext.register(
                     RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
+            ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
         }
 
         return endpoints;

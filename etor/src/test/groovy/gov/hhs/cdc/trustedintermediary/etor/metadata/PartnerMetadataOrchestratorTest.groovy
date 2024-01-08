@@ -30,12 +30,11 @@ class PartnerMetadataOrchestratorTest extends Specification {
         TestApplicationContext.register(PartnerMetadataOrchestrator, PartnerMetadataOrchestrator.getInstance())
         TestApplicationContext.register(OrderConverter, HapiOrderConverter.getInstance())
         TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
-      
+
         TestApplicationContext.register(RSEndpointClient, mockClient)
         TestApplicationContext.register(Formatter, mockFormatter)
-      
-        TestApplicationContext.injectRegisteredImplementations()
 
+        TestApplicationContext.injectRegisteredImplementations()
     }
 
     def "updateMetadataForReceivedOrder updates metadata successfully"() {
