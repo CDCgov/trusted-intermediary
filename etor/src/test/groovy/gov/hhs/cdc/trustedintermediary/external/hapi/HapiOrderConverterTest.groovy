@@ -297,5 +297,4 @@ class HapiOrderConverterTest extends Specification {
 
         return patient
     }
-
 }

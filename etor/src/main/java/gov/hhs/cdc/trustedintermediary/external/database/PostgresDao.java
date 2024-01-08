@@ -82,6 +82,7 @@ public class PostgresDao implements DbDao {
     @Override
     public synchronized void upsertMetadata(
             String receivedSubmissionId,
+            String sentSubmissionId,
             String sender,
             String receiver,
             String hash,
@@ -92,15 +93,16 @@ public class PostgresDao implements DbDao {
                 PreparedStatement statement =
                         conn.prepareStatement(
                                 """
-                                INSERT INTO metadata VALUES (?, ?, ?, ?, ?)
-                                ON CONFLICT (message_id) DO UPDATE SET receiver = EXCLUDED.receiver
+                                INSERT INTO metadata VALUES (?, ?, ?, ?, ?, ?)
+                                ON CONFLICT (received_message_id) DO UPDATE SET receiver = EXCLUDED.receiver, sent_message_id = EXCLUDED.sent_message_id
                                 """)) {
 
             statement.setString(1, receivedSubmissionId);
-            statement.setString(2, sender);
-            statement.setString(3, receiver);
-            statement.setString(4, hash);
-            statement.setTimestamp(5, Timestamp.from(timeReceived));
+            statement.setString(2, sentSubmissionId);
+            statement.setString(3, sender);
+            statement.setString(4, receiver);
+            statement.setString(5, hash);
+            statement.setTimestamp(6, Timestamp.from(timeReceived));
 
             statement.executeUpdate();
         }
@@ -111,7 +113,8 @@ public class PostgresDao implements DbDao {
             throws SQLException {
         try (Connection conn = connect();
                 PreparedStatement statement =
-                        conn.prepareStatement("SELECT * FROM metadata where message_id = ?")) {
+                        conn.prepareStatement(
+                                "SELECT * FROM metadata where received_message_id = ?")) {
 
             statement.setString(1, receivedSubmissionId);
 
@@ -123,7 +126,8 @@ public class PostgresDao implements DbDao {
             }
 
             return new PartnerMetadata(
-                    result.getString("message_id"),
+                    result.getString("received_message_id"),
+                    result.getString("sent_message_id"),
                     result.getString("sender"),
                     result.getString("receiver"),
                     result.getTimestamp("time_received").toInstant(),
