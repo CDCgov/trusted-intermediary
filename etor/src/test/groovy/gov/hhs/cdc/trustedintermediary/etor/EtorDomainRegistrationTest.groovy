@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.etor
 
-import ca.uhn.fhir.util.OperationOutcomeUtil
 import gov.hhs.cdc.trustedintermediary.DemographicsMock
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
@@ -21,11 +20,9 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
-import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import org.hl7.fhir.r4.model.OperationOutcome
 
 import java.time.Instant
@@ -340,8 +337,6 @@ class EtorDomainRegistrationTest extends Specification {
         def mockFhir = Mock(HapiFhir)
         mockFhir.encodeResourceToJson(_ as OperationOutcome) >> ""
         TestApplicationContext.register(HapiFhir, mockFhir)
-
-        //TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:

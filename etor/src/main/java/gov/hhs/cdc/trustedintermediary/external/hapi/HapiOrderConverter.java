@@ -203,6 +203,7 @@ public class HapiOrderConverter implements OrderConverter {
         return provenance;
     }
 
+    @Override
     public OperationOutcome extractPublicMetadataToOperationOutcome(PartnerMetadata metadata) {
         var operation = new OperationOutcome();
 
