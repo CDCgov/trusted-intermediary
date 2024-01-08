@@ -148,17 +148,18 @@ class PostgresDaoTest extends Specification {
     def "fetchMetadata returns partnermetadata when rows exist"() {
         given:
         def messageId = "12345"
-        def receiver = "DogCow"
+        def sender = "DogCow"
         Timestamp timestampForMock = Timestamp.from(Instant.parse("2024-01-03T15:45:33.30Z"))
         Instant timeReceived = timestampForMock.toInstant()
-        def hash = receiver.hashCode().toString()
-        def expected = new PartnerMetadata(messageId, receiver, timeReceived, hash)
+        def hash = sender.hashCode().toString()
+        def expected = new PartnerMetadata(messageId, sender, null, timeReceived, hash)
 
         mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
         mockResultSet.next() >> true
         mockResultSet.getString("message_id") >> messageId
-        mockResultSet.getString("receiver") >> receiver
+        mockResultSet.getString("sender") >> sender
+        mockResultSet.getString("receiver") >> null
         mockResultSet.getTimestamp("time_received") >> timestampForMock
         mockResultSet.getString("hash_of_order") >> hash
         mockPreparedStatement.executeQuery() >> mockResultSet
