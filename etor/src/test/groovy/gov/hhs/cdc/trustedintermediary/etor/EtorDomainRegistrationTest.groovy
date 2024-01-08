@@ -337,8 +337,6 @@ class EtorDomainRegistrationTest extends Specification {
         def mockFhir = Mock(HapiFhir)
         mockFhir.encodeResourceToJson(_ as OperationOutcome) >> ""
         TestApplicationContext.register(HapiFhir, mockFhir)
-
-        //TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
