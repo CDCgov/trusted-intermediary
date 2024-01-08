@@ -11,6 +11,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemograph
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
@@ -33,6 +34,7 @@ import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpoin
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.DbDao;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
+import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager;
 import java.io.IOException;
@@ -42,6 +44,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import javax.inject.Inject;
+import org.hl7.fhir.r4.model.OperationOutcome;
 
 /**
  * The domain connector for the ETOR domain. It connects it with the larger trusted intermediary. It
@@ -60,6 +63,10 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject Logger logger;
     @Inject DomainResponseHelper domainResponseHelper;
     @Inject PartnerMetadataOrchestrator partnerMetadataOrchestrator;
+
+    @Inject OrderConverter orderConverter;
+
+    @Inject HapiFhir fhir;
 
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
             Map.of(
@@ -82,6 +89,7 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(
                 PartnerMetadataOrchestrator.class, PartnerMetadataOrchestrator.getInstance());
 
+        ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
 
         if (ApplicationContext.getProperty("DB_URL") != null) {
             ApplicationContext.register(SqlDriverManager.class, EtorSqlDriverManager.getInstance());
@@ -102,7 +110,6 @@ public class EtorDomainRegistration implements DomainConnector {
         } else {
             ApplicationContext.register(
                     RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
-            ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
         }
 
         return endpoints;
@@ -167,17 +174,19 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleMetadata(DomainRequest request) {
         try {
             String metadataId = request.getPathParams().get("id");
-            Optional<String> metadata = partnerMetadataOrchestrator.getMetadata(metadataId);
+            Optional<PartnerMetadata> metadata =
+                    partnerMetadataOrchestrator.getMetadata(metadataId);
 
             if (metadata.isEmpty()) {
                 return domainResponseHelper.constructErrorResponse(
                         404, "Metadata not found for ID: " + metadataId);
             }
 
-            // Convert to FHIR object
-            // Call domainResponseHelper to use the HAPI library to stringify it?
+            OperationOutcome responseObject =
+                    orderConverter.extractPublicMetadataToOperationOutcome(metadata.get());
 
-            return domainResponseHelper.constructOkResponseFromString(metadata.get());
+            return domainResponseHelper.constructOkResponseFromString(
+                    fhir.encodeResourceToJson(responseObject));
         } catch (PartnerMetadataException e) {
             String errorMessage = "Unable to retrieve requested metadata";
             logger.logError(errorMessage, e);

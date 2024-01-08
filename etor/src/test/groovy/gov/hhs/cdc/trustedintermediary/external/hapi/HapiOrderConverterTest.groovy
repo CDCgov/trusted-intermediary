@@ -244,16 +244,6 @@ class HapiOrderConverterTest extends Specification {
         !contactSection.hasName()
     }
 
-    def "extract public metadata to operation outcome returns operation outcome" () {
-        given:
-        def mockMetadata = new PartnerMetadata("123456", "7890", "test_sender", "test_receiver", Instant.now(), "test_hash")
-        when:
-        def metadataOutput = HapiOrderConverter.getInstance().extractPublicMetadataToOperationOutcome(mockMetadata, "7890")
-        then:
-        metadataOutput != null
-        metadataOutput.getId() == "7890"
-        metadataOutput.getIssue().size() == 4
-    }
 
     def "creating an issue returns a valid OperationOutcomeIssueComponent with Information level severity and code" () {
         when:

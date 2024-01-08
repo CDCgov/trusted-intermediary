@@ -203,11 +203,10 @@ public class HapiOrderConverter implements OrderConverter {
         return provenance;
     }
 
-    public OperationOutcome extractPublicMetadataToOperationOutcome(
-            PartnerMetadata metadata, String submissionKey) {
+    public OperationOutcome extractPublicMetadataToOperationOutcome(PartnerMetadata metadata) {
         var operation = new OperationOutcome();
 
-        operation.setId(submissionKey);
+        operation.setId(metadata.receivedSubmissionId());
         operation.getIssue().add(createInformationIssueComponent("sender name", metadata.sender()));
         operation
                 .getIssue()
