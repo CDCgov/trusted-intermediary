@@ -117,7 +117,7 @@ class SendOrderUsecaseTest extends Specification {
         1 * mockConverter.convertMetadataToOmlOrder(order) >> omlOrder
         1 * mockConverter.addContactSectionToPatientResource(omlOrder) >> omlOrder
         1 * mockSender.sendOrder(omlOrder) >> Optional.of("sentId")
-        1 * mockRetryTask.retry(_, _, _) >> { throw new RetryFailedException("Error") }
+        1 * mockRetryTask.retry(_, _, _) >> { throw new RetryFailedException("Error", new Exception()) }
         1 * mockLogger.logError(_, _)
         noExceptionThrown()
     }
