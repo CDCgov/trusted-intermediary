@@ -72,7 +72,7 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PostgresDao.getInstance().upsertMetadata("mock_id", "mock_sender", "mock_receiver", "mock_hash", Instant.now())
+        PostgresDao.getInstance().upsertMetadata("mock_id_receiver", "mock_id_sender", "mock_sender", "mock_receiver", "mock_hash", Instant.now())
 
         then:
         1 * mockPreparedStatement.executeUpdate()
@@ -87,10 +87,27 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PostgresDao.getInstance().upsertMetadata("mock_id", "mock_sender", "mock_receiver", "mock_hash", Instant.now())
+        PostgresDao.getInstance().upsertMetadata("mock_id_receiver", "mock_id_sender", "mock_sender", "mock_receiver", "mock_hash", Instant.now())
 
         then:
         thrown(SQLException)
+    }
+
+    def "upsertMetadata writes null timestamp"() {
+        given:
+        mockDriver.getConnection(_ as String, _ as Properties) >>  mockConn
+        mockConn.prepareStatement(_ as String) >> mockPreparedStatement
+
+        TestApplicationContext.register(SqlDriverManager, mockDriver)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        PostgresDao.getInstance().upsertMetadata("mock_id_receiver", "mock_id_sender", "mock_sender", "mock_receiver", "mock_hash", null)
+
+        then:
+        mockPreparedStatement.setTimestamp(_ as Integer, _) >> { Integer parameterIndex, Timestamp timestamp ->
+            assert timestamp == null
+        }
     }
 
     def "select metadata retrieves data"(){
@@ -147,17 +164,19 @@ class PostgresDaoTest extends Specification {
 
     def "fetchMetadata returns partnermetadata when rows exist"() {
         given:
-        def messageId = "12345"
+        def receivedMessageId = "12345"
+        def sentMessageId = "7890"
         def sender = "DogCow"
         Timestamp timestampForMock = Timestamp.from(Instant.parse("2024-01-03T15:45:33.30Z"))
         Instant timeReceived = timestampForMock.toInstant()
         def hash = sender.hashCode().toString()
-        def expected = new PartnerMetadata(messageId, sender, null, timeReceived, hash)
+        def expected = new PartnerMetadata(receivedMessageId, sentMessageId, sender, null, timeReceived, hash)
 
         mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
         mockResultSet.next() >> true
-        mockResultSet.getString("message_id") >> messageId
+        mockResultSet.getString("received_message_id") >> receivedMessageId
+        mockResultSet.getString("sent_message_id") >> sentMessageId
         mockResultSet.getString("sender") >> sender
         mockResultSet.getString("receiver") >> null
         mockResultSet.getTimestamp("time_received") >> timestampForMock

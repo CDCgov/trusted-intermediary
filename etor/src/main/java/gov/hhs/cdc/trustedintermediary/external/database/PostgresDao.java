@@ -102,7 +102,12 @@ public class PostgresDao implements DbDao {
             statement.setString(3, sender);
             statement.setString(4, receiver);
             statement.setString(5, hash);
-            statement.setTimestamp(6, Timestamp.from(timeReceived));
+
+            Timestamp timestamp = null;
+            if (timeReceived != null) {
+                timestamp = Timestamp.from(timeReceived);
+            }
+            statement.setTimestamp(6, timestamp);
 
             statement.executeUpdate();
         }
