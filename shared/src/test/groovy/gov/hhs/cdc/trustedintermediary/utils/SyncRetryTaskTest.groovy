@@ -43,4 +43,28 @@ class SyncRetryTaskTest extends Specification {
         def exception = thrown(RetryFailedException)
         exception.getCause().getClass() == Exception
     }
+
+    def "should handle thread interruption"() {
+        given:
+        def callable = Mock(Callable)
+        callable.call() >> { throw new Exception("Fail") }
+        Exception thrown
+        def syncRetryTask = SyncRetryTask.getInstance()
+
+        when:
+        def thread = new Thread({
+            try {
+                syncRetryTask.retry(callable, 3, 1000)
+            } catch (RetryFailedException e) {
+                thrown = e
+            }
+        })
+        thread.start()
+        Thread.sleep(500)
+        thread.interrupt()
+        thread.join()
+
+        then:
+        thrown.cause instanceof InterruptedException
+    }
 }

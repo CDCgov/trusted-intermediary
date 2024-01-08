@@ -222,6 +222,21 @@ class PartnerMetadataOrchestratorTest extends Specification {
         1 * mockPartnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(metadata)
     }
 
+    def "getMetadata retrieves metadata successfully when receiver is present and sentSubmissionId is missing"() {
+        given:
+        String receivedSubmissionId = "receivedSubmissionId"
+        def bearerToken = "token"
+        def metadata = new PartnerMetadata(receivedSubmissionId, null, "sender", "receiver", Instant.now(), "hash")
+
+        when:
+        def result = PartnerMetadataOrchestrator.getInstance().getMetadata(receivedSubmissionId)
+
+        then:
+        result.isPresent()
+        result.get() == metadata
+        1 * mockPartnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(metadata)
+    }
+
     def "getMetadata gets receiver if missing from metadata"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
