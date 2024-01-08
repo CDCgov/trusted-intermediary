@@ -54,6 +54,14 @@ public class PartnerMetadataOrchestrator {
             timeReceived = Instant.parse(timestamp);
 
         } catch (Exception e) {
+            // write the received submission ID so that the rest of the metadata flow works even if
+            // some data is missing
+            logger.logWarning(
+                    "Unable to retrieve metadata from RS history API, but writing basic metadata entry anyway for received submission ID {}",
+                    receivedSubmissionId);
+            PartnerMetadata partnerMetadata = new PartnerMetadata(receivedSubmissionId, orderHash);
+            partnerMetadataStorage.saveMetadata(partnerMetadata);
+
             throw new PartnerMetadataException(
                     "Unable to retrieve metadata from RS history API", e);
         }
