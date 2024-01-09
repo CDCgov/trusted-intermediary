@@ -43,7 +43,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
     def "readMetadata unhappy path works"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
-        mockDao.fetchMetadata(_ as String) >> { throw new SQLException("Something went wrong!")}
+        mockDao.fetchMetadata(_ as String) >> { throw new SQLException("Something went wrong!") }
 
         when:
         DatabasePartnerMetadataStorage.getInstance().readMetadata(receivedSubmissionId)
@@ -55,12 +55,52 @@ class DatabasePartnerMetadataStorageTest extends Specification {
     def "saveMetadata happy path works"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
-        def mockMetadata = new PartnerMetadata(receivedSubmissionId, "sentSubmissionId", "sender", "receiver", Instant.now(), "hash")
+        def mockMetadata = new PartnerMetadata(
+                receivedSubmissionId,
+                "sentSubmissionId",
+                "sender",
+                "receiver",
+                Instant.now(),
+                "hash"
+                )
 
         when:
         DatabasePartnerMetadataStorage.getInstance().saveMetadata(mockMetadata)
 
         then:
-        1 * mockDao.upsertMetadata(mockMetadata.receivedSubmissionId(), mockMetadata.sender(), mockMetadata.receiver(), mockMetadata.hash(), mockMetadata.timeReceived())
+        1 * mockDao.upsertMetadata(
+                mockMetadata.receivedSubmissionId(),
+                mockMetadata.sender(),
+                mockMetadata.receiver(),
+                mockMetadata.hash(),
+                mockMetadata.timeReceived()
+                )
+    }
+
+    def "saveMetadata unhappy path works"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def mockMetadata = new PartnerMetadata(
+                receivedSubmissionId,
+                "sentSubmissionId",
+                "sender",
+                "receiver",
+                Instant.now(),
+                "hash"
+                )
+
+        mockDao.upsertMetadata(
+                mockMetadata.receivedSubmissionId(),
+                mockMetadata.sender(),
+                mockMetadata.receiver(),
+                mockMetadata.hash(),
+                mockMetadata.timeReceived()
+                ) >> { throw new SQLException("Something went wrong!") }
+
+        when:
+        DatabasePartnerMetadataStorage.getInstance().saveMetadata(mockMetadata)
+
+        then:
+        thrown(PartnerMetadataException)
     }
 }
