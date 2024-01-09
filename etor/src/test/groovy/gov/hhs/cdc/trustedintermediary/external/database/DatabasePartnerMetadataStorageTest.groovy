@@ -2,10 +2,12 @@ package gov.hhs.cdc.trustedintermediary.external.database
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage
 import gov.hhs.cdc.trustedintermediary.wrappers.DbDao
 import spock.lang.Specification
 
+import java.sql.SQLException
 import java.time.Instant
 
 class DatabasePartnerMetadataStorageTest extends Specification {
@@ -25,7 +27,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
     def "readMetadata happy path works"() {
         given:
-        String receivedSubmissionId = "receivedSubmissionId"
+        def receivedSubmissionId = "receivedSubmissionId"
         def mockMetadata = new PartnerMetadata(receivedSubmissionId, "sentSubmissionId", "sender", "receiver", Instant.now(), "hash")
         def expectedResult = Optional.of(mockMetadata)
 
@@ -36,5 +38,17 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
         then:
         actualResult == expectedResult
+    }
+
+    def "readMetadata unhappy path works"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        mockDao.fetchMetadata(_ as String) >> { throw new SQLException("Something went wrong!")}
+
+        when:
+        DatabasePartnerMetadataStorage.getInstance().readMetadata(receivedSubmissionId)
+
+        then:
+        thrown(PartnerMetadataException)
     }
 }
