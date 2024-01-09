@@ -107,6 +107,9 @@ class PartnerMetadataOrchestratorTest extends Specification {
         PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, "hash")
 
         then:
+        1 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata) >> { PartnerMetadata metadata ->
+            assert metadata.receivedSubmissionId() == receivedSubmissionId
+        }
         thrown(PartnerMetadataException)
     }
 

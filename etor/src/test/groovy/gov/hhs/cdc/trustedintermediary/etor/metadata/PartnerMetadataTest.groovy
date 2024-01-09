@@ -54,6 +54,23 @@ class PartnerMetadataTest extends Specification {
         metadata.hash() == hash
     }
 
+    def "test constructor with only received submission ID and hash"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def hash = "abcd"
+
+        when:
+        def metadata = new PartnerMetadata(receivedSubmissionId, hash)
+
+        then:
+        metadata.receivedSubmissionId() == receivedSubmissionId
+        metadata.sentSubmissionId() == null
+        metadata.sender() == null
+        metadata.receiver() == null
+        metadata.timeReceived() == null
+        metadata.hash() == hash
+    }
+
     def "test withSentSubmissionId and withReceiver to update PartnerMetadata"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
