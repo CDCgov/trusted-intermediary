@@ -6,7 +6,12 @@ import java.time.Instant;
 /** Interface for accessing the database for metadata */
 public interface DbDao {
     void upsertMetadata(
-            String id, String sender, String receiver, String hash, Instant timeReceived)
+            String receivedId,
+            String sentId,
+            String sender,
+            String receiver,
+            String hash,
+            Instant timeReceived)
             throws SQLException;
 
     Object fetchMetadata(String uniqueId) throws SQLException;

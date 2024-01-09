@@ -2,7 +2,6 @@ package gov.hhs.cdc.trustedintermediary.etor.metadata
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient
-import gov.hhs.cdc.trustedintermediary.etor.orders.Order
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
@@ -10,7 +9,6 @@ import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpoin
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
-
 import java.time.Instant
 import spock.lang.Specification
 
@@ -288,7 +286,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         receiverName == "org_id.service_name"
     }
 
-    def "getReceiverName throws FormatterProcessingException for unexpected format response"() {
+    def "getReceiverName throws FormatterProcessingException or returns null for unexpected format response"() {
         given:
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
@@ -315,11 +313,12 @@ class PartnerMetadataOrchestratorTest extends Specification {
         thrown(FormatterProcessingException)
 
         when:
+
         def jsonWithEmptyDestinations = "{\"destinations\": []}"
-        PartnerMetadataOrchestrator.getInstance().getReceiverName(jsonWithEmptyDestinations)
+        def receiverName = PartnerMetadataOrchestrator.getInstance().getReceiverName(jsonWithEmptyDestinations)
 
         then:
-        thrown(FormatterProcessingException)
+        receiverName == null
 
         when:
         def jsonWithoutOrgId = "{\"destinations\":[{\"service\":\"service\"}]}"
