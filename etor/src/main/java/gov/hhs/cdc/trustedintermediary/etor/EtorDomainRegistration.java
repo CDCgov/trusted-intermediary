@@ -15,6 +15,7 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
+import gov.hhs.cdc.trustedintermediary.etor.operationoutcomes.FhirMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter;
@@ -44,7 +45,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import javax.inject.Inject;
-import org.hl7.fhir.r4.model.OperationOutcome;
 
 /**
  * The domain connector for the ETOR domain. It connects it with the larger trusted intermediary. It
@@ -181,11 +181,11 @@ public class EtorDomainRegistration implements DomainConnector {
                         404, "Metadata not found for ID: " + metadataId);
             }
 
-            OperationOutcome responseObject =
+            FhirMetadata<?> responseObject =
                     orderConverter.extractPublicMetadataToOperationOutcome(metadata.get());
 
             return domainResponseHelper.constructOkResponseFromString(
-                    fhir.encodeResourceToJson(responseObject));
+                    fhir.encodeResourceToJson(responseObject.getUnderlyingOutcome()));
         } catch (PartnerMetadataException e) {
             String errorMessage = "Unable to retrieve requested metadata";
             logger.logError(errorMessage, e);
