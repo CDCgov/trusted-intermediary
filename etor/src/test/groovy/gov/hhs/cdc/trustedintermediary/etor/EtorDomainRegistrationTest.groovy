@@ -14,6 +14,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResp
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator
+import gov.hhs.cdc.trustedintermediary.etor.operationoutcomes.FhirMetadata
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
@@ -331,11 +332,11 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
 
         def mockOrderConverter = Mock(OrderConverter)
-        mockOrderConverter.extractPublicMetadataToOperationOutcome(_ as PartnerMetadata) >> Mock(OperationOutcome)
+        mockOrderConverter.extractPublicMetadataToOperationOutcome(_ as PartnerMetadata) >> Mock(FhirMetadata)
         TestApplicationContext.register(OrderConverter, mockOrderConverter)
 
         def mockFhir = Mock(HapiFhir)
-        mockFhir.encodeResourceToJson(_ as OperationOutcome) >> ""
+        mockFhir.encodeResourceToJson(_) >> ""
         TestApplicationContext.register(HapiFhir, mockFhir)
         TestApplicationContext.injectRegisteredImplementations()
 

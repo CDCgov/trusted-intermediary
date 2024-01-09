@@ -2,6 +2,8 @@ package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
+import gov.hhs.cdc.trustedintermediary.etor.operationoutcomes.FhirMetadata;
+import gov.hhs.cdc.trustedintermediary.etor.operationoutcomes.HapiFhirMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -204,7 +206,7 @@ public class HapiOrderConverter implements OrderConverter {
     }
 
     @Override
-    public OperationOutcome extractPublicMetadataToOperationOutcome(PartnerMetadata metadata) {
+    public FhirMetadata<?> extractPublicMetadataToOperationOutcome(PartnerMetadata metadata) {
         var operation = new OperationOutcome();
 
         operation.setId(metadata.receivedSubmissionId());
@@ -219,7 +221,7 @@ public class HapiOrderConverter implements OrderConverter {
                                 "order ingestion", metadata.timeReceived().toString()));
         operation.getIssue().add(createInformationIssueComponent("payload hash", metadata.hash()));
 
-        return operation;
+        return new HapiFhirMetadata(operation);
     }
 
     protected OperationOutcome.OperationOutcomeIssueComponent createInformationIssueComponent(

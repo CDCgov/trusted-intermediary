@@ -2,7 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.orders;
 
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
-import org.hl7.fhir.r4.model.OperationOutcome;
+import gov.hhs.cdc.trustedintermediary.etor.operationoutcomes.FhirMetadata;
 
 /** Interface for converting things to orders and things in orders. */
 public interface OrderConverter {
@@ -12,5 +12,5 @@ public interface OrderConverter {
 
     Order<?> addContactSectionToPatientResource(Order<?> order);
 
-    OperationOutcome extractPublicMetadataToOperationOutcome(PartnerMetadata metadata);
+    FhirMetadata<?> extractPublicMetadataToOperationOutcome(PartnerMetadata metadata);
 }
