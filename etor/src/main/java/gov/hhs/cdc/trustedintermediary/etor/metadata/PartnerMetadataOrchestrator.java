@@ -156,6 +156,9 @@ public class PartnerMetadataOrchestrator {
             Map<?, ?> destination = (Map<?, ?>) destinations.get(0);
             organizationId = destination.get("organization_id").toString();
             service = destination.get("service").toString();
+        } catch (IndexOutOfBoundsException e) {
+            // the destinations have not been determined yet by RS
+            return null;
         } catch (Exception e) {
             throw new FormatterProcessingException(
                     "Unable to extract receiver name from response due to unexpected format", e);
