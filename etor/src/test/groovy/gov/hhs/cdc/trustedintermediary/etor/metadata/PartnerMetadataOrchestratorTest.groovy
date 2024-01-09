@@ -210,7 +210,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
     def "getMetadata retrieves metadata successfully"() {
         given:
-        String receivedSubmissionId = "receivedSubmissionId"
+        def receivedSubmissionId = "receivedSubmissionId"
         def metadata = new PartnerMetadata(receivedSubmissionId, "sentSubmissionId", "sender", "receiver", Instant.now(), "hash")
 
         when:
@@ -224,8 +224,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
     def "getMetadata retrieves metadata successfully when receiver is present and sentSubmissionId is missing"() {
         given:
-        String receivedSubmissionId = "receivedSubmissionId"
-        def bearerToken = "token"
+        def receivedSubmissionId = "receivedSubmissionId"
         def metadata = new PartnerMetadata(receivedSubmissionId, null, "sender", "receiver", Instant.now(), "hash")
 
         when:
@@ -268,13 +267,13 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
     def "getReceiverName returns correct receiver name from valid JSON response"() {
         given:
-        String validJson = "{\"destinations\": [{\"organization_id\": \"org_id\", \"service\": \"service_name\"}]}"
+        def validJson = "{\"destinations\": [{\"organization_id\": \"org_id\", \"service\": \"service_name\"}]}"
 
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        String receiverName = PartnerMetadataOrchestrator.getInstance().getReceiverName(validJson)
+        def receiverName = PartnerMetadataOrchestrator.getInstance().getReceiverName(validJson)
 
         then:
         receiverName == "org_id.service_name"
@@ -286,42 +285,42 @@ class PartnerMetadataOrchestratorTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        String invalidJson = "invalid JSON"
+        def invalidJson = "invalid JSON"
         PartnerMetadataOrchestrator.getInstance().getReceiverName(invalidJson)
 
         then:
         thrown(FormatterProcessingException)
 
         when:
-        String emptyJson = "{}"
+        def emptyJson = "{}"
         PartnerMetadataOrchestrator.getInstance().getReceiverName(emptyJson)
 
         then:
         thrown(FormatterProcessingException)
 
         when:
-        String jsonWithoutDestinations = "{\"someotherkey\": \"value\"}"
+        def jsonWithoutDestinations = "{\"someotherkey\": \"value\"}"
         PartnerMetadataOrchestrator.getInstance().getReceiverName(jsonWithoutDestinations)
 
         then:
         thrown(FormatterProcessingException)
 
         when:
-        String jsonWithEmptyDestinations = "{\"destinations\": []}"
+        def jsonWithEmptyDestinations = "{\"destinations\": []}"
         PartnerMetadataOrchestrator.getInstance().getReceiverName(jsonWithEmptyDestinations)
 
         then:
         thrown(FormatterProcessingException)
 
         when:
-        String jsonWithoutOrgId = "{\"destinations\":[{\"service\":\"service\"}]}"
+        def jsonWithoutOrgId = "{\"destinations\":[{\"service\":\"service\"}]}"
         PartnerMetadataOrchestrator.getInstance().getReceiverName(jsonWithoutOrgId)
 
         then:
         thrown(FormatterProcessingException)
 
         when:
-        String jsonWithoutService = "{\"destinations\":[{\"organization_id\":\"org_id\"}]}"
+        def jsonWithoutService = "{\"destinations\":[{\"organization_id\":\"org_id\"}]}"
         PartnerMetadataOrchestrator.getInstance().getReceiverName(jsonWithoutService)
 
         then:

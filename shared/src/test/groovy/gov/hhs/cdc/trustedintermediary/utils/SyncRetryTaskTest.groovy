@@ -18,7 +18,7 @@ class SyncRetryTaskTest extends Specification {
         given:
         def maxRetries = 3
         def waitTime = 10
-        Callable<Void> mockTask = Mock(Callable)
+        def mockTask = Mock(Callable)
 
         when:
         def result = SyncRetryTask.getInstance().retry(mockTask, maxRetries, waitTime)
@@ -33,7 +33,7 @@ class SyncRetryTaskTest extends Specification {
         given:
         def maxRetries = 3
         def waitTime = 10
-        Callable<Void> mockTask = Mock(Callable)
+        def mockTask = Mock(Callable)
 
         when:
         SyncRetryTask.getInstance().retry(mockTask, maxRetries, waitTime)
@@ -46,15 +46,15 @@ class SyncRetryTaskTest extends Specification {
 
     def "should handle thread interruption"() {
         given:
-        def callable = Mock(Callable)
-        callable.call() >> { throw new Exception("Fail") }
+        def mockCallable = Mock(Callable)
+        mockCallable.call() >> { throw new Exception("Fail") }
         Exception thrown
         def syncRetryTask = SyncRetryTask.getInstance()
 
         when:
         def thread = new Thread({
             try {
-                syncRetryTask.retry(callable, 3, 1000)
+                syncRetryTask.retry(mockCallable, 3, 1000)
             } catch (RetryFailedException e) {
                 thrown = e
             }
