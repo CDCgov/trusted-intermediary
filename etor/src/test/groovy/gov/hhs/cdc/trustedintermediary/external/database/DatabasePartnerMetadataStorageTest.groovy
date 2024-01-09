@@ -70,6 +70,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         then:
         1 * mockDao.upsertMetadata(
                 mockMetadata.receivedSubmissionId(),
+                mockMetadata.sentSubmissionId(),
                 mockMetadata.sender(),
                 mockMetadata.receiver(),
                 mockMetadata.hash(),
@@ -91,6 +92,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
         mockDao.upsertMetadata(
                 mockMetadata.receivedSubmissionId(),
+                mockMetadata.sentSubmissionId(),
                 mockMetadata.sender(),
                 mockMetadata.receiver(),
                 mockMetadata.hash(),
