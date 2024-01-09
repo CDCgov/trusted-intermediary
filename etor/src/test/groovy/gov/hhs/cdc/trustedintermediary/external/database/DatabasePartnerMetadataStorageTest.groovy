@@ -51,4 +51,16 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         then:
         thrown(PartnerMetadataException)
     }
+
+    def "saveMetadata happy path works"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def mockMetadata = new PartnerMetadata(receivedSubmissionId, "sentSubmissionId", "sender", "receiver", Instant.now(), "hash")
+
+        when:
+        DatabasePartnerMetadataStorage.getInstance().saveMetadata(mockMetadata)
+
+        then:
+        1 * mockDao.upsertMetadata(mockMetadata.receivedSubmissionId(), mockMetadata.sender(), mockMetadata.receiver(), mockMetadata.hash(), mockMetadata.timeReceived())
+    }
 }
