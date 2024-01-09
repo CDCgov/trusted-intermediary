@@ -192,4 +192,22 @@ class PostgresDaoTest extends Specification {
         then:
         actual == expected
     }
+
+    def "fetchMetadata successfully sets the received timestamp to null"() {
+        given:
+        mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
+        mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
+        mockPreparedStatement.executeQuery() >> mockResultSet
+        mockResultSet.next() >> true
+        mockResultSet.getTimestamp("time_received") >> null
+
+        TestApplicationContext.register(SqlDriverManager, mockDriver)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def actual = PostgresDao.getInstance().fetchMetadata("mock_lookup")
+
+        then:
+        actual.timeReceived() == null
+    }
 }

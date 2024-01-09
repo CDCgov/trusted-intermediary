@@ -129,12 +129,18 @@ public class PostgresDao implements DbDao {
                 return null;
             }
 
+            Instant timeReceived = null;
+            Timestamp timestamp = result.getTimestamp("time_received");
+            if (timestamp != null) {
+                timeReceived = timestamp.toInstant();
+            }
+
             return new PartnerMetadata(
                     result.getString("received_message_id"),
                     result.getString("sent_message_id"),
                     result.getString("sender"),
                     result.getString("receiver"),
-                    result.getTimestamp("time_received").toInstant(),
+                    timeReceived,
                     result.getString("hash_of_order"));
         }
     }
