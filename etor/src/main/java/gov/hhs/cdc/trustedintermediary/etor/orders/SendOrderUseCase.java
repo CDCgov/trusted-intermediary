@@ -3,7 +3,6 @@ package gov.hhs.cdc.trustedintermediary.etor.orders;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator;
-import gov.hhs.cdc.trustedintermediary.utils.SyncRetryTask;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import javax.inject.Inject;
@@ -16,7 +15,6 @@ public class SendOrderUseCase {
     @Inject MetricMetadata metadata;
     @Inject PartnerMetadataOrchestrator partnerMetadataOrchestrator;
     @Inject Logger logger;
-    @Inject SyncRetryTask retryTask;
 
     private SendOrderUseCase() {}
 
