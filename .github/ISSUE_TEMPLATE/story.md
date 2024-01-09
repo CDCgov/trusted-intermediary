@@ -34,11 +34,9 @@ As a _, so that _, I need _.
     - [ ] Main `README.md`
     - [ ] Other READMEs in the repo
     - [ ] If applicable, update the `ReportStream Setup` section in `README.md`
-  - [ ] Threat model updated
+  - [ ] [Threat model](https://lucid.app/lucidchart/8c6e8d37-2612-42a8-ac57-150c83f8e29e/edit) updated
   - [ ] API documentation updated
-  - [ ] Source code documentation created when the code is not self-documenting
 - [ ] Code quality tasks completed
-  - [ ] Logging added where useful
   - [ ] Code refactored for clarity and no design/technical debt
   - [ ] Adhere to separation of concerns; code is not tightly coupled, especially to 3rd party dependencies
   - [ ] Code is reviewed or developed by pair; 1 approval is needed but consider requiring an outside-the-pair reviewer
