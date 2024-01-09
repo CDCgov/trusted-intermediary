@@ -14,15 +14,18 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResp
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator
+import gov.hhs.cdc.trustedintermediary.etor.operationoutcomes.FhirMetadata
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController
+import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
-import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException
+import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
+import org.hl7.fhir.r4.model.OperationOutcome
+
 import java.time.Instant
 import spock.lang.Specification
 
@@ -325,10 +328,16 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.register(PartnerMetadataOrchestrator, mockPartnerMetadataOrchestrator)
 
         def mockResponseHelper = Mock(DomainResponseHelper)
-        mockResponseHelper.constructOkResponse(_ as PartnerMetadata) >> new DomainResponse(expectedStatusCode)
+        mockResponseHelper.constructOkResponseFromString(_ as String) >> new DomainResponse(expectedStatusCode)
         TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
 
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        def mockOrderConverter = Mock(OrderConverter)
+        mockOrderConverter.extractPublicMetadataToOperationOutcome(_ as PartnerMetadata) >> Mock(FhirMetadata)
+        TestApplicationContext.register(OrderConverter, mockOrderConverter)
+
+        def mockFhir = Mock(HapiFhir)
+        mockFhir.encodeResourceToJson(_) >> ""
+        TestApplicationContext.register(HapiFhir, mockFhir)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:

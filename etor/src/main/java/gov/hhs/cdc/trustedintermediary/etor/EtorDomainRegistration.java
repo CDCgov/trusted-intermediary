@@ -15,6 +15,7 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
+import gov.hhs.cdc.trustedintermediary.etor.operationoutcomes.FhirMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter;
@@ -34,6 +35,7 @@ import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpoin
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.DbDao;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
+import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager;
 import java.io.IOException;
@@ -61,6 +63,10 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject Logger logger;
     @Inject DomainResponseHelper domainResponseHelper;
     @Inject PartnerMetadataOrchestrator partnerMetadataOrchestrator;
+
+    @Inject OrderConverter orderConverter;
+
+    @Inject HapiFhir fhir;
 
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
             Map.of(
@@ -175,7 +181,11 @@ public class EtorDomainRegistration implements DomainConnector {
                         404, "Metadata not found for ID: " + metadataId);
             }
 
-            return domainResponseHelper.constructOkResponse(metadata.get());
+            FhirMetadata<?> responseObject =
+                    orderConverter.extractPublicMetadataToOperationOutcome(metadata.get());
+
+            return domainResponseHelper.constructOkResponseFromString(
+                    fhir.encodeResourceToJson(responseObject.getUnderlyingOutcome()));
         } catch (PartnerMetadataException e) {
             String errorMessage = "Unable to retrieve requested metadata";
             logger.logError(errorMessage, e);

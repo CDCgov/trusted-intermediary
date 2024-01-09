@@ -40,8 +40,22 @@ public class DomainResponseHelper {
         return response;
     }
 
+    public DomainResponse constructResponseFromString(int httpStatus, String jsonResponseBody) {
+        logger.logInfo("Constructing the response");
+        var response = new DomainResponse(httpStatus);
+        response.setBody(jsonResponseBody);
+
+        response.setHeaders(Map.of(CONTENT_TYPE_LITERAL, APPLICATION_JSON_LITERAL));
+
+        return response;
+    }
+
     public DomainResponse constructOkResponse(Object objectResponseBody) {
         return constructResponse(200, objectResponseBody);
+    }
+
+    public DomainResponse constructOkResponseFromString(String jsonBody) {
+        return constructResponseFromString(200, jsonBody);
     }
 
     public DomainResponse constructErrorResponse(int httpStatus, String errorString) {
