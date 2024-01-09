@@ -3,11 +3,13 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 import gov.hhs.cdc.trustedintermediary.DemographicsMock
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.StringType
 
 import java.time.Instant
@@ -240,6 +242,17 @@ class HapiOrderConverterTest extends Specification {
         def contactSection = convertedPatient.getContact()[0]
 
         !contactSection.hasName()
+    }
+
+
+    def "creating an issue returns a valid OperationOutcomeIssueComponent with Information level severity and code" () {
+        when:
+        def output = HapiOrderConverter.getInstance().createInformationIssueComponent("test_details", "test_diagnostics")
+        then:
+        output.getSeverity() == OperationOutcome.IssueSeverity.INFORMATION
+        output.getCode() == OperationOutcome.IssueType.INFORMATIONAL
+        output.getDetails().getText() == "test_details"
+        output.getDiagnostics() == "test_diagnostics"
     }
 
     Patient fakePatientResource(boolean addHumanName) {

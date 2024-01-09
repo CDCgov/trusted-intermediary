@@ -74,7 +74,7 @@ jobs:
       - name: Run Db migration
         run: |
           export PGPASSWORD=$(az account get-access-token --resource-type oss-rdbms --query "[accessToken]" -o tsv)
-          psql "host=$(terraform output -raw database_hostname) port=5432 dbname=postgres user=cdcti-github sslmode=require" -c "CREATE TABLE IF NOT EXISTS metadata (message_id varchar(30), sender varchar(30), receiver varchar(30), hash_of_order varchar(1000), time_received timestamptz); GRANT ALL ON metadata TO azure_pg_admin; ALTER TABLE metadata OWNER TO azure_pg_admin;"
+          psql "host=$(terraform output -raw database_hostname) port=5432 dbname=postgres user=cdcti-github sslmode=require" -c "CREATE TABLE IF NOT EXISTS metadata (message_id varchar(30) PRIMARY KEY, sender varchar(30), receiver varchar(30), hash_of_order varchar(1000), time_received timestamptz); GRANT ALL ON metadata TO azure_pg_admin; ALTER TABLE metadata OWNER TO azure_pg_admin;"
 
       - id: export-terraform-output
         name: Export Terraform Output

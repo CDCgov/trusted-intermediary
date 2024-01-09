@@ -53,6 +53,20 @@ class DomainResponseHelperTest extends Specification {
         actual.getHeaders().get(DomainResponseHelper.CONTENT_TYPE_LITERAL) == DomainResponseHelper.APPLICATION_JSON_LITERAL
     }
 
+    def "constructOkResponseFromString returns expected response"() {
+        given:
+        def expectedResponseStatus = 200
+        def expectedResponseBody = "{json: DogCow goes Moof}"
+
+        when:
+        def actual = DomainResponseHelper.getInstance().constructOkResponseFromString(expectedResponseBody)
+
+        then:
+        actual.getBody() == expectedResponseBody
+        actual.getStatusCode() == expectedResponseStatus
+        actual.getHeaders().get(DomainResponseHelper.CONTENT_TYPE_LITERAL) == DomainResponseHelper.APPLICATION_JSON_LITERAL
+    }
+
     def "constructErrorResponse with error message returns expected response"() {
         given:
         def expectedResponseStatus = 500

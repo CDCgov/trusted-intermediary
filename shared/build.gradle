@@ -17,7 +17,7 @@ dependencies {
     implementation 'javax.annotation:javax.annotation-api:1.3.2'
 
     //logging
-    implementation 'org.slf4j:slf4j-api:2.0.10'
+    implementation 'org.slf4j:slf4j-api:2.0.11'
     implementation 'ch.qos.logback:logback-classic:1.4.14'
     implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
 
@@ -51,7 +51,7 @@ dependencies {
     testFixturesImplementation 'org.apache.groovy:groovy:4.0.17'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
     testFixturesImplementation 'com.openpojo:openpojo:0.9.1'
-    testFixturesImplementation 'nl.jqno.equalsverifier:equalsverifier:3.15.5'
+    testFixturesImplementation 'nl.jqno.equalsverifier:equalsverifier:3.15.6'
 
     // dotenv-java
     implementation 'io.github.cdimascio:dotenv-java:3.0.0'
