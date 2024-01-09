@@ -12,8 +12,7 @@ Accepted
 
 ## Context
 
-Postgres is an open-source, relational, SQL database. It provides a proven and robust feature set in the base implementation as well as add ons if specific features are required
-
+Postgres is an open-source, relational, SQL database. It provides a proven and robust feature set in the base implementation as well as add ons if specific features are required. Postgres is also well-supported by the community.
 [Reference](https://www.postgresql.org/docs/)
 
 ### Related Issues
