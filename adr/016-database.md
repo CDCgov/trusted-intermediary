@@ -1,4 +1,4 @@
-# 16 Postgres Database
+# 16. Postgres Database
 
 Date: 2024-01-08
 
