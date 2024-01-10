@@ -2,7 +2,6 @@ package gov.hhs.cdc.trustedintermediary.etor.metadata
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient
-import gov.hhs.cdc.trustedintermediary.etor.orders.Order
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
@@ -10,7 +9,6 @@ import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpoin
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
-
 import java.time.Instant
 import spock.lang.Specification
 
@@ -219,8 +217,22 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
     def "getMetadata retrieves metadata successfully"() {
         given:
-        String receivedSubmissionId = "receivedSubmissionId"
+        def receivedSubmissionId = "receivedSubmissionId"
         def metadata = new PartnerMetadata(receivedSubmissionId, "sentSubmissionId", "sender", "receiver", Instant.now(), "hash")
+
+        when:
+        def result = PartnerMetadataOrchestrator.getInstance().getMetadata(receivedSubmissionId)
+
+        then:
+        result.isPresent()
+        result.get() == metadata
+        1 * mockPartnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(metadata)
+    }
+
+    def "getMetadata retrieves metadata successfully when receiver is present and sentSubmissionId is missing"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def metadata = new PartnerMetadata(receivedSubmissionId, null, "sender", "receiver", Instant.now(), "hash")
 
         when:
         def result = PartnerMetadataOrchestrator.getInstance().getMetadata(receivedSubmissionId)
@@ -262,60 +274,61 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
     def "getReceiverName returns correct receiver name from valid JSON response"() {
         given:
-        String validJson = "{\"destinations\": [{\"organization_id\": \"org_id\", \"service\": \"service_name\"}]}"
+        def validJson = "{\"destinations\": [{\"organization_id\": \"org_id\", \"service\": \"service_name\"}]}"
 
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        String receiverName = PartnerMetadataOrchestrator.getInstance().getReceiverName(validJson)
+        def receiverName = PartnerMetadataOrchestrator.getInstance().getReceiverName(validJson)
 
         then:
         receiverName == "org_id.service_name"
     }
 
-    def "getReceiverName throws FormatterProcessingException for unexpected format response"() {
+    def "getReceiverName throws FormatterProcessingException or returns null for unexpected format response"() {
         given:
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        String invalidJson = "invalid JSON"
+        def invalidJson = "invalid JSON"
         PartnerMetadataOrchestrator.getInstance().getReceiverName(invalidJson)
 
         then:
         thrown(FormatterProcessingException)
 
         when:
-        String emptyJson = "{}"
+        def emptyJson = "{}"
         PartnerMetadataOrchestrator.getInstance().getReceiverName(emptyJson)
 
         then:
         thrown(FormatterProcessingException)
 
         when:
-        String jsonWithoutDestinations = "{\"someotherkey\": \"value\"}"
+        def jsonWithoutDestinations = "{\"someotherkey\": \"value\"}"
         PartnerMetadataOrchestrator.getInstance().getReceiverName(jsonWithoutDestinations)
 
         then:
         thrown(FormatterProcessingException)
 
         when:
-        String jsonWithEmptyDestinations = "{\"destinations\": []}"
-        PartnerMetadataOrchestrator.getInstance().getReceiverName(jsonWithEmptyDestinations)
+
+        def jsonWithEmptyDestinations = "{\"destinations\": []}"
+        def receiverName = PartnerMetadataOrchestrator.getInstance().getReceiverName(jsonWithEmptyDestinations)
 
         then:
-        thrown(FormatterProcessingException)
+        receiverName == null
 
         when:
-        String jsonWithoutOrgId = "{\"destinations\":[{\"service\":\"service\"}]}"
+        def jsonWithoutOrgId = "{\"destinations\":[{\"service\":\"service\"}]}"
         PartnerMetadataOrchestrator.getInstance().getReceiverName(jsonWithoutOrgId)
 
         then:
         thrown(FormatterProcessingException)
 
         when:
-        String jsonWithoutService = "{\"destinations\":[{\"organization_id\":\"org_id\"}]}"
+        def jsonWithoutService = "{\"destinations\":[{\"organization_id\":\"org_id\"}]}"
         PartnerMetadataOrchestrator.getInstance().getReceiverName(jsonWithoutService)
 
         then:

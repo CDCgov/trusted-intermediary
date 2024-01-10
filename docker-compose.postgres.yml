@@ -1,3 +1,5 @@
+# Find the SQL schema in `/.github/workflows/terraform-deploy_reusable.yml`.
+
 version: "3.7"
 
 services:
