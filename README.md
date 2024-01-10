@@ -213,7 +213,7 @@ CDC including this GitHub page may be subject to applicable federal law, includi
 
 ### Database
 
-For documentation regarding database documentation [go here](/docs/database.md)
+For database documentation [go here](/docs/database.md)
 
 ### Setup with ReportStream
 
