@@ -3,7 +3,7 @@
 ## Requirements
 Choose a Postgres client, [pgAdmin](https://www.pgadmin.org/) is the most full featured, intelliJ also has a built in plugin.
 
-### Connecting to Local Database
+## Connecting to Local Database
 1. Run the docker file ./docker-compose.postgres.yml in the root of the project
 2. Run the `generate_env.sh` script:
 
@@ -16,7 +16,7 @@ Choose a Postgres client, [pgAdmin](https://www.pgadmin.org/) is the most full f
 5. Grab the create table command from [line 77 of this project file](.github/workflows/terraform-deploy_reusable.yml) from after the -c to the first semi-colon, no need for the `ALTER TABLE` statements and run it in your local postgres instance to create the table
 6. Upon creating the table for the first time you may have to instruct your client to refresh (In pgAdmin right-click on the left hand menu and select Refresh)
 
-### Connecting to an Azure Hosted Database
+## Connecting to an Azure Hosted Database
 1. Install the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
 2. Open the azure environment you are trying to access from within your browser and navigate to the database
 3. Inside of the Azure database page select the Networking option from the left hand nav
@@ -29,7 +29,7 @@ Choose a Postgres client, [pgAdmin](https://www.pgadmin.org/) is the most full f
 7. Run `az login` inside of your local terminal
 8. Run `az account get-access-token --resource https://ossrdbms-aad.database.windows.net` to get a temporary password
 
-### Modifying the database schema
+## Modifying the database schema
 To modify the schema there are a few locations in the code we need to update.
 1. [Line 77 of this file contains the table creation statements](.github/workflows/terraform-deploy_reusable.yml) To modify column data types or add or remove columns, go there.
 2. The `PostgresDao.java` contains our queries for the database. Remember to update both the save and the fetch methods
