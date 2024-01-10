@@ -34,4 +34,7 @@ ig/temp
 ig/template
 
 __pycache__
+
 localfileorder.json
+
+logback.log
