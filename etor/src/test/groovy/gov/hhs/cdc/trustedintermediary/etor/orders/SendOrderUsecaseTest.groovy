@@ -111,4 +111,19 @@ class SendOrderUsecaseTest extends Specification {
         1 * mockSender.sendOrder(omlOrder) >> Optional.of("sentId")
         1 * mockLogger.logError(_, partnerMetadataException)
     }
+
+    def "convertAndSend logs event when submissionId is null"() {
+        given:
+        def mockOrder = Mock(Order)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        mockSender.sendOrder(_) >> Optional.empty()
+
+        when:
+        SendOrderUseCase.getInstance().convertAndSend(mockOrder, "receivedId")
+
+        then:
+        1 * mockLogger.logWarning(_)
+        0 * mockOrchestrator.updateMetadataForSentOrder(_ as String, _ as String)
+    }
 }
