@@ -5,13 +5,9 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator
-import gov.hhs.cdc.trustedintermediary.utils.RetryFailedException
-import gov.hhs.cdc.trustedintermediary.utils.SyncRetryTask
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import spock.lang.Specification
-
-import java.util.concurrent.Callable
 
 class SendOrderUsecaseTest extends Specification {
 
@@ -19,7 +15,6 @@ class SendOrderUsecaseTest extends Specification {
     def mockConverter = Mock(OrderConverter)
     def mockSender = Mock(OrderSender)
     def mockLogger = Mock(Logger)
-    def mockRetryTask = Mock(SyncRetryTask)
 
     def setup() {
         TestApplicationContext.reset()
@@ -30,7 +25,6 @@ class SendOrderUsecaseTest extends Specification {
         TestApplicationContext.register(OrderConverter, mockConverter)
         TestApplicationContext.register(OrderSender, mockSender)
         TestApplicationContext.register(Logger, mockLogger)
-        TestApplicationContext.register(SyncRetryTask, mockRetryTask)
     }
 
     def "send sends successfully"() {
@@ -41,8 +35,6 @@ class SendOrderUsecaseTest extends Specification {
         def sendOrder = SendOrderUseCase.getInstance()
         def mockOrder = new OrderMock(null, null, null)
         def mockOmlOrder = Mock(Order)
-
-        mockRetryTask.retry({ it.call(); true }, _, _) >> { Callable<Void> task, int retries, int delay -> task.call(); true }
 
         TestApplicationContext.injectRegisteredImplementations()
 
@@ -100,14 +92,14 @@ class SendOrderUsecaseTest extends Specification {
         1 * mockConverter.convertMetadataToOmlOrder(order) >> omlOrder
         1 * mockConverter.addContactSectionToPatientResource(omlOrder) >> omlOrder
         1 * mockSender.sendOrder(omlOrder) >> Optional.of("sentId")
-        1 * mockRetryTask.retry(_, _, _)
-        noExceptionThrown()
     }
 
-    def "convertAndSend logs error and continues when retryTask throws exception"() {
+    def "convertAndSend logs error and continues when updating the metadata for the sent order throws exception"() {
         given:
         def order = Mock(Order)
         def omlOrder = Mock(Order)
+        def partnerMetadataException = new PartnerMetadataException("Error")
+        mockOrchestrator.updateMetadataForSentOrder("receivedId", _) >> { throw  partnerMetadataException}
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -117,8 +109,6 @@ class SendOrderUsecaseTest extends Specification {
         1 * mockConverter.convertMetadataToOmlOrder(order) >> omlOrder
         1 * mockConverter.addContactSectionToPatientResource(omlOrder) >> omlOrder
         1 * mockSender.sendOrder(omlOrder) >> Optional.of("sentId")
-        1 * mockRetryTask.retry(_, _, _) >> { throw new RetryFailedException("Error", new Exception()) }
-        1 * mockLogger.logError(_, _)
-        noExceptionThrown()
+        1 * mockLogger.logError(_, partnerMetadataException)
     }
 }
