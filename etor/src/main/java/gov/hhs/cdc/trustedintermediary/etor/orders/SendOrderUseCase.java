@@ -3,11 +3,8 @@ package gov.hhs.cdc.trustedintermediary.etor.orders;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator;
-import gov.hhs.cdc.trustedintermediary.utils.RetryFailedException;
-import gov.hhs.cdc.trustedintermediary.utils.SyncRetryTask;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
-import java.util.concurrent.Callable;
 import javax.inject.Inject;
 
 /** The overall logic to receive, convert to OML, and subsequently send a lab order. */
@@ -18,7 +15,6 @@ public class SendOrderUseCase {
     @Inject MetricMetadata metadata;
     @Inject PartnerMetadataOrchestrator partnerMetadataOrchestrator;
     @Inject Logger logger;
-    @Inject SyncRetryTask retryTask;
 
     private SendOrderUseCase() {}
 
@@ -66,15 +62,11 @@ public class SendOrderUseCase {
                     "Received and/or sent submissionId is null so not saving metadata for sent order");
             return;
         }
-        Callable<Void> task =
-                () -> {
-                    partnerMetadataOrchestrator.updateMetadataForSentOrder(
-                            receivedSubmissionId, sentSubmissionId);
-                    return null;
-                };
+
         try {
-            retryTask.retry(task, 3, 1000);
-        } catch (RetryFailedException e) {
+            partnerMetadataOrchestrator.updateMetadataForSentOrder(
+                    receivedSubmissionId, sentSubmissionId);
+        } catch (PartnerMetadataException e) {
             logger.logError(
                     "Unable to update metadata for received submissionId "
                             + receivedSubmissionId

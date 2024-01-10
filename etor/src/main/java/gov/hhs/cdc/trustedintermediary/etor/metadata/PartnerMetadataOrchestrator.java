@@ -91,27 +91,13 @@ public class PartnerMetadataOrchestrator {
         }
 
         PartnerMetadata partnerMetadata = optionalPartnerMetadata.get();
-        if (!sentSubmissionId.equals(partnerMetadata.sentSubmissionId())) {
-            logger.logInfo("Updating metadata with sentSubmissionId: {}", sentSubmissionId);
-            partnerMetadata = partnerMetadata.withSentSubmissionId(sentSubmissionId);
-            partnerMetadataStorage.saveMetadata(partnerMetadata);
+
+        if (sentSubmissionId.equals(partnerMetadata.sentSubmissionId())) {
+            return;
         }
 
-        logger.logInfo(
-                "Looking up receiver name from RS history API for sentSubmissionId: {}",
-                sentSubmissionId);
-        String receiver;
-        try {
-            String bearerToken = rsclient.getRsToken();
-            String responseBody = rsclient.requestHistoryEndpoint(sentSubmissionId, bearerToken);
-            receiver = getReceiverName(responseBody);
-        } catch (ReportStreamEndpointClientException | FormatterProcessingException e) {
-            throw new PartnerMetadataException(
-                    "Unable to retrieve metadata from RS history API", e);
-        }
-
-        logger.logInfo("Updating metadata with receiver: {}", receiver);
-        partnerMetadata = partnerMetadata.withReceiver(receiver);
+        logger.logInfo("Updating metadata with sentSubmissionId: {}", sentSubmissionId);
+        partnerMetadata = partnerMetadata.withSentSubmissionId(sentSubmissionId);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
@@ -125,10 +111,26 @@ public class PartnerMetadataOrchestrator {
         }
 
         PartnerMetadata partnerMetadata = optionalPartnerMetadata.get();
-        if (partnerMetadata.receiver() == null && partnerMetadata.sentSubmissionId() != null) {
-            logger.logInfo("Receiver name not found in metadata, looking up from RS history API");
-            updateMetadataForSentOrder(receivedSubmissionId, partnerMetadata.sentSubmissionId());
-            return partnerMetadataStorage.readMetadata(receivedSubmissionId);
+        var sentSubmissionId = partnerMetadata.sentSubmissionId();
+        if (partnerMetadata.receiver() == null && sentSubmissionId != null) {
+            logger.logInfo(
+                    "Receiver name not found in metadata, looking up {} from RS history API",
+                    sentSubmissionId);
+
+            String receiver;
+            try {
+                String bearerToken = rsclient.getRsToken();
+                String responseBody =
+                        rsclient.requestHistoryEndpoint(sentSubmissionId, bearerToken);
+                receiver = getReceiverName(responseBody);
+            } catch (ReportStreamEndpointClientException | FormatterProcessingException e) {
+                throw new PartnerMetadataException(
+                        "Unable to retrieve metadata from RS history API", e);
+            }
+
+            logger.logInfo("Updating metadata with receiver: {}", receiver);
+            partnerMetadata = partnerMetadata.withReceiver(receiver);
+            partnerMetadataStorage.saveMetadata(partnerMetadata);
         }
 
         return Optional.of(partnerMetadata);

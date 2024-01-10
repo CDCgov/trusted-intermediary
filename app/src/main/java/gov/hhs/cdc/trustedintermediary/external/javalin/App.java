@@ -17,7 +17,6 @@ import gov.hhs.cdc.trustedintermediary.external.localfile.LocalSecrets;
 import gov.hhs.cdc.trustedintermediary.external.slf4j.DeployedLogger;
 import gov.hhs.cdc.trustedintermediary.external.slf4j.LocalLogger;
 import gov.hhs.cdc.trustedintermediary.organizations.OrganizationsSettings;
-import gov.hhs.cdc.trustedintermediary.utils.SyncRetryTask;
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
@@ -88,6 +87,5 @@ public class App {
         ApplicationContext.register(
                 OrganizationsSettings.class, OrganizationsSettings.getInstance());
         ApplicationContext.register(MetricMetadata.class, LoggingMetricMetadata.getInstance());
-        ApplicationContext.register(SyncRetryTask.class, SyncRetryTask.getInstance());
     }
 }
