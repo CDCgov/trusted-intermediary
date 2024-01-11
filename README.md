@@ -234,7 +234,7 @@ For database documentation [go here](/docs/database.md)
    ApplicationContext.register(RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
    ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
    ```
-3. Run TI with `REPORT_STREAM_URL_PREFIX=http://localhost:7071 ./gradlew clean app:run`
+3. Run TI with `./gradlew clean app:run`
 
 #### ReportStream Setup
 
