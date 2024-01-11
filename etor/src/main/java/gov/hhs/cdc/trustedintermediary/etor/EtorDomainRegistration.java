@@ -108,8 +108,9 @@ public class EtorDomainRegistration implements DomainConnector {
         } else {
             ApplicationContext.register(
                     RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
+
+            ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
         }
-        ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
         return endpoints;
     }
 
