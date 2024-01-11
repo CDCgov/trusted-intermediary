@@ -4,7 +4,6 @@ import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureClient;
-import gov.hhs.cdc.trustedintermediary.wrappers.DbDao;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager;
 import java.sql.Connection;
@@ -87,14 +86,15 @@ public class PostgresDao implements DbDao {
             String sender,
             String receiver,
             String hash,
-            Instant timeReceived)
+            Instant timeReceived,
+            PartnerMetadataStatus deliveryStatus)
             throws SQLException {
 
         try (Connection conn = connect();
                 PreparedStatement statement =
                         conn.prepareStatement(
                                 """
-                                INSERT INTO metadata VALUES (?, ?, ?, ?, ?, ?)
+                                INSERT INTO metadata VALUES (?, ?, ?, ?, ?, ?, ?)
                                 ON CONFLICT (received_message_id) DO UPDATE SET receiver = EXCLUDED.receiver, sent_message_id = EXCLUDED.sent_message_id
                                 """)) {
 
@@ -109,6 +109,7 @@ public class PostgresDao implements DbDao {
                 timestamp = Timestamp.from(timeReceived);
             }
             statement.setTimestamp(6, timestamp);
+            statement.setString(7, deliveryStatus.toString());
 
             statement.executeUpdate();
         }

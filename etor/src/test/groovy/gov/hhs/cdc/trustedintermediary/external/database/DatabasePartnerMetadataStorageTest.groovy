@@ -4,7 +4,6 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage
-import gov.hhs.cdc.trustedintermediary.wrappers.DbDao
 import spock.lang.Specification
 
 import java.sql.SQLException
