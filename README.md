@@ -241,8 +241,8 @@ After enabling this option it is recommended that you delete all docker images a
 with this option enabled.
 
 1. Checkout `master` branch for `CDCgov/prime-reportstream`
-2. Follow [the steps in the ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/docs-deprecated/getting-started/getting-started.md#building-the-baseline) to build the baseline
-3. CD to `prime-reportstream/prime-router`
+2. CD to `prime-reportstream/prime-router`
+3. Run the `./cleanslate` script. For more information you can refer to the [ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/docs-deprecated/getting-started/getting-started.md#building-the-baseline)
 4. Run RS with `docker compose up --build -d`
 5. Run `./gradlew resetDB && ./gradlew reloadTable && ./gradlew reloadSettings`
 6. Edit `prime-router/settings/staging/0149-etor.yml`
