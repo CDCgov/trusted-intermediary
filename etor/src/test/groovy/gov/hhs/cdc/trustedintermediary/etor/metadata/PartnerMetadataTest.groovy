@@ -2,6 +2,8 @@ package gov.hhs.cdc.trustedintermediary.etor.metadata
 
 
 import gov.hhs.cdc.trustedintermediary.PojoTestUtils
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
+
 import java.time.Instant
 import spock.lang.Specification
 
@@ -22,9 +24,10 @@ class PartnerMetadataTest extends Specification {
         def receiver = "receiver"
         def timeReceived = Instant.now()
         def hash = "abcd"
+        def status = PartnerMetadataStatus.DELIVERED
 
         when:
-        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, hash)
+        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, hash, PartnerMetadataStatus.DELIVERED)
 
         then:
         metadata.receivedSubmissionId() == receivedSubmissionId
@@ -33,6 +36,7 @@ class PartnerMetadataTest extends Specification {
         metadata.receiver() == receiver
         metadata.timeReceived() == timeReceived
         metadata.hash() == hash
+        metadata.deliveryStatus() == status
     }
 
     def "test overloaded constructor"() {
@@ -41,9 +45,9 @@ class PartnerMetadataTest extends Specification {
         def sender = "sender"
         def timeReceived = Instant.now()
         def hash = "abcd"
-
+        def status = PartnerMetadataStatus.DELIVERED
         when:
-        def metadata = new PartnerMetadata(receivedSubmissionId, sender, timeReceived, hash)
+        def metadata = new PartnerMetadata(receivedSubmissionId, sender, timeReceived, hash, PartnerMetadataStatus.DELIVERED)
 
         then:
         metadata.receivedSubmissionId() == receivedSubmissionId
@@ -52,6 +56,7 @@ class PartnerMetadataTest extends Specification {
         metadata.receiver() == null
         metadata.timeReceived() == timeReceived
         metadata.hash() == hash
+        metadata.deliveryStatus() == status
     }
 
     def "test constructor with only received submission ID and hash"() {
@@ -69,6 +74,7 @@ class PartnerMetadataTest extends Specification {
         metadata.receiver() == null
         metadata.timeReceived() == null
         metadata.hash() == hash
+        metadata.deliveryStatus() == null
     }
 
     def "test withSentSubmissionId and withReceiver to update PartnerMetadata"() {
@@ -79,7 +85,8 @@ class PartnerMetadataTest extends Specification {
         def receiver = "receiver"
         def timeReceived = Instant.now()
         def hash = "abcd"
-        def metadata = new PartnerMetadata(receivedSubmissionId, sender, timeReceived, hash)
+        def status = PartnerMetadataStatus.DELIVERED
+        def metadata = new PartnerMetadata(receivedSubmissionId, sender, timeReceived, hash, status)
 
         when:
         def updatedMetadata = metadata.withSentSubmissionId(sentSubmissionId).withReceiver(receiver)
@@ -91,5 +98,6 @@ class PartnerMetadataTest extends Specification {
         updatedMetadata.receiver() == receiver
         updatedMetadata.timeReceived() == timeReceived
         updatedMetadata.hash() == hash
+        updatedMetadata.deliveryStatus() == status
     }
 }

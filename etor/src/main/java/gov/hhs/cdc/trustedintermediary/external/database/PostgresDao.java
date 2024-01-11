@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.database;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureClient;
 import gov.hhs.cdc.trustedintermediary.wrappers.DbDao;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -135,13 +136,19 @@ public class PostgresDao implements DbDao {
                 timeReceived = timestamp.toInstant();
             }
 
+            String status =
+                    result.getString("delivery_status") != null
+                            ? result.getString("delivery_status")
+                            : "PENDING";
+
             return new PartnerMetadata(
                     result.getString("received_message_id"),
                     result.getString("sent_message_id"),
                     result.getString("sender"),
                     result.getString("receiver"),
                     timeReceived,
-                    result.getString("hash_of_order"));
+                    result.getString("hash_of_order"),
+                    PartnerMetadataStatus.valueOf(status));
         }
     }
 }
