@@ -109,7 +109,13 @@ public class PostgresDao implements DbDao {
                 timestamp = Timestamp.from(timeReceived);
             }
             statement.setTimestamp(6, timestamp);
-            statement.setString(7, deliveryStatus.toString());
+
+            String deliveryStatusString = null;
+            if (deliveryStatus != null) {
+                deliveryStatusString = deliveryStatus.toString();
+            }
+
+            statement.setString(7, deliveryStatusString);
 
             statement.executeUpdate();
         }
