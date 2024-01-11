@@ -72,7 +72,12 @@ public class PartnerMetadataOrchestrator {
                 sender,
                 timeReceived);
         PartnerMetadata partnerMetadata =
-                new PartnerMetadata(receivedSubmissionId, sender, timeReceived, orderHash, PartnerMetadataStatus.PENDING);
+                new PartnerMetadata(
+                        receivedSubmissionId,
+                        sender,
+                        timeReceived,
+                        orderHash,
+                        PartnerMetadataStatus.PENDING);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 

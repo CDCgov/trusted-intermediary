@@ -12,6 +12,7 @@ import java.time.Instant;
  * @param receiver The name of the receiver of the message.
  * @param timeReceived The time the message was received.
  * @param hash The hash of the message.
+ * @param deliveryStatus the status of the message based on an enum
  */
 public record PartnerMetadata(
         String receivedSubmissionId,

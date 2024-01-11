@@ -225,6 +225,12 @@ public class HapiOrderConverter implements OrderConverter {
                 .add(createInformationIssueComponent("order ingestion", orderIngestion));
         operation.getIssue().add(createInformationIssueComponent("payload hash", metadata.hash()));
 
+        operation
+                .getIssue()
+                .add(
+                        createInformationIssueComponent(
+                                "delivery status", metadata.deliveryStatus().toString()));
+
         return new HapiFhirMetadata(operation);
     }
 

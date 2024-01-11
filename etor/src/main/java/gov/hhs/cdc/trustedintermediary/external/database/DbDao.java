@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.database;
 
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
-
 import java.sql.SQLException;
 import java.time.Instant;
 
