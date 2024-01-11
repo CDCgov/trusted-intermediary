@@ -222,15 +222,17 @@ For database documentation [go here](/docs/database.md)
 1. Checkout `main` branch for `CDCgov/trusted-intermediary`
 2. Edit the `app/src/main/java/gov/hhs/cdc/trustedintermediary/etor/EtorDomainRegistration.java` file and replace:
    ```Java
-   │ 66 │        if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
-   │ 67 │            ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
-   │ 68 │        } else {
-   │ 69 │            ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
-   │ 70 │        }
+if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
+   ApplicationContext.register(RSEndpointClient.class, MockRSEndpointClient.getInstance());
+} else {
+   ApplicationContext.register(RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
+   ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
+}
    ```
    with:
    ```Java
-   │ 66 │        ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
+ApplicationContext.register(RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
+ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
    ```
 3. Run TI with `REPORT_STREAM_URL_PREFIX=http://localhost:7071 ./gradlew clean app:run`
 
