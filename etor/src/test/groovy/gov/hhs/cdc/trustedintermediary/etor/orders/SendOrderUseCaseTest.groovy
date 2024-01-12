@@ -9,7 +9,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import spock.lang.Specification
 
-class SendOrderUsecaseTest extends Specification {
+class SendOrderUseCaseTest extends Specification {
 
     def mockOrchestrator = Mock(PartnerMetadataOrchestrator)
     def mockConverter = Mock(OrderConverter)
