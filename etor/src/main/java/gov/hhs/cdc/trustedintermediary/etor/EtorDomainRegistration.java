@@ -156,23 +156,27 @@ public class EtorDomainRegistration implements DomainConnector {
             logger.logError("Missing required header or empty: RecordId");
         }
 
+        var markMetadataAsFailed = false;
         try {
             orders = orderController.parseOrders(request);
             sendOrderUseCase.convertAndSend(orders, receivedSubmissionId);
         } catch (FhirParseException e) {
             logger.logError("Unable to parse order request", e);
-            try {
-                partnerMetadataOrchestrator.setMetadataStatus(
-                        receivedSubmissionId, PartnerMetadataStatus.FAILED);
-            } catch (PartnerMetadataException innerE) {
-                logger.logError("Unable to update metadata status", innerE);
-                // possible domain response?
-            }
+            markMetadataAsFailed = true;
             return domainResponseHelper.constructErrorResponse(400, e);
         } catch (UnableToSendOrderException e) {
             logger.logError("Unable to send order", e);
-            // setMetadataStatus(receivedSubmissionId)
+            markMetadataAsFailed = true;
             return domainResponseHelper.constructErrorResponse(400, e);
+        } finally {
+            if (markMetadataAsFailed) {
+                try {
+                    partnerMetadataOrchestrator.setMetadataStatus(
+                            receivedSubmissionId, PartnerMetadataStatus.FAILED);
+                } catch (PartnerMetadataException innerE) {
+                    logger.logError("Unable to update metadata status", innerE);
+                }
+            }
         }
 
         OrderResponse orderResponse = new OrderResponse(orders);
