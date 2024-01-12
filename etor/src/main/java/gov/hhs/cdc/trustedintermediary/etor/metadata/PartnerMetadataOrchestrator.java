@@ -142,6 +142,33 @@ public class PartnerMetadataOrchestrator {
         return Optional.of(partnerMetadata);
     }
 
+    public void setMetadataStatus(String submissionId, PartnerMetadataStatus metadataStatus)
+            throws PartnerMetadataException {
+        if (submissionId == null) {
+            return;
+        }
+
+        Optional<PartnerMetadata> optionalPartnerMetadata =
+                partnerMetadataStorage.readMetadata(submissionId);
+        if (optionalPartnerMetadata.isEmpty()) {
+            logger.logWarning("Metadata not found for submissionId: {}", submissionId);
+            return;
+        }
+
+        PartnerMetadata partnerMetadata = optionalPartnerMetadata.get();
+
+        if (partnerMetadata.deliveryStatus().equals(metadataStatus)) {
+            return;
+        }
+
+        logger.logInfo(
+                "Updating metadata delivery status {} with submissionId: {}",
+                metadataStatus,
+                submissionId);
+        partnerMetadata = partnerMetadata.withDeliveryStatus(metadataStatus);
+        partnerMetadataStorage.saveMetadata(partnerMetadata);
+    }
+
     String getReceiverName(String responseBody) throws FormatterProcessingException {
         // the expected json structure for the response is:
         // {
@@ -173,32 +200,5 @@ public class PartnerMetadataOrchestrator {
         }
 
         return organizationId + "." + service;
-    }
-
-    public void setMetadataStatus(String submissionId, PartnerMetadataStatus metadataStatus)
-            throws PartnerMetadataException {
-        if (submissionId == null) {
-            return;
-        }
-
-        Optional<PartnerMetadata> optionalPartnerMetadata =
-                partnerMetadataStorage.readMetadata(submissionId);
-        if (optionalPartnerMetadata.isEmpty()) {
-            logger.logWarning("Metadata not found for submissionId: {}", submissionId);
-            return;
-        }
-
-        PartnerMetadata partnerMetadata = optionalPartnerMetadata.get();
-
-        if (partnerMetadata.deliveryStatus().equals(metadataStatus)) {
-            return;
-        }
-
-        logger.logInfo(
-                "Updating metadata delivery status {} with submissionId: {}",
-                metadataStatus,
-                submissionId);
-        partnerMetadata = partnerMetadata.withDeliveryStatus(metadataStatus);
-        partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 }
