@@ -175,7 +175,8 @@ public class PartnerMetadataOrchestrator {
         return organizationId + "." + service;
     }
 
-    public void setMetadataStatus (String submissionId, PartnerMetadataStatus metadataStatus) throws PartnerMetadataException {
+    public void setMetadataStatus(String submissionId, PartnerMetadataStatus metadataStatus)
+            throws PartnerMetadataException {
         if (submissionId == null) {
             return;
         }
@@ -183,8 +184,7 @@ public class PartnerMetadataOrchestrator {
         Optional<PartnerMetadata> optionalPartnerMetadata =
                 partnerMetadataStorage.readMetadata(submissionId);
         if (optionalPartnerMetadata.isEmpty()) {
-            logger.logWarning(
-                    "Metadata not found for submissionId: {}", submissionId);
+            logger.logWarning("Metadata not found for submissionId: {}", submissionId);
             return;
         }
 
@@ -194,7 +194,10 @@ public class PartnerMetadataOrchestrator {
             return;
         }
 
-        logger.logInfo("Updating metadata delivery status {} with submissionId: {}", metadataStatus, submissionId);
+        logger.logInfo(
+                "Updating metadata delivery status {} with submissionId: {}",
+                metadataStatus,
+                submissionId);
         partnerMetadata = partnerMetadata.withDeliveryStatus(metadataStatus);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }

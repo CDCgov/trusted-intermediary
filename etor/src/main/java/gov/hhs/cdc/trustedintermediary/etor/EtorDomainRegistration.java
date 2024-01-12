@@ -15,6 +15,7 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
 import gov.hhs.cdc.trustedintermediary.etor.operationoutcomes.FhirMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController;
@@ -160,11 +161,17 @@ public class EtorDomainRegistration implements DomainConnector {
             sendOrderUseCase.convertAndSend(orders, receivedSubmissionId);
         } catch (FhirParseException e) {
             logger.logError("Unable to parse order request", e);
-            //helper
+            try {
+                partnerMetadataOrchestrator.setMetadataStatus(
+                        receivedSubmissionId, PartnerMetadataStatus.FAILED);
+            } catch (PartnerMetadataException innerE) {
+                logger.logError("Unable to update metadata status", innerE);
+                // possible domain response?
+            }
             return domainResponseHelper.constructErrorResponse(400, e);
         } catch (UnableToSendOrderException e) {
             logger.logError("Unable to send order", e);
-            //helper
+            // setMetadataStatus(receivedSubmissionId)
             return domainResponseHelper.constructErrorResponse(400, e);
         }
 
