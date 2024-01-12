@@ -3,7 +3,6 @@ package gov.hhs.cdc.trustedintermediary.external.database;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
-import gov.hhs.cdc.trustedintermediary.wrappers.DbDao;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.sql.SQLException;
 import java.util.Optional;
@@ -45,7 +44,8 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                     metadata.sender(),
                     metadata.receiver(),
                     metadata.hash(),
-                    metadata.timeReceived());
+                    metadata.timeReceived(),
+                    metadata.deliveryStatus());
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error saving metadata", e);
         }

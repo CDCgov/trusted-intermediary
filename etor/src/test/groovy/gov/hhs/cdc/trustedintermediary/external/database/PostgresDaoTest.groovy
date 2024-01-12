@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.database
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureClient
 import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager
 import spock.lang.Specification
@@ -72,7 +73,7 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PostgresDao.getInstance().upsertMetadata("mock_id_receiver", "mock_id_sender", "mock_sender", "mock_receiver", "mock_hash", Instant.now())
+        PostgresDao.getInstance().upsertMetadata("mock_id_receiver", "mock_id_sender", "mock_sender", "mock_receiver", "mock_hash", Instant.now(), PartnerMetadataStatus.PENDING)
 
         then:
         1 * mockPreparedStatement.executeUpdate()
@@ -87,7 +88,7 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PostgresDao.getInstance().upsertMetadata("mock_id_receiver", "mock_id_sender", "mock_sender", "mock_receiver", "mock_hash", Instant.now())
+        PostgresDao.getInstance().upsertMetadata("mock_id_receiver", "mock_id_sender", "mock_sender", "mock_receiver", "mock_hash", Instant.now(), PartnerMetadataStatus.DELIVERED)
 
         then:
         thrown(SQLException)
@@ -102,7 +103,7 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PostgresDao.getInstance().upsertMetadata("mock_id_receiver", "mock_id_sender", "mock_sender", "mock_receiver", "mock_hash", null)
+        PostgresDao.getInstance().upsertMetadata("mock_id_receiver", "mock_id_sender", "mock_sender", "mock_receiver", "mock_hash", null, PartnerMetadataStatus.DELIVERED)
 
         then:
         mockPreparedStatement.setTimestamp(_ as Integer, _) >> { Integer parameterIndex, Timestamp timestamp ->
@@ -117,7 +118,7 @@ class PostgresDaoTest extends Specification {
         mockPreparedStatement.executeQuery() >> mockResultSet
         mockResultSet.next() >> true
         mockResultSet.getTimestamp(_ as String) >> Timestamp.from(Instant.now())
-
+        mockResultSet.getString("delivery_status") >> "DELIVERED"
         TestApplicationContext.register(SqlDriverManager, mockDriver)
         TestApplicationContext.injectRegisteredImplementations()
 
@@ -170,7 +171,8 @@ class PostgresDaoTest extends Specification {
         Timestamp timestampForMock = Timestamp.from(Instant.parse("2024-01-03T15:45:33.30Z"))
         Instant timeReceived = timestampForMock.toInstant()
         def hash = sender.hashCode().toString()
-        def expected = new PartnerMetadata(receivedMessageId, sentMessageId, sender, null, timeReceived, hash)
+        def status = PartnerMetadataStatus.PENDING
+        def expected = new PartnerMetadata(receivedMessageId, sentMessageId, sender, null, timeReceived, hash, status)
 
         mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
@@ -181,6 +183,7 @@ class PostgresDaoTest extends Specification {
         mockResultSet.getString("receiver") >> null
         mockResultSet.getTimestamp("time_received") >> timestampForMock
         mockResultSet.getString("hash_of_order") >> hash
+        mockResultSet.getString("delivery_status") >> status.toString()
         mockPreparedStatement.executeQuery() >> mockResultSet
 
         TestApplicationContext.register(SqlDriverManager, mockDriver)
@@ -200,7 +203,7 @@ class PostgresDaoTest extends Specification {
         mockPreparedStatement.executeQuery() >> mockResultSet
         mockResultSet.next() >> true
         mockResultSet.getTimestamp("time_received") >> null
-
+        mockResultSet.getString("delivery_status") >> "DELIVERED"
         TestApplicationContext.register(SqlDriverManager, mockDriver)
         TestApplicationContext.injectRegisteredImplementations()
 

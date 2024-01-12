@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.localfile
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
@@ -23,7 +24,7 @@ class FilePartnerMetadataStorageTest extends Specification {
         given:
         def expectedReceivedSubmissionId = "receivedSubmissionId"
         def expectedSentSubmissionId = "receivedSubmissionId"
-        PartnerMetadata metadata = new PartnerMetadata(expectedReceivedSubmissionId, expectedSentSubmissionId, "sender", "receiver", Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd")
+        PartnerMetadata metadata = new PartnerMetadata(expectedReceivedSubmissionId, expectedSentSubmissionId, "sender", "receiver", Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd", PartnerMetadataStatus.DELIVERED)
 
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
@@ -38,7 +39,7 @@ class FilePartnerMetadataStorageTest extends Specification {
 
     def "saveMetadata throws PartnerMetadataException when unable to save file"() {
         given:
-        PartnerMetadata metadata = new PartnerMetadata("receivedSubmissionId", "sentSubmissionId","sender", "receiver", Instant.now(), "abcd")
+        PartnerMetadata metadata = new PartnerMetadata("receivedSubmissionId", "sentSubmissionId","sender", "receiver", Instant.now(), "abcd", PartnerMetadataStatus.DELIVERED)
 
         def mockFormatter = Mock(Formatter)
         mockFormatter.convertToJsonString(_ as PartnerMetadata) >> {throw new FormatterProcessingException("error", new Exception())}

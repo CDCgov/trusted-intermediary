@@ -4,7 +4,7 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage
-import gov.hhs.cdc.trustedintermediary.wrappers.DbDao
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
 import spock.lang.Specification
 
 import java.sql.SQLException
@@ -28,7 +28,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
     def "readMetadata happy path works"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
-        def mockMetadata = new PartnerMetadata(receivedSubmissionId, "sentSubmissionId", "sender", "receiver", Instant.now(), "hash")
+        def mockMetadata = new PartnerMetadata(receivedSubmissionId, "sentSubmissionId", "sender", "receiver", Instant.now(), "hash", PartnerMetadataStatus.PENDING)
         def expectedResult = Optional.of(mockMetadata)
 
         mockDao.fetchMetadata(_ as String) >> mockMetadata
@@ -61,7 +61,8 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 "sender",
                 "receiver",
                 Instant.now(),
-                "hash"
+                "hash",
+                PartnerMetadataStatus.PENDING
                 )
 
         when:
@@ -74,7 +75,8 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 mockMetadata.sender(),
                 mockMetadata.receiver(),
                 mockMetadata.hash(),
-                mockMetadata.timeReceived()
+                mockMetadata.timeReceived(),
+                mockMetadata.deliveryStatus()
                 )
     }
 
@@ -87,7 +89,8 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 "sender",
                 "receiver",
                 Instant.now(),
-                "hash"
+                "hash",
+                PartnerMetadataStatus.FAILED
                 )
 
         mockDao.upsertMetadata(
@@ -96,7 +99,8 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 mockMetadata.sender(),
                 mockMetadata.receiver(),
                 mockMetadata.hash(),
-                mockMetadata.timeReceived()
+                mockMetadata.timeReceived(),
+                mockMetadata.deliveryStatus()
                 ) >> { throw new SQLException("Something went wrong!") }
 
         when:

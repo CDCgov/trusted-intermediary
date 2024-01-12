@@ -6,6 +6,7 @@ import com.azure.storage.blob.BlobClient
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import java.time.Instant
@@ -27,8 +28,9 @@ class AzureStorageAccountPartnerMetadataStorageTest extends Specification {
         def expectedReceiver = "receiver"
         def expectedTimestamp = Instant.parse("2023-12-04T18:51:48.941875Z")
         def expectedHash = "abcd"
+        PartnerMetadataStatus status = PartnerMetadataStatus.PENDING
 
-        PartnerMetadata expectedMetadata = new PartnerMetadata(expectedReceivedSubmissionId, expectedSentSubmissionId, expectedSender, expectedReceiver, expectedTimestamp, expectedHash)
+        PartnerMetadata expectedMetadata = new PartnerMetadata(expectedReceivedSubmissionId, expectedSentSubmissionId, expectedSender, expectedReceiver, expectedTimestamp, expectedHash, status)
 
         String simulatedMetadataJson = """{
             "receivedSubmissionId": "${expectedReceivedSubmissionId}",
@@ -36,7 +38,8 @@ class AzureStorageAccountPartnerMetadataStorageTest extends Specification {
             "sender": "${expectedSender}",
             "receiver": "${expectedReceiver}",
             "timeReceived": "${expectedTimestamp}",
-            "hash": "${expectedHash}"
+            "hash": "${expectedHash}",
+            "deliveryStatus": "${status}"
         }"""
 
         def mockBlobClient = Mock(BlobClient)
@@ -97,7 +100,7 @@ class AzureStorageAccountPartnerMetadataStorageTest extends Specification {
 
     def "successfully save metadata"() {
         given:
-        PartnerMetadata partnerMetadata = new PartnerMetadata("receivedSubmissionId", "sentSubmissionId", "sender", "receiver", Instant.now(), "abcd")
+        PartnerMetadata partnerMetadata = new PartnerMetadata("receivedSubmissionId", "sentSubmissionId", "sender", "receiver", Instant.now(), "abcd", PartnerMetadataStatus.DELIVERED)
 
         def mockBlobClient = Mock(BlobClient)
         def azureClient = Mock(AzureClient)
@@ -119,7 +122,7 @@ class AzureStorageAccountPartnerMetadataStorageTest extends Specification {
 
     def "failed to save metadata"() {
         given:
-        PartnerMetadata partnerMetadata = new PartnerMetadata("receivedSubmissionId", "sentSubmissionId", "sender", "receiver", Instant.now(), "abcd")
+        PartnerMetadata partnerMetadata = new PartnerMetadata("receivedSubmissionId", "sentSubmissionId", "sender", "receiver", Instant.now(), "abcd", PartnerMetadataStatus.DELIVERED)
 
         def mockBlobClient = Mock(BlobClient)
         mockBlobClient.upload(_ as BinaryData, true) >> { throw new AzureException("upload failed") }

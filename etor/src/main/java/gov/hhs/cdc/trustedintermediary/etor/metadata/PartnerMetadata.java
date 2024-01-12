@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata;
 
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
 import java.time.Instant;
 
 /**
@@ -11,6 +12,7 @@ import java.time.Instant;
  * @param receiver The name of the receiver of the message.
  * @param timeReceived The time the message was received.
  * @param hash The hash of the message.
+ * @param deliveryStatus the status of the message based on an enum
  */
 public record PartnerMetadata(
         String receivedSubmissionId,
@@ -18,15 +20,27 @@ public record PartnerMetadata(
         String sender,
         String receiver,
         Instant timeReceived,
-        String hash) {
+        String hash,
+        PartnerMetadataStatus deliveryStatus) {
+
+    // Below is for defaulting status when null
+    public PartnerMetadata {
+        if (deliveryStatus == null) {
+            deliveryStatus = PartnerMetadataStatus.PENDING;
+        }
+    }
 
     public PartnerMetadata(
-            String receivedSubmissionId, String sender, Instant timeReceived, String hash) {
-        this(receivedSubmissionId, null, sender, null, timeReceived, hash);
+            String receivedSubmissionId,
+            String sender,
+            Instant timeReceived,
+            String hash,
+            PartnerMetadataStatus deliveryStatus) {
+        this(receivedSubmissionId, null, sender, null, timeReceived, hash, deliveryStatus);
     }
 
     public PartnerMetadata(String receivedSubmissionId, String hash) {
-        this(receivedSubmissionId, null, null, null, null, hash);
+        this(receivedSubmissionId, null, null, null, null, hash, null);
     }
 
     public PartnerMetadata withSentSubmissionId(String sentSubmissionId) {
@@ -36,7 +50,8 @@ public record PartnerMetadata(
                 this.sender,
                 this.receiver,
                 this.timeReceived,
-                this.hash);
+                this.hash,
+                this.deliveryStatus);
     }
 
     public PartnerMetadata withReceiver(String receiver) {
@@ -46,6 +61,7 @@ public record PartnerMetadata(
                 this.sender,
                 receiver,
                 this.timeReceived,
-                this.hash);
+                this.hash,
+                this.deliveryStatus);
     }
 }
