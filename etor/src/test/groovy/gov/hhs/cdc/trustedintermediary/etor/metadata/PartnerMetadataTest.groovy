@@ -74,7 +74,8 @@ class PartnerMetadataTest extends Specification {
         metadata.receiver() == null
         metadata.timeReceived() == null
         metadata.hash() == hash
-        metadata.deliveryStatus() == null
+        //Status should default to PENDING
+        metadata.deliveryStatus() == PartnerMetadataStatus.PENDING
     }
 
     def "test withSentSubmissionId and withReceiver to update PartnerMetadata"() {

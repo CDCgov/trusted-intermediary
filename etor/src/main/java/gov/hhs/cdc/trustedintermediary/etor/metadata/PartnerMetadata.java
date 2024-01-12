@@ -23,6 +23,13 @@ public record PartnerMetadata(
         String hash,
         PartnerMetadataStatus deliveryStatus) {
 
+    // Below is for defaulting status when null
+    public PartnerMetadata {
+        if (deliveryStatus == null) {
+            deliveryStatus = PartnerMetadataStatus.PENDING;
+        }
+    }
+
     public PartnerMetadata(
             String receivedSubmissionId,
             String sender,

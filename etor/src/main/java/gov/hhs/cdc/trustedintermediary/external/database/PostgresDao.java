@@ -143,11 +143,6 @@ public class PostgresDao implements DbDao {
                 timeReceived = timestamp.toInstant();
             }
 
-            String status =
-                    result.getString("delivery_status") != null
-                            ? result.getString("delivery_status")
-                            : "PENDING";
-
             return new PartnerMetadata(
                     result.getString("received_message_id"),
                     result.getString("sent_message_id"),
@@ -155,7 +150,7 @@ public class PostgresDao implements DbDao {
                     result.getString("receiver"),
                     timeReceived,
                     result.getString("hash_of_order"),
-                    PartnerMetadataStatus.valueOf(status));
+                    PartnerMetadataStatus.valueOf(result.getString("delivery_status")));
         }
     }
 }

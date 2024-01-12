@@ -171,7 +171,7 @@ class PostgresDaoTest extends Specification {
         Timestamp timestampForMock = Timestamp.from(Instant.parse("2024-01-03T15:45:33.30Z"))
         Instant timeReceived = timestampForMock.toInstant()
         def hash = sender.hashCode().toString()
-        def status = PartnerMetadataStatus.DELIVERED
+        def status = PartnerMetadataStatus.PENDING
         def expected = new PartnerMetadata(receivedMessageId, sentMessageId, sender, null, timeReceived, hash, status)
 
         mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
