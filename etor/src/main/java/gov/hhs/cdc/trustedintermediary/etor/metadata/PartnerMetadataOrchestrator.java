@@ -151,8 +151,9 @@ public class PartnerMetadataOrchestrator {
         Optional<PartnerMetadata> optionalPartnerMetadata =
                 partnerMetadataStorage.readMetadata(submissionId);
         if (optionalPartnerMetadata.isEmpty()) {
-            logger.logWarning("Metadata not found for submissionId: {}", submissionId);
-            return;
+            // there wasn't any metadata given the submission ID, so make one with the status
+            optionalPartnerMetadata =
+                    Optional.of(new PartnerMetadata(submissionId, metadataStatus));
         }
 
         PartnerMetadata partnerMetadata = optionalPartnerMetadata.get();
