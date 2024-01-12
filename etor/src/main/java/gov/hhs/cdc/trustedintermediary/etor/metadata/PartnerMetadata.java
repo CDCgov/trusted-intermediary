@@ -64,4 +64,15 @@ public record PartnerMetadata(
                 this.hash,
                 this.deliveryStatus);
     }
+
+    public PartnerMetadata withDeliveryStatus(PartnerMetadataStatus deliveryStatus) {
+        return new PartnerMetadata(
+                this.receivedSubmissionId,
+                this.sentSubmissionId,
+                this.sender,
+                this.receiver,
+                this.timeReceived,
+                this.hash,
+                deliveryStatus);
+    }
 }

@@ -160,9 +160,11 @@ public class EtorDomainRegistration implements DomainConnector {
             sendOrderUseCase.convertAndSend(orders, receivedSubmissionId);
         } catch (FhirParseException e) {
             logger.logError("Unable to parse order request", e);
+            //helper
             return domainResponseHelper.constructErrorResponse(400, e);
         } catch (UnableToSendOrderException e) {
             logger.logError("Unable to send order", e);
+            //helper
             return domainResponseHelper.constructErrorResponse(400, e);
         }
 
