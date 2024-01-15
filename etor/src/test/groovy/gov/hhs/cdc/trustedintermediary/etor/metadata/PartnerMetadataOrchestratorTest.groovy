@@ -265,6 +265,10 @@ class PartnerMetadataOrchestratorTest extends Specification {
         1 * mockPartnerMetadataStorage.saveMetadata(expectedMetadata)
     }
 
+    def "setMetadataStatus sets status to failed "(){
+
+    }
+
     def "getReceiverName returns correct receiver name from valid JSON response"() {
         given:
         def validJson = "{\"destinations\": [{\"organization_id\": \"org_id\", \"service\": \"service_name\"}]}"
@@ -327,4 +331,6 @@ class PartnerMetadataOrchestratorTest extends Specification {
         then:
         thrown(FormatterProcessingException)
     }
+
+
 }
