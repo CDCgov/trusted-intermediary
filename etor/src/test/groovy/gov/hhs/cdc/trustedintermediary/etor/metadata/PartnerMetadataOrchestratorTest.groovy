@@ -353,18 +353,22 @@ class PartnerMetadataOrchestratorTest extends Specification {
         }
     }
 
-    def "getReceiverName returns correct receiver name from valid JSON response"() {
+    def "getReceiverAndStatus returns correct status name and receiver name from valid JSON response"() {
         given:
-        def validJson = "{\"destinations\": [{\"organization_id\": \"org_id\", \"service\": \"service_name\"}]}"
+        def organization = "org_id"
+        def sender = "service_name"
+        def status = "Not Delivering"
+        def validJson = """{"overallStatus": "${status}", "destinations": [{"organization_id": "${organization}", "service": "${sender}"}]}"""
 
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def receiverName = PartnerMetadataOrchestrator.getInstance().getReceiverName(validJson)
+        def parsedResponse = PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(validJson)
 
         then:
-        receiverName == "org_id.service_name"
+        parsedResponse[0] == "${organization}.${sender}"
+        parsedResponse[1] == status
     }
 
     def "getReceiverName throws FormatterProcessingException or returns null for unexpected format response"() {
@@ -374,21 +378,21 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
         when:
         def invalidJson = "invalid JSON"
-        PartnerMetadataOrchestrator.getInstance().getReceiverName(invalidJson)
+        PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(invalidJson)
 
         then:
         thrown(FormatterProcessingException)
 
         when:
         def emptyJson = "{}"
-        PartnerMetadataOrchestrator.getInstance().getReceiverName(emptyJson)
+        PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(emptyJson)
 
         then:
         thrown(FormatterProcessingException)
 
         when:
         def jsonWithoutDestinations = "{\"someotherkey\": \"value\"}"
-        PartnerMetadataOrchestrator.getInstance().getReceiverName(jsonWithoutDestinations)
+        PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(jsonWithoutDestinations)
 
         then:
         thrown(FormatterProcessingException)
@@ -396,21 +400,21 @@ class PartnerMetadataOrchestratorTest extends Specification {
         when:
 
         def jsonWithEmptyDestinations = "{\"destinations\": []}"
-        def receiverName = PartnerMetadataOrchestrator.getInstance().getReceiverName(jsonWithEmptyDestinations)
+        def receiverName = PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(jsonWithEmptyDestinations)
 
         then:
         receiverName == null
 
         when:
         def jsonWithoutOrgId = "{\"destinations\":[{\"service\":\"service\"}]}"
-        PartnerMetadataOrchestrator.getInstance().getReceiverName(jsonWithoutOrgId)
+        PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(jsonWithoutOrgId)
 
         then:
         thrown(FormatterProcessingException)
 
         when:
         def jsonWithoutService = "{\"destinations\":[{\"organization_id\":\"org_id\"}]}"
-        PartnerMetadataOrchestrator.getInstance().getReceiverName(jsonWithoutService)
+        PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(jsonWithoutService)
 
         then:
         thrown(FormatterProcessingException)

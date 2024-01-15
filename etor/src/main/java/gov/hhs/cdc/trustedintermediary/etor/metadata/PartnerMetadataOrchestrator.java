@@ -131,8 +131,9 @@ public class PartnerMetadataOrchestrator {
                 String bearerToken = rsclient.getRsToken();
                 String responseBody =
                         rsclient.requestHistoryEndpoint(sentSubmissionId, bearerToken);
-                receiver = getReceiverName(responseBody);
-                rsStatus = getReportStreamStatus(responseBody);
+                var parsedResponseBody = getReceiverAndStatus(responseBody);
+                receiver = parsedResponseBody[0];
+                rsStatus = parsedResponseBody[1];
             } catch (ReportStreamEndpointClientException | FormatterProcessingException e) {
                 throw new PartnerMetadataException(
                         "Unable to retrieve metadata from RS history API", e);
@@ -175,9 +176,11 @@ public class PartnerMetadataOrchestrator {
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
-    String getReceiverName(String responseBody) throws FormatterProcessingException {
+    String[] getReceiverAndStatus(String responseBody) throws FormatterProcessingException {
         // the expected json structure for the response is:
         // {
+        //    ...
+        //    "overallStatus": "Waiting to Deliver",
         //    ...
         //    "destinations" : [ {
         //        ...
@@ -190,6 +193,7 @@ public class PartnerMetadataOrchestrator {
 
         String organizationId;
         String service;
+        String overallStatus;
         try {
             Map<String, Object> responseObject =
                     formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
@@ -197,6 +201,7 @@ public class PartnerMetadataOrchestrator {
             Map<?, ?> destination = (Map<?, ?>) destinations.get(0);
             organizationId = destination.get("organization_id").toString();
             service = destination.get("service").toString();
+            overallStatus = (String) responseObject.get("overallStatus");
         } catch (IndexOutOfBoundsException e) {
             // the destinations have not been determined yet by RS
             return null;
@@ -205,29 +210,7 @@ public class PartnerMetadataOrchestrator {
                     "Unable to extract receiver name from response due to unexpected format", e);
         }
 
-        return organizationId + "." + service;
-    }
-
-    String getReportStreamStatus(String responseBody) throws FormatterProcessingException {
-        // the expected json structure for the response is:
-        // {
-        //    ...
-        //    "overallStatus": "Waiting to Deliver",
-        //    ...
-        // }
-
-        String overallStatus;
-        try {
-            Map<String, Object> responseObject =
-                    formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
-            overallStatus = (String) responseObject.get("overallStatus");
-        } catch (Exception e) {
-            throw new FormatterProcessingException(
-                    "Unable to extract overallStatus from RS history response due to unexpected format",
-                    e);
-        }
-
-        return overallStatus;
+        return new String[] {organizationId + "." + service, overallStatus};
     }
 
     PartnerMetadataStatus ourStatusFromReportStreamStatus(String rsStatus) {
