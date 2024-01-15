@@ -150,16 +150,15 @@ public class PartnerMetadataOrchestrator {
 
         Optional<PartnerMetadata> optionalPartnerMetadata =
                 partnerMetadataStorage.readMetadata(submissionId);
+        PartnerMetadata partnerMetadata;
         if (optionalPartnerMetadata.isEmpty()) {
             // there wasn't any metadata given the submission ID, so make one with the status
-            optionalPartnerMetadata =
-                    Optional.of(new PartnerMetadata(submissionId, metadataStatus));
-        }
-
-        PartnerMetadata partnerMetadata = optionalPartnerMetadata.get();
-
-        if (partnerMetadata.deliveryStatus().equals(metadataStatus)) {
-            return;
+            partnerMetadata = new PartnerMetadata(submissionId, metadataStatus);
+        } else {
+            partnerMetadata = optionalPartnerMetadata.get();
+            if (partnerMetadata.deliveryStatus().equals(metadataStatus)) {
+                return;
+            }
         }
 
         logger.logInfo(
