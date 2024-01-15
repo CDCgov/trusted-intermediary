@@ -265,13 +265,20 @@ class PartnerMetadataOrchestratorTest extends Specification {
         1 * mockPartnerMetadataStorage.saveMetadata(expectedMetadata)
     }
 
-    def "setMetadataStatus sets status to failed "(){
+    def "setMetadataStatus sets status to Pending"(){
         given:
+        def submissionId = "13425"
+        def metadataStatus = PartnerMetadataStatus.PENDING
+        def optional = Optional.of(new PartnerMetadata("","","","",Instant.now(),"",PartnerMetadataStatus.FAILED))
+        mockPartnerMetadataStorage.readMetadata(submissionId) >> optional
 
         when:
+        PartnerMetadataOrchestrator.getInstance().setMetadataStatus(submissionId,metadataStatus)
 
         then:
-
+        1 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata) >> { PartnerMetadata partnerMetadata ->
+            assert partnerMetadata.deliveryStatus() == metadataStatus
+        }
     }
 
     def "getReceiverName returns correct receiver name from valid JSON response"() {
