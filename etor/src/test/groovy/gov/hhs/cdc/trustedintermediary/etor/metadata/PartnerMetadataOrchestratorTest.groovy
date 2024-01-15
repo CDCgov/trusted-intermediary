@@ -266,6 +266,12 @@ class PartnerMetadataOrchestratorTest extends Specification {
     }
 
     def "setMetadataStatus sets status to failed "(){
+        given:
+
+        when:
+
+        then:
+
     }
 
     def "getReceiverName returns correct receiver name from valid JSON response"() {
