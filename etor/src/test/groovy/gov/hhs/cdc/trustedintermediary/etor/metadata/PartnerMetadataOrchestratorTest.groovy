@@ -427,4 +427,40 @@ class PartnerMetadataOrchestratorTest extends Specification {
         then:
         thrown(FormatterProcessingException)
     }
+
+    def "ourStatusFromReportStreamStatus returns FAILED"() {
+        when:
+        def ourStatus = PartnerMetadataOrchestrator.getInstance().ourStatusFromReportStreamStatus("Error")
+
+        then:
+        ourStatus == PartnerMetadataStatus.FAILED
+
+        when:
+        ourStatus = PartnerMetadataOrchestrator.getInstance().ourStatusFromReportStreamStatus("Not Delivering")
+
+        then:
+        ourStatus == PartnerMetadataStatus.FAILED
+    }
+
+    def "ourStatusFromReportStreamStatus returns DELIVERED"() {
+        when:
+        def ourStatus = PartnerMetadataOrchestrator.getInstance().ourStatusFromReportStreamStatus("Delivered")
+
+        then:
+        ourStatus == PartnerMetadataStatus.DELIVERED
+    }
+
+    def "ourStatusFromReportStreamStatus returns PENDING"() {
+        when:
+        def ourStatus = PartnerMetadataOrchestrator.getInstance().ourStatusFromReportStreamStatus("Waiting to Deliver")
+
+        then:
+        ourStatus == PartnerMetadataStatus.PENDING
+
+        when:
+        ourStatus = PartnerMetadataOrchestrator.getInstance().ourStatusFromReportStreamStatus("DogCow")
+
+        then:
+        ourStatus == PartnerMetadataStatus.PENDING
+    }
 }
