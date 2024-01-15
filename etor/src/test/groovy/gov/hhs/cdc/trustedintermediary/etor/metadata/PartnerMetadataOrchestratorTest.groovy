@@ -295,6 +295,14 @@ class PartnerMetadataOrchestratorTest extends Specification {
         0 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata)
     }
 
+    def "setMetadataStatus doesn't update when submissionId is null"(){
+        when:
+        PartnerMetadataOrchestrator.getInstance().setMetadataStatus(null,PartnerMetadataStatus.DELIVERED)
+
+        then:
+        0 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata)
+    }
+
     def "setMetadataStatus sets status to Pending when there is no metadata"(){
         given:
         def submissionId = "13425"
