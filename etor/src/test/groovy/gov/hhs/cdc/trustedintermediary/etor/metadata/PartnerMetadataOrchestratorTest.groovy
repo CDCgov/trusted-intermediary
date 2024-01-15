@@ -266,7 +266,6 @@ class PartnerMetadataOrchestratorTest extends Specification {
     }
 
     def "setMetadataStatus sets status to failed "(){
-
     }
 
     def "getReceiverName returns correct receiver name from valid JSON response"() {
@@ -331,6 +330,4 @@ class PartnerMetadataOrchestratorTest extends Specification {
         then:
         thrown(FormatterProcessingException)
     }
-
-
 }
