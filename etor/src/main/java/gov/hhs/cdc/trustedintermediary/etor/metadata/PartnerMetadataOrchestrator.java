@@ -225,6 +225,8 @@ public class PartnerMetadataOrchestrator {
             return PartnerMetadataStatus.PENDING;
         }
 
+        // based off of the Status enum in the SubmissionHistory.kt code in RS
+        // https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/src/main/kotlin/history/SubmissionHistory.kt
         return switch (rsStatus) {
             case "Error", "Not Delivering" -> PartnerMetadataStatus.FAILED;
             case "Delivered" -> PartnerMetadataStatus.DELIVERED;
