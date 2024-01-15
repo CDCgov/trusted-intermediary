@@ -267,6 +267,37 @@ class PartnerMetadataOrchestratorTest extends Specification {
         1 * mockPartnerMetadataStorage.saveMetadata(expectedMetadata)
     }
 
+    def "getMetadata gets status if still pending in metadata"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def sentSubmissionId = "sentSubmissionId"
+        def sender = "senderName"
+        def receiver = "org.service"
+        def timestamp = Instant.now()
+        def hashCode = "123"
+        def bearerToken = "token"
+        def rsHistoryApiResponse = "{\"destinations\": [{\"organization_id\": \"org\", \"service\": \"service\"}]}"
+        def missingReceiverMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timestamp, hashCode, PartnerMetadataStatus.PENDING)
+        def expectedMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timestamp, hashCode, PartnerMetadataStatus.FAILED)
+
+        mockClient.getRsToken() >> bearerToken
+        mockClient.requestHistoryEndpoint(sentSubmissionId, bearerToken) >> rsHistoryApiResponse
+        mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> [
+            overallStatus: "Not Delivering",
+            destinations: [
+                [organization_id: "org", service: "service"]
+            ]]
+
+        when:
+        Optional<PartnerMetadata> result = PartnerMetadataOrchestrator.getInstance().getMetadata(receivedSubmissionId)
+
+        then:
+        result.isPresent()
+        result.get() == expectedMetadata
+        1 * mockPartnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(missingReceiverMetadata)
+        1 * mockPartnerMetadataStorage.saveMetadata(expectedMetadata)
+    }
+
     def "setMetadataStatus sets status to Pending"(){
         given:
         def submissionId = "13425"
