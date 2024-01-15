@@ -191,26 +191,33 @@ public class PartnerMetadataOrchestrator {
         //    ...
         // }
 
-        String organizationId;
-        String service;
-        String overallStatus;
+        Map<String, Object> responseObject =
+                formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
+
+        String receiver;
         try {
-            Map<String, Object> responseObject =
-                    formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
             ArrayList<?> destinations = (ArrayList<?>) responseObject.get("destinations");
             Map<?, ?> destination = (Map<?, ?>) destinations.get(0);
-            organizationId = destination.get("organization_id").toString();
-            service = destination.get("service").toString();
-            overallStatus = (String) responseObject.get("overallStatus");
+            String organizationId = destination.get("organization_id").toString();
+            String service = destination.get("service").toString();
+            receiver = organizationId + "." + service;
         } catch (IndexOutOfBoundsException e) {
             // the destinations have not been determined yet by RS
-            return null;
+            receiver = null;
         } catch (Exception e) {
             throw new FormatterProcessingException(
                     "Unable to extract receiver name from response due to unexpected format", e);
         }
 
-        return new String[] {organizationId + "." + service, overallStatus};
+        String overallStatus;
+        try {
+            overallStatus = (String) responseObject.get("overallStatus");
+        } catch (Exception e) {
+            throw new FormatterProcessingException(
+                    "Unable to extract overallStatus from response due to unexpected format", e);
+        }
+
+        return new String[] {receiver, overallStatus};
     }
 
     PartnerMetadataStatus ourStatusFromReportStreamStatus(String rsStatus) {

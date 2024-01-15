@@ -371,7 +371,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         parsedResponse[1] == status
     }
 
-    def "getReceiverName throws FormatterProcessingException or returns null for unexpected format response"() {
+    def "getReceiverAndStatus throws FormatterProcessingException or returns null for unexpected format response"() {
         given:
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
@@ -400,10 +400,18 @@ class PartnerMetadataOrchestratorTest extends Specification {
         when:
 
         def jsonWithEmptyDestinations = "{\"destinations\": []}"
-        def receiverName = PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(jsonWithEmptyDestinations)
+        def parsedData = PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(jsonWithEmptyDestinations)
 
         then:
-        receiverName == null
+        parsedData[0] == null
+
+        when:
+
+        def jsonWithNoStatus = "{\"destinations\": []}"
+        parsedData = PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(jsonWithNoStatus)
+
+        then:
+        parsedData[1] == null
 
         when:
         def jsonWithoutOrgId = "{\"destinations\":[{\"service\":\"service\"}]}"
