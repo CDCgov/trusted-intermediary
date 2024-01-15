@@ -221,6 +221,10 @@ public class PartnerMetadataOrchestrator {
     }
 
     PartnerMetadataStatus ourStatusFromReportStreamStatus(String rsStatus) {
+        if (rsStatus == null) {
+            return PartnerMetadataStatus.PENDING;
+        }
+
         return switch (rsStatus) {
             case "Error", "Not Delivering" -> PartnerMetadataStatus.FAILED;
             case "Delivered" -> PartnerMetadataStatus.DELIVERED;

@@ -462,5 +462,11 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
         then:
         ourStatus == PartnerMetadataStatus.PENDING
+
+        when:
+        ourStatus = PartnerMetadataOrchestrator.getInstance().ourStatusFromReportStreamStatus(null)
+
+        then:
+        ourStatus == PartnerMetadataStatus.PENDING
     }
 }
