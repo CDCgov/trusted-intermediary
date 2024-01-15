@@ -222,17 +222,19 @@ For database documentation [go here](/docs/database.md)
 1. Checkout `main` branch for `CDCgov/trusted-intermediary`
 2. Edit the `app/src/main/java/gov/hhs/cdc/trustedintermediary/etor/EtorDomainRegistration.java` file and replace:
    ```Java
-   │ 66 │        if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
-   │ 67 │            ApplicationContext.register(OrderSender.class, LocalFileOrderSender.getInstance());
-   │ 68 │        } else {
-   │ 69 │            ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
-   │ 70 │        }
+   if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
+      ApplicationContext.register(RSEndpointClient.class, MockRSEndpointClient.getInstance());
+   } else {
+      ApplicationContext.register(RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
+      ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
+   }
    ```
    with:
    ```Java
-   │ 66 │        ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
+   ApplicationContext.register(RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
+   ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
    ```
-3. Run TI with `REPORT_STREAM_URL_PREFIX=http://localhost:7071 ./gradlew clean app:run`
+3. Run TI with `./gradlew clean app:run`
 
 #### ReportStream Setup
 
@@ -241,8 +243,8 @@ After enabling this option it is recommended that you delete all docker images a
 with this option enabled.
 
 1. Checkout `master` branch for `CDCgov/prime-reportstream`
-2. Follow [the steps in the ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/docs-deprecated/getting-started/getting-started.md#building-the-baseline) to build the baseline
-3. CD to `prime-reportstream/prime-router`
+2. CD to `prime-reportstream/prime-router`
+3. Run the `./cleanslate` script. For more information you can refer to the [ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/docs-deprecated/getting-started/getting-started.md#building-the-baseline)
 4. Run RS with `docker compose up --build -d`
 5. Run `./gradlew resetDB && ./gradlew reloadTable && ./gradlew reloadSettings`
 6. Edit `prime-router/settings/staging/0149-etor.yml`
