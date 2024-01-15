@@ -43,6 +43,10 @@ public record PartnerMetadata(
         this(receivedSubmissionId, null, null, null, null, hash, null);
     }
 
+    public PartnerMetadata(String receivedSubmissionId, PartnerMetadataStatus deliveryStatus) {
+        this(receivedSubmissionId, null, null, null, null, null, deliveryStatus);
+    }
+
     public PartnerMetadata withSentSubmissionId(String sentSubmissionId) {
         return new PartnerMetadata(
                 this.receivedSubmissionId,
@@ -63,5 +67,16 @@ public record PartnerMetadata(
                 this.timeReceived,
                 this.hash,
                 this.deliveryStatus);
+    }
+
+    public PartnerMetadata withDeliveryStatus(PartnerMetadataStatus deliveryStatus) {
+        return new PartnerMetadata(
+                this.receivedSubmissionId,
+                this.sentSubmissionId,
+                this.sender,
+                this.receiver,
+                this.timeReceived,
+                this.hash,
+                deliveryStatus);
     }
 }

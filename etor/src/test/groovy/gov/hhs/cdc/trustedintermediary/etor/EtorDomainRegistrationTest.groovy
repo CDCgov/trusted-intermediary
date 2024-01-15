@@ -213,6 +213,9 @@ class EtorDomainRegistrationTest extends Specification {
         mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as Exception) >> new DomainResponse(expectedStatusCode)
         TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
 
+        def mockPartnerMetadataOrchestrator = Mock(PartnerMetadataOrchestrator)
+        TestApplicationContext.register(PartnerMetadataOrchestrator,mockPartnerMetadataOrchestrator)
+
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -240,6 +243,49 @@ class EtorDomainRegistrationTest extends Specification {
         def mockResponseHelper = Mock(DomainResponseHelper)
         mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as Exception) >> new DomainResponse(expectedStatusCode)
         TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
+
+        def mockPartnerMetadataOrchestrator = Mock(PartnerMetadataOrchestrator)
+        TestApplicationContext.register(PartnerMetadataOrchestrator,mockPartnerMetadataOrchestrator)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def res = domainRegistration.handleOrders(request)
+        def actualStatusCode = res.statusCode
+
+        then:
+        actualStatusCode == expectedStatusCode
+    }
+
+    def "handleOrders generates an error response when not being able to send the order even when setMetadataStatus throws an exception"() {
+        given:
+        def expectedStatusCode = 400
+
+        def request = new DomainRequest()
+        request.headers["recordid"] = "recordId"
+
+        def domainRegistration = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
+
+        def mockController = Mock(OrderController)
+        mockController.parseOrders(_ as DomainRequest) >> new OrderMock<?>(null, null, null)
+        TestApplicationContext.register(OrderController, mockController)
+
+        def mockUseCase = Mock(SendOrderUseCase)
+        mockUseCase.convertAndSend(_ as Order<?>, _ as String) >> {
+            throw new UnableToSendOrderException("error", new NullPointerException())
+        }
+        TestApplicationContext.register(SendOrderUseCase, mockUseCase)
+
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as UnableToSendOrderException) >> new DomainResponse(expectedStatusCode)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
+
+        def mockPartnerMetadataOrchestrator = Mock(PartnerMetadataOrchestrator)
+        mockPartnerMetadataOrchestrator.setMetadataStatus(_, PartnerMetadataStatus.FAILED) >> {
+            throw new PartnerMetadataException("error")
+        }
+        TestApplicationContext.register(PartnerMetadataOrchestrator,mockPartnerMetadataOrchestrator)
 
         TestApplicationContext.injectRegisteredImplementations()
 

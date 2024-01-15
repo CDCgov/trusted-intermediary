@@ -265,6 +265,61 @@ class PartnerMetadataOrchestratorTest extends Specification {
         1 * mockPartnerMetadataStorage.saveMetadata(expectedMetadata)
     }
 
+    def "setMetadataStatus sets status to Pending"(){
+        given:
+        def submissionId = "13425"
+        def metadataStatus = PartnerMetadataStatus.PENDING
+        def optional = Optional.of(new PartnerMetadata("","","","",Instant.now(),"",PartnerMetadataStatus.FAILED))
+        mockPartnerMetadataStorage.readMetadata(submissionId) >> optional
+
+        when:
+        PartnerMetadataOrchestrator.getInstance().setMetadataStatus(submissionId,metadataStatus)
+
+        then:
+        1 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata) >> { PartnerMetadata partnerMetadata ->
+            assert partnerMetadata.deliveryStatus() == metadataStatus
+        }
+    }
+
+    def "setMetadataStatus doesn't update status if status is the same"(){
+        given:
+        def submissionId = "13425"
+        def metadataStatus = PartnerMetadataStatus.PENDING
+        def optional = Optional.of(new PartnerMetadata("","","","",Instant.now(),"",metadataStatus))
+        mockPartnerMetadataStorage.readMetadata(submissionId) >> optional
+
+        when:
+        PartnerMetadataOrchestrator.getInstance().setMetadataStatus(submissionId,metadataStatus)
+
+        then:
+        0 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata)
+    }
+
+    def "setMetadataStatus doesn't update when submissionId is null"(){
+        when:
+        PartnerMetadataOrchestrator.getInstance().setMetadataStatus(null,PartnerMetadataStatus.DELIVERED)
+
+        then:
+        0 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata)
+    }
+
+    def "setMetadataStatus sets status to Pending when there is no metadata"(){
+        given:
+        def submissionId = "13425"
+        def metadataStatus = PartnerMetadataStatus.DELIVERED
+        def optional = Optional.empty()
+        mockPartnerMetadataStorage.readMetadata(submissionId) >> optional
+
+        when:
+        PartnerMetadataOrchestrator.getInstance().setMetadataStatus(submissionId,metadataStatus)
+
+        then:
+        1 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata) >> { PartnerMetadata partnerMetadata ->
+            assert partnerMetadata.deliveryStatus() == metadataStatus
+            assert partnerMetadata.receivedSubmissionId() == submissionId
+        }
+    }
+
     def "getReceiverName returns correct receiver name from valid JSON response"() {
         given:
         def validJson = "{\"destinations\": [{\"organization_id\": \"org_id\", \"service\": \"service_name\"}]}"

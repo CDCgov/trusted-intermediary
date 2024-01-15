@@ -78,6 +78,24 @@ class PartnerMetadataTest extends Specification {
         metadata.deliveryStatus() == PartnerMetadataStatus.PENDING
     }
 
+    def "test constructor with only received submission ID and status"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def deliverStatus = PartnerMetadataStatus.DELIVERED
+
+        when:
+        def metadata = new PartnerMetadata(receivedSubmissionId, deliverStatus)
+
+        then:
+        metadata.receivedSubmissionId() == receivedSubmissionId
+        metadata.sentSubmissionId() == null
+        metadata.sender() == null
+        metadata.receiver() == null
+        metadata.timeReceived() == null
+        metadata.hash() == null
+        metadata.deliveryStatus() == deliverStatus
+    }
+
     def "test withSentSubmissionId and withReceiver to update PartnerMetadata"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
@@ -100,5 +118,29 @@ class PartnerMetadataTest extends Specification {
         updatedMetadata.timeReceived() == timeReceived
         updatedMetadata.hash() == hash
         updatedMetadata.deliveryStatus() == status
+    }
+
+    def "test withDeliveryStatus to update PartnerMetadata"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def sentSubmissionId = "sentSubmissionId"
+        def sender = "sender"
+        def receiver = "receiver"
+        def timeReceived = Instant.now()
+        def hash = "abcd"
+        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, hash, PartnerMetadataStatus.PENDING)
+
+        when:
+        def newStatus = PartnerMetadataStatus.DELIVERED
+        def updatedMetadata = metadata.withSentSubmissionId(sentSubmissionId).withDeliveryStatus(newStatus)
+
+        then:
+        updatedMetadata.receivedSubmissionId() == receivedSubmissionId
+        updatedMetadata.sentSubmissionId() == sentSubmissionId
+        updatedMetadata.sender() == sender
+        updatedMetadata.receiver() == receiver
+        updatedMetadata.timeReceived() == timeReceived
+        updatedMetadata.hash() == hash
+        updatedMetadata.deliveryStatus() == newStatus
     }
 }
