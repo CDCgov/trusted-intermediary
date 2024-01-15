@@ -173,7 +173,7 @@ public class EtorDomainRegistration implements DomainConnector {
                 try {
                     partnerMetadataOrchestrator.setMetadataStatus(
                             receivedSubmissionId, PartnerMetadataStatus.FAILED);
-                } catch (PartnerMetadataException innerE) {
+                } catch (PartnerMetadataException | NullPointerException innerE) {
                     logger.logError("Unable to update metadata status", innerE);
                 }
             }
