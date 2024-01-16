@@ -94,7 +94,7 @@ public class HapiOrderConverter implements OrderConverter {
     }
 
     @Override
-    public Order<?> convertMetadataToOmlOrder(Order<?> order) {
+    public Order<?> convertToOmlOrder(Order<?> order) {
         logger.logInfo("Converting order to have OML metadata");
 
         var hapiOrder = (Order<Bundle>) order;
