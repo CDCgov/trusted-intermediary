@@ -251,7 +251,40 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
         mockClient.getRsToken() >> bearerToken
         mockClient.requestHistoryEndpoint(sentSubmissionId, bearerToken) >> rsHistoryApiResponse
-        mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> [destinations: [
+        mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> [
+            overallStatus: "Delivered",
+            destinations: [
+                [organization_id: "org", service: "service"]
+            ]]
+
+        when:
+        Optional<PartnerMetadata> result = PartnerMetadataOrchestrator.getInstance().getMetadata(receivedSubmissionId)
+
+        then:
+        result.isPresent()
+        result.get() == expectedMetadata
+        1 * mockPartnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(missingReceiverMetadata)
+        1 * mockPartnerMetadataStorage.saveMetadata(expectedMetadata)
+    }
+
+    def "getMetadata gets status if still pending in metadata"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def sentSubmissionId = "sentSubmissionId"
+        def sender = "senderName"
+        def receiver = "org.service"
+        def timestamp = Instant.now()
+        def hashCode = "123"
+        def bearerToken = "token"
+        def rsHistoryApiResponse = "{\"destinations\": [{\"organization_id\": \"org\", \"service\": \"service\"}]}"
+        def missingReceiverMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timestamp, hashCode, PartnerMetadataStatus.PENDING)
+        def expectedMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timestamp, hashCode, PartnerMetadataStatus.FAILED)
+
+        mockClient.getRsToken() >> bearerToken
+        mockClient.requestHistoryEndpoint(sentSubmissionId, bearerToken) >> rsHistoryApiResponse
+        mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> [
+            overallStatus: "Not Delivering",
+            destinations: [
                 [organization_id: "org", service: "service"]
             ]]
 
@@ -320,42 +353,46 @@ class PartnerMetadataOrchestratorTest extends Specification {
         }
     }
 
-    def "getReceiverName returns correct receiver name from valid JSON response"() {
+    def "getReceiverAndStatus returns correct status name and receiver name from valid JSON response"() {
         given:
-        def validJson = "{\"destinations\": [{\"organization_id\": \"org_id\", \"service\": \"service_name\"}]}"
+        def organization = "org_id"
+        def sender = "service_name"
+        def status = "Not Delivering"
+        def validJson = """{"overallStatus": "${status}", "destinations": [{"organization_id": "${organization}", "service": "${sender}"}]}"""
 
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def receiverName = PartnerMetadataOrchestrator.getInstance().getReceiverName(validJson)
+        def parsedResponse = PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(validJson)
 
         then:
-        receiverName == "org_id.service_name"
+        parsedResponse[0] == "${organization}.${sender}"
+        parsedResponse[1] == status
     }
 
-    def "getReceiverName throws FormatterProcessingException or returns null for unexpected format response"() {
+    def "getReceiverAndStatus throws FormatterProcessingException or returns null for unexpected format response"() {
         given:
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
         def invalidJson = "invalid JSON"
-        PartnerMetadataOrchestrator.getInstance().getReceiverName(invalidJson)
+        PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(invalidJson)
 
         then:
         thrown(FormatterProcessingException)
 
         when:
         def emptyJson = "{}"
-        PartnerMetadataOrchestrator.getInstance().getReceiverName(emptyJson)
+        PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(emptyJson)
 
         then:
         thrown(FormatterProcessingException)
 
         when:
         def jsonWithoutDestinations = "{\"someotherkey\": \"value\"}"
-        PartnerMetadataOrchestrator.getInstance().getReceiverName(jsonWithoutDestinations)
+        PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(jsonWithoutDestinations)
 
         then:
         thrown(FormatterProcessingException)
@@ -363,23 +400,73 @@ class PartnerMetadataOrchestratorTest extends Specification {
         when:
 
         def jsonWithEmptyDestinations = "{\"destinations\": []}"
-        def receiverName = PartnerMetadataOrchestrator.getInstance().getReceiverName(jsonWithEmptyDestinations)
+        def parsedData = PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(jsonWithEmptyDestinations)
 
         then:
-        receiverName == null
+        parsedData[0] == null
+
+        when:
+
+        def jsonWithNoStatus = "{\"destinations\": []}"
+        parsedData = PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(jsonWithNoStatus)
+
+        then:
+        parsedData[1] == null
 
         when:
         def jsonWithoutOrgId = "{\"destinations\":[{\"service\":\"service\"}]}"
-        PartnerMetadataOrchestrator.getInstance().getReceiverName(jsonWithoutOrgId)
+        PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(jsonWithoutOrgId)
 
         then:
         thrown(FormatterProcessingException)
 
         when:
         def jsonWithoutService = "{\"destinations\":[{\"organization_id\":\"org_id\"}]}"
-        PartnerMetadataOrchestrator.getInstance().getReceiverName(jsonWithoutService)
+        PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(jsonWithoutService)
 
         then:
         thrown(FormatterProcessingException)
+    }
+
+    def "ourStatusFromReportStreamStatus returns FAILED"() {
+        when:
+        def ourStatus = PartnerMetadataOrchestrator.getInstance().ourStatusFromReportStreamStatus("Error")
+
+        then:
+        ourStatus == PartnerMetadataStatus.FAILED
+
+        when:
+        ourStatus = PartnerMetadataOrchestrator.getInstance().ourStatusFromReportStreamStatus("Not Delivering")
+
+        then:
+        ourStatus == PartnerMetadataStatus.FAILED
+    }
+
+    def "ourStatusFromReportStreamStatus returns DELIVERED"() {
+        when:
+        def ourStatus = PartnerMetadataOrchestrator.getInstance().ourStatusFromReportStreamStatus("Delivered")
+
+        then:
+        ourStatus == PartnerMetadataStatus.DELIVERED
+    }
+
+    def "ourStatusFromReportStreamStatus returns PENDING"() {
+        when:
+        def ourStatus = PartnerMetadataOrchestrator.getInstance().ourStatusFromReportStreamStatus("Waiting to Deliver")
+
+        then:
+        ourStatus == PartnerMetadataStatus.PENDING
+
+        when:
+        ourStatus = PartnerMetadataOrchestrator.getInstance().ourStatusFromReportStreamStatus("DogCow")
+
+        then:
+        ourStatus == PartnerMetadataStatus.PENDING
+
+        when:
+        ourStatus = PartnerMetadataOrchestrator.getInstance().ourStatusFromReportStreamStatus(null)
+
+        then:
+        ourStatus == PartnerMetadataStatus.PENDING
     }
 }

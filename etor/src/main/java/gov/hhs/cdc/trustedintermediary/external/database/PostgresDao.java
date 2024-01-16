@@ -11,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.time.Instant;
 import java.util.Properties;
 import javax.inject.Inject;
@@ -116,7 +117,7 @@ public class PostgresDao implements DbDao {
                 deliveryStatusString = deliveryStatus.toString();
             }
 
-            statement.setString(7, deliveryStatusString);
+            statement.setObject(7, deliveryStatusString, Types.OTHER);
 
             statement.setString(8, failureReason);
 

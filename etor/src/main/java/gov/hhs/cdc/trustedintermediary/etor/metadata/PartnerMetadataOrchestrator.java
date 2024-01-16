@@ -120,24 +120,31 @@ public class PartnerMetadataOrchestrator {
 
         PartnerMetadata partnerMetadata = optionalPartnerMetadata.get();
         var sentSubmissionId = partnerMetadata.sentSubmissionId();
-        if (partnerMetadata.receiver() == null && sentSubmissionId != null) {
+        if ((partnerMetadata.receiver() == null
+                        || partnerMetadata.deliveryStatus() == PartnerMetadataStatus.PENDING)
+                && sentSubmissionId != null) {
             logger.logInfo(
-                    "Receiver name not found in metadata, looking up {} from RS history API",
+                    "Receiver name not found in metadata or delivery status still pending, looking up {} from RS history API",
                     sentSubmissionId);
 
             String receiver;
+            String rsStatus;
             try {
                 String bearerToken = rsclient.getRsToken();
                 String responseBody =
                         rsclient.requestHistoryEndpoint(sentSubmissionId, bearerToken);
-                receiver = getReceiverName(responseBody);
+                var parsedResponseBody = getReceiverAndStatus(responseBody);
+                receiver = parsedResponseBody[0];
+                rsStatus = parsedResponseBody[1];
             } catch (ReportStreamEndpointClientException | FormatterProcessingException e) {
                 throw new PartnerMetadataException(
                         "Unable to retrieve metadata from RS history API", e);
             }
 
-            logger.logInfo("Updating metadata with receiver: {}", receiver);
-            partnerMetadata = partnerMetadata.withReceiver(receiver);
+            var ourStatus = ourStatusFromReportStreamStatus(rsStatus);
+
+            logger.logInfo("Updating metadata with receiver {} and status {}", receiver, ourStatus);
+            partnerMetadata = partnerMetadata.withReceiver(receiver).withDeliveryStatus(ourStatus);
             partnerMetadataStorage.saveMetadata(partnerMetadata);
         }
 
@@ -171,9 +178,11 @@ public class PartnerMetadataOrchestrator {
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
-    String getReceiverName(String responseBody) throws FormatterProcessingException {
+    String[] getReceiverAndStatus(String responseBody) throws FormatterProcessingException {
         // the expected json structure for the response is:
         // {
+        //    ...
+        //    "overallStatus": "Waiting to Deliver",
         //    ...
         //    "destinations" : [ {
         //        ...
@@ -184,23 +193,46 @@ public class PartnerMetadataOrchestrator {
         //    ...
         // }
 
-        String organizationId;
-        String service;
+        Map<String, Object> responseObject =
+                formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
+
+        String receiver;
         try {
-            Map<String, Object> responseObject =
-                    formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
             ArrayList<?> destinations = (ArrayList<?>) responseObject.get("destinations");
             Map<?, ?> destination = (Map<?, ?>) destinations.get(0);
-            organizationId = destination.get("organization_id").toString();
-            service = destination.get("service").toString();
+            String organizationId = destination.get("organization_id").toString();
+            String service = destination.get("service").toString();
+            receiver = organizationId + "." + service;
         } catch (IndexOutOfBoundsException e) {
             // the destinations have not been determined yet by RS
-            return null;
+            receiver = null;
         } catch (Exception e) {
             throw new FormatterProcessingException(
                     "Unable to extract receiver name from response due to unexpected format", e);
         }
 
-        return organizationId + "." + service;
+        String overallStatus;
+        try {
+            overallStatus = (String) responseObject.get("overallStatus");
+        } catch (Exception e) {
+            throw new FormatterProcessingException(
+                    "Unable to extract overallStatus from response due to unexpected format", e);
+        }
+
+        return new String[] {receiver, overallStatus};
+    }
+
+    PartnerMetadataStatus ourStatusFromReportStreamStatus(String rsStatus) {
+        if (rsStatus == null) {
+            return PartnerMetadataStatus.PENDING;
+        }
+
+        // based off of the Status enum in the SubmissionHistory.kt code in RS
+        // https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/src/main/kotlin/history/SubmissionHistory.kt
+        return switch (rsStatus) {
+            case "Error", "Not Delivering" -> PartnerMetadataStatus.FAILED;
+            case "Delivered" -> PartnerMetadataStatus.DELIVERED;
+            default -> PartnerMetadataStatus.PENDING;
+        };
     }
 }
