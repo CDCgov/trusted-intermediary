@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata
 
-
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
 import spock.lang.Specification
 
 class PartnerMetadataExceptionTest extends Specification {

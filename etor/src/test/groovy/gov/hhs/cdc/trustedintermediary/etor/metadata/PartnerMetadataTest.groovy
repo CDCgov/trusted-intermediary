@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.metadata
 
 
 import gov.hhs.cdc.trustedintermediary.PojoTestUtils
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
 
 import java.time.Instant

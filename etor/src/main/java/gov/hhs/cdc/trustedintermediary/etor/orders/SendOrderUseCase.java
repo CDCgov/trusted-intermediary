@@ -1,8 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders;
 
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
-import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
-import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import javax.inject.Inject;
