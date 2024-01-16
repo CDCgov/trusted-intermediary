@@ -13,7 +13,8 @@ public interface DbDao {
             String receiver,
             String hash,
             Instant timeReceived,
-            PartnerMetadataStatus deliveryStatus)
+            PartnerMetadataStatus deliveryStatus,
+            String failureReason)
             throws SQLException;
 
     Object fetchMetadata(String uniqueId) throws SQLException;

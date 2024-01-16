@@ -21,7 +21,8 @@ public record PartnerMetadata(
         String receiver,
         Instant timeReceived,
         String hash,
-        PartnerMetadataStatus deliveryStatus) {
+        PartnerMetadataStatus deliveryStatus,
+        String failureReason) {
 
     // Below is for defaulting status when null
     public PartnerMetadata {
@@ -35,16 +36,25 @@ public record PartnerMetadata(
             String sender,
             Instant timeReceived,
             String hash,
-            PartnerMetadataStatus deliveryStatus) {
-        this(receivedSubmissionId, null, sender, null, timeReceived, hash, deliveryStatus);
+            PartnerMetadataStatus deliveryStatus,
+            String failureReason) {
+        this(
+                receivedSubmissionId,
+                null,
+                sender,
+                null,
+                timeReceived,
+                hash,
+                deliveryStatus,
+                failureReason);
     }
 
     public PartnerMetadata(String receivedSubmissionId, String hash) {
-        this(receivedSubmissionId, null, null, null, null, hash, null);
+        this(receivedSubmissionId, null, null, null, null, hash, null, null);
     }
 
     public PartnerMetadata(String receivedSubmissionId, PartnerMetadataStatus deliveryStatus) {
-        this(receivedSubmissionId, null, null, null, null, null, deliveryStatus);
+        this(receivedSubmissionId, null, null, null, null, null, deliveryStatus, null);
     }
 
     public PartnerMetadata withSentSubmissionId(String sentSubmissionId) {
@@ -55,7 +65,8 @@ public record PartnerMetadata(
                 this.receiver,
                 this.timeReceived,
                 this.hash,
-                this.deliveryStatus);
+                this.deliveryStatus,
+                this.failureReason);
     }
 
     public PartnerMetadata withReceiver(String receiver) {
@@ -66,7 +77,8 @@ public record PartnerMetadata(
                 receiver,
                 this.timeReceived,
                 this.hash,
-                this.deliveryStatus);
+                this.deliveryStatus,
+                this.failureReason);
     }
 
     public PartnerMetadata withDeliveryStatus(PartnerMetadataStatus deliveryStatus) {
@@ -77,6 +89,7 @@ public record PartnerMetadata(
                 this.receiver,
                 this.timeReceived,
                 this.hash,
-                deliveryStatus);
+                deliveryStatus,
+                this.failureReason);
     }
 }
