@@ -26,8 +26,9 @@ class PartnerMetadataTest extends Specification {
         def hash = "abcd"
         def status = PartnerMetadataStatus.DELIVERED
 
+
         when:
-        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, hash, PartnerMetadataStatus.DELIVERED)
+        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, hash, PartnerMetadataStatus.DELIVERED, null)
 
         then:
         metadata.receivedSubmissionId() == receivedSubmissionId
@@ -37,6 +38,7 @@ class PartnerMetadataTest extends Specification {
         metadata.timeReceived() == timeReceived
         metadata.hash() == hash
         metadata.deliveryStatus() == status
+        metadata.failureReason() == null
     }
 
     def "test overloaded constructor"() {
@@ -46,8 +48,9 @@ class PartnerMetadataTest extends Specification {
         def timeReceived = Instant.now()
         def hash = "abcd"
         def status = PartnerMetadataStatus.DELIVERED
+
         when:
-        def metadata = new PartnerMetadata(receivedSubmissionId, sender, timeReceived, hash, PartnerMetadataStatus.DELIVERED)
+        def metadata = new PartnerMetadata(receivedSubmissionId, sender, timeReceived, hash, PartnerMetadataStatus.DELIVERED, null)
 
         then:
         metadata.receivedSubmissionId() == receivedSubmissionId
@@ -105,7 +108,7 @@ class PartnerMetadataTest extends Specification {
         def timeReceived = Instant.now()
         def hash = "abcd"
         def status = PartnerMetadataStatus.DELIVERED
-        def metadata = new PartnerMetadata(receivedSubmissionId, sender, timeReceived, hash, status)
+        def metadata = new PartnerMetadata(receivedSubmissionId, sender, timeReceived, hash, status, null)
 
         when:
         def updatedMetadata = metadata.withSentSubmissionId(sentSubmissionId).withReceiver(receiver)
@@ -128,7 +131,7 @@ class PartnerMetadataTest extends Specification {
         def receiver = "receiver"
         def timeReceived = Instant.now()
         def hash = "abcd"
-        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, hash, PartnerMetadataStatus.PENDING)
+        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, hash, PartnerMetadataStatus.PENDING, null)
 
         when:
         def newStatus = PartnerMetadataStatus.DELIVERED
