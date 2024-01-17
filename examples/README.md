@@ -21,22 +21,22 @@
 
 #### Minnesota
 
-- [004_MN_NBS_ORU_R01.hl7](/examples/MN/004_MN_ORU_R01_NBS.hl7)
-- [003_MN_NBS_ORU_R01_translation_from_initial_hl7_ingestion.fhir](/examples/MN/003_MN_ORU_R01_NBS_translarion_from_fhir_for_final_delivery.fhir)
-- [003_MN_NBS_ORU_R01_translarion_from_fhir_for_final_delivery.fhir](/examples/MN/003_MN_ORU_R01_NBS_translarion_from_fhir_for_final_delivery.fhir)
+- [004_MN_ORU_R01_NBS.hl7](/examples/MN/004_MN_ORU_R01_NBS.hl7)
+- [004_MN_ORU_R01_NBS_translation_from_initial_hl7_ingestion.fhir](/examples/MN/004_MN_ORU_R01_NBS_translation_from_initial_hl7_ingestion.fhir)
+- [004_MN_ORU_R01_NBS_translation_from_fhir_for_final_delivery.fhir](/examples/MN/004_MN_ORU_R01_NBS_translation_from_fhir_for_final_delivery.fhir)
 - [001_MN_ADT_A01.hl7](/examples/MN/001_MN_ADT_A01.hl7)
-- [002_MN_NBS_OML_O21.hl7](/examples/MN/002_MN_OML_O21_NBS.hl7)
-- [003_MN_NBS_ORM_O01.hl7](/examples/MN/003_MN_ORM_O01_NBS.hl7)
-- [003_MN_NBS_ORM_O01_extended.hl7](/examples/MN/003_MN_ORM_O01_NBS_extended.hl7)
-- [003_MN_NBS_ORM_O01_simplified.hl7](/examples/MN/003_MN_ORM_O01_NBS_simplified.hl7)
-- [001_MN_NBS_Order.fhir](/examples/MN/001_MN_Order_NBS.fhir)
+- [002_MN_OML_O21_NBS.hl7](/examples/MN/002_MN_OML_O21_NBS.hl7)
+- [003_MN_ORM_O01_NBS.hl7](/examples/MN/003_MN_ORM_O01_NBS.hl7)
+- [003_MN_ORM_O01_NBS_extended.hl7](/examples/MN/003_MN_ORM_O01_NBS_extended.hl7)
+- [003_MN_ORM_O01_NBS_simplified.hl7](/examples/MN/003_MN_ORM_O01_NBS_simplified.hl7)
+- [001_MN_Order_NBS.fhir](/examples/MN/001_MN_Order_NBS.fhir)
 
 #### Tennessee
 
-- [001_TN_LRI_ORU_R01_annotated_for_transformation.hl7](/examples/TN/001_TN_ORU_R01_LRI_annotated_for_transformation.hl7)
-- [001_TN_LRI_ORU_R01_transformed_to_r5.hl7](/examples/TN/001_TN_ORU_R01_LRI_transformed_to_r5.hl7)
-- [001_TN_LRI_ORU_R01.hl7](/examples/TN/001_TN_ORU_R01_LRI.hl7)
-- [002_TN_NBS_OML_O21.hl7](/examples/TN/002_TN_OML_O21_NBS.hl7)
+- [001_TN_ORU_R01_LRI_annotated_for_transformation.hl7](/examples/TN/001_TN_ORU_R01_LRI_annotated_for_transformation.hl7)
+- [001_TN_ORU_R01_LRI_transformed_to_r5.hl7](/examples/TN/001_TN_ORU_R01_LRI_transformed_to_r5.hl7)
+- [001_TN_ORU_R01_LRI.hl7](/examples/TN/001_TN_ORU_R01_LRI.hl7)
+- [002_TN_OML_O21_NBS.hl7](/examples/TN/002_TN_OML_O21_NBS.hl7)
 
 #### Texas
 
@@ -47,8 +47,8 @@
 
 #### Epic
 
-- [001_Epic_ORM_O0.hl7](/examples/Epic/001_Epic_ORM_O01.hl7)
-- [002_Epic_ORU_R0.hl7](/examples/Epic/002_Epic_ORU_R01.hl7)
+- [001_Epic_ORM_O01.hl7](/examples/Epic/001_Epic_ORM_O01.hl7)
+- [002_Epic_ORU_R01.hl7](/examples/Epic/002_Epic_ORU_R01.hl7)
 
 #### Natus
 
@@ -70,7 +70,7 @@
 
 - [005_ADT_A01.hl7](/examples/Other/005_ADT_A01.hl7)
 - [002_Order.fhir](/examples/Other/002_Order.fhir)
-- [003_NBS_patient.fhir](/examples/Other/003_Patient_NBS.fhir)
+- [003_Patient_NBS.fhir](/examples/Other/003_Patient_NBS.fhir)
 - [004_OML_O21.fhir](/examples/Other/004_OML_O21.fhir)
 
 ## Previously renamed files
