@@ -7,8 +7,8 @@ import java.nio.file.Path
 
 class DemographicsTest extends Specification {
 
-    def demographicsClient = new EndpointClient("/v1/etor/demographics")
-    def newbornPatientJsonFileString = Files.readString(Path.of("../examples/fhir/newborn_patient.json"))
+    def demographicsClient = new EndpointClient('/v1/etor/demographics')
+    def newbornPatientJsonFileString = Files.readString(Path.of('../examples/Other/003_NBS_patient.fhir'))
 
     def setup() {
         SentPayloadReader.delete()
@@ -16,8 +16,8 @@ class DemographicsTest extends Specification {
 
     def "a demographics response is returned from the ETOR demographics endpoint"() {
         given:
-        def expectedFhirResourceId  = "Bundle/bundle-with-patient"
-        def expectedPatientId  = "MRN7465737865"
+        def expectedFhirResourceId  = 'Bundle/bundle-with-patient'
+        def expectedPatientId  = 'MRN7465737865'
 
         when:
         def response = demographicsClient.submit(newbornPatientJsonFileString, true)
@@ -38,14 +38,14 @@ class DemographicsTest extends Specification {
 
         then:
         response.getCode() == 200
-        parsedSentPayload.entry[0].resource.resourceType == "MessageHeader"
-        parsedSentPayload.entry[2].resource.resourceType == "ServiceRequest"
+        parsedSentPayload.entry[0].resource.resourceType == 'MessageHeader'
+        parsedSentPayload.entry[2].resource.resourceType == 'ServiceRequest'
 
-        parsedSentPayload.entry[1].resource.resourceType == "Patient"
-        parsedSentPayload.entry[1].resource.id == "infant-twin-1"
+        parsedSentPayload.entry[1].resource.resourceType == 'Patient'
+        parsedSentPayload.entry[1].resource.id == 'infant-twin-1'
 
         parsedSentPayload.entry[1].resource.identifier[1].value == parsedResponseBody.patientId  //the second (index 1) identifier so happens to be the MRN
-        parsedSentPayload.resourceType + "/" + parsedSentPayload.id == parsedResponseBody.fhirResourceId
+        parsedSentPayload.resourceType + '/' + parsedSentPayload.id == parsedResponseBody.fhirResourceId
     }
 
     def "return a 400 response when request has unexpected format"() {
