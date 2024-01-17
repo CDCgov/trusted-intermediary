@@ -45,7 +45,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def bearerToken = "token"
         def rsHistoryApiResponse = "{\"sender\": \"${sender}\", \"timestamp\": \"${timestamp}\"}"
         def deliveryStatus = PartnerMetadataStatus.PENDING
-        def failureReason = "It done goofed"
+
 
         mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> [sender: sender, timestamp: timestamp]
 
@@ -55,7 +55,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         then:
         1 * mockClient.getRsToken() >> bearerToken
         1 * mockClient.requestHistoryEndpoint(receivedSubmissionId, bearerToken) >> rsHistoryApiResponse
-        1 * mockPartnerMetadataStorage.saveMetadata(new PartnerMetadata(receivedSubmissionId, sender, Instant.parse(timestamp), hashCode, deliveryStatus, failureReason))
+        1 * mockPartnerMetadataStorage.saveMetadata(new PartnerMetadata(receivedSubmissionId, sender, Instant.parse(timestamp), hashCode, deliveryStatus, null))
     }
 
     def "updateMetadataForSentOrder test case when sentSubmissionId is null"() {
@@ -278,8 +278,8 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def hashCode = "123"
         def bearerToken = "token"
         def rsHistoryApiResponse = "{\"destinations\": [{\"organization_id\": \"org\", \"service\": \"service\"}]}"
-        def missingReceiverMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timestamp, hashCode, PartnerMetadataStatus.PENDING)
-        def expectedMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timestamp, hashCode, PartnerMetadataStatus.FAILED)
+        def missingReceiverMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timestamp, hashCode, PartnerMetadataStatus.PENDING, null)
+        def expectedMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timestamp, hashCode, PartnerMetadataStatus.FAILED, null)
 
         mockClient.getRsToken() >> bearerToken
         mockClient.requestHistoryEndpoint(sentSubmissionId, bearerToken) >> rsHistoryApiResponse

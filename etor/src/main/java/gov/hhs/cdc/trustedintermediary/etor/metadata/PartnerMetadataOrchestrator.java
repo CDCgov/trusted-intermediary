@@ -43,7 +43,7 @@ public class PartnerMetadataOrchestrator {
 
         String sender;
         Instant timeReceived;
-        String failureReason = null;
+
         try {
             String bearerToken = rsclient.getRsToken();
             String responseBody =
@@ -79,7 +79,7 @@ public class PartnerMetadataOrchestrator {
                         timeReceived,
                         orderHash,
                         PartnerMetadataStatus.PENDING,
-                        failureReason);
+                        null);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
