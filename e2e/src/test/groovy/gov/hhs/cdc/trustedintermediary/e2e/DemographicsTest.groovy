@@ -8,7 +8,7 @@ import java.nio.file.Path
 class DemographicsTest extends Specification {
 
     def demographicsClient = new EndpointClient("/v1/etor/demographics")
-    def newbornPatientJsonFileString = Files.readString(Path.of("../examples/Other/003_NBS_patient.fhir"))
+    def newbornPatientJsonFileString = Files.readString(Path.of("../examples/Other/003_Patient_NBS.fhir"))
 
     def setup() {
         SentPayloadReader.delete()
