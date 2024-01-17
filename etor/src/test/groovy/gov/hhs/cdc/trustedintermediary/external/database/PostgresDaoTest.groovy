@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureClient
 import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager
+import java.sql.Types
 import spock.lang.Specification
 
 import java.sql.Timestamp
@@ -17,10 +18,10 @@ import java.sql.SQLException
 
 class PostgresDaoTest extends Specification {
 
-    private def mockDriver
-    private def mockConn
-    private def mockPreparedStatement
-    private def mockResultSet
+    private SqlDriverManager mockDriver
+    private Connection mockConn
+    private PreparedStatement mockPreparedStatement
+    private ResultSet mockResultSet
 
     def setup() {
         TestApplicationContext.reset()
@@ -66,6 +67,15 @@ class PostgresDaoTest extends Specification {
 
     def "upsertMetadata works"() {
         given:
+        def receivedSubmissionId = "mock_id_receiver"
+        def sentSubmissionId = "mock_id_sender"
+        def sender = "mock_sender"
+        def receiver = "mock_receiver"
+        def hash = "mock_hash"
+        def timestamp = Instant.now()
+        def status = PartnerMetadataStatus.PENDING
+        def failureReason = "failure reason"
+
         mockDriver.getConnection(_ as String, _ as Properties) >>  mockConn
         mockConn.prepareStatement(_ as String) >> mockPreparedStatement
 
@@ -73,9 +83,17 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PostgresDao.getInstance().upsertMetadata("mock_id_receiver", "mock_id_sender", "mock_sender", "mock_receiver", "mock_hash", Instant.now(), PartnerMetadataStatus.PENDING, "failure reason")
+        PostgresDao.getInstance().upsertMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, hash, timestamp, status, failureReason)
 
         then:
+        1 * mockPreparedStatement.setString(1, receivedSubmissionId)
+        1 * mockPreparedStatement.setString(2, sentSubmissionId)
+        1 * mockPreparedStatement.setString(3, sender)
+        1 * mockPreparedStatement.setString(4, receiver)
+        1 * mockPreparedStatement.setString(5, hash)
+        1 * mockPreparedStatement.setTimestamp(6, Timestamp.from(timestamp))
+        1 * mockPreparedStatement.setObject(7, status.toString(), Types.OTHER)
+        1 * mockPreparedStatement.setString(8, failureReason)
         1 * mockPreparedStatement.executeUpdate()
     }
 
