@@ -27,7 +27,7 @@ public class SendOrderUseCase {
 
         savePartnerMetadataForReceivedOrder(receivedSubmissionId, order);
 
-        var omlOrder = converter.convertMetadataToOmlOrder(order);
+        var omlOrder = converter.convertToOmlOrder(order);
         metadata.put(order.getFhirResourceId(), EtorMetadataStep.ORDER_CONVERTED_TO_OML);
 
         omlOrder = converter.addContactSectionToPatientResource(omlOrder);

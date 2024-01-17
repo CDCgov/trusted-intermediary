@@ -159,7 +159,7 @@ class HapiOrderConverterTest extends Specification {
                 "ORM"))))
 
         when:
-        def convertedOrderBundle = HapiOrderConverter.getInstance().convertMetadataToOmlOrder(mockOrder).getUnderlyingOrder() as Bundle
+        def convertedOrderBundle = HapiOrderConverter.getInstance().convertToOmlOrder(mockOrder).getUnderlyingOrder() as Bundle
 
         then:
         def convertedMessageHeader = convertedOrderBundle.getEntry().get(1).getResource() as MessageHeader
@@ -170,7 +170,7 @@ class HapiOrderConverterTest extends Specification {
 
     def "adds the message header to specify OML"() {
         when:
-        def convertedOrderBundle = HapiOrderConverter.getInstance().convertMetadataToOmlOrder(mockOrder).getUnderlyingOrder() as Bundle
+        def convertedOrderBundle = HapiOrderConverter.getInstance().convertToOmlOrder(mockOrder).getUnderlyingOrder() as Bundle
 
         then:
         def convertedMessageHeader = convertedOrderBundle.getEntry().get(1).getResource() as MessageHeader
