@@ -1,8 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders;
 
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
-import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
-import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import javax.inject.Inject;
@@ -27,7 +27,7 @@ public class SendOrderUseCase {
 
         savePartnerMetadataForReceivedOrder(receivedSubmissionId, order);
 
-        var omlOrder = converter.convertMetadataToOmlOrder(order);
+        var omlOrder = converter.convertToOmlOrder(order);
         metadata.put(order.getFhirResourceId(), EtorMetadataStep.ORDER_CONVERTED_TO_OML);
 
         omlOrder = converter.addContactSectionToPatientResource(omlOrder);

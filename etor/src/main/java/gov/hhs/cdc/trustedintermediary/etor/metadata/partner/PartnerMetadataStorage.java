@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.etor.metadata;
+package gov.hhs.cdc.trustedintermediary.etor.metadata.partner;
 
 import java.util.Optional;
 

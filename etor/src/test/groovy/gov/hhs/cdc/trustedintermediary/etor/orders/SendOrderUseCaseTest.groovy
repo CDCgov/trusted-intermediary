@@ -3,8 +3,8 @@ package gov.hhs.cdc.trustedintermediary.etor.orders
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep
-import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException
-import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import spock.lang.Specification
@@ -42,7 +42,7 @@ class SendOrderUseCaseTest extends Specification {
         sendOrder.convertAndSend(mockOrder, receivedSubmissionId)
 
         then:
-        1 * mockConverter.convertMetadataToOmlOrder(mockOrder) >> mockOmlOrder
+        1 * mockConverter.convertToOmlOrder(mockOrder) >> mockOmlOrder
         1 * mockConverter.addContactSectionToPatientResource(mockOmlOrder) >> mockOmlOrder
         1 * mockSender.sendOrder(mockOmlOrder) >> Optional.of(sentSubmissionId)
         1 * sendOrder.metadata.put(_, EtorMetadataStep.ORDER_CONVERTED_TO_OML)
@@ -89,7 +89,7 @@ class SendOrderUseCaseTest extends Specification {
 
         then:
         1 * mockLogger.logError(_, _)
-        1 * mockConverter.convertMetadataToOmlOrder(order) >> omlOrder
+        1 * mockConverter.convertToOmlOrder(order) >> omlOrder
         1 * mockConverter.addContactSectionToPatientResource(omlOrder) >> omlOrder
         1 * mockSender.sendOrder(omlOrder) >> Optional.of("sentId")
     }
@@ -106,7 +106,7 @@ class SendOrderUseCaseTest extends Specification {
         SendOrderUseCase.getInstance().convertAndSend(order, "receivedId")
 
         then:
-        1 * mockConverter.convertMetadataToOmlOrder(order) >> omlOrder
+        1 * mockConverter.convertToOmlOrder(order) >> omlOrder
         1 * mockConverter.addContactSectionToPatientResource(omlOrder) >> omlOrder
         1 * mockSender.sendOrder(omlOrder) >> Optional.of("sentId")
         1 * mockLogger.logError(_, partnerMetadataException)
