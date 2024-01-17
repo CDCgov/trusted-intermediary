@@ -25,10 +25,11 @@ class PartnerMetadataTest extends Specification {
         def timeReceived = Instant.now()
         def hash = "abcd"
         def status = PartnerMetadataStatus.DELIVERED
+        def failureReason = "failure reason"
 
 
         when:
-        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, hash, PartnerMetadataStatus.DELIVERED, null)
+        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, hash, PartnerMetadataStatus.DELIVERED, failureReason)
 
         then:
         metadata.receivedSubmissionId() == receivedSubmissionId
@@ -38,7 +39,7 @@ class PartnerMetadataTest extends Specification {
         metadata.timeReceived() == timeReceived
         metadata.hash() == hash
         metadata.deliveryStatus() == status
-        metadata.failureReason() == null
+        metadata.failureReason() == failureReason
     }
 
     def "test overloaded constructor"() {

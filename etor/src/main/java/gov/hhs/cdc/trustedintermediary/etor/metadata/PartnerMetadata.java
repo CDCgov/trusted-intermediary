@@ -38,15 +38,7 @@ public record PartnerMetadata(
             String hash,
             PartnerMetadataStatus deliveryStatus,
             String failureReason) {
-        this(
-                receivedSubmissionId,
-                null,
-                sender,
-                null,
-                timeReceived,
-                hash,
-                deliveryStatus,
-                failureReason);
+        this(receivedSubmissionId, null, sender, null, timeReceived, hash, deliveryStatus, null);
     }
 
     public PartnerMetadata(String receivedSubmissionId, String hash) {
