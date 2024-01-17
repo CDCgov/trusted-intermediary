@@ -1,9 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.external.database
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata
-import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException
-import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStorage
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
 import spock.lang.Specification
 

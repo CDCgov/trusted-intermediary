@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.etor.metadata
+package gov.hhs.cdc.trustedintermediary.etor.metadata.partner
 
 
 import spock.lang.Specification
