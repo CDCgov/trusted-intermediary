@@ -51,7 +51,7 @@ class PartnerMetadataTest extends Specification {
         def status = PartnerMetadataStatus.DELIVERED
 
         when:
-        def metadata = new PartnerMetadata(receivedSubmissionId, sender, timeReceived, hash, PartnerMetadataStatus.DELIVERED, null)
+        def metadata = new PartnerMetadata(receivedSubmissionId, sender, timeReceived, hash, PartnerMetadataStatus.DELIVERED)
 
         then:
         metadata.receivedSubmissionId() == receivedSubmissionId
@@ -109,7 +109,7 @@ class PartnerMetadataTest extends Specification {
         def timeReceived = Instant.now()
         def hash = "abcd"
         def status = PartnerMetadataStatus.DELIVERED
-        def metadata = new PartnerMetadata(receivedSubmissionId, sender, timeReceived, hash, status, null)
+        def metadata = new PartnerMetadata(receivedSubmissionId, sender, timeReceived, hash, status)
 
         when:
         def updatedMetadata = metadata.withSentSubmissionId(sentSubmissionId).withReceiver(receiver)

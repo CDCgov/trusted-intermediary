@@ -78,8 +78,7 @@ public class PartnerMetadataOrchestrator {
                         sender,
                         timeReceived,
                         orderHash,
-                        PartnerMetadataStatus.PENDING,
-                        null);
+                        PartnerMetadataStatus.PENDING);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
