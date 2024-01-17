@@ -37,7 +37,7 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.register(PostgresDao, PostgresDao.getInstance())
     }
 
-    def "connect happy path works"(){
+    def "connect happy path works"() {
         given:
         mockDriver.getConnection(_ as String, _ as Properties) >> {mockConn}
 
@@ -146,8 +146,6 @@ class PostgresDaoTest extends Specification {
 
     def "fetchMetadata returns null when rows do not exist"() {
         given:
-        def expected = null
-
         mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
         mockResultSet.next() >> false
@@ -160,7 +158,7 @@ class PostgresDaoTest extends Specification {
         def actual = PostgresDao.getInstance().fetchMetadata("mock_lookup")
 
         then:
-        actual == expected
+        actual == null
     }
 
     def "fetchMetadata returns partner metadata when rows exist"() {
@@ -168,12 +166,13 @@ class PostgresDaoTest extends Specification {
         def receivedMessageId = "12345"
         def sentMessageId = "7890"
         def sender = "DogCow"
+        def receiver = "You'll get your just reward"
         Timestamp timestampForMock = Timestamp.from(Instant.parse("2024-01-03T15:45:33.30Z"))
         Instant timeReceived = timestampForMock.toInstant()
         def hash = sender.hashCode().toString()
         def status = PartnerMetadataStatus.PENDING
         def reason = "It done Goofed"
-        def expected = new PartnerMetadata(receivedMessageId, sentMessageId, sender, null, timeReceived, hash, status, reason)
+        def expected = new PartnerMetadata(receivedMessageId, sentMessageId, sender, receiver, timeReceived, hash, status, reason)
 
         mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
@@ -181,7 +180,7 @@ class PostgresDaoTest extends Specification {
         mockResultSet.getString("received_message_id") >> receivedMessageId
         mockResultSet.getString("sent_message_id") >> sentMessageId
         mockResultSet.getString("sender") >> sender
-        mockResultSet.getString("receiver") >> null
+        mockResultSet.getString("receiver") >> receiver
         mockResultSet.getTimestamp("time_received") >> timestampForMock
         mockResultSet.getString("hash_of_order") >> hash
         mockResultSet.getString("delivery_status") >> status.toString()
