@@ -63,7 +63,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 Instant.now(),
                 "hash",
                 PartnerMetadataStatus.PENDING,
-                null
+                "DogCow failure"
                 )
 
         when:
@@ -93,7 +93,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 Instant.now(),
                 "hash",
                 PartnerMetadataStatus.FAILED,
-                null
+                "DogCow failure"
                 )
 
         mockDao.upsertMetadata(
