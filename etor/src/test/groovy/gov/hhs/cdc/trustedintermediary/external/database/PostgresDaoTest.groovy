@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureClient
 import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager
+import java.sql.Types
 import spock.lang.Specification
 
 import java.sql.Timestamp
@@ -17,10 +18,10 @@ import java.sql.SQLException
 
 class PostgresDaoTest extends Specification {
 
-    private def mockDriver
-    private def mockConn
-    private def mockPreparedStatement
-    private def mockResultSet
+    private SqlDriverManager mockDriver
+    private Connection mockConn
+    private PreparedStatement mockPreparedStatement
+    private ResultSet mockResultSet
 
     def setup() {
         TestApplicationContext.reset()
@@ -37,7 +38,7 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.register(PostgresDao, PostgresDao.getInstance())
     }
 
-    def "connect happy path works"(){
+    def "connect happy path works"() {
         given:
         mockDriver.getConnection(_ as String, _ as Properties) >> {mockConn}
 
@@ -66,6 +67,15 @@ class PostgresDaoTest extends Specification {
 
     def "upsertMetadata works"() {
         given:
+        def receivedSubmissionId = "mock_id_receiver"
+        def sentSubmissionId = "mock_id_sender"
+        def sender = "mock_sender"
+        def receiver = "mock_receiver"
+        def hash = "mock_hash"
+        def timestamp = Instant.now()
+        def status = PartnerMetadataStatus.PENDING
+        def failureReason = "failure reason"
+
         mockDriver.getConnection(_ as String, _ as Properties) >>  mockConn
         mockConn.prepareStatement(_ as String) >> mockPreparedStatement
 
@@ -73,9 +83,17 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PostgresDao.getInstance().upsertMetadata("mock_id_receiver", "mock_id_sender", "mock_sender", "mock_receiver", "mock_hash", Instant.now(), PartnerMetadataStatus.PENDING)
+        PostgresDao.getInstance().upsertMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, hash, timestamp, status, failureReason)
 
         then:
+        1 * mockPreparedStatement.setString(1, receivedSubmissionId)
+        1 * mockPreparedStatement.setString(2, sentSubmissionId)
+        1 * mockPreparedStatement.setString(3, sender)
+        1 * mockPreparedStatement.setString(4, receiver)
+        1 * mockPreparedStatement.setString(5, hash)
+        1 * mockPreparedStatement.setTimestamp(6, Timestamp.from(timestamp))
+        1 * mockPreparedStatement.setObject(7, status.toString(), Types.OTHER)
+        1 * mockPreparedStatement.setString(8, failureReason)
         1 * mockPreparedStatement.executeUpdate()
     }
 
@@ -88,7 +106,7 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PostgresDao.getInstance().upsertMetadata("mock_id_receiver", "mock_id_sender", "mock_sender", "mock_receiver", "mock_hash", Instant.now(), PartnerMetadataStatus.DELIVERED)
+        PostgresDao.getInstance().upsertMetadata("mock_id_receiver", "mock_id_sender", "mock_sender", "mock_receiver", "mock_hash", Instant.now(), PartnerMetadataStatus.DELIVERED, "mock_failure_reason")
 
         then:
         thrown(SQLException)
@@ -103,7 +121,7 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PostgresDao.getInstance().upsertMetadata("mock_id_receiver", "mock_id_sender", "mock_sender", "mock_receiver", "mock_hash", null, PartnerMetadataStatus.DELIVERED)
+        PostgresDao.getInstance().upsertMetadata("mock_id_receiver", "mock_id_sender", "mock_sender", "mock_receiver", "mock_hash", null, PartnerMetadataStatus.DELIVERED, "mock_failure_reason")
 
         then:
         mockPreparedStatement.setTimestamp(_ as Integer, _) >> { Integer parameterIndex, Timestamp timestamp ->
@@ -146,8 +164,6 @@ class PostgresDaoTest extends Specification {
 
     def "fetchMetadata returns null when rows do not exist"() {
         given:
-        def expected = null
-
         mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
         mockResultSet.next() >> false
@@ -160,19 +176,21 @@ class PostgresDaoTest extends Specification {
         def actual = PostgresDao.getInstance().fetchMetadata("mock_lookup")
 
         then:
-        actual == expected
+        actual == null
     }
 
-    def "fetchMetadata returns partnermetadata when rows exist"() {
+    def "fetchMetadata returns partner metadata when rows exist"() {
         given:
         def receivedMessageId = "12345"
         def sentMessageId = "7890"
         def sender = "DogCow"
+        def receiver = "You'll get your just reward"
         Timestamp timestampForMock = Timestamp.from(Instant.parse("2024-01-03T15:45:33.30Z"))
         Instant timeReceived = timestampForMock.toInstant()
         def hash = sender.hashCode().toString()
         def status = PartnerMetadataStatus.PENDING
-        def expected = new PartnerMetadata(receivedMessageId, sentMessageId, sender, null, timeReceived, hash, status)
+        def reason = "It done Goofed"
+        def expected = new PartnerMetadata(receivedMessageId, sentMessageId, sender, receiver, timeReceived, hash, status, reason)
 
         mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
@@ -180,10 +198,11 @@ class PostgresDaoTest extends Specification {
         mockResultSet.getString("received_message_id") >> receivedMessageId
         mockResultSet.getString("sent_message_id") >> sentMessageId
         mockResultSet.getString("sender") >> sender
-        mockResultSet.getString("receiver") >> null
+        mockResultSet.getString("receiver") >> receiver
         mockResultSet.getTimestamp("time_received") >> timestampForMock
         mockResultSet.getString("hash_of_order") >> hash
         mockResultSet.getString("delivery_status") >> status.toString()
+        mockResultSet.getString("failure_reason") >> reason
         mockPreparedStatement.executeQuery() >> mockResultSet
 
         TestApplicationContext.register(SqlDriverManager, mockDriver)
@@ -204,6 +223,7 @@ class PostgresDaoTest extends Specification {
         mockResultSet.next() >> true
         mockResultSet.getTimestamp("time_received") >> null
         mockResultSet.getString("delivery_status") >> "DELIVERED"
+        mockResultSet.getString("failure_reason") >> "Your time is up"
         TestApplicationContext.register(SqlDriverManager, mockDriver)
         TestApplicationContext.injectRegisteredImplementations()
 

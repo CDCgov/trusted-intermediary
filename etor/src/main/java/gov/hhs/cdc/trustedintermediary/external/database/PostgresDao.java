@@ -88,15 +88,16 @@ public class PostgresDao implements DbDao {
             String receiver,
             String hash,
             Instant timeReceived,
-            PartnerMetadataStatus deliveryStatus)
+            PartnerMetadataStatus deliveryStatus,
+            String failureReason)
             throws SQLException {
 
         try (Connection conn = connect();
                 PreparedStatement statement =
                         conn.prepareStatement(
                                 """
-                                INSERT INTO metadata VALUES (?, ?, ?, ?, ?, ?, ?)
-                                ON CONFLICT (received_message_id) DO UPDATE SET receiver = EXCLUDED.receiver, sent_message_id = EXCLUDED.sent_message_id
+                                INSERT INTO metadata VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                                ON CONFLICT (received_message_id) DO UPDATE SET receiver = EXCLUDED.receiver, sent_message_id = EXCLUDED.sent_message_id, delivery_status = EXCLUDED.delivery_status, failure_reason = EXCLUDED.failure_reason
                                 """)) {
 
             statement.setString(1, receivedSubmissionId);
@@ -117,6 +118,8 @@ public class PostgresDao implements DbDao {
             }
 
             statement.setObject(7, deliveryStatusString, Types.OTHER);
+
+            statement.setString(8, failureReason);
 
             statement.executeUpdate();
         }
@@ -151,7 +154,8 @@ public class PostgresDao implements DbDao {
                     result.getString("receiver"),
                     timeReceived,
                     result.getString("hash_of_order"),
-                    PartnerMetadataStatus.valueOf(result.getString("delivery_status")));
+                    PartnerMetadataStatus.valueOf(result.getString("delivery_status")),
+                    result.getString("failure_reason"));
         }
     }
 }

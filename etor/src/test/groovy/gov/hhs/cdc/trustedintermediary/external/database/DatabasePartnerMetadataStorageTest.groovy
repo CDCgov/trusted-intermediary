@@ -28,7 +28,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
     def "readMetadata happy path works"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
-        def mockMetadata = new PartnerMetadata(receivedSubmissionId, "sentSubmissionId", "sender", "receiver", Instant.now(), "hash", PartnerMetadataStatus.PENDING)
+        def mockMetadata = new PartnerMetadata(receivedSubmissionId, "sentSubmissionId", "sender", "receiver", Instant.now(), "hash", PartnerMetadataStatus.PENDING, null)
         def expectedResult = Optional.of(mockMetadata)
 
         mockDao.fetchMetadata(_ as String) >> mockMetadata
@@ -62,7 +62,8 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 "receiver",
                 Instant.now(),
                 "hash",
-                PartnerMetadataStatus.PENDING
+                PartnerMetadataStatus.PENDING,
+                "DogCow failure"
                 )
 
         when:
@@ -76,7 +77,8 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 mockMetadata.receiver(),
                 mockMetadata.hash(),
                 mockMetadata.timeReceived(),
-                mockMetadata.deliveryStatus()
+                mockMetadata.deliveryStatus(),
+                mockMetadata.failureReason()
                 )
     }
 
@@ -90,7 +92,8 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 "receiver",
                 Instant.now(),
                 "hash",
-                PartnerMetadataStatus.FAILED
+                PartnerMetadataStatus.FAILED,
+                "DogCow failure"
                 )
 
         mockDao.upsertMetadata(
@@ -100,7 +103,8 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 mockMetadata.receiver(),
                 mockMetadata.hash(),
                 mockMetadata.timeReceived(),
-                mockMetadata.deliveryStatus()
+                mockMetadata.deliveryStatus(),
+                mockMetadata.failureReason()
                 ) >> { throw new SQLException("Something went wrong!") }
 
         when:
