@@ -157,22 +157,25 @@ public class EtorDomainRegistration implements DomainConnector {
         }
 
         var markMetadataAsFailed = false;
+        String errorMessage = "";
         try {
             orders = orderController.parseOrders(request);
             sendOrderUseCase.convertAndSend(orders, receivedSubmissionId);
         } catch (FhirParseException e) {
-            logger.logError("Unable to parse order request", e);
+            errorMessage = "Unable to parse order request";
+            logger.logError(errorMessage, e);
             markMetadataAsFailed = true;
             return domainResponseHelper.constructErrorResponse(400, e);
         } catch (UnableToSendOrderException e) {
-            logger.logError("Unable to send order", e);
+            errorMessage = "Unable to send order";
+            logger.logError(errorMessage, e);
             markMetadataAsFailed = true;
             return domainResponseHelper.constructErrorResponse(400, e);
         } finally {
             if (markMetadataAsFailed) {
                 try {
                     partnerMetadataOrchestrator.setMetadataStatus(
-                            receivedSubmissionId, PartnerMetadataStatus.FAILED);
+                            receivedSubmissionId, PartnerMetadataStatus.FAILED, errorMessage);
                 } catch (PartnerMetadataException innerE) {
                     logger.logError("Unable to update metadata status", innerE);
                 }

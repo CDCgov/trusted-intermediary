@@ -127,13 +127,15 @@ public class PartnerMetadataOrchestrator {
 
             String receiver;
             String rsStatus;
+            String rsMessage = "";
             try {
                 String bearerToken = rsclient.getRsToken();
                 String responseBody =
                         rsclient.requestHistoryEndpoint(sentSubmissionId, bearerToken);
-                var parsedResponseBody = getReceiverAndStatus(responseBody);
+                var parsedResponseBody = getDataFromReportStream(responseBody);
                 receiver = parsedResponseBody[0];
                 rsStatus = parsedResponseBody[1];
+                rsMessage = parsedResponseBody[2];
             } catch (ReportStreamEndpointClientException | FormatterProcessingException e) {
                 throw new PartnerMetadataException(
                         "Unable to retrieve metadata from RS history API", e);
@@ -142,14 +144,19 @@ public class PartnerMetadataOrchestrator {
             var ourStatus = ourStatusFromReportStreamStatus(rsStatus);
 
             logger.logInfo("Updating metadata with receiver {} and status {}", receiver, ourStatus);
-            partnerMetadata = partnerMetadata.withReceiver(receiver).withDeliveryStatus(ourStatus);
+            partnerMetadata =
+                    partnerMetadata
+                            .withReceiver(receiver)
+                            .withDeliveryStatus(ourStatus)
+                            .withFailureMessage(rsMessage);
             partnerMetadataStorage.saveMetadata(partnerMetadata);
         }
 
         return Optional.of(partnerMetadata);
     }
 
-    public void setMetadataStatus(String submissionId, PartnerMetadataStatus metadataStatus)
+    public void setMetadataStatus(
+            String submissionId, PartnerMetadataStatus metadataStatus, String errorMessage)
             throws PartnerMetadataException {
         if (submissionId == null) {
             return;
@@ -172,11 +179,12 @@ public class PartnerMetadataOrchestrator {
                 "Updating metadata delivery status {} with submissionId: {}",
                 metadataStatus,
                 submissionId);
-        partnerMetadata = partnerMetadata.withDeliveryStatus(metadataStatus);
+        partnerMetadata =
+                partnerMetadata.withDeliveryStatus(metadataStatus).withFailureMessage(errorMessage);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
-    String[] getReceiverAndStatus(String responseBody) throws FormatterProcessingException {
+    String[] getDataFromReportStream(String responseBody) throws FormatterProcessingException {
         // the expected json structure for the response is:
         // {
         //    ...
@@ -217,7 +225,21 @@ public class PartnerMetadataOrchestrator {
                     "Unable to extract overallStatus from response due to unexpected format", e);
         }
 
-        return new String[] {receiver, overallStatus};
+        StringBuilder errorMessages = new StringBuilder();
+        if ("Error".equalsIgnoreCase(overallStatus)) {
+            try {
+                ArrayList<?> errors = (ArrayList<?>) responseObject.get("errors");
+                for (Object error : errors) {
+                    Map<?, ?> x = (Map<?, ?>) error;
+                    errorMessages.append(x.get("message").toString()).append("/ ");
+                }
+            } catch (Exception e) {
+                throw new FormatterProcessingException(
+                        "Unable to extract failure reason due to unexpected format", e);
+            }
+        }
+
+        return new String[] {receiver, overallStatus, errorMessages.toString()};
     }
 
     PartnerMetadataStatus ourStatusFromReportStreamStatus(String rsStatus) {
