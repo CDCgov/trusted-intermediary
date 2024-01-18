@@ -14,7 +14,6 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResp
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator;
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.etor.operationoutcomes.FhirMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
@@ -174,8 +173,8 @@ public class EtorDomainRegistration implements DomainConnector {
         } finally {
             if (markMetadataAsFailed) {
                 try {
-                    partnerMetadataOrchestrator.setMetadataStatus(
-                            receivedSubmissionId, PartnerMetadataStatus.FAILED, errorMessage);
+                    partnerMetadataOrchestrator.setMetadataStatusToFailed(
+                            receivedSubmissionId, errorMessage);
                 } catch (PartnerMetadataException innerE) {
                     logger.logError("Unable to update metadata status", innerE);
                 }

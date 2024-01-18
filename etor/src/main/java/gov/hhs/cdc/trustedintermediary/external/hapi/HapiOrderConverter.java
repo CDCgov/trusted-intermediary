@@ -233,7 +233,7 @@ public class HapiOrderConverter implements OrderConverter {
 
         operation
                 .getIssue()
-                .add(createInformationIssueComponent("Status Message", metadata.failureReason()));
+                .add(createInformationIssueComponent("status message", metadata.failureReason()));
 
         return new HapiFhirMetadata(operation);
     }

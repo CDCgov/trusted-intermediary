@@ -155,8 +155,7 @@ public class PartnerMetadataOrchestrator {
         return Optional.of(partnerMetadata);
     }
 
-    public void setMetadataStatus(
-            String submissionId, PartnerMetadataStatus metadataStatus, String errorMessage)
+    public void setMetadataStatusToFailed(String submissionId, String errorMessage)
             throws PartnerMetadataException {
         if (submissionId == null) {
             return;
@@ -167,20 +166,22 @@ public class PartnerMetadataOrchestrator {
         PartnerMetadata partnerMetadata;
         if (optionalPartnerMetadata.isEmpty()) {
             // there wasn't any metadata given the submission ID, so make one with the status
-            partnerMetadata = new PartnerMetadata(submissionId, metadataStatus);
+            partnerMetadata = new PartnerMetadata(submissionId, PartnerMetadataStatus.FAILED);
         } else {
             partnerMetadata = optionalPartnerMetadata.get();
-            if (partnerMetadata.deliveryStatus().equals(metadataStatus)) {
+            if (partnerMetadata.deliveryStatus().equals(PartnerMetadataStatus.FAILED)) {
                 return;
             }
         }
 
         logger.logInfo(
                 "Updating metadata delivery status {} with submissionId: {}",
-                metadataStatus,
+                PartnerMetadataStatus.FAILED,
                 submissionId);
         partnerMetadata =
-                partnerMetadata.withDeliveryStatus(metadataStatus).withFailureMessage(errorMessage);
+                partnerMetadata
+                        .withDeliveryStatus(PartnerMetadataStatus.FAILED)
+                        .withFailureMessage(errorMessage);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
@@ -231,7 +232,7 @@ public class PartnerMetadataOrchestrator {
                 ArrayList<?> errors = (ArrayList<?>) responseObject.get("errors");
                 for (Object error : errors) {
                     Map<?, ?> x = (Map<?, ?>) error;
-                    errorMessages.append(x.get("message").toString()).append("/ ");
+                    errorMessages.append(x.get("message").toString()).append(" / ");
                 }
             } catch (Exception e) {
                 throw new FormatterProcessingException(

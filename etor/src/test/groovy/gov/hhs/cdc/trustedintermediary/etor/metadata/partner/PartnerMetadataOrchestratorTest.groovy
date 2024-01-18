@@ -298,15 +298,15 @@ class PartnerMetadataOrchestratorTest extends Specification {
         1 * mockPartnerMetadataStorage.saveMetadata(expectedMetadata)
     }
 
-    def "setMetadataStatus sets status to Pending"(){
+    def "setMetadataStatusToFailed sets status to Failed"(){
         given:
         def submissionId = "13425"
-        def metadataStatus = PartnerMetadataStatus.PENDING
-        def optional = Optional.of(new PartnerMetadata("","","","",Instant.now(),"",PartnerMetadataStatus.FAILED, null))
+        def metadataStatus = PartnerMetadataStatus.FAILED
+        def optional = Optional.of(new PartnerMetadata("","","","",Instant.now(),"",PartnerMetadataStatus.PENDING, "Bad Message"))
         mockPartnerMetadataStorage.readMetadata(submissionId) >> optional
 
         when:
-        PartnerMetadataOrchestrator.getInstance().setMetadataStatus(submissionId,metadataStatus,null)
+        PartnerMetadataOrchestrator.getInstance().setMetadataStatusToFailed(submissionId, "Bad Message")
 
         then:
         1 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata) >> { PartnerMetadata partnerMetadata ->
@@ -314,15 +314,15 @@ class PartnerMetadataOrchestratorTest extends Specification {
         }
     }
 
-    def "setMetadataStatus doesn't update status if status is the same"(){
+    def "setMetadataStatusToFailed doesn't update status if status is the same"(){
         given:
         def submissionId = "13425"
-        def metadataStatus = PartnerMetadataStatus.PENDING
+        def metadataStatus = PartnerMetadataStatus.FAILED
         def optional = Optional.of(new PartnerMetadata("","","","",Instant.now(),"",metadataStatus, null))
         mockPartnerMetadataStorage.readMetadata(submissionId) >> optional
 
         when:
-        PartnerMetadataOrchestrator.getInstance().setMetadataStatus(submissionId,metadataStatus,null)
+        PartnerMetadataOrchestrator.getInstance().setMetadataStatusToFailed(submissionId, null)
 
         then:
         0 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata)
@@ -330,48 +330,14 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
     def "setMetadataStatus doesn't update when submissionId is null"(){
         when:
-        PartnerMetadataOrchestrator.getInstance().setMetadataStatus(null,PartnerMetadataStatus.DELIVERED, null)
+        PartnerMetadataOrchestrator.getInstance().setMetadataStatusToFailed(null, null)
 
         then:
         0 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata)
     }
 
-    def "setMetadataStatus sets status to Pending when there is no metadata"(){
-        given:
-        def submissionId = "13425"
-        def metadataStatus = PartnerMetadataStatus.DELIVERED
-        def optional = Optional.empty()
-        mockPartnerMetadataStorage.readMetadata(submissionId) >> optional
 
-        when:
-        PartnerMetadataOrchestrator.getInstance().setMetadataStatus(submissionId,metadataStatus, null)
-
-        then:
-        1 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata) >> { PartnerMetadata partnerMetadata ->
-            assert partnerMetadata.deliveryStatus() == metadataStatus
-            assert partnerMetadata.receivedSubmissionId() == submissionId
-        }
-    }
-
-    def "getReceiverAndStatus returns correct status name and receiver name from valid JSON response"() {
-        given:
-        def organization = "org_id"
-        def sender = "service_name"
-        def status = "Not Delivering"
-        def validJson = """{"overallStatus": "${status}", "destinations": [{"organization_id": "${organization}", "service": "${sender}"}]}"""
-
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        def parsedResponse = PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(validJson)
-
-        then:
-        parsedResponse[0] == "${organization}.${sender}"
-        parsedResponse[1] == status
-    }
-
-    def "getReceiverAndStatus returns correct status name and receiver name from invalid JSON response"() {
+    def "getDataFromReportStream returns correct status name and receiver name from valid JSON response"() {
         given:
         def organization = "org_id"
         def sender = "service_name"
@@ -391,7 +357,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         parsedResponse[2].contains(errorMessage)
     }
 
-    def "getReceiverAndStatus throws FormatterProcessingException or returns null for unexpected format response"() {
+    def "getDataFromReportStream throws FormatterProcessingException or returns null for unexpected format response"() {
         given:
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
@@ -443,6 +409,13 @@ class PartnerMetadataOrchestratorTest extends Specification {
         when:
         def jsonWithoutService = "{\"destinations\":[{\"organization_id\":\"org_id\"}]}"
         PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithoutService)
+
+        then:
+        thrown(FormatterProcessingException)
+
+        when:
+        def jsonWithoutErrorMessageSubString = "{\"destinations\":[{\"organization_id\":\"org_id\", \"service\":\"service\"}], \"overallStatus\": \"Error\"}"
+        PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithoutErrorMessageSubString)
 
         then:
         thrown(FormatterProcessingException)
