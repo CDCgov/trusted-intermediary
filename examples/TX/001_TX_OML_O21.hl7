@@ -1,0 +1,20 @@
+MSH|^~\&|OrderingFacilityApplicationName^2.16.840.1.114222.XXX^ISO|OrderingFacilityName^2.16.840.1.114222.XXX^ISO|txdshslabNBS^2.16.840.1.114222.4.1.181960.2^ISO|txdshslab^2.16.840.1.114222.4.1.181960^ISO|20190720091229||OML^O21^OML_O21|0123|P|2.5.1|||AL|AL
+PID|1||123456^^^^MR||BabyLast^BabyFirst|MotherMaiden|201907011118|F^Female^HL70001||2028-9^Asian^HL70005~2106-3^White^HL70005||||||||ABCD1234^^^OrderingFacilityName&2.16.840.1.114222.XXX&ISO^AN|||223456^^^OrderingFacilityName&2.16.840.1.114222.XXX&ISO^MR|N|Birth Hospital Name|Y|1
+NK1|1|MotherLast^MotherFirst|MTH^Mother^HL70063|123 SUNSHINE DR^^AUSTIN^TX^78756|^^PH^^^555^9204202||N^Next of Kin^HL70131|||||||||19901115|||||||||||||||||123456789^^^txMCDmedIDadm&2.16.840.1.113883.4.446&ISO^MA~555667788^^^SSN&2.16.840.1.113883.4.1&ISO^SS
+ORC|NW|123456^OrderingFacilityName^2.16.840.1.114222.XXX^ISO||25^OrderingFacilityName^2.16.840.1.114222.XXX^ISO|CM||||20190720090530|||1234567890^Dolittle^John^Q^JR^DR^^^NPI&2.16.840.1.113883.4.6&ISO^L^^^NPI|||20190720090030||||||ORDERING FACILITY NAME^^^^^txdshslabNBS&2.16.840.1.114222.4.1.181960.2&ISO^FI^^^01234567
+OBR|1|123456^OrderingFacilityName^2.16.840.1.114222.XXX^ISO||54089-8^Newborn screening
+panel AHIC^LN|||201907200835|||12188^Hippocrates^Harold^H^IV^Dr^MD^^OrderingFacilityName&2.16.840.1.114222.XXX&ISO^L^^EI|||F^Patient fasting prior to procedure^HL70916|||1234567890^Dolittle^John^Q^JR^DR^^^NPI&2.16.840.1.113883.4.6&ISO^L||PlacerField1|PlacerField2||||||||||||||||||||^difficulty collecting sample||||||||||A^Alert provider when abnormal^HL70507
+OBX|1|ST|57723-9^Unique bar code number of Current sample^LN||190123456||||||F|||201907200835|
+OBX|2|ST|57711-4^Unique bar code number of Initial sample^LN||190112233||||||F|||201907200835
+OBX|3|CE|57721-3^Reason for lab test in Dried blood spot^LN||LA12425-7^Subsequent screen - required by law^LN||||||F|||201907200835
+OBX|4|NM|8339-4^Birthweight^LN||2805|g^gram^UCUM|||||F|||201907200835
+OBX|5|NM|57714-8^Obstetric estimation of gestational age^LN|1|39|wk^week^UCUM|||||F|||201907200835
+OBX|6|ST|57713-0^Infant NICU factors that affect newborn screening interpretation^LN||LA12419-0^Infant in NICU at time of specimen collection^LN||||||F|||201907200835
+OBX|7|ST|57713-0^Infant NICU factors that affect newborn screening interpretation^LN||LA12420-8^Systemic antibiotics before newborn screening^LN||||||F|||201907200835
+OBX|8|CE|67704-7^Feeding types^LN||LA16914-6^Breastmilk^LN||||||F|||201907200835
+OBX|9|CE|67704-7^Feeding types^LN||LA16915-3^Lactose formula^LN||||||F|||201907200835
+OBX|10|TX|62324-9^Post-discharge provider name in Provider^LN||Healthy,Bob||||||F|||201907200835
+OBX|11|XAD|62327-2^Post-discharge provider practice address^LN||1234 Main St^Ste. 200^Austin^TX^78758^^^^^^^^^||||||F|||201907200835
+OBX|12|XTN|62328-0^Post-discharge provider practice telephone number in Provider^LN|1|^^PH^^^555^5551212^||||||F|||201907200835
+OBX|13|XTN|62328-0^Post-discharge provider practice telephone number in Provider^LN|1|^^FX^^^555^5551213^||||||F|||201907200835
+SPM|1|SID20192019999&OrderingFacilityName&2.16.840.1.114222.XXX&ISO||440500007^Blood spot specimen^SCT|||CAP^Capillary Specimen^HL70396||||||||||201907200835|||||||||||||000002019201009999^^^OrderingFacilityName&2.16.840.1.114222.XXX&ISO^ACSN|190123456^^^txdshslab&2.16.840.1.114222.4.1.181960&ISO^SID
