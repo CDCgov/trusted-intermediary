@@ -11,11 +11,11 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemograph
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
-import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata;
-import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataException;
-import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataOrchestrator;
-import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadataStorage;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.etor.operationoutcomes.FhirMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController;

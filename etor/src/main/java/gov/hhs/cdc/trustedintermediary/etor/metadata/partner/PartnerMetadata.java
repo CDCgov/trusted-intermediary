@@ -1,6 +1,5 @@
-package gov.hhs.cdc.trustedintermediary.etor.metadata;
+package gov.hhs.cdc.trustedintermediary.etor.metadata.partner;
 
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
 import java.time.Instant;
 
 /**
@@ -36,17 +35,8 @@ public record PartnerMetadata(
             String sender,
             Instant timeReceived,
             String hash,
-            PartnerMetadataStatus deliveryStatus,
-            String failureReason) {
-        this(
-                receivedSubmissionId,
-                null,
-                sender,
-                null,
-                timeReceived,
-                hash,
-                deliveryStatus,
-                failureReason);
+            PartnerMetadataStatus deliveryStatus) {
+        this(receivedSubmissionId, null, sender, null, timeReceived, hash, deliveryStatus, null);
     }
 
     public PartnerMetadata(String receivedSubmissionId, String hash) {

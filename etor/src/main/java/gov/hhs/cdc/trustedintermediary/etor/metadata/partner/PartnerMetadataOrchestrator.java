@@ -1,7 +1,6 @@
-package gov.hhs.cdc.trustedintermediary.etor.metadata;
+package gov.hhs.cdc.trustedintermediary.etor.metadata.partner;
 
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
@@ -43,7 +42,7 @@ public class PartnerMetadataOrchestrator {
 
         String sender;
         Instant timeReceived;
-        String failureReason = null;
+
         try {
             String bearerToken = rsclient.getRsToken();
             String responseBody =
@@ -78,8 +77,7 @@ public class PartnerMetadataOrchestrator {
                         sender,
                         timeReceived,
                         orderHash,
-                        PartnerMetadataStatus.PENDING,
-                        failureReason);
+                        PartnerMetadataStatus.PENDING);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 

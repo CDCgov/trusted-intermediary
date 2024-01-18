@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.etor.metadata;
+package gov.hhs.cdc.trustedintermediary.etor.metadata.partner;
 
 /** Custom exception class use to catch partner metadata exceptions */
 public class PartnerMetadataException extends Exception {

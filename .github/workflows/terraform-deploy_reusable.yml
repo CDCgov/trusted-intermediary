@@ -74,7 +74,8 @@ jobs:
       - name: Run Db migration
         run: |
           export PGPASSWORD=$(az account get-access-token --resource-type oss-rdbms --query "[accessToken]" -o tsv)
-          psql "host=$(terraform output -raw database_hostname) port=5432 dbname=postgres user=cdcti-github sslmode=require" -c "DO \$\$ BEGIN CREATE TYPE message_status AS ENUM ('PENDING', 'DELIVERED', 'FAILED'); EXCEPTION WHEN duplicate_object THEN null; END \$\$; CREATE TABLE IF NOT EXISTS metadata (received_message_id varchar(40) PRIMARY KEY, sent_message_id varchar(40), sender varchar(30), receiver varchar(30), hash_of_order varchar(1000), time_received timestamptz, delivery_status message_status); GRANT ALL ON metadata TO azure_pg_admin; ALTER TABLE metadata OWNER TO azure_pg_admin;"
+          psql "host=$(terraform output -raw database_hostname) port=5432 dbname=postgres user=cdcti-github sslmode=require" -c "DO \$\$ BEGIN CREATE TYPE message_status AS ENUM ('PENDING', 'DELIVERED', 'FAILED'); EXCEPTION WHEN duplicate_object THEN null; END \$\$; CREATE TABLE IF NOT EXISTS metadata (received_message_id varchar(40) PRIMARY KEY, sent_message_id varchar(40), sender varchar(30), receiver varchar(30), hash_of_order varchar(1000), time_received timestamptz, delivery_status message_status, failure_reason varchar(1000)); GRANT ALL ON metadata TO azure_pg_admin; ALTER TABLE metadata OWNER TO azure_pg_admin; ALTER TYPE message_status OWNER TO azure_pg_admin"
+
       - id: export-terraform-output
         name: Export Terraform Output
         run: |

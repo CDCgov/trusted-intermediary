@@ -3,7 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 import gov.hhs.cdc.trustedintermediary.DemographicsMock
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.metadata.PartnerMetadata
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
 import org.hl7.fhir.r4.model.Address
@@ -159,7 +159,7 @@ class HapiOrderConverterTest extends Specification {
                 "ORM"))))
 
         when:
-        def convertedOrderBundle = HapiOrderConverter.getInstance().convertMetadataToOmlOrder(mockOrder).getUnderlyingOrder() as Bundle
+        def convertedOrderBundle = HapiOrderConverter.getInstance().convertToOmlOrder(mockOrder).getUnderlyingOrder() as Bundle
 
         then:
         def convertedMessageHeader = convertedOrderBundle.getEntry().get(1).getResource() as MessageHeader
@@ -170,7 +170,7 @@ class HapiOrderConverterTest extends Specification {
 
     def "adds the message header to specify OML"() {
         when:
-        def convertedOrderBundle = HapiOrderConverter.getInstance().convertMetadataToOmlOrder(mockOrder).getUnderlyingOrder() as Bundle
+        def convertedOrderBundle = HapiOrderConverter.getInstance().convertToOmlOrder(mockOrder).getUnderlyingOrder() as Bundle
 
         then:
         def convertedMessageHeader = convertedOrderBundle.getEntry().get(1).getResource() as MessageHeader
@@ -307,7 +307,7 @@ class HapiOrderConverterTest extends Specification {
         def time = Instant.now()
         def hash = "hash"
         PartnerMetadata metadata = new PartnerMetadata(
-                "receivedSubmissionId", "sentSubmissionId", sender, receiver, time, hash, PartnerMetadataStatus.DELIVERED)
+                "receivedSubmissionId", "sentSubmissionId", sender, receiver, time, hash, PartnerMetadataStatus.DELIVERED, null)
 
         when:
         def result = HapiOrderConverter.getInstance().extractPublicMetadataToOperationOutcome(metadata).getUnderlyingOutcome() as OperationOutcome
