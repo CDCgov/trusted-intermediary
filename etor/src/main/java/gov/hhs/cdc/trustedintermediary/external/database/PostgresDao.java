@@ -97,7 +97,7 @@ public class PostgresDao implements DbDao {
                         conn.prepareStatement(
                                 """
                                 INSERT INTO metadata VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                                ON CONFLICT (received_message_id) DO UPDATE SET receiver = EXCLUDED.receiver, sent_message_id = EXCLUDED.sent_message_id, failure_reason = EXCLUDED.failure_reason
+                                ON CONFLICT (received_message_id) DO UPDATE SET receiver = EXCLUDED.receiver, sent_message_id = EXCLUDED.sent_message_id, delivery_status = EXCLUDED.delivery_status, failure_reason = EXCLUDED.failure_reason
                                 """)) {
 
             statement.setString(1, receivedSubmissionId);
