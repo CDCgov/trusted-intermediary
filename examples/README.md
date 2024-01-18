@@ -21,21 +21,21 @@
 
 #### Minnesota
 
-- [004_MN_ORU_R01_NBS.hl7](/examples/MN/004_MN_ORU_R01_NBS.hl7)
-- [004_MN_ORU_R01_NBS_translation_from_initial_hl7_ingestion.fhir](/examples/MN/004_MN_ORU_R01_NBS_translation_from_initial_hl7_ingestion.fhir)
-- [004_MN_ORU_R01_NBS_translation_from_fhir_for_final_delivery.fhir](/examples/MN/004_MN_ORU_R01_NBS_translation_from_fhir_for_final_delivery.fhir)
-- [001_MN_ADT_A01.hl7](/examples/MN/001_MN_ADT_A01.hl7)
+- [001_MN_Order_NBS.fhir](/examples/MN/001_MN_Order_NBS.fhir)
 - [002_MN_OML_O21_NBS.hl7](/examples/MN/002_MN_OML_O21_NBS.hl7)
 - [003_MN_ORM_O01_NBS.hl7](/examples/MN/003_MN_ORM_O01_NBS.hl7)
 - [003_MN_ORM_O01_NBS_extended.hl7](/examples/MN/003_MN_ORM_O01_NBS_extended.hl7)
 - [003_MN_ORM_O01_NBS_simplified.hl7](/examples/MN/003_MN_ORM_O01_NBS_simplified.hl7)
-- [001_MN_Order_NBS.fhir](/examples/MN/001_MN_Order_NBS.fhir)
+- [004_MN_ORU_R01_NBS.hl7](/examples/MN/004_MN_ORU_R01_NBS.hl7)
+- [004_MN_ORU_R01_NBS_translation_from_initial_hl7_ingestion.fhir](/examples/MN/004_MN_ORU_R01_NBS_translation_from_initial_hl7_ingestion.fhir)
+- [004_MN_ORU_R01_NBS_translation_from_fhir_for_final_delivery.fhir](/examples/MN/004_MN_ORU_R01_NBS_translation_from_fhir_for_final_delivery.fhir)
+- [005_MN_ADT_A01.hl7](/examples/MN/005_MN_ADT_A01.hl7)
 
 #### Tennessee
 
+- [001_TN_ORU_R01_LRI.hl7](/examples/TN/001_TN_ORU_R01_LRI.hl7)
 - [001_TN_ORU_R01_LRI_annotated_for_transformation.hl7](/examples/TN/001_TN_ORU_R01_LRI_annotated_for_transformation.hl7)
 - [001_TN_ORU_R01_LRI_transformed_to_r5.hl7](/examples/TN/001_TN_ORU_R01_LRI_transformed_to_r5.hl7)
-- [001_TN_ORU_R01_LRI.hl7](/examples/TN/001_TN_ORU_R01_LRI.hl7)
 - [002_TN_OML_O21_NBS.hl7](/examples/TN/002_TN_OML_O21_NBS.hl7)
 
 #### Texas
@@ -68,7 +68,7 @@
 
 ### Other
 
-- [005_ADT_A01.hl7](/examples/Other/005_ADT_A01.hl7)
+- [001_ADT_A01.hl7](/examples/Other/001_ADT_A01.hl7)
 - [002_Order.fhir](/examples/Other/002_Order.fhir)
 - [003_Patient_NBS.fhir](/examples/Other/003_Patient_NBS.fhir)
 - [004_OML_O21.fhir](/examples/Other/004_OML_O21.fhir)
@@ -86,7 +86,7 @@
 - `hl7/CA/CA NBS ORU_R01 Lab Result Message.txt` => `CA/002_CA_ORU_R01.hl7`
 - `hl7/LA/Ochsner ORM.txt` => `Epic/001_Epic_ORM_O01.hl7`
 - `hl7/LA/Ochsner ORU.txt` => `Epic/002_Epic_ORU_R01.hl7`
-- `hl7/MN/ADT_A01.txt` => `MN/001_MN_ADT_A01.hl7`
+- `hl7/MN/ADT_A01.txt` => `MN/005_MN_ADT_A01.hl7`
 - `hl7/MN/MN NBS OML_O21 Lab Order Message.txt` => `MN/002_MN_OML_O21_NBS.hl7`
 - `hl7/MN/MN NBS ORM_O01 Lab Order Message.txt` => `MN/003_MN_ORM_O01_NBS.hl7`
 - `hl7/MN/MN NBS ORM_O01 Lab Order Message Extended.txt` => `MN/003_MN_ORM_O01_NBS_extended.hl7`
@@ -94,4 +94,4 @@
 - `hl7/MN/ORM simplified.txt` => `MN/003_MN_ORM_O01_NBS_simplified.hl7`
 - `hl7/OML_021.hl7` => `NewSTEPs/001_NewSTEPs_OML_021.hl7`
 - `hl7/ORU_R01.hl7` => `NewSTEPs/002_NewSTEPs_ORU_R01.hl7`
-- `hl7/ADT_A01.txt` => `Other/005_ADT_A01.hl7`
+- `hl7/ADT_A01.txt` => `Other/001_ADT_A01.hl7`
