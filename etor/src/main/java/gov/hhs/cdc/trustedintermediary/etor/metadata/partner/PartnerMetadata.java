@@ -82,4 +82,16 @@ public record PartnerMetadata(
                 deliveryStatus,
                 this.failureReason);
     }
+
+    public PartnerMetadata withFailureMessage(String failureMessage) {
+        return new PartnerMetadata(
+                this.receivedSubmissionId,
+                this.sentSubmissionId,
+                this.sender,
+                this.receiver,
+                this.timeReceived,
+                this.hash,
+                this.deliveryStatus,
+                failureMessage);
+    }
 }

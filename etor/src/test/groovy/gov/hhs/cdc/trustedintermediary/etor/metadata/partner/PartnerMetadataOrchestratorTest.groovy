@@ -2,11 +2,6 @@ package gov.hhs.cdc.trustedintermediary.etor.metadata.partner
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStorage
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
@@ -251,8 +246,8 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def hashCode = "123"
         def bearerToken = "token"
         def rsHistoryApiResponse = "{\"destinations\": [{\"organization_id\": \"org\", \"service\": \"service\"}]}"
-        def missingReceiverMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, null, timestamp, hashCode, PartnerMetadataStatus.DELIVERED, null)
-        def expectedMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, "org.service", timestamp, hashCode, PartnerMetadataStatus.DELIVERED, null)
+        def missingReceiverMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, null, timestamp, hashCode, PartnerMetadataStatus.DELIVERED, "")
+        def expectedMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, "org.service", timestamp, hashCode, PartnerMetadataStatus.DELIVERED, "")
 
         mockClient.getRsToken() >> bearerToken
         mockClient.requestHistoryEndpoint(sentSubmissionId, bearerToken) >> rsHistoryApiResponse
@@ -283,7 +278,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def bearerToken = "token"
         def rsHistoryApiResponse = "{\"destinations\": [{\"organization_id\": \"org\", \"service\": \"service\"}]}"
         def missingReceiverMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timestamp, hashCode, PartnerMetadataStatus.PENDING, null)
-        def expectedMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timestamp, hashCode, PartnerMetadataStatus.FAILED, null)
+        def expectedMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timestamp, hashCode, PartnerMetadataStatus.FAILED, "")
 
         mockClient.getRsToken() >> bearerToken
         mockClient.requestHistoryEndpoint(sentSubmissionId, bearerToken) >> rsHistoryApiResponse
@@ -303,15 +298,15 @@ class PartnerMetadataOrchestratorTest extends Specification {
         1 * mockPartnerMetadataStorage.saveMetadata(expectedMetadata)
     }
 
-    def "setMetadataStatus sets status to Pending"(){
+    def "setMetadataStatusToFailed sets status to Failed"(){
         given:
         def submissionId = "13425"
-        def metadataStatus = PartnerMetadataStatus.PENDING
-        def optional = Optional.of(new PartnerMetadata("","","","",Instant.now(),"",PartnerMetadataStatus.FAILED, null))
+        def metadataStatus = PartnerMetadataStatus.FAILED
+        def optional = Optional.of(new PartnerMetadata("","","","",Instant.now(),"",PartnerMetadataStatus.PENDING, "Bad Message"))
         mockPartnerMetadataStorage.readMetadata(submissionId) >> optional
 
         when:
-        PartnerMetadataOrchestrator.getInstance().setMetadataStatus(submissionId,metadataStatus)
+        PartnerMetadataOrchestrator.getInstance().setMetadataStatusToFailed(submissionId, "Bad Message")
 
         then:
         1 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata) >> { PartnerMetadata partnerMetadata ->
@@ -319,23 +314,15 @@ class PartnerMetadataOrchestratorTest extends Specification {
         }
     }
 
-    def "setMetadataStatus doesn't update status if status is the same"(){
+    def "setMetadataStatusToFailed doesn't update status if status is the same"(){
         given:
         def submissionId = "13425"
-        def metadataStatus = PartnerMetadataStatus.PENDING
+        def metadataStatus = PartnerMetadataStatus.FAILED
         def optional = Optional.of(new PartnerMetadata("","","","",Instant.now(),"",metadataStatus, null))
         mockPartnerMetadataStorage.readMetadata(submissionId) >> optional
 
         when:
-        PartnerMetadataOrchestrator.getInstance().setMetadataStatus(submissionId,metadataStatus)
-
-        then:
-        0 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata)
-    }
-
-    def "setMetadataStatus doesn't update when submissionId is null"(){
-        when:
-        PartnerMetadataOrchestrator.getInstance().setMetadataStatus(null,PartnerMetadataStatus.DELIVERED)
+        PartnerMetadataOrchestrator.getInstance().setMetadataStatusToFailed(submissionId, null)
 
         then:
         0 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata)
@@ -344,60 +331,70 @@ class PartnerMetadataOrchestratorTest extends Specification {
     def "setMetadataStatus sets status to Pending when there is no metadata"(){
         given:
         def submissionId = "13425"
-        def metadataStatus = PartnerMetadataStatus.DELIVERED
         def optional = Optional.empty()
         mockPartnerMetadataStorage.readMetadata(submissionId) >> optional
 
         when:
-        PartnerMetadataOrchestrator.getInstance().setMetadataStatus(submissionId,metadataStatus)
+        PartnerMetadataOrchestrator.getInstance().setMetadataStatusToFailed(submissionId, "Failure")
 
         then:
         1 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata) >> { PartnerMetadata partnerMetadata ->
-            assert partnerMetadata.deliveryStatus() == metadataStatus
+            assert partnerMetadata.deliveryStatus() == PartnerMetadataStatus.FAILED
             assert partnerMetadata.receivedSubmissionId() == submissionId
         }
     }
 
-    def "getReceiverAndStatus returns correct status name and receiver name from valid JSON response"() {
+    def "setMetadataStatus doesn't update when submissionId is null"(){
+        when:
+        PartnerMetadataOrchestrator.getInstance().setMetadataStatusToFailed(null, null)
+
+        then:
+        0 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata)
+    }
+
+
+    def "getDataFromReportStream returns correct status name and receiver name from valid JSON response"() {
         given:
         def organization = "org_id"
         def sender = "service_name"
-        def status = "Not Delivering"
-        def validJson = """{"overallStatus": "${status}", "destinations": [{"organization_id": "${organization}", "service": "${sender}"}]}"""
+        def status = "Error"
+        def errorMessage = "Bad message"
+        def validJson = """{"overallStatus": "${status}", "destinations": [{"organization_id": "${organization}", "service": "${sender}"}], "errors": [{"message": "${errorMessage}" }]}"""
 
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def parsedResponse = PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(validJson)
+        def parsedResponse = PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(validJson)
 
         then:
         parsedResponse[0] == "${organization}.${sender}"
         parsedResponse[1] == status
+        parsedResponse[2].contains(errorMessage)
     }
 
-    def "getReceiverAndStatus throws FormatterProcessingException or returns null for unexpected format response"() {
+    def "getDataFromReportStream throws FormatterProcessingException or returns null for unexpected format response"() {
         given:
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
         def invalidJson = "invalid JSON"
-        PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(invalidJson)
+        PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(invalidJson)
 
         then:
         thrown(FormatterProcessingException)
 
         when:
         def emptyJson = "{}"
-        PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(emptyJson)
+        PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(emptyJson)
 
         then:
         thrown(FormatterProcessingException)
 
         when:
         def jsonWithoutDestinations = "{\"someotherkey\": \"value\"}"
-        PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(jsonWithoutDestinations)
+        PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithoutDestinations)
 
         then:
         thrown(FormatterProcessingException)
@@ -405,7 +402,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         when:
 
         def jsonWithEmptyDestinations = "{\"destinations\": []}"
-        def parsedData = PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(jsonWithEmptyDestinations)
+        def parsedData = PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithEmptyDestinations)
 
         then:
         parsedData[0] == null
@@ -413,21 +410,28 @@ class PartnerMetadataOrchestratorTest extends Specification {
         when:
 
         def jsonWithNoStatus = "{\"destinations\": []}"
-        parsedData = PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(jsonWithNoStatus)
+        parsedData = PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithNoStatus)
 
         then:
         parsedData[1] == null
 
         when:
         def jsonWithoutOrgId = "{\"destinations\":[{\"service\":\"service\"}]}"
-        PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(jsonWithoutOrgId)
+        PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithoutOrgId)
 
         then:
         thrown(FormatterProcessingException)
 
         when:
         def jsonWithoutService = "{\"destinations\":[{\"organization_id\":\"org_id\"}]}"
-        PartnerMetadataOrchestrator.getInstance().getReceiverAndStatus(jsonWithoutService)
+        PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithoutService)
+
+        then:
+        thrown(FormatterProcessingException)
+
+        when:
+        def jsonWithoutErrorMessageSubString = "{\"destinations\":[{\"organization_id\":\"org_id\", \"service\":\"service\"}], \"overallStatus\": \"Error\"}"
+        PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithoutErrorMessageSubString)
 
         then:
         thrown(FormatterProcessingException)

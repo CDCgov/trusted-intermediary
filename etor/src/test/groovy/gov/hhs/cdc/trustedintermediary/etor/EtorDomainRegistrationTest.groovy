@@ -280,7 +280,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
 
         def mockPartnerMetadataOrchestrator = Mock(PartnerMetadataOrchestrator)
-        mockPartnerMetadataOrchestrator.setMetadataStatus(_, PartnerMetadataStatus.FAILED) >> {
+        mockPartnerMetadataOrchestrator.setMetadataStatusToFailed(_, PartnerMetadataStatus.FAILED) >> {
             throw new PartnerMetadataException("error")
         }
         TestApplicationContext.register(PartnerMetadataOrchestrator,mockPartnerMetadataOrchestrator)

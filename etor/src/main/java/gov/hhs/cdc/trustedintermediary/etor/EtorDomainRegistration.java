@@ -14,7 +14,6 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResp
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator;
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.etor.operationoutcomes.FhirMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
@@ -157,22 +156,25 @@ public class EtorDomainRegistration implements DomainConnector {
         }
 
         var markMetadataAsFailed = false;
+        String errorMessage = "";
         try {
             orders = orderController.parseOrders(request);
             sendOrderUseCase.convertAndSend(orders, receivedSubmissionId);
         } catch (FhirParseException e) {
-            logger.logError("Unable to parse order request", e);
+            errorMessage = "Unable to parse order request";
+            logger.logError(errorMessage, e);
             markMetadataAsFailed = true;
             return domainResponseHelper.constructErrorResponse(400, e);
         } catch (UnableToSendOrderException e) {
-            logger.logError("Unable to send order", e);
+            errorMessage = "Unable to send order";
+            logger.logError(errorMessage, e);
             markMetadataAsFailed = true;
             return domainResponseHelper.constructErrorResponse(400, e);
         } finally {
             if (markMetadataAsFailed) {
                 try {
-                    partnerMetadataOrchestrator.setMetadataStatus(
-                            receivedSubmissionId, PartnerMetadataStatus.FAILED);
+                    partnerMetadataOrchestrator.setMetadataStatusToFailed(
+                            receivedSubmissionId, errorMessage);
                 } catch (PartnerMetadataException innerE) {
                     logger.logError("Unable to update metadata status", innerE);
                 }
