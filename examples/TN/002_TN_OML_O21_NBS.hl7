@@ -1,0 +1,24 @@
+MSH|^~\&|OZNBS|MHHS^2.16.840.1.113883.9.189.106.47^HL7|NBS^natus.health.state.TN.us^DNS|TN^2.16.840.1.114222.4.1.175791^ISO|20221216140529||OML^O21^OML_O21|C8E93305-2069-46A0-89D7-A58C80DB0FDE|T|2.5.1|||AL|AL|||||LOI_NG_PRN_Profile^^2.16.840.1.113883.9.88^ISO~LOI_NDBS_COMPONENT^^2.16.840.1.113883.9.5^ISO||||||||||||||||||||||
+PID|1|1000420000000001290|914265^^^Covenant- Morristown-Hamblen Healthcare System^MR||ZZZTEST^GIRL WHOZNEW||20221215134500|F||^||||||||||||||N||||||0|
+NK1|1|ZZZTEST^WHOZNEW|MTH^Mother^HL70063|1410 CENTERPOINT BLVD^^KNOXVILLE^TN^37932^^^^47|^^PH^^^555^5555555|||||||||||19931225|||||||||||||||||^^^^United States (US) Social Security Number (SSN)&2.16.840.1.113883.4.1&ISO|||||
+ORC|NW|^4754768137^|||||||20221216135000|||3209224|||||||||Covenant- Morristown-Hamblen Healthcare System^^^^^^NPI^^^3209224|908 West Fourth North Street^^Morristown^TN^37814^^^^^^^^^|^^PH^^^423^4929000^|
+OBR|1|4754768137^Covenant- Morristown-Hamblen Healthcare System^3209224^NPI||54089-8^Newborn screening panel American Health Information Community (AHIC)^LN|||20221216135000|||||||20221216140529||3209224^^^^^^^^^^^^NPI||||||||||
+OBX|1|CWE|73742-9^Newborn hearing screen reason not performed - Right^LN|1|HOSPITALIZED^Still In Hospital^99TNH||||||O|||20221216|||||||||||||||QST|AOE||||||||||||
+OBX|2|CWE|73739-5^Newborn hearing screen reason not performed - Left^LN|1|HOSPITALIZED^Still In Hospital^99TNH||||||O|||20221216|||||||||||||||QST|AOE||||||||||||
+OBX|3|CWE|73698-3^Reason CCHD oxygen saturation screening not performed ^LN|1|LA19825-1^On O2^LN||||||O|||20221216135000|||||||||||||||QST|AOE||||||||||||
+OBR|2|4754768137^Covenant- Morristown-Hamblen Healthcare System^3209224^NPI||57717-1^Newborn screen card data panel^LN|||20221216135000|||||||20221216135000||3209224^^^^^^^^^^^^NPI||||||||||
+OBX|1|ST|57723-9^Unique bar code number of Current sample^LN||M827270||||||O|||20221216135000|||||||||||||||QST|AOE||||||||||||
+OBX|2|CWE|57721-3^Reason for lab test in Dried blood spot^LN||LA12421-6^Initial Specimen^LN||||||O|||20221216135000|||||||||||||||QST|AOE||||||||||||
+OBX|3|NM|8339-4^Birth Weight Measured^LN||3555|g^gram^UCUM|||||O|||20221216135000|||||||||||||||QST|AOE||||||||||||
+OBX|4|NM|57714-8^Obstetric estimation of gestational age^LN||38|wk^week^UCUM|||||O|||20221216135000|||||||||||||||QST|AOE||||||||||||
+OBX|5|NM|58229-6^Body weight Measured when specimen taken^LN||3540|g^gram^UCUM|||||O|||20221216135000|||||||||||||||QST|AOE||||||||||||
+OBX|6|CWE|67704-7^Feeding types^LN|1|LA16914-6^Breast milk^LN||||||O|||20221216135000|||||||||||||||QST|AOE||||||||||||
+OBX|7|TX|62323-1^Post discharge provider^LN||BAT.TEST||||||O|||20221216135000|||||||||||||||QST|AOE||||||||||||
+OBX|8|TX|62324-9^Post-discharge provider name in Provider^LN||BATES, JOHN||||||O|||20221216135000|||||||||||||||QST|AOE||||||||||||
+OBX|9|XAD|62327-2^Post-discharge provider practice address^LN||1345 EDWARDS STREET^^UNION CITY^TN^38261^^^^^^^^^||||||O|||20221216135000|||||||||||||||QST|AOE||||||||||||
+OBX|10|XTN|62328-0^Post-discharge provider practice telephone number in Provider^LN|1|^^PH^^^731^8854338||||||O|||20221216135000|||||||||||||||QST|AOE||||||||||||
+OBX|11|TX|62329-8^Birth hospital facility ID [Identifier] in Facility^LN||3209224||||||O|||20221216135000|||||||||||||||QST|AOE||||||||||||
+OBX|12|TX|62330-6^Birth Hospital Name^LN||Covenant- Morristown-Hamblen Healthcare System||||||O|||20221216135000|||||||||||||||QST|AOE||||||||||||
+OBX|13|XAD|62331-4^Birth hosiptal facility address^LN||908 West Fourth North Street^^Morristown^TN^37814^^^^^^^^^||||||O|||20221216135000|||||||||||||||QST|AOE||||||||||||
+OBX|14|XTN|62332-2^Birth hospital facility phone number in Facility^LN|1|^^PH^^^423^4929000||||||O|||20221216135000|||||||||||||||QST|AOE||||||||||||
+SPM|1|M827270^Covenant- Morristown-Hamblen Healthcare System^3209224^NPI||440500007^Blood spot specimen^SCT|||||||||||||20221216135000|||||||||||||
