@@ -46,11 +46,11 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
     }
 
     @Override
-    public Optional<PartnerMetadata> readMetadata(final String receivedSubmissionId)
+    public Optional<PartnerMetadata> readMetadata(final String submissionId)
             throws PartnerMetadataException {
-        Path filePath = getFilePath(receivedSubmissionId);
         try {
-            if (!Files.exists(filePath)) {
+            Path filePath = searchFilePath(submissionId);
+            if (filePath == null || !Files.exists(filePath)) {
                 logger.logWarning("Metadata file not found: {}", filePath);
                 return Optional.empty();
             }
@@ -65,7 +65,8 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
 
     @Override
     public void saveMetadata(final PartnerMetadata metadata) throws PartnerMetadataException {
-        Path metadataFilePath = getFilePath(metadata.receivedSubmissionId());
+        Path metadataFilePath =
+                getFilePath(metadata.receivedSubmissionId() + "|" + metadata.sentSubmissionId());
         try {
             String content = formatter.convertToJsonString(metadata);
             Files.writeString(metadataFilePath, content);
@@ -81,5 +82,21 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
 
     private Path getFilePath(String metadataId) {
         return METADATA_DIRECTORY.resolve(metadataId + ".json");
+    }
+
+    private Path searchFilePath(String metadataId) throws IOException {
+        //  /tmp/coolmetadata/481C2227-2F4D-4CF2-945A-FF4721118322|1234567890.json
+        //  /tmp/coolmetadata/D3E298BE-A78B-42A9-BF70-AADCCD573C0B|1234567890.json
+
+        // 481C2227-2F4D-4CF2-945A-FF4721118322|1234567890.json
+        return Files.list(METADATA_DIRECTORY)
+                .filter(
+                        metadataPath -> {
+                            String fileName = metadataPath.getFileName().toString();
+                            return fileName.startsWith(metadataId)
+                                    || fileName.endsWith(metadataId + ".json");
+                        })
+                .findFirst()
+                .orElse(null);
     }
 }
