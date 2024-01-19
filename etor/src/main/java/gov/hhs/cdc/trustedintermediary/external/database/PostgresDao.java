@@ -126,14 +126,14 @@ public class PostgresDao implements DbDao {
     }
 
     @Override
-    public synchronized PartnerMetadata fetchMetadata(String receivedSubmissionId)
-            throws SQLException {
+    public synchronized PartnerMetadata fetchMetadata(String submissionId) throws SQLException {
         try (Connection conn = connect();
                 PreparedStatement statement =
                         conn.prepareStatement(
-                                "SELECT * FROM metadata where received_message_id = ?")) {
+                                "SELECT * FROM metadata where received_message_id = ? OR sent_message_id = ?")) {
 
-            statement.setString(1, receivedSubmissionId);
+            statement.setString(1, submissionId);
+            statement.setString(2, submissionId);
 
             ResultSet result = statement.executeQuery();
 
