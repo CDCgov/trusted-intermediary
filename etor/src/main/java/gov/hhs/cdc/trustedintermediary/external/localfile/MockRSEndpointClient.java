@@ -46,9 +46,15 @@ public class MockRSEndpointClient implements RSEndpointClient {
                 {
                     "timestamp" : "2020-01-01T00:00:00.000Z",
                     "sender" : "flexion.simulated-hospital",
+                    "overallStatus": "Not Delivering",
                     "destinations": [{
                         "organization_id": "flexion",
                         "service": "simulated-lab"
+                    }],
+                    "errors": [{
+                        "message": "The message was not good"
+                    }, {
+                        "message": "The DogCow couldn't Moof!"
                     }]
                  }""";
     }

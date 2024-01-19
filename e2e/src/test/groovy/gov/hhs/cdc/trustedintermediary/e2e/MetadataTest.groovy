@@ -33,6 +33,20 @@ class MetadataTest extends Specification {
         then:
         metadataResponse.getCode() == expectedStatusCode
         parsedJsonBody.get("id") == submissionId
+
+        [
+            "sender name",
+            "receiver name",
+            "order ingestion",
+            "payload hash",
+            "delivery status",
+            "status message"
+        ].each { String metadataKey ->
+            def issue = (parsedJsonBody.issue as List).find( {issue -> issue.details.text == metadataKey })
+            assert issue != null
+            assert issue.diagnostics != null
+            assert !issue.diagnostics.isEmpty()
+        }
     }
 
     def "a 404 is returned when there is no metadata for a given ID"() {

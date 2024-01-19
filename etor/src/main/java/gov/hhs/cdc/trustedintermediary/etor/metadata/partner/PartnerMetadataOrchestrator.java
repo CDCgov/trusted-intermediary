@@ -144,11 +144,12 @@ public class PartnerMetadataOrchestrator {
             var ourStatus = ourStatusFromReportStreamStatus(rsStatus);
 
             logger.logInfo("Updating metadata with receiver {} and status {}", receiver, ourStatus);
-            partnerMetadata =
-                    partnerMetadata
-                            .withReceiver(receiver)
-                            .withDeliveryStatus(ourStatus)
-                            .withFailureMessage(rsMessage);
+            partnerMetadata = partnerMetadata.withReceiver(receiver).withDeliveryStatus(ourStatus);
+
+            if (ourStatus == PartnerMetadataStatus.FAILED) {
+                partnerMetadata = partnerMetadata.withFailureMessage(rsMessage);
+            }
+
             partnerMetadataStorage.saveMetadata(partnerMetadata);
         }
 
@@ -198,6 +199,9 @@ public class PartnerMetadataOrchestrator {
         //        ...
         //    } ],
         //    ...
+        //    "errors": [{
+        //        "message": "some error message"
+        //    }]
         // }
 
         Map<String, Object> responseObject =
@@ -227,17 +231,15 @@ public class PartnerMetadataOrchestrator {
         }
 
         StringBuilder errorMessages = new StringBuilder();
-        if ("Error".equalsIgnoreCase(overallStatus)) {
-            try {
-                ArrayList<?> errors = (ArrayList<?>) responseObject.get("errors");
-                for (Object error : errors) {
-                    Map<?, ?> x = (Map<?, ?>) error;
-                    errorMessages.append(x.get("message").toString()).append(" / ");
-                }
-            } catch (Exception e) {
-                throw new FormatterProcessingException(
-                        "Unable to extract failure reason due to unexpected format", e);
+        try {
+            ArrayList<?> errors = (ArrayList<?>) responseObject.get("errors");
+            for (Object error : errors) {
+                Map<?, ?> x = (Map<?, ?>) error;
+                errorMessages.append(x.get("message").toString()).append(" / ");
             }
+        } catch (Exception e) {
+            throw new FormatterProcessingException(
+                    "Unable to extract failure reason due to unexpected format", e);
         }
 
         return new String[] {receiver, overallStatus, errorMessages.toString()};
