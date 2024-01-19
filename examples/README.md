@@ -28,7 +28,7 @@
 - [003_MN_ORM_O01_NBS_simplified.hl7](/examples/MN/003_MN_ORM_O01_NBS_simplified.hl7)
 - [004_MN_ORU_R01_NBS.hl7](/examples/MN/004_MN_ORU_R01_NBS.hl7)
 - [004_MN_ORU_R01_NBS_translation_from_initial_hl7_ingestion.fhir](/examples/MN/004_MN_ORU_R01_NBS_translation_from_initial_hl7_ingestion.fhir)
-- [004_MN_ORU_R01_NBS_translation_from_fhir_for_final_delivery.fhir](/examples/MN/004_MN_ORU_R01_NBS_translation_from_fhir_for_final_delivery.fhir)
+- [004_MN_ORU_R01_NBS_translation_from_fhir_for_final_delivery.hl7](/examples/MN/004_MN_ORU_R01_NBS_translation_from_fhir_for_final_delivery.hl7)
 - [005_MN_ADT_A01.hl7](/examples/MN/005_MN_ADT_A01.hl7)
 
 #### Tennessee
