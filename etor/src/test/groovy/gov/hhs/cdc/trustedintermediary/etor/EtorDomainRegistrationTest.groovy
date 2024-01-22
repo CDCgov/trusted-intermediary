@@ -377,7 +377,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
 
         def mockOrderConverter = Mock(OrderConverter)
-        mockOrderConverter.extractPublicMetadataToOperationOutcome(_ as PartnerMetadata) >> Mock(FhirMetadata)
+        mockOrderConverter.extractPublicMetadataToOperationOutcome(_ as PartnerMetadata, _ as String) >> Mock(FhirMetadata)
         TestApplicationContext.register(OrderConverter, mockOrderConverter)
 
         def mockFhir = Mock(HapiFhir)

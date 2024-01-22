@@ -16,23 +16,28 @@ class MetadataTest extends Specification {
     def "a metadata response is returned from the ETOR metadata endpoint"() {
         given:
         def expectedStatusCode = 200
-        def submissionId = UUID.randomUUID().toString()
+        def inboundSubmissionId = UUID.randomUUID().toString()
+        def outboundSubmissionId = "1234567890"
         def orderClient = new EndpointClient("/v1/etor/orders")
         def labOrderJsonFileString = Files.readString(Path.of("../examples/MN/001_MN_Order_NBS.fhir"))
 
         when:
-        def orderResponse = orderClient.submit(labOrderJsonFileString, submissionId, true)
+        def orderResponse = orderClient.submit(labOrderJsonFileString, inboundSubmissionId, true)
 
         then:
         orderResponse.getCode() == expectedStatusCode
 
         when:
-        def metadataResponse = metadataClient.get(submissionId, true)
-        def parsedJsonBody = JsonParsing.parseContent(metadataResponse)
+        def inboundMetadataResponse = metadataClient.get(inboundSubmissionId, true)
+        def outboundMetadataResponse = metadataClient.get(outboundSubmissionId, true)
+        def inboundParsedJsonBody = JsonParsing.parseContent(inboundMetadataResponse)
+        def outboundParsedJsonBody = JsonParsing.parseContent(outboundMetadataResponse)
 
         then:
-        metadataResponse.getCode() == expectedStatusCode
-        parsedJsonBody.get("id") == submissionId
+        inboundMetadataResponse.getCode() == expectedStatusCode
+        outboundMetadataResponse.getCode() == expectedStatusCode
+        inboundParsedJsonBody.get("id") == inboundSubmissionId
+        outboundParsedJsonBody.get("id") == outboundSubmissionId
 
         [
             "sender name",
@@ -42,7 +47,7 @@ class MetadataTest extends Specification {
             "delivery status",
             "status message"
         ].each { String metadataKey ->
-            def issue = (parsedJsonBody.issue as List).find( {issue -> issue.details.text == metadataKey })
+            def issue = (inboundParsedJsonBody.issue as List).find( {issue -> issue.details.text == metadataKey })
             assert issue != null
             assert issue.diagnostics != null
             assert !issue.diagnostics.isEmpty()

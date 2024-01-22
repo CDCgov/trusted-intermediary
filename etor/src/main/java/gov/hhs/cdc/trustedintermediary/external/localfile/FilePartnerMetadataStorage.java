@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Optional;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 
 /** Implements the {@link PartnerMetadataStorage} using local files. */
@@ -24,7 +25,7 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
     @Inject Formatter formatter;
     @Inject Logger logger;
 
-    private static final Path METADATA_DIRECTORY;
+    static final Path METADATA_DIRECTORY;
 
     static {
         try {
@@ -46,11 +47,11 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
     }
 
     @Override
-    public Optional<PartnerMetadata> readMetadata(final String receivedSubmissionId)
+    public Optional<PartnerMetadata> readMetadata(final String submissionId)
             throws PartnerMetadataException {
-        Path filePath = getFilePath(receivedSubmissionId);
         try {
-            if (!Files.exists(filePath)) {
+            Path filePath = searchFilePath(submissionId);
+            if (filePath == null || !Files.exists(filePath)) {
                 logger.logWarning("Metadata file not found: {}", filePath);
                 return Optional.empty();
             }
@@ -65,7 +66,21 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
 
     @Override
     public void saveMetadata(final PartnerMetadata metadata) throws PartnerMetadataException {
-        Path metadataFilePath = getFilePath(metadata.receivedSubmissionId());
+        try {
+            Path previousMetadataFilePath = searchFilePath(metadata.receivedSubmissionId());
+            if (previousMetadataFilePath != null) {
+                // delete the pre-existing metadata file so that we don't find the old file when we
+                // search for a given metadata ID
+                Files.delete(previousMetadataFilePath);
+            }
+        } catch (IOException e) {
+            throw new PartnerMetadataException(
+                    "Error deleting previous metadata file for " + metadata.receivedSubmissionId(),
+                    e);
+        }
+
+        Path metadataFilePath =
+                getFilePath(metadata.receivedSubmissionId() + "|" + metadata.sentSubmissionId());
         try {
             String content = formatter.convertToJsonString(metadata);
             Files.writeString(metadataFilePath, content);
@@ -81,5 +96,24 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
 
     private Path getFilePath(String metadataId) {
         return METADATA_DIRECTORY.resolve(metadataId + ".json");
+    }
+
+    private Path searchFilePath(String metadataId) throws IOException {
+
+        Path path = null;
+
+        try (Stream<Path> fileList = Files.list(METADATA_DIRECTORY)) {
+            path =
+                    fileList.filter(
+                                    metadataPath -> {
+                                        String fileName = metadataPath.getFileName().toString();
+                                        return fileName.startsWith(metadataId)
+                                                || fileName.endsWith(metadataId + ".json");
+                                    })
+                            .findFirst()
+                            .orElse(null);
+        }
+
+        return path;
     }
 }

@@ -197,7 +197,8 @@ public class EtorDomainRegistration implements DomainConnector {
             }
 
             FhirMetadata<?> responseObject =
-                    orderConverter.extractPublicMetadataToOperationOutcome(metadata.get());
+                    orderConverter.extractPublicMetadataToOperationOutcome(
+                            metadata.get(), metadataId);
 
             return domainResponseHelper.constructOkResponseFromString(
                     fhir.encodeResourceToJson(responseObject.getUnderlyingOutcome()));
