@@ -99,8 +99,6 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
                                     })
                             .findFirst()
                             .orElse(null);
-        } catch (IOException e) {
-            throw new IOException("Error searching for file path for " + metadataId, e);
         }
 
         return path;
