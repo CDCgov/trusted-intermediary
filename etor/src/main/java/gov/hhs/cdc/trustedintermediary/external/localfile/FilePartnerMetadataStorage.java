@@ -66,6 +66,19 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
 
     @Override
     public void saveMetadata(final PartnerMetadata metadata) throws PartnerMetadataException {
+        try {
+            Path previousMetadataFilePath = searchFilePath(metadata.receivedSubmissionId());
+            if (previousMetadataFilePath != null) {
+                // delete the pre-existing metadata file so that we don't find the old file when we
+                // search for a given metadata ID
+                Files.delete(previousMetadataFilePath);
+            }
+        } catch (IOException e) {
+            throw new PartnerMetadataException(
+                    "Error deleting previous metadata file for " + metadata.receivedSubmissionId(),
+                    e);
+        }
+
         Path metadataFilePath =
                 getFilePath(metadata.receivedSubmissionId() + "|" + metadata.sentSubmissionId());
         try {

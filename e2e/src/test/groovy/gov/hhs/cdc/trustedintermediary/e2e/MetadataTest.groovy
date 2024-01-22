@@ -49,11 +49,8 @@ class MetadataTest extends Specification {
         ].each { String metadataKey ->
             def issue = (inboundParsedJsonBody.issue as List).find( {issue -> issue.details.text == metadataKey })
             assert issue != null
-
-            if(metadataKey != "sender name" || metadataKey != "receiver name") {
-                assert issue.diagnostics != null
-                assert !issue.diagnostics.isEmpty()
-            }
+            assert issue.diagnostics != null
+            assert !issue.diagnostics.isEmpty()
         }
     }
 
