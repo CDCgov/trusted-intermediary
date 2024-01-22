@@ -8,9 +8,9 @@ import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
-import spock.lang.Specification
-
+import java.nio.file.Files
 import java.time.Instant
+import spock.lang.Specification
 
 class FilePartnerMetadataStorageTest extends Specification {
 
@@ -18,6 +18,8 @@ class FilePartnerMetadataStorageTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(FilePartnerMetadataStorage, FilePartnerMetadataStorage.getInstance())
+
+        Files.list(FilePartnerMetadataStorage.METADATA_DIRECTORY).forEach {Files.delete(it) }
     }
 
     def "save and read metadata successfully"() {
@@ -53,15 +55,21 @@ class FilePartnerMetadataStorageTest extends Specification {
         thrown(PartnerMetadataException)
     }
 
-    def "readMetadata throws PartnerMetadataException when unable to read file"() {
+    def "readMetadata throws PartnerMetadataException when unable to parse file"() {
         given:
         def mockFormatter = Mock(Formatter)
         mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> {throw new FormatterProcessingException("error", new Exception())}
+        mockFormatter.convertToJsonString(_) >> "DogCow is great!"
         TestApplicationContext.register(Formatter, mockFormatter)
         TestApplicationContext.injectRegisteredImplementations()
 
+        //write something to the hard drive so that the `readMetadata` in the when gets pass the file existence check
+        def submissionId = "asljfaskljgalsjgjlas"
+        PartnerMetadata metadata = new PartnerMetadata(submissionId, null, null, null, null, null, null, null)
+        FilePartnerMetadataStorage.getInstance().saveMetadata(metadata)
+
         when:
-        FilePartnerMetadataStorage.getInstance().readMetadata("receivedSubmissionId")
+        FilePartnerMetadataStorage.getInstance().readMetadata(submissionId)
 
         then:
         thrown(PartnerMetadataException)

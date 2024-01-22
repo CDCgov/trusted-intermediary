@@ -25,7 +25,7 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
     @Inject Formatter formatter;
     @Inject Logger logger;
 
-    private static final Path METADATA_DIRECTORY;
+    static final Path METADATA_DIRECTORY;
 
     static {
         try {
