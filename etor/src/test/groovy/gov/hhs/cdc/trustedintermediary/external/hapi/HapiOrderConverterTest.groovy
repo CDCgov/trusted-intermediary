@@ -311,7 +311,7 @@ class HapiOrderConverterTest extends Specification {
                 "receivedSubmissionId", "sentSubmissionId", sender, receiver, time, hash, PartnerMetadataStatus.DELIVERED, failureReason)
 
         when:
-        def result = HapiOrderConverter.getInstance().extractPublicMetadataToOperationOutcome(metadata).getUnderlyingOutcome() as OperationOutcome
+        def result = HapiOrderConverter.getInstance().extractPublicMetadataToOperationOutcome(metadata, "receivedSubmissionId").getUnderlyingOutcome() as OperationOutcome
 
         then:
         result.getId() == "receivedSubmissionId"

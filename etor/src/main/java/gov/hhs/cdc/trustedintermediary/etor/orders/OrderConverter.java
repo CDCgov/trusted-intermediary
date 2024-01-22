@@ -12,5 +12,6 @@ public interface OrderConverter {
 
     Order<?> addContactSectionToPatientResource(Order<?> order);
 
-    FhirMetadata<?> extractPublicMetadataToOperationOutcome(PartnerMetadata metadata);
+    FhirMetadata<?> extractPublicMetadataToOperationOutcome(
+            PartnerMetadata metadata, String requestedId);
 }

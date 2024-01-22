@@ -206,10 +206,11 @@ public class HapiOrderConverter implements OrderConverter {
     }
 
     @Override
-    public FhirMetadata<?> extractPublicMetadataToOperationOutcome(PartnerMetadata metadata) {
+    public FhirMetadata<?> extractPublicMetadataToOperationOutcome(
+            PartnerMetadata metadata, String requestedId) {
         var operation = new OperationOutcome();
 
-        operation.setId(metadata.receivedSubmissionId());
+        operation.setId(requestedId);
         operation.getIssue().add(createInformationIssueComponent("sender name", metadata.sender()));
         operation
                 .getIssue()
