@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Optional;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 
 /** Implements the {@link PartnerMetadataStorage} using local files. */
@@ -89,14 +90,23 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
         //  /tmp/coolmetadata/D3E298BE-A78B-42A9-BF70-AADCCD573C0B|1234567890.json
 
         // 481C2227-2F4D-4CF2-945A-FF4721118322|1234567890.json
-        return Files.list(METADATA_DIRECTORY)
-                .filter(
-                        metadataPath -> {
-                            String fileName = metadataPath.getFileName().toString();
-                            return fileName.startsWith(metadataId)
-                                    || fileName.endsWith(metadataId + ".json");
-                        })
-                .findFirst()
-                .orElse(null);
+
+        Path path = null;
+
+        try (Stream<Path> fileList = Files.list(METADATA_DIRECTORY)) {
+            path =
+                    fileList.filter(
+                                    metadataPath -> {
+                                        String fileName = metadataPath.getFileName().toString();
+                                        return fileName.startsWith(metadataId)
+                                                || fileName.endsWith(metadataId + ".json");
+                                    })
+                            .findFirst()
+                            .orElse(null);
+        } catch (IOException e) {
+            throw new IOException("Error searching for file path for " + metadataId, e);
+        }
+
+        return path;
     }
 }
