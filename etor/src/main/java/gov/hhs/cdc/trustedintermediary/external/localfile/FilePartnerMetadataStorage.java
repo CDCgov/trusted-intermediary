@@ -86,10 +86,6 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
     }
 
     private Path searchFilePath(String metadataId) throws IOException {
-        //  /tmp/coolmetadata/481C2227-2F4D-4CF2-945A-FF4721118322|1234567890.json
-        //  /tmp/coolmetadata/D3E298BE-A78B-42A9-BF70-AADCCD573C0B|1234567890.json
-
-        // 481C2227-2F4D-4CF2-945A-FF4721118322|1234567890.json
 
         Path path = null;
 
