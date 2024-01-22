@@ -63,6 +63,7 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject Logger logger;
     @Inject DomainResponseHelper domainResponseHelper;
     @Inject PartnerMetadataOrchestrator partnerMetadataOrchestrator;
+    @Inject FilePartnerMetadataStorage localFileOrderSender;
 
     @Inject OrderConverter orderConverter;
 
@@ -101,6 +102,12 @@ public class EtorDomainRegistration implements DomainConnector {
             ApplicationContext.register(
                     PartnerMetadataStorage.class,
                     AzureStorageAccountPartnerMetadataStorage.getInstance());
+        }
+
+        if (ApplicationContext.getProperty("REPORT_STREAM_URL_PREFIX") != null){
+            ApplicationContext.register(RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
+        } else {
+            ApplicationContext.register(RSEndpointClient.class, MockRSEndpointClient.getInstance());
         }
 
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
