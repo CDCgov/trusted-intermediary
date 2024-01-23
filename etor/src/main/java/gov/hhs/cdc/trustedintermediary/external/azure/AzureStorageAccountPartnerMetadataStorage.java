@@ -10,8 +10,8 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import javax.inject.Inject;
 
 /** Implements the {@link PartnerMetadataStorage} using files stored in an Azure Storage Account. */
@@ -67,7 +67,7 @@ public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadat
     }
 
     @Override
-    public Map<String, String> readConsolidatedMetadata(String sender)
+    public Set<PartnerMetadata> readMetadataForSender(String sender)
             throws PartnerMetadataException {
         return null;
     }

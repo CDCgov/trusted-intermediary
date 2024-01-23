@@ -13,9 +13,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.Instant;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
 import javax.inject.Inject;
 
 /** Class for accessing and managing data for the postgres Database */
@@ -128,28 +128,25 @@ public class PostgresDao implements DbDao {
     }
 
     @Override
-    public synchronized Map<String, String> fetchConsolidatedMetadata(String sender)
+    public synchronized Set<PartnerMetadata> fetchMetadataForSender(String sender)
             throws SQLException {
 
-        Map<String, String> metadataMap = new ConcurrentHashMap<>();
         try (Connection conn = connect();
                 PreparedStatement statement =
                         conn.prepareStatement(
-                                "SELECT received_message_id, delivery_status, failure_reason "
+                                "SELECT * " // TODO: revert back to just a few columns?
                                         + "FROM metadata "
                                         + "WHERE sender = ?")) {
             statement.setString(1, sender);
             ResultSet resultSet = statement.executeQuery();
 
+            Set<PartnerMetadata> metadataSet = new HashSet<>();
+
             while (resultSet.next()) {
-                metadataMap.put(
-                        resultSet.getString("received_message_id"),
-                        resultSet.getString("delivery_status")
-                                + " | "
-                                + resultSet.getString("failure_reason"));
+                metadataSet.add(partnerMetadataFromResultSet(resultSet));
             }
 
-            return metadataMap;
+            return metadataSet;
         }
     }
 
@@ -169,21 +166,25 @@ public class PostgresDao implements DbDao {
                 return null;
             }
 
-            Instant timeReceived = null;
-            Timestamp timestamp = result.getTimestamp("time_received");
-            if (timestamp != null) {
-                timeReceived = timestamp.toInstant();
-            }
-
-            return new PartnerMetadata(
-                    result.getString("received_message_id"),
-                    result.getString("sent_message_id"),
-                    result.getString("sender"),
-                    result.getString("receiver"),
-                    timeReceived,
-                    result.getString("hash_of_order"),
-                    PartnerMetadataStatus.valueOf(result.getString("delivery_status")),
-                    result.getString("failure_reason"));
+            return partnerMetadataFromResultSet(result);
         }
+    }
+
+    private PartnerMetadata partnerMetadataFromResultSet(ResultSet resultSet) throws SQLException {
+        Instant timeReceived = null;
+        Timestamp timestamp = resultSet.getTimestamp("time_received");
+        if (timestamp != null) {
+            timeReceived = timestamp.toInstant();
+        }
+
+        return new PartnerMetadata(
+                resultSet.getString("received_message_id"),
+                resultSet.getString("sent_message_id"),
+                resultSet.getString("sender"),
+                resultSet.getString("receiver"),
+                timeReceived,
+                resultSet.getString("hash_of_order"),
+                PartnerMetadataStatus.valueOf(resultSet.getString("delivery_status")),
+                resultSet.getString("failure_reason"));
     }
 }

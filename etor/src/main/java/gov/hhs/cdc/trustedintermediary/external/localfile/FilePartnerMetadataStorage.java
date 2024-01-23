@@ -13,8 +13,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 import javax.inject.Inject;
 
@@ -96,7 +96,7 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
     }
 
     @Override
-    public Map<String, String> readConsolidatedMetadata(String sender)
+    public Set<PartnerMetadata> readMetadataForSender(String sender)
             throws PartnerMetadataException {
         return null;
     }

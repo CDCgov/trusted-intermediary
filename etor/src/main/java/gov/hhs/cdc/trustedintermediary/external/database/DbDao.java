@@ -1,9 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.external.database;
 
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.util.Map;
+import java.util.Set;
 
 /** Interface for accessing the database for metadata */
 public interface DbDao {
@@ -18,7 +19,7 @@ public interface DbDao {
             String failureReason)
             throws SQLException;
 
-    Map<String, String> fetchConsolidatedMetadata(String sender) throws SQLException;
+    Set<PartnerMetadata> fetchMetadataForSender(String sender) throws SQLException;
 
     Object fetchMetadata(String uniqueId) throws SQLException;
 }

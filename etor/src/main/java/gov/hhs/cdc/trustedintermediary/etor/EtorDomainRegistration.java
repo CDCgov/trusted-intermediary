@@ -215,15 +215,16 @@ public class EtorDomainRegistration implements DomainConnector {
 
     DomainResponse handleConsolidatedOrders(DomainRequest request) {
 
-        Map<String, String> metadata;
+        Map<String, Map<String, String>> metadata;
         try {
             String senderName = request.getPathParams().get("sender");
 
             metadata = partnerMetadataOrchestrator.getConsolidatedMetadata(senderName);
 
         } catch (Exception e) {
-            return domainResponseHelper.constructErrorResponse(
-                    500, "Unable to retrieve consolidated orders");
+            var errorString = "Unable to retrieve consolidated orders";
+            logger.logFatal(errorString, e);
+            return domainResponseHelper.constructErrorResponse(500, errorString);
         }
 
         return domainResponseHelper.constructOkResponse(metadata);
