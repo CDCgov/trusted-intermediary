@@ -233,4 +233,6 @@ class PostgresDaoTest extends Specification {
         then:
         actual.timeReceived() == null
     }
+
+    //TODO: Write test for consolidated metadata
 }

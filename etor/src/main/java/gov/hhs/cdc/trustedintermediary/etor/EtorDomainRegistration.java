@@ -56,6 +56,8 @@ public class EtorDomainRegistration implements DomainConnector {
     static final String ORDERS_API_ENDPOINT = "/v1/etor/orders";
     static final String METADATA_API_ENDPOINT = "/v1/etor/metadata/{id}";
 
+    static final String CONSOLIDATED_ORDER_API_ENDPOINT = "/v1/etor/metadata/orders/{sender}";
+
     @Inject PatientDemographicsController patientDemographicsController;
     @Inject OrderController orderController;
     @Inject ConvertAndSendDemographicsUsecase convertAndSendDemographicsUsecase;
@@ -73,7 +75,9 @@ public class EtorDomainRegistration implements DomainConnector {
                     new HttpEndpoint("POST", DEMOGRAPHICS_API_ENDPOINT, true),
                             this::handleDemographics,
                     new HttpEndpoint("POST", ORDERS_API_ENDPOINT, true), this::handleOrders,
-                    new HttpEndpoint("GET", METADATA_API_ENDPOINT, true), this::handleMetadata);
+                    new HttpEndpoint("GET", METADATA_API_ENDPOINT, true), this::handleMetadata,
+                    new HttpEndpoint("GET", CONSOLIDATED_ORDER_API_ENDPOINT, true),
+                            this::handleConsolidatedOrders);
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
@@ -207,5 +211,21 @@ public class EtorDomainRegistration implements DomainConnector {
             logger.logError(errorMessage, e);
             return domainResponseHelper.constructErrorResponse(500, errorMessage);
         }
+    }
+
+    DomainResponse handleConsolidatedOrders(DomainRequest request) {
+
+        Map<String, String> metadata;
+        try {
+            String senderName = request.getPathParams().get("sender");
+
+            metadata = partnerMetadataOrchestrator.getConsolidatedMetadata(senderName);
+
+        } catch (Exception e) {
+            return domainResponseHelper.constructErrorResponse(
+                    500, "Unable to retrieve consolidated orders");
+        }
+
+        return domainResponseHelper.constructOkResponse(metadata);
     }
 }

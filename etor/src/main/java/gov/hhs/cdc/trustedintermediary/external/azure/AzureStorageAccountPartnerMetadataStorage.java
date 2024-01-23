@@ -10,6 +10,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
+import java.util.Map;
 import java.util.Optional;
 import javax.inject.Inject;
 
@@ -63,6 +64,12 @@ public class AzureStorageAccountPartnerMetadataStorage implements PartnerMetadat
             throw new PartnerMetadataException(
                     "Failed to upload metadata file " + metadataFileName, e);
         }
+    }
+
+    @Override
+    public Map<String, String> readConsolidatedMetadata(String sender)
+            throws PartnerMetadataException {
+        return null;
     }
 
     public static String getMetadataFileName(String uniqueId) {

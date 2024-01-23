@@ -41,6 +41,7 @@ class EtorDomainRegistrationTest extends Specification {
         def demographicsEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.DEMOGRAPHICS_API_ENDPOINT, true)
         def ordersEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.ORDERS_API_ENDPOINT, true)
         def metadataEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.METADATA_API_ENDPOINT, true)
+        def consolidatedOrdersEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.CONSOLIDATED_ORDER_API_ENDPOINT, true)
 
         when:
         def endpoints = domainRegistration.domainRegistration()
@@ -50,6 +51,7 @@ class EtorDomainRegistrationTest extends Specification {
         endpoints.get(demographicsEndpoint) != null
         endpoints.get(ordersEndpoint) != null
         endpoints.get(metadataEndpoint) != null
+        endpoints.get(consolidatedOrdersEndpoint) != null
     }
 
     def "has an OpenAPI specification"() {
@@ -447,5 +449,36 @@ class EtorDomainRegistrationTest extends Specification {
 
         then:
         actualStatusCode == expectedStatusCode
+    }
+
+    def "Consolidated orders endpoint happy path"() {
+        given:
+        def expectedStatusCode = 200
+
+        def expectedResultMap = ["12345678": "FAILED | Message Failed"]
+
+        def request = new DomainRequest()
+        request.setPathParams(["sender":"testSender"])
+
+        def connector = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, connector)
+
+
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
+
+        def mockOrchestrator = Mock(PartnerMetadataOrchestrator)
+        mockOrchestrator.getConsolidatedMetadata(_ as String) >> expectedResultMap
+        TestApplicationContext.register(PartnerMetadataOrchestrator, mockOrchestrator)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def res = connector.handleConsolidatedOrders(request)
+        def actualStatusCode = res.statusCode
+
+        then:
+        actualStatusCode == expectedStatusCode
+        1 * mockResponseHelper.constructOkResponse(expectedResultMap) >> new DomainResponse(expectedStatusCode)
     }
 }

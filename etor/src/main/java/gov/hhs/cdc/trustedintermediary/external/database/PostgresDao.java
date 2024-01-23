@@ -13,7 +13,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 
 /** Class for accessing and managing data for the postgres Database */
@@ -122,6 +124,32 @@ public class PostgresDao implements DbDao {
             statement.setString(8, failureReason);
 
             statement.executeUpdate();
+        }
+    }
+
+    @Override
+    public synchronized Map<String, String> fetchConsolidatedMetadata(String sender)
+            throws SQLException {
+
+        Map<String, String> metadataMap = new ConcurrentHashMap<>();
+        try (Connection conn = connect();
+                PreparedStatement statement =
+                        conn.prepareStatement(
+                                "SELECT received_message_id, delivery_status, failure_reason "
+                                        + "FROM metadata "
+                                        + "WHERE sender = ?")) {
+            statement.setString(1, sender);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                metadataMap.put(
+                        resultSet.getString("received_message_id"),
+                        resultSet.getString("delivery_status")
+                                + " | "
+                                + resultSet.getString("failure_reason"));
+            }
+
+            return metadataMap;
         }
     }
 

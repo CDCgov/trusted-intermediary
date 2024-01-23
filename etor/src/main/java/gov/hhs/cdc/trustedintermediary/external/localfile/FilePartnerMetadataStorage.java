@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.inject.Inject;
@@ -92,6 +93,12 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
             throw new PartnerMetadataException(
                     "Error saving metadata for " + metadata.receivedSubmissionId(), e);
         }
+    }
+
+    @Override
+    public Map<String, String> readConsolidatedMetadata(String sender)
+            throws PartnerMetadataException {
+        return null;
     }
 
     private Path getFilePath(String metadataId) {

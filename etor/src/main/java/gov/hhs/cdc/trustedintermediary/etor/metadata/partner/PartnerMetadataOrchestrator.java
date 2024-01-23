@@ -258,4 +258,21 @@ public class PartnerMetadataOrchestrator {
             default -> PartnerMetadataStatus.PENDING;
         };
     }
+
+    public Map<String, String> getConsolidatedMetadata(String senderName)
+            throws PartnerMetadataException {
+        Map<String, String> metadataMap;
+
+        /**
+         * { 123456789: FAILED | You dun goofed 987765432: DELIVERED | , etc
+         *
+         * <p>}
+         */
+
+        // TODO: Figure out if we should call the history API as part of this,
+        /** PROS : Most up to date data CONS : Spamming the heck out of report stream */
+        metadataMap = partnerMetadataStorage.readConsolidatedMetadata(senderName);
+
+        return metadataMap;
+    }
 }
