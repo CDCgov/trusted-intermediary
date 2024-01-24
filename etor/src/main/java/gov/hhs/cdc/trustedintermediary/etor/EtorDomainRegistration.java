@@ -63,6 +63,11 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject OrderController orderController;
     @Inject ConvertAndSendDemographicsUsecase convertAndSendDemographicsUsecase;
     @Inject SendOrderUseCase sendOrderUseCase;
+
+    // TODO: @Inject ResultController resultController
+
+    // TODO: @Inject SendResultUseCase sendResultUseCase
+
     @Inject Logger logger;
     @Inject DomainResponseHelper domainResponseHelper;
     @Inject PartnerMetadataOrchestrator partnerMetadataOrchestrator;
@@ -219,5 +224,18 @@ public class EtorDomainRegistration implements DomainConnector {
             logger.logError(errorMessage, e);
             return domainResponseHelper.constructErrorResponse(500, errorMessage);
         }
+    }
+
+    public DomainResponse handleResults(DomainRequest request) {
+
+        // Get the result
+        // Result<?> result;
+        // resultController.parseResults(request)
+        // sendResultUseCase/ sendOrderUseCase? change name for reuse?
+
+        // ResultResponse resultResponse = new ResultResponse(results);
+        // return domainResponseHelper.constructOkResponse(resultResponse);
+
+        return new DomainResponse(200);
     }
 }
