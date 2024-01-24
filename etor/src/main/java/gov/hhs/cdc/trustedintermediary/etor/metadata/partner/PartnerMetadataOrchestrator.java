@@ -186,7 +186,7 @@ public class PartnerMetadataOrchestrator {
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
-    public Map<String, Map<String, String>> getConsolidatedMetadata(String senderName)
+    public Map<String, Map<String, Object>> getConsolidatedMetadata(String senderName)
             throws PartnerMetadataException {
 
         var metadataSet = partnerMetadataStorage.readMetadataForSender(senderName);
@@ -197,10 +197,10 @@ public class PartnerMetadataOrchestrator {
                                 PartnerMetadata::receivedSubmissionId,
                                 metadata -> {
                                     var status = String.valueOf(metadata.deliveryStatus());
-                                    var stale = metadataIsStale(metadata) ? "💩" : "✅";
+                                    var stale = metadataIsStale(metadata);
                                     var failureReason = metadata.failureReason();
 
-                                    Map<String, String> innerMap = new HashMap<>();
+                                    Map<String, Object> innerMap = new HashMap<>();
                                     innerMap.put("status", status);
                                     innerMap.put("stale", stale);
                                     innerMap.put("failureReason", failureReason);

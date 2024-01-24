@@ -227,7 +227,7 @@ public class EtorDomainRegistration implements DomainConnector {
 
     DomainResponse handleConsolidatedSummary(DomainRequest request) {
 
-        Map<String, Map<String, String>> metadata;
+        Map<String, Map<String, Object>> metadata;
         try {
             String senderName = request.getPathParams().get("sender");
 

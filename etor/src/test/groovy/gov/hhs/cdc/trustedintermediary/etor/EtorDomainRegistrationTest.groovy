@@ -451,11 +451,11 @@ class EtorDomainRegistrationTest extends Specification {
         actualStatusCode == expectedStatusCode
     }
 
-    def "Consolidated orders endpoint happy path"() {
+    def "Consolidated metadata endpoint happy path"() {
         given:
         def expectedStatusCode = 200
 
-        def expectedResultMap = ["12345678": "FAILED | Message Failed"]
+        def expectedResultMap = ["12345678": ["status":"FAILED", "stale": true, "failureReason": "you done goof"]]
 
         def request = new DomainRequest()
         request.setPathParams(["sender":"testSender"])
