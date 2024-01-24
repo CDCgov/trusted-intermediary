@@ -523,10 +523,12 @@ class PartnerMetadataOrchestratorTest extends Specification {
         given:
 
         def senderName = "sender_name"
+        def failure = "This thing is bonked"
+        def status = PartnerMetadataStatus.PENDING
         def mockMetadata = [
-            new PartnerMetadata("123456789", null, senderName, "receiver_name", Instant.now(), null, null, null)
+            new PartnerMetadata("123456789", null, senderName, "receiver_name", Instant.now(), null, status, failure)
         ]
-        mockPartnerMetadataStorage.readMetadataForSender(_ as String) >> mockMetadata
+        mockPartnerMetadataStorage.readMetadataForSender(senderName) >> mockMetadata
 
 
         when:
@@ -534,7 +536,8 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
         then:
         !result.isEmpty()
-        result["123456789"]["status"].toString() == "PENDING"
-        result["123456789"]["stale"].toString() != null
+        result["123456789"]["status"] == status.toString()
+        result["123456789"]["stale"] == true
+        result["123456789"]["failureReason"] == failure
     }
 }
