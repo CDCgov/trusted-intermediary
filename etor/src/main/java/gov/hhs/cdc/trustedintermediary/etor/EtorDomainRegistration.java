@@ -25,6 +25,7 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
 import gov.hhs.cdc.trustedintermediary.etor.results.Result;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultController;
+import gov.hhs.cdc.trustedintermediary.etor.results.ResultResponse;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureClient;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureDatabaseCredentialsProvider;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureStorageAccountPartnerMetadataStorage;
@@ -230,12 +231,10 @@ public class EtorDomainRegistration implements DomainConnector {
     }
 
     public DomainResponse handleResults(DomainRequest request) {
+        Result<?> results;
         String errorMessage = "";
-
-        // Get the result
         try {
-            Result<?> result;
-            result = resultController.parseResults(request);
+            results = resultController.parseResults(request);
         } catch (FhirParseException e) {
             errorMessage = "Unable to parse result request";
             logger.logError(errorMessage, e);
@@ -243,9 +242,7 @@ public class EtorDomainRegistration implements DomainConnector {
         }
         // sendResultUseCase/ sendOrderUseCase? change name for reuse?
 
-        // ResultResponse resultResponse = new ResultResponse(results);
-        // return domainResponseHelper.constructOkResponse(resultResponse);
-
-        return new DomainResponse(200);
+         ResultResponse resultResponse = new ResultResponse(results);
+         return domainResponseHelper.constructOkResponse(resultResponse);
     }
 }
