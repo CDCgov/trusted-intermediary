@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.etor.message;
+package gov.hhs.cdc.trustedintermediary.etor.messages;
 
 public interface SendMessageUseCase<T> {
 

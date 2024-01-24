@@ -1,7 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.results;
 
-import gov.hhs.cdc.trustedintermediary.etor.message.SendMessageUseCase;
-import gov.hhs.cdc.trustedintermediary.etor.message.UnableToSendMessageException;
+import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageUseCase;
+import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
 import javax.inject.Inject;
 
 public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
