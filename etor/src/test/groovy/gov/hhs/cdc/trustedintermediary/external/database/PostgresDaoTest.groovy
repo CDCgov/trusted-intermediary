@@ -234,5 +234,42 @@ class PostgresDaoTest extends Specification {
         actual.timeReceived() == null
     }
 
-    //TODO: Write test for consolidated metadata
+    def "fetchMetadataForSender retrieves a set of PartnerMetadata"() {
+        given:
+        def receivedMessageId = "12345"
+        def sentMessageId = "7890"
+        def sender = "DogCow"
+        def receiver = "You'll get your just reward"
+        Timestamp timestampForMock = Timestamp.from(Instant.parse("2024-01-03T15:45:33.30Z"))
+        Instant timeReceived = timestampForMock.toInstant()
+        def hash = sender.hashCode().toString()
+        def status = PartnerMetadataStatus.PENDING
+        def reason = "It done Goofed"
+        def expected = new PartnerMetadata(receivedMessageId, sentMessageId, sender, receiver, timeReceived, hash, status, reason)
+
+
+        mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
+        mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
+        mockResultSet.next() >>> [true, false]
+        mockResultSet.getString("received_message_id") >> receivedMessageId
+        mockResultSet.getString("sent_message_id") >> sentMessageId
+        mockResultSet.getString("sender") >> sender
+        mockResultSet.getString("receiver") >> receiver
+        mockResultSet.getTimestamp("time_received") >> timestampForMock
+        mockResultSet.getString("hash_of_order") >> hash
+        mockResultSet.getString("delivery_status") >> status.toString()
+        mockResultSet.getString("failure_reason") >> reason
+        mockPreparedStatement.executeQuery() >> mockResultSet
+
+        TestApplicationContext.register(SqlDriverManager, mockDriver)
+        TestApplicationContext.injectRegisteredImplementations()
+
+
+        when:
+        def actual = PostgresDao.getInstance().fetchMetadataForSender("sender")
+
+        then:
+
+        actual[0] == expected
+    }
 }
