@@ -18,10 +18,10 @@ public class ResultController {
 		return INSTANCE;
 	}
 
-	public Result<?> parseOrders(DomainRequest request) throws FhirParseException {
+	public Result<?> parseResults(DomainRequest request) throws FhirParseException {
 		logger.logInfo("Parsing results");
 		var fhirBundle = fhir.parseResource(request.getBody(), Bundle.class);
-		// ETOR Results metadata
+		// ETOR Results metadata ?
 		return new HapiResult(fhirBundle);
 	}
 }

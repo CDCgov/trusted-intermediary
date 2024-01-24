@@ -1,6 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Patient;
 
 import gov.hhs.cdc.trustedintermediary.etor.results.Result;
 
@@ -17,16 +19,27 @@ public class HapiResult implements Result<Bundle> {
 
 	@Override
 	public Bundle getUnderlyingResult() {
-		return null;
+		return innerResult;
 	}
 
 	@Override
 	public String getFhirResourceId() {
-		return null;
+		return innerResult.getId();
 	}
 
 	@Override
 	public String getPatientId() {
-		return null;
+		return HapiHelper.resourcesInBundle(innerResult, Patient.class)
+			.flatMap(patient -> patient.getIdentifier().stream())
+			.filter(
+				identifier ->
+					identifier
+						.getType()
+						.hasCoding(
+							"http://terminology.hl7.org/CodeSystem/v2-0203",
+							"MR"))
+			.map(Identifier::getValue)
+			.findFirst()
+			.orElse("");
 	}
 }
