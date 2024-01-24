@@ -66,6 +66,7 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject SendOrderUseCase sendOrderUseCase;
 
     // @Inject ResultController resultController
+
     // @Inject SendResultUseCase sendResultUseCase
 
     @Inject Logger logger;
