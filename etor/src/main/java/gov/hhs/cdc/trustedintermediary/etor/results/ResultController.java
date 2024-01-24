@@ -7,14 +7,14 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
-public class ResultsController {
+public class ResultController {
 
-	private static final ResultsController INSTANCE = new ResultsController();
+	private static final ResultController INSTANCE = new ResultController();
 	@Inject HapiFhir fhir;
 	@Inject Logger logger;
-	private ResultsController() {}
+	private ResultController() {}
 
-	public static ResultsController getInstance() {
+	public static ResultController getInstance() {
 		return INSTANCE;
 	}
 
