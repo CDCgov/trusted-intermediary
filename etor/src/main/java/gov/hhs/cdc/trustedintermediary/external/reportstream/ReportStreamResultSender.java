@@ -5,6 +5,10 @@ import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageExceptio
 import gov.hhs.cdc.trustedintermediary.etor.results.Result;
 import java.util.Optional;
 
+/**
+ * This class is responsible for sending results to the ReportStream service and receiving a
+ * response back.
+ */
 public class ReportStreamResultSender implements MessageSender<Result<?>> {
 
     private static final ReportStreamResultSender INSTANCE = new ReportStreamResultSender();
