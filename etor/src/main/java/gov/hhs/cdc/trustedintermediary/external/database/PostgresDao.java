@@ -121,10 +121,7 @@ public class PostgresDao implements DbDao {
 
         try (Connection conn = connect();
                 PreparedStatement statement =
-                        conn.prepareStatement(
-                                "SELECT * " // TODO: revert back to just a few columns?
-                                        + "FROM metadata "
-                                        + "WHERE sender = ?")) {
+                        conn.prepareStatement("SELECT * FROM metadata WHERE sender = ?")) {
             statement.setString(1, sender);
             ResultSet resultSet = statement.executeQuery();
 
