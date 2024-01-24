@@ -41,7 +41,7 @@ class EtorDomainRegistrationTest extends Specification {
         def demographicsEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.DEMOGRAPHICS_API_ENDPOINT, true)
         def ordersEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.ORDERS_API_ENDPOINT, true)
         def metadataEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.METADATA_API_ENDPOINT, true)
-        def consolidatedOrdersEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.CONSOLIDATED_ORDER_API_ENDPOINT, true)
+        def consolidatedOrdersEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.CONSOLIDATED_SUMMARY_API_ENDPOINT, true)
 
         when:
         def endpoints = domainRegistration.domainRegistration()
@@ -474,7 +474,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def res = connector.handleConsolidatedOrders(request)
+        def res = connector.handleConsolidatedSummary(request)
         def actualStatusCode = res.statusCode
 
         then:

@@ -56,7 +56,7 @@ public class EtorDomainRegistration implements DomainConnector {
     static final String ORDERS_API_ENDPOINT = "/v1/etor/orders";
     static final String METADATA_API_ENDPOINT = "/v1/etor/metadata/{id}";
 
-    static final String CONSOLIDATED_ORDER_API_ENDPOINT = "/v1/etor/metadata/orders/{sender}";
+    static final String CONSOLIDATED_SUMMARY_API_ENDPOINT = "/v1/etor/metadata/summary/{sender}";
 
     @Inject PatientDemographicsController patientDemographicsController;
     @Inject OrderController orderController;
@@ -76,8 +76,8 @@ public class EtorDomainRegistration implements DomainConnector {
                             this::handleDemographics,
                     new HttpEndpoint("POST", ORDERS_API_ENDPOINT, true), this::handleOrders,
                     new HttpEndpoint("GET", METADATA_API_ENDPOINT, true), this::handleMetadata,
-                    new HttpEndpoint("GET", CONSOLIDATED_ORDER_API_ENDPOINT, true),
-                            this::handleConsolidatedOrders);
+                    new HttpEndpoint("GET", CONSOLIDATED_SUMMARY_API_ENDPOINT, true),
+                            this::handleConsolidatedSummary);
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
@@ -213,7 +213,7 @@ public class EtorDomainRegistration implements DomainConnector {
         }
     }
 
-    DomainResponse handleConsolidatedOrders(DomainRequest request) {
+    DomainResponse handleConsolidatedSummary(DomainRequest request) {
 
         Map<String, Map<String, String>> metadata;
         try {
