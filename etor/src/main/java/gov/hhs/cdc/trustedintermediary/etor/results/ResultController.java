@@ -7,21 +7,23 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
+
 public class ResultController {
 
-	private static final ResultController INSTANCE = new ResultController();
-	@Inject HapiFhir fhir;
-	@Inject Logger logger;
-	private ResultController() {}
+    private static final ResultController INSTANCE = new ResultController();
+    @Inject HapiFhir fhir;
+    @Inject Logger logger;
 
-	public static ResultController getInstance() {
-		return INSTANCE;
-	}
+    private ResultController() {}
 
-	public Result<?> parseOrders(DomainRequest request) throws FhirParseException {
-		logger.logInfo("Parsing results");
-		var fhirBundle = fhir.parseResource(request.getBody(), Bundle.class);
-		// ETOR Results metadata
-		return new HapiResult(fhirBundle);
-	}
+    public static ResultController getInstance() {
+        return INSTANCE;
+    }
+
+    public Result<?> parseOrders(DomainRequest request) throws FhirParseException {
+        logger.logInfo("Parsing results");
+        var fhirBundle = fhir.parseResource(request.getBody(), Bundle.class);
+        // ETOR Results metadata
+        return new HapiResult(fhirBundle);
+    }
 }
