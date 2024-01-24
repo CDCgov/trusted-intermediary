@@ -6,9 +6,9 @@ package gov.hhs.cdc.trustedintermediary.etor.results;
  * @param <T>
  */
 public interface Result<T> {
-	T getUnderlyingResult();
+    T getUnderlyingResult();
 
-	String getFhirResourceId();
+    String getFhirResourceId();
 
-	String getPatientId();
+    String getPatientId();
 }

@@ -10,14 +10,15 @@ import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import org.hl7.fhir.r4.model.Bundle;
 import spock.lang.Specification;
 
+
 class ResultControllerTest extends Specification {
 
-	def setup() {
-		TestApplicationContext.reset()
-		TestApplicationContext.init()
-		TestApplicationContext.register(ResultController, ResultController.getInstance())
-		TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
-	}
+    def setup() {
+        TestApplicationContext.reset()
+        TestApplicationContext.init()
+        TestApplicationContext.register(ResultController, ResultController.getInstance())
+        TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
+    }
 
 	def "parseResults Happy path works"() {
 		given:
@@ -50,4 +51,5 @@ class ResultControllerTest extends Specification {
 		then:
 		thrown(FhirParseException)
 	}
+
 }
