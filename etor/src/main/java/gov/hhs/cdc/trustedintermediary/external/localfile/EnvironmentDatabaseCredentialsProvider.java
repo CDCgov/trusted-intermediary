@@ -3,6 +3,11 @@ package gov.hhs.cdc.trustedintermediary.external.localfile;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.external.database.DatabaseCredentialsProvider;
 
+/**
+ * The EnvironmentDatabaseCredentialsProvider class is an implementation of the
+ * DatabaseCredentialsProvider interface. It retrieves the database credentials from environment
+ * variables.
+ */
 public class EnvironmentDatabaseCredentialsProvider implements DatabaseCredentialsProvider {
 
     private static final EnvironmentDatabaseCredentialsProvider INSTANCE =

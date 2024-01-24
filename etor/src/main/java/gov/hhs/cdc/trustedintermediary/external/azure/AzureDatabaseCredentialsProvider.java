@@ -3,6 +3,10 @@ package gov.hhs.cdc.trustedintermediary.external.azure;
 import gov.hhs.cdc.trustedintermediary.external.database.DatabaseCredentialsProvider;
 import javax.inject.Inject;
 
+/**
+ * AzureDatabaseCredentialsProvider is a class responsible for providing credentials for a database
+ * deployed in Azure.
+ */
 public class AzureDatabaseCredentialsProvider implements DatabaseCredentialsProvider {
 
     private static final AzureDatabaseCredentialsProvider INSTANCE =
