@@ -97,7 +97,9 @@ ext.jacoco_excludes = [
         '**/apache/ApacheClient*',
         '**/azure/AzureSecrets*',
         '**/database/EtorSqlDriverManager*',
-        '**/azure/AzureClient*'
+        '**/azure/AzureClient*',
+        '**/azure/AzureDatabaseCredentialsProvider*',
+        '**/localfile/EnvironmentDatabaseCredentialsProvider*',
 ]
 
 tasks.register('allUnitTests') {
