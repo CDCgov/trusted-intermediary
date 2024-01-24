@@ -3,18 +3,15 @@ package gov.hhs.cdc.trustedintermediary.external.database
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
-import gov.hhs.cdc.trustedintermediary.external.azure.AzureClient
 import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager
-import java.sql.Types
-import spock.lang.Specification
-
-import java.sql.Timestamp
-import java.time.Instant
-
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
+import java.sql.Timestamp
+import java.sql.Types
+import java.time.Instant
+import spock.lang.Specification
 
 class PostgresDaoTest extends Specification {
 
@@ -31,10 +28,10 @@ class PostgresDaoTest extends Specification {
         mockConn = Mock(Connection)
         mockPreparedStatement = Mock(PreparedStatement)
         mockResultSet = Mock(ResultSet)
-        def mockAzureClient = Mock(AzureClient)
-        mockAzureClient.getScopedToken(_ as String) >> "DogCow password"
+        def mockCredentialsProvider = Mock(DatabaseCredentialsProvider)
+        mockCredentialsProvider.getPassword() >> "DogCow password"
 
-        TestApplicationContext.register(AzureClient, mockAzureClient)
+        TestApplicationContext.register(DatabaseCredentialsProvider, mockCredentialsProvider)
         TestApplicationContext.register(PostgresDao, PostgresDao.getInstance())
     }
 

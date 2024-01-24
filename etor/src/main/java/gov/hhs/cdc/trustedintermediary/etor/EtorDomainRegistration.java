@@ -24,12 +24,15 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureClient;
+import gov.hhs.cdc.trustedintermediary.external.azure.AzureDatabaseCredentialsProvider;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureStorageAccountPartnerMetadataStorage;
+import gov.hhs.cdc.trustedintermediary.external.database.DatabaseCredentialsProvider;
 import gov.hhs.cdc.trustedintermediary.external.database.DatabasePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.DbDao;
 import gov.hhs.cdc.trustedintermediary.external.database.EtorSqlDriverManager;
 import gov.hhs.cdc.trustedintermediary.external.database.PostgresDao;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
+import gov.hhs.cdc.trustedintermediary.external.localfile.EnvironmentDatabaseCredentialsProvider;
 import gov.hhs.cdc.trustedintermediary.external.localfile.FilePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.localfile.MockRSEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClient;
@@ -94,6 +97,15 @@ public class EtorDomainRegistration implements DomainConnector {
             ApplicationContext.register(DbDao.class, PostgresDao.getInstance());
             ApplicationContext.register(
                     PartnerMetadataStorage.class, DatabasePartnerMetadataStorage.getInstance());
+            if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
+                ApplicationContext.register(
+                        DatabaseCredentialsProvider.class,
+                        EnvironmentDatabaseCredentialsProvider.getInstance());
+            } else {
+                ApplicationContext.register(
+                        DatabaseCredentialsProvider.class,
+                        AzureDatabaseCredentialsProvider.getInstance());
+            }
         } else if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
             ApplicationContext.register(
                     PartnerMetadataStorage.class, FilePartnerMetadataStorage.getInstance());
