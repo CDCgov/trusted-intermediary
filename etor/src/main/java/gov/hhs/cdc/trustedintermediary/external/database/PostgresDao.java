@@ -3,7 +3,6 @@ package gov.hhs.cdc.trustedintermediary.external.database;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
-import gov.hhs.cdc.trustedintermediary.external.azure.AzureClient;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager;
 import java.sql.Connection;
@@ -23,7 +22,7 @@ public class PostgresDao implements DbDao {
 
     @Inject Logger logger;
     @Inject SqlDriverManager driverManager;
-    @Inject AzureClient azureClient;
+    @Inject DatabaseCredentialsProvider credentialsProvider;
 
     private PostgresDao() {}
 
@@ -45,10 +44,9 @@ public class PostgresDao implements DbDao {
                 ApplicationContext.getProperty("DB_USER") == null
                         ? ""
                         : ApplicationContext.getProperty("DB_USER");
-        String pass =
-                ApplicationContext.getProperty("DB_PASS") == null
-                        ? ""
-                        : ApplicationContext.getProperty("DB_PASS");
+
+        String pass = credentialsProvider.getPassword();
+
         String ssl =
                 ApplicationContext.getProperty("DB_SSL") == null
                         ? ""
@@ -56,17 +54,7 @@ public class PostgresDao implements DbDao {
 
         Properties props = new Properties();
         props.setProperty("user", user);
-        logger.logInfo("About to get the db password");
-
-        String token =
-                pass.isBlank()
-                        ? azureClient.getScopedToken(
-                                "https://ossrdbms-aad.database.windows.net/.default")
-                        : pass;
-
-        logger.logInfo("got the db password");
-
-        props.setProperty("password", token);
+        props.setProperty("password", pass);
 
         // If the below prop isn't set to require and we just set ssl=true it will expect a CA cert
         // in azure which breaks it
