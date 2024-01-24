@@ -65,9 +65,9 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject ConvertAndSendDemographicsUsecase convertAndSendDemographicsUsecase;
     @Inject SendOrderUseCase sendOrderUseCase;
 
-    // TODO: @Inject ResultController resultController
+    // @Inject ResultController resultController
 
-    // TODO: @Inject SendResultUseCase sendResultUseCase
+    // @Inject SendResultUseCase sendResultUseCase
 
     @Inject Logger logger;
     @Inject DomainResponseHelper domainResponseHelper;
@@ -230,12 +230,12 @@ public class EtorDomainRegistration implements DomainConnector {
     public DomainResponse handleResults(DomainRequest request) {
 
         // Get the result
-        // Result<?> result;
+        // Result<?> result
         // resultController.parseResults(request)
         // sendResultUseCase/ sendOrderUseCase? change name for reuse?
 
-        // ResultResponse resultResponse = new ResultResponse(results);
-        // return domainResponseHelper.constructOkResponse(resultResponse);
+        // ResultResponse resultResponse = new ResultResponse(results)
+        // return domainResponseHelper.constructOkResponse(resultResponse)
 
         logger.logInfo(request.getHeaders().toString());
         return new DomainResponse(200);
