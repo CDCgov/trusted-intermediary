@@ -11,6 +11,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemograph
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
+import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator;
@@ -26,6 +27,7 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
 import gov.hhs.cdc.trustedintermediary.etor.results.Result;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultController;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultResponse;
+import gov.hhs.cdc.trustedintermediary.etor.results.SendResultUseCase;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureClient;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureDatabaseCredentialsProvider;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureStorageAccountPartnerMetadataStorage;
@@ -72,6 +74,8 @@ public class EtorDomainRegistration implements DomainConnector {
 
     @Inject ResultController resultController;
 
+    @Inject SendResultUseCase sendResultUseCase;
+
     // TODO: @Inject SendResultUseCase sendResultUseCase
 
     @Inject Logger logger;
@@ -106,6 +110,7 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(
                 PartnerMetadataOrchestrator.class, PartnerMetadataOrchestrator.getInstance());
         ApplicationContext.register(ResultController.class, ResultController.getInstance());
+        ApplicationContext.register(SendResultUseCase.class, SendResultUseCase.getInstance());
 
         if (ApplicationContext.getProperty("DB_URL") != null) {
             ApplicationContext.register(SqlDriverManager.class, EtorSqlDriverManager.getInstance());
@@ -238,15 +243,26 @@ public class EtorDomainRegistration implements DomainConnector {
 
     DomainResponse handleResults(DomainRequest request) {
         Result<?> results;
+
+        String receivedSubmissionId = request.getHeaders().get("recordid");
+        if (receivedSubmissionId == null || receivedSubmissionId.isEmpty()) {
+            receivedSubmissionId = null;
+            logger.logError("Missing required header or empty: RecordId");
+        }
+
         String errorMessage = "";
         try {
             results = resultController.parseResults(request);
+            sendResultUseCase.convertAndSend(results, receivedSubmissionId);
         } catch (FhirParseException e) {
             errorMessage = "Unable to parse result request";
             logger.logError(errorMessage, e);
             return domainResponseHelper.constructErrorResponse(400, e);
+        } catch (UnableToSendMessageException e) {
+            errorMessage = "Unable to send result";
+            logger.logError(errorMessage, e);
+            return domainResponseHelper.constructErrorResponse(400, e);
         }
-        // sendResultUseCase/ sendOrderUseCase? change name for reuse?
 
         ResultResponse resultResponse = new ResultResponse(results);
         logger.logInfo(request.getHeaders().toString());
