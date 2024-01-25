@@ -43,7 +43,11 @@ class EtorDomainRegistrationTest extends Specification {
         def demographicsEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.DEMOGRAPHICS_API_ENDPOINT, true)
         def ordersEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.ORDERS_API_ENDPOINT, true)
         def metadataEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.METADATA_API_ENDPOINT, true)
+
+        def consolidatedOrdersEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.CONSOLIDATED_SUMMARY_API_ENDPOINT, true)
+
         def resultsEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.RESULTS_API_ENDPOINT, true)
+
 
         when:
         def endpoints = domainRegistration.domainRegistration()
@@ -53,6 +57,7 @@ class EtorDomainRegistrationTest extends Specification {
         endpoints.get(demographicsEndpoint) != null
         endpoints.get(ordersEndpoint) != null
         endpoints.get(metadataEndpoint) != null
+        endpoints.get(consolidatedOrdersEndpoint) != null
     }
 
     def "has an OpenAPI specification"() {
@@ -450,6 +455,65 @@ class EtorDomainRegistrationTest extends Specification {
 
         then:
         actualStatusCode == expectedStatusCode
+    }
+
+
+    def "Consolidated metadata endpoint happy path"() {
+        given:
+        def expectedStatusCode = 200
+
+        def expectedResultMap = ["12345678": ["status": "FAILED", "stale": true, "failureReason": "you done goof"]]
+
+        def request = new DomainRequest()
+        request.setPathParams(["sender": "testSender"])
+
+        def connector = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, connector)
+
+
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
+
+        def mockOrchestrator = Mock(PartnerMetadataOrchestrator)
+        mockOrchestrator.getConsolidatedMetadata(_ as String) >> expectedResultMap
+        TestApplicationContext.register(PartnerMetadataOrchestrator, mockOrchestrator)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def res = connector.handleConsolidatedSummary(request)
+        def actualStatusCode = res.statusCode
+
+        then:
+        actualStatusCode == expectedStatusCode
+        1 * mockResponseHelper.constructOkResponse(expectedResultMap) >> new DomainResponse(expectedStatusCode)
+    }
+
+    def "Consolidated metadata endpoint fails with a 500"() {
+        given:
+        def expectedStatusCode = 500
+
+        def request = new DomainRequest()
+        request.setPathParams(["sender": "testSender"])
+
+        def connector = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, connector)
+
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
+
+        def mockOrchestrator = Mock(PartnerMetadataOrchestrator)
+        mockOrchestrator.getConsolidatedMetadata(_ as String) >> { throw new PartnerMetadataException("woops") }
+        TestApplicationContext.register(PartnerMetadataOrchestrator, mockOrchestrator)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def response = connector.handleConsolidatedSummary(request)
+
+        then:
+        response.statusCode == 500
+        1 * mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as String) >> new DomainResponse(expectedStatusCode)
     }
 
     def "results endpoint happy path"() {

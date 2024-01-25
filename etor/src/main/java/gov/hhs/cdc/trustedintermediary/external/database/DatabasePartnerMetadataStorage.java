@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStor
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.Set;
 import javax.inject.Inject;
 
 /** Implements the {@link PartnerMetadataStorage} using a database. */
@@ -50,5 +51,17 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error saving metadata", e);
         }
+    }
+
+    @Override
+    public Set<PartnerMetadata> readMetadataForSender(String sender)
+            throws PartnerMetadataException {
+        Set<PartnerMetadata> consolidatedMetadata;
+        try {
+            consolidatedMetadata = dao.fetchMetadataForSender(sender);
+        } catch (SQLException e) {
+            throw new PartnerMetadataException("Error retrieving consolidated metadata", e);
+        }
+        return consolidatedMetadata;
     }
 }
