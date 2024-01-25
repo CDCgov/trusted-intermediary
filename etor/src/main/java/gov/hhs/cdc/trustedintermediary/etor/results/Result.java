@@ -1,9 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.etor.results;
 
 /**
- * Filler Result Interface for now with Generic Type Result
+ * Interface to wrap a third-party lab result class (Ex: Hapi FHIR Bundle)
  *
- * @param <T>
+ * @param <T> The underlying FHIR lab result type.
  */
 public interface Result<T> {
     T getUnderlyingResult();

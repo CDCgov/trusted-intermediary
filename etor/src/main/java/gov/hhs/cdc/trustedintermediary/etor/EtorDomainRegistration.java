@@ -61,16 +61,23 @@ public class EtorDomainRegistration implements DomainConnector {
     static final String DEMOGRAPHICS_API_ENDPOINT = "/v1/etor/demographics";
     static final String ORDERS_API_ENDPOINT = "/v1/etor/orders";
     static final String METADATA_API_ENDPOINT = "/v1/etor/metadata/{id}";
+    static final String RESULTS_API_ENDPOINT = "/v1/etor/results";
 
     @Inject PatientDemographicsController patientDemographicsController;
     @Inject OrderController orderController;
     @Inject ConvertAndSendDemographicsUsecase convertAndSendDemographicsUsecase;
     @Inject SendOrderUseCase sendOrderUseCase;
 
+<<<<<<< HEAD
     @Inject
     ResultController resultController;
 
     // TODO: @Inject SendResultUseCase sendResultUseCase
+=======
+    // @Inject ResultController resultController
+
+    // @Inject SendResultUseCase sendResultUseCase
+>>>>>>> main
 
     @Inject Logger logger;
     @Inject DomainResponseHelper domainResponseHelper;
@@ -243,6 +250,7 @@ public class EtorDomainRegistration implements DomainConnector {
         // sendResultUseCase/ sendOrderUseCase? change name for reuse?
 
          ResultResponse resultResponse = new ResultResponse(results);
+        logger.logInfo(request.getHeaders().toString());
          return domainResponseHelper.constructOkResponse(resultResponse);
     }
 }
