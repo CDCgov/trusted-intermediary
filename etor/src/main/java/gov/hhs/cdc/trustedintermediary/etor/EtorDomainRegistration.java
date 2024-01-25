@@ -241,7 +241,7 @@ public class EtorDomainRegistration implements DomainConnector {
 
         } catch (Exception e) {
             var errorString = "Unable to retrieve consolidated orders";
-            logger.logFatal(errorString, e);
+            logger.logError(errorString, e);
             return domainResponseHelper.constructErrorResponse(500, errorString);
         }
 
