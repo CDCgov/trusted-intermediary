@@ -231,7 +231,6 @@ public class EtorDomainRegistration implements DomainConnector {
         }
     }
 
-
     DomainResponse handleConsolidatedSummary(DomainRequest request) {
 
         Map<String, Map<String, Object>> metadata;
@@ -247,6 +246,7 @@ public class EtorDomainRegistration implements DomainConnector {
         }
 
         return domainResponseHelper.constructOkResponse(metadata);
+    }
 
     public DomainResponse handleResults(DomainRequest request) {
 
@@ -260,6 +260,5 @@ public class EtorDomainRegistration implements DomainConnector {
 
         logger.logInfo(request.getHeaders().toString());
         return new DomainResponse(200);
-
     }
 }

@@ -461,10 +461,10 @@ class EtorDomainRegistrationTest extends Specification {
         given:
         def expectedStatusCode = 200
 
-        def expectedResultMap = ["12345678": ["status":"FAILED", "stale": true, "failureReason": "you done goof"]]
+        def expectedResultMap = ["12345678": ["status": "FAILED", "stale": true, "failureReason": "you done goof"]]
 
         def request = new DomainRequest()
-        request.setPathParams(["sender":"testSender"])
+        request.setPathParams(["sender": "testSender"])
 
         def connector = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, connector)
@@ -486,6 +486,7 @@ class EtorDomainRegistrationTest extends Specification {
         then:
         actualStatusCode == expectedStatusCode
         1 * mockResponseHelper.constructOkResponse(expectedResultMap) >> new DomainResponse(expectedStatusCode)
+    }
 
     def "results endpoint happy path"() {
         given:
