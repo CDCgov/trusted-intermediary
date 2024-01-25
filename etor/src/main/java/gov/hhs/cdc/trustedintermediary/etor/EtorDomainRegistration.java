@@ -70,8 +70,7 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject ConvertAndSendDemographicsUsecase convertAndSendDemographicsUsecase;
     @Inject SendOrderUseCase sendOrderUseCase;
 
-    @Inject
-    ResultController resultController;
+    @Inject ResultController resultController;
 
     // TODO: @Inject SendResultUseCase sendResultUseCase
 
@@ -262,8 +261,7 @@ public class EtorDomainRegistration implements DomainConnector {
 
             metadata = partnerMetadataOrchestrator.getConsolidatedMetadata(senderName);
 
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             var errorString = "Unable to retrieve consolidated orders";
             logger.logError(errorString, e);
             return domainResponseHelper.constructErrorResponse(500, errorString);
