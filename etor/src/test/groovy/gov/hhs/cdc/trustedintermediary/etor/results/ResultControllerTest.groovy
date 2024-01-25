@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.results
+package gov.hhs.cdc.trustedintermediary.etor.results
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
