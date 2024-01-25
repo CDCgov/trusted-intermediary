@@ -14,6 +14,8 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.inject.Inject;
 
@@ -92,6 +94,40 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
             throw new PartnerMetadataException(
                     "Error saving metadata for " + metadata.receivedSubmissionId(), e);
         }
+    }
+
+    @Override
+    public Set<PartnerMetadata> readMetadataForSender(String sender)
+            throws PartnerMetadataException {
+
+        Set<PartnerMetadata> partnerMetadata = null;
+
+        try (Stream<Path> fileList = Files.list(METADATA_DIRECTORY)) {
+            partnerMetadata =
+                    fileList.map(
+                                    fileName -> {
+                                        try {
+                                            return Files.readString(fileName);
+                                        } catch (IOException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    })
+                            .map(
+                                    metadataContent -> {
+                                        try {
+                                            return formatter.convertJsonToObject(
+                                                    metadataContent,
+                                                    new TypeReference<PartnerMetadata>() {});
+                                        } catch (FormatterProcessingException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    })
+                            .filter(metadata -> metadata.sender().equals(sender))
+                            .collect(Collectors.toSet());
+        } catch (Exception e) {
+            throw new PartnerMetadataException("Failed reading metadata for sender: " + sender, e);
+        }
+        return partnerMetadata;
     }
 
     private Path getFilePath(String metadataId) {
