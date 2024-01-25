@@ -11,6 +11,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemograph
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse
+import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator
@@ -21,7 +22,7 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase
-import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
+
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
@@ -112,7 +113,7 @@ class EtorDomainRegistrationTest extends Specification {
 
         def mockUseCase = Mock(ConvertAndSendDemographicsUsecase)
         mockUseCase.convertAndSend(_ as Demographics<?>) >> {
-            throw new UnableToSendOrderException("error", new NullPointerException())
+            throw new UnableToSendMessageException("error", new NullPointerException())
         }
         TestApplicationContext.register(ConvertAndSendDemographicsUsecase, mockUseCase)
 
@@ -205,7 +206,7 @@ class EtorDomainRegistrationTest extends Specification {
 
         def mockUseCase = Mock(SendOrderUseCase)
         mockUseCase.convertAndSend(_ as Order<?>, _ as String) >> {
-            throw new UnableToSendOrderException("error", new NullPointerException())
+            throw new UnableToSendMessageException("error", new NullPointerException())
         }
         TestApplicationContext.register(SendOrderUseCase, mockUseCase)
 
@@ -273,12 +274,12 @@ class EtorDomainRegistrationTest extends Specification {
 
         def mockUseCase = Mock(SendOrderUseCase)
         mockUseCase.convertAndSend(_ as Order<?>, _ as String) >> {
-            throw new UnableToSendOrderException("error", new NullPointerException())
+            throw new UnableToSendMessageException("error", new NullPointerException())
         }
         TestApplicationContext.register(SendOrderUseCase, mockUseCase)
 
         def mockResponseHelper = Mock(DomainResponseHelper)
-        mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as UnableToSendOrderException) >> new DomainResponse(expectedStatusCode)
+        mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as UnableToSendMessageException) >> new DomainResponse(expectedStatusCode)
         TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
 
         def mockPartnerMetadataOrchestrator = Mock(PartnerMetadataOrchestrator)
