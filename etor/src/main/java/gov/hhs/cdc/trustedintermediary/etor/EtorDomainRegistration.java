@@ -243,8 +243,8 @@ public class EtorDomainRegistration implements DomainConnector {
         }
         // sendResultUseCase/ sendOrderUseCase? change name for reuse?
 
-         ResultResponse resultResponse = new ResultResponse(results);
+        ResultResponse resultResponse = new ResultResponse(results);
         logger.logInfo(request.getHeaders().toString());
-         return domainResponseHelper.constructOkResponse(resultResponse);
+        return domainResponseHelper.constructOkResponse(resultResponse);
     }
 }
