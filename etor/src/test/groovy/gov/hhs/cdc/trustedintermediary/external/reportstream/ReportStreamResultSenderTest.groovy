@@ -15,7 +15,7 @@ class ReportStreamResultSenderTest extends Specification {
 
     def "send results works"() {
         when:
-        ReportStreamResultSender.getInstance().send(new ResultMock(null, null, "Mock result"))
+        ReportStreamResultSender.getInstance().send(new ResultMock(null, "Mock result"))
 
         then:
         noExceptionThrown()

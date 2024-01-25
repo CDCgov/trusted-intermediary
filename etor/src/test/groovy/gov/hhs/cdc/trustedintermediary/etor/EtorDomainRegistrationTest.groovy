@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor
 
 import gov.hhs.cdc.trustedintermediary.DemographicsMock
 import gov.hhs.cdc.trustedintermediary.OrderMock
+import gov.hhs.cdc.trustedintermediary.ResultMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
@@ -22,6 +23,8 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase
 import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
+import gov.hhs.cdc.trustedintermediary.etor.results.ResultController
+import gov.hhs.cdc.trustedintermediary.etor.results.ResultResponse
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
@@ -460,6 +463,17 @@ class EtorDomainRegistrationTest extends Specification {
 
         def connector = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, connector)
+
+        def mockRequestId = "asdf-12341-jkl-7890"
+        def resultMock = new ResultMock<?>(mockRequestId, "lab result")
+        def mockController = Mock(ResultController)
+        mockController.parseResults(_ as DomainRequest) >> resultMock
+        TestApplicationContext.register(ResultController, mockController)
+
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        mockResponseHelper.constructOkResponse(_ as ResultResponse) >> new DomainResponse(expectedStatusCode)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
+
         TestApplicationContext.injectRegisteredImplementations()
 
         when:

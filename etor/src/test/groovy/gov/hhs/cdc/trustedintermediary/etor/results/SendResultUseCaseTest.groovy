@@ -20,7 +20,7 @@ class SendResultUseCaseTest extends Specification {
 
     def "convertAndSend works"() {
         given:
-        def mockResult = new ResultMock(null, null, "Mock result")
+        def mockResult = new ResultMock(null, "Mock result")
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
