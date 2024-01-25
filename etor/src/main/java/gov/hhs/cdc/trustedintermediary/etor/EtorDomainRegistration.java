@@ -1,5 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor;
 
+import com.nimbusds.oauth2.sdk.Message;
+
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
@@ -11,6 +13,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemograph
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageSender;
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException;
@@ -42,6 +45,7 @@ import gov.hhs.cdc.trustedintermediary.external.localfile.FilePartnerMetadataSto
 import gov.hhs.cdc.trustedintermediary.external.localfile.MockRSEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
+import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamResultSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -76,8 +80,6 @@ public class EtorDomainRegistration implements DomainConnector {
 
     @Inject SendResultUseCase sendResultUseCase;
 
-    // TODO: @Inject SendResultUseCase sendResultUseCase
-
     @Inject Logger logger;
     @Inject DomainResponseHelper domainResponseHelper;
     @Inject PartnerMetadataOrchestrator partnerMetadataOrchestrator;
@@ -109,6 +111,7 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
         ApplicationContext.register(
                 PartnerMetadataOrchestrator.class, PartnerMetadataOrchestrator.getInstance());
+        ApplicationContext.register(MessageSender.class, ReportStreamResultSender.getInstance());
         ApplicationContext.register(ResultController.class, ResultController.getInstance());
         ApplicationContext.register(SendResultUseCase.class, SendResultUseCase.getInstance());
 
