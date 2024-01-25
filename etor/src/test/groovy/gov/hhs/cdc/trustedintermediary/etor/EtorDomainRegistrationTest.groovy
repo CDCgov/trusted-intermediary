@@ -518,7 +518,7 @@ class EtorDomainRegistrationTest extends Specification {
         1 * mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as String) >> new DomainResponse(expectedStatusCode)
     }
 
-    def "results endpoint happy path"() {
+    def "handleResults endpoint happy path"() {
         given:
         def expectedStatusCode = 200
 
@@ -543,6 +543,34 @@ class EtorDomainRegistrationTest extends Specification {
         when:
         def res = connector.handleResults(request)
         def actualStatusCode = res.getStatusCode()
+        then:
+        actualStatusCode == expectedStatusCode
+    }
+
+    def "handleResults returns a 400 response when the request is not parseable"() {
+        given:
+        def expectedStatusCode = 400
+
+        def request = new DomainRequest()
+        request.headers["recordid"] = "recordId"
+
+        def domainRegistration = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
+
+        def mockController = Mock(ResultController)
+        mockController.parseResults(_ as DomainRequest) >> { throw new FhirParseException("error", new NullPointerException()) }
+        TestApplicationContext.register(ResultController, mockController)
+
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as Exception) >> new DomainResponse(expectedStatusCode)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def res = domainRegistration.handleResults(request)
+        def actualStatusCode = res.statusCode
+
         then:
         actualStatusCode == expectedStatusCode
     }
