@@ -82,4 +82,18 @@ class FilePartnerMetadataStorageTest extends Specification {
         then:
         actualMetadata.isEmpty()
     }
+
+    def "readMetadataForSender returns a set of PartnerMetadata"() {
+        given:
+        PartnerMetadata metadata = new PartnerMetadata("123456789", null, "sender", null, null, null, null, null)
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        FilePartnerMetadataStorage.getInstance().saveMetadata(metadata)
+        def metadataSet = FilePartnerMetadataStorage.getInstance().readMetadataForSender("sender")
+
+        then:
+        metadataSet[0].sender() == "sender"
+    }
 }
