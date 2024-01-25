@@ -33,6 +33,7 @@ class EtorDomainRegistrationTest extends Specification {
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
+        TestApplicationContext.injectRegisteredImplementations()
     }
 
     def "domain registration has endpoints"() {
@@ -41,7 +42,11 @@ class EtorDomainRegistrationTest extends Specification {
         def demographicsEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.DEMOGRAPHICS_API_ENDPOINT, true)
         def ordersEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.ORDERS_API_ENDPOINT, true)
         def metadataEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.METADATA_API_ENDPOINT, true)
+
         def consolidatedOrdersEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.CONSOLIDATED_SUMMARY_API_ENDPOINT, true)
+
+        def resultsEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.RESULTS_API_ENDPOINT, true)
+
 
         when:
         def endpoints = domainRegistration.domainRegistration()
@@ -451,6 +456,7 @@ class EtorDomainRegistrationTest extends Specification {
         actualStatusCode == expectedStatusCode
     }
 
+
     def "Consolidated metadata endpoint happy path"() {
         given:
         def expectedStatusCode = 200
@@ -480,5 +486,22 @@ class EtorDomainRegistrationTest extends Specification {
         then:
         actualStatusCode == expectedStatusCode
         1 * mockResponseHelper.constructOkResponse(expectedResultMap) >> new DomainResponse(expectedStatusCode)
+
+    def "results endpoint happy path"() {
+        given:
+        def expectedStatusCode = 200
+
+        def request = new DomainRequest()
+        request.headers["recordid"] = "recordId"
+
+        def connector = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, connector)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def res = connector.handleResults(request)
+        def actualStatusCode = res.getStatusCode()
+        then:
+        actualStatusCode == expectedStatusCode
     }
 }

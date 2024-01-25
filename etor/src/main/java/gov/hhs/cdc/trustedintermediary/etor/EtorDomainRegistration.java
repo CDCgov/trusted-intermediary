@@ -58,6 +58,7 @@ public class EtorDomainRegistration implements DomainConnector {
     static final String DEMOGRAPHICS_API_ENDPOINT = "/v1/etor/demographics";
     static final String ORDERS_API_ENDPOINT = "/v1/etor/orders";
     static final String METADATA_API_ENDPOINT = "/v1/etor/metadata/{id}";
+    static final String RESULTS_API_ENDPOINT = "/v1/etor/results";
 
     static final String CONSOLIDATED_SUMMARY_API_ENDPOINT = "/v1/etor/metadata/summary/{sender}";
 
@@ -65,6 +66,11 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject OrderController orderController;
     @Inject ConvertAndSendDemographicsUsecase convertAndSendDemographicsUsecase;
     @Inject SendOrderUseCase sendOrderUseCase;
+
+    // @Inject ResultController resultController
+
+    // @Inject SendResultUseCase sendResultUseCase
+
     @Inject Logger logger;
     @Inject DomainResponseHelper domainResponseHelper;
     @Inject PartnerMetadataOrchestrator partnerMetadataOrchestrator;
@@ -225,6 +231,7 @@ public class EtorDomainRegistration implements DomainConnector {
         }
     }
 
+
     DomainResponse handleConsolidatedSummary(DomainRequest request) {
 
         Map<String, Map<String, Object>> metadata;
@@ -240,5 +247,19 @@ public class EtorDomainRegistration implements DomainConnector {
         }
 
         return domainResponseHelper.constructOkResponse(metadata);
+
+    public DomainResponse handleResults(DomainRequest request) {
+
+        // Get the result
+        // Result<?> result
+        // resultController.parseResults(request)
+        // sendResultUseCase/ sendOrderUseCase? change name for reuse?
+
+        // ResultResponse resultResponse = new ResultResponse(results)
+        // return domainResponseHelper.constructOkResponse(resultResponse)
+
+        logger.logInfo(request.getHeaders().toString());
+        return new DomainResponse(200);
+
     }
 }
