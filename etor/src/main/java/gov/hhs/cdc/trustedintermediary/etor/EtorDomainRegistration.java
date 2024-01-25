@@ -1,7 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.etor;
 
-import com.nimbusds.oauth2.sdk.Message;
-
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
