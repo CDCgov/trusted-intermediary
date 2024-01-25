@@ -68,16 +68,10 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject ConvertAndSendDemographicsUsecase convertAndSendDemographicsUsecase;
     @Inject SendOrderUseCase sendOrderUseCase;
 
-<<<<<<< HEAD
     @Inject
     ResultController resultController;
 
     // TODO: @Inject SendResultUseCase sendResultUseCase
-=======
-    // @Inject ResultController resultController
-
-    // @Inject SendResultUseCase sendResultUseCase
->>>>>>> main
 
     @Inject Logger logger;
     @Inject DomainResponseHelper domainResponseHelper;
