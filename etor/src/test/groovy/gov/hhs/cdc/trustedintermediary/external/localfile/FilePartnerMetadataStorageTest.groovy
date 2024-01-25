@@ -85,15 +85,18 @@ class FilePartnerMetadataStorageTest extends Specification {
 
     def "readMetadataForSender returns a set of PartnerMetadata"() {
         given:
-        PartnerMetadata metadata = new PartnerMetadata("123456789", null, "sender", null, null, null, null, null)
+        def sender = "same_sender"
+        PartnerMetadata metadata2 = new PartnerMetadata("abcdefghi", null, sender, null, null, null, null, null)
+        PartnerMetadata metadata1 = new PartnerMetadata("123456789", null, sender, null, null, null, null, null)
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        FilePartnerMetadataStorage.getInstance().saveMetadata(metadata)
-        def metadataSet = FilePartnerMetadataStorage.getInstance().readMetadataForSender("sender")
+        FilePartnerMetadataStorage.getInstance().saveMetadata(metadata1)
+        FilePartnerMetadataStorage.getInstance().saveMetadata(metadata2)
+        def metadataSet = FilePartnerMetadataStorage.getInstance().readMetadataForSender(sender)
 
         then:
-        metadataSet[0].sender() == "sender"
+        metadataSet.containsAll(Set.of(metadata1, metadata2))
     }
 }

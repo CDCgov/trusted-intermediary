@@ -234,8 +234,8 @@ class PostgresDaoTest extends Specification {
     def "fetchMetadataForSender retrieves a set of PartnerMetadata"() {
         given:
         def sender = "DogCow"
-        def expected1 = new PartnerMetadata("12345", "7890", "DogCow", "You'll get your just reward", Instant.parse("2024-01-03T15:45:33.30Z"), sender.hashCode().toString(), PartnerMetadataStatus.PENDING, "It done Goofed")
-        def expected2 = new PartnerMetadata("doreyme", "fasole", "sender", "receiver", Instant.now(), "gobeltygoook", PartnerMetadataStatus.DELIVERED, "cause I said so")
+        def expected1 = new PartnerMetadata("12345", "7890", sender, "You'll get your just reward", Instant.parse("2024-01-03T15:45:33.30Z"), sender.hashCode().toString(), PartnerMetadataStatus.PENDING, "It done Goofed")
+        def expected2 = new PartnerMetadata("doreyme", "fasole", sender, "receiver", Instant.now(), "gobeltygoook", PartnerMetadataStatus.DELIVERED, "cause I said so")
 
         mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
