@@ -26,6 +26,7 @@ public class ConvertAndSendDemographicsUsecase implements SendMessageUseCase<Dem
 
     private ConvertAndSendDemographicsUsecase() {}
 
+    @Override
     public void convertAndSend(Demographics<?> demographics) throws UnableToSendMessageException {
         Order<?> order = converter.convertToOrder(demographics);
         sender.send(order);
