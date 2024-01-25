@@ -13,6 +13,7 @@ AUTH_ENDPOINT = "/v1/auth/token"
 DEMOGRAPHICS_ENDPOINT = "/v1/etor/demographics"
 ORDERS_ENDPOINT = "/v1/etor/orders"
 METADATA_ENDPOINT = "/v1/etor/metadata"
+CONSOLIDATED_ENDPOINT = "/v1/etor/metadata/summary"
 
 demographics_request_body = None
 order_request_body = None
@@ -32,6 +33,7 @@ class SampleUser(FastHttpUser):
 
         self.submission_id = str(uuid.uuid4())
         self.orders_api_called = False
+        self.sender = "flexion.simulated-hospital"
 
         # Start the token refreshing thread
         threading.Thread(
@@ -74,11 +76,19 @@ class SampleUser(FastHttpUser):
         if response.status_code == 200:
             self.orders_api_called = True
 
-    @task(2)
+    @task(1)
     def get_v1_etor_metadata(self):
         if self.orders_api_called:
             self.client.get(
                 f"{METADATA_ENDPOINT}/{self.submission_id}",
+                headers={"Authorization": self.access_token},
+            )
+
+    @task(1)
+    def get_v1_metadata_consolidated(self):
+        if self.orders_api_called:
+            self.client.get(
+                f"{CONSOLIDATED_ENDPOINT}/{self.sender}",
                 headers={"Authorization": self.access_token},
             )
 
@@ -124,11 +134,11 @@ def get_auth_request_body():
 
 def get_demographics_request_body():
     # read the sample request body for the demographics endpoint
-    with open("examples/fhir/newborn_patient.json", "r") as f:
+    with open("examples/Other/003_Patient_NBS.fhir", "r") as f:
         return f.read()
 
 
 def get_orders_request_body():
     # read the sample request body for the orders endpoint
-    with open("examples/fhir/lab_order.json", "r") as f:
+    with open("examples/Other/002_Order.fhir", "r") as f:
         return f.read()
