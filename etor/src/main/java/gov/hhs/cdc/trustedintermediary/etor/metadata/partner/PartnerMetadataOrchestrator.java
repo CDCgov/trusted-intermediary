@@ -8,8 +8,10 @@ import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingExc
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 /**
@@ -118,9 +120,7 @@ public class PartnerMetadataOrchestrator {
 
         PartnerMetadata partnerMetadata = optionalPartnerMetadata.get();
         var sentSubmissionId = partnerMetadata.sentSubmissionId();
-        if ((partnerMetadata.receiver() == null
-                        || partnerMetadata.deliveryStatus() == PartnerMetadataStatus.PENDING)
-                && sentSubmissionId != null) {
+        if (metadataIsStale(partnerMetadata) && sentSubmissionId != null) {
             logger.logInfo(
                     "Receiver name not found in metadata or delivery status still pending, looking up {} from RS history API",
                     sentSubmissionId);
@@ -184,6 +184,29 @@ public class PartnerMetadataOrchestrator {
                         .withDeliveryStatus(PartnerMetadataStatus.FAILED)
                         .withFailureMessage(errorMessage);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
+    }
+
+    public Map<String, Map<String, Object>> getConsolidatedMetadata(String senderName)
+            throws PartnerMetadataException {
+
+        var metadataSet = partnerMetadataStorage.readMetadataForSender(senderName);
+
+        return metadataSet.stream()
+                .collect(
+                        Collectors.toMap(
+                                PartnerMetadata::receivedSubmissionId,
+                                metadata -> {
+                                    var status = String.valueOf(metadata.deliveryStatus());
+                                    var stale = metadataIsStale(metadata);
+                                    var failureReason = metadata.failureReason();
+
+                                    Map<String, Object> innerMap = new HashMap<>();
+                                    innerMap.put("status", status);
+                                    innerMap.put("stale", stale);
+                                    innerMap.put("failureReason", failureReason);
+
+                                    return innerMap;
+                                }));
     }
 
     String[] getDataFromReportStream(String responseBody) throws FormatterProcessingException {
@@ -257,5 +280,10 @@ public class PartnerMetadataOrchestrator {
             case "Delivered" -> PartnerMetadataStatus.DELIVERED;
             default -> PartnerMetadataStatus.PENDING;
         };
+    }
+
+    private boolean metadataIsStale(PartnerMetadata partnerMetadata) {
+        return partnerMetadata.receiver() == null
+                || partnerMetadata.deliveryStatus() == PartnerMetadataStatus.PENDING;
     }
 }

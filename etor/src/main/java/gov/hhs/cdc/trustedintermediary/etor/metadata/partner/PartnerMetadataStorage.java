@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata.partner;
 
 import java.util.Optional;
+import java.util.Set;
 
 /** Interface to store and retrieve our partner-facing metadata. */
 public interface PartnerMetadataStorage {
@@ -21,4 +22,12 @@ public interface PartnerMetadataStorage {
      * @param metadata The metadata to save.
      */
     void saveMetadata(PartnerMetadata metadata) throws PartnerMetadataException;
+
+    /**
+     * This method will return a set of partner metadata for the given sender.
+     *
+     * @param sender the name of the sender to search for
+     * @return a set of {@link PartnerMetadata}s.
+     */
+    Set<PartnerMetadata> readMetadataForSender(String sender) throws PartnerMetadataException;
 }

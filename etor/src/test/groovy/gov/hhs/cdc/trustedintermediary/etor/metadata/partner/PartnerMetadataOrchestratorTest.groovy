@@ -518,4 +518,26 @@ class PartnerMetadataOrchestratorTest extends Specification {
         then:
         ourStatus == PartnerMetadataStatus.PENDING
     }
+
+    def "getConsolidatedMetadata populates a map of maps"() {
+        given:
+
+        def senderName = "sender_name"
+        def failure = "This thing is bonked"
+        def status = PartnerMetadataStatus.PENDING
+        def mockMetadata = [
+            new PartnerMetadata("123456789", null, senderName, "receiver_name", Instant.now(), null, status, failure)
+        ]
+        mockPartnerMetadataStorage.readMetadataForSender(senderName) >> mockMetadata
+
+
+        when:
+        def result = PartnerMetadataOrchestrator.getInstance().getConsolidatedMetadata(senderName)
+
+        then:
+        !result.isEmpty()
+        result["123456789"]["status"] == status.toString()
+        result["123456789"]["stale"] == true
+        result["123456789"]["failureReason"] == failure
+    }
 }

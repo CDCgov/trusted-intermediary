@@ -230,4 +230,57 @@ class PostgresDaoTest extends Specification {
         then:
         actual.timeReceived() == null
     }
+
+    def "fetchMetadataForSender retrieves a set of PartnerMetadata"() {
+        given:
+        def sender = "DogCow"
+        def expected1 = new PartnerMetadata("12345", "7890", sender, "You'll get your just reward", Instant.parse("2024-01-03T15:45:33.30Z"), sender.hashCode().toString(), PartnerMetadataStatus.PENDING, "It done Goofed")
+        def expected2 = new PartnerMetadata("doreyme", "fasole", sender, "receiver", Instant.now(), "gobeltygoook", PartnerMetadataStatus.DELIVERED, "cause I said so")
+
+        mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
+        mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
+        mockResultSet.next() >>> [true, true, false]
+        mockResultSet.getString("received_message_id") >>> [
+            expected1.receivedSubmissionId(),
+            expected2.receivedSubmissionId()
+        ]
+        mockResultSet.getString("sent_message_id") >>> [
+            expected1.sentSubmissionId(),
+            expected2.sentSubmissionId()
+        ]
+        mockResultSet.getString("sender") >>> [
+            expected1.sender(),
+            expected2.sender()
+        ]
+        mockResultSet.getString("receiver") >>> [
+            expected1.receiver(),
+            expected2.receiver()
+        ]
+        mockResultSet.getTimestamp("time_received") >>> [
+            Timestamp.from(expected1.timeReceived()),
+            Timestamp.from(expected2.timeReceived())
+        ]
+        mockResultSet.getString("hash_of_order") >>> [
+            expected1.hash(),
+            expected2.hash()
+        ]
+        mockResultSet.getString("delivery_status") >>> [
+            expected1.deliveryStatus().toString(),
+            expected2.deliveryStatus().toString()
+        ]
+        mockResultSet.getString("failure_reason") >>> [
+            expected1.failureReason(),
+            expected2.failureReason()
+        ]
+        mockPreparedStatement.executeQuery() >> mockResultSet
+
+        TestApplicationContext.register(SqlDriverManager, mockDriver)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def actual = PostgresDao.getInstance().fetchMetadataForSender("sender")
+
+        then:
+        actual.containsAll(Set.of(expected1, expected2))
+    }
 }
