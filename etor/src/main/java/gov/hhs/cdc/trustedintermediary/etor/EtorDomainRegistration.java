@@ -86,7 +86,8 @@ public class EtorDomainRegistration implements DomainConnector {
                     new HttpEndpoint("POST", DEMOGRAPHICS_API_ENDPOINT, true),
                             this::handleDemographics,
                     new HttpEndpoint("POST", ORDERS_API_ENDPOINT, true), this::handleOrders,
-                    new HttpEndpoint("GET", METADATA_API_ENDPOINT, true), this::handleMetadata);
+                    new HttpEndpoint("GET", METADATA_API_ENDPOINT, true), this::handleMetadata,
+                    new HttpEndpoint("POST", RESULTS_API_ENDPOINT, true), this::handleResults);
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
@@ -101,6 +102,7 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
         ApplicationContext.register(
                 PartnerMetadataOrchestrator.class, PartnerMetadataOrchestrator.getInstance());
+        ApplicationContext.register(ResultController.class, ResultController.getInstance());
 
         if (ApplicationContext.getProperty("DB_URL") != null) {
             ApplicationContext.register(SqlDriverManager.class, EtorSqlDriverManager.getInstance());
@@ -231,7 +233,7 @@ public class EtorDomainRegistration implements DomainConnector {
         }
     }
 
-    public DomainResponse handleResults(DomainRequest request) {
+    DomainResponse handleResults(DomainRequest request) {
         Result<?> results;
         String errorMessage = "";
         try {
