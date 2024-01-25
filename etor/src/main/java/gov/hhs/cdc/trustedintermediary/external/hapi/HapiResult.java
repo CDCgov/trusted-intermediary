@@ -27,20 +27,4 @@ public class HapiResult implements Result<Bundle> {
     public String getFhirResourceId() {
         return innerResult.getId();
     }
-
-    @Override
-    public String getPatientId() {
-        return HapiHelper.resourcesInBundle(innerResult, Patient.class)
-                .flatMap(patient -> patient.getIdentifier().stream())
-                .filter(
-                        identifier ->
-                                identifier
-                                        .getType()
-                                        .hasCoding(
-                                                "http://terminology.hl7.org/CodeSystem/v2-0203",
-                                                "MR"))
-                .map(Identifier::getValue)
-                .findFirst()
-                .orElse("");
-    }
 }
