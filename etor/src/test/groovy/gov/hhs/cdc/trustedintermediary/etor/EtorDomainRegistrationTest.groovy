@@ -645,9 +645,10 @@ class EtorDomainRegistrationTest extends Specification {
 
         when:
         connector.handleResults(request)
+
         then:
         1 * mockLogger.logError(_ as String)
         1 * mockController.parseResults(_ as DomainRequest) >> new ResultMock<?>("12345", "lab result")
-        1 * mockUseCase.convertAndSend(_, null)
+        1 * mockUseCase.convertAndSend(_)
     }
 }
