@@ -39,7 +39,7 @@ resource "azurerm_linux_web_app" "api" {
     DB_URL                          = azurerm_postgresql_flexible_server.database.fqdn
     DB_PORT                         = "5432"
     DB_NAME                         = "postgres"
-    DB_USER                         = "cdcti-internal-api"
+    DB_USER                         = "cdcti-${var.environment}-api"
     DB_SSL                          = "require"
   }
 
