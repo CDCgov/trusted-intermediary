@@ -2,7 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.reportstream
 
 import gov.hhs.cdc.trustedintermediary.ResultMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.messages.MessageSender
+import gov.hhs.cdc.trustedintermediary.etor.results.ResultSender
 import spock.lang.Specification
 
 class ReportStreamResultSenderTest extends Specification {
@@ -10,7 +10,7 @@ class ReportStreamResultSenderTest extends Specification {
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
-        TestApplicationContext.register(MessageSender, ReportStreamResultSender.getInstance())
+        TestApplicationContext.register(ResultSender, ReportStreamResultSender.getInstance())
     }
 
     def "send results works"() {

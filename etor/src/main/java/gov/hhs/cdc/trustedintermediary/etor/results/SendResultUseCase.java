@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.etor.results;
 
-import gov.hhs.cdc.trustedintermediary.etor.messages.MessageSender;
 import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
 import javax.inject.Inject;
@@ -8,7 +7,7 @@ import javax.inject.Inject;
 /** Use case for converting and sending a lab result message. */
 public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
     private static final SendResultUseCase INSTANCE = new SendResultUseCase();
-    @Inject MessageSender<Result<?>> sender;
+    @Inject ResultSender sender;
 
     private SendResultUseCase() {}
 

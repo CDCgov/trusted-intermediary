@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders;
 
-import gov.hhs.cdc.trustedintermediary.etor.messages.MessageSender;
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException;
@@ -13,7 +12,7 @@ import javax.inject.Inject;
 public class SendOrderUseCase {
     private static final SendOrderUseCase INSTANCE = new SendOrderUseCase();
     @Inject OrderConverter converter;
-    @Inject MessageSender<Order<?>> sender;
+    @Inject OrderSender sender;
     @Inject MetricMetadata metadata;
     @Inject PartnerMetadataOrchestrator partnerMetadataOrchestrator;
     @Inject Logger logger;

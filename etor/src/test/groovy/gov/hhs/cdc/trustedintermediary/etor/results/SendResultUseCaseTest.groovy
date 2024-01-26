@@ -2,20 +2,19 @@ package gov.hhs.cdc.trustedintermediary.etor.results
 
 import gov.hhs.cdc.trustedintermediary.ResultMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.messages.MessageSender
 import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageUseCase
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException
 import spock.lang.Specification
 
 class SendResultUseCaseTest extends Specification {
 
-    def mockSender = Mock(MessageSender)
+    def mockSender = Mock(ResultSender)
 
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(SendMessageUseCase, SendResultUseCase.getInstance())
-        TestApplicationContext.register(MessageSender, mockSender)
+        TestApplicationContext.register(ResultSender, mockSender)
     }
 
     def "convertAndSend works"() {
