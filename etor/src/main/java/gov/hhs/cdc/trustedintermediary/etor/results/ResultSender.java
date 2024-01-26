@@ -5,5 +5,5 @@ import java.util.Optional;
 
 /** Interface for sending a lab order. */
 public interface ResultSender {
-    Optional<String> send(Result<?> order) throws UnableToSendMessageException;
+    Optional<String> send(Result<?> result) throws UnableToSendMessageException;
 }
