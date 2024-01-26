@@ -23,7 +23,6 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse;
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase;
-import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
 import gov.hhs.cdc.trustedintermediary.etor.results.Result;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultController;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultResponse;
@@ -253,7 +252,7 @@ public class EtorDomainRegistration implements DomainConnector {
         String errorMessage = "";
         try {
             results = resultController.parseResults(request);
-            sendResultUseCase.convertAndSend(results, receivedSubmissionId);
+            sendResultUseCase.convertAndSend(results);
         } catch (FhirParseException e) {
             errorMessage = "Unable to parse result request";
             logger.logError(errorMessage, e);

@@ -23,7 +23,6 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase
-import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException
 import gov.hhs.cdc.trustedintermediary.etor.results.Result
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultController
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultResponse
@@ -595,7 +594,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.register(EtorDomainRegistration, connector)
 
         def mockUseCase = Mock(SendResultUseCase)
-        mockUseCase.convertAndSend(_ as Result<?>, _ as String) >> {
+        mockUseCase.convertAndSend(_ as Result<?>) >> {
             throw new UnableToSendMessageException("error", new NullPointerException())
         }
         TestApplicationContext.register(SendResultUseCase, mockUseCase)
