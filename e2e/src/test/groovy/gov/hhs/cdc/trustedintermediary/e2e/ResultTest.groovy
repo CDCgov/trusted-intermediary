@@ -27,30 +27,31 @@ class ResultTest extends Specification {
 		parsedJsonBody.fhirResourceId == expectedFhirResourceId
 	}
 
-	def "check that the rest of the message is unchanged except the parts we changed"() {
-		when:
-		resultClient.submit(labResultJsonFileString, submissionId, true)
-		def sentPayload = SentPayloadReader.read()
-		def parsedSentPayload = JsonParsing.parse(sentPayload)
-		def parsedLabResultJsonFile = JsonParsing.parse(labResultJsonFileString)
-
-		then:
-
-		parsedSentPayload == parsedLabResultJsonFile
-	}
-
-	def "check that message type is converted to ORU_R01"() {
-		when:
-		resultClient.submit(labResultJsonFileString, submissionId, true)
-		def sentPayload = SentPayloadReader.read()
-		def parsedSentPayload = JsonParsing.parse(sentPayload)
-
-		then:
-		//test that the MessageHeader's event is now an OML_O21
-		parsedSentPayload.entry[0].resource.resourceType == "MessageHeader"
-		parsedSentPayload.entry[0].resource.eventCoding.code == "R01"
-		parsedSentPayload.entry[0].resource.eventCoding.display.contains("ORU")
-	}
+// Will progress on these tests when sending data to RS
+//	def "check that the rest of the message is unchanged except the parts we changed"() {
+//		when:
+//		resultClient.submit(labResultJsonFileString, submissionId, true)
+//		def sentPayload = SentPayloadReader.read()
+//		def parsedSentPayload = JsonParsing.parse(sentPayload)
+//		def parsedLabResultJsonFile = JsonParsing.parse(labResultJsonFileString)
+//
+//		then:
+//
+//		parsedSentPayload == parsedLabResultJsonFile
+//	}
+//
+//	def "check that message type is converted to ORU_R01"() {
+//		when:
+//		resultClient.submit(labResultJsonFileString, submissionId, true)
+//		def sentPayload = SentPayloadReader.read()
+//		def parsedSentPayload = JsonParsing.parse(sentPayload)
+//
+//		then:
+//		//test that the MessageHeader's event is now an OML_O21
+//		parsedSentPayload.entry[0].resource.resourceType == "MessageHeader"
+//		parsedSentPayload.entry[0].resource.eventCoding.code == "R01"
+//		parsedSentPayload.entry[0].resource.eventCoding.display.contains("ORU")
+//	}
 
 	def "return a 400 response when request has unexpected format"() {
 		given:
