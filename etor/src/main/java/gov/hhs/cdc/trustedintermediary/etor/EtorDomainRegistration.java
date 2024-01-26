@@ -250,7 +250,6 @@ public class EtorDomainRegistration implements DomainConnector {
             logger.logError("Missing required header or empty: RecordId");
         }
 
-        String errorMessage = "";
         try {
             results = resultController.parseResults(request);
             sendResultUseCase.convertAndSend(results);
