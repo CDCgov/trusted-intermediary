@@ -1,7 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.reportstream
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageSender
 import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
@@ -60,7 +60,7 @@ class ReportStreamEndpointClientTest extends Specification {
         def orderSender = ReportStreamEndpointClient.getInstance()
         def mockClient = Mock(HttpClient)
         TestApplicationContext.register(HttpClient, mockClient)
-        TestApplicationContext.register(OrderSender, orderSender)
+        TestApplicationContext.register(MessageSender, orderSender)
         TestApplicationContext.injectRegisteredImplementations()
 
         mockClient.post(_ as String, _ as Map<String,String>, _ as String) >> {
