@@ -255,12 +255,10 @@ public class EtorDomainRegistration implements DomainConnector {
             results = resultController.parseResults(request);
             sendResultUseCase.convertAndSend(results);
         } catch (FhirParseException e) {
-            errorMessage = "Unable to parse result request";
-            logger.logError(errorMessage, e);
+            logger.logError("Unable to parse result request", e);
             return domainResponseHelper.constructErrorResponse(400, e);
         } catch (UnableToSendMessageException e) {
-            errorMessage = "Unable to send result";
-            logger.logError(errorMessage, e);
+            logger.logError("Unable to send result", e);
             return domainResponseHelper.constructErrorResponse(400, e);
         }
 
