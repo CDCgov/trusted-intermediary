@@ -1,10 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.external.reportstream;
 
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageSender;
+import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
-import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
@@ -16,7 +16,7 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 /** Accepts a {@link Order} and sends it to ReportStream. */
-public class ReportStreamOrderSender implements OrderSender {
+public class ReportStreamOrderSender implements MessageSender<Order<?>> {
 
     private static final ReportStreamOrderSender INSTANCE = new ReportStreamOrderSender();
 
@@ -33,7 +33,7 @@ public class ReportStreamOrderSender implements OrderSender {
     private ReportStreamOrderSender() {}
 
     @Override
-    public Optional<String> sendOrder(final Order<?> order) throws UnableToSendOrderException {
+    public Optional<String> send(final Order<?> order) throws UnableToSendMessageException {
         logger.logInfo("Sending the order to ReportStream");
 
         String json = fhir.encodeResourceToJson(order.getUnderlyingOrder());
@@ -44,7 +44,7 @@ public class ReportStreamOrderSender implements OrderSender {
             bearerToken = rsclient.getRsToken();
             rsResponseBody = rsclient.requestWatersEndpoint(json, bearerToken);
         } catch (ReportStreamEndpointClientException e) {
-            throw new UnableToSendOrderException("Unable to send order to ReportStream", e);
+            throw new UnableToSendMessageException("Unable to send order to ReportStream", e);
         }
 
         logger.logInfo("Order successfully sent to ReportStream");

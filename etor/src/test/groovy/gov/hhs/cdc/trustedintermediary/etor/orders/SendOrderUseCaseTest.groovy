@@ -2,6 +2,8 @@ package gov.hhs.cdc.trustedintermediary.etor.orders
 
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageSender
+import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator
@@ -13,7 +15,7 @@ class SendOrderUseCaseTest extends Specification {
 
     def mockOrchestrator = Mock(PartnerMetadataOrchestrator)
     def mockConverter = Mock(OrderConverter)
-    def mockSender = Mock(OrderSender)
+    def mockSender = Mock(MessageSender)
     def mockLogger = Mock(Logger)
 
     def setup() {
@@ -23,7 +25,7 @@ class SendOrderUseCaseTest extends Specification {
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
         TestApplicationContext.register(PartnerMetadataOrchestrator, mockOrchestrator)
         TestApplicationContext.register(OrderConverter, mockConverter)
-        TestApplicationContext.register(OrderSender, mockSender)
+        TestApplicationContext.register(MessageSender, mockSender)
         TestApplicationContext.register(Logger, mockLogger)
     }
 
@@ -44,7 +46,7 @@ class SendOrderUseCaseTest extends Specification {
         then:
         1 * mockConverter.convertToOmlOrder(mockOrder) >> mockOmlOrder
         1 * mockConverter.addContactSectionToPatientResource(mockOmlOrder) >> mockOmlOrder
-        1 * mockSender.sendOrder(mockOmlOrder) >> Optional.of(sentSubmissionId)
+        1 * mockSender.send(mockOmlOrder) >> Optional.of(sentSubmissionId)
         1 * sendOrder.metadata.put(_, EtorMetadataStep.ORDER_CONVERTED_TO_OML)
         1 * sendOrder.metadata.put(_, EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT)
         1 * mockOrchestrator.updateMetadataForReceivedOrder(receivedSubmissionId, _ as String)
@@ -53,19 +55,19 @@ class SendOrderUseCaseTest extends Specification {
 
     def "send fails to send"() {
         given:
-        mockSender.sendOrder(_) >> { throw new UnableToSendOrderException("DogCow", new NullPointerException()) }
+        mockSender.send(_) >> { throw new UnableToSendMessageException("DogCow", new NullPointerException()) }
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
         SendOrderUseCase.getInstance().convertAndSend(Mock(Order), _ as String)
 
         then:
-        thrown(UnableToSendOrderException)
+        thrown(UnableToSendMessageException)
     }
 
     def "convertAndSend should log warnings for null receivedSubmissionId"() {
         given:
-        mockSender.sendOrder(_) >> Optional.of("sentSubmissionId")
+        mockSender.send(_) >> Optional.of("sentSubmissionId")
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -91,7 +93,7 @@ class SendOrderUseCaseTest extends Specification {
         1 * mockLogger.logError(_, _)
         1 * mockConverter.convertToOmlOrder(order) >> omlOrder
         1 * mockConverter.addContactSectionToPatientResource(omlOrder) >> omlOrder
-        1 * mockSender.sendOrder(omlOrder) >> Optional.of("sentId")
+        1 * mockSender.send(omlOrder) >> Optional.of("sentId")
     }
 
     def "convertAndSend logs error and continues when updating the metadata for the sent order throws exception"() {
@@ -108,7 +110,7 @@ class SendOrderUseCaseTest extends Specification {
         then:
         1 * mockConverter.convertToOmlOrder(order) >> omlOrder
         1 * mockConverter.addContactSectionToPatientResource(omlOrder) >> omlOrder
-        1 * mockSender.sendOrder(omlOrder) >> Optional.of("sentId")
+        1 * mockSender.send(omlOrder) >> Optional.of("sentId")
         1 * mockLogger.logError(_, partnerMetadataException)
     }
 
@@ -117,7 +119,7 @@ class SendOrderUseCaseTest extends Specification {
         def mockOrder = Mock(Order)
         TestApplicationContext.injectRegisteredImplementations()
 
-        mockSender.sendOrder(_) >> Optional.empty()
+        mockSender.send(_) >> Optional.empty()
 
         when:
         SendOrderUseCase.getInstance().convertAndSend(mockOrder, "receivedId")

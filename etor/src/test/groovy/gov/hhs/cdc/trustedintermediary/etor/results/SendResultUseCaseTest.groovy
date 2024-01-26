@@ -24,7 +24,7 @@ class SendResultUseCaseTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        SendResultUseCase.getInstance().convertAndSend(mockResult, _ as String)
+        SendResultUseCase.getInstance().convertAndSend(mockResult)
 
         then:
         1 * mockSender.send(mockResult) >> Optional.empty()
@@ -37,7 +37,7 @@ class SendResultUseCaseTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        SendResultUseCase.getInstance().convertAndSend(Mock(Result), _ as String)
+        SendResultUseCase.getInstance().convertAndSend(Mock(Result))
 
         then:
         thrown(UnableToSendMessageException)

@@ -17,8 +17,7 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
     }
 
     @Override
-    public void convertAndSend(Result<?> result, String receivedSubmissionId)
-            throws UnableToSendMessageException {
+    public void convertAndSend(Result<?> result) throws UnableToSendMessageException {
         sender.send(result);
     }
 }
