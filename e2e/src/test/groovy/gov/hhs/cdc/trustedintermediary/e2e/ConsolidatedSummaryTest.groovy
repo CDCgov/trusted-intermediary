@@ -1,0 +1,46 @@
+package gov.hhs.cdc.trustedintermediary.e2e
+
+import spock.lang.Specification
+
+import java.nio.file.Files
+import java.nio.file.Path
+
+class ConsolidatedSummaryTest extends Specification {
+
+    def ConsolidatedSummaryClient = new ConsolidatedSummaryClient()
+    def setup() {
+        SentPayloadReader.delete()
+    }
+
+    def "a consolidated summary is returned from the ETOR consolidated summary endpoint"() {
+        given:
+        def expectedStatusCode = 200
+        def inboundSubmissionId = UUID.randomUUID().toString()
+
+        def orderClient = new EndpointClient("/v1/etor/orders")
+        def labOrderJsonFileString = Files.readString(Path.of("../examples/MN/001_MN_Order_NBS.fhir"))
+        def senderName = "flexion.simulated-hospital"
+        when:
+        def orderResponse = orderClient.submit(labOrderJsonFileString, inboundSubmissionId, true)
+        then:
+        orderResponse.getCode() == expectedStatusCode
+
+        when:
+        def senderNameResponse = ConsolidatedSummaryClient.get(senderName, true)
+        def jsonBody = JsonParsing.parseContent(senderNameResponse)
+        then:
+        jsonBody.get((jsonBody.keySet().toArray())[1]).stale != null
+        jsonBody.get((jsonBody.keySet().toArray())[1]).failureReason == null
+        jsonBody.get((jsonBody.keySet().toArray())[1]).status != null
+    }
+
+    def "consolidated endpoint failes when called while not authenticated"() {
+        when:
+        def consolidatedResponse = ConsolidatedSummaryClient.get("test", false)
+        def parsedJsonBody = JsonParsing.parseContent(consolidatedResponse)
+
+        then:
+        consolidatedResponse.getCode() == 401
+        !(parsedJsonBody.error as String).isEmpty()
+    }
+}
