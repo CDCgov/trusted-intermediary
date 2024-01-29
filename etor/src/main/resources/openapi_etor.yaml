@@ -105,6 +105,38 @@ paths:
             application/json:
             schema:
               $ref: '#/components/schemas/NotFoundError'
+  /v1/etor/metadata/summary/{sender}:
+    get:
+      summary: Returns all the order and their status for particular hospital
+      parameters:
+        - name: sender
+          description: A valid sender for the partner metadata
+          required: true
+          schema:
+            type: string
+      security:
+        - bearerAuthorization: [ ]
+      responses:
+        '200':
+          description: orders and their status returned successfully
+          content:
+            application/json:
+            schema:
+              $ref: 'https://github.com/LinuxForHealth/FHIR/blob/main/fhir-openapi/src/main/webapp/META-INF/openapi.json?raw=true#/components/schemas/OperationOutcome'
+        '401':
+          description: Authentication failed due to invalid token or unknown organization
+          content:
+            application/json:
+            schema:
+              $ref: '#/components/schemas/UnauthorizedRequestError'
+        '404':
+          description: Unable to find requested metadata
+          content:
+            application/json:
+            schema:
+              $ref: '#/components/schemas/NotFoundError'
+
+
 components:
   schemas:
     PatientDemographicsResponse:
