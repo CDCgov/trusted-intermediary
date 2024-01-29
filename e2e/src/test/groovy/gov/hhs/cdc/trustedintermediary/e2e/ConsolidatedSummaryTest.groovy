@@ -29,9 +29,9 @@ class ConsolidatedSummaryTest extends Specification {
         def senderNameResponse = ConsolidatedSummaryClient.get(senderName, true)
         def jsonBody = JsonParsing.parseContent(senderNameResponse)
         then:
-        jsonBody.get((jsonBody.keySet().toArray())[1]).stale != null
-        jsonBody.get((jsonBody.keySet().toArray())[1]).failureReason == null
-        jsonBody.get((jsonBody.keySet().toArray())[1]).status != null
+        jsonBody.get((jsonBody.keySet().toArray())[0]).stale != null
+        jsonBody.get((jsonBody.keySet().toArray())[0]).failureReason == null
+        jsonBody.get((jsonBody.keySet().toArray())[0]).status != null
     }
 
     def "consolidated endpoint failes when called while not authenticated"() {
