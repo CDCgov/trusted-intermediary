@@ -4,7 +4,7 @@ import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageSender
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.external.localfile.MockRSEndpointClient
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
@@ -24,7 +24,7 @@ class ReportStreamOrderSenderTest extends Specification {
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
-        TestApplicationContext.register(OrderSender, ReportStreamOrderSender.getInstance())
+        TestApplicationContext.register(MessageSender, ReportStreamOrderSender.getInstance())
         TestApplicationContext.register(RSEndpointClient, MockRSEndpointClient.getInstance())
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
     }
@@ -55,7 +55,7 @@ class ReportStreamOrderSenderTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        ReportStreamOrderSender.getInstance().sendOrder(new OrderMock(null, null, "Mock order"))
+        ReportStreamOrderSender.getInstance().send(new OrderMock(null, null, "Mock order"))
 
         then:
         noExceptionThrown()
@@ -88,7 +88,7 @@ class ReportStreamOrderSenderTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        ReportStreamOrderSender.getInstance().sendOrder(new OrderMock(null, null, "Mock order"))
+        ReportStreamOrderSender.getInstance().send(new OrderMock(null, null, "Mock order"))
 
         then:
         1 * ReportStreamOrderSender.getInstance().metadata.put(_, EtorMetadataStep.SENT_TO_REPORT_STREAM)

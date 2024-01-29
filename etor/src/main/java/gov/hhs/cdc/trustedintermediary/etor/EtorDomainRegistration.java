@@ -11,6 +11,8 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemograph
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageSender;
+import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator;
@@ -20,9 +22,7 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse;
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase;
-import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureClient;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureDatabaseCredentialsProvider;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureStorageAccountPartnerMetadataStorage;
@@ -98,7 +98,7 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(OrderConverter.class, HapiOrderConverter.getInstance());
         ApplicationContext.register(OrderController.class, OrderController.getInstance());
         ApplicationContext.register(SendOrderUseCase.class, SendOrderUseCase.getInstance());
-        ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
+        ApplicationContext.register(MessageSender.class, ReportStreamOrderSender.getInstance());
         ApplicationContext.register(
                 PartnerMetadataOrchestrator.class, PartnerMetadataOrchestrator.getInstance());
 
@@ -157,7 +157,7 @@ public class EtorDomainRegistration implements DomainConnector {
         } catch (FhirParseException e) {
             logger.logError("Unable to parse demographics request", e);
             return domainResponseHelper.constructErrorResponse(400, e);
-        } catch (UnableToSendOrderException e) {
+        } catch (UnableToSendMessageException e) {
             logger.logError("Unable to send demographics", e);
             return domainResponseHelper.constructErrorResponse(400, e);
         }
@@ -187,7 +187,7 @@ public class EtorDomainRegistration implements DomainConnector {
             logger.logError(errorMessage, e);
             markMetadataAsFailed = true;
             return domainResponseHelper.constructErrorResponse(400, e);
-        } catch (UnableToSendOrderException e) {
+        } catch (UnableToSendMessageException e) {
             errorMessage = "Unable to send order";
             logger.logError(errorMessage, e);
             markMetadataAsFailed = true;
