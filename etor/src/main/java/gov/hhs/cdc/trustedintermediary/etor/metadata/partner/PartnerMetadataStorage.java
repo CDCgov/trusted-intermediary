@@ -24,11 +24,10 @@ public interface PartnerMetadataStorage {
     void saveMetadata(PartnerMetadata metadata) throws PartnerMetadataException;
 
     /**
-     * This method will return a list of IDs along with the associated status and any status
-     * messages
+     * This method will return a set of partner metadata for the given sender.
      *
      * @param sender the name of the sender to search for
-     * @return a map of all submission ids
+     * @return a set of {@link PartnerMetadata}s.
      */
     Set<PartnerMetadata> readMetadataForSender(String sender) throws PartnerMetadataException;
 }

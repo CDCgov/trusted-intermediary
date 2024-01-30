@@ -274,7 +274,7 @@ with this option enabled.
         ```
         {
           "@type": "UserApiKey",
-          "apiKey": "TI's private key in RS at trusted-intermediary/mock_credentials/organization-report-stream-private-key.pem",
+          "apiKey": "Contents of file at trusted-intermediary/mock_credentials/organization-report-stream-private-key-local.pem",
           "user": "flexion"
         }
         ```

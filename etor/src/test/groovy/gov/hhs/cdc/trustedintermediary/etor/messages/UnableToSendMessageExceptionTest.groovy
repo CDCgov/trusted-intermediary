@@ -1,10 +1,9 @@
-package gov.hhs.cdc.trustedintermediary.etor.orders
-
+package gov.hhs.cdc.trustedintermediary.etor.messages
 
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException
 import spock.lang.Specification
 
-class UnableToSendOrderExceptionTest extends Specification {
+class UnableToSendMessageExceptionTest extends Specification {
     def "contructor works"() {
 
         given:
@@ -12,7 +11,7 @@ class UnableToSendOrderExceptionTest extends Specification {
         def cause = new HttpClientException(message, new IOException())
 
         when:
-        def exception = new UnableToSendOrderException(message, cause)
+        def exception = new UnableToSendMessageException(message, cause)
 
         then:
         exception.getMessage() == message

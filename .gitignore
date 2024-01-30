@@ -22,6 +22,9 @@ Thumbs.db
 # Ignore python version file
 .python-version
 
+# Ignore java version file
+.java-version
+
 # Ignore terraform state (as it is persisted via Azure Storage)
 terraform.tfstate*
 .terraform*

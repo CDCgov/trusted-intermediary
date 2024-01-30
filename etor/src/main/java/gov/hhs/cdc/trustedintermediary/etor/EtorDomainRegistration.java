@@ -11,6 +11,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemograph
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
+import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator;
@@ -22,7 +23,11 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase;
-import gov.hhs.cdc.trustedintermediary.etor.orders.UnableToSendOrderException;
+import gov.hhs.cdc.trustedintermediary.etor.results.Result;
+import gov.hhs.cdc.trustedintermediary.etor.results.ResultController;
+import gov.hhs.cdc.trustedintermediary.etor.results.ResultResponse;
+import gov.hhs.cdc.trustedintermediary.etor.results.ResultSender;
+import gov.hhs.cdc.trustedintermediary.etor.results.SendResultUseCase;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureClient;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureDatabaseCredentialsProvider;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureStorageAccountPartnerMetadataStorage;
@@ -37,6 +42,7 @@ import gov.hhs.cdc.trustedintermediary.external.localfile.FilePartnerMetadataSto
 import gov.hhs.cdc.trustedintermediary.external.localfile.MockRSEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
+import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamResultSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -67,9 +73,9 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject ConvertAndSendDemographicsUsecase convertAndSendDemographicsUsecase;
     @Inject SendOrderUseCase sendOrderUseCase;
 
-    // @Inject ResultController resultController
+    @Inject ResultController resultController;
 
-    // @Inject SendResultUseCase sendResultUseCase
+    @Inject SendResultUseCase sendResultUseCase;
 
     @Inject Logger logger;
     @Inject DomainResponseHelper domainResponseHelper;
@@ -85,6 +91,7 @@ public class EtorDomainRegistration implements DomainConnector {
                             this::handleDemographics,
                     new HttpEndpoint("POST", ORDERS_API_ENDPOINT, true), this::handleOrders,
                     new HttpEndpoint("GET", METADATA_API_ENDPOINT, true), this::handleMetadata,
+                    new HttpEndpoint("POST", RESULTS_API_ENDPOINT, true), this::handleResults,
                     new HttpEndpoint("GET", CONSOLIDATED_SUMMARY_API_ENDPOINT, true),
                             this::handleConsolidatedSummary);
 
@@ -101,6 +108,9 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
         ApplicationContext.register(
                 PartnerMetadataOrchestrator.class, PartnerMetadataOrchestrator.getInstance());
+        ApplicationContext.register(ResultSender.class, ReportStreamResultSender.getInstance());
+        ApplicationContext.register(ResultController.class, ResultController.getInstance());
+        ApplicationContext.register(SendResultUseCase.class, SendResultUseCase.getInstance());
 
         if (ApplicationContext.getProperty("DB_URL") != null) {
             ApplicationContext.register(SqlDriverManager.class, EtorSqlDriverManager.getInstance());
@@ -157,7 +167,7 @@ public class EtorDomainRegistration implements DomainConnector {
         } catch (FhirParseException e) {
             logger.logError("Unable to parse demographics request", e);
             return domainResponseHelper.constructErrorResponse(400, e);
-        } catch (UnableToSendOrderException e) {
+        } catch (UnableToSendMessageException e) {
             logger.logError("Unable to send demographics", e);
             return domainResponseHelper.constructErrorResponse(400, e);
         }
@@ -187,7 +197,7 @@ public class EtorDomainRegistration implements DomainConnector {
             logger.logError(errorMessage, e);
             markMetadataAsFailed = true;
             return domainResponseHelper.constructErrorResponse(400, e);
-        } catch (UnableToSendOrderException e) {
+        } catch (UnableToSendMessageException e) {
             errorMessage = "Unable to send order";
             logger.logError(errorMessage, e);
             markMetadataAsFailed = true;
@@ -231,6 +241,31 @@ public class EtorDomainRegistration implements DomainConnector {
         }
     }
 
+    DomainResponse handleResults(DomainRequest request) {
+        Result<?> results;
+
+        String receivedSubmissionId = request.getHeaders().get("recordid");
+        if (receivedSubmissionId == null || receivedSubmissionId.isEmpty()) {
+            receivedSubmissionId = null;
+            logger.logError("Missing required header or empty: RecordId");
+        }
+
+        try {
+            results = resultController.parseResults(request);
+            sendResultUseCase.convertAndSend(results);
+        } catch (FhirParseException e) {
+            logger.logError("Unable to parse result request", e);
+            return domainResponseHelper.constructErrorResponse(400, e);
+        } catch (UnableToSendMessageException e) {
+            logger.logError("Unable to send result", e);
+            return domainResponseHelper.constructErrorResponse(400, e);
+        }
+
+        ResultResponse resultResponse = new ResultResponse(results);
+        logger.logInfo(request.getHeaders().toString());
+        return domainResponseHelper.constructOkResponse(resultResponse);
+    }
+
     DomainResponse handleConsolidatedSummary(DomainRequest request) {
 
         Map<String, Map<String, Object>> metadata;
@@ -241,24 +276,10 @@ public class EtorDomainRegistration implements DomainConnector {
 
         } catch (Exception e) {
             var errorString = "Unable to retrieve consolidated orders";
-            logger.logFatal(errorString, e);
+            logger.logError(errorString, e);
             return domainResponseHelper.constructErrorResponse(500, errorString);
         }
 
         return domainResponseHelper.constructOkResponse(metadata);
-    }
-
-    public DomainResponse handleResults(DomainRequest request) {
-
-        // Get the result
-        // Result<?> result
-        // resultController.parseResults(request)
-        // sendResultUseCase/ sendOrderUseCase? change name for reuse?
-
-        // ResultResponse resultResponse = new ResultResponse(results)
-        // return domainResponseHelper.constructOkResponse(resultResponse)
-
-        logger.logInfo(request.getHeaders().toString());
-        return new DomainResponse(200);
     }
 }

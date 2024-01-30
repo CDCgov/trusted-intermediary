@@ -55,7 +55,7 @@ class ReportStreamOrderSenderTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        ReportStreamOrderSender.getInstance().sendOrder(new OrderMock(null, null, "Mock order"))
+        ReportStreamOrderSender.getInstance().send(new OrderMock(null, null, "Mock order"))
 
         then:
         noExceptionThrown()
@@ -88,7 +88,7 @@ class ReportStreamOrderSenderTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        ReportStreamOrderSender.getInstance().sendOrder(new OrderMock(null, null, "Mock order"))
+        ReportStreamOrderSender.getInstance().send(new OrderMock(null, null, "Mock order"))
 
         then:
         1 * ReportStreamOrderSender.getInstance().metadata.put(_, EtorMetadataStep.SENT_TO_REPORT_STREAM)

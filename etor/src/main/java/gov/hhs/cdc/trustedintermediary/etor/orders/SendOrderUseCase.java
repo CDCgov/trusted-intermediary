@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders;
 
+import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator;
@@ -23,7 +24,7 @@ public class SendOrderUseCase {
     }
 
     public void convertAndSend(final Order<?> order, String receivedSubmissionId)
-            throws UnableToSendOrderException {
+            throws UnableToSendMessageException {
 
         savePartnerMetadataForReceivedOrder(receivedSubmissionId, order);
 
@@ -33,7 +34,7 @@ public class SendOrderUseCase {
         omlOrder = converter.addContactSectionToPatientResource(omlOrder);
         metadata.put(order.getFhirResourceId(), EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT);
 
-        String sentSubmissionId = sender.sendOrder(omlOrder).orElse(null);
+        String sentSubmissionId = sender.send(omlOrder).orElse(null);
 
         saveSentOrderSubmissionId(receivedSubmissionId, sentSubmissionId);
     }

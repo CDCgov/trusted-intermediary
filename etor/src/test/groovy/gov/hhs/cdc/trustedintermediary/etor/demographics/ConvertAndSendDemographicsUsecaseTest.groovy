@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender
+
 import spock.lang.Specification
 
 class ConvertAndSendDemographicsUsecaseTest extends Specification {
@@ -32,6 +33,6 @@ class ConvertAndSendDemographicsUsecaseTest extends Specification {
 
         then:
         1 * mockConverter.convertToOrder(_ as Demographics) >> mockOrder
-        1 * mockSender.sendOrder(mockOrder)
+        1 * mockSender.send(mockOrder)
     }
 }
