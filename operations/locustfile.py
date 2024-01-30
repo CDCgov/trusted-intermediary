@@ -84,13 +84,13 @@ class SampleUser(FastHttpUser):
                 headers={"Authorization": self.access_token},
             )
 
-    @task(1)
-    def get_v1_metadata_consolidated(self):
-        if self.orders_api_called:
-            self.client.get(
-                f"{CONSOLIDATED_ENDPOINT}/{self.sender}",
-                headers={"Authorization": self.access_token},
-            )
+    # @task(1)
+    # def get_v1_metadata_consolidated(self):
+    #     if self.orders_api_called:
+    #         self.client.get(
+    #             f"{CONSOLIDATED_ENDPOINT}/{self.sender}",
+    #             headers={"Authorization": self.access_token},
+    #         )
 
 
 @events.test_start.add_listener
