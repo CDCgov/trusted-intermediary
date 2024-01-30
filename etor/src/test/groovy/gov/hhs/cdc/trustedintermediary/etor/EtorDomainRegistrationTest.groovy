@@ -493,6 +493,7 @@ class EtorDomainRegistrationTest extends Specification {
         1 * mockResponseHelper.constructOkResponse(expectedResultMap) >> new DomainResponse(expectedStatusCode)
     }
 
+
     def "Consolidated metadata endpoint fails with a 500"() {
         given:
         def expectedStatusCode = 500

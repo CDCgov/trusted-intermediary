@@ -277,6 +277,7 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.register(SqlDriverManager, mockDriver)
         TestApplicationContext.injectRegisteredImplementations()
 
+
         when:
         def actual = PostgresDao.getInstance().fetchMetadataForSender("sender")
 
