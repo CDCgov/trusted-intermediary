@@ -2,7 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.orders
 
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.messages.MessageSender
+import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
@@ -15,7 +15,7 @@ class SendOrderUseCaseTest extends Specification {
 
     def mockOrchestrator = Mock(PartnerMetadataOrchestrator)
     def mockConverter = Mock(OrderConverter)
-    def mockSender = Mock(MessageSender)
+    def mockSender = Mock(OrderSender)
     def mockLogger = Mock(Logger)
 
     def setup() {
@@ -25,7 +25,7 @@ class SendOrderUseCaseTest extends Specification {
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
         TestApplicationContext.register(PartnerMetadataOrchestrator, mockOrchestrator)
         TestApplicationContext.register(OrderConverter, mockConverter)
-        TestApplicationContext.register(MessageSender, mockSender)
+        TestApplicationContext.register(OrderSender, mockSender)
         TestApplicationContext.register(Logger, mockLogger)
     }
 

@@ -1,10 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.etor.demographics;
 
-import gov.hhs.cdc.trustedintermediary.etor.messages.MessageSender;
 import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter;
+import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
 import javax.inject.Inject;
 
 /**
@@ -18,7 +18,7 @@ public class ConvertAndSendDemographicsUsecase implements SendMessageUseCase<Dem
 
     @Inject OrderConverter converter;
 
-    @Inject MessageSender<Order<?>> sender;
+    @Inject OrderSender sender;
 
     public static ConvertAndSendDemographicsUsecase getInstance() {
         return INSTANCE;

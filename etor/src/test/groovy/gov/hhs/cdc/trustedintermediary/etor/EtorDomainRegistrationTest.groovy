@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor
 
 import gov.hhs.cdc.trustedintermediary.DemographicsMock
 import gov.hhs.cdc.trustedintermediary.OrderMock
+import gov.hhs.cdc.trustedintermediary.ResultMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
@@ -22,7 +23,10 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase
-
+import gov.hhs.cdc.trustedintermediary.etor.results.Result
+import gov.hhs.cdc.trustedintermediary.etor.results.ResultController
+import gov.hhs.cdc.trustedintermediary.etor.results.ResultResponse
+import gov.hhs.cdc.trustedintermediary.etor.results.SendResultUseCase
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
@@ -516,7 +520,7 @@ class EtorDomainRegistrationTest extends Specification {
         1 * mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as String) >> new DomainResponse(expectedStatusCode)
     }
 
-    def "results endpoint happy path"() {
+    def "handleResults endpoint happy path"() {
         given:
         def expectedStatusCode = 200
 
@@ -525,6 +529,20 @@ class EtorDomainRegistrationTest extends Specification {
 
         def connector = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, connector)
+
+        def mockUseCase = Mock(SendResultUseCase)
+        TestApplicationContext.register(SendResultUseCase, mockUseCase)
+
+        def mockRequestId = "asdf-12341-jkl-7890"
+        def resultMock = new ResultMock<?>(mockRequestId, "lab result")
+        def mockController = Mock(ResultController)
+        mockController.parseResults(_ as DomainRequest) >> resultMock
+        TestApplicationContext.register(ResultController, mockController)
+
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        mockResponseHelper.constructOkResponse(_ as ResultResponse) >> new DomainResponse(expectedStatusCode)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
+
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -532,5 +550,105 @@ class EtorDomainRegistrationTest extends Specification {
         def actualStatusCode = res.getStatusCode()
         then:
         actualStatusCode == expectedStatusCode
+    }
+
+    def "handleResults returns a 400 response when the request is not parseable"() {
+        given:
+        def expectedStatusCode = 400
+
+        def request = new DomainRequest()
+        request.headers["recordid"] = "recordId"
+
+        def connector = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, connector)
+
+        def mockUseCase = Mock(SendResultUseCase)
+        TestApplicationContext.register(SendResultUseCase, mockUseCase)
+
+        def mockController = Mock(ResultController)
+        mockController.parseResults(_ as DomainRequest) >> { throw new FhirParseException("error", new NullPointerException()) }
+        TestApplicationContext.register(ResultController, mockController)
+
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as Exception) >> new DomainResponse(expectedStatusCode)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def res = connector.handleResults(request)
+        def actualStatusCode = res.statusCode
+
+        then:
+        actualStatusCode == expectedStatusCode
+    }
+
+    def "handleResults returns a 400 response when the result cannot be sent"() {
+        given:
+        def expectedStatusCode = 400
+
+        def request = new DomainRequest()
+        request.headers["recordid"] = "recordId"
+
+        def connector = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, connector)
+
+        def mockUseCase = Mock(SendResultUseCase)
+        mockUseCase.convertAndSend(_ as Result<?>) >> {
+            throw new UnableToSendMessageException("error", new NullPointerException())
+        }
+        TestApplicationContext.register(SendResultUseCase, mockUseCase)
+
+        def mockRequestId = "abcd-e2341-fgh-1234"
+        def resultMock = new ResultMock<?>(mockRequestId, "lab result")
+        def mockController = Mock(ResultController)
+        mockController.parseResults(_ as DomainRequest) >> resultMock
+        TestApplicationContext.register(ResultController, mockController)
+
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as UnableToSendMessageException) >> new DomainResponse(expectedStatusCode)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def res = connector.handleResults(request)
+        def actualStatusCode = res.getStatusCode()
+        then:
+        actualStatusCode == expectedStatusCode
+    }
+
+    def "handleResults logs error and continues usecase when record id is missing"() {
+        given:
+        def request = new DomainRequest()
+        request.headers["recordid"] = null
+
+        def connector = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, connector)
+
+        def mockUseCase = Mock(SendResultUseCase)
+        TestApplicationContext.register(SendResultUseCase, mockUseCase)
+
+        def mockRequestId = "asdf-12341-jkl-7890"
+        def resultMock = new ResultMock<?>(mockRequestId, "lab result")
+        def mockController = Mock(ResultController)
+        mockController.parseResults(_ as DomainRequest) >> resultMock
+        TestApplicationContext.register(ResultController, mockController)
+
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
+
+        def mockLogger = Mock(Logger)
+        TestApplicationContext.register(Logger, mockLogger)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        connector.handleResults(request)
+
+        then:
+        1 * mockLogger.logError(_ as String)
+        1 * mockController.parseResults(_ as DomainRequest) >> new ResultMock<?>("12345", "lab result")
+        1 * mockUseCase.convertAndSend(_)
     }
 }

@@ -8,12 +8,10 @@ import gov.hhs.cdc.trustedintermediary.etor.results.Result
 class ResultMock<T> implements Result<T> {
 
     private String fhirResourceId
-    private String patientId
     private T underlyingResult
 
-    ResultMock(String fhirResourceId, String patientId, T underlyingOrders) {
+    ResultMock(String fhirResourceId, T underlyingOrders) {
         this.fhirResourceId = fhirResourceId
-        this.patientId = patientId
         this.underlyingResult = underlyingOrders
     }
 
@@ -25,10 +23,5 @@ class ResultMock<T> implements Result<T> {
     @Override
     String getFhirResourceId() {
         return fhirResourceId
-    }
-
-    @Override
-    String getPatientId() {
-        return patientId
     }
 }
