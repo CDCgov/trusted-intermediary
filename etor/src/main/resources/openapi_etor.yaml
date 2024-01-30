@@ -122,21 +122,13 @@ paths:
           content:
             application/json:
             schema:
-              $ref: 'https://github.com/LinuxForHealth/FHIR/blob/main/fhir-openapi/src/main/webapp/META-INF/openapi.json?raw=true#/components/schemas/OperationOutcome'
+              $ref: '#/components/schemas/ConsolidatedMetadata'
         '401':
           description: Authentication failed due to invalid token or unknown organization
           content:
             application/json:
             schema:
               $ref: '#/components/schemas/UnauthorizedRequestError'
-        '404':
-          description: Unable to find requested metadata
-          content:
-            application/json:
-            schema:
-              $ref: '#/components/schemas/NotFoundError'
-
-
 components:
   schemas:
     PatientDemographicsResponse:
@@ -157,6 +149,25 @@ components:
         patientId:
           type: string
           example: MRN7465737865
+
+    ConsolidatedMetadata:
+      type: map<string, map<string, object>>
+      properties:
+        receivedSubmissionId:
+          type: string
+          properties:
+            value:
+              type: map<string, object>
+              properties:
+                status:
+                  type: string
+                  example: DELIVERED
+                stale:
+                  type: boolean
+                  example: true
+                failureReason:
+                  type: string
+                  example: xyz
     BadRequestError:
       description: Bad Request
       type: object
