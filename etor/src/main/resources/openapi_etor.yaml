@@ -107,7 +107,7 @@ paths:
               $ref: '#/components/schemas/NotFoundError'
   /v1/etor/metadata/summary/{sender}:
     get:
-      summary: Returns all the order and their status for particular hospital
+      summary: Returns all the orders and their status for a particular hospital
       parameters:
         - name: sender
           description: A valid sender for the partner metadata
