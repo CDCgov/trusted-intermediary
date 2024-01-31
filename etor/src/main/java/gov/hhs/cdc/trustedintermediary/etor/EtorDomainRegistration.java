@@ -95,16 +95,16 @@ public class EtorDomainRegistration implements DomainConnector {
             ApplicationContext.register(DbDao.class, PostgresDao.getInstance());
             ApplicationContext.register(
                     PartnerMetadataStorage.class, DatabasePartnerMetadataStorage.getInstance());
+
+
         } else if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
             ApplicationContext.register(
                     PartnerMetadataStorage.class, FilePartnerMetadataStorage.getInstance());
-        } else {
-            ApplicationContext.register(
-                    PartnerMetadataStorage.class,
-                    AzureStorageAccountPartnerMetadataStorage.getInstance());
         }
 
+
         if (ApplicationContext.getProperty("REPORT_STREAM_URL_PREFIX") != null){
+
             ApplicationContext.register(RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
         } else {
             ApplicationContext.register(RSEndpointClient.class, MockRSEndpointClient.getInstance());
@@ -114,9 +114,7 @@ public class EtorDomainRegistration implements DomainConnector {
             ApplicationContext.register(RSEndpointClient.class, MockRSEndpointClient.getInstance());
         } else {
             ApplicationContext.register(
-                    RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
-
-            ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
+                    PartnerMetadataStorage.class, FilePartnerMetadataStorage.getInstance());
         }
         return endpoints;
     }
