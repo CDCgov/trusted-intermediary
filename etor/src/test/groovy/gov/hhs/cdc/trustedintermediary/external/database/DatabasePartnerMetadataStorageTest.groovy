@@ -28,7 +28,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
     def "readMetadata happy path works"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
-        def mockMetadata = new PartnerMetadata(receivedSubmissionId, "sentSubmissionId", "sender", "receiver", Instant.now(), "hash", PartnerMetadataStatus.PENDING, null)
+        def mockMetadata = new PartnerMetadata(receivedSubmissionId, "sentSubmissionId", "sender", "receiver", Instant.now(), Instant.now(), "hash", PartnerMetadataStatus.PENDING, null)
         def expectedResult = Optional.of(mockMetadata)
 
         mockDao.fetchMetadata(_ as String) >> mockMetadata
@@ -61,6 +61,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 "sender",
                 "receiver",
                 Instant.now(),
+                Instant.now(),
                 "hash",
                 PartnerMetadataStatus.PENDING,
                 "DogCow failure"
@@ -77,6 +78,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 mockMetadata.receiver(),
                 mockMetadata.hash(),
                 mockMetadata.timeReceived(),
+                mockMetadata.timeDelivered(),
                 mockMetadata.deliveryStatus(),
                 mockMetadata.failureReason()
                 )
@@ -91,6 +93,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 "sender",
                 "receiver",
                 Instant.now(),
+                Instant.now(),
                 "hash",
                 PartnerMetadataStatus.FAILED,
                 "DogCow failure"
@@ -103,6 +106,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 mockMetadata.receiver(),
                 mockMetadata.hash(),
                 mockMetadata.timeReceived(),
+                mockMetadata.timeDelivered(),
                 mockMetadata.deliveryStatus(),
                 mockMetadata.failureReason()
                 ) >> { throw new SQLException("Something went wrong!") }

@@ -381,7 +381,7 @@ class EtorDomainRegistrationTest extends Specification {
         request.setPathParams(["id": "metadataId"])
 
         def mockPartnerMetadataOrchestrator = Mock(PartnerMetadataOrchestrator)
-        mockPartnerMetadataOrchestrator.getMetadata(_ as String) >> Optional.ofNullable(new PartnerMetadata("receivedSubmissionId", "sender", Instant.now(), "hash", PartnerMetadataStatus.DELIVERED))
+        mockPartnerMetadataOrchestrator.getMetadata(_ as String) >> Optional.ofNullable(new PartnerMetadata("receivedSubmissionId", "sender", Instant.now(), null, "hash", PartnerMetadataStatus.DELIVERED))
         TestApplicationContext.register(PartnerMetadataOrchestrator, mockPartnerMetadataOrchestrator)
 
         def mockResponseHelper = Mock(DomainResponseHelper)

@@ -15,6 +15,7 @@ public interface DbDao {
             String receiver,
             String hash,
             Instant timeReceived,
+            Instant timeDelivered,
             PartnerMetadataStatus deliveryStatus,
             String failureReason)
             throws SQLException;

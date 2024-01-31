@@ -308,7 +308,7 @@ class HapiOrderConverterTest extends Specification {
         def hash = "hash"
         def failureReason = "timed_out"
         PartnerMetadata metadata = new PartnerMetadata(
-                "receivedSubmissionId", "sentSubmissionId", sender, receiver, time, hash, PartnerMetadataStatus.DELIVERED, failureReason)
+                "receivedSubmissionId", "sentSubmissionId", sender, receiver, time, time, hash, PartnerMetadataStatus.DELIVERED, failureReason)
 
         when:
         def result = HapiOrderConverter.getInstance().extractPublicMetadataToOperationOutcome(metadata, "receivedSubmissionId").getUnderlyingOutcome() as OperationOutcome
@@ -319,7 +319,8 @@ class HapiOrderConverterTest extends Specification {
         result.getIssue().get(1).diagnostics == receiver
         result.getIssue().get(2).diagnostics == time.toString()
         result.getIssue().get(3).diagnostics == hash
-        result.getIssue().get(4).diagnostics == PartnerMetadataStatus.DELIVERED.toString()
-        result.getIssue().get(5).diagnostics == failureReason
+        result.getIssue().get(4).diagnostics == time.toString()
+        result.getIssue().get(5).diagnostics == PartnerMetadataStatus.DELIVERED.toString()
+        result.getIssue().get(6).diagnostics == failureReason
     }
 }

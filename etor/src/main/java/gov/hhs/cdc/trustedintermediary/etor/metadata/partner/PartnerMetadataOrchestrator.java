@@ -44,6 +44,7 @@ public class PartnerMetadataOrchestrator {
 
         String sender;
         Instant timeReceived;
+        Instant timeDelivered = null;
 
         try {
             String bearerToken = rsclient.getRsToken();
@@ -78,6 +79,7 @@ public class PartnerMetadataOrchestrator {
                         receivedSubmissionId,
                         sender,
                         timeReceived,
+                        null,
                         orderHash,
                         PartnerMetadataStatus.PENDING);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
@@ -128,6 +130,7 @@ public class PartnerMetadataOrchestrator {
             String receiver;
             String rsStatus;
             String rsMessage = "";
+            String timeDelivered;
             try {
                 String bearerToken = rsclient.getRsToken();
                 String responseBody =
@@ -136,6 +139,7 @@ public class PartnerMetadataOrchestrator {
                 receiver = parsedResponseBody[0];
                 rsStatus = parsedResponseBody[1];
                 rsMessage = parsedResponseBody[2];
+                timeDelivered = parsedResponseBody[3];
             } catch (ReportStreamEndpointClientException | FormatterProcessingException e) {
                 throw new PartnerMetadataException(
                         "Unable to retrieve metadata from RS history API", e);
@@ -148,6 +152,8 @@ public class PartnerMetadataOrchestrator {
 
             if (ourStatus == PartnerMetadataStatus.FAILED) {
                 partnerMetadata = partnerMetadata.withFailureMessage(rsMessage);
+            } else if (ourStatus == PartnerMetadataStatus.DELIVERED && timeDelivered != null) {
+                partnerMetadata = partnerMetadata.withTimeDelivered(Instant.parse(timeDelivered));
             }
 
             partnerMetadataStorage.saveMetadata(partnerMetadata);
@@ -214,6 +220,7 @@ public class PartnerMetadataOrchestrator {
         // {
         //    ...
         //    "overallStatus": "Waiting to Deliver",
+        //    "actualCompletionAt": "2023-10-24T19:48:26.921Z"
         //    ...
         //    "destinations" : [ {
         //        ...
@@ -265,7 +272,16 @@ public class PartnerMetadataOrchestrator {
                     "Unable to extract failure reason due to unexpected format", e);
         }
 
-        return new String[] {receiver, overallStatus, errorMessages.toString()};
+        String timeDelivered = null;
+        try {
+
+            timeDelivered = (String) responseObject.get("actualCompletionAt");
+        } catch (Exception e) {
+            throw new FormatterProcessingException(
+                    "Unable to extract timeDelivered due to unexpected format", e);
+        }
+
+        return new String[] {receiver, overallStatus, errorMessages.toString(), timeDelivered};
     }
 
     PartnerMetadataStatus ourStatusFromReportStreamStatus(String rsStatus) {

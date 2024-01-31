@@ -78,6 +78,7 @@ public class PostgresDao implements DbDao {
             String receiver,
             String hash,
             Instant timeReceived,
+            Instant timeDelivered,
             PartnerMetadataStatus deliveryStatus,
             String failureReason)
             throws SQLException {
@@ -86,7 +87,7 @@ public class PostgresDao implements DbDao {
                 PreparedStatement statement =
                         conn.prepareStatement(
                                 """
-                                INSERT INTO metadata VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                                INSERT INTO metadata VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                                 ON CONFLICT (received_message_id) DO UPDATE SET receiver = EXCLUDED.receiver, sent_message_id = EXCLUDED.sent_message_id, delivery_status = EXCLUDED.delivery_status, failure_reason = EXCLUDED.failure_reason
                                 """)) {
 
@@ -96,20 +97,27 @@ public class PostgresDao implements DbDao {
             statement.setString(4, receiver);
             statement.setString(5, hash);
 
-            Timestamp timestamp = null;
+            Timestamp timestampReceived = null;
             if (timeReceived != null) {
-                timestamp = Timestamp.from(timeReceived);
+                timestampReceived = Timestamp.from(timeReceived);
             }
-            statement.setTimestamp(6, timestamp);
+            statement.setTimestamp(6, timestampReceived);
+
+            Timestamp timestampDelivered = null;
+
+            if (timeDelivered != null) {
+                timestampDelivered = Timestamp.from(timeDelivered);
+            }
+            statement.setTimestamp(7, timestampDelivered);
 
             String deliveryStatusString = null;
             if (deliveryStatus != null) {
                 deliveryStatusString = deliveryStatus.toString();
             }
 
-            statement.setObject(7, deliveryStatusString, Types.OTHER);
+            statement.setObject(8, deliveryStatusString, Types.OTHER);
 
-            statement.setString(8, failureReason);
+            statement.setString(9, failureReason);
 
             statement.executeUpdate();
         }
@@ -157,9 +165,15 @@ public class PostgresDao implements DbDao {
 
     private PartnerMetadata partnerMetadataFromResultSet(ResultSet resultSet) throws SQLException {
         Instant timeReceived = null;
-        Timestamp timestamp = resultSet.getTimestamp("time_received");
-        if (timestamp != null) {
-            timeReceived = timestamp.toInstant();
+        Instant timeDelivered = null;
+        Timestamp timestampReceived = resultSet.getTimestamp("time_received");
+        Timestamp timestampDelivered = resultSet.getTimestamp("time_delivered");
+        if (timestampReceived != null) {
+            timeReceived = timestampReceived.toInstant();
+        }
+
+        if (timestampDelivered != null) {
+            timeDelivered = timestampDelivered.toInstant();
         }
 
         return new PartnerMetadata(
@@ -168,6 +182,7 @@ public class PostgresDao implements DbDao {
                 resultSet.getString("sender"),
                 resultSet.getString("receiver"),
                 timeReceived,
+                timeDelivered,
                 resultSet.getString("hash_of_order"),
                 PartnerMetadataStatus.valueOf(resultSet.getString("delivery_status")),
                 resultSet.getString("failure_reason"));
