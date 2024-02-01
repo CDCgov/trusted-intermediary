@@ -16,6 +16,7 @@ import io.javalin.Javalin
 import io.javalin.http.Context
 import io.javalin.http.Handler
 import io.javalin.http.HandlerType
+import io.javalin.router.Endpoint
 import spock.lang.Specification
 
 import java.util.function.Function
@@ -291,7 +292,7 @@ class DomainsRegistrationTest extends Specification {
         DomainsRegistration.registerDomains(javalinApp, domains as Set<Class<? extends DomainConnector>>)
 
         then:
-        expectedNumberOfAddHandlerCalls * javalinApp.addHandler(_ as HandlerType, _ as String, _ as Handler)
+        expectedNumberOfAddHandlerCalls * javalinApp.addEndpoint(_ as Endpoint)
     }
 
     def "an OpenAPI endpoint is registered and it sets it content-type as YAML"() {
