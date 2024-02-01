@@ -88,6 +88,7 @@ class FilePartnerMetadataStorageTest extends Specification {
         def sender = "same_sender"
         PartnerMetadata metadata2 = new PartnerMetadata("abcdefghi", null, sender, null, null, null, null, null, null)
         PartnerMetadata metadata1 = new PartnerMetadata("123456789", null, sender, null, null, null, null, null, null)
+
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
