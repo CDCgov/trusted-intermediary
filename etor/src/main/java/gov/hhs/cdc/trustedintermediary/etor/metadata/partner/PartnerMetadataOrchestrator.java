@@ -44,8 +44,6 @@ public class PartnerMetadataOrchestrator {
 
         String sender;
         Instant timeReceived;
-        Instant timeDelivered = null;
-
         try {
             String bearerToken = rsclient.getRsToken();
             String responseBody =

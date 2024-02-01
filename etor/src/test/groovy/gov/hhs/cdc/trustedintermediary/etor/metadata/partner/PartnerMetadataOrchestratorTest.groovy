@@ -480,6 +480,17 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
         then:
         thrown(FormatterProcessingException)
+
+        when:
+        def jsonWithBadCompletionDate = "{\"actualCompletionAt\": 123, \"destinations\":[{\"organization_id\":\"org_id\", \"service\":\"service\"}], \"overallStatus\": \"Error\"}"
+        PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithBadCompletionDate)
+        then:
+        thrown(FormatterProcessingException)
+        when:
+        def jsonWithBadStatus = "{\"overallStatus\": 123, \"destinations\":[{\"organization_id\":\"org_id\", \"service\":\"service\"}]}"
+        PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithBadStatus)
+        then:
+        thrown(FormatterProcessingException)
     }
 
     def "ourStatusFromReportStreamStatus returns FAILED"() {
