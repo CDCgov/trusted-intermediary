@@ -10,6 +10,7 @@ import java.time.Instant;
  * @param sender The name of the sender of the message.
  * @param receiver The name of the receiver of the message.
  * @param timeReceived The time the message was received.
+ * @param timeDelivered The time the message was delivered.
  * @param hash The hash of the message.
  * @param deliveryStatus the status of the message based on an enum
  */
@@ -19,6 +20,7 @@ public record PartnerMetadata(
         String sender,
         String receiver,
         Instant timeReceived,
+        Instant timeDelivered,
         String hash,
         PartnerMetadataStatus deliveryStatus,
         String failureReason) {
@@ -34,17 +36,27 @@ public record PartnerMetadata(
             String receivedSubmissionId,
             String sender,
             Instant timeReceived,
+            Instant timeDelivered,
             String hash,
             PartnerMetadataStatus deliveryStatus) {
-        this(receivedSubmissionId, null, sender, null, timeReceived, hash, deliveryStatus, null);
+        this(
+                receivedSubmissionId,
+                null,
+                sender,
+                null,
+                timeReceived,
+                timeDelivered,
+                hash,
+                deliveryStatus,
+                null);
     }
 
     public PartnerMetadata(String receivedSubmissionId, String hash) {
-        this(receivedSubmissionId, null, null, null, null, hash, null, null);
+        this(receivedSubmissionId, null, null, null, null, null, hash, null, null);
     }
 
     public PartnerMetadata(String receivedSubmissionId, PartnerMetadataStatus deliveryStatus) {
-        this(receivedSubmissionId, null, null, null, null, null, deliveryStatus, null);
+        this(receivedSubmissionId, null, null, null, null, null, null, deliveryStatus, null);
     }
 
     public PartnerMetadata withSentSubmissionId(String sentSubmissionId) {
@@ -54,6 +66,7 @@ public record PartnerMetadata(
                 this.sender,
                 this.receiver,
                 this.timeReceived,
+                this.timeDelivered,
                 this.hash,
                 this.deliveryStatus,
                 this.failureReason);
@@ -66,6 +79,20 @@ public record PartnerMetadata(
                 this.sender,
                 receiver,
                 this.timeReceived,
+                this.timeDelivered,
+                this.hash,
+                this.deliveryStatus,
+                this.failureReason);
+    }
+
+    public PartnerMetadata withTimeDelivered(Instant timeDelivered) {
+        return new PartnerMetadata(
+                this.receivedSubmissionId,
+                this.sentSubmissionId,
+                this.sender,
+                this.receiver,
+                this.timeReceived,
+                timeDelivered,
                 this.hash,
                 this.deliveryStatus,
                 this.failureReason);
@@ -78,6 +105,7 @@ public record PartnerMetadata(
                 this.sender,
                 this.receiver,
                 this.timeReceived,
+                this.timeDelivered,
                 this.hash,
                 deliveryStatus,
                 this.failureReason);
@@ -90,6 +118,7 @@ public record PartnerMetadata(
                 this.sender,
                 this.receiver,
                 this.timeReceived,
+                this.timeDelivered,
                 this.hash,
                 this.deliveryStatus,
                 failureMessage);

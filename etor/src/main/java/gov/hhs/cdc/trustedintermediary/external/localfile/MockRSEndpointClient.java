@@ -46,6 +46,7 @@ public class MockRSEndpointClient implements RSEndpointClient {
                 {
                     "timestamp" : "2020-01-01T00:00:00.000Z",
                     "sender" : "flexion.simulated-hospital",
+                    "actualCompletionAt" : "2023-10-24T19:48:26.921Z",
                     "overallStatus": "Not Delivering",
                     "destinations": [{
                         "organization_id": "flexion",
