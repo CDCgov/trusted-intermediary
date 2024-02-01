@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.database;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
+import gov.hhs.cdc.trustedintermediary.external.EtorConnectionPool;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager;
 import java.sql.Connection;
@@ -29,6 +30,7 @@ public class PostgresDao implements DbDao {
     private PostgresDao() {}
 
     protected Connection connect() throws SQLException {
+
         Connection conn;
         String url =
                 "jdbc:postgresql://"
@@ -83,7 +85,7 @@ public class PostgresDao implements DbDao {
             String failureReason)
             throws SQLException {
 
-        try (Connection conn = connect();
+        try (Connection conn = EtorConnectionPool.getInstance().getConnection();
                 PreparedStatement statement =
                         conn.prepareStatement(
                                 """
@@ -127,7 +129,7 @@ public class PostgresDao implements DbDao {
     public synchronized Set<PartnerMetadata> fetchMetadataForSender(String sender)
             throws SQLException {
 
-        try (Connection conn = connect();
+        try (Connection conn = EtorConnectionPool.getInstance().getConnection();
                 PreparedStatement statement =
                         conn.prepareStatement("SELECT * FROM metadata WHERE sender = ?")) {
             statement.setString(1, sender);
@@ -145,7 +147,7 @@ public class PostgresDao implements DbDao {
 
     @Override
     public synchronized PartnerMetadata fetchMetadata(String submissionId) throws SQLException {
-        try (Connection conn = connect();
+        try (Connection conn = EtorConnectionPool.getInstance().getConnection();
                 PreparedStatement statement =
                         conn.prepareStatement(
                                 "SELECT * FROM metadata where received_message_id = ? OR sent_message_id = ?")) {
