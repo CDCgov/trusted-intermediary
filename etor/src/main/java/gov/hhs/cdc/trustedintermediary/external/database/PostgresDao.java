@@ -1,11 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.external.database;
 
-import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
-import gov.hhs.cdc.trustedintermediary.external.EtorConnectionPool;
+import gov.hhs.cdc.trustedintermediary.wrappers.ConnectionPool;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,7 +12,6 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.Instant;
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 import javax.inject.Inject;
 
@@ -24,49 +21,10 @@ public class PostgresDao implements DbDao {
     private static final PostgresDao INSTANCE = new PostgresDao();
 
     @Inject Logger logger;
-    @Inject SqlDriverManager driverManager;
+    @Inject ConnectionPool connectionPool;
     @Inject DatabaseCredentialsProvider credentialsProvider;
 
     private PostgresDao() {}
-
-    protected Connection connect() throws SQLException {
-
-        Connection conn;
-        String url =
-                "jdbc:postgresql://"
-                        + ApplicationContext.getProperty("DB_URL")
-                        + ":"
-                        + ApplicationContext.getProperty("DB_PORT")
-                        + "/"
-                        + ApplicationContext.getProperty("DB_NAME");
-
-        logger.logInfo("going to connect to db url {}", url);
-
-        // Ternaries prevent NullPointerException during testing since we decided not to mock env
-        // vars.
-        String user =
-                ApplicationContext.getProperty("DB_USER") == null
-                        ? ""
-                        : ApplicationContext.getProperty("DB_USER");
-
-        String pass = credentialsProvider.getPassword();
-
-        String ssl =
-                ApplicationContext.getProperty("DB_SSL") == null
-                        ? ""
-                        : ApplicationContext.getProperty("DB_SSL");
-
-        Properties props = new Properties();
-        props.setProperty("user", user);
-        props.setProperty("password", pass);
-
-        // If the below prop isn't set to require and we just set ssl=true it will expect a CA cert
-        // in azure which breaks it
-        props.setProperty("ssl", ssl);
-        conn = driverManager.getConnection(url, props);
-        logger.logInfo("DB Connected Successfully");
-        return conn;
-    }
 
     public static PostgresDao getInstance() {
         return INSTANCE;
@@ -85,7 +43,7 @@ public class PostgresDao implements DbDao {
             String failureReason)
             throws SQLException {
 
-        try (Connection conn = EtorConnectionPool.getInstance().getConnection();
+        try (Connection conn = connectionPool.getConnection();
                 PreparedStatement statement =
                         conn.prepareStatement(
                                 """
@@ -128,7 +86,7 @@ public class PostgresDao implements DbDao {
     @Override
     public Set<PartnerMetadata> fetchMetadataForSender(String sender) throws SQLException {
 
-        try (Connection conn = EtorConnectionPool.getInstance().getConnection();
+        try (Connection conn = connectionPool.getConnection();
                 PreparedStatement statement =
                         conn.prepareStatement("SELECT * FROM metadata WHERE sender = ?")) {
             statement.setString(1, sender);
@@ -146,7 +104,7 @@ public class PostgresDao implements DbDao {
 
     @Override
     public PartnerMetadata fetchMetadata(String submissionId) throws SQLException {
-        try (Connection conn = EtorConnectionPool.getInstance().getConnection();
+        try (Connection conn = connectionPool.getConnection();
                 PreparedStatement statement =
                         conn.prepareStatement(
                                 "SELECT * FROM metadata where received_message_id = ? OR sent_message_id = ?")) {

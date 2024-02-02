@@ -3,7 +3,8 @@ package gov.hhs.cdc.trustedintermediary.external.database
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
-import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager
+import gov.hhs.cdc.trustedintermediary.wrappers.ConnectionPool
+
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -15,7 +16,7 @@ import spock.lang.Specification
 
 class PostgresDaoTest extends Specification {
 
-    private SqlDriverManager mockDriver
+    private ConnectionPool mockConnPool
     private Connection mockConn
     private PreparedStatement mockPreparedStatement
     private ResultSet mockResultSet
@@ -24,7 +25,7 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
 
-        mockDriver = Mock(SqlDriverManager)
+        mockConnPool = Mock(ConnectionPool)
         mockConn = Mock(Connection)
         mockPreparedStatement = Mock(PreparedStatement)
         mockResultSet = Mock(ResultSet)
@@ -35,32 +36,6 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.register(PostgresDao, PostgresDao.getInstance())
     }
 
-    def "connect happy path works"() {
-        given:
-        mockDriver.getConnection(_ as String, _ as Properties) >> {mockConn}
-
-        TestApplicationContext.register(SqlDriverManager, mockDriver)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        def conn = PostgresDao.getInstance().connect()
-
-        then:
-        conn == mockConn
-    }
-
-    def "connect unhappy path throws exception"() {
-        given:
-        mockDriver.getConnection(_ as String, _ as Properties) >> {throw new SQLException()}
-        TestApplicationContext.register(SqlDriverManager, mockDriver)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        PostgresDao.getInstance().connect()
-
-        then:
-        thrown(SQLException)
-    }
 
     def "upsertMetadata works"() {
         given:
@@ -73,10 +48,10 @@ class PostgresDaoTest extends Specification {
         def status = PartnerMetadataStatus.PENDING
         def failureReason = "failure reason"
 
-        mockDriver.getConnection(_ as String, _ as Properties) >>  mockConn
+        mockConnPool.getConnection() >>  mockConn
         mockConn.prepareStatement(_ as String) >> mockPreparedStatement
 
-        TestApplicationContext.register(SqlDriverManager, mockDriver)
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -97,10 +72,10 @@ class PostgresDaoTest extends Specification {
 
     def "upsertMetadata unhappy path throws exception"() {
         given:
-        mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
+        mockConnPool.getConnection() >> mockConn
         mockConn.prepareStatement(_ as String) >> { throw new SQLException() }
 
-        TestApplicationContext.register(SqlDriverManager, mockDriver)
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -112,10 +87,10 @@ class PostgresDaoTest extends Specification {
 
     def "upsertMetadata writes null timestamp"() {
         given:
-        mockDriver.getConnection(_ as String, _ as Properties) >>  mockConn
+        mockConnPool.getConnection() >>  mockConn
         mockConn.prepareStatement(_ as String) >> mockPreparedStatement
 
-        TestApplicationContext.register(SqlDriverManager, mockDriver)
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -129,13 +104,13 @@ class PostgresDaoTest extends Specification {
 
     def "select metadata retrieves data"(){
         given:
-        mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
+        mockConnPool.getConnection() >> mockConn
         mockConn.prepareStatement(_ as String) >> mockPreparedStatement
         mockPreparedStatement.executeQuery() >> mockResultSet
         mockResultSet.next() >> true
         mockResultSet.getTimestamp(_ as String) >> Timestamp.from(Instant.now())
         mockResultSet.getString("delivery_status") >> "DELIVERED"
-        TestApplicationContext.register(SqlDriverManager, mockDriver)
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -147,10 +122,10 @@ class PostgresDaoTest extends Specification {
 
     def "fetchMetadata unhappy path throws exception"() {
         given:
-        mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
+        mockConnPool.getConnection() >> mockConn
         mockConn.prepareStatement(_ as String) >> { throw new SQLException() }
 
-        TestApplicationContext.register(SqlDriverManager, mockDriver)
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -162,12 +137,12 @@ class PostgresDaoTest extends Specification {
 
     def "fetchMetadata returns null when rows do not exist"() {
         given:
-        mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
+        mockConnPool.getConnection() >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
         mockResultSet.next() >> false
         mockPreparedStatement.executeQuery() >> mockResultSet
 
-        TestApplicationContext.register(SqlDriverManager, mockDriver)
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -192,7 +167,7 @@ class PostgresDaoTest extends Specification {
         def reason = "It done Goofed"
         def expected = new PartnerMetadata(receivedMessageId, sentMessageId, sender, receiver, timeReceived, timeDelivered, hash, status, reason)
 
-        mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
+        mockConnPool.getConnection() >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
         mockResultSet.next() >> true
         mockResultSet.getString("received_message_id") >> receivedMessageId
@@ -206,7 +181,7 @@ class PostgresDaoTest extends Specification {
         mockResultSet.getString("failure_reason") >> reason
         mockPreparedStatement.executeQuery() >> mockResultSet
 
-        TestApplicationContext.register(SqlDriverManager, mockDriver)
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -218,14 +193,14 @@ class PostgresDaoTest extends Specification {
 
     def "fetchMetadata successfully sets the received timestamp to null"() {
         given:
-        mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
+        mockConnPool.getConnection() >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
         mockPreparedStatement.executeQuery() >> mockResultSet
         mockResultSet.next() >> true
         mockResultSet.getTimestamp("time_received") >> null
         mockResultSet.getString("delivery_status") >> "DELIVERED"
         mockResultSet.getString("failure_reason") >> "Your time is up"
-        TestApplicationContext.register(SqlDriverManager, mockDriver)
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -241,7 +216,7 @@ class PostgresDaoTest extends Specification {
         def expected1 = new PartnerMetadata("12345", "7890", sender, "You'll get your just reward", Instant.parse("2024-01-03T15:45:33.30Z"),Instant.parse("2024-01-03T15:45:33.30Z"),  sender.hashCode().toString(), PartnerMetadataStatus.PENDING, "It done Goofed")
         def expected2 = new PartnerMetadata("doreyme", "fasole", sender, "receiver", Instant.now(), Instant.now(), "gobeltygoook", PartnerMetadataStatus.DELIVERED, "cause I said so")
 
-        mockDriver.getConnection(_ as String, _ as Properties) >> mockConn
+        mockConnPool.getConnection() >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
         mockResultSet.next() >>> [true, true, false]
         mockResultSet.getString("received_message_id") >>> [
@@ -282,7 +257,7 @@ class PostgresDaoTest extends Specification {
         ]
         mockPreparedStatement.executeQuery() >> mockResultSet
 
-        TestApplicationContext.register(SqlDriverManager, mockDriver)
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
         TestApplicationContext.injectRegisteredImplementations()
 
 
