@@ -5,7 +5,6 @@ import com.zaxxer.hikari.HikariDataSource;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Properties;
 
 public class EtorConnectionPool {
 
@@ -17,7 +16,6 @@ public class EtorConnectionPool {
     private static HikariDataSource ds;
 
     static {
-        Properties props = new Properties();
         config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
         config.addDataSourceProperty("user", ApplicationContext.getProperty("DB_USER"));
         config.addDataSourceProperty("password", ApplicationContext.getProperty("DB_PASS"));

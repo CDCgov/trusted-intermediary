@@ -73,7 +73,7 @@ public class PostgresDao implements DbDao {
     }
 
     @Override
-    public synchronized void upsertMetadata(
+    public void upsertMetadata(
             String receivedSubmissionId,
             String sentSubmissionId,
             String sender,
@@ -126,8 +126,7 @@ public class PostgresDao implements DbDao {
     }
 
     @Override
-    public synchronized Set<PartnerMetadata> fetchMetadataForSender(String sender)
-            throws SQLException {
+    public Set<PartnerMetadata> fetchMetadataForSender(String sender) throws SQLException {
 
         try (Connection conn = EtorConnectionPool.getInstance().getConnection();
                 PreparedStatement statement =
@@ -146,7 +145,7 @@ public class PostgresDao implements DbDao {
     }
 
     @Override
-    public synchronized PartnerMetadata fetchMetadata(String submissionId) throws SQLException {
+    public PartnerMetadata fetchMetadata(String submissionId) throws SQLException {
         try (Connection conn = EtorConnectionPool.getInstance().getConnection();
                 PreparedStatement statement =
                         conn.prepareStatement(
