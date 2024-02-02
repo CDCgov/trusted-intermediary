@@ -10,7 +10,7 @@ WORKDIR /app
 COPY ${JAR_LIB_FILE} app.jar
 
 # Run the api
-CMD ["java", "-agentlib:jdwp=transport=dt_socket,address=*:6006,server=y,suspend=n", "-jar", "app.jar"]
+CMD ["java", "-jar", "app.jar"]
 
 # Use port 8080
 EXPOSE 8080
