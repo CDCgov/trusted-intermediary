@@ -3,8 +3,8 @@ package gov.hhs.cdc.trustedintermediary.external.database
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
-import gov.hhs.cdc.trustedintermediary.wrappers.ConnectionPool
-
+import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool
+import gov.hhs.cdc.trustedintermediary.wrappers.database.DatabaseCredentialsProvider
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet

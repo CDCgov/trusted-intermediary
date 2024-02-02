@@ -3,29 +3,25 @@ package gov.hhs.cdc.trustedintermediary.external;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
-import gov.hhs.cdc.trustedintermediary.wrappers.ConnectionPool;
+import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool;
+import gov.hhs.cdc.trustedintermediary.wrappers.database.DatabaseCredentialsProvider;
 import java.sql.Connection;
 import java.sql.SQLException;
+import javax.inject.Inject;
 
 public class EtorConnectionPool implements ConnectionPool {
 
     private static final EtorConnectionPool INSTANCE = new EtorConnectionPool();
 
-    private EtorConnectionPool() {}
+    @Inject DatabaseCredentialsProvider credentialsProvider;
+    private final HikariDataSource ds;
 
-    private static HikariConfig config = new HikariDataSource();
-    private static HikariDataSource ds;
-
-    static {
+    private EtorConnectionPool() {
         String user =
                 ApplicationContext.getProperty("DB_USER") != null
                         ? ApplicationContext.getProperty("DB_USER")
                         : "";
-        // TODO: Need to update DB_PASS for Azure
-        String pass =
-                ApplicationContext.getProperty("DB_PASS") != null
-                        ? ApplicationContext.getProperty("DB_PASS")
-                        : "";
+        String pass = credentialsProvider.getPassword();
         String serverName =
                 ApplicationContext.getProperty("DB_URL") != null
                         ? ApplicationContext.getProperty("DB_URL")
@@ -39,6 +35,7 @@ public class EtorConnectionPool implements ConnectionPool {
                         ? ApplicationContext.getProperty("DB_PORT")
                         : "";
 
+        HikariConfig config = new HikariDataSource();
         config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
         config.addDataSourceProperty("user", user);
         config.addDataSourceProperty("password", pass);

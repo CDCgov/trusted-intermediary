@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.azure;
 
-import gov.hhs.cdc.trustedintermediary.external.database.DatabaseCredentialsProvider;
+import gov.hhs.cdc.trustedintermediary.wrappers.database.DatabaseCredentialsProvider;
 import javax.inject.Inject;
 
 /**

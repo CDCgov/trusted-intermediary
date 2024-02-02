@@ -2,8 +2,8 @@ package gov.hhs.cdc.trustedintermediary.external.database;
 
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
-import gov.hhs.cdc.trustedintermediary.wrappers.ConnectionPool;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -22,7 +22,6 @@ public class PostgresDao implements DbDao {
 
     @Inject Logger logger;
     @Inject ConnectionPool connectionPool;
-    @Inject DatabaseCredentialsProvider credentialsProvider;
 
     private PostgresDao() {}
 
