@@ -1,27 +1,35 @@
 package gov.hhs.cdc.trustedintermediary.external;
 
+import com.azure.core.credential.TokenRequestContext;
+import com.azure.identity.DefaultAzureCredentialBuilder;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool;
-import gov.hhs.cdc.trustedintermediary.wrappers.database.DatabaseCredentialsProvider;
 import java.sql.Connection;
 import java.sql.SQLException;
-import javax.inject.Inject;
 
-public class EtorConnectionPool implements ConnectionPool {
+public class HikariConnectionPool implements ConnectionPool {
 
-    private static final EtorConnectionPool INSTANCE = new EtorConnectionPool();
+    private static final HikariConnectionPool INSTANCE = new HikariConnectionPool();
 
-    @Inject DatabaseCredentialsProvider credentialsProvider;
     private final HikariDataSource ds;
 
-    private EtorConnectionPool() {
+    private HikariConnectionPool() {
         String user =
                 ApplicationContext.getProperty("DB_USER") != null
                         ? ApplicationContext.getProperty("DB_USER")
                         : "";
-        String pass = credentialsProvider.getPassword();
+        String pass =
+                !ApplicationContext.getEnvironment().equalsIgnoreCase("local")
+                        ? new DefaultAzureCredentialBuilder()
+                                .build()
+                                .getTokenSync(
+                                        new TokenRequestContext()
+                                                .addScopes(
+                                                        "https://ossrdbms-aad.database.windows.net/.default"))
+                                .getToken()
+                        : ApplicationContext.getProperty("DB_PASS");
         String serverName =
                 ApplicationContext.getProperty("DB_URL") != null
                         ? ApplicationContext.getProperty("DB_URL")
@@ -50,7 +58,7 @@ public class EtorConnectionPool implements ConnectionPool {
         return ds.getConnection();
     }
 
-    public static EtorConnectionPool getInstance() {
+    public static HikariConnectionPool getInstance() {
         return INSTANCE;
     }
 }

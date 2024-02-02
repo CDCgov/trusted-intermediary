@@ -28,7 +28,7 @@ import gov.hhs.cdc.trustedintermediary.etor.results.ResultController;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultResponse;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultSender;
 import gov.hhs.cdc.trustedintermediary.etor.results.SendResultUseCase;
-import gov.hhs.cdc.trustedintermediary.external.EtorConnectionPool;
+import gov.hhs.cdc.trustedintermediary.external.HikariConnectionPool;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureClient;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureDatabaseCredentialsProvider;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureStorageAccountPartnerMetadataStorage;
@@ -113,7 +113,7 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(SendResultUseCase.class, SendResultUseCase.getInstance());
 
         if (ApplicationContext.getProperty("DB_URL") != null) {
-            ApplicationContext.register(ConnectionPool.class, EtorConnectionPool.getInstance());
+            ApplicationContext.register(ConnectionPool.class, HikariConnectionPool.getInstance());
             ApplicationContext.register(DbDao.class, PostgresDao.getInstance());
             ApplicationContext.register(
                     PartnerMetadataStorage.class, DatabasePartnerMetadataStorage.getInstance());
