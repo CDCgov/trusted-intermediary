@@ -53,3 +53,12 @@ jacocoTestReport {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+sourceSets {
+    main {
+        resources {
+            // Include the mock_credentials folder as part of the resources
+            srcDir '../mock_credentials'
+        }
+    }
+}
