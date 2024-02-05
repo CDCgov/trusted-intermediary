@@ -9,11 +9,17 @@ import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+/**
+ * A shared connection pool for connecting to the database. The class currently spins up 10
+ * connections on server startup. This is the default Hikari behavior. For troubleshooting or tuning
+ * help please check the HikariCP repo for info on how to tune the connection performance should any
+ * issues arise.
+ */
 public class HikariConnectionPool implements ConnectionPool {
 
     private static final HikariConnectionPool INSTANCE = new HikariConnectionPool();
 
-    private final HikariDataSource ds;
+    public final HikariDataSource ds;
 
     private HikariConnectionPool() {
         String user =

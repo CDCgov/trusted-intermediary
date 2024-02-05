@@ -29,9 +29,7 @@ import gov.hhs.cdc.trustedintermediary.etor.results.ResultResponse;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultSender;
 import gov.hhs.cdc.trustedintermediary.etor.results.SendResultUseCase;
 import gov.hhs.cdc.trustedintermediary.external.HikariConnectionPool;
-import gov.hhs.cdc.trustedintermediary.external.azure.AzureClient;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureDatabaseCredentialsProvider;
-import gov.hhs.cdc.trustedintermediary.external.azure.AzureStorageAccountPartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.DatabasePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.DbDao;
 import gov.hhs.cdc.trustedintermediary.external.database.PostgresDao;
@@ -39,7 +37,6 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.EnvironmentDatabaseCredentialsProvider;
 import gov.hhs.cdc.trustedintermediary.external.localfile.FilePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.localfile.MockRSEndpointClient;
-import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamResultSender;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
@@ -129,20 +126,11 @@ public class EtorDomainRegistration implements DomainConnector {
         } else if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
             ApplicationContext.register(
                     PartnerMetadataStorage.class, FilePartnerMetadataStorage.getInstance());
-        } else {
-            ApplicationContext.register(
-                    PartnerMetadataStorage.class,
-                    AzureStorageAccountPartnerMetadataStorage.getInstance());
         }
-
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
             ApplicationContext.register(RSEndpointClient.class, MockRSEndpointClient.getInstance());
-        } else {
-            ApplicationContext.register(
-                    RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
-
-            ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
         }
+
         return endpoints;
     }
 
