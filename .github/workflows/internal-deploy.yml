@@ -12,6 +12,7 @@ jobs:
     name: Internal Infrastructure Deploy
     uses: ./.github/workflows/terraform-deploy_reusable.yml
     with:
+      ENVIRONMENT: internal
       TERRAFORM_DIRECTORY: operations/environments/internal
     secrets:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
