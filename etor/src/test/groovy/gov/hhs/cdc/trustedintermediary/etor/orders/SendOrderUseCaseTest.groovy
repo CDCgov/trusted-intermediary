@@ -95,6 +95,7 @@ class SendOrderUseCaseTest extends Specification {
         1 * mockLogger.logError(_, _)
         1 * mockConverter.convertToOmlOrder(order) >> omlOrder
         1 * mockConverter.addContactSectionToPatientResource(omlOrder) >> omlOrder
+        1 * mockConverter.addEtorProcessingTag(omlOrder) >> omlOrder
         1 * mockSender.send(omlOrder) >> Optional.of("sentId")
     }
 
@@ -112,6 +113,7 @@ class SendOrderUseCaseTest extends Specification {
         then:
         1 * mockConverter.convertToOmlOrder(order) >> omlOrder
         1 * mockConverter.addContactSectionToPatientResource(omlOrder) >> omlOrder
+        1 * mockConverter.addEtorProcessingTag(omlOrder) >> omlOrder
         1 * mockSender.send(omlOrder) >> Optional.of("sentId")
         1 * mockLogger.logError(_, partnerMetadataException)
     }
