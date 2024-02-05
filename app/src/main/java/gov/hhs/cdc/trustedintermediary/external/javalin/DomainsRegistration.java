@@ -15,6 +15,7 @@ import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import io.javalin.http.HandlerType;
+import io.javalin.router.Endpoint;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
@@ -70,10 +71,13 @@ public class DomainsRegistration {
                         registrationMap ->
                                 registrationMap.forEach(
                                         (endpoint, handler) -> {
-                                            app.addHandler(
-                                                    HandlerType.valueOf(endpoint.verb()),
-                                                    endpoint.path(),
-                                                    createHandler(handler, endpoint.isProtected()));
+                                            app.addEndpoint(
+                                                    new Endpoint(
+                                                            HandlerType.valueOf(endpoint.verb()),
+                                                            endpoint.path(),
+                                                            createHandler(
+                                                                    handler,
+                                                                    endpoint.isProtected())));
                                             LOGGER.logInfo(
                                                     "verb: "
                                                             + endpoint.verb()
