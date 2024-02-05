@@ -243,7 +243,7 @@ class HapiOrderConverterTest extends Specification {
         def convertedOrderBundle = HapiOrderConverter.getInstance().addEtorProcessingTag(mockOrder).getUnderlyingOrder() as Bundle
 
         then:
-        def messageHeaders = convertedOrderBundle.getEntry().get(0).getResource() as MessageHeader
+        def messageHeaders = convertedOrderBundle.getEntry().get(1).getResource() as MessageHeader
         def actualSystem = messageHeaders.getMeta().getTag()[0].getSystem()
         def actualCode = messageHeaders.getMeta().getTag()[0].getCode()
         def actualDisplay = messageHeaders.getMeta().getTag()[0].getDisplay()
