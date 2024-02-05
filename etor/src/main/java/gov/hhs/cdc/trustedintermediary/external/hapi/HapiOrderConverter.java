@@ -176,7 +176,7 @@ public class HapiOrderConverter implements OrderConverter {
                 HapiHelper.resourcesInBundle(messageBundle, MessageHeader.class).findFirst();
         if (messageHeaderOptional.isPresent()) {
             var messageHeader = messageHeaderOptional.get();
-            var meta = messageHeader.hasMeta() ? messageBundle.getMeta() : new Meta();
+            var meta = messageHeader.hasMeta() ? messageHeader.getMeta() : new Meta();
 
             meta.addTag(new Coding("http://localcodes.org/ETOR", "ETOR", "Processed by ETOR"));
             messageHeader.setMeta(meta);
