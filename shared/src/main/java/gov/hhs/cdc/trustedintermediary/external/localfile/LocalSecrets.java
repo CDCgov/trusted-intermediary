@@ -3,11 +3,8 @@ package gov.hhs.cdc.trustedintermediary.external.localfile;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import javax.inject.Inject;
 
 /**
@@ -33,24 +30,15 @@ public class LocalSecrets implements Secrets {
         String key = "";
 
         try {
-            key = readSecretFromFileSystem(secretName);
-        } catch (SecretRetrievalException exception) {
-            logger.logWarning(
-                    "Not finding the " + secretName + " on the filesystem, searching in resources");
             key = readSecretFromResources(secretName);
+        } catch (SecretRetrievalException exception) {
+            logger.logWarning("Not finding the " + secretName + " in resources");
+            throw new SecretRetrievalException(
+                    "Could not find " + secretName + "in resources", exception);
         }
 
         logger.logInfo("Successfully got local key " + secretName);
         return key;
-    }
-
-    protected String readSecretFromFileSystem(String secretName) throws SecretRetrievalException {
-        try {
-            return Files.readString(Path.of("..", "mock_credentials", secretName + ".pem"));
-        } catch (IOException exception) {
-            throw new SecretRetrievalException(
-                    "Error getting local key " + secretName + " from the filesystem", exception);
-        }
     }
 
     protected String readSecretFromResources(String secretName) throws SecretRetrievalException {
