@@ -25,17 +25,6 @@ public class HikariConnectionPool implements ConnectionPool {
                 ApplicationContext.getProperty("DB_USER") != null
                         ? ApplicationContext.getProperty("DB_USER")
                         : "";
-        //        String pass =
-        //                !ApplicationContext.getEnvironment().equalsIgnoreCase("local")
-        //                        ? new DefaultAzureCredentialBuilder()
-        //                                .build()
-        //                                .getTokenSync(
-        //                                        new TokenRequestContext()
-        //                                                .addScopes(
-        //
-        // "https://ossrdbms-aad.database.windows.net/.default"))
-        //                                .getToken()
-        //                        : ApplicationContext.getProperty("DB_PASS");
         String pass =
                 ApplicationContext.getImplementation(DatabaseCredentialsProvider.class)
                         .getPassword();

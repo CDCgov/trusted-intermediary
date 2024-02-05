@@ -29,6 +29,7 @@ import gov.hhs.cdc.trustedintermediary.etor.results.ResultResponse;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultSender;
 import gov.hhs.cdc.trustedintermediary.etor.results.SendResultUseCase;
 import gov.hhs.cdc.trustedintermediary.external.HikariConnectionPool;
+import gov.hhs.cdc.trustedintermediary.external.azure.AzureDatabaseCredentialsProvider;
 import gov.hhs.cdc.trustedintermediary.external.database.DatabasePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.DbDao;
 import gov.hhs.cdc.trustedintermediary.external.database.PostgresDao;
@@ -119,7 +120,7 @@ public class EtorDomainRegistration implements DomainConnector {
             } else {
                 ApplicationContext.register(
                         DatabaseCredentialsProvider.class,
-                        EnvironmentDatabaseCredentialsProvider.getInstance());
+                        AzureDatabaseCredentialsProvider.getInstance());
             }
             ApplicationContext.register(ConnectionPool.class, HikariConnectionPool.getInstance());
         } else if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
