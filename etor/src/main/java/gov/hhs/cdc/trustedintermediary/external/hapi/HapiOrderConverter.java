@@ -143,7 +143,6 @@ public class HapiOrderConverter implements OrderConverter {
         return new HapiOrder(orderBundle);
     }
 
-    // Used to convert demographics bundle to OML
     private MessageHeader createMessageHeader() {
         logger.logInfo("Creating new MessageHeader");
 
@@ -157,9 +156,6 @@ public class HapiOrderConverter implements OrderConverter {
 
         // Adding processing id of 'P'
         meta.addTag("http://terminology.hl7.org/CodeSystem/v2-0103", "P", "Production");
-
-        // Adding ETOR processing tag
-        meta.addTag(new Coding("http://localcodes.org/ETOR", "ETOR", "Processed by ETOR"));
 
         messageHeader.setMeta(meta);
 

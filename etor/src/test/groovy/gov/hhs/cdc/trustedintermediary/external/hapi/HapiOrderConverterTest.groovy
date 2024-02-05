@@ -100,9 +100,6 @@ class HapiOrderConverterTest extends Specification {
         messageHeader.getMeta().getTag().system[0] == "http://terminology.hl7.org/CodeSystem/v2-0103"
         messageHeader.getMeta().getTag().code[0] == "P"
         messageHeader.getMeta().getTag().display[0] == "Production"
-        messageHeader.getMeta().getTag().system[1] == "http://localcodes.org/ETOR"
-        messageHeader.getMeta().getTag().code[1] == "ETOR"
-        messageHeader.getMeta().getTag().display[1] == "Processed by ETOR"
         messageHeader.getEventCoding().getSystem() == "http://terminology.hl7.org/CodeSystem/v2-0003"
         messageHeader.getEventCoding().getCode() == "O21"
         messageHeader.getSource().getName() == "CDC Trusted Intermediary"
@@ -239,7 +236,7 @@ class HapiOrderConverterTest extends Specification {
         def messageHeader = new MessageHeader()
         messageHeader.setId(UUID.randomUUID().toString())
         def messageHeaderEntry = new Bundle.BundleEntryComponent().setResource(messageHeader)
-        mockOrderBundle.getEntry().add(0, messageHeaderEntry)
+        mockOrderBundle.getEntry().add(1, messageHeaderEntry)
         mockOrder.getUnderlyingOrder() >> mockOrderBundle
 
         when:
