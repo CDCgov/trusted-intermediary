@@ -152,13 +152,15 @@ public class HapiOrderConverter implements OrderConverter {
 
         messageHeader.setEvent(OML_CODING);
 
-        messageHeader.setMeta(
-                new Meta()
-                        .addTag(
-                                new Coding(
-                                        "http://terminology.hl7.org/CodeSystem/v2-0103",
-                                        "P",
-                                        "Production")));
+        var meta = new Meta();
+
+        // Adding processing id of 'P'
+        meta.addTag("http://terminology.hl7.org/CodeSystem/v2-0103", "P", "Production");
+
+        // Adding processed tag
+        meta.addTag(new Coding("http://prime-etor.org", "ETOR", "ETOR Processing Complete"));
+
+        messageHeader.setMeta(meta);
 
         messageHeader.setSource(
                 new MessageHeader.MessageSourceComponent(
