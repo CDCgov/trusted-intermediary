@@ -34,6 +34,11 @@ public class SendOrderUseCase {
         omlOrder = converter.addContactSectionToPatientResource(omlOrder);
         metadata.put(order.getFhirResourceId(), EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT);
 
+        omlOrder = converter.addEtorProcessingTag(omlOrder);
+        metadata.put(
+                order.getFhirResourceId(),
+                EtorMetadataStep.ETOR_PROCESSING_TAG_ADDED_TO_MESSAGE_HEADER);
+
         String sentSubmissionId = sender.send(omlOrder).orElse(null);
 
         saveSentOrderSubmissionId(receivedSubmissionId, sentSubmissionId);

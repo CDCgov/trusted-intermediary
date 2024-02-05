@@ -46,9 +46,11 @@ class SendOrderUseCaseTest extends Specification {
         then:
         1 * mockConverter.convertToOmlOrder(mockOrder) >> mockOmlOrder
         1 * mockConverter.addContactSectionToPatientResource(mockOmlOrder) >> mockOmlOrder
+        1 * mockConverter.addEtorProcessingTag(mockOmlOrder) >> mockOmlOrder
         1 * mockSender.send(mockOmlOrder) >> Optional.of(sentSubmissionId)
         1 * sendOrder.metadata.put(_, EtorMetadataStep.ORDER_CONVERTED_TO_OML)
         1 * sendOrder.metadata.put(_, EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT)
+        1 * sendOrder.metadata.put(_, EtorMetadataStep.ETOR_PROCESSING_TAG_ADDED_TO_MESSAGE_HEADER)
         1 * mockOrchestrator.updateMetadataForReceivedOrder(receivedSubmissionId, _ as String)
         1 * mockOrchestrator.updateMetadataForSentOrder(receivedSubmissionId, sentSubmissionId)
     }

@@ -143,6 +143,7 @@ public class HapiOrderConverter implements OrderConverter {
         return new HapiOrder(orderBundle);
     }
 
+    // Used to convert demographics bundle to OML
     private MessageHeader createMessageHeader() {
         logger.logInfo("Creating new MessageHeader");
 
@@ -157,8 +158,8 @@ public class HapiOrderConverter implements OrderConverter {
         // Adding processing id of 'P'
         meta.addTag("http://terminology.hl7.org/CodeSystem/v2-0103", "P", "Production");
 
-        // Adding processed tag
-        meta.addTag(new Coding("http://prime-etor.org", "ETOR", "ETOR Processing Complete"));
+        // Adding ETOR processing tag
+        meta.addTag(new Coding("http://localcodes.org/ETOR", "ETOR", "Processed by ETOR"));
 
         messageHeader.setMeta(meta);
 
@@ -168,6 +169,26 @@ public class HapiOrderConverter implements OrderConverter {
                         .setName("CDC Trusted Intermediary"));
 
         return messageHeader;
+    }
+
+    @Override
+    public Order<?> addEtorProcessingTag(Order<?> message) {
+        var hapiOrder = (Order<Bundle>) message;
+        var messageBundle = hapiOrder.getUnderlyingOrder();
+
+        var messageHeaderOptional =
+                HapiHelper.resourcesInBundle(messageBundle, MessageHeader.class).findFirst();
+        if (messageHeaderOptional.isPresent()) {
+            var messageHeader = messageHeaderOptional.get();
+            var meta = messageHeader.hasMeta() ? messageBundle.getMeta() : new Meta();
+
+            meta.addTag(new Coding("http://localcodes.org/ETOR", "ETOR", "Processed by ETOR"));
+            messageHeader.setMeta(meta);
+        } else {
+            logger.logInfo("No MessageHeader found in the Bundle to add the ETOR processing tag.");
+        }
+
+        return new HapiOrder(messageBundle);
     }
 
     private ServiceRequest createServiceRequest(final Patient patient, final Date orderDateTime) {

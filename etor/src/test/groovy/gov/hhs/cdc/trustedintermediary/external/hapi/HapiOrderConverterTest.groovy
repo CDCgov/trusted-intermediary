@@ -100,6 +100,9 @@ class HapiOrderConverterTest extends Specification {
         messageHeader.getMeta().getTag().system[0] == "http://terminology.hl7.org/CodeSystem/v2-0103"
         messageHeader.getMeta().getTag().code[0] == "P"
         messageHeader.getMeta().getTag().display[0] == "Production"
+        messageHeader.getMeta().getTag().system[1] == "http://localcodes.org/ETOR"
+        messageHeader.getMeta().getTag().code[1] == "ETOR"
+        messageHeader.getMeta().getTag().display[1] == "Processed by ETOR"
         messageHeader.getEventCoding().getSystem() == "http://terminology.hl7.org/CodeSystem/v2-0003"
         messageHeader.getEventCoding().getCode() == "O21"
         messageHeader.getSource().getName() == "CDC Trusted Intermediary"
@@ -226,6 +229,32 @@ class HapiOrderConverterTest extends Specification {
         contactSectionAddress.getCity() == convertedPatientAddress.getCity()
         contactSectionAddress.getPostalCode() == convertedPatientAddress.getPostalCode()
     }
+
+    def "add etor processing tag to messageHeader resource"() {
+        given:
+        def expectedSystem = "http://localcodes.org/ETOR"
+        def expectedCode = "ETOR"
+        def expectedDisplay = "Processed by ETOR"
+
+        def messageHeader = new MessageHeader()
+        messageHeader.setId(UUID.randomUUID().toString())
+        def messageHeaderEntry = new Bundle.BundleEntryComponent().setResource(messageHeader)
+        mockOrderBundle.getEntry().add(0, messageHeaderEntry)
+        mockOrder.getUnderlyingOrder() >> mockOrderBundle
+
+        when:
+        def convertedOrderBundle = HapiOrderConverter.getInstance().addEtorProcessingTag(mockOrder).getUnderlyingOrder() as Bundle
+
+        then:
+        def messageHeaders = convertedOrderBundle.getEntry().get(0).getResource() as MessageHeader
+        def actualSystem = messageHeaders.getMeta().getTag()[0].getSystem()
+        def actualCode = messageHeaders.getMeta().getTag()[0].getCode()
+        def actualDisplay = messageHeaders.getMeta().getTag()[0].getDisplay()
+        actualSystem == expectedSystem
+        actualCode == expectedCode
+        actualDisplay == expectedDisplay
+    }
+
 
     def "no humanName section in contact"() {
         given:
