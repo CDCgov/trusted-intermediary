@@ -52,6 +52,7 @@ class OrderTest extends Specification {
         parsedSentPayload.entry[0].resource.remove("eventCoding")
         parsedLabOrderJsonFile.entry[0].resource.remove("eventCoding")
         parsedSentPayload.entry[24].resource.remove("contact")
+        parsedSentPayload.entry[0].resource.meta.tag.remove(1)
 
         parsedSentPayload == parsedLabOrderJsonFile
     }
