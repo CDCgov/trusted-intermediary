@@ -1,11 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.external;
 
-import com.azure.core.credential.TokenRequestContext;
-import com.azure.identity.DefaultAzureCredentialBuilder;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool;
+import gov.hhs.cdc.trustedintermediary.wrappers.database.DatabaseCredentialsProvider;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -26,16 +25,20 @@ public class HikariConnectionPool implements ConnectionPool {
                 ApplicationContext.getProperty("DB_USER") != null
                         ? ApplicationContext.getProperty("DB_USER")
                         : "";
+        //        String pass =
+        //                !ApplicationContext.getEnvironment().equalsIgnoreCase("local")
+        //                        ? new DefaultAzureCredentialBuilder()
+        //                                .build()
+        //                                .getTokenSync(
+        //                                        new TokenRequestContext()
+        //                                                .addScopes(
+        //
+        // "https://ossrdbms-aad.database.windows.net/.default"))
+        //                                .getToken()
+        //                        : ApplicationContext.getProperty("DB_PASS");
         String pass =
-                !ApplicationContext.getEnvironment().equalsIgnoreCase("local")
-                        ? new DefaultAzureCredentialBuilder()
-                                .build()
-                                .getTokenSync(
-                                        new TokenRequestContext()
-                                                .addScopes(
-                                                        "https://ossrdbms-aad.database.windows.net/.default"))
-                                .getToken()
-                        : ApplicationContext.getProperty("DB_PASS");
+                ApplicationContext.getImplementation(DatabaseCredentialsProvider.class)
+                        .getPassword();
         String serverName =
                 ApplicationContext.getProperty("DB_URL") != null
                         ? ApplicationContext.getProperty("DB_URL")
