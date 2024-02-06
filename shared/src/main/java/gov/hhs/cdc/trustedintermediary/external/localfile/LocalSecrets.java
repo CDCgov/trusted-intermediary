@@ -29,13 +29,7 @@ public class LocalSecrets implements Secrets {
         logger.logInfo("Acquiring local key " + secretName);
         String key = "";
 
-        try {
-            key = readSecretFromResources(secretName);
-        } catch (SecretRetrievalException exception) {
-            logger.logWarning("Not finding the " + secretName + " in resources");
-            throw new SecretRetrievalException(
-                    "Could not find " + secretName + "in resources", exception);
-        }
+        key = readSecretFromResources(secretName);
 
         logger.logInfo("Successfully got local key " + secretName);
         return key;

@@ -3,6 +3,9 @@ name: Terraform Deploy
 on:
   workflow_call:
     inputs:
+      ENVIRONMENT:
+        required: true
+        type: string
       TERRAFORM_DIRECTORY:
         type: string
         required: true
@@ -32,6 +35,8 @@ on:
 jobs:
   terraform-deploy:
     name: Terraform Deploy
+    environment:
+      name: ${{ inputs.ENVIRONMENT }}
     runs-on: ubuntu-latest
     env:
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
