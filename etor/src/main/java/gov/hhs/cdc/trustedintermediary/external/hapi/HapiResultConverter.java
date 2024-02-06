@@ -17,11 +17,13 @@ import javax.inject.Inject;
  */
 public class HapiResultConverter implements ResultConverter {
 
+	private static final HapiResultConverter INSTANCE = new HapiResultConverter();
+
 	@Inject
 	Logger logger;
 
 	public static HapiResultConverter getInstance() {
-		return getInstance();
+		return INSTANCE;
 	}
 
 	private HapiResultConverter() {}

@@ -9,11 +9,13 @@ import spock.lang.Specification
 class SendResultUseCaseTest extends Specification {
 
     def mockSender = Mock(ResultSender)
+    def mockConverter = Mock(ResultConverter)
 
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(SendMessageUseCase, SendResultUseCase.getInstance())
+        TestApplicationContext.register(ResultConverter, mockConverter)
         TestApplicationContext.register(ResultSender, mockSender)
     }
 
@@ -26,6 +28,7 @@ class SendResultUseCaseTest extends Specification {
         SendResultUseCase.getInstance().convertAndSend(mockResult)
 
         then:
+        1 * mockConverter.addEtorProcessingTag(mockResult) >> mockResult
         1 * mockSender.send(mockResult) >> Optional.empty()
         noExceptionThrown()
     }
