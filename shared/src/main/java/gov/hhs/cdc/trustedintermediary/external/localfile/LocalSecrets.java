@@ -27,9 +27,7 @@ public class LocalSecrets implements Secrets {
     public String getKey(String secretName) throws SecretRetrievalException {
 
         logger.logInfo("Acquiring local key " + secretName);
-        String key = "";
-
-        key = readSecretFromResources(secretName);
+        String key = readSecretFromResources(secretName);
 
         logger.logInfo("Successfully got local key " + secretName);
         return key;
