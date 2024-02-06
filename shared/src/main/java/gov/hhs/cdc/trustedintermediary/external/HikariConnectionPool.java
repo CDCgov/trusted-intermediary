@@ -25,7 +25,7 @@ public class HikariConnectionPool implements ConnectionPool {
         ds = new HikariDataSource(config);
     }
 
-    public static HikariConfig constructHikariConfig() {
+    static HikariConfig constructHikariConfig() {
         String user = ApplicationContext.getProperty("DB_USER", "");
         DatabaseCredentialsProvider credProvider =
                 ApplicationContext.getImplementation(DatabaseCredentialsProvider.class);
