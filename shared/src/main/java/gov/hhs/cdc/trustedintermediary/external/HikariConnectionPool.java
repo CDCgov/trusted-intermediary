@@ -25,6 +25,13 @@ public class HikariConnectionPool implements ConnectionPool {
         ds = new HikariDataSource(config);
     }
 
+    public static synchronized HikariConnectionPool getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new HikariConnectionPool();
+        }
+        return INSTANCE;
+    }
+
     static HikariConfig constructHikariConfig() {
         String user = ApplicationContext.getProperty("DB_USER", "");
         DatabaseCredentialsProvider credProvider =
@@ -50,12 +57,5 @@ public class HikariConnectionPool implements ConnectionPool {
     @Override
     public Connection getConnection() throws SQLException {
         return ds.getConnection();
-    }
-
-    public static synchronized HikariConnectionPool getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new HikariConnectionPool();
-        }
-        return INSTANCE;
     }
 }
