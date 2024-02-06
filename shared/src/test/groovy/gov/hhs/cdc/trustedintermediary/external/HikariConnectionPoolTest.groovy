@@ -26,5 +26,9 @@ class HikariConnectionPoolTest extends Specification {
 
         then:
         result.getDataSourceProperties().get("user") == "test_user"
+        result.getDataSourceProperties().get("password") == "test_pass"
+        result.getDataSourceProperties().get("serverName") == "test_url"
+        result.getDataSourceProperties().get("databaseName") == "test_name"
+        result.getDataSourceProperties().get("portNumber") == "1234"
     }
 }
