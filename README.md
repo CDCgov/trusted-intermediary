@@ -282,19 +282,28 @@ with this option enabled.
 7. Run `./prime multiple-settings set -i ./settings/staging/0149-etor.yml`
 8. Run `./prime organization addkey --public-key /path/to/trusted-intermediary/mock_credentials/organization-trusted-intermediary-public-key-local.pem --scope "flexion.*.report" --orgName flexion --kid flexion.etor-service-sender --doit`
 9. Setup local vault secret
-    1. Go to: `http://localhost:8200/`
-    2. Use token in `prime-router/.vault/env/.env.local` to authenticate
-    3. Go to `Secrets engines` > `secret/` > `Create secret`
-        1. Path for this secret: `FLEXION--ETOR-SERVICE-RECEIVER`
+   1. Go to: `http://localhost:8200/`
+   2. Use token in `prime-router/.vault/env/.env.local` to authenticate
+   3. Go to `Secrets engines` > `secret/` > `Create secret`
+      1. Create secret for `flexion.etor-service-receiver-orders`
+        1. Path for this secret: `FLEXION--ETOR-SERVICE-RECEIVER-ORDERS`
         2. JSON data:
-
-        ```
-        {
-          "@type": "UserApiKey",
-          "apiKey": "Contents of file at trusted-intermediary/mock_credentials/organization-report-stream-private-key-local.pem",
-          "user": "flexion"
-        }
-        ```
+         ```
+         {
+            "@type": "UserApiKey",
+            "apiKey": "Contents of file at trusted-intermediary/mock_credentials/organization-report-stream-private-key-local.pem",
+            "user": "flexion"
+         }
+         ```
+      2. Create secret for `flexion.etor-service-receiver-results`
+         1. Path for this secret: `FLEXION--ETOR-SERVICE-RECEIVER-RESULTS`
+         2. JSON data:
+         ```
+         {
+         "@type": "UserApiKey",
+         "apiKey": "Contents of file at trusted-intermediary/mock_credentials/organization-report-stream-private-key-local.pem",
+         "user": "flexion"
+         }
 
 #### Submit request to ReportStream
 
