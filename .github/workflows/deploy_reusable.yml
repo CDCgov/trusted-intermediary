@@ -30,6 +30,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.ENVIRONMENT }}
     permissions:
       id-token: write
       contents: read

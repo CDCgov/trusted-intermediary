@@ -12,6 +12,7 @@ jobs:
     name: Dev Infrastructure Deploy
     uses: ./.github/workflows/terraform-deploy_reusable.yml
     with:
+      ENVIRONMENT: dev
       TERRAFORM_DIRECTORY: operations/environments/dev
     secrets:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CDC_CLIENT_ID }}
