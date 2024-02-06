@@ -16,47 +16,46 @@ import java.sql.SQLException;
  */
 public class HikariConnectionPool implements ConnectionPool {
 
-    private static final HikariConnectionPool INSTANCE = new HikariConnectionPool();
+    private static HikariConnectionPool INSTANCE;
 
     public final HikariDataSource ds;
 
     private HikariConnectionPool() {
-        String user =
-                ApplicationContext.getProperty("DB_USER") != null
-                        ? ApplicationContext.getProperty("DB_USER")
-                        : "";
-        String pass =
-                ApplicationContext.getImplementation(DatabaseCredentialsProvider.class)
-                        .getPassword();
-        String serverName =
-                ApplicationContext.getProperty("DB_URL") != null
-                        ? ApplicationContext.getProperty("DB_URL")
-                        : "";
-        String dbName =
-                ApplicationContext.getProperty("DB_NAME") != null
-                        ? ApplicationContext.getProperty("DB_NAME")
-                        : "";
-        String dbPort =
-                ApplicationContext.getProperty("DB_PORT") != null
-                        ? ApplicationContext.getProperty("DB_PORT")
-                        : "";
+        HikariConfig config = constructHikariConfig();
+        ds = new HikariDataSource(config);
+    }
+
+    public static HikariConfig constructHikariConfig() {
+        String user = ApplicationContext.getProperty("DB_USER", "");
+        DatabaseCredentialsProvider credProvider =
+                ApplicationContext.getImplementation(DatabaseCredentialsProvider.class);
+
+        String pass = credProvider.getPassword();
+        String serverName = ApplicationContext.getProperty("DB_URL", "");
+        String dbName = ApplicationContext.getProperty("DB_NAME", "");
+        String dbPort = ApplicationContext.getProperty("DB_PORT", "");
 
         HikariConfig config = new HikariDataSource();
+
         config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
         config.addDataSourceProperty("user", user);
         config.addDataSourceProperty("password", pass);
         config.addDataSourceProperty("serverName", serverName);
         config.addDataSourceProperty("databaseName", dbName);
         config.addDataSourceProperty("portNumber", dbPort);
-        // TODO: Add tests
-        ds = new HikariDataSource(config);
+
+        return config;
     }
 
+    @Override
     public Connection getConnection() throws SQLException {
         return ds.getConnection();
     }
 
-    public static HikariConnectionPool getInstance() {
+    public static synchronized HikariConnectionPool getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new HikariConnectionPool();
+        }
         return INSTANCE;
     }
 }

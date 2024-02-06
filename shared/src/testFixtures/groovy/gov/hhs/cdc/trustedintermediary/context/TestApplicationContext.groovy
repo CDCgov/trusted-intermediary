@@ -16,9 +16,14 @@ class TestApplicationContext extends ApplicationContext {
     def static reset() {
         OBJECT_MAP.clear()
         IMPLEMENTATIONS.clear()
+        TEST_ENV_VARS.clear()
     }
 
     def static injectRegisteredImplementations() {
         injectRegisteredImplementations(true)
+    }
+
+    def static addEnvironmentVariable(String key, String value) {
+        TEST_ENV_VARS.put(key, value)
     }
 }
