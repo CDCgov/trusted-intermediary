@@ -109,6 +109,23 @@ The terminal will start a local web interface, and you can enter
 the swarm parameters for the test and the local url where the app is running
 (usually http://localhost:8080).  You can also set time limits for the tests under 'Advanced Settings'.
 
+### Debugging
+
+#### Docker Container Debugging Using Java Debug Wire Protocal (JDWP)
+
+Go into the `Dockerfile` file and change `CMD ["java", "-jar", "app.jar"]` to `CMD ["java", "-agentlib:jdwp=transport=dt_socket,address=*:6006,server=y,suspend=n", "-jar", "app.jar"]`
+
+#### Steps
+1. In Intellij, click on Run and select Edit Configurations ![img.png](images/img.png)
+2. Create a new Remote JVM Debug ![img_1.png](images/img_1.png)
+3. Set up the configuration for the remote JVM debug to look like this. ![img_3.png](images/img_2.png)
+4. In your code, set your breakpoint, and then start your docker container with `docker-compose up --build`
+5. Once your docker container is running, in order to attach, select Run again.
+6. Select Debug (not Attach to Process) ![img_3.png](images/img_3.png)
+7. Select your Docker Debug that you set up in step 3 ![img_4.png](images/img_4.png)
+8. A console window will pop up that will show you that it is connected to Docker, and at that point, you can interact with your container and then step through the code at your breakpoints. ![img_5.png](images/img_5.png)
+
+
 ### Deploying
 
 #### Environments
