@@ -31,6 +31,7 @@ jobs:
     uses: ./.github/workflows/terraform-deploy_reusable.yml
     if: needs.paths-filter.outputs.operations == 'true'
     with:
+      ENVIRONMENT: pr
       TERRAFORM_DIRECTORY: operations/environments/pr
       TERRAFORM_INIT_PARAMETERS: -backend-config="key=pr_${{ github.event.number }}.tfstate"
       TERRAFORM_APPLY_PARAMETERS: -var="pr_number=${{ github.event.number }}"
@@ -76,6 +77,8 @@ jobs:
 
   destroy-environment:
     name: Destroy PR Environment
+    environment:
+      name: pr
     needs:
       - pr-deploy
       - paths-filter

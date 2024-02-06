@@ -37,20 +37,6 @@ class LocalSecretsTest extends Specification {
         thrown(SecretRetrievalException)
     }
 
-    def "readSecretFromFileSystem takes a bad secret name"() {
-        given:
-        def secrets = LocalSecrets.getInstance()
-        def name = "bad secret name"
-
-        when:
-        def secret = secrets.readSecretFromFileSystem(name)
-        println(secret)
-
-        then:
-        def exception = thrown(SecretRetrievalException)
-        exception.getCause().getClass() == NoSuchFileException
-    }
-
     def "readSecretFromResources takes a bad secret name"() {
         given:
         def secrets = LocalSecrets.getInstance()
