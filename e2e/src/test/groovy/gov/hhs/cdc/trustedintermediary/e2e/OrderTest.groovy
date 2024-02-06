@@ -48,7 +48,7 @@ class OrderTest extends Specification {
         def parsedLabOrderJsonFile = JsonParsing.parse(labOrderJsonFileString)
 
         then:
-        //test that everything else is the same except the MessageHeader's event and Patient contact
+        //test that everything else is the same except the MessageHeader's event, Patient contact, and etor processing tag
         parsedSentPayload.entry[0].resource.remove("eventCoding")
         parsedLabOrderJsonFile.entry[0].resource.remove("eventCoding")
         parsedSentPayload.entry[24].resource.remove("contact")
