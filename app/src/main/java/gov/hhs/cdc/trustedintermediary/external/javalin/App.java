@@ -6,13 +6,16 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnectorConstructionException;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper;
 import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecificationException;
+import gov.hhs.cdc.trustedintermediary.external.HikariConnectionPool;
 import gov.hhs.cdc.trustedintermediary.external.apache.ApacheClient;
+import gov.hhs.cdc.trustedintermediary.external.azure.AzureDatabaseCredentialsProvider;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureSecrets;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation;
 import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache;
 import gov.hhs.cdc.trustedintermediary.external.inmemory.LoggingMetricMetadata;
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson;
 import gov.hhs.cdc.trustedintermediary.external.jjwt.JjwtEngine;
+import gov.hhs.cdc.trustedintermediary.external.localfile.EnvironmentDatabaseCredentialsProvider;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalSecrets;
 import gov.hhs.cdc.trustedintermediary.external.slf4j.DeployedLogger;
 import gov.hhs.cdc.trustedintermediary.external.slf4j.LocalLogger;
@@ -25,6 +28,8 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombiner;
+import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool;
+import gov.hhs.cdc.trustedintermediary.wrappers.database.DatabaseCredentialsProvider;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import io.javalin.Javalin;
 import java.util.Set;
@@ -87,5 +92,17 @@ public class App {
         ApplicationContext.register(
                 OrganizationsSettings.class, OrganizationsSettings.getInstance());
         ApplicationContext.register(MetricMetadata.class, LoggingMetricMetadata.getInstance());
+        if (ApplicationContext.getProperty("DB_URL") != null) {
+            if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
+                ApplicationContext.register(
+                        DatabaseCredentialsProvider.class,
+                        EnvironmentDatabaseCredentialsProvider.getInstance());
+            } else {
+                ApplicationContext.register(
+                        DatabaseCredentialsProvider.class,
+                        AzureDatabaseCredentialsProvider.getInstance());
+            }
+            ApplicationContext.register(ConnectionPool.class, HikariConnectionPool.getInstance());
+        }
     }
 }
