@@ -28,16 +28,10 @@ import gov.hhs.cdc.trustedintermediary.etor.results.ResultController;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultResponse;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultSender;
 import gov.hhs.cdc.trustedintermediary.etor.results.SendResultUseCase;
-import gov.hhs.cdc.trustedintermediary.external.azure.AzureClient;
-import gov.hhs.cdc.trustedintermediary.external.azure.AzureDatabaseCredentialsProvider;
-import gov.hhs.cdc.trustedintermediary.external.azure.AzureStorageAccountPartnerMetadataStorage;
-import gov.hhs.cdc.trustedintermediary.external.database.DatabaseCredentialsProvider;
 import gov.hhs.cdc.trustedintermediary.external.database.DatabasePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.DbDao;
-import gov.hhs.cdc.trustedintermediary.external.database.EtorSqlDriverManager;
 import gov.hhs.cdc.trustedintermediary.external.database.PostgresDao;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
-import gov.hhs.cdc.trustedintermediary.external.localfile.EnvironmentDatabaseCredentialsProvider;
 import gov.hhs.cdc.trustedintermediary.external.localfile.FilePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.localfile.MockRSEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClient;
@@ -46,7 +40,6 @@ import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamResultS
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import gov.hhs.cdc.trustedintermediary.wrappers.SqlDriverManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -113,36 +106,20 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(SendResultUseCase.class, SendResultUseCase.getInstance());
 
         if (ApplicationContext.getProperty("DB_URL") != null) {
-            ApplicationContext.register(SqlDriverManager.class, EtorSqlDriverManager.getInstance());
             ApplicationContext.register(DbDao.class, PostgresDao.getInstance());
             ApplicationContext.register(
                     PartnerMetadataStorage.class, DatabasePartnerMetadataStorage.getInstance());
-            if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
-                ApplicationContext.register(
-                        DatabaseCredentialsProvider.class,
-                        EnvironmentDatabaseCredentialsProvider.getInstance());
-            } else {
-                ApplicationContext.register(
-                        DatabaseCredentialsProvider.class,
-                        AzureDatabaseCredentialsProvider.getInstance());
-            }
         } else if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
             ApplicationContext.register(
                     PartnerMetadataStorage.class, FilePartnerMetadataStorage.getInstance());
-        } else {
-            ApplicationContext.register(
-                    PartnerMetadataStorage.class,
-                    AzureStorageAccountPartnerMetadataStorage.getInstance());
         }
-
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
             ApplicationContext.register(RSEndpointClient.class, MockRSEndpointClient.getInstance());
         } else {
             ApplicationContext.register(
                     RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
-
-            ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
         }
+
         return endpoints;
     }
 

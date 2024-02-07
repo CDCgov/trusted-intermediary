@@ -22,6 +22,7 @@ import javax.inject.Inject;
 public class ApplicationContext {
 
     protected static final Map<Class<?>, Object> OBJECT_MAP = new ConcurrentHashMap<>();
+    protected static final Map<String, String> TEST_ENV_VARS = new ConcurrentHashMap<>();
     protected static final Set<Object> IMPLEMENTATIONS = new HashSet<>();
 
     protected ApplicationContext() {}
@@ -147,10 +148,16 @@ public class ApplicationContext {
     }
 
     public static String getProperty(String key) {
+        if (!TEST_ENV_VARS.isEmpty()) {
+            return TEST_ENV_VARS.get(key);
+        }
         return DotEnv.get(key);
     }
 
     public static String getProperty(String key, String defaultValue) {
+        if (!TEST_ENV_VARS.isEmpty()) {
+            return TEST_ENV_VARS.getOrDefault(key, defaultValue);
+        }
         return DotEnv.get(key, defaultValue);
     }
 

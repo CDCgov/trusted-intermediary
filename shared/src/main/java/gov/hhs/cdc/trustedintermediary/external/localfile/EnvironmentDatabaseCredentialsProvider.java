@@ -1,7 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.localfile;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
-import gov.hhs.cdc.trustedintermediary.external.database.DatabaseCredentialsProvider;
+import gov.hhs.cdc.trustedintermediary.wrappers.database.DatabaseCredentialsProvider;
 
 /**
  * The EnvironmentDatabaseCredentialsProvider class is an implementation of the
