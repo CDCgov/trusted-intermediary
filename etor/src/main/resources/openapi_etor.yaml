@@ -74,6 +74,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedRequestError'
+  /v1/etor/results:
+    post:
+      summary: Forwards results from a lab to ReportStream
+      requestBody:
+        description: A FHIR result resource wrapped in a FHIR Bundle
+        content:
+          application/json:
+            schema:
+              $ref: 'https://github.com/LinuxForHealth/FHIR/blob/main/fhir-openapi/src/main/webapp/META-INF/openapi.json?raw=true#/components/schemas/Bundle'
+        required: true
+      security:
+        - bearerAuthorization: [ ]
+      responses:
+        '200':
+          description: The Results were parsed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultsResponse'
+        '400':
+          description: Unable to parse result request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: Authentication failed due to invalid token or unknown organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedRequestError'
   /v1/etor/metadata/{id}:
     get:
       summary: Returns metadata about a specific submission
@@ -149,7 +180,12 @@ components:
         patientId:
           type: string
           example: MRN7465737865
-
+    ResultsResponse:
+      type: object
+      properties:
+        fhirResourceId:
+          type: string
+          example: Patient/infant-twin-1
     ConsolidatedMetadata:
       type: map<string, map<string, object>>
       properties:
