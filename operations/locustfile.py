@@ -82,6 +82,7 @@ class SampleUser(FastHttpUser):
             self.client.get(
                 f"{METADATA_ENDPOINT}/{self.submission_id}",
                 headers={"Authorization": self.access_token},
+                name=f"{METADATA_ENDPOINT}/{{id}}"
             )
 
     @task(1)
