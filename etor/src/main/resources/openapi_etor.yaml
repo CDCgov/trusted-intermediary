@@ -176,7 +176,7 @@ components:
       properties:
         fhirResourceId:
           type: string
-          example: Patient/infant-twin-1
+          example: Bundle/1707117455086711513.58842eca-72f0-4862-a992-01cf9b464acb
         patientId:
           type: string
           example: MRN7465737865
@@ -185,7 +185,7 @@ components:
       properties:
         fhirResourceId:
           type: string
-          example: Patient/infant-twin-1
+          example: Bundle/1707117455086711513.58842eca-72f0-4862-a992-01cf9b464acb
     ConsolidatedMetadata:
       type: map<string, map<string, object>>
       properties:
