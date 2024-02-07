@@ -239,7 +239,6 @@ public class EtorDomainRegistration implements DomainConnector {
         }
 
         ResultResponse resultResponse = new ResultResponse(results);
-        logger.logInfo(request.getHeaders().toString());
         return domainResponseHelper.constructOkResponse(resultResponse);
     }
 
