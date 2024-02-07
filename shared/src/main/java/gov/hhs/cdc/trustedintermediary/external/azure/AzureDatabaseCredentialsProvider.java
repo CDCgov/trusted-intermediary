@@ -1,7 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.external.azure;
 
-import gov.hhs.cdc.trustedintermediary.external.database.DatabaseCredentialsProvider;
-import javax.inject.Inject;
+import com.azure.core.credential.TokenRequestContext;
+import com.azure.identity.DefaultAzureCredentialBuilder;
+import gov.hhs.cdc.trustedintermediary.wrappers.database.DatabaseCredentialsProvider;
 
 /**
  * AzureDatabaseCredentialsProvider is a class responsible for providing credentials for a database
@@ -12,8 +13,6 @@ public class AzureDatabaseCredentialsProvider implements DatabaseCredentialsProv
     private static final AzureDatabaseCredentialsProvider INSTANCE =
             new AzureDatabaseCredentialsProvider();
 
-    @Inject AzureClient azureClient;
-
     public static AzureDatabaseCredentialsProvider getInstance() {
         return INSTANCE;
     }
@@ -22,6 +21,11 @@ public class AzureDatabaseCredentialsProvider implements DatabaseCredentialsProv
 
     @Override
     public String getPassword() {
-        return azureClient.getScopedToken("https://ossrdbms-aad.database.windows.net/.default");
+        return new DefaultAzureCredentialBuilder()
+                .build()
+                .getTokenSync(
+                        new TokenRequestContext()
+                                .addScopes("https://ossrdbms-aad.database.windows.net/.default"))
+                .getToken();
     }
 }

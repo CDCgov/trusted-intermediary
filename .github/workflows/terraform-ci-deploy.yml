@@ -22,7 +22,8 @@ jobs:
         with:
           filters: |
             operations:
-              - 'operations/**'
+              - 'operations/environments/pr/**'
+              - 'operations/template/**'
 
 
   terraform-deploy:
