@@ -239,6 +239,7 @@ public class EtorDomainRegistration implements DomainConnector {
         }
 
         ResultResponse resultResponse = new ResultResponse(results);
+        logger.logInfo("Successful result parsing of FHIR resource: " + results.getFhirResourceId());
         return domainResponseHelper.constructOkResponse(resultResponse);
     }
 
