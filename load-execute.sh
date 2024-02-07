@@ -62,7 +62,6 @@ cleanup() {
 }
 
 trap cleanup EXIT  # Run the cleanup function on exit
-trap cleanup INT
 start_database
 migrate_database
 start_api
