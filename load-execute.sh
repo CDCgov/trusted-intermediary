@@ -17,12 +17,14 @@ start_api() {
 start_database() {
     echo 'Starting database'
     docker compose -f docker-compose.postgres.yml up -d
+    sleep 2
     echo "Database started"
 }
 
 migrate_database() {
     echo 'Migrating database'
-    psql "host=localhost port=5432 dbname=intermediary user=intermediary sslmode=require" -c "DO \$\$ BEGIN CREATE TYPE message_status AS ENUM ('PENDING', 'DELIVERED', 'FAILED'); EXCEPTION WHEN duplicate_object THEN null; END \$\$; CREATE TABLE IF NOT EXISTS metadata (received_message_id varchar(40) PRIMARY KEY, sent_message_id varchar(40), sender varchar(30), receiver varchar(30), hash_of_order varchar(1000), time_received timestamptz, time_delivered timestamptz, delivery_status message_status, failure_reason varchar(1000));"
+    export 'PGPASSWORD=changeIT!'
+    psql --set=sslmode=require -h localhost -p 5433 -d intermediary -U intermediary -c "CREATE TYPE message_status AS ENUM ('PENDING', 'DELIVERED', 'FAILED'); CREATE TABLE IF NOT EXISTS metadata (received_message_id varchar(40) PRIMARY KEY, sent_message_id varchar(40), sender varchar(30), receiver varchar(30), hash_of_order varchar(1000), time_received timestamptz, time_delivered timestamptz, delivery_status message_status, failure_reason varchar(1000));"
     echo "Database migrated"
 }
 
@@ -52,10 +54,13 @@ cleanup() {
     echo "Killing API at PID ${API_PID}"
     kill "${API_PID}"
     echo "Stopping database"
-    docker compose -f docker-compose.postgres.yml down
+    docker stop trusted-intermediary-postgresql-1
+    docker rm -f trusted-intermediary-postgresql-1
+    docker volume rm trusted-intermediary_ti_postgres_data
 }
 
 trap cleanup EXIT  # Run the cleanup function on exit
+trap cleanup INT
 start_database
 migrate_database
 start_api
