@@ -8,6 +8,12 @@ start_api() {
     echo "API starting at PID ${API_PID}"
 }
 
+start_database() {
+    echo 'Starting database'
+    docker compose -f docker-compose.postgres.yml up -d
+    echo "Database started"
+}
+
 wait_for_api() {
     attempt_counter=0
     max_attempts=36
@@ -33,9 +39,12 @@ run_tests() {
 cleanup() {
     echo "Killing API at PID ${API_PID}"
     kill "${API_PID}"
+    echo "Stopping database"
+    docker compose -f docker-compose.postgres.yml down
 }
 
 trap cleanup EXIT  # Run the cleanup function on exit
+start_database
 start_api
 wait_for_api
 run_tests
