@@ -53,10 +53,12 @@ run_tests() {
 cleanup() {
     echo "Killing API at PID ${API_PID}"
     kill "${API_PID}"
-    echo "Stopping database"
+    echo "PID ${API_PID} killed"
+    echo "Stopping and deleting database"
     docker stop trusted-intermediary-postgresql-1
     docker rm -f trusted-intermediary-postgresql-1
     docker volume rm trusted-intermediary_ti_postgres_data
+    echo "Database stopped and deleted"
 }
 
 trap cleanup EXIT  # Run the cleanup function on exit
