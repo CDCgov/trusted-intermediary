@@ -9,18 +9,8 @@ databaseChangeLog:
        - sql:
            sql: CREATE TYPE message_status AS ENUM ('PENDING', 'DELIVERED', 'FAILED')
 
-#  - changeSet:
-#      id: 2
-#      author: jeff.crichlake
-#      labels: azure
-#      context: metadata
-#      comment: transfer ownership of the message_status type in Azure environments
-#      changes:
-#        - sql:
-#            sql: ALTER TYPE message_status OWNER TO azure_pg_admin
-
   - changeSet:
-      id: 3
+      id: 2
       author:  jeff.crichlake
       labels: create-metadata-table
       context: metadata
@@ -59,33 +49,3 @@ databaseChangeLog:
               - column:
                   name: failure_reason
                   type: varchar(1000)
-
-#  - changeSet:
-#      id: 4
-#      author: jeff.crichlake
-#      labels: azure
-#      context: metadata
-#      comment: Allow Azure admin role to do anything to the metadata table
-#      changes:
-#        - sql:
-#            sql: GRANT ALL ON metadata TO azure_pg_admin
-
-#  - changeSet:
-#      id: 5
-#      author: jeff.crichlake
-#      labels: azure
-#      context: metadata
-#      comment: Make Azure admin role the owner of the metadata table
-#      changes:
-#        - sql:
-#            sql: ALTER TABLE metadata OWNER TO azure_pg_admin
-
-#  - changeSet:
-#       id: 6
-#       author: jeff.crichlake
-#       labels: azure
-#       context: metadata
-#       comment: Fix role issue
-#       changes:
-#        - sql:
-#            sql: GRANT SELECT ON ALL TABLES IN SCHEMA public TO azure_pg_admin

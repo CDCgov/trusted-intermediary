@@ -3,4 +3,5 @@ databaseChangeLog:
       file: etor/databaseMigrations/1.0.0.yml
   - include:
       file: etor/databaseMigrations/azure.yml
+      comment: This include should always be last in this list
       labels: azure
