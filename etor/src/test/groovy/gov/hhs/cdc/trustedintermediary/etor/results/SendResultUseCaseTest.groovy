@@ -17,12 +17,12 @@ class SendResultUseCaseTest extends Specification {
         TestApplicationContext.register(SendMessageUseCase, SendResultUseCase.getInstance())
         TestApplicationContext.register(ResultConverter, mockConverter)
         TestApplicationContext.register(ResultSender, mockSender)
+        TestApplicationContext.injectRegisteredImplementations()
     }
 
     def "convertAndSend works"() {
         given:
         def mockResult = new ResultMock(null, "Mock result")
-        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         SendResultUseCase.getInstance().convertAndSend(mockResult)
@@ -36,7 +36,6 @@ class SendResultUseCaseTest extends Specification {
     def "convertAndSend throws exception when send fails"() {
         given:
         mockSender.send(_) >> { throw new UnableToSendMessageException("DogCow", new NullPointerException()) }
-        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         SendResultUseCase.getInstance().convertAndSend(Mock(Result))

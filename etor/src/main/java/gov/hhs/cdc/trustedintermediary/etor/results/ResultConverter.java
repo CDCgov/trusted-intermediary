@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.results;
 
-import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
-
+/** Interface for converting things to results and things in results. */
 public interface ResultConverter {
-	Result<?> addEtorProcessingTag(Result<?> message);
+    Result<?> addEtorProcessingTag(Result<?> message);
 }
