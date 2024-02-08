@@ -264,30 +264,19 @@ with this option enabled.
 3. Run the `./cleanslate` script. For more information you can refer to the [ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/docs-deprecated/getting-started/getting-started.md#building-the-baseline)
 4. Run RS with `docker compose up --build -d`
 5. Run `./gradlew resetDB && ./gradlew reloadTable && ./gradlew reloadSettings`
-6. Edit `prime-router/settings/staging/0149-etor.yml`
-   1. Comment the following two lines under `receivers.transport`:
-
-   ```
-   reportUrl: "https://cdcti-staging-api.azurewebsites.net/v1/etor/orders"
-   authTokenUrl: "https://cdcti-staging-api.azurewebsites.net/v1/auth/token"
-   ```
-
-   2. Uncomment the following lines to call the local instance of the API instead:
-
-   ```
-   reportUrl: "http://host.docker.internal:8080/v1/etor/orders"
-   authTokenUrl: "http://host.docker.internal:8080/v1/auth/token"
-   ```
-
-7. Run `./prime multiple-settings set -i ./settings/staging/0149-etor.yml`
+6. Edit `/settings/staging/0166-flexion-staging-results-handling.yml`
+   1. Comment the lines related to staging settings, and uncomment the ones for local settings:
+      1. `authTokenUrl`, `reportUrl`, `authHeaders.host` under REST `transport` in `receivers`
+      2. `type` and `credentialName` under SFTP `transport` in `receivers`
+7. Run `./prime multiple-settings set -i ./settings/staging/0166-flexion-staging-results-handling.yml`
 8. Run `./prime organization addkey --public-key /path/to/trusted-intermediary/mock_credentials/organization-trusted-intermediary-public-key-local.pem --scope "flexion.*.report" --orgName flexion --kid flexion.etor-service-sender --doit`
 9. Setup local vault secret
    1. Go to: `http://localhost:8200/`
    2. Use token in `prime-router/.vault/env/.env.local` to authenticate
    3. Go to `Secrets engines` > `secret/` > `Create secret`
       1. Create secret for `flexion.etor-service-receiver-orders`
-        1. Path for this secret: `FLEXION--ETOR-SERVICE-RECEIVER-ORDERS`
-        2. JSON data:
+         1. Path for this secret: `FLEXION--ETOR-SERVICE-RECEIVER-ORDERS`
+         2. JSON data:
          ```
          {
             "@type": "UserApiKey",
