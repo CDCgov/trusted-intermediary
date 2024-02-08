@@ -92,7 +92,6 @@ jobs:
           url: "jdbc:postgresql://${{ env.DATABASE_HOSTNAME }}:5432/postgres"
           username: cdcti-github
           password: ${{ env.DATABASE_PASSWORD }}
-          rollbackOnError: true
 
       - id: export-terraform-output
         name: Export Terraform Output

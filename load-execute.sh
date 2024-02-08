@@ -23,9 +23,7 @@ start_database() {
 
 migrate_database() {
     echo 'Migrating database'
-    pushd ./etor/databaseMigrations/
-    liquibase update --changelog-file ./root.yml --url jdbc:postgresql://localhost:5433/intermediary --username intermediary --password 'changeIT!' --label-filter '!azure'
-    popd
+    liquibase update --changelog-file ./etor/databaseMigrations/root.yml --url jdbc:postgresql://localhost:5433/intermediary --username intermediary --password 'changeIT!' --label-filter '!azure'
     echo "Database migrated"
 }
 
