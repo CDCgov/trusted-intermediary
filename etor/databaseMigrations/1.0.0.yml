@@ -98,4 +98,4 @@ databaseChangeLog:
       comment: Fix role ownership
       changes:
         - sql:
-            sql: REASSIGN OWNED BY cdcti-github TO azure_pg_admin
+            sql: REASSIGN OWNED BY 'cdcti-github' TO 'azure_pg_admin'
