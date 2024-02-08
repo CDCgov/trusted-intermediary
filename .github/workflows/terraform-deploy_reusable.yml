@@ -76,13 +76,22 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      - name: Extract database hostname and password into GitHub Env
+        run: |
+          DATABASE_HOSTNAME=$(terraform output -raw database_hostname)
+          DATABASE_PASSWORD=$(az account get-access-token --resource-type oss-rdbms --query "[accessToken]" -o tsv)
+          echo "::add-mask::$DATABASE_HOSTNAME"
+          echo "::add-mask::$DATABASE_PASSWORD"
+          echo "DATABASE_HOSTNAME=$DATABASE_HOSTNAME" >> "$GITHUB_ENV"
+          echo "DATABASE_PASSWORD=$DATABASE_PASSWORD" >> "$GITHUB_ENV"
+
       - name: Run Db migration
         uses: liquibase-github-actions/update@v4.25.1
         with:
           changelogFile: ./etor/databaseMigrations/root.yml
-          url: "jdbc:postgresql://$(terraform output -raw database_hostname):5432/postgres"
+          url: "jdbc:postgresql://${{ env.DATABASE_HOSTNAME }}:5432/postgres"
           username: cdcti-github
-          password: $(az account get-access-token --resource-type oss-rdbms --query "[accessToken]" -o tsv)
+          password: ${{ env.DATABASE_PASSWORD }}
           rollbackOnError: true
 
       - id: export-terraform-output
