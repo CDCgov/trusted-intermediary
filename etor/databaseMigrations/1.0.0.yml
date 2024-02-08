@@ -79,3 +79,13 @@ databaseChangeLog:
       changes:
         - sql:
             sql: ALTER TABLE metadata OWNER TO azure_pg_admin
+
+  - changeSet:
+       id: 6
+       author: jeff.crichlake
+       labels: azure
+       context: metadata
+       comment: Fix role issue
+       changes:
+        - sql:
+            sql: GRANT SELECT ON ALL TABLES IN SCHEMA intermediary TO azure_pg_admin
