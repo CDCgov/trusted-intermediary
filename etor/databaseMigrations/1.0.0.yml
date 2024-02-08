@@ -89,3 +89,13 @@ databaseChangeLog:
        changes:
         - sql:
             sql: GRANT SELECT ON ALL TABLES IN SCHEMA public TO azure_pg_admin
+
+  - changeSet:
+      id: 7
+      author: jeff.crichlake
+      labels: azure
+      context: metadata
+      comment: Fix role ownership
+      changes:
+        - sql:
+            sql: REASSIGN OWNED BY cdcti-github TO azure_pg_admin
