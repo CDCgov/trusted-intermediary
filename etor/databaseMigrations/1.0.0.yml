@@ -88,4 +88,4 @@ databaseChangeLog:
        comment: Fix role issue
        changes:
         - sql:
-            sql: GRANT SELECT ON ALL TABLES IN SCHEMA intermediary TO azure_pg_admin
+            sql: GRANT SELECT ON ALL TABLES IN SCHEMA public TO azure_pg_admin
