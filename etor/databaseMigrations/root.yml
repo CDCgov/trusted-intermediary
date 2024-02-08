@@ -1,3 +1,6 @@
 databaseChangeLog:
   - include:
       file: etor/databaseMigrations/1.0.0.yml
+  - include:
+      file: etor/databaseMigrations/azure.yml
+      labels: azure
