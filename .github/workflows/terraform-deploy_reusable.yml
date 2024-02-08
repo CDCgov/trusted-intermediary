@@ -83,6 +83,7 @@ jobs:
           url: "jdbc:postgresql://$(terraform output -raw database_hostname):5432/postgres"
           username: cdcti-github
           password: $(az account get-access-token --resource-type oss-rdbms --query "[accessToken]" -o tsv)
+          rollbackOnError: true
 
       - id: export-terraform-output
         name: Export Terraform Output
