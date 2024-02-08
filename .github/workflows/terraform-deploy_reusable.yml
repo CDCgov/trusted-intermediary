@@ -76,13 +76,18 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      - name: stuff
+        run: |
+          DATABASE_HOSTNAME=$(terraform output -raw database_hostname)
+          echo "::add-mask::$DATABASE_HOSTNAME"
+          echo "DATABASE_HOSTNAME=$DATABASE_HOSTNAME" >> "$GITHUB_ENV"
+
       - name: Run Db migration
         uses: liquibase-github-actions/update@v4.25.1
         with:
           changelogFile: ./etor/databaseMigrations/root.yml
-          url: "jdbc:postgresql://$(terraform output -raw database_hostname):5432/postgres"
+          url: "jdbc:postgresql://${{ env.DATABASE_HOSTNAME }}:5432/postgres"
           username: cdcti-github
-          password: $(az account get-access-token --resource-type oss-rdbms --query "[accessToken]" -o tsv)
           rollbackOnError: true
 
       - id: export-terraform-output
