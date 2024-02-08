@@ -17,6 +17,7 @@ import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson;
 import gov.hhs.cdc.trustedintermediary.external.jjwt.JjwtEngine;
 import gov.hhs.cdc.trustedintermediary.external.localfile.EnvironmentDatabaseCredentialsProvider;
 import gov.hhs.cdc.trustedintermediary.external.localfile.LocalSecrets;
+import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamSenderHelper;
 import gov.hhs.cdc.trustedintermediary.external.slf4j.DeployedLogger;
 import gov.hhs.cdc.trustedintermediary.external.slf4j.LocalLogger;
 import gov.hhs.cdc.trustedintermediary.organizations.OrganizationsSettings;
@@ -103,6 +104,8 @@ public class App {
                         AzureDatabaseCredentialsProvider.getInstance());
             }
             ApplicationContext.register(ConnectionPool.class, HikariConnectionPool.getInstance());
+            ApplicationContext.register(
+                    ReportStreamSenderHelper.class, ReportStreamSenderHelper.getInstance());
         }
     }
 }
