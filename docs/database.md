@@ -22,7 +22,7 @@ Choose a Postgres client, [pgAdmin](https://www.pgadmin.org/) is the most full f
 3. Inside of the Azure database page select the Networking option from the left hand nav
 4. Click the link that says `Add current client IP address` and then save the page
     1. NOTE: You should only add your local IP address on a temporary basis, you should remove it after the verification is complete
-5. On the left hand navigation select Authentication and select the `Add Microsoft Entra Admins` link to add your user to the list
+5. On the left hand navigation select Authentication and select the `Add Microsoft Entra Admins` link to add your user to the list. Select Okay and then save the underlying page
     1. NOTE: This permission should only be added temporarily and removed after you are finished with verification
 6. Enter new connection settings from Azure into your db client of choice
    1. Password will come from step 8 of these instructions and can be left blank
@@ -31,7 +31,7 @@ Choose a Postgres client, [pgAdmin](https://www.pgadmin.org/) is the most full f
 
 ## Modifying the database schema
 To modify the schema there are a few locations in the code we need to update.
-1. [Line 77 of this file contains the table creation statements](.github/workflows/terraform-deploy_reusable.yml) To modify column data types or add or remove columns, go there.
+1. Add the update inside of the databaseMigrations folder in the repo
 2. The `PostgresDao.java` contains our queries for the database. Remember to update both the save and the fetch methods
 3. `DatabasePartnerMetadataStorage` is what calls our dao to perform the db operation, you will need to update the inputs here
 
