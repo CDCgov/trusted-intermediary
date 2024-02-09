@@ -23,8 +23,8 @@ on:
 
 
 jobs:
-  terraform-deploy:
-    name: Terraform Deploy
+  database-rollback:
+    name: Database Rollback
     environment:
       name: ${{ github.event.inputs.environment }}
     runs-on: ubuntu-latest
