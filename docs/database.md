@@ -53,7 +53,7 @@ flexibility is needed.
 A couple of concepts we adhere to...
 1. For each new file, start the `id` at 1 and increment from there.
 2. Use your GitHub username as the `author`.
-3. Provide `comment` that better describes what or why you are trying to accomplish.
+3. Provide a `comment` that better describes what or why you are trying to accomplish.
 4. If a migration only applies to Azure, include a `label` of `azure`.
 5. Include only one change per `changeSet`.
 
