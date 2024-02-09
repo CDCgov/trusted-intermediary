@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import javax.inject.Inject;
 
+/** Helper class for sending messages to ReportStream */
 public class ReportStreamSenderHelper {
     private static final ReportStreamSenderHelper INSTANCE = new ReportStreamSenderHelper();
 
