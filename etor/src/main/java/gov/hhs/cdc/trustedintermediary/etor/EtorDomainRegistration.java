@@ -32,6 +32,7 @@ import gov.hhs.cdc.trustedintermediary.etor.results.SendResultUseCase;
 import gov.hhs.cdc.trustedintermediary.external.database.DatabasePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.DbDao;
 import gov.hhs.cdc.trustedintermediary.external.database.PostgresDao;
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiMessageConverterHelper;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiResultConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.FilePartnerMetadataStorage;
@@ -109,6 +110,10 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(ResultController.class, ResultController.getInstance());
         ApplicationContext.register(SendResultUseCase.class, SendResultUseCase.getInstance());
         ApplicationContext.register(ResultSender.class, ReportStreamResultSender.getInstance());
+
+        // Message
+        ApplicationContext.register(
+                HapiMessageConverterHelper.class, HapiMessageConverterHelper.getInstance());
 
         // Metadata
         ApplicationContext.register(
