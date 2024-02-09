@@ -1,4 +1,5 @@
-# Find the SQL schema in `/.github/workflows/terraform-deploy_reusable.yml`.
+# Run the following to migrate...
+# liquibase update --changelog-file ./etor/databaseMigrations/root.yml --url jdbc:postgresql://localhost:5433/intermediary --username intermediary --password 'changeIT!' --label-filter '!azure'
 
 version: "3.7"
 
