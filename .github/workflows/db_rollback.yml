@@ -36,9 +36,6 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    defaults:
-      run:
-        working-directory: ./operations/environments/${{ github.event.inputs.environment }}
 
     outputs:
       REGISTRY: ${{ steps.export-terraform-output.outputs.REGISTRY }}
@@ -50,7 +47,9 @@ jobs:
 
       - name: Terraform Init
         id: init
-        run: terraform init
+        run: |
+          cd ./operations/environments/${{ github.event.inputs.environment }}
+          terraform init
 
       - name: Login via Azure CLI
         uses: azure/login@v1
@@ -61,6 +60,7 @@ jobs:
 
       - name: Extract database hostname and password into GitHub Env
         run: |
+          cd ./operations/environments/${{ github.event.inputs.environment }}
           DATABASE_HOSTNAME=$(terraform output -raw database_hostname)
           DATABASE_PASSWORD=$(az account get-access-token --resource-type oss-rdbms --query "[accessToken]" -o tsv)
           echo "::add-mask::$DATABASE_HOSTNAME"
