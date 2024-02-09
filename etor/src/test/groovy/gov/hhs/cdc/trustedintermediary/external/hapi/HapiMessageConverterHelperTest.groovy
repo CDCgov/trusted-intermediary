@@ -1,19 +1,14 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi
 
-import gov.hhs.cdc.trustedintermediary.ResultMock
+
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.MessageHeader
-import org.hl7.fhir.r4.model.Meta
-import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.*
 import spock.lang.Specification
 
 class HapiMessageConverterHelperTest extends Specification {
 
     Bundle mockBundle
     Patient mockPatient
-    ResultMock resultMock
 
     def setup() {
         TestApplicationContext.reset()
