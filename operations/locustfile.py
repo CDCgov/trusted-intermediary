@@ -12,11 +12,13 @@ HEALTH_ENDPOINT = "/health"
 AUTH_ENDPOINT = "/v1/auth/token"
 DEMOGRAPHICS_ENDPOINT = "/v1/etor/demographics"
 ORDERS_ENDPOINT = "/v1/etor/orders"
+RESULTS_ENDPOINT = "/v1/etor/results"
 METADATA_ENDPOINT = "/v1/etor/metadata"
 CONSOLIDATED_ENDPOINT = "/v1/etor/metadata/summary"
 
 demographics_request_body = None
 order_request_body = None
+result_request_body = None
 auth_request_body = None
 
 
@@ -72,6 +74,19 @@ class SampleUser(FastHttpUser):
                 "RecordId": self.submission_id,
             },
             data=order_request_body,
+        )
+        if response.status_code == 200:
+            self.orders_api_called = True
+
+    @task(5)
+    def post_v1_etor_results(self):
+        response = self.client.post(
+            RESULTS_ENDPOINT,
+            headers={
+                "Authorization": self.access_token,
+                "RecordId": self.submission_id,
+            },
+            data=result_request_body,
         )
         if response.status_code == 200:
             self.orders_api_called = True
