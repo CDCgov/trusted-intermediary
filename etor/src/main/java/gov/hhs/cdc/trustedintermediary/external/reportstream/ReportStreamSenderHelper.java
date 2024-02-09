@@ -27,14 +27,14 @@ public class ReportStreamSenderHelper {
         return INSTANCE;
     }
 
-    public Optional<String> sendResultToReportStream(String body, String fhirResourceId)
-            throws UnableToSendMessageException {
-        return sendToReportStream(body, fhirResourceId, "result");
-    }
-
     public Optional<String> sendOrderToReportStream(String body, String fhirResourceId)
             throws UnableToSendMessageException {
         return sendToReportStream(body, fhirResourceId, "order");
+    }
+
+    public Optional<String> sendResultToReportStream(String body, String fhirResourceId)
+            throws UnableToSendMessageException {
+        return sendToReportStream(body, fhirResourceId, "result");
     }
 
     protected Optional<String> sendToReportStream(

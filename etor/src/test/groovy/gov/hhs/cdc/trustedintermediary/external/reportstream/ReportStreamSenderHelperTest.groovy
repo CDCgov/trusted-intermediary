@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.reportstream
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient
+import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.external.localfile.MockRSEndpointClient
@@ -25,7 +26,7 @@ class ReportStreamSenderHelperTest extends Specification {
     def "sendToReportStream works"() {
         given:
         def mockFormatter = Mock(Formatter)
-        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of("submissionId", "fake-id")
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of('submissionId', 'fake-id')
         TestApplicationContext.register(Formatter, mockFormatter)
 
         TestApplicationContext.injectRegisteredImplementations()
@@ -36,6 +37,55 @@ class ReportStreamSenderHelperTest extends Specification {
         then:
         noExceptionThrown()
         1 * ReportStreamSenderHelper.getInstance().metadata.put(_, EtorMetadataStep.SENT_TO_REPORT_STREAM)
+    }
+
+    def "sendOrderToReportStream works"() {
+        setup:
+        def body = "testBody"
+        def fhirResourceId = "testId"
+        def expected = Optional.of("result")
+
+        def senderHelper = Spy(ReportStreamSenderHelper.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def order = senderHelper.sendOrderToReportStream(body, fhirResourceId)
+
+        then:
+        order.get() == expected.get()
+        1 * senderHelper.sendToReportStream(body, fhirResourceId, "order") >> expected
+    }
+
+    def "sendResultToReportStream works"() {
+        setup:
+        def body = "testBody"
+        def fhirResourceId = "testId"
+        def expected = Optional.of("result")
+
+        def senderHelper = Spy(ReportStreamSenderHelper.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def result = senderHelper.sendResultToReportStream(body, fhirResourceId)
+
+        then:
+        result.get() == expected.get()
+        1 * senderHelper.sendToReportStream(body, fhirResourceId, "result") >> expected
+    }
+
+    def "sendToReportStream throws exception if RS client fails"() {
+        setup:
+        def mockEndpointClient = Mock(RSEndpointClient)
+        mockEndpointClient.getRsToken() >> { throw new ReportStreamEndpointClientException("couldn't get token", new Exception())}
+        TestApplicationContext.register(RSEndpointClient, mockEndpointClient)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        ReportStreamSenderHelper.getInstance().sendToReportStream("testBody", "testId", "testType")
+
+        then:
+        thrown(UnableToSendMessageException)
     }
 
     def "getSubmissionId logs submissionId if convertJsonToObject is successful"() {
