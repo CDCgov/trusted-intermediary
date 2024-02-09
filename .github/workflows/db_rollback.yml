@@ -42,13 +42,6 @@ jobs:
         id: init
         run: terraform init ${{ inputs.TERRAFORM_INIT_PARAMETERS }}
 
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate -no-color
-
-      - name: Terraform Apply
-        run: terraform apply -auto-approve -input=false ${{ inputs.TERRAFORM_APPLY_PARAMETERS }}
-
       - name: Login via Azure CLI
         uses: azure/login@v1
         with:
