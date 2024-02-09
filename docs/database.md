@@ -31,7 +31,7 @@ Choose a Postgres client, [pgAdmin](https://www.pgadmin.org/) is the most full f
 
 ## Modifying the database schema
 To modify the schema there are a few locations in the code we need to update.
-1. Add the update inside of the databaseMigrations folder in the repo
+1. Add the update inside the databaseMigrations folder in the repo.  See the [section on migrations](#database-migrations) for details
 2. The `PostgresDao.java` contains our queries for the database. Remember to update both the save and the fetch methods
 3. `DatabasePartnerMetadataStorage` is what calls our dao to perform the db operation, you will need to update the inputs here
 
@@ -44,11 +44,11 @@ We use [Liquibase](https://www.liquibase.com/download) to handle the migrations.
 
 Documentation on Liquibase can be found [here](https://docs.liquibase.com/).
 
-For any migrations needed for a backlog item, add a new file to [`/etor/databaseMigrations`](/etor/databaseMigrations)
-with the number of the story.  For example, `753.yml` for
-[backlog item 753](https://github.com/CDCgov/trusted-intermediary/issues/753).  Liquibase supports multiple change log
-file types, but we prefer YAML.  YAML supports specialized change types but also supports arbitrary SQL if the
-flexibility is needed.
+Our change log files are organized by business domain.  For example, `metadata.yml` includes migrations about our
+metadata.  You may need to create a new file if the migrations are for a business domain not previously covered.  Add
+the new file to [`/etor/databaseMigrations`](/etor/databaseMigrations) with the name of the business domain.  For
+example, `dogcow.yml` for migrations associated with DogCows.  Liquibase supports multiple change log file types, but we
+prefer YAML.  YAML supports specialized change types but also supports arbitrary SQL if the flexibility is needed.
 
 A couple of concepts we adhere to...
 1. For each new file, start the `id` at 1 and increment from there.
