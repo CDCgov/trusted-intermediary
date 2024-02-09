@@ -1,0 +1,51 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: jeff.crichlake
+      labels: create-type
+      context: metadata
+      comment: create status type
+      changes:
+       - sql:
+           sql: CREATE TYPE message_status AS ENUM ('PENDING', 'DELIVERED', 'FAILED')
+
+  - changeSet:
+      id: 2
+      author:  jeff.crichlake
+      labels: create-metadata-table
+      context: metadata
+      comment: create partner metadata table
+      changes:
+       - createTable:
+            tableName: metadata
+            columns:
+              - column:
+                  name: received_message_id
+                  type: varchar(40)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: sent_message_id
+                  type: varchar(40)
+              - column:
+                  name: sender
+                  type: varchar(30)
+              - column:
+                  name: receiver
+                  type: varchar(30)
+              - column:
+                  name: hash_of_order
+                  type: varchar(1000)
+              - column:
+                  name: time_received
+                  type: timestamptz
+              - column:
+                  name: time_delivered
+                  type: timestamptz
+              - column:
+                  name: delivery_status
+                  type: message_status
+              - column:
+                  name: failure_reason
+                  type: varchar(1000)

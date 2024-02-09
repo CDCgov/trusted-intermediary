@@ -23,8 +23,7 @@ start_database() {
 
 migrate_database() {
     echo 'Migrating database'
-    export 'PGPASSWORD=changeIT!'
-    psql --set=sslmode=require -h localhost -p 5433 -d intermediary -U intermediary -c "CREATE TYPE message_status AS ENUM ('PENDING', 'DELIVERED', 'FAILED'); CREATE TABLE IF NOT EXISTS metadata (received_message_id varchar(40) PRIMARY KEY, sent_message_id varchar(40), sender varchar(30), receiver varchar(30), hash_of_order varchar(1000), time_received timestamptz, time_delivered timestamptz, delivery_status message_status, failure_reason varchar(1000));"
+    liquibase update --changelog-file ./etor/databaseMigrations/root.yml --url jdbc:postgresql://localhost:5433/intermediary --username intermediary --password 'changeIT!' --label-filter '!azure'
     echo "Database migrated"
 }
 
