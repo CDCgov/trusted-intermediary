@@ -36,7 +36,7 @@ public class ReportStreamSenderHelper {
         return sendToReportStream(body, fhirResourceId, "order");
     }
 
-    public Optional<String> sendToReportStream(
+    protected Optional<String> sendToReportStream(
             String body, String fhirResourceId, String messageType)
             throws UnableToSendMessageException {
         String bearerToken;
