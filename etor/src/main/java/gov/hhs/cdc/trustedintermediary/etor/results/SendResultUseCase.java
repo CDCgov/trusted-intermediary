@@ -20,6 +20,7 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
 
     @Override
     public void convertAndSend(Result<?> result) throws UnableToSendMessageException {
-        sender.send(converter.addEtorProcessingTag(result));
+        var convertedResult = converter.addEtorProcessingTag(result);
+        sender.send(convertedResult);
     }
 }
