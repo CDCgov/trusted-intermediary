@@ -21,17 +21,18 @@ public class HapiMessageConverterHelper {
 
 	private HapiMessageConverterHelper() {}
 
+	/**
+	 * Adds the `ETOR` code to any message provided
+	 *
+	 * @param messageBundle
+	 */
 	public void addEtorTag(Bundle messageBundle) {
 		var messageHeaderOptional =
 			HapiHelper.resourcesInBundle(messageBundle, MessageHeader.class).findFirst();
-		if (messageHeaderOptional.isPresent()) {
-			var messageHeader = messageHeaderOptional.get();
-			var meta = messageHeader.hasMeta() ? messageHeader.getMeta() : new Meta();
+		var messageHeader = messageHeaderOptional.isPresent() ? messageHeaderOptional.get() : new MessageHeader();
+		var meta = messageHeader.hasMeta() ? messageHeader.getMeta() : new Meta();
 
-			meta.addTag(new Coding("http://localcodes.org/ETOR", "ETOR", "Processed by ETOR"));
-			messageHeader.setMeta(meta);
-		} else {
-			logger.logInfo("No MessageHeader found in the Bundle to add the ETOR processing tag.");
-		}
+		meta.addTag(new Coding("http://localcodes.org/ETOR", "ETOR", "Processed by ETOR"));
+		messageHeader.setMeta(meta);
 	}
 }
