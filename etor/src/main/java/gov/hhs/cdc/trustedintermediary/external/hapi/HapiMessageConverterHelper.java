@@ -1,13 +1,11 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
-
-import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-
-import javax.inject.Inject;
 
 public class HapiMessageConverterHelper {
 
@@ -35,7 +33,8 @@ public class HapiMessageConverterHelper {
     }
 
     public MessageHeader findOrInitializeMessageHeader(Bundle bundle) {
-        var messageHeader = HapiHelper.resourcesInBundle(bundle, MessageHeader.class).findFirst().orElse(null);
+        var messageHeader =
+                HapiHelper.resourcesInBundle(bundle, MessageHeader.class).findFirst().orElse(null);
         if (messageHeader == null) {
             messageHeader = new MessageHeader();
             bundle.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader));
