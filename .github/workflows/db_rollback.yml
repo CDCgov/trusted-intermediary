@@ -1,0 +1,75 @@
+name: Rollback DB
+
+on:
+  workflow_dispatch:
+    inputs:
+      rollbackCount:
+        description: 'Number of migrations to rollback'
+        required: true
+        default: # of rollback you require in the file input
+      rollbackFile:
+        description: "File with migrations you want to rollback"
+        required: true
+        default: Filepath to yml
+
+jobs:
+  terraform-deploy:
+    name: Terraform Deploy
+    environment:
+      name: ${{ inputs.ENVIRONMENT }}
+    runs-on: ubuntu-latest
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_USE_OIDC: true
+    permissions:
+      id-token: write
+      contents: read
+    defaults:
+      run:
+        working-directory: ${{ inputs.TERRAFORM_DIRECTORY }}
+
+    outputs:
+      REGISTRY: ${{ steps.export-terraform-output.outputs.REGISTRY }}
+      APP: ${{ steps.export-terraform-output.outputs.APP }}
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - name: Terraform Init
+        id: init
+        run: terraform init ${{ inputs.TERRAFORM_INIT_PARAMETERS }}
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -input=false ${{ inputs.TERRAFORM_APPLY_PARAMETERS }}
+
+      - name: Login via Azure CLI
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Extract database hostname and password into GitHub Env
+        run: |
+          DATABASE_HOSTNAME=$(terraform output -raw database_hostname)
+          DATABASE_PASSWORD=$(az account get-access-token --resource-type oss-rdbms --query "[accessToken]" -o tsv)
+          echo "::add-mask::$DATABASE_HOSTNAME"
+          echo "::add-mask::$DATABASE_PASSWORD"
+          echo "DATABASE_HOSTNAME=$DATABASE_HOSTNAME" >> "$GITHUB_ENV"
+          echo "DATABASE_PASSWORD=$DATABASE_PASSWORD" >> "$GITHUB_ENV"
+
+      - name: Run Db Rollback
+        uses: liquibase-github-actions/rollback-count-sql@v4.25.1
+        with:
+          changelogFile: ${{ github.event.inputs.rollbackFile }}
+          count: ${{ github.event.inputs.rollbackCount }}
+          url: "jdbc:postgresql://${{ env.DATABASE_HOSTNAME }}:5432/postgres"
+          username: cdcti-github
+          password: ${{ env.DATABASE_PASSWORD }}
