@@ -45,6 +45,9 @@ public class HapiOrderConverter implements OrderConverter {
 
     @Inject Logger logger;
 
+    @Inject
+    HapiMessageConverterHelper hapiMessageConverterHelper;
+
     public static HapiOrderConverter getInstance() {
         return INSTANCE;
     }
@@ -172,17 +175,7 @@ public class HapiOrderConverter implements OrderConverter {
         var hapiOrder = (Order<Bundle>) message;
         var messageBundle = hapiOrder.getUnderlyingOrder();
 
-        var messageHeaderOptional =
-                HapiHelper.resourcesInBundle(messageBundle, MessageHeader.class).findFirst();
-        if (messageHeaderOptional.isPresent()) {
-            var messageHeader = messageHeaderOptional.get();
-            var meta = messageHeader.hasMeta() ? messageHeader.getMeta() : new Meta();
-
-            meta.addTag(new Coding("http://localcodes.org/ETOR", "ETOR", "Processed by ETOR"));
-            messageHeader.setMeta(meta);
-        } else {
-            logger.logInfo("No MessageHeader found in the Bundle to add the ETOR processing tag.");
-        }
+        hapiMessageConverterHelper.addEtorTag(messageBundle);
 
         return new HapiOrder(messageBundle);
     }

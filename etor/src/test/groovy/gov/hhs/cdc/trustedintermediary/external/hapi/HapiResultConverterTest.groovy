@@ -19,6 +19,7 @@ class HapiResultConverterTest extends Specification {
 		TestApplicationContext.reset()
 		TestApplicationContext.init()
 		TestApplicationContext.register(ResultConverter, HapiResultConverter.getInstance())
+		TestApplicationContext.register(HapiMessageConverterHelper, HapiMessageConverterHelper.getInstance())
 		TestApplicationContext.injectRegisteredImplementations()
 
 		mockPatient = new Patient()

@@ -1,9 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.MessageHeader;
-import org.hl7.fhir.r4.model.Meta;
 
 import gov.hhs.cdc.trustedintermediary.etor.results.Result;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultConverter;
@@ -20,6 +17,9 @@ public class HapiResultConverter implements ResultConverter {
 	private static final HapiResultConverter INSTANCE = new HapiResultConverter();
 
 	@Inject
+	HapiMessageConverterHelper hapiMessageConverterHelper;
+
+	@Inject
 	Logger logger;
 
 	public static HapiResultConverter getInstance() {
@@ -33,17 +33,7 @@ public class HapiResultConverter implements ResultConverter {
 		var hapiResult = (Result<Bundle>) message;
 		var messageBundle = hapiResult.getUnderlyingResult();
 
-		var messageHeaderOptional =
-			HapiHelper.resourcesInBundle(messageBundle, MessageHeader.class).findFirst();
-		if (messageHeaderOptional.isPresent()) {
-			var messageHeader = messageHeaderOptional.get();
-			var meta = messageHeader.hasMeta() ? messageHeader.getMeta() : new Meta();
-
-			meta.addTag(new Coding("http://localcodes.org/ETOR", "ETOR", "Processed by ETOR"));
-			messageHeader.setMeta(meta);
-		} else {
-			logger.logInfo("No MessageHeader found in the Bundle to add the ETOR processing tag.");
-		}
+		hapiMessageConverterHelper.addEtorTag(messageBundle);
 
 		return new HapiResult(messageBundle);
 	}

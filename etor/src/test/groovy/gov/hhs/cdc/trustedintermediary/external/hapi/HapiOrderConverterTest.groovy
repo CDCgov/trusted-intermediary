@@ -35,6 +35,7 @@ class HapiOrderConverterTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(OrderConverter, HapiOrderConverter.getInstance())
+        TestApplicationContext.register(HapiMessageConverterHelper, HapiMessageConverterHelper.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         mockPatient = new Patient()
