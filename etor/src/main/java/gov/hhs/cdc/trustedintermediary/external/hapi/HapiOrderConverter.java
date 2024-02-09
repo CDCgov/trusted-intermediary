@@ -101,16 +101,7 @@ public class HapiOrderConverter implements OrderConverter {
 
         var hapiOrder = (Order<Bundle>) order;
         var orderBundle = hapiOrder.getUnderlyingOrder();
-
-        var messageHeader =
-                HapiHelper.resourcesInBundle(orderBundle, MessageHeader.class)
-                        .findFirst()
-                        .orElse(null);
-
-        if (messageHeader == null) {
-            messageHeader = new MessageHeader();
-            orderBundle.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader));
-        }
+        var messageHeader = hapiMessageConverterHelper.findOrInitializeMessageHeader(orderBundle);
 
         messageHeader.setEvent(OML_CODING);
 
@@ -174,7 +165,7 @@ public class HapiOrderConverter implements OrderConverter {
         var hapiOrder = (Order<Bundle>) message;
         var messageBundle = hapiOrder.getUnderlyingOrder();
 
-        hapiMessageConverterHelper.addEtorTag(messageBundle);
+        hapiMessageConverterHelper.addEtorTagToBundle(messageBundle);
 
         return new HapiOrder(messageBundle);
     }

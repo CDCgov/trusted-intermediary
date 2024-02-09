@@ -35,7 +35,25 @@ class HapiMessageConverterHelperTest extends Specification {
         mockBundle.getEntry().add(messageHeaderEntry)
 
         when:
-        HapiMessageConverterHelper.getInstance().addEtorTag(mockBundle) as Bundle
+        HapiMessageConverterHelper.getInstance().addEtorTagToBundle(mockBundle) as Bundle
+
+        then:
+        def messageHeaders = mockBundle.getEntry().get(1).getResource() as MessageHeader
+        def actualMessageTag = messageHeaders.getMeta().getTag()[0]
+
+        actualMessageTag.getSystem() == expectedSystem
+        actualMessageTag.getCode() == expectedCode
+        actualMessageTag.getDisplay() == expectedDisplay
+    }
+
+    def "addEtorTag adds the ETOR message header tag to any Bundle when message header is missing"() {
+        given:
+        def expectedSystem = "http://localcodes.org/ETOR"
+        def expectedCode = "ETOR"
+        def expectedDisplay = "Processed by ETOR"
+
+        when:
+        HapiMessageConverterHelper.getInstance().addEtorTagToBundle(mockBundle) as Bundle
 
         then:
         def messageHeaders = mockBundle.getEntry().get(1).getResource() as MessageHeader

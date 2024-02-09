@@ -29,7 +29,7 @@ public class HapiResultConverter implements ResultConverter {
         var hapiResult = (Result<Bundle>) message;
         var messageBundle = hapiResult.getUnderlyingResult();
 
-        hapiMessageConverterHelper.addEtorTag(messageBundle);
+        hapiMessageConverterHelper.addEtorTagToBundle(messageBundle);
 
         return new HapiResult(messageBundle);
     }
