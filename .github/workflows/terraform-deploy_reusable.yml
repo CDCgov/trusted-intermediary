@@ -76,10 +76,22 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Run Db migration
+      - name: Extract database hostname and password into GitHub Env
         run: |
-          export PGPASSWORD=$(az account get-access-token --resource-type oss-rdbms --query "[accessToken]" -o tsv)
-          psql "host=$(terraform output -raw database_hostname) port=5432 dbname=postgres user=cdcti-github sslmode=require" -c "DO \$\$ BEGIN CREATE TYPE message_status AS ENUM ('PENDING', 'DELIVERED', 'FAILED'); EXCEPTION WHEN duplicate_object THEN null; END \$\$; CREATE TABLE IF NOT EXISTS metadata (received_message_id varchar(40) PRIMARY KEY, sent_message_id varchar(40), sender varchar(30), receiver varchar(30), hash_of_order varchar(1000), time_received timestamptz, time_delivered timestamptz, delivery_status message_status, failure_reason varchar(1000)); GRANT ALL ON metadata TO azure_pg_admin; ALTER TABLE metadata OWNER TO azure_pg_admin; ALTER TYPE message_status OWNER TO azure_pg_admin"
+          DATABASE_HOSTNAME=$(terraform output -raw database_hostname)
+          DATABASE_PASSWORD=$(az account get-access-token --resource-type oss-rdbms --query "[accessToken]" -o tsv)
+          echo "::add-mask::$DATABASE_HOSTNAME"
+          echo "::add-mask::$DATABASE_PASSWORD"
+          echo "DATABASE_HOSTNAME=$DATABASE_HOSTNAME" >> "$GITHUB_ENV"
+          echo "DATABASE_PASSWORD=$DATABASE_PASSWORD" >> "$GITHUB_ENV"
+
+      - name: Run Db migration
+        uses: liquibase-github-actions/update@v4.25.1
+        with:
+          changelogFile: ./etor/databaseMigrations/root.yml
+          url: "jdbc:postgresql://${{ env.DATABASE_HOSTNAME }}:5432/postgres"
+          username: cdcti-github
+          password: ${{ env.DATABASE_PASSWORD }}
 
       - id: export-terraform-output
         name: Export Terraform Output

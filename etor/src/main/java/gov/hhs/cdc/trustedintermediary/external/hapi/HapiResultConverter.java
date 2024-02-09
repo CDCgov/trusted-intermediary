@@ -1,20 +1,18 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
-import org.hl7.fhir.r4.model.Bundle;
-
 import gov.hhs.cdc.trustedintermediary.etor.results.Result;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultConverter;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-
 import javax.inject.Inject;
+import org.hl7.fhir.r4.model.Bundle;
 
 /**
- * Converts {@link Result} to a Hapi-specific FHIR lab result {@link
- * Result <Bundle>}) with proper identifying message headers.
+ * Converts {@link Result} to a Hapi-specific FHIR lab result {@link Result <Bundle>}) with proper
+ * identifying message headers.
  */
 public class HapiResultConverter implements ResultConverter {
 
-	private static final HapiResultConverter INSTANCE = new HapiResultConverter();
+    private static final HapiResultConverter INSTANCE = new HapiResultConverter();
 
 	@Inject
 	HapiMessageConverterHelper hapiMessageConverterHelper;
@@ -22,19 +20,19 @@ public class HapiResultConverter implements ResultConverter {
 	@Inject
 	Logger logger;
 
-	public static HapiResultConverter getInstance() {
-		return INSTANCE;
-	}
+    public static HapiResultConverter getInstance() {
+        return INSTANCE;
+    }
 
-	private HapiResultConverter() {}
+    private HapiResultConverter() {}
 
-	@Override
-	public Result<?> addEtorProcessingTag(final Result<?> message) {
-		var hapiResult = (Result<Bundle>) message;
-		var messageBundle = hapiResult.getUnderlyingResult();
+    @Override
+    public Result<?> addEtorProcessingTag(final Result<?> message) {
+        var hapiResult = (Result<Bundle>) message;
+        var messageBundle = hapiResult.getUnderlyingResult();
 
 		hapiMessageConverterHelper.addEtorTag(messageBundle);
 
-		return new HapiResult(messageBundle);
-	}
+        return new HapiResult(messageBundle);
+    }
 }

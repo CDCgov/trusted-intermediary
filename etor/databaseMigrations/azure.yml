@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: halprin
+      labels: azure
+      context: azure
+      runAlways: true
+      comment: Fix ownership of anything created in every migration run
+      changes:
+        - sql:
+            sql: REASSIGN OWNED BY CURRENT_USER TO azure_pg_admin
