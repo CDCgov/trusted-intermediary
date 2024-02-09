@@ -1,3 +1,4 @@
+<!--Configuration settings to add to IntelliJ for debugging the application when running in docker container-->
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Debug TI" type="Remote">
     <option name="USE_SOCKET_TRANSPORT" value="true" />

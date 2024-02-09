@@ -112,6 +112,12 @@ the swarm parameters for the test and the local url where the app is running
 
 ### Debugging
 
+#### Setting for IntelliJ
+The project comes with an attached remote jvm configuration for debuging the container.
+If you check your remote JVM settings, under `Run/Edit Configurations`,
+you will see the `Debu TI`. If you want to add a new remote JVM configuration, follow the steps below,
+under "**Docker Container Debugging Using Java Debug Wire Protocal**"
+
 #### Docker Container Debugging Using Java Debug Wire Protocal (JDWP)
 
 Go into the `Dockerfile` file and change `CMD ["java", "-jar", "app.jar"]` to `CMD ["java", "-agentlib:jdwp=transport=dt_socket,address=*:6006,server=y,suspend=n", "-jar", "app.jar"]`
