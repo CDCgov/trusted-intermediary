@@ -4,29 +4,28 @@ import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
 
 class HapiResultTest extends Specification{
-	def "getUnderlyingResult works"() {
-		given:
-		def expectedResult = new Bundle()
-		def result = new HapiResult(expectedResult)
+    def "getUnderlyingResult works"() {
+        given:
+        def expectedResult = new Bundle()
+        def result = new HapiResult(expectedResult)
 
-		when:
-		def actualResult = result.getUnderlyingResult();
+        when:
+        def actualResult = result.getUnderlyingResult()
 
-		then:
-		actualResult == expectedResult
-	}
+        then:
+        actualResult == expectedResult
+    }
 
-	def "getFhirResourceId works"() {
-		given:
-		def expectId = "fhirResourceId"
-		def innerResult = new Bundle()
-		innerResult.setId(expectId)
+    def "getFhirResourceId works"() {
+        given:
+        def expectId = "fhirResourceId"
+        def innerResult = new Bundle()
+        innerResult.setId(expectId)
 
-		when:
-		def actualResult = new HapiResult(innerResult)
+        when:
+        def actualResult = new HapiResult(innerResult)
 
-		then:
-		actualResult.getFhirResourceId() == expectId
-	}
-
+        then:
+        actualResult.getFhirResourceId() == expectId
+    }
 }

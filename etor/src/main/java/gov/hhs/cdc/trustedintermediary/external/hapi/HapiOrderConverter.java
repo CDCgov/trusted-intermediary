@@ -45,8 +45,7 @@ public class HapiOrderConverter implements OrderConverter {
 
     @Inject Logger logger;
 
-    @Inject
-    HapiMessageConverterHelper hapiMessageConverterHelper;
+    @Inject HapiMessageConverterHelper hapiMessageConverterHelper;
 
     public static HapiOrderConverter getInstance() {
         return INSTANCE;

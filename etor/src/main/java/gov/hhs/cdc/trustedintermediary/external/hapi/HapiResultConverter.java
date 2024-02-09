@@ -14,11 +14,9 @@ public class HapiResultConverter implements ResultConverter {
 
     private static final HapiResultConverter INSTANCE = new HapiResultConverter();
 
-	@Inject
-	HapiMessageConverterHelper hapiMessageConverterHelper;
+    @Inject HapiMessageConverterHelper hapiMessageConverterHelper;
 
-	@Inject
-	Logger logger;
+    @Inject Logger logger;
 
     public static HapiResultConverter getInstance() {
         return INSTANCE;
@@ -31,7 +29,7 @@ public class HapiResultConverter implements ResultConverter {
         var hapiResult = (Result<Bundle>) message;
         var messageBundle = hapiResult.getUnderlyingResult();
 
-		hapiMessageConverterHelper.addEtorTag(messageBundle);
+        hapiMessageConverterHelper.addEtorTag(messageBundle);
 
         return new HapiResult(messageBundle);
     }

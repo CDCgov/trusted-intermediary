@@ -9,40 +9,40 @@ import spock.lang.Specification
 
 class HapiMessageConverterHelperTest extends Specification {
 
-	Bundle mockBundle
-	Patient mockPatient
-	ResultMock resultMock
+    Bundle mockBundle
+    Patient mockPatient
+    ResultMock resultMock
 
-	def setup() {
-		TestApplicationContext.reset()
-		TestApplicationContext.init()
-		TestApplicationContext.register(HapiMessageConverterHelper, HapiMessageConverterHelper.getInstance())
-		TestApplicationContext.injectRegisteredImplementations()
+    def setup() {
+        TestApplicationContext.reset()
+        TestApplicationContext.init()
+        TestApplicationContext.register(HapiMessageConverterHelper, HapiMessageConverterHelper.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
 
-		mockPatient = new Patient()
-		mockBundle = new Bundle().addEntry(new Bundle.BundleEntryComponent().setResource(mockPatient))
-	}
+        mockPatient = new Patient()
+        mockBundle = new Bundle().addEntry(new Bundle.BundleEntryComponent().setResource(mockPatient))
+    }
 
-	def "addEtorTag adds the ETOR message header tag to any Bundle"() {
-		given:
-		def expectedSystem = "http://localcodes.org/ETOR"
-		def expectedCode = "ETOR"
-		def expectedDisplay = "Processed by ETOR"
+    def "addEtorTag adds the ETOR message header tag to any Bundle"() {
+        given:
+        def expectedSystem = "http://localcodes.org/ETOR"
+        def expectedCode = "ETOR"
+        def expectedDisplay = "Processed by ETOR"
 
-		def messageHeader = new MessageHeader()
-		messageHeader.setId(UUID.randomUUID().toString())
-		def messageHeaderEntry = new Bundle.BundleEntryComponent().setResource(messageHeader)
-		mockBundle.getEntry().add(messageHeaderEntry);
+        def messageHeader = new MessageHeader()
+        messageHeader.setId(UUID.randomUUID().toString())
+        def messageHeaderEntry = new Bundle.BundleEntryComponent().setResource(messageHeader)
+        mockBundle.getEntry().add(messageHeaderEntry)
 
-		when:
-		HapiMessageConverterHelper.getInstance().addEtorTag(mockBundle) as Bundle
+        when:
+        HapiMessageConverterHelper.getInstance().addEtorTag(mockBundle) as Bundle
 
-		then:
-		def messageHeaders = mockBundle.getEntry().get(1).getResource() as MessageHeader
-		def actualMessageTag = messageHeaders.getMeta().getTag()[0]
+        then:
+        def messageHeaders = mockBundle.getEntry().get(1).getResource() as MessageHeader
+        def actualMessageTag = messageHeaders.getMeta().getTag()[0]
 
-		actualMessageTag.getSystem() == expectedSystem
-		actualMessageTag.getCode() == expectedCode
-		actualMessageTag.getDisplay() == expectedDisplay
-	}
+        actualMessageTag.getSystem() == expectedSystem
+        actualMessageTag.getCode() == expectedCode
+        actualMessageTag.getDisplay() == expectedDisplay
+    }
 }

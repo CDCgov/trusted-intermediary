@@ -90,20 +90,24 @@ public class EtorDomainRegistration implements DomainConnector {
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
+        // Demographics
         ApplicationContext.register(
                 PatientDemographicsController.class, PatientDemographicsController.getInstance());
         ApplicationContext.register(
                 ConvertAndSendDemographicsUsecase.class,
                 ConvertAndSendDemographicsUsecase.getInstance());
+        // Orders
         ApplicationContext.register(OrderConverter.class, HapiOrderConverter.getInstance());
         ApplicationContext.register(OrderController.class, OrderController.getInstance());
         ApplicationContext.register(SendOrderUseCase.class, SendOrderUseCase.getInstance());
         ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
-        ApplicationContext.register(
-                PartnerMetadataOrchestrator.class, PartnerMetadataOrchestrator.getInstance());
-        ApplicationContext.register(ResultSender.class, ReportStreamResultSender.getInstance());
+        // Results
         ApplicationContext.register(ResultController.class, ResultController.getInstance());
         ApplicationContext.register(SendResultUseCase.class, SendResultUseCase.getInstance());
+        ApplicationContext.register(ResultSender.class, ReportStreamResultSender.getInstance());
+        // Metadata
+        ApplicationContext.register(
+                PartnerMetadataOrchestrator.class, PartnerMetadataOrchestrator.getInstance());
 
         if (ApplicationContext.getProperty("DB_URL") != null) {
             ApplicationContext.register(DbDao.class, PostgresDao.getInstance());

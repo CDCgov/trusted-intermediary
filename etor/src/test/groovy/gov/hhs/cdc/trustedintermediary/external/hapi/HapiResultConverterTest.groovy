@@ -15,12 +15,12 @@ class HapiResultConverterTest extends Specification {
     Patient mockPatient
     Result<Bundle> mockResult
 
-	def setup() {
-		TestApplicationContext.reset()
-		TestApplicationContext.init()
-		TestApplicationContext.register(ResultConverter, HapiResultConverter.getInstance())
-		TestApplicationContext.register(HapiMessageConverterHelper, HapiMessageConverterHelper.getInstance())
-		TestApplicationContext.injectRegisteredImplementations()
+    def setup() {
+        TestApplicationContext.reset()
+        TestApplicationContext.init()
+        TestApplicationContext.register(ResultConverter, HapiResultConverter.getInstance())
+        TestApplicationContext.register(HapiMessageConverterHelper, HapiMessageConverterHelper.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
 
         mockPatient = new Patient()
         mockResultBundle = new Bundle().addEntry(new Bundle.BundleEntryComponent().setResource(mockPatient))
