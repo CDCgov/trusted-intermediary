@@ -37,10 +37,6 @@ jobs:
       id-token: write
       contents: read
 
-    outputs:
-      REGISTRY: ${{ steps.export-terraform-output.outputs.REGISTRY }}
-      APP: ${{ steps.export-terraform-output.outputs.APP }}
-
     steps:
 
       - uses: actions/checkout@v4
