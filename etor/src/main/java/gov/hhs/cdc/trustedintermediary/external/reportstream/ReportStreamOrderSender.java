@@ -13,9 +13,9 @@ public class ReportStreamOrderSender implements OrderSender {
 
     private static final ReportStreamOrderSender INSTANCE = new ReportStreamOrderSender();
 
-    @Inject private ReportStreamSenderHelper sender;
-    @Inject private HapiFhir fhir;
-    @Inject private Logger logger;
+    @Inject ReportStreamSenderHelper sender;
+    @Inject HapiFhir fhir;
+    @Inject Logger logger;
 
     public static ReportStreamOrderSender getInstance() {
         return INSTANCE;
@@ -27,6 +27,6 @@ public class ReportStreamOrderSender implements OrderSender {
     public Optional<String> send(final Order<?> order) throws UnableToSendMessageException {
         logger.logInfo("Sending the order to ReportStream");
         String json = fhir.encodeResourceToJson(order.getUnderlyingOrder());
-        return sender.sendToReportStream(json, order.getFhirResourceId(), "order");
+        return sender.sendOrderToReportStream(json, order.getFhirResourceId());
     }
 }

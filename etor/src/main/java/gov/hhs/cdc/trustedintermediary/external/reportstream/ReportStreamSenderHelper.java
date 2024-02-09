@@ -15,15 +15,25 @@ import javax.inject.Inject;
 public class ReportStreamSenderHelper {
     private static final ReportStreamSenderHelper INSTANCE = new ReportStreamSenderHelper();
 
-    @Inject private RSEndpointClient rsclient;
-    @Inject private Formatter formatter;
-    @Inject private Logger logger;
+    @Inject RSEndpointClient rsclient;
+    @Inject Formatter formatter;
+    @Inject Logger logger;
     @Inject MetricMetadata metadata;
 
     private ReportStreamSenderHelper() {}
 
     public static ReportStreamSenderHelper getInstance() {
         return INSTANCE;
+    }
+
+    public Optional<String> sendResultToReportStream(String body, String fhirResourceId)
+            throws UnableToSendMessageException {
+        return sendToReportStream(body, fhirResourceId, "result");
+    }
+
+    public Optional<String> sendOrderToReportStream(String body, String fhirResourceId)
+            throws UnableToSendMessageException {
+        return sendToReportStream(body, fhirResourceId, "order");
     }
 
     public Optional<String> sendToReportStream(

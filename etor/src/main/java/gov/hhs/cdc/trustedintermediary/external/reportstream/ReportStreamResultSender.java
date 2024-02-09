@@ -16,9 +16,9 @@ public class ReportStreamResultSender implements ResultSender {
 
     private static final ReportStreamResultSender INSTANCE = new ReportStreamResultSender();
 
-    @Inject private ReportStreamSenderHelper sender;
-    @Inject private HapiFhir fhir;
-    @Inject private Logger logger;
+    @Inject ReportStreamSenderHelper sender;
+    @Inject HapiFhir fhir;
+    @Inject Logger logger;
 
     public static ReportStreamResultSender getInstance() {
         return INSTANCE;
@@ -30,6 +30,6 @@ public class ReportStreamResultSender implements ResultSender {
     public Optional<String> send(Result<?> result) throws UnableToSendMessageException {
         logger.logInfo("Sending results to ReportStream");
         String json = fhir.encodeResourceToJson(result.getUnderlyingResult());
-        return sender.sendToReportStream(json, result.getFhirResourceId(), "result");
+        return sender.sendResultToReportStream(json, result.getFhirResourceId());
     }
 }
