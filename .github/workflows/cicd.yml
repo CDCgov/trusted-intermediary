@@ -20,7 +20,7 @@ jobs:
     uses: ./.github/workflows/terraform-deploy_reusable.yml
     with:
       ENVIRONMENT: stg
-      TERRAFORM_DIRECTORY: operations/environments/staging
+      TERRAFORM_DIRECTORY: operations/environments/stg
     secrets:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CDC_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_CDC_TENANT_ID }}

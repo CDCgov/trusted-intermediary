@@ -17,7 +17,7 @@ jobs:
     uses: ./.github/workflows/terraform-deploy_reusable.yml
     with:
       ENVIRONMENT: prd
-      TERRAFORM_DIRECTORY: operations/environments/prod
+      TERRAFORM_DIRECTORY: operations/environments/prd
     secrets:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CDC_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_CDC_TENANT_ID }}
