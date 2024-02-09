@@ -1,13 +1,13 @@
 # Database
 
 ## Requirements
-Choose a Postgres client, [pgAdmin](https://www.pgadmin.org/) is the most full featured, intelliJ also has a built in plugin.
+Choose a Postgres client, [pgAdmin](https://www.pgadmin.org/) is the most full featured, IntelliJ also has a built-in plugin.
 
 ## Connecting to Local Database
 1. Run the docker file ./docker-compose.postgres.yml in the root of the project
 2. Run the `generate_env.sh` script:
 
-    ```bash
+    ```shell
     ./generate_env.sh
     ```
 
@@ -34,3 +34,41 @@ To modify the schema there are a few locations in the code we need to update.
 1. [Line 77 of this file contains the table creation statements](.github/workflows/terraform-deploy_reusable.yml) To modify column data types or add or remove columns, go there.
 2. The `PostgresDao.java` contains our queries for the database. Remember to update both the save and the fetch methods
 3. `DatabasePartnerMetadataStorage` is what calls our dao to perform the db operation, you will need to update the inputs here
+
+## Database Migrations
+
+We use [Liquibase](https://www.liquibase.com/download) to handle the migrations.  Our migration files are located in
+[`/etor/databaseMigrations`](/etor/databaseMigrations).
+
+### Adding Migrations
+
+Documentation on Liquibase can be found [here](https://docs.liquibase.com/).
+
+For any migrations needed for a backlog item, add a new file to [`/etor/databaseMigrations`](/etor/databaseMigrations)
+with the number of the story.  For example, `753.yml` for
+[backlog item 753](https://github.com/CDCgov/trusted-intermediary/issues/753).  Liquibase supports multiple change log
+file types, but we prefer YAML.  YAML supports specialized change types but also supports arbitrary SQL if the
+flexibility is needed.
+
+A couple of concepts we adhere to...
+1. For each new file, start the `id` at 1 and increment from there.
+2. Use your GitHub username as the `author`.
+3. Provide `comment` that better describes what or why you are trying to accomplish.
+4. If a migration only applies to Azure, include a `label` of `azure`.
+5. Include only one change per `changeSet`.
+
+Reference this new file in [`root.yml`](/etor/databaseMigrations/root.yml) by adding it at the bottom of all the other
+includes except for any includes that are required to be last (e.g. the `etor/databaseMigrations/azure.yml` include).
+
+### Running
+
+Our deployed databases have migrations automatically ran by our CD processes.
+
+To run migrations when running our database locally, run the following...
+
+```shell
+liquibase update --changelog-file ./etor/databaseMigrations/root.yml --url jdbc:postgresql://localhost:5433/intermediary --username intermediary --password 'changeIT!' --label-filter '!azure'
+```
+
+Notice the `--label-filter '!azure'`.  This will prevent the Azure-specific migrations from running and failing in the
+local environment.

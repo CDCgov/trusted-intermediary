@@ -31,6 +31,7 @@ The additional requirements needed to contribute towards development are...
 - [Locust.io](https://docs.locust.io/en/stable/installation.html)
 - [Python](https://docs.python-guide.org/starting/installation/)
 - [Terraform](https://www.terraform.io)
+- [Liquibase](https://www.liquibase.com/download)
 
 ### Generating .env File
 
