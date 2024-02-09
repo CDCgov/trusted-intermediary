@@ -37,6 +37,7 @@ import gov.hhs.cdc.trustedintermediary.external.localfile.MockRSEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamResultSender;
+import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamSenderHelper;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -104,6 +105,8 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(ResultSender.class, ReportStreamResultSender.getInstance());
         ApplicationContext.register(ResultController.class, ResultController.getInstance());
         ApplicationContext.register(SendResultUseCase.class, SendResultUseCase.getInstance());
+        ApplicationContext.register(
+                ReportStreamSenderHelper.class, ReportStreamSenderHelper.getInstance());
 
         if (ApplicationContext.getProperty("DB_URL") != null) {
             ApplicationContext.register(DbDao.class, PostgresDao.getInstance());
