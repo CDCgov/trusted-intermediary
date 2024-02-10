@@ -20,7 +20,13 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
 
     @Override
     public void convertAndSend(Result<?> result) throws UnableToSendMessageException {
+
+        // savePartnerMetadataForReceivedResult(receivedSubmissionId, result)
         var convertedResult = converter.addEtorProcessingTag(result);
-        sender.send(convertedResult);
+        // metadata.put(result.getFhirResourceId(),
+        // EtorMetadataStep.ETOR_PROCESSING_TAG_ADDED_TO_MESSAGE_HEADER);
+        sender.send(convertedResult); // var bundleId = sender.send(convertedResult).orElse(null),
+        // thoughts?
+        // saveSentResultSubmissionId(receivedSubmissionId, bundleId)
     }
 }
