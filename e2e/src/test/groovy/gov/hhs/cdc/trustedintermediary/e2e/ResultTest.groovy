@@ -48,7 +48,7 @@ class ResultTest extends Specification {
         def parsedSentPayload = JsonParsing.parse(sentPayload)
 
         then:
-        //test that the MessageHeader's event is now an OML_O21
+        //test that the MessageHeader's event is now an ORU_R01
         parsedSentPayload.entry[0].resource.resourceType == "MessageHeader"
         parsedSentPayload.entry[0].resource.eventCoding.code == "R01"
         parsedSentPayload.entry[0].resource.eventCoding.display.contains("ORU")
