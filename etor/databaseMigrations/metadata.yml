@@ -8,6 +8,9 @@ databaseChangeLog:
       changes:
        - sql:
            sql: CREATE TYPE message_status AS ENUM ('PENDING', 'DELIVERED', 'FAILED')
+      rollback:
+        - sql:
+            sql: DROP TYPE message_status
 
   - changeSet:
       id: 2
