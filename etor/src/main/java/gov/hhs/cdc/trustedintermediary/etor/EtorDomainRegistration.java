@@ -25,13 +25,16 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.results.Result;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultController;
+import gov.hhs.cdc.trustedintermediary.etor.results.ResultConverter;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultResponse;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultSender;
 import gov.hhs.cdc.trustedintermediary.etor.results.SendResultUseCase;
 import gov.hhs.cdc.trustedintermediary.external.database.DatabasePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.DbDao;
 import gov.hhs.cdc.trustedintermediary.external.database.PostgresDao;
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiMessageConverterHelper;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiResultConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.FilePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.localfile.MockRSEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClient;
@@ -91,22 +94,30 @@ public class EtorDomainRegistration implements DomainConnector {
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
+        // Demographics
         ApplicationContext.register(
                 PatientDemographicsController.class, PatientDemographicsController.getInstance());
         ApplicationContext.register(
                 ConvertAndSendDemographicsUsecase.class,
                 ConvertAndSendDemographicsUsecase.getInstance());
+        // Orders
         ApplicationContext.register(OrderConverter.class, HapiOrderConverter.getInstance());
         ApplicationContext.register(OrderController.class, OrderController.getInstance());
         ApplicationContext.register(SendOrderUseCase.class, SendOrderUseCase.getInstance());
         ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
-        ApplicationContext.register(
-                PartnerMetadataOrchestrator.class, PartnerMetadataOrchestrator.getInstance());
-        ApplicationContext.register(ResultSender.class, ReportStreamResultSender.getInstance());
+        // Results
+        ApplicationContext.register(ResultConverter.class, HapiResultConverter.getInstance());
         ApplicationContext.register(ResultController.class, ResultController.getInstance());
         ApplicationContext.register(SendResultUseCase.class, SendResultUseCase.getInstance());
+        ApplicationContext.register(ResultSender.class, ReportStreamResultSender.getInstance());
+        // Message
+        ApplicationContext.register(
+                HapiMessageConverterHelper.class, HapiMessageConverterHelper.getInstance());
         ApplicationContext.register(
                 ReportStreamSenderHelper.class, ReportStreamSenderHelper.getInstance());
+        // Metadata
+        ApplicationContext.register(
+                PartnerMetadataOrchestrator.class, PartnerMetadataOrchestrator.getInstance());
 
         if (ApplicationContext.getProperty("DB_URL") != null) {
             ApplicationContext.register(DbDao.class, PostgresDao.getInstance());

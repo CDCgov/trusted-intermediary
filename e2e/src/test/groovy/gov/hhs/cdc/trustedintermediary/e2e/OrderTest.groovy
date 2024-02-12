@@ -40,6 +40,27 @@ class OrderTest extends Specification {
         parsedSentPayload.entry[24].resource.contact.name.text.contains("SADIE S SMITH")
     }
 
+    def "check that ETOR processing code is added to the order before sending to report stream"() {
+        given:
+        var loginFirst = true
+        def expectedSystem = "http://localcodes.org/ETOR"
+        def expectedCode = "ETOR"
+        def expectedDisplay = "Processed by ETOR"
+
+        when:
+        orderClient.submit(labOrderJsonFileString, submissionId, loginFirst)
+        def sentPayload = SentPayloadReader.read()
+        def parsedSentPayLoad = JsonParsing.parse(sentPayload)
+        def actualSystem = parsedSentPayLoad.entry[0].resource.meta.tag[1].system
+        def actualCode = parsedSentPayLoad.entry[0].resource.meta.tag[1].code
+        def actualDisplay = parsedSentPayLoad.entry[0].resource.meta.tag[1].display
+
+        then:
+        actualSystem == expectedSystem
+        actualCode == expectedCode
+        actualDisplay == expectedDisplay
+    }
+
     def "check that the rest of the message is unchanged except the parts we changed"() {
         when:
         orderClient.submit(labOrderJsonFileString, submissionId, true)
@@ -48,10 +69,11 @@ class OrderTest extends Specification {
         def parsedLabOrderJsonFile = JsonParsing.parse(labOrderJsonFileString)
 
         then:
-        //test that everything else is the same except the MessageHeader's event and Patient contact
+        //test that everything else is the same except the MessageHeader's event, Patient contact, and etor processing tag
         parsedSentPayload.entry[0].resource.remove("eventCoding")
         parsedLabOrderJsonFile.entry[0].resource.remove("eventCoding")
         parsedSentPayload.entry[24].resource.remove("contact")
+        parsedSentPayload.entry[0].resource.meta.tag.remove(1)
 
         parsedSentPayload == parsedLabOrderJsonFile
     }

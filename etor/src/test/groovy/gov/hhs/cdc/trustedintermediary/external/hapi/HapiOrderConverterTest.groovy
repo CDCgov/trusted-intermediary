@@ -35,6 +35,7 @@ class HapiOrderConverterTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(OrderConverter, HapiOrderConverter.getInstance())
+        TestApplicationContext.register(HapiMessageConverterHelper, HapiMessageConverterHelper.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         mockPatient = new Patient()
@@ -226,6 +227,32 @@ class HapiOrderConverterTest extends Specification {
         contactSectionAddress.getCity() == convertedPatientAddress.getCity()
         contactSectionAddress.getPostalCode() == convertedPatientAddress.getPostalCode()
     }
+
+    def "add etor processing tag to messageHeader resource"() {
+        given:
+        def expectedSystem = "http://localcodes.org/ETOR"
+        def expectedCode = "ETOR"
+        def expectedDisplay = "Processed by ETOR"
+
+        def messageHeader = new MessageHeader()
+        messageHeader.setId(UUID.randomUUID().toString())
+        def messageHeaderEntry = new Bundle.BundleEntryComponent().setResource(messageHeader)
+        mockOrderBundle.getEntry().add(1, messageHeaderEntry)
+        mockOrder.getUnderlyingOrder() >> mockOrderBundle
+
+        when:
+        def convertedOrderBundle = HapiOrderConverter.getInstance().addEtorProcessingTag(mockOrder).getUnderlyingOrder() as Bundle
+
+        then:
+        def messageHeaders = convertedOrderBundle.getEntry().get(1).getResource() as MessageHeader
+        def actualSystem = messageHeaders.getMeta().getTag()[0].getSystem()
+        def actualCode = messageHeaders.getMeta().getTag()[0].getCode()
+        def actualDisplay = messageHeaders.getMeta().getTag()[0].getDisplay()
+        actualSystem == expectedSystem
+        actualCode == expectedCode
+        actualDisplay == expectedDisplay
+    }
+
 
     def "no humanName section in contact"() {
         given:

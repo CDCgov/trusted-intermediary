@@ -45,6 +45,8 @@ public class HapiOrderConverter implements OrderConverter {
 
     @Inject Logger logger;
 
+    @Inject HapiMessageConverterHelper hapiMessageConverterHelper;
+
     public static HapiOrderConverter getInstance() {
         return INSTANCE;
     }
@@ -99,16 +101,7 @@ public class HapiOrderConverter implements OrderConverter {
 
         var hapiOrder = (Order<Bundle>) order;
         var orderBundle = hapiOrder.getUnderlyingOrder();
-
-        var messageHeader =
-                HapiHelper.resourcesInBundle(orderBundle, MessageHeader.class)
-                        .findFirst()
-                        .orElse(null);
-
-        if (messageHeader == null) {
-            messageHeader = new MessageHeader();
-            orderBundle.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader));
-        }
+        var messageHeader = hapiMessageConverterHelper.findOrInitializeMessageHeader(orderBundle);
 
         messageHeader.setEvent(OML_CODING);
 
@@ -152,13 +145,12 @@ public class HapiOrderConverter implements OrderConverter {
 
         messageHeader.setEvent(OML_CODING);
 
-        messageHeader.setMeta(
-                new Meta()
-                        .addTag(
-                                new Coding(
-                                        "http://terminology.hl7.org/CodeSystem/v2-0103",
-                                        "P",
-                                        "Production")));
+        var meta = new Meta();
+
+        // Adding processing id of 'P'
+        meta.addTag("http://terminology.hl7.org/CodeSystem/v2-0103", "P", "Production");
+
+        messageHeader.setMeta(meta);
 
         messageHeader.setSource(
                 new MessageHeader.MessageSourceComponent(
@@ -166,6 +158,16 @@ public class HapiOrderConverter implements OrderConverter {
                         .setName("CDC Trusted Intermediary"));
 
         return messageHeader;
+    }
+
+    @Override
+    public Order<?> addEtorProcessingTag(Order<?> message) {
+        var hapiOrder = (Order<Bundle>) message;
+        var messageBundle = hapiOrder.getUnderlyingOrder();
+
+        hapiMessageConverterHelper.addEtorTagToBundle(messageBundle);
+
+        return new HapiOrder(messageBundle);
     }
 
     private ServiceRequest createServiceRequest(final Patient patient, final Date orderDateTime) {
