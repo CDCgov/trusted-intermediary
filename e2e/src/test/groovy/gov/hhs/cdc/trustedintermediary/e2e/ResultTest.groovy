@@ -29,7 +29,6 @@ class ResultTest extends Specification {
         parsedJsonBody.fhirResourceId == expectedFhirResourceId
     }
 
-    // Will progress on these tests when sending data to RS
     def "check that the rest of the message is unchanged except the parts we changed"() {
         when:
         resultClient.submit(labResultJsonFileString, submissionId, true)
@@ -38,7 +37,7 @@ class ResultTest extends Specification {
         def parsedLabResultJsonFile = JsonParsing.parse(labResultJsonFileString)
 
         then:
-        parsedSentPayload.entry[0].resource.meta.tag.remove(1)
+        parsedSentPayload.entry[0].resource.meta.tag.remove(1) // Remove ETOR meta tagging from tests
         parsedSentPayload == parsedLabResultJsonFile
     }
 
@@ -53,6 +52,10 @@ class ResultTest extends Specification {
         parsedSentPayload.entry[0].resource.resourceType == "MessageHeader"
         parsedSentPayload.entry[0].resource.eventCoding.code == "R01"
         parsedSentPayload.entry[0].resource.eventCoding.display.contains("ORU")
+        def etorHeader = parsedSentPayload.entry[0].resource.meta.tag.get(1)
+        etorHeader.system == "http://localcodes.org/ETOR"
+        etorHeader.code == "ETOR"
+        etorHeader.display == "Processed by ETOR"
     }
 
     def "return a 400 response when request has unexpected format"() {
