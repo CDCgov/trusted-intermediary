@@ -11,6 +11,7 @@ class HapiMessageConverterHelperTest extends Specification {
     Patient mockPatient
 
     def setup() {
+        mockBundle = null
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(HapiMessageConverterHelper, HapiMessageConverterHelper.getInstance())
