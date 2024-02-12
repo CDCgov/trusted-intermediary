@@ -42,18 +42,18 @@ class ResultTest extends Specification {
         parsedSentPayload == parsedLabResultJsonFile
     }
 
-    	def "check that message type is converted to ORU_R01"() {
-    		when:
-    		resultClient.submit(labResultJsonFileString, submissionId, true)
-    		def sentPayload = SentPayloadReader.read()
-    		def parsedSentPayload = JsonParsing.parse(sentPayload)
+    def "check that message type is converted to ORU_R01"() {
+        when:
+        resultClient.submit(labResultJsonFileString, submissionId, true)
+        def sentPayload = SentPayloadReader.read()
+        def parsedSentPayload = JsonParsing.parse(sentPayload)
 
-    		then:
-    		//test that the MessageHeader's event is now an OML_O21
-    		parsedSentPayload.entry[0].resource.resourceType == "MessageHeader"
-    		parsedSentPayload.entry[0].resource.eventCoding.code == "R01"
-    		parsedSentPayload.entry[0].resource.eventCoding.display.contains("ORU")
-    	}
+        then:
+        //test that the MessageHeader's event is now an OML_O21
+        parsedSentPayload.entry[0].resource.resourceType == "MessageHeader"
+        parsedSentPayload.entry[0].resource.eventCoding.code == "R01"
+        parsedSentPayload.entry[0].resource.eventCoding.display.contains("ORU")
+    }
 
     def "return a 400 response when request has unexpected format"() {
         given:
