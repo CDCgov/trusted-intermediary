@@ -10,9 +10,9 @@ class ResultMock<T> implements Result<T> {
     private String fhirResourceId
     private T underlyingResult
 
-    ResultMock(String fhirResourceId, T underlyingResults) {
+    ResultMock(String fhirResourceId, T underlyingResult) {
         this.fhirResourceId = fhirResourceId
-        this.underlyingResult = underlyingResults
+        this.underlyingResult = underlyingResult
     }
 
     @Override

@@ -40,6 +40,7 @@ import gov.hhs.cdc.trustedintermediary.external.localfile.MockRSEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamResultSender;
+import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamSenderHelper;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -112,6 +113,8 @@ public class EtorDomainRegistration implements DomainConnector {
         // Message
         ApplicationContext.register(
                 HapiMessageConverterHelper.class, HapiMessageConverterHelper.getInstance());
+        ApplicationContext.register(
+                ReportStreamSenderHelper.class, ReportStreamSenderHelper.getInstance());
         // Metadata
         ApplicationContext.register(
                 PartnerMetadataOrchestrator.class, PartnerMetadataOrchestrator.getInstance());
