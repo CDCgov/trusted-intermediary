@@ -9,3 +9,4 @@ databaseChangeLog:
       changes:
         - sql:
             sql: REASSIGN OWNED BY CURRENT_USER TO azure_pg_admin
+      rollback: empty
