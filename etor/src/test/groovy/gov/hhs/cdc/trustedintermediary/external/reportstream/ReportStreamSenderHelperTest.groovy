@@ -19,23 +19,30 @@ class ReportStreamSenderHelperTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(ReportStreamSenderHelper, ReportStreamSenderHelper.getInstance())
-        TestApplicationContext.register(RSEndpointClient, MockRSEndpointClient.getInstance())
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
     }
 
     def "sendToReportStream works"() {
         given:
+        def requestBody = "testBody"
+        def bearerToken = "fake-token"
+        def responseBody = """{"submissionId": "fake-id"}"""
+
         def mockFormatter = Mock(Formatter)
-        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Map.of('submissionId', 'fake-id')
         TestApplicationContext.register(Formatter, mockFormatter)
+
+        def mockRsClient = Mock(RSEndpointClient)
+        TestApplicationContext.register(RSEndpointClient, mockRsClient)
 
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        ReportStreamSenderHelper.getInstance().sendToReportStream(_ as String, _ as String, _ as String)
+        ReportStreamSenderHelper.getInstance().sendToReportStream(requestBody, _ as String, _ as String)
 
         then:
-        noExceptionThrown()
+        1 * mockRsClient.getRsToken() >> "fake-token"
+        1 * mockRsClient.requestWatersEndpoint(requestBody, bearerToken) >> responseBody
+        1 * mockFormatter.convertJsonToObject(responseBody, _ as TypeReference) >> [submissionId: "fake-id"]
         1 * ReportStreamSenderHelper.getInstance().metadata.put(_, EtorMetadataStep.SENT_TO_REPORT_STREAM)
     }
 
@@ -104,7 +111,6 @@ class ReportStreamSenderHelperTest extends Specification {
         def submissionId = ReportStreamSenderHelper.getInstance().getSubmissionId(mockResponseBody)
 
         then:
-        noExceptionThrown()
         submissionId.get() == mockSubmissionId
     }
 
