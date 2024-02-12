@@ -11,6 +11,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemograph
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageRequestHandler;
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException;
@@ -170,42 +171,28 @@ public class EtorDomainRegistration implements DomainConnector {
     }
 
     DomainResponse handleOrders(DomainRequest request) {
-        Order<?> orders;
+        return handleMessageRequest(
+                request,
+                (receivedSubmissionId) -> {
+                    Order<?> orders = orderController.parseOrders(request);
+                    sendOrderUseCase.convertAndSend(orders, receivedSubmissionId);
+                    return domainResponseHelper.constructOkResponse(new OrderResponse(orders));
+                },
+                "order");
+    }
 
-        String receivedSubmissionId = request.getHeaders().get("recordid");
-        if (receivedSubmissionId == null || receivedSubmissionId.isEmpty()) {
-            receivedSubmissionId = null;
-            logger.logError("Missing required header or empty: RecordId");
-        }
-
-        var markMetadataAsFailed = false;
-        String errorMessage = "";
-        try {
-            orders = orderController.parseOrders(request);
-            sendOrderUseCase.convertAndSend(orders, receivedSubmissionId);
-        } catch (FhirParseException e) {
-            errorMessage = "Unable to parse order request";
-            logger.logError(errorMessage, e);
-            markMetadataAsFailed = true;
-            return domainResponseHelper.constructErrorResponse(400, e);
-        } catch (UnableToSendMessageException e) {
-            errorMessage = "Unable to send order";
-            logger.logError(errorMessage, e);
-            markMetadataAsFailed = true;
-            return domainResponseHelper.constructErrorResponse(400, e);
-        } finally {
-            if (markMetadataAsFailed) {
-                try {
-                    partnerMetadataOrchestrator.setMetadataStatusToFailed(
-                            receivedSubmissionId, errorMessage);
-                } catch (PartnerMetadataException innerE) {
-                    logger.logError("Unable to update metadata status", innerE);
-                }
-            }
-        }
-
-        OrderResponse orderResponse = new OrderResponse(orders);
-        return domainResponseHelper.constructOkResponse(orderResponse);
+    DomainResponse handleResults(DomainRequest request) {
+        return handleMessageRequest(
+                request,
+                (receivedSubmissionId) -> {
+                    Result<?> results = resultController.parseResults(request);
+                    sendResultUseCase.convertAndSend(results);
+                    logger.logInfo(
+                            "Successful result parsing of FHIR resource: "
+                                    + results.getFhirResourceId());
+                    return domainResponseHelper.constructOkResponse(new ResultResponse(results));
+                },
+                "results");
     }
 
     DomainResponse handleMetadata(DomainRequest request) {
@@ -232,32 +219,6 @@ public class EtorDomainRegistration implements DomainConnector {
         }
     }
 
-    DomainResponse handleResults(DomainRequest request) {
-        Result<?> results;
-
-        String receivedSubmissionId = request.getHeaders().get("recordid");
-        if (receivedSubmissionId == null || receivedSubmissionId.isEmpty()) {
-            receivedSubmissionId = null;
-            logger.logError("Missing required header or empty: RecordId");
-        }
-
-        try {
-            results = resultController.parseResults(request);
-            sendResultUseCase.convertAndSend(results);
-        } catch (FhirParseException e) {
-            logger.logError("Unable to parse result request", e);
-            return domainResponseHelper.constructErrorResponse(400, e);
-        } catch (UnableToSendMessageException e) {
-            logger.logError("Unable to send result", e);
-            return domainResponseHelper.constructErrorResponse(400, e);
-        }
-
-        ResultResponse resultResponse = new ResultResponse(results);
-        logger.logInfo(
-                "Successful result parsing of FHIR resource: " + results.getFhirResourceId());
-        return domainResponseHelper.constructOkResponse(resultResponse);
-    }
-
     DomainResponse handleConsolidatedSummary(DomainRequest request) {
 
         Map<String, Map<String, Object>> metadata;
@@ -273,5 +234,47 @@ public class EtorDomainRegistration implements DomainConnector {
         }
 
         return domainResponseHelper.constructOkResponse(metadata);
+    }
+
+    protected DomainResponse handleMessageRequest(
+            DomainRequest request,
+            MessageRequestHandler<DomainResponse> requestHandler,
+            String messageType) {
+        String receivedSubmissionId = getReceivedSubmissionId(request);
+        boolean markMetadataAsFailed = false;
+        String errorMessage = "";
+
+        try {
+            return requestHandler.handle(receivedSubmissionId);
+        } catch (FhirParseException e) {
+            errorMessage = "Unable to parse " + messageType + " request";
+            logger.logError(errorMessage, e);
+            markMetadataAsFailed = true;
+            return domainResponseHelper.constructErrorResponse(400, e);
+        } catch (UnableToSendMessageException e) {
+            errorMessage = "Unable to send " + messageType;
+            logger.logError(errorMessage, e);
+            markMetadataAsFailed = true;
+            return domainResponseHelper.constructErrorResponse(400, e);
+        } finally {
+            if (markMetadataAsFailed) {
+                try {
+                    partnerMetadataOrchestrator.setMetadataStatusToFailed(
+                            receivedSubmissionId, errorMessage);
+                } catch (PartnerMetadataException innerE) {
+                    logger.logError("Unable to update metadata status", innerE);
+                }
+            }
+        }
+    }
+
+    protected String getReceivedSubmissionId(DomainRequest request) {
+
+        String receivedSubmissionId = request.getHeaders().get("recordid");
+        if (receivedSubmissionId == null || receivedSubmissionId.isEmpty()) {
+            logger.logError("Missing required header or empty: RecordId");
+            return null;
+        }
+        return receivedSubmissionId;
     }
 }
