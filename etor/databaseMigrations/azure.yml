@@ -1,3 +1,4 @@
+# This file is for Azure specific migration scenarios. All changesets in this file should have the azure label on them, this is what we use to filter them out when running migrations in non-cloud environments It is run last of all the files in our repo.
 databaseChangeLog:
   - changeSet:
       id: 1

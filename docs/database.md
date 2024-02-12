@@ -72,3 +72,16 @@ liquibase update --changelog-file ./etor/databaseMigrations/root.yml --url jdbc:
 
 Notice the `--label-filter '!azure'`.  This will prevent the Azure-specific migrations from running and failing in the
 local environment.
+
+### Reverting changes
+To revert changes in the Azure database we use The Github Actions runner.
+1. Find the runner named Rollback DB in the repository under the `Actions` tab
+2. Select Run workflow
+3. Run the workflow (Example inputs below)
+   - Use workflow from: Always Main
+   - Number of migrations to rollback, an integer that is specific to the file input
+   - File with migrations you want to roll back: This should be the file containing the specific sub-file in the `databaseMigrations` directory you want to rollback from EX: `./etor/databaseMigrations/metadata.yml`
+   - Azure environment to rollback on: Select the environment you want to see the changes reverted from
+4. Once you have the inputs entered select Run Workflow on the tab and the workflow should start up
+
+To rollback changes locally use the `rollback-count` command and pass in an argument for the number of rollbacks using `--count=?`

@@ -1,6 +1,7 @@
 databaseChangeLog:
   - include:
       file: etor/databaseMigrations/metadata.yml
+      # Please put all other migrations above this comment
   - include:
       file: etor/databaseMigrations/azure.yml
       comment: This include should always be last in this list
