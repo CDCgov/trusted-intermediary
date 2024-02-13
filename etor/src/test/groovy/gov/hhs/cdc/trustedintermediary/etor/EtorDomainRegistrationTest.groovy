@@ -422,7 +422,7 @@ class EtorDomainRegistrationTest extends Specification {
         1 * mockLogger.logError(_ as String, _ as Exception)
 
         when:
-        requestHandler.handle(_ as String) >> { throw new FhirParseException("DogCow", new NullPointerException()) }
+        requestHandler.handle(_ as String) >> { throw new UnableToSendMessageException("DogCow", new NullPointerException()) }
         response = connector.handleMessageRequest(request, requestHandler, _ as String, false)
 
         then:
