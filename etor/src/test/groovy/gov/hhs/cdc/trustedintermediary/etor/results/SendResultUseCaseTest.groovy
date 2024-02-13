@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.ResultMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageUseCase
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException
+import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import spock.lang.Specification
 
 class SendResultUseCaseTest extends Specification {
@@ -17,6 +18,7 @@ class SendResultUseCaseTest extends Specification {
         TestApplicationContext.register(SendMessageUseCase, SendResultUseCase.getInstance())
         TestApplicationContext.register(ResultConverter, mockConverter)
         TestApplicationContext.register(ResultSender, mockSender)
+        TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
         TestApplicationContext.injectRegisteredImplementations()
     }
 
@@ -29,8 +31,7 @@ class SendResultUseCaseTest extends Specification {
 
         then:
         1 * mockConverter.addEtorProcessingTag(mockResult) >> mockResult
-        1 * mockSender.send(mockResult) >> Optional.empty()
-        noExceptionThrown()
+        1 * mockSender.send(mockResult) >> Optional.of("sentSubmissionId")
     }
 
     def "convertAndSend throws exception when send fails"() {
