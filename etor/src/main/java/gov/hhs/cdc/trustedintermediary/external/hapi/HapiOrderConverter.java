@@ -17,7 +17,6 @@ import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
-import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.OperationOutcome;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Provenance;
@@ -144,13 +143,6 @@ public class HapiOrderConverter implements OrderConverter {
         messageHeader.setId(UUID.randomUUID().toString());
 
         messageHeader.setEvent(OML_CODING);
-
-        var meta = new Meta();
-
-        // Adding processing id of 'P'
-        meta.addTag("http://terminology.hl7.org/CodeSystem/v2-0103", "P", "Production");
-
-        messageHeader.setMeta(meta);
 
         messageHeader.setSource(
                 new MessageHeader.MessageSourceComponent(
