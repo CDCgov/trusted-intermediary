@@ -173,7 +173,7 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleOrders(DomainRequest request) {
         return handleMessageRequest(
                 request,
-                (receivedSubmissionId) -> {
+                receivedSubmissionId -> {
                     Order<?> orders = orderController.parseOrders(request);
                     sendOrderUseCase.convertAndSend(orders, receivedSubmissionId);
                     return domainResponseHelper.constructOkResponse(new OrderResponse(orders));
@@ -185,7 +185,7 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleResults(DomainRequest request) {
         return handleMessageRequest(
                 request,
-                (receivedSubmissionId) -> {
+                receivedSubmissionId -> {
                     Result<?> results = resultController.parseResults(request);
                     sendResultUseCase.convertAndSend(results);
                     return domainResponseHelper.constructOkResponse(new ResultResponse(results));
