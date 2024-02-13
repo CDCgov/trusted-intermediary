@@ -178,7 +178,8 @@ public class EtorDomainRegistration implements DomainConnector {
                     sendOrderUseCase.convertAndSend(orders, receivedSubmissionId);
                     return domainResponseHelper.constructOkResponse(new OrderResponse(orders));
                 },
-                "order");
+                "order",
+                true);
     }
 
     DomainResponse handleResults(DomainRequest request) {
@@ -187,12 +188,10 @@ public class EtorDomainRegistration implements DomainConnector {
                 (receivedSubmissionId) -> {
                     Result<?> results = resultController.parseResults(request);
                     sendResultUseCase.convertAndSend(results);
-                    logger.logInfo(
-                            "Successful result parsing of FHIR resource: "
-                                    + results.getFhirResourceId());
                     return domainResponseHelper.constructOkResponse(new ResultResponse(results));
                 },
-                "results");
+                "results",
+                false);
     }
 
     DomainResponse handleMetadata(DomainRequest request) {
@@ -239,7 +238,8 @@ public class EtorDomainRegistration implements DomainConnector {
     protected DomainResponse handleMessageRequest(
             DomainRequest request,
             MessageRequestHandler<DomainResponse> requestHandler,
-            String messageType) {
+            String messageType,
+            boolean doUpdatePartnerMetadata) {
         String receivedSubmissionId = getReceivedSubmissionId(request);
         boolean markMetadataAsFailed = false;
         String errorMessage = "";
@@ -257,7 +257,7 @@ public class EtorDomainRegistration implements DomainConnector {
             markMetadataAsFailed = true;
             return domainResponseHelper.constructErrorResponse(400, e);
         } finally {
-            if (markMetadataAsFailed) {
+            if (doUpdatePartnerMetadata && markMetadataAsFailed) {
                 try {
                     partnerMetadataOrchestrator.setMetadataStatusToFailed(
                             receivedSubmissionId, errorMessage);
