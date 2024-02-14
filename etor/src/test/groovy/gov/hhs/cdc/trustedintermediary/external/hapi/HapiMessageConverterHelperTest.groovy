@@ -9,6 +9,9 @@ class HapiMessageConverterHelperTest extends Specification {
 
     Bundle mockBundle
     Patient mockPatient
+    def expectedSystem = "http://localcodes.org/ETOR"
+    def expectedCode = "ETOR"
+    def expectedDisplay = "Processed by ETOR"
 
     def setup() {
         mockBundle = null
@@ -23,10 +26,6 @@ class HapiMessageConverterHelperTest extends Specification {
 
     def "addEtorTag adds the ETOR message header tag to any Bundle"() {
         given:
-        def expectedSystem = "http://localcodes.org/ETOR"
-        def expectedCode = "ETOR"
-        def expectedDisplay = "Processed by ETOR"
-
         def messageHeader = new MessageHeader()
         messageHeader.setId(UUID.randomUUID().toString())
         def messageHeaderEntry = new Bundle.BundleEntryComponent().setResource(messageHeader)
@@ -45,11 +44,6 @@ class HapiMessageConverterHelperTest extends Specification {
     }
 
     def "addEtorTag adds the ETOR message header tag to any Bundle when message header is missing"() {
-        given:
-        def expectedSystem = "http://localcodes.org/ETOR"
-        def expectedCode = "ETOR"
-        def expectedDisplay = "Processed by ETOR"
-
         when:
         HapiMessageConverterHelper.getInstance().addEtorTagToBundle(mockBundle) as Bundle
 
@@ -67,9 +61,6 @@ class HapiMessageConverterHelperTest extends Specification {
         def firstExpectedSystem = "a system"
         def firstExpectedCode = "test"
         def firstExpectedDisplay = "Processed by tests"
-        def secondExpectedSystem = "http://localcodes.org/ETOR"
-        def secondExpectedCode = "ETOR"
-        def secondExpectedDisplay = "Processed by ETOR"
 
         def messageHeader = new MessageHeader()
         messageHeader.setId(UUID.randomUUID().toString())
@@ -91,8 +82,29 @@ class HapiMessageConverterHelperTest extends Specification {
         firstActualMessageTag.getCode() == firstExpectedCode
         firstActualMessageTag.getDisplay() == firstExpectedDisplay
 
-        secondActualMessageTag.getSystem() == secondExpectedSystem
-        secondActualMessageTag.getCode() == secondExpectedCode
-        secondActualMessageTag.getDisplay() == secondExpectedDisplay
+        secondActualMessageTag.getSystem() == expectedSystem
+        secondActualMessageTag.getCode() == expectedCode
+        secondActualMessageTag.getDisplay() == expectedDisplay
+    }
+
+
+    def "addEtorTag adds the ETOR header tag only once"() {
+        given:
+        def etorTag = new Coding(expectedSystem, expectedCode, expectedDisplay)
+
+        def messageHeader = new MessageHeader()
+        messageHeader.setId(UUID.randomUUID().toString())
+        def messageHeaderEntry = new Bundle.BundleEntryComponent().setResource(messageHeader)
+        mockBundle.getEntry().add(messageHeaderEntry)
+
+        def converter = HapiMessageConverterHelper.getInstance()
+
+        when:
+        converter.addEtorTagToBundle(mockBundle)
+        messageHeader.getMeta().getTag().findAll {it.system == etorTag.system}.size() == 1
+        converter.addEtorTagToBundle(mockBundle)
+
+        then:
+        messageHeader.getMeta().getTag().findAll {it.system == etorTag.system}.size() == 1
     }
 }

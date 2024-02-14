@@ -33,7 +33,14 @@ public class HapiMessageConverterHelper {
         var messageHeader = findOrInitializeMessageHeader(messageBundle);
         var meta = messageHeader.hasMeta() ? messageHeader.getMeta() : new Meta();
 
-        meta.addTag(new Coding("http://localcodes.org/ETOR", "ETOR", "Processed by ETOR"));
+        var systemValue = "http://localcodes.org/ETOR";
+        var codeValue = "ETOR";
+        var displayValue = "Processed by ETOR";
+
+        if (meta.getTag(systemValue, codeValue) == null) {
+            meta.addTag(new Coding(systemValue, codeValue, displayValue));
+        }
+
         messageHeader.setMeta(meta);
     }
 
