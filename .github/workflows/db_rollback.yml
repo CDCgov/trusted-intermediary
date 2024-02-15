@@ -65,7 +65,7 @@ jobs:
           echo "DATABASE_PASSWORD=$DATABASE_PASSWORD" >> "$GITHUB_ENV"
 
       - name: Run Db Rollback
-        uses: liquibase-github-actions/rollback-count@v4.25.1
+        uses: liquibase-github-actions/rollback-count@v4.26.0
         with:
           changelogFile: ${{ github.event.inputs.rollbackFile }}
           count: ${{ github.event.inputs.rollbackCount }}
