@@ -86,7 +86,7 @@ jobs:
           echo "DATABASE_PASSWORD=$DATABASE_PASSWORD" >> "$GITHUB_ENV"
 
       - name: Run Db migration
-        uses: liquibase-github-actions/update@v4.25.1
+        uses: liquibase-github-actions/update@v4.26.0
         with:
           changelogFile: ./etor/databaseMigrations/root.yml
           url: "jdbc:postgresql://${{ env.DATABASE_HOSTNAME }}:5432/postgres"
