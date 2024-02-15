@@ -3,13 +3,14 @@
 # Define the content of the .env file
 
 
+
 env_content="ENV=local
 KEY_VAULT-NAME=ti-key-vault-name
 REPORT_STREAM_URL_PREFIX=http://localhost:7071
 STORAGE_ACCOUNT_BLOB_ENDPOINT=https://cdctiinternal.blob.core.windows.net
 METADATA_CONTAINER_NAME=metadata
-DB_URL=localhost
-DB_PORT=5433
+DB_URL=postgresql # for gradlew: DB_URL=localhost
+DB_PORT=5432      # for gradlew: DB_PORT=5433
 DB_NAME=intermediary
 DB_USER=intermediary
 DB_PASS=changeIT!
