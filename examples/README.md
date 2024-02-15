@@ -27,9 +27,9 @@
 - [003_MN_ORM_O01_NBS_extended.hl7](/examples/MN/003_MN_ORM_O01_NBS_extended.hl7)
 - [003_MN_ORM_O01_NBS_simplified.hl7](/examples/MN/003_MN_ORM_O01_NBS_simplified.hl7)
 - [004_MN_ORU_R01_NBS_0_initial_message.hl7](examples/MN/004_MN_ORU_R01_NBS_0_initial_message.hl7)
-- [004_MN_ORU_R01_NBS_1_translation_from_initial_hl7_ingestion.fhir](/examples/MN/004_MN_ORU_R01_NBS_1_translation_from_initial_hl7_ingestion.fhir)
-- [004_MN_ORU_R01_NBS_2_transformation_from_initial_fhir_translation.fhir](/examples/MN/004_MN_ORU_R01_NBS_2_transformation_from_initial_fhir_translation.fhir)
-- [004_MN_ORU_R01_NBS_3_translation_from_fhir_for_final_delivery.hl7](/examples/MN/004_MN_ORU_R01_NBS_3_translation_from_fhir_for_final_delivery.hl7)
+- [004_MN_ORU_R01_NBS_1_hl7_translation.fhir](/examples/MN/004_MN_ORU_R01_NBS_1_hl7_translation.fhir)
+- [004_MN_ORU_R01_NBS_2_fhir_transformation.fhir](/examples/MN/004_MN_ORU_R01_NBS_2_fhir_transformation.fhir)
+- [004_MN_ORU_R01_NBS_3_hl7_translation_final.hl7](/examples/MN/004_MN_ORU_R01_NBS_3_hl7_translation_final.hl7)
 - [005_MN_ADT_A01.hl7](/examples/MN/005_MN_ADT_A01.hl7)
 
 #### Tennessee
