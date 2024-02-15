@@ -13,7 +13,7 @@ resource "azurerm_service_plan" "plan" {
   resource_group_name     = data.azurerm_resource_group.group.name
   location                = data.azurerm_resource_group.group.location
   os_type                 = "Linux"
-  sku_name                = var.environment == "local" || var.environment == "dev" ? "P0v3" : "P1v3"
+  sku_name                = var.environment == "internal" || var.environment == "dev" ? "P0v3" : "P1v3"
   zone_balancing_enabled  = true
 }
 
@@ -60,9 +60,9 @@ resource "azurerm_monitor_autoscale_setting" "api_autoscale" {
     name = "defaultProfile"
 
     capacity {
-      default = var.environment == "local" || var.environment == "dev" ? 1 : 3
-      minimum = var.environment == "local" || var.environment == "dev" ? 1 : 3
-      maximum = var.environment == "local" || var.environment == "dev" ? 1 : 10
+      default = var.environment == "internal" || var.environment == "dev" ? 1 : 3
+      minimum = var.environment == "internal" || var.environment == "dev" ? 1 : 3
+      maximum = var.environment == "internal" || var.environment == "dev" ? 1 : 10
     }
 
     rule {
