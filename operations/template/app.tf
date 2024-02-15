@@ -107,9 +107,4 @@ resource "azurerm_monitor_autoscale_setting" "api_autoscale" {
       }
     }
   }
-
-  predictive {
-    scale_mode      = "Enabled"
-    look_ahead_time = "PT5M"
-  }
 }
