@@ -8,7 +8,7 @@ import java.nio.file.Path
 class ResultTest extends Specification {
     def resultClient = new EndpointClient("/v1/etor/results")
 
-    def labResultJsonFileString = Files.readString(Path.of("../examples/MN/004_MN_ORU_R01_NBS_1_translation_from_initial_hl7_ingestion.fhir"))
+    def labResultJsonFileString = Files.readString(Path.of("../examples/MN/004_MN_ORU_R01_NBS_1_hl7_translation.fhir"))
 
     def submissionId = "submissionId"
 
