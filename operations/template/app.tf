@@ -9,12 +9,12 @@ resource "azurerm_container_registry" "registry" {
 
 # Create the staging service plan
 resource "azurerm_service_plan" "plan" {
-  name                    = "cdcti-${var.environment}-service-plan"
-  resource_group_name     = data.azurerm_resource_group.group.name
-  location                = data.azurerm_resource_group.group.location
-  os_type                 = "Linux"
-  sku_name                = var.environment == "internal" || var.environment == "dev" ? "P0v3" : "P1v3"
-  zone_balancing_enabled  = true
+  name                   = "cdcti-${var.environment}-service-plan"
+  resource_group_name    = data.azurerm_resource_group.group.name
+  location               = data.azurerm_resource_group.group.location
+  os_type                = "Linux"
+  sku_name               = var.environment == "internal" || var.environment == "dev" ? "P0v3" : "P1v3"
+  zone_balancing_enabled = true
 }
 
 # Create the staging App Service
