@@ -165,5 +165,5 @@ def get_orders_request_body():
 
 def get_results_request_body():
     # read the sample request body for the results endpoint
-    with open("examples/MN/004_MN_ORU_R01_NBS_1_translation_from_initial_hl7_ingestion.fhir", "r") as f:
+    with open("examples/MN/004_MN_ORU_R01_NBS_1_hl7_translation.fhir", "r") as f:
         return f.read()
