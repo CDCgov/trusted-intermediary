@@ -35,6 +35,7 @@ class SampleUser(FastHttpUser):
 
         self.submission_id = str(uuid.uuid4())
         self.orders_api_called = False
+        self.results_api_called = False
         self.sender = "flexion.simulated-hospital"
 
         # Start the token refreshing thread
@@ -87,9 +88,10 @@ class SampleUser(FastHttpUser):
                 "RecordId": self.submission_id,
             },
             data=result_request_body,
+
         )
         if response.status_code == 200:
-            self.orders_api_called = True
+            self.results_api_called = True
 
     @task(1)
     def get_v1_etor_metadata(self):
@@ -114,6 +116,7 @@ def test_start(environment):
     global demographics_request_body
     global auth_request_body
     global order_request_body
+    global result_request_body
 
     if isinstance(environment.runner, MasterRunner):
         # in a distributed run, the master does not typically need any test data
@@ -122,6 +125,7 @@ def test_start(environment):
     demographics_request_body = get_demographics_request_body()
     auth_request_body = get_auth_request_body()
     order_request_body = get_orders_request_body()
+    result_request_body = get_results_request_body()
 
 
 @events.quitting.add_listener
@@ -157,4 +161,9 @@ def get_demographics_request_body():
 def get_orders_request_body():
     # read the sample request body for the orders endpoint
     with open("examples/Other/002_Order.fhir", "r") as f:
+        return f.read()
+
+def get_results_request_body():
+    # read the sample request body for the results endpoint
+    with open("examples/MN/004_MN_ORU_R01_NBS_1_translation_from_initial_hl7_ingestion.fhir", "r") as f:
         return f.read()

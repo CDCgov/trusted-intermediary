@@ -9,11 +9,12 @@ resource "azurerm_container_registry" "registry" {
 
 # Create the staging service plan
 resource "azurerm_service_plan" "plan" {
-  name                = "cdcti-${var.environment}-service-plan"
-  resource_group_name = data.azurerm_resource_group.group.name
-  location            = data.azurerm_resource_group.group.location
-  os_type             = "Linux"
-  sku_name            = "B1"
+  name                   = "cdcti-${var.environment}-service-plan"
+  resource_group_name    = data.azurerm_resource_group.group.name
+  location               = data.azurerm_resource_group.group.location
+  os_type                = "Linux"
+  sku_name               = local.higher_environment_level ? "P1v3" : "P0v3"
+  zone_balancing_enabled = true
 }
 
 # Create the staging App Service
@@ -47,5 +48,65 @@ resource "azurerm_linux_web_app" "api" {
 
   identity {
     type = "SystemAssigned"
+  }
+}
+
+resource "azurerm_monitor_autoscale_setting" "api_autoscale" {
+  name                = "api_autoscale"
+  resource_group_name = data.azurerm_resource_group.group.name
+  location            = data.azurerm_resource_group.group.location
+  target_resource_id  = azurerm_service_plan.plan.id
+
+
+  profile {
+    name = "defaultProfile"
+
+    capacity {
+      default = local.higher_environment_level ? 3 : 1
+      minimum = local.higher_environment_level ? 3 : 1
+      maximum = local.higher_environment_level ? 10 : 1
+    }
+
+    rule {
+      metric_trigger {
+        metric_name        = "CpuPercentage"
+        metric_resource_id = azurerm_service_plan.plan.id
+        time_grain         = "PT1M"
+        statistic          = "Average"
+        time_window        = "PT5M"
+        time_aggregation   = "Average"
+        operator           = "GreaterThan"
+        threshold          = 75
+        metric_namespace   = "microsoft.web/serverfarms"
+      }
+
+      scale_action {
+        direction = "Increase"
+        type      = "ChangeCount"
+        value     = "1"
+        cooldown  = "PT1M"
+      }
+    }
+
+    rule {
+      metric_trigger {
+        metric_name        = "CpuPercentage"
+        metric_resource_id = azurerm_service_plan.plan.id
+        time_grain         = "PT1M"
+        statistic          = "Average"
+        time_window        = "PT5M"
+        time_aggregation   = "Average"
+        operator           = "LessThan"
+        threshold          = 25
+        metric_namespace   = "microsoft.web/serverfarms"
+      }
+
+      scale_action {
+        direction = "Decrease"
+        type      = "ChangeCount"
+        value     = "1"
+        cooldown  = "PT5M"
+      }
+    }
   }
 }
