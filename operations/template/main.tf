@@ -36,6 +36,12 @@ data "azurerm_subnet" "db_subnet" {
   resource_group_name  = data.azurerm_resource_group.group.name
 }
 
+data "azurerm_subnet" "app_subnet" {
+  name                 = data.azurerm_virtual_network.app_vnet.subnets[0]
+  virtual_network_name = data.azurerm_virtual_network.app_vnet.name
+  resource_group_name  = data.azurerm_resource_group.group.name
+}
+
 resource "azurerm_private_dns_zone" "dns_zone" {
   name                = "privateintermediary.postgres.database.azure.com"
   resource_group_name = data.azurerm_resource_group.group.name

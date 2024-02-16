@@ -25,7 +25,7 @@ resource "azurerm_linux_web_app" "api" {
 
   https_only = true
 
-  virtual_network_subnet_id = azurerm_virtual_network.vnet.subnet.id
+  virtual_network_subnet_id = data.azurerm_subnet.app_subnet.id
 
   site_config {}
 
