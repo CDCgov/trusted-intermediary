@@ -40,7 +40,7 @@ public class App {
     static final String HEALTH_API_ENDPOINT = "/health";
 
     public static void main(String[] args) {
-        var app = Javalin.create().start(8080);
+        var app = Javalin.create(config -> config.http.maxRequestSize = 2000000).start(8080);
 
         // apply this security header to all responses, but allow it to be overwritten by a specific
         // endpoint by using `before` if needed
