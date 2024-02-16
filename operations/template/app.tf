@@ -13,7 +13,7 @@ resource "azurerm_service_plan" "plan" {
   resource_group_name    = data.azurerm_resource_group.group.name
   location               = data.azurerm_resource_group.group.location
   os_type                = "Linux"
-  sku_name               = local.higher_environment_level ?  "P1v3" : "P0v3"
+  sku_name               = local.higher_environment_level ? "P1v3" : "P0v3"
   zone_balancing_enabled = true
 }
 
