@@ -36,11 +36,13 @@ import java.util.Set;
 
 /** Creates the starting point of our API. Handles the registration of the domains. */
 public class App {
-
+    private static final long MAX_REQUEST_SIZE = 2 * 1024 * 1024L; // 2 MB in bytes
+    private static final int PORT = 8080;
     static final String HEALTH_API_ENDPOINT = "/health";
 
     public static void main(String[] args) {
-        var app = Javalin.create(config -> config.http.maxRequestSize = 2000000).start(8080);
+        var app =
+                Javalin.create(config -> config.http.maxRequestSize = MAX_REQUEST_SIZE).start(PORT);
 
         // apply this security header to all responses, but allow it to be overwritten by a specific
         // endpoint by using `before` if needed
