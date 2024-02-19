@@ -54,6 +54,21 @@ resource "azurerm_subnet_route_table_association" "database_route_table" {
   route_table_id = data.azurerm_route_table.route_table.id
 }
 
+data "azurerm_network_security_group" "security_group" {
+  name                = "csels-rsti-${var.environment}-moderate-default-sg"
+  resource_group_name = data.azurerm_resource_group.group.name
+}
+
+resource "azurerm_subnet_network_security_group_association" "app_security_group" {
+  subnet_id                 = azurerm_subnet.app.id
+  network_security_group_id = data.azurerm_network_security_group.security_group.id
+}
+
+resource "azurerm_subnet_network_security_group_association" "database_security_group" {
+  subnet_id                 = azurerm_subnet.database.id
+  network_security_group_id = data.azurerm_network_security_group.security_group.id
+}
+
 #data "azurerm_subnet" "db_subnet" {
 #  name                 = data.azurerm_virtual_network.db_vnet.subnets[0]
 #  virtual_network_name = data.azurerm_virtual_network.db_vnet.name
