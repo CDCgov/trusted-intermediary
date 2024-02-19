@@ -78,7 +78,22 @@ resource "azurerm_network_security_rule" "allow_http_from_everywhere" {
   access                      = "Allow"
   protocol                    = "Tcp"
   source_port_range           = "*"
-  destination_port_range      = "80,443"
+  destination_port_range      = "80"
+  source_address_prefix       = "*"
+  destination_address_prefix  = "*"
+}
+
+resource "azurerm_network_security_rule" "allow_https_from_everywhere" {
+  resource_group_name         = data.azurerm_resource_group.group.name
+  network_security_group_name = data.azurerm_network_security_group.security_group.name
+
+  name                        = "AllowHTTPSTraffic"
+  direction                   = "Inbound"
+  priority                    = 120
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "443"
   source_address_prefix       = "*"
   destination_address_prefix  = "*"
 }
