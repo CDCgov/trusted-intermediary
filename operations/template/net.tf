@@ -19,6 +19,8 @@ resource "azurerm_subnet" "app" {
   resource_group_name  = data.azurerm_resource_group.group.name
   virtual_network_name = data.azurerm_virtual_network.app.name
   address_prefixes     = ["172.17.67.128/26"]
+
+  service_endpoints = ["Microsoft.ContainerRegistry", "Microsoft.KeyVault", "Microsoft.Storage", "Microsoft.Web"]
 }
 
 resource "azurerm_subnet" "database" {
