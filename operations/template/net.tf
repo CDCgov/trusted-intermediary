@@ -18,14 +18,14 @@ resource "azurerm_subnet" "app" {
   name                 = "app"
   resource_group_name  = data.azurerm_resource_group.group.name
   virtual_network_name = data.azurerm_virtual_network.app.name
-  address_prefixes     = ["172.17.69.128/26"]
+  address_prefixes     = ["172.17.67.128/26"]
 }
 
 resource "azurerm_subnet" "database" {
   name                 = "database"
   resource_group_name  = data.azurerm_resource_group.group.name
   virtual_network_name = data.azurerm_virtual_network.app.name
-  address_prefixes     = ["172.17.69.192/27"]
+  address_prefixes     = ["172.17.67.192/27"]
 
   delegation {
     name = "delegation"
