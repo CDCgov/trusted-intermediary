@@ -89,7 +89,7 @@ resource "azurerm_network_security_rule" "allow_https_from_everywhere" {
 
   name                        = "AllowHTTPSTraffic"
   direction                   = "Inbound"
-  priority                    = 120
+  priority                    = 121
   access                      = "Allow"
   protocol                    = "Tcp"
   source_port_range           = "*"
@@ -104,7 +104,7 @@ resource "azurerm_network_security_rule" "allow_postgres_from_everywhere" {
 
   name                        = "AllowPostgresTraffic"
   direction                   = "Inbound"
-  priority                    = 121
+  priority                    = 122
   access                      = "Allow"
   protocol                    = "Tcp"
   source_port_range           = "*"
