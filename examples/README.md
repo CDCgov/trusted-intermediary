@@ -7,7 +7,11 @@
 - `SS`: state initials or organization name (e.g. `CA`, `Natus`)
 - `HL7_Type`: HL7 message type (e.g. `ORU_R01`)
 - `SUB_TYPE`: specific HL7 message type (e.g. `NBS`)
-- `DESCRIPTION`: any additional description to identify the message type (e.g. `translation_from_initial_hl7_ingestion`)
+- `DESCRIPTION`: any additional description to identify the message type. For message flow description, we'll use this convention:
+  - `0_initial_message`
+  - `1_hl7_translation`
+  - `2_fhir_transformation`
+  - `3_hl7_translation_final`
 - File extension: either `hl7` or `fhir`
 
 ## Current sample files
@@ -91,7 +95,7 @@
 - `hl7/MN/MN NBS OML_O21 Lab Order Message.txt` => `MN/002_MN_OML_O21_NBS.hl7`
 - `hl7/MN/MN NBS ORM_O01 Lab Order Message.txt` => `MN/003_MN_ORM_O01_NBS.hl7`
 - `hl7/MN/MN NBS ORM_O01 Lab Order Message Extended.txt` => `MN/003_MN_ORM_O01_NBS_extended.hl7`
-- `hl7/MN/MN NBS ORU_R01 Lab Result Message.txt` => `MN/004_MN_ORU_R01_NBS.hl7`
+- `hl7/MN/MN NBS ORU_R01 Lab Result Message.txt` => `MN/004_MN_ORU_R01_NBS_0_initial_message.hl7`
 - `hl7/MN/ORM simplified.txt` => `MN/003_MN_ORM_O01_NBS_simplified.hl7`
 - `hl7/OML_021.hl7` => `NewSTEPs/001_NewSTEPs_OML_021.hl7`
 - `hl7/ORU_R01.hl7` => `NewSTEPs/002_NewSTEPs_ORU_R01.hl7`
