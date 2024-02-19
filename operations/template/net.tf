@@ -98,20 +98,6 @@ resource "azurerm_network_security_rule" "allow_postgres_from_everywhere" {
   destination_address_prefix  = "*"
 }
 
-resource "azurerm_network_security_rule" "example" {
-  name                        = "test123"
-  priority                    = 100
-  direction                   = "Outbound"
-  access                      = "Allow"
-  protocol                    = "Tcp"
-  source_port_range           = "*"
-  destination_port_range      = "*"
-  source_address_prefix       = "*"
-  destination_address_prefix  = "*"
-  resource_group_name         = azurerm_resource_group.example.name
-  network_security_group_name = azurerm_network_security_group.example.name
-}
-
 resource "azurerm_subnet_network_security_group_association" "app_security_group" {
   subnet_id                 = azurerm_subnet.app.id
   network_security_group_id = data.azurerm_network_security_group.security_group.id
