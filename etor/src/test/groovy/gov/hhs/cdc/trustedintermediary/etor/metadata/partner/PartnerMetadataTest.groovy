@@ -2,8 +2,6 @@ package gov.hhs.cdc.trustedintermediary.etor.metadata.partner
 
 
 import gov.hhs.cdc.trustedintermediary.PojoTestUtils
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
 
 import java.time.Instant
 import spock.lang.Specification
@@ -20,7 +18,7 @@ class PartnerMetadataTest extends Specification {
     def "test constructor"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
-        def sentSubmissionId = "sentSubmissionId"
+        def inboundMessageId = "inboundMessageId"
         def sender = "sender"
         def receiver = "receiver"
         def timeReceived = Instant.now()
@@ -31,11 +29,11 @@ class PartnerMetadataTest extends Specification {
 
 
         when:
-        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, timeDelivered, hash, PartnerMetadataStatus.DELIVERED, failureReason)
+        def metadata = new PartnerMetadata(receivedSubmissionId, inboundMessageId, sender, receiver, timeReceived, timeDelivered, hash, PartnerMetadataStatus.DELIVERED, failureReason)
 
         then:
         metadata.receivedSubmissionId() == receivedSubmissionId
-        metadata.sentSubmissionId() == sentSubmissionId
+        metadata.inboundMessageId() == inboundMessageId
         metadata.sender() == sender
         metadata.receiver() == receiver
         metadata.timeDelivered() == timeDelivered
@@ -59,7 +57,7 @@ class PartnerMetadataTest extends Specification {
 
         then:
         metadata.receivedSubmissionId() == receivedSubmissionId
-        metadata.sentSubmissionId() == null
+        metadata.inboundMessageId() == null
         metadata.sender() == sender
         metadata.receiver() == null
         metadata.timeReceived() == timeReceived
@@ -78,7 +76,7 @@ class PartnerMetadataTest extends Specification {
 
         then:
         metadata.receivedSubmissionId() == receivedSubmissionId
-        metadata.sentSubmissionId() == null
+        metadata.inboundMessageId() == null
         metadata.sender() == null
         metadata.receiver() == null
         metadata.timeReceived() == null
@@ -98,7 +96,7 @@ class PartnerMetadataTest extends Specification {
 
         then:
         metadata.receivedSubmissionId() == receivedSubmissionId
-        metadata.sentSubmissionId() == null
+        metadata.inboundMessageId() == null
         metadata.sender() == null
         metadata.receiver() == null
         metadata.timeReceived() == null
@@ -107,10 +105,10 @@ class PartnerMetadataTest extends Specification {
         metadata.deliveryStatus() == deliverStatus
     }
 
-    def "test withSentSubmissionId and withReceiver to update PartnerMetadata"() {
+    def "test withInboundMessageId and withReceiver to update PartnerMetadata"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
-        def sentSubmissionId = "sentSubmissionId"
+        def inboundMessageId = "inboundMessageId"
         def sender = "sender"
         def receiver = "receiver"
         def timeReceived = Instant.now()
@@ -120,11 +118,11 @@ class PartnerMetadataTest extends Specification {
         def metadata = new PartnerMetadata(receivedSubmissionId, null, sender, null, timeReceived, null, hash, status, failureReason)
 
         when:
-        def updatedMetadata = metadata.withSentSubmissionId(sentSubmissionId).withReceiver(receiver)
+        def updatedMetadata = metadata.withInboundMessageId(inboundMessageId).withReceiver(receiver)
 
         then:
         updatedMetadata.receivedSubmissionId() == receivedSubmissionId
-        updatedMetadata.sentSubmissionId() == sentSubmissionId
+        updatedMetadata.inboundMessageId() == inboundMessageId
         updatedMetadata.sender() == sender
         updatedMetadata.receiver() == receiver
         updatedMetadata.timeReceived() == timeReceived
@@ -135,22 +133,22 @@ class PartnerMetadataTest extends Specification {
     def "test withDeliveryStatus to update PartnerMetadata"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
-        def sentSubmissionId = "sentSubmissionId"
+        def inboundMessageId = "inboundMessageId"
         def sender = "sender"
         def receiver = "receiver"
         def timeReceived = Instant.now()
         def timeDelivered = null
         def hash = "abcd"
         def failureReason = "DogCow goes boom"
-        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, timeDelivered, hash, PartnerMetadataStatus.PENDING, failureReason)
+        def metadata = new PartnerMetadata(receivedSubmissionId, inboundMessageId, sender, receiver, timeReceived, timeDelivered, hash, PartnerMetadataStatus.PENDING, failureReason)
 
         when:
         def newStatus = PartnerMetadataStatus.DELIVERED
-        def updatedMetadata = metadata.withSentSubmissionId(sentSubmissionId).withDeliveryStatus(newStatus)
+        def updatedMetadata = metadata.withInboundMessageId(inboundMessageId).withDeliveryStatus(newStatus)
 
         then:
         updatedMetadata.receivedSubmissionId() == receivedSubmissionId
-        updatedMetadata.sentSubmissionId() == sentSubmissionId
+        updatedMetadata.inboundMessageId() == inboundMessageId
         updatedMetadata.sender() == sender
         updatedMetadata.receiver() == receiver
         updatedMetadata.timeReceived() == timeReceived
@@ -163,21 +161,21 @@ class PartnerMetadataTest extends Specification {
     def "test withTimeDelivered to update PartnerMetadata"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
-        def sentSubmissionId = "sentSubmissionId"
+        def inboundMessageId = "inboundMessageId"
         def sender = "sender"
         def receiver = "receiver"
         def timeReceived = Instant.now()
         def timeDelivered = Instant.now()
         def hash = "abcd"
         def failureReason = "DogCow goes boom"
-        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, null, hash, PartnerMetadataStatus.PENDING, failureReason)
+        def metadata = new PartnerMetadata(receivedSubmissionId, inboundMessageId, sender, receiver, timeReceived, null, hash, PartnerMetadataStatus.PENDING, failureReason)
 
         when:
         def updatedMetadata = metadata.withTimeDelivered(timeDelivered)
 
         then:
         updatedMetadata.receivedSubmissionId() == receivedSubmissionId
-        updatedMetadata.sentSubmissionId() == sentSubmissionId
+        updatedMetadata.inboundMessageId() == inboundMessageId
         updatedMetadata.sender() == sender
         updatedMetadata.receiver() == receiver
         updatedMetadata.timeReceived() == timeReceived

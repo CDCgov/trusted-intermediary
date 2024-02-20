@@ -41,7 +41,7 @@ class FilePartnerMetadataStorageTest extends Specification {
 
     def "saveMetadata throws PartnerMetadataException when unable to save file"() {
         given:
-        PartnerMetadata metadata = new PartnerMetadata("receivedSubmissionId", "sentSubmissionId","sender", "receiver", Instant.now(), Instant.now(), "abcd", PartnerMetadataStatus.DELIVERED, null)
+        PartnerMetadata metadata = new PartnerMetadata("receivedSubmissionId", "inboundMessageId","sender", "receiver", Instant.now(), Instant.now(), "abcd", PartnerMetadataStatus.DELIVERED, null)
 
         def mockFormatter = Mock(Formatter)
         mockFormatter.convertToJsonString(_ as PartnerMetadata) >> {throw new FormatterProcessingException("error", new Exception())}

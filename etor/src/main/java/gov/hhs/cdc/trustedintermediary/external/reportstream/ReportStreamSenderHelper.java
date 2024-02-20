@@ -54,14 +54,14 @@ public class ReportStreamSenderHelper {
         logger.logInfo("{} successfully sent to ReportStream", messageType);
         metadata.put(fhirResourceId, EtorMetadataStep.SENT_TO_REPORT_STREAM);
 
-        Optional<String> sentSubmissionId = getSubmissionId(rsResponseBody);
-        if (sentSubmissionId.isEmpty()) {
-            logger.logError("Unable to retrieve sentSubmissionId from ReportStream response");
+        Optional<String> inboundMessageId = getSubmissionId(rsResponseBody);
+        if (inboundMessageId.isEmpty()) {
+            logger.logError("Unable to retrieve inboundMessageId from ReportStream response");
         } else {
-            logger.logInfo("ReportStream response's sentSubmissionId={}", sentSubmissionId);
+            logger.logInfo("ReportStream response's inboundMessageId={}", inboundMessageId);
         }
 
-        return sentSubmissionId;
+        return inboundMessageId;
     }
 
     protected Optional<String> getSubmissionId(String rsResponseBody) {

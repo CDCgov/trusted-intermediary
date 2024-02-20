@@ -39,9 +39,9 @@ public class SendOrderUseCase {
                 order.getFhirResourceId(),
                 EtorMetadataStep.ETOR_PROCESSING_TAG_ADDED_TO_MESSAGE_HEADER);
 
-        String sentSubmissionId = sender.send(omlOrder).orElse(null);
+        String inboundMessageId = sender.send(omlOrder).orElse(null);
 
-        saveSentOrderSubmissionId(receivedSubmissionId, sentSubmissionId);
+        saveSentOrderSubmissionId(receivedSubmissionId, inboundMessageId);
     }
 
     private void savePartnerMetadataForReceivedOrder(
@@ -62,8 +62,8 @@ public class SendOrderUseCase {
         }
     }
 
-    private void saveSentOrderSubmissionId(String receivedSubmissionId, String sentSubmissionId) {
-        if (sentSubmissionId == null || receivedSubmissionId == null) {
+    private void saveSentOrderSubmissionId(String receivedSubmissionId, String inboundMessageId) {
+        if (inboundMessageId == null || receivedSubmissionId == null) {
             logger.logWarning(
                     "Received and/or sent submissionId is null so not saving metadata for sent order");
             return;
@@ -71,13 +71,13 @@ public class SendOrderUseCase {
 
         try {
             partnerMetadataOrchestrator.updateMetadataForSentOrder(
-                    receivedSubmissionId, sentSubmissionId);
+                    receivedSubmissionId, inboundMessageId);
         } catch (PartnerMetadataException e) {
             logger.logError(
                     "Unable to update metadata for received submissionId "
                             + receivedSubmissionId
                             + " and sent submissionId "
-                            + sentSubmissionId,
+                            + inboundMessageId,
                     e);
         }
     }

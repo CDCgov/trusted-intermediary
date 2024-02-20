@@ -40,7 +40,7 @@ class PostgresDaoTest extends Specification {
     def "upsertMetadata works"() {
         given:
         def receivedSubmissionId = "mock_id_receiver"
-        def sentSubmissionId = "mock_id_sender"
+        def inboundMessageId = "mock_id_sender"
         def sender = "mock_sender"
         def receiver = "mock_receiver"
         def hash = "mock_hash"
@@ -55,11 +55,11 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PostgresDao.getInstance().upsertMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, hash, timestamp, timestamp, status, failureReason)
+        PostgresDao.getInstance().upsertMetadata(receivedSubmissionId, inboundMessageId, sender, receiver, hash, timestamp, timestamp, status, failureReason)
 
         then:
         1 * mockPreparedStatement.setString(1, receivedSubmissionId)
-        1 * mockPreparedStatement.setString(2, sentSubmissionId)
+        1 * mockPreparedStatement.setString(2, inboundMessageId)
         1 * mockPreparedStatement.setString(3, sender)
         1 * mockPreparedStatement.setString(4, receiver)
         1 * mockPreparedStatement.setString(5, hash)
@@ -224,8 +224,8 @@ class PostgresDaoTest extends Specification {
             expected2.receivedSubmissionId()
         ]
         mockResultSet.getString("sent_message_id") >>> [
-            expected1.sentSubmissionId(),
-            expected2.sentSubmissionId()
+            expected1.inboundMessageId(),
+            expected2.inboundMessageId()
         ]
         mockResultSet.getString("sender") >>> [
             expected1.sender(),

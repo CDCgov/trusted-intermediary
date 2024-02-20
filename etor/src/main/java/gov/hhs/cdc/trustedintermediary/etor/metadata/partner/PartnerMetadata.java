@@ -6,7 +6,7 @@ import java.time.Instant;
  * The partner-facing metadata.
  *
  * @param receivedSubmissionId The received submission ID.
- * @param sentSubmissionId The sent submission ID.
+ * @param inboundMessageId The sent submission ID.
  * @param sender The name of the sender of the message.
  * @param receiver The name of the receiver of the message.
  * @param timeReceived The time the message was received.
@@ -16,7 +16,7 @@ import java.time.Instant;
  */
 public record PartnerMetadata(
         String receivedSubmissionId,
-        String sentSubmissionId,
+        String inboundMessageId,
         String sender,
         String receiver,
         Instant timeReceived,
@@ -59,10 +59,10 @@ public record PartnerMetadata(
         this(receivedSubmissionId, null, null, null, null, null, null, deliveryStatus, null);
     }
 
-    public PartnerMetadata withSentSubmissionId(String sentSubmissionId) {
+    public PartnerMetadata withInboundMessageId(String inboundMessageId) {
         return new PartnerMetadata(
                 this.receivedSubmissionId,
-                sentSubmissionId,
+                inboundMessageId,
                 this.sender,
                 this.receiver,
                 this.timeReceived,
@@ -75,7 +75,7 @@ public record PartnerMetadata(
     public PartnerMetadata withReceiver(String receiver) {
         return new PartnerMetadata(
                 this.receivedSubmissionId,
-                this.sentSubmissionId,
+                this.inboundMessageId,
                 this.sender,
                 receiver,
                 this.timeReceived,
@@ -88,7 +88,7 @@ public record PartnerMetadata(
     public PartnerMetadata withTimeDelivered(Instant timeDelivered) {
         return new PartnerMetadata(
                 this.receivedSubmissionId,
-                this.sentSubmissionId,
+                this.inboundMessageId,
                 this.sender,
                 this.receiver,
                 this.timeReceived,
@@ -101,7 +101,7 @@ public record PartnerMetadata(
     public PartnerMetadata withDeliveryStatus(PartnerMetadataStatus deliveryStatus) {
         return new PartnerMetadata(
                 this.receivedSubmissionId,
-                this.sentSubmissionId,
+                this.inboundMessageId,
                 this.sender,
                 this.receiver,
                 this.timeReceived,
@@ -114,7 +114,7 @@ public record PartnerMetadata(
     public PartnerMetadata withFailureMessage(String failureMessage) {
         return new PartnerMetadata(
                 this.receivedSubmissionId,
-                this.sentSubmissionId,
+                this.inboundMessageId,
                 this.sender,
                 this.receiver,
                 this.timeReceived,

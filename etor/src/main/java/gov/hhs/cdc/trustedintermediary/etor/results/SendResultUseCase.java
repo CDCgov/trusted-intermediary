@@ -33,8 +33,8 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
                 result.getFhirResourceId(),
                 EtorMetadataStep.ETOR_PROCESSING_TAG_ADDED_TO_MESSAGE_HEADER);
 
-        String sentSubmissionId = sender.send(convertedResult).orElse(null);
-        logger.logInfo("Sent result submissionId: {}", sentSubmissionId);
+        String inboundMessageId = sender.send(convertedResult).orElse(null);
+        logger.logInfo("Sent result submissionId: {}", inboundMessageId);
 
         // todo: for story #650 (results metadata)
         // saveSentResultSubmissionId(receivedSubmissionId, bundleId)

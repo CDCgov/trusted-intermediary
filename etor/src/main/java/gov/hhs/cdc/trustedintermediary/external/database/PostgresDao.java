@@ -30,7 +30,7 @@ public class PostgresDao implements DbDao {
     @Override
     public void upsertMetadata(
             String receivedSubmissionId,
-            String sentSubmissionId,
+            String inboundMessageId,
             String sender,
             String receiver,
             String hash,
@@ -49,7 +49,7 @@ public class PostgresDao implements DbDao {
                                 """)) {
 
             statement.setString(1, receivedSubmissionId);
-            statement.setString(2, sentSubmissionId);
+            statement.setString(2, inboundMessageId);
             statement.setString(3, sender);
             statement.setString(4, receiver);
             statement.setString(5, hash);

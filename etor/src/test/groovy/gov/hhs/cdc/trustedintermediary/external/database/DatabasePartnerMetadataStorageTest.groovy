@@ -28,7 +28,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
     def "readMetadata happy path works"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
-        def mockMetadata = new PartnerMetadata(receivedSubmissionId, "sentSubmissionId", "sender", "receiver", Instant.now(), Instant.now(), "hash", PartnerMetadataStatus.PENDING, null)
+        def mockMetadata = new PartnerMetadata(receivedSubmissionId, "inboundMessageId", "sender", "receiver", Instant.now(), Instant.now(), "hash", PartnerMetadataStatus.PENDING, null)
         def expectedResult = Optional.of(mockMetadata)
 
         mockDao.fetchMetadata(_ as String) >> mockMetadata
@@ -57,7 +57,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         def receivedSubmissionId = "receivedSubmissionId"
         def mockMetadata = new PartnerMetadata(
                 receivedSubmissionId,
-                "sentSubmissionId",
+                "inboundMessageId",
                 "sender",
                 "receiver",
                 Instant.now(),
@@ -73,7 +73,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         then:
         1 * mockDao.upsertMetadata(
                 mockMetadata.receivedSubmissionId(),
-                mockMetadata.sentSubmissionId(),
+                mockMetadata.inboundMessageId(),
                 mockMetadata.sender(),
                 mockMetadata.receiver(),
                 mockMetadata.hash(),
@@ -89,7 +89,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         def receivedSubmissionId = "receivedSubmissionId"
         def mockMetadata = new PartnerMetadata(
                 receivedSubmissionId,
-                "sentSubmissionId",
+                "inboundMessageId",
                 "sender",
                 "receiver",
                 Instant.now(),
@@ -101,7 +101,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
         mockDao.upsertMetadata(
                 mockMetadata.receivedSubmissionId(),
-                mockMetadata.sentSubmissionId(),
+                mockMetadata.inboundMessageId(),
                 mockMetadata.sender(),
                 mockMetadata.receiver(),
                 mockMetadata.hash(),

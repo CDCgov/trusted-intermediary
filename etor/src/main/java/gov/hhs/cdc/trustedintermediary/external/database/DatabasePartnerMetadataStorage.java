@@ -41,7 +41,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
         try {
             dao.upsertMetadata(
                     metadata.receivedSubmissionId(),
-                    metadata.sentSubmissionId(),
+                    metadata.inboundMessageId(),
                     metadata.sender(),
                     metadata.receiver(),
                     metadata.hash(),
