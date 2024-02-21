@@ -3,11 +3,13 @@
 Logical: ORUR01
 Id: oru-R01-logical-model
 Title: "ORU-R01"
-Description: "The expected input for ORU formatted data for the newborn screening ETOR workflow"
+Description: "The expected input and output for ORU formatted data for the newborn screening ETOR workflow"
 * MSH 1..1 MSHSegment "MSH segment"
 * PID 1..1 PIDSegment "PID segment"
+* NK1 1..1 NK1Segment "NK1 segment"
 * ORC 1..* ORCSegment "ORC segment"
 * OBR 1..* OBRSegment "OBR segment"
+* SPM 1..1 SPMSegment "SPM segment"
 * OBX 1..* OBXSegment "OBX segment"
 
 
