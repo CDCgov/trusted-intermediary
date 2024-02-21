@@ -138,7 +138,7 @@ resource "azurerm_network_security_rule" "ForeScout_Manager_omhsinf" {
   network_security_group_name = azurerm_network_security_group.db_security_group.name
 }
 
-resource "azurerm_network_security_rule" "ForeScout_Manager_omhsinf" {
+resource "azurerm_network_security_rule" "BigFix_omhsinf" {
   name                       = "BigFix_omhsinf"
   priority                   = 107
   direction                  = "Inbound"
