@@ -11,6 +11,9 @@ Orders request flow from a healthcare organization (HCO), such as a hospital or 
 The order contains demographic information on the baby and their next-of-kin, the formal request of the newborn screening panel, and any observations required to evaluate the specimen such as birth weight.
 
 #### Results
+
+Results return flow from a public health lab to a healthcare organization (HCO), such as a hospital or birthing center. The result contains the observation request results of newborn screening tests performed for the baby as well as demographic information on the baby and their next-of-kin.
+
 #### Acknowledgements and Negative Acknowledgements
 
 This workflow is a work in progress.  More details will emerge as the intermediary researches this area.
