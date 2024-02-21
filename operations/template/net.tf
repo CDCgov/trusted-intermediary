@@ -161,7 +161,7 @@ resource "azurerm_network_security_rule" "Allow_All_Out_omhsinf" {
   protocol                   = "Tcp"
   source_port_range          = "*"
   destination_port_ranges     = ["5432"]
-  source_address_prefixes    = ["VirtualNetwork"]
+  source_address_prefixes    = ["VIRTUALNETWORK"]
   destination_address_prefix = "*"
   resource_group_name         = data.azurerm_resource_group.group.name
   network_security_group_name = azurerm_network_security_group.db_security_group.name
@@ -174,8 +174,8 @@ resource "azurerm_network_security_rule" "db_outbound_allow" {
   access                     = "Allow"
   protocol                   = "*"
   source_port_range          = "*"
-  destination_port_ranges     = ["*"]
-  source_address_prefixes    = ["*"]
+  destination_port_range     = "*"
+  source_address_prefix      = "*"
   destination_address_prefix = "*"
   resource_group_name         = data.azurerm_resource_group.group.name
   network_security_group_name = azurerm_network_security_group.db_security_group.name
@@ -189,8 +189,8 @@ resource "azurerm_network_security_rule" "db_inbound_allow" {
   protocol                   = "Tcp"
   source_port_range          = "*"
   destination_port_ranges     = ["5432"]
-  source_address_prefixes    = ["VirtualNetwork"]
-  destination_address_prefix = "VirtualNetwork"
+  source_address_prefixes    = ["VIRTUALNETWORK"]
+  destination_address_prefix = "VIRTUALNETWORK"
   resource_group_name         = data.azurerm_resource_group.group.name
   network_security_group_name = azurerm_network_security_group.db_security_group.name
 }
