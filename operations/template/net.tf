@@ -29,7 +29,8 @@ resource "azurerm_subnet" "app" {
       name    = "Microsoft.Web/serverFarms"
       actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
     }
-  }}
+  }
+}
 
 resource "azurerm_subnet" "database" {
   name                 = "database"
@@ -44,7 +45,8 @@ resource "azurerm_subnet" "database" {
       name    = "Microsoft.DBforPostgreSQL/flexibleServers"
       actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
     }
-  }}
+  }
+}
 
 
 #data "azurerm_subnet" "db_subnet" {
