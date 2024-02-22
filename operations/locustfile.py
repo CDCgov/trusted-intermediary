@@ -1,11 +1,11 @@
-import time
-import uuid
 import logging
 import threading
+import time
 import urllib.parse
 import urllib.request
+import uuid
 
-from locust import FastHttpUser, task, events
+from locust import FastHttpUser, events, task
 from locust.runners import MasterRunner
 
 HEALTH_ENDPOINT = "/health"
@@ -88,7 +88,6 @@ class SampleUser(FastHttpUser):
                 "RecordId": self.submission_id,
             },
             data=result_request_body,
-
         )
         if response.status_code == 200:
             self.results_api_called = True
@@ -99,7 +98,7 @@ class SampleUser(FastHttpUser):
             self.client.get(
                 f"{METADATA_ENDPOINT}/{self.submission_id}",
                 headers={"Authorization": self.access_token},
-                name=f"{METADATA_ENDPOINT}/{{id}}"
+                name=f"{METADATA_ENDPOINT}/{{id}}",
             )
 
     @task(1)
@@ -154,16 +153,17 @@ def get_auth_request_body():
 
 def get_demographics_request_body():
     # read the sample request body for the demographics endpoint
-    with open("examples/Other/003_Patient_NBS.fhir", "r") as f:
+    with open("examples/Test/Patient_NBS.fhir", "r") as f:
         return f.read()
 
 
 def get_orders_request_body():
     # read the sample request body for the orders endpoint
-    with open("examples/Other/002_Order.fhir", "r") as f:
+    with open("examples/Test/OML_O21_short.fhir", "r") as f:
         return f.read()
+
 
 def get_results_request_body():
     # read the sample request body for the results endpoint
-    with open("examples/MN/004_MN_ORU_R01_NBS_1_hl7_translation.fhir", "r") as f:
+    with open("examples/Test/ORU_R01_short.fhir", "r") as f:
         return f.read()

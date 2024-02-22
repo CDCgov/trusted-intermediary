@@ -25,7 +25,6 @@
 
 #### Minnesota
 
-- [001_MN_Order_NBS.fhir](/examples/MN/001_MN_Order_NBS.fhir)
 - [002_MN_OML_O21_NBS.hl7](/examples/MN/002_MN_OML_O21_NBS.hl7)
 - [003_MN_ORM_O01_NBS.hl7](/examples/MN/003_MN_ORM_O01_NBS.hl7)
 - [003_MN_ORM_O01_NBS_extended.hl7](/examples/MN/003_MN_ORM_O01_NBS_extended.hl7)
@@ -74,15 +73,21 @@
 ### Other
 
 - [001_ADT_A01.hl7](/examples/Other/001_ADT_A01.hl7)
-- [002_Order.fhir](/examples/Other/002_Order.fhir)
-- [003_Patient_NBS.fhir](/examples/Other/003_Patient_NBS.fhir)
 - [004_OML_O21.fhir](/examples/Other/004_OML_O21.fhir)
+
+### Test
+
+- [Patient_NBS.fhir](/examples/Test/Patient_NBS.fhir)
+- [ORM_O01.fhir](/examples/Test/ORM_O01.fhir)
+- [OML_O21_short.fhir](/examples/Test/OML_O21_short.fhir)
+- [ORU_R01.fhir](/examples/Test/ORU_R01.fhir)
+- [ORU_R01_short.fhir](/examples/Test/ORU_R01_short.fhir)
 
 ## Previously renamed files
 
-- `fhir/MN NBS FHIR Order Message.json` => `MN/001_MN_Order_NBS.fhir`
-- `fhir/lab_order.json` => `Other/002_Order.fhir`
-- `fhir/newborn_patient.json` => `Other/003_Patient_NBS.fhir`
+- `fhir/MN NBS FHIR Order Message.json` => `Test/ORM_O01.fhir`
+- `fhir/lab_order.json` => `Test/OML_O21_short.fhir`
+- `fhir/newborn_patient.json` => `Test/Patient_NBS.fhir`
 - `fhir/oml_message.json` => `Other/004_OML_O21.fhir`
 - `hl7/AL/Baptist ORM 1.txt` => `Oracle/001_Oracle_ORM_O01.hl7`
 - `hl7/AL/Baptist ORM 2.txt` => `Oracle/002_Oracle_ORM_O01.hl7`

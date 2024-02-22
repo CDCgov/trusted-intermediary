@@ -8,7 +8,7 @@ import java.nio.file.Path
 class OrderTest extends Specification {
 
     def orderClient = new EndpointClient("/v1/etor/orders")
-    def labOrderJsonFileString = Files.readString(Path.of("../examples/MN/001_MN_Order_NBS.fhir"))
+    def labOrderJsonFileString = Files.readString(Path.of("../examples/Test/ORM_O01.fhir"))
     def submissionId = "submissionId"
 
     def setup() {
