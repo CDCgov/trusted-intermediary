@@ -303,14 +303,30 @@ with this option enabled.
 
 #### Submit request to ReportStream
 
+##### Orders
+
+To test sending from a simulated hospital:
 ```
-curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-hospital' --header 'Authorization: Bearer <token>' --data-binary '@/path/to/message.hl7' 'http://localhost:7071/api/waters'
+curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-hospital' --header 'Authorization: Bearer <token>' --data-binary '@/path/to/orm_message.hl7' 'http://localhost:7071/api/waters'
 ```
 
-or
 
+To test sending from TI:
 ```
-curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.etor-service-sender' --header 'Authorization: Bearer <token>' --data-binary '@/path/to/message.fhir' 'http://localhost:7071/api/waters'
+curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.etor-service-sender' --header 'Authorization: Bearer <token>' --data-binary '@/path/to/oml_message.fhir' 'http://localhost:7071/api/waters'
+```
+
+##### Results
+
+To test sending from a simulated lab:
+```
+curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-lab' --header 'Authorization: Bearer <token>' --data-binary '@/path/to/oru_message.hl7' 'http://localhost:7071/api/waters'
+```
+
+
+To test sending from TI:
+```
+curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.etor-service-sender' --header 'Authorization: Bearer <token>' --data-binary '@/path/to/oru_message.fhir' 'http://localhost:7071/api/waters'
 ```
 
 After one or two minutes, check that hl7 files have been dropped to `prime-reportstream/prime-router/build/sftp` folder
