@@ -282,7 +282,7 @@ resource "azurerm_network_security_rule" "App_BigFix_omhsinf" {
 resource "azurerm_network_security_rule" "App_Allow_All_Out_omhsinf" {
   name                        = "App_Allow_All_Out_omhsinf"
   priority                    = 109
-  direction                   = "Inbound"
+  direction                   = "Outbound"
   access                      = "Allow"
   protocol                    = "Tcp"
   source_port_range           = "*"
