@@ -12,7 +12,8 @@ The order contains demographic information on the baby and their next-of-kin, th
 
 #### Results
 
-This workflow is a work in progress.  More details will emerge as the intermediary researches this area.
+Results return flow from a public health lab to a healthcare organization (HCO), such as a hospital or birthing center.
+The result contains the observation request results of newborn screening tests performed for the baby as well as demographic information on the baby and their next-of-kin.
 
 #### Acknowledgements and Negative Acknowledgements
 
