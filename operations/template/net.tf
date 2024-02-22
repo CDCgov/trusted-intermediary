@@ -81,8 +81,8 @@ resource "azurerm_network_security_group" "db_security_group" {
 }
 
 
-resource "azurerm_network_security_rule" "Splunk_UF_omhsinf" {
-  name                        = "Splunk_UF_omhsinf"
+resource "azurerm_network_security_rule" "DB_Splunk_UF_omhsinf" {
+  name                        = "DB_Splunk_UF_omhsinf"
   priority                    = 103
   direction                   = "Inbound"
   access                      = "Allow"
@@ -95,8 +95,8 @@ resource "azurerm_network_security_rule" "Splunk_UF_omhsinf" {
   network_security_group_name = azurerm_network_security_group.db_security_group.name
 }
 
-resource "azurerm_network_security_rule" "Splunk_Indexer_Discovery_omhsinf" {
-  name                        = "Splunk_Indexer_Discovery_omhsinf"
+resource "azurerm_network_security_rule" "DB_Splunk_Indexer_Discovery_omhsinf" {
+  name                        = "DB_Splunk_Indexer_Discovery_omhsinf"
   priority                    = 104
   direction                   = "Inbound"
   access                      = "Allow"
@@ -110,8 +110,8 @@ resource "azurerm_network_security_rule" "Splunk_Indexer_Discovery_omhsinf" {
 }
 
 
-resource "azurerm_network_security_rule" "Safe_Encase_Monitoring_omhsinf" {
-  name                        = "Safe_Encase_Monitoring_omhsinf"
+resource "azurerm_network_security_rule" "DB_Safe_Encase_Monitoring_omhsinf" {
+  name                        = "DB_Safe_Encase_Monitoring_omhsinf"
   priority                    = 105
   direction                   = "Inbound"
   access                      = "Allow"
@@ -124,8 +124,8 @@ resource "azurerm_network_security_rule" "Safe_Encase_Monitoring_omhsinf" {
   network_security_group_name = azurerm_network_security_group.db_security_group.name
 }
 
-resource "azurerm_network_security_rule" "ForeScout_Manager_omhsinf" {
-  name                        = "ForeScout_Manager_omhsinf"
+resource "azurerm_network_security_rule" "DB_ForeScout_Manager_omhsinf" {
+  name                        = "DB_ForeScout_Manager_omhsinf"
   priority                    = 106
   direction                   = "Inbound"
   access                      = "Allow"
@@ -138,8 +138,8 @@ resource "azurerm_network_security_rule" "ForeScout_Manager_omhsinf" {
   network_security_group_name = azurerm_network_security_group.db_security_group.name
 }
 
-resource "azurerm_network_security_rule" "BigFix_omhsinf" {
-  name                        = "BigFix_omhsinf"
+resource "azurerm_network_security_rule" "DB_BigFix_omhsinf" {
+  name                        = "DB_BigFix_omhsinf"
   priority                    = 107
   direction                   = "Inbound"
   access                      = "Allow"
@@ -153,8 +153,8 @@ resource "azurerm_network_security_rule" "BigFix_omhsinf" {
 }
 
 
-resource "azurerm_network_security_rule" "Allow_All_Out_omhsinf" {
-  name                        = "Allow_All_Out_omhsinf"
+resource "azurerm_network_security_rule" "DB_Allow_All_Out_omhsinf" {
+  name                        = "DB_Allow_All_Out_omhsinf"
   priority                    = 109
   direction                   = "Outbound"
   access                      = "Allow"
@@ -207,8 +207,8 @@ resource "azurerm_network_security_group" "app_security_group" {
 }
 
 
-resource "azurerm_network_security_rule" "Splunk_UF_omhsinf" {
-  name                        = "Splunk_UF_omhsinf"
+resource "azurerm_network_security_rule" "App_Splunk_UF_omhsinf" {
+  name                        = "App_Splunk_UF_omhsinf"
   priority                    = 103
   direction                   = "Inbound"
   access                      = "Allow"
@@ -221,8 +221,8 @@ resource "azurerm_network_security_rule" "Splunk_UF_omhsinf" {
   network_security_group_name = azurerm_network_security_group.app_security_group.name
 }
 
-resource "azurerm_network_security_rule" "Splunk_Indexer_Discovery_omhsinf" {
-  name                        = "Splunk_Indexer_Discovery_omhsinf"
+resource "azurerm_network_security_rule" "App_Splunk_Indexer_Discovery_omhsinf" {
+  name                        = "App_Splunk_Indexer_Discovery_omhsinf"
   priority                    = 104
   direction                   = "Inbound"
   access                      = "Allow"
@@ -236,8 +236,8 @@ resource "azurerm_network_security_rule" "Splunk_Indexer_Discovery_omhsinf" {
 }
 
 
-resource "azurerm_network_security_rule" "Safe_Encase_Monitoring_omhsinf" {
-  name                        = "Safe_Encase_Monitoring_omhsinf"
+resource "azurerm_network_security_rule" "App_Safe_Encase_Monitoring_omhsinf" {
+  name                        = "App_Safe_Encase_Monitoring_omhsinf"
   priority                    = 105
   direction                   = "Inbound"
   access                      = "Allow"
@@ -250,8 +250,8 @@ resource "azurerm_network_security_rule" "Safe_Encase_Monitoring_omhsinf" {
   network_security_group_name = azurerm_network_security_group.app_security_group.name
 }
 
-resource "azurerm_network_security_rule" "ForeScout_Manager_omhsinf" {
-  name                        = "ForeScout_Manager_omhsinf"
+resource "azurerm_network_security_rule" "App_ForeScout_Manager_omhsinf" {
+  name                        = "App_ForeScout_Manager_omhsinf"
   priority                    = 106
   direction                   = "Inbound"
   access                      = "Allow"
@@ -264,8 +264,8 @@ resource "azurerm_network_security_rule" "ForeScout_Manager_omhsinf" {
   network_security_group_name = azurerm_network_security_group.app_security_group.name
 }
 
-resource "azurerm_network_security_rule" "BigFix_omhsinf" {
-  name                        = "BigFix_omhsinf"
+resource "azurerm_network_security_rule" "App_BigFix_omhsinf" {
+  name                        = "App_BigFix_omhsinf"
   priority                    = 107
   direction                   = "Inbound"
   access                      = "Allow"
@@ -279,8 +279,8 @@ resource "azurerm_network_security_rule" "BigFix_omhsinf" {
 }
 
 
-resource "azurerm_network_security_rule" "Allow_All_Out_omhsinf" {
-  name                        = "Allow_All_Out_omhsinf"
+resource "azurerm_network_security_rule" "App_Allow_All_Out_omhsinf" {
+  name                        = "App_Allow_All_Out_omhsinf"
   priority                    = 109
   direction                   = "Inbound"
   access                      = "Allow"
