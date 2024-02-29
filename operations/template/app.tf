@@ -29,6 +29,8 @@ resource "azurerm_linux_web_app" "api" {
   virtual_network_subnet_id = azurerm_subnet.app.id
 
   site_config {
+    scm_use_main_ip_restriction = true
+
     ip_restriction {
       name       = "deny_all_ipv4"
       action     = "Deny"
