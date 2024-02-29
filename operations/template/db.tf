@@ -28,23 +28,23 @@ resource "azurerm_postgresql_flexible_server" "database" {
   }
 }
 
-resource "azurerm_postgresql_flexible_server_active_directory_administrator" "admin_for_deployer" {
-  server_name         = azurerm_postgresql_flexible_server.database.name
-  resource_group_name = data.azurerm_resource_group.group.name
-  tenant_id           = data.azurerm_client_config.current.tenant_id
-  object_id           = var.deployer_id
-  principal_name      = "cdcti-github"
-  principal_type      = "ServicePrincipal"
-}
-
-resource "azurerm_postgresql_flexible_server_active_directory_administrator" "admin_for_app" {
-  server_name         = azurerm_postgresql_flexible_server.database.name
-  resource_group_name = data.azurerm_resource_group.group.name
-  tenant_id           = data.azurerm_client_config.current.tenant_id
-  object_id           = azurerm_linux_web_app.api.identity.0.principal_id
-  principal_name      = azurerm_linux_web_app.api.name
-  principal_type      = "ServicePrincipal"
-}
+#resource "azurerm_postgresql_flexible_server_active_directory_administrator" "admin_for_deployer" {
+#  server_name         = azurerm_postgresql_flexible_server.database.name
+#  resource_group_name = data.azurerm_resource_group.group.name
+#  tenant_id           = data.azurerm_client_config.current.tenant_id
+#  object_id           = var.deployer_id
+#  principal_name      = "cdcti-github"
+#  principal_type      = "ServicePrincipal"
+#}
+#
+#resource "azurerm_postgresql_flexible_server_active_directory_administrator" "admin_for_app" {
+#  server_name         = azurerm_postgresql_flexible_server.database.name
+#  resource_group_name = data.azurerm_resource_group.group.name
+#  tenant_id           = data.azurerm_client_config.current.tenant_id
+#  object_id           = azurerm_linux_web_app.api.identity.0.principal_id
+#  principal_name      = azurerm_linux_web_app.api.name
+#  principal_type      = "ServicePrincipal"
+#}
 
 resource "azurerm_postgresql_flexible_server_firewall_rule" "db_firewall_5" {
   name             = "AllowAzure"
