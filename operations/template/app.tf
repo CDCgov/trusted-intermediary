@@ -28,7 +28,21 @@ resource "azurerm_linux_web_app" "api" {
 
   virtual_network_subnet_id = azurerm_subnet.app.id
 
-  site_config {}
+  site_config {
+    ip_restriction {
+      name       = "deny_all_ipv4"
+      action     = "Deny"
+      ip_address = "0.0.0.0/0"
+      priority   = "200"
+    }
+
+    ip_restriction {
+      name       = "deny_all_ipv6"
+      action     = "Deny"
+      ip_address = "::/0"
+      priority   = "201"
+    }
+  }
 
   app_settings = {
     DOCKER_REGISTRY_SERVER_URL      = "https://${azurerm_container_registry.registry.login_server}"
