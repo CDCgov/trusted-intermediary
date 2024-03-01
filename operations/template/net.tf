@@ -184,7 +184,7 @@ resource "azurerm_network_security_rule" "db_outbound_allow" {
 }
 resource "azurerm_network_security_rule" "db_outbound_auth_allow" {
   name                        = "db_outbound_auth_allow"
-  priority                    = 110
+  priority                    = 131
   direction                   = "Outbound"
   access                      = "Allow"
   protocol                    = "*"
