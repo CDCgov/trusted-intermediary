@@ -51,7 +51,7 @@ dependencies {
     testFixturesImplementation 'org.apache.groovy:groovy:4.0.18'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
     testFixturesImplementation 'com.openpojo:openpojo:0.9.1'
-    testFixturesImplementation 'nl.jqno.equalsverifier:equalsverifier:3.15.7'
+    testFixturesImplementation 'nl.jqno.equalsverifier:equalsverifier:3.15.8'
 
     // dotenv-java
     implementation 'io.github.cdimascio:dotenv-java:3.0.0'
