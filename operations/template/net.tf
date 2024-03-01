@@ -182,6 +182,19 @@ resource "azurerm_network_security_rule" "db_outbound_allow" {
   resource_group_name         = data.azurerm_resource_group.group.name
   network_security_group_name = azurerm_network_security_group.db_security_group.name
 }
+resource "azurerm_network_security_rule" "db_outbound_auth_allow" {
+  name                        = "db_outbound_auth_allow"
+  priority                    = 110
+  direction                   = "Outbound"
+  access                      = "Allow"
+  protocol                    = "*"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = "*"
+  destination_address_prefix  = "AzureActiveDirectory"
+  resource_group_name         = data.azurerm_resource_group.group.name
+  network_security_group_name = azurerm_network_security_group.db_security_group.name
+}
 
 resource "azurerm_network_security_rule" "db_inbound_allow" {
   name                        = "db_inbound_allow"
