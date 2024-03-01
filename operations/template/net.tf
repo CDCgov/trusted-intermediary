@@ -142,7 +142,7 @@ resource "azurerm_subnet_route_table_association" "database_database" {
 }
 
 resource "azurerm_network_security_rule" "DB_Splunk_UF_omhsinf" {
-  name                        = "DB_Splunk_UF_omhsinf"
+  name                        = "Splunk_UF_omhsinf"
   priority                    = 103
   direction                   = "Inbound"
   access                      = "Allow"
@@ -156,7 +156,7 @@ resource "azurerm_network_security_rule" "DB_Splunk_UF_omhsinf" {
 }
 
 resource "azurerm_network_security_rule" "DB_Splunk_Indexer_Discovery_omhsinf" {
-  name                        = "DB_Splunk_Indexer_Discovery_omhsinf"
+  name                        = "Splunk_Indexer_Discovery_omhsinf"
   priority                    = 104
   direction                   = "Inbound"
   access                      = "Allow"
@@ -171,7 +171,7 @@ resource "azurerm_network_security_rule" "DB_Splunk_Indexer_Discovery_omhsinf" {
 
 
 resource "azurerm_network_security_rule" "DB_Safe_Encase_Monitoring_omhsinf" {
-  name                        = "DB_Safe_Encase_Monitoring_omhsinf"
+  name                        = "Safe_Encase_Monitoring_omhsinf"
   priority                    = 105
   direction                   = "Inbound"
   access                      = "Allow"
@@ -185,7 +185,7 @@ resource "azurerm_network_security_rule" "DB_Safe_Encase_Monitoring_omhsinf" {
 }
 
 resource "azurerm_network_security_rule" "DB_ForeScout_Manager_omhsinf" {
-  name                        = "DB_ForeScout_Manager_omhsinf"
+  name                        = "ForeScout_Manager_omhsinf"
   priority                    = 106
   direction                   = "Inbound"
   access                      = "Allow"
@@ -199,7 +199,7 @@ resource "azurerm_network_security_rule" "DB_ForeScout_Manager_omhsinf" {
 }
 
 resource "azurerm_network_security_rule" "DB_BigFix_omhsinf" {
-  name                        = "DB_BigFix_omhsinf"
+  name                        = "BigFix_omhsinf"
   priority                    = 107
   direction                   = "Inbound"
   access                      = "Allow"
