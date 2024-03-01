@@ -20,7 +20,17 @@ resource "azurerm_subnet" "app" {
   virtual_network_name = data.azurerm_virtual_network.app.name
   address_prefixes     = ["172.17.67.128/26"]
 
-  service_endpoints = ["Microsoft.ContainerRegistry", "Microsoft.KeyVault", "Microsoft.Storage", "Microsoft.Web"]
+  service_endpoints = [
+    "Microsoft.AzureActiveDirectory",
+    "Microsoft.AzureCosmosDB",
+    "Microsoft.ContainerRegistry",
+    "Microsoft.EventHub",
+    "Microsoft.KeyVault",
+    "Microsoft.ServiceBus",
+    "Microsoft.Sql",
+    "Microsoft.Storage",
+    "Microsoft.Web",
+  ]
 
   delegation {
     name = "delegation"
@@ -38,7 +48,17 @@ resource "azurerm_subnet" "database" {
   virtual_network_name = data.azurerm_virtual_network.app.name
   address_prefixes     = ["172.17.67.192/27"]
 
-  service_endpoints = ["Microsoft.AzureActiveDirectory"]
+  service_endpoints = [
+    "Microsoft.AzureActiveDirectory",
+    "Microsoft.AzureCosmosDB",
+    "Microsoft.ContainerRegistry",
+    "Microsoft.EventHub",
+    "Microsoft.KeyVault",
+    "Microsoft.ServiceBus",
+    "Microsoft.Sql",
+    "Microsoft.Storage",
+    "Microsoft.Web",
+  ]
 
   delegation {
     name = "delegation"
@@ -82,6 +102,25 @@ resource "azurerm_network_security_group" "db_security_group" {
   resource_group_name = data.azurerm_resource_group.group.name
 }
 
+resource "azurerm_network_security_group" "db_security_group_small" {
+  name                = "database-security-group-small"
+  location            = data.azurerm_resource_group.group.location
+  resource_group_name = data.azurerm_resource_group.group.name
+}
+
+resource "azurerm_network_security_rule" "db_outbound_auth_allow_small" {
+  name                        = "db_outbound_auth_allow"
+  priority                    = 131
+  direction                   = "Outbound"
+  access                      = "Allow"
+  protocol                    = "*"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = "*"
+  destination_address_prefix  = "AzureActiveDirectory"
+  resource_group_name         = data.azurerm_resource_group.group.name
+  network_security_group_name = azurerm_network_security_group.db_security_group_small.name
+}
 
 resource "azurerm_network_security_rule" "DB_Splunk_UF_omhsinf" {
   name                        = "DB_Splunk_UF_omhsinf"
@@ -182,6 +221,7 @@ resource "azurerm_network_security_rule" "db_outbound_allow" {
   resource_group_name         = data.azurerm_resource_group.group.name
   network_security_group_name = azurerm_network_security_group.db_security_group.name
 }
+
 resource "azurerm_network_security_rule" "db_outbound_auth_allow" {
   name                        = "db_outbound_auth_allow"
   priority                    = 131
@@ -212,7 +252,7 @@ resource "azurerm_network_security_rule" "db_inbound_allow" {
 
 resource "azurerm_subnet_network_security_group_association" "database_security_group" {
   subnet_id                 = azurerm_subnet.database.id
-  network_security_group_id = azurerm_network_security_group.db_security_group.id
+  network_security_group_id = azurerm_network_security_group.db_security_group_small.id
 }
 
 resource "azurerm_network_security_group" "app_security_group" {
