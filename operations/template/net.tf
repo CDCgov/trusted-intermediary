@@ -38,12 +38,14 @@ resource "azurerm_subnet" "database" {
   virtual_network_name = data.azurerm_virtual_network.app.name
   address_prefixes     = ["172.17.67.192/27"]
 
+  service_endpoints = ["Microsoft.AzureActiveDirectory"]
+
   delegation {
     name = "delegation"
 
     service_delegation {
       name    = "Microsoft.DBforPostgreSQL/flexibleServers"
-      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
+      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
     }
   }
 }
