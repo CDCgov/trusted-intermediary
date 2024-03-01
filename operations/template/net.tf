@@ -122,6 +122,25 @@ resource "azurerm_network_security_rule" "db_outbound_auth_allow_small" {
   network_security_group_name = azurerm_network_security_group.db_security_group_small.name
 }
 
+resource "azurerm_route_table" "database" {
+  name                          = "database-test"
+  location                      = data.azurerm_resource_group.group.location
+  resource_group_name           = data.azurerm_resource_group.group.name
+}
+
+resource "azurerm_route" "entra_internet" {
+  name                          = "entra_internet"
+  resource_group_name           = data.azurerm_resource_group.group.name
+  route_table_name    = azurerm_route_table.database.name
+  address_prefix      = "AzureActiveDirectory"
+  next_hop_type       = "Internet"
+}
+
+resource "azurerm_subnet_route_table_association" "database_database" {
+  subnet_id      = azurerm_subnet.database.id
+  route_table_id = azurerm_route_table.database.id
+}
+
 resource "azurerm_network_security_rule" "DB_Splunk_UF_omhsinf" {
   name                        = "DB_Splunk_UF_omhsinf"
   priority                    = 103
