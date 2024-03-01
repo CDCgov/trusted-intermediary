@@ -68,13 +68,13 @@ resource "azurerm_private_dns_zone" "dns_zone" {
   resource_group_name = data.azurerm_resource_group.group.name
 }
 
-#resource "azurerm_private_dns_zone_virtual_network_link" "db_network_link" {
-#  name                  = "intermediarylink.com"
-#  private_dns_zone_name = azurerm_private_dns_zone.dns_zone.name
-#  virtual_network_id    = data.azurerm_virtual_network.app.id
-#  resource_group_name   = data.azurerm_resource_group.group.name
-#  depends_on            = [azurerm_subnet.database]
-#}
+resource "azurerm_private_dns_zone_virtual_network_link" "db_network_link" {
+  name                  = "intermediarylink.com"
+  private_dns_zone_name = azurerm_private_dns_zone.dns_zone.name
+  virtual_network_id    = data.azurerm_virtual_network.app.id
+  resource_group_name   = data.azurerm_resource_group.group.name
+  depends_on            = [azurerm_subnet.database]
+}
 
 resource "azurerm_network_security_group" "db_security_group" {
   name                = "database-security-group"
