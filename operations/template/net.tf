@@ -79,7 +79,7 @@ resource "azurerm_network_security_group" "db_security_group" {
 }
 
 resource "azurerm_route_table" "database" {
-  name                          = "database"
+  name                          = "database-route-table"
   location                      = data.azurerm_resource_group.group.location
   resource_group_name           = data.azurerm_resource_group.group.name
 }
