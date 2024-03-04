@@ -19,7 +19,7 @@ class MetadataTest extends Specification {
         def inboundSubmissionId = UUID.randomUUID().toString()
         def outboundSubmissionId = "1234567890"
         def orderClient = new EndpointClient("/v1/etor/orders")
-        def labOrderJsonFileString = Files.readString(Path.of("../examples/MN/001_MN_Order_NBS.fhir"))
+        def labOrderJsonFileString = Files.readString(Path.of("../examples/Test/ORM_O01.fhir"))
 
         when:
         def orderResponse = orderClient.submit(labOrderJsonFileString, inboundSubmissionId, true)
