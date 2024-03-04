@@ -85,13 +85,13 @@ jobs:
           echo "DATABASE_HOSTNAME=$DATABASE_HOSTNAME" >> "$GITHUB_ENV"
           echo "DATABASE_PASSWORD=$DATABASE_PASSWORD" >> "$GITHUB_ENV"
 
-#      - name: Run Db migration
-#        uses: liquibase-github-actions/update@v4.26.0
-#        with:
-#          changelogFile: ./etor/databaseMigrations/root.yml
-#          url: "jdbc:postgresql://${{ env.DATABASE_HOSTNAME }}:5432/postgres"
-#          username: cdcti-github
-#          password: ${{ env.DATABASE_PASSWORD }}
+      - name: Run Db migration
+        uses: liquibase-github-actions/update@v4.26.0
+        with:
+          changelogFile: ./etor/databaseMigrations/root.yml
+          url: "jdbc:postgresql://${{ env.DATABASE_HOSTNAME }}:5432/postgres"
+          username: cdcti-github
+          password: ${{ env.DATABASE_PASSWORD }}
 
       - id: export-terraform-output
         name: Export Terraform Output
