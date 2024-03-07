@@ -3,6 +3,10 @@ data "azurerm_virtual_network" "app" {
   resource_group_name = data.azurerm_resource_group.group.name
 }
 
+#locals {
+#  subnets_cidrs = cidrsubnets(data.azurerm_virtual_network.app.)
+#}
+
 resource "azurerm_subnet" "app" {
   name                 = "app"
   resource_group_name  = data.azurerm_resource_group.group.name
