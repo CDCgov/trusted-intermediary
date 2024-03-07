@@ -77,7 +77,7 @@ resource "azurerm_subnet" "resolver_inbound" {
 
     service_delegation {
       name    = "Microsoft.Network/dnsResolvers"
-      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
+      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
     }
   }
 }
@@ -93,7 +93,7 @@ resource "azurerm_subnet" "resolver_outbound" {
 
     service_delegation {
       name    = "Microsoft.Network/dnsResolvers"
-      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
+      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
     }
   }
 }
