@@ -105,11 +105,11 @@ jobs:
           USER_CRT: ${{ secrets.VPN_USER_CERTIFICATE }}
           USER_KEY: ${{ secrets.VPN_USER_SECRET_KEY }}
 
-      - name: Check VPN Connection
-        run: echo ${{ steps.connect_vpn.outputs.STATUS }}
-
-      - name: debug
-        run: dig ${{ env.DATABASE_HOSTNAME }}
+      - name: Fail if VPN isn't Connected
+        if: steps.connect_vpn.outputs.STATUS != 'true'
+        run: |
+          echo 'VPN connected: ${{ steps.connect_vpn.outputs.STATUS }}'
+          exit 1
 
       - name: Install Liquibase
         run: |
@@ -121,14 +121,6 @@ jobs:
       - name: Run Db migration
         working-directory: ./
         run: liquibase update --changelog-file ./etor/databaseMigrations/root.yml --url 'jdbc:postgresql://${{ env.DATABASE_HOSTNAME }}:5432/postgres' --username cdcti-github --password '${{ env.DATABASE_PASSWORD }}'
-
-#      - name: Run Db migration
-#        uses: liquibase-github-actions/update@v4.26.0
-#        with:
-#          changelogFile: ./etor/databaseMigrations/root.yml
-#          url: "jdbc:postgresql://${{ env.DATABASE_HOSTNAME }}:5432/postgres"
-#          username: cdcti-github
-#          password: ${{ env.DATABASE_PASSWORD }}
 
       - name: Disconnect VPN
         if: always()
