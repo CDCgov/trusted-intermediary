@@ -93,7 +93,8 @@ jobs:
           echo "DATABASE_HOSTNAME=$DATABASE_HOSTNAME" >> "$GITHUB_ENV"
           echo "DATABASE_PASSWORD=$DATABASE_PASSWORD" >> "$GITHUB_ENV"
 
-      - uses: josiahsiegel/action-connect-ovpn@v2.0.2
+      - name: Connect to VPN
+        uses: josiahsiegel/action-connect-ovpn@v2.0.2
         id: connect_vpn
         with:
           PING_URL: ${{ env.DATABASE_HOSTNAME }}
@@ -104,8 +105,11 @@ jobs:
           USER_CRT: ${{ secrets.VPN_USER_CERTIFICATE }}
           USER_KEY: ${{ secrets.VPN_USER_SECRET_KEY }}
 
-      - name: Check Connect VPN
+      - name: Check VPN Connection
         run: echo ${{ steps.connect_vpn.outputs.STATUS }}
+
+      - name: debug
+        run: dig ${{ env.DATABASE_HOSTNAME }}
 
       - name: Run Db migration
         uses: liquibase-github-actions/update@v4.26.0
