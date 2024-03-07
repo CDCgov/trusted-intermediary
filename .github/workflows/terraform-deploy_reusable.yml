@@ -93,7 +93,7 @@ jobs:
           echo "DATABASE_HOSTNAME=$DATABASE_HOSTNAME" >> "$GITHUB_ENV"
           echo "DATABASE_PASSWORD=$DATABASE_PASSWORD" >> "$GITHUB_ENV"
 
-      - uses: josiahsiegel/action-connect-ovpn@2.0.2
+      - uses: josiahsiegel/action-connect-ovpn@v2.0.2
         with:
           FILE_OVPN: /operations/vpn/${{ inputs.ENVIRONMENT }}.ovpn
           TLS_KEY: ${{ secrets.VPN_TLS_KEY }}
