@@ -20,8 +20,8 @@ jobs:
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_CDC_DMZ_C1_SUBSCRIPTION_ID }}
       VPN_TLS_KEY: ${{ secrets.VPN_TLS_KEY }}
       VPN_CA_CERTIFICATE: ${{ secrets.VPN_CA_CERTIFICATE }}
-      VPN_USER_CERTIFICATE: ${{ secrets.VPN_GITHUB_CERTIFICATE }}
-      VPN_USER_SECRET_KEY: ${{ secrets.VPN_GITHUB_SECRET_KEY }}
+      VPN_GITHUB_CERTIFICATE: ${{ secrets.VPN_GITHUB_CERTIFICATE }}
+      VPN_GITHUB_SECRET_KEY: ${{ secrets.VPN_GITHUB_SECRET_KEY }}
 
   dev-deploy:
     name: Dev Application Deploy
