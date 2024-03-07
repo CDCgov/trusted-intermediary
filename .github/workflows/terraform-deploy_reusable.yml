@@ -95,7 +95,7 @@ jobs:
 
       - uses: josiahsiegel/action-connect-ovpn@v2.0.2
         with:
-          FILE_OVPN: /operations/vpn/${{ inputs.ENVIRONMENT }}.ovpn
+          FILE_OVPN: ./operations/vpn/${{ inputs.ENVIRONMENT }}.ovpn
           TLS_KEY: ${{ secrets.VPN_TLS_KEY }}
         env:
           CA_CRT: ${{ secrets.VPN_CA_CERTIFICATE }}
