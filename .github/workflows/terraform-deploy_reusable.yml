@@ -28,9 +28,9 @@ on:
         required: true
       VPN_CA_CERTIFICATE:
         required: true
-      VPN_USER_CERTIFICATE:
+      VPN_GITHUB_CERTIFICATE:
         required: true
-      VPN_USER_SECRET_KEY:
+      VPN_GITHUB_SECRET_KEY:
         required: true
     outputs:
       REGISTRY:
@@ -102,8 +102,8 @@ jobs:
           TLS_KEY: ${{ secrets.VPN_TLS_KEY }}
         env:
           CA_CRT: ${{ secrets.VPN_CA_CERTIFICATE }}
-          USER_CRT: ${{ secrets.VPN_USER_CERTIFICATE }}
-          USER_KEY: ${{ secrets.VPN_USER_SECRET_KEY }}
+          USER_CRT: ${{ secrets.VPN_GITHUB_CERTIFICATE }}
+          USER_KEY: ${{ secrets.VPN_GITHUB_SECRET_KEY }}
 
       - name: Fail if VPN isn't Connected
         if: steps.connect_vpn.outputs.STATUS != 'true'

@@ -76,9 +76,6 @@ jobs:
           USER_CRT: ${{ secrets.VPN_GITHUB_CERTIFICATE }}
           USER_KEY: ${{ secrets.VPN_GITHUB_SECRET_KEY }}
 
-      - name: debug
-        run: dig ${{ env.DATABASE_HOSTNAME }}
-
       - name: Fail if VPN isn't Connected
         if: steps.connect_vpn.outputs.STATUS != 'true'
         run: |
