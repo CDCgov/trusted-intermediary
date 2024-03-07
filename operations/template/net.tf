@@ -3,15 +3,15 @@ data "azurerm_virtual_network" "app" {
   resource_group_name = data.azurerm_resource_group.group.name
 }
 
-#locals {
-#  subnets_cidrs = cidrsubnets(data.azurerm_virtual_network.app.address_space[0], )
-#}
+locals {
+  subnets_cidrs = cidrsubnets(data.azurerm_virtual_network.app.address_space[0], 2, 2, 2, 3, 3)
+}
 
 resource "azurerm_subnet" "app" {
   name                 = "app"
   resource_group_name  = data.azurerm_resource_group.group.name
   virtual_network_name = data.azurerm_virtual_network.app.name
-  address_prefixes     = ["172.17.67.128/27"]
+  address_prefixes     = [local.subnets_cidrs[0]]
 
   service_endpoints = [
     "Microsoft.AzureActiveDirectory",
@@ -39,7 +39,7 @@ resource "azurerm_subnet" "database" {
   name                 = "database"
   resource_group_name  = data.azurerm_resource_group.group.name
   virtual_network_name = data.azurerm_virtual_network.app.name
-  address_prefixes     = ["172.17.67.160/27"]
+  address_prefixes     = [local.subnets_cidrs[1]]
 
   service_endpoints = [
     "Microsoft.AzureActiveDirectory",
@@ -67,14 +67,14 @@ resource "azurerm_subnet" "vpn" {
   name                 = "GatewaySubnet"
   resource_group_name  = data.azurerm_resource_group.group.name
   virtual_network_name = data.azurerm_virtual_network.app.name
-  address_prefixes     = ["172.17.67.192/27"]
+  address_prefixes     = [local.subnets_cidrs[2]]
 }
 
 resource "azurerm_subnet" "resolver_inbound" {
   name                 = "resolver-inbound"
   resource_group_name  = data.azurerm_resource_group.group.name
   virtual_network_name = data.azurerm_virtual_network.app.name
-  address_prefixes     = ["172.17.67.224/28"]
+  address_prefixes     = [local.subnets_cidrs[3]]
 
   delegation {
     name = "delegation"
@@ -90,7 +90,7 @@ resource "azurerm_subnet" "resolver_outbound" {
   name                 = "resolver-outbound"
   resource_group_name  = data.azurerm_resource_group.group.name
   virtual_network_name = data.azurerm_virtual_network.app.name
-  address_prefixes     = ["172.17.67.240/28"]
+  address_prefixes     = [local.subnets_cidrs[4]]
 
   delegation {
     name = "delegation"
