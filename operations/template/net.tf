@@ -7,7 +7,7 @@ resource "azurerm_subnet" "app" {
   name                 = "app"
   resource_group_name  = data.azurerm_resource_group.group.name
   virtual_network_name = data.azurerm_virtual_network.app.name
-  address_prefixes     = ["172.17.67.128/26"]
+  address_prefixes     = ["172.17.67.128/27"]
 
   service_endpoints = [
     "Microsoft.AzureActiveDirectory",
@@ -35,7 +35,7 @@ resource "azurerm_subnet" "database" {
   name                 = "database"
   resource_group_name  = data.azurerm_resource_group.group.name
   virtual_network_name = data.azurerm_virtual_network.app.name
-  address_prefixes     = ["172.17.67.192/27"]
+  address_prefixes     = ["172.17.67.160/27"]
 
   service_endpoints = [
     "Microsoft.AzureActiveDirectory",
@@ -54,6 +54,45 @@ resource "azurerm_subnet" "database" {
 
     service_delegation {
       name    = "Microsoft.DBforPostgreSQL/flexibleServers"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
+    }
+  }
+}
+
+resource "azurerm_subnet" "vpn" {
+  name                 = "GatewaySubnet"
+  resource_group_name  = data.azurerm_resource_group.group.name
+  virtual_network_name = data.azurerm_virtual_network.app.name
+  address_prefixes     = ["172.17.67.192/27"]
+}
+
+resource "azurerm_subnet" "resolver_inbound" {
+  name                 = "resolver-inbound"
+  resource_group_name  = data.azurerm_resource_group.group.name
+  virtual_network_name = data.azurerm_virtual_network.app.name
+  address_prefixes     = ["172.17.67.224/28"]
+
+  delegation {
+    name = "delegation"
+
+    service_delegation {
+      name    = "Microsoft.Network/dnsResolvers"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
+    }
+  }
+}
+
+resource "azurerm_subnet" "resolver_outbound" {
+  name                 = "resolver-outbound"
+  resource_group_name  = data.azurerm_resource_group.group.name
+  virtual_network_name = data.azurerm_virtual_network.app.name
+  address_prefixes     = ["172.17.67.240/28"]
+
+  delegation {
+    name = "delegation"
+
+    service_delegation {
+      name    = "Microsoft.Network/dnsResolvers"
       actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
     }
   }
