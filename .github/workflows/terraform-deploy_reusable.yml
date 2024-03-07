@@ -24,6 +24,14 @@ on:
         required: true
       AZURE_SUBSCRIPTION_ID:
         required: true
+      VPN_TLS_KEY:
+        required: true
+      VPN_CA_CERTIFICATE:
+        required: true
+      VPN_USER_CERTIFICATE:
+        required: true
+      VPN_USER_SECRET_KEY:
+        required: true
     outputs:
       REGISTRY:
         description: The container registry
@@ -85,13 +93,26 @@ jobs:
           echo "DATABASE_HOSTNAME=$DATABASE_HOSTNAME" >> "$GITHUB_ENV"
           echo "DATABASE_PASSWORD=$DATABASE_PASSWORD" >> "$GITHUB_ENV"
 
-#      - name: Run Db migration
-#        uses: liquibase-github-actions/update@v4.26.0
-#        with:
-#          changelogFile: ./etor/databaseMigrations/root.yml
-#          url: "jdbc:postgresql://${{ env.DATABASE_HOSTNAME }}:5432/postgres"
-#          username: cdcti-github
-#          password: ${{ env.DATABASE_PASSWORD }}
+      - uses: josiahsiegel/action-connect-ovpn@2.0.2
+        with:
+          FILE_OVPN: /operations/vpn/${{ inputs.ENVIRONMENT }}.ovpn
+          TLS_KEY: ${{ secrets.VPN_TLS_KEY }}
+        env:
+          CA_CRT: ${{ secrets.VPN_CA_CERTIFICATE }}
+          USER_CRT: ${{ secrets.VPN_USER_CERTIFICATE }}
+          USER_KEY: ${{ secrets.VPN_USER_SECRET_KEY }}
+
+      - name: Run Db migration
+        uses: liquibase-github-actions/update@v4.26.0
+        with:
+          changelogFile: ./etor/databaseMigrations/root.yml
+          url: "jdbc:postgresql://${{ env.DATABASE_HOSTNAME }}:5432/postgres"
+          username: cdcti-github
+          password: ${{ env.DATABASE_PASSWORD }}
+
+      - name: Disconnect VPN
+        if: always()
+        run: sudo killall openvpn
 
       - id: export-terraform-output
         name: Export Terraform Output
