@@ -119,6 +119,7 @@ jobs:
           liquibase -v
 
       - name: Run Db migration
+        working-directory: ./
         run: liquibase update --changelog-file ./etor/databaseMigrations/root.yml --url 'jdbc:postgresql://${{ env.DATABASE_HOSTNAME }}:5432/postgres' --username cdcti-github --password '${{ env.DATABASE_PASSWORD }}'
 
 #      - name: Run Db migration
