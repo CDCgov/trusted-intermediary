@@ -4,7 +4,7 @@ data "azurerm_virtual_network" "app" {
 }
 
 #locals {
-#  subnets_cidrs = cidrsubnets(data.azurerm_virtual_network.app.)
+#  subnets_cidrs = cidrsubnets(data.azurerm_virtual_network.app.address_space[0], )
 #}
 
 resource "azurerm_subnet" "app" {

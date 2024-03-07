@@ -50,9 +50,8 @@ resource "azurerm_private_dns_resolver_inbound_endpoint" "resolver_inbound_endpo
   location                = azurerm_private_dns_resolver.private_zone_resolver.location
 
   ip_configurations {
-    private_ip_allocation_method = "Static"
+    private_ip_allocation_method = "Dynamic"
     subnet_id                    = azurerm_subnet.resolver_inbound.id
-    private_ip_address           = cidrhost(azurerm_subnet.resolver_inbound.address_prefixes[0], 1)
   }
 }
 
