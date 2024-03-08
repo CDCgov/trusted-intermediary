@@ -3,11 +3,15 @@ data "azurerm_virtual_network" "app" {
   resource_group_name = data.azurerm_resource_group.group.name
 }
 
+locals {
+  subnets_cidrs = cidrsubnets(data.azurerm_virtual_network.app.address_space[0], 2, 2, 2, 3, 3)
+}
+
 resource "azurerm_subnet" "app" {
   name                 = "app"
   resource_group_name  = data.azurerm_resource_group.group.name
   virtual_network_name = data.azurerm_virtual_network.app.name
-  address_prefixes     = ["172.17.67.128/26"]
+  address_prefixes     = [local.subnets_cidrs[0]]
 
   service_endpoints = [
     "Microsoft.AzureActiveDirectory",
@@ -35,7 +39,7 @@ resource "azurerm_subnet" "database" {
   name                 = "database"
   resource_group_name  = data.azurerm_resource_group.group.name
   virtual_network_name = data.azurerm_virtual_network.app.name
-  address_prefixes     = ["172.17.67.192/27"]
+  address_prefixes     = [local.subnets_cidrs[1]]
 
   service_endpoints = [
     "Microsoft.AzureActiveDirectory",
@@ -55,6 +59,45 @@ resource "azurerm_subnet" "database" {
     service_delegation {
       name    = "Microsoft.DBforPostgreSQL/flexibleServers"
       actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
+    }
+  }
+}
+
+resource "azurerm_subnet" "vpn" {
+  name                 = "GatewaySubnet"
+  resource_group_name  = data.azurerm_resource_group.group.name
+  virtual_network_name = data.azurerm_virtual_network.app.name
+  address_prefixes     = [local.subnets_cidrs[2]]
+}
+
+resource "azurerm_subnet" "resolver_inbound" {
+  name                 = "resolver-inbound"
+  resource_group_name  = data.azurerm_resource_group.group.name
+  virtual_network_name = data.azurerm_virtual_network.app.name
+  address_prefixes     = [local.subnets_cidrs[3]]
+
+  delegation {
+    name = "delegation"
+
+    service_delegation {
+      name    = "Microsoft.Network/dnsResolvers"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
+    }
+  }
+}
+
+resource "azurerm_subnet" "resolver_outbound" {
+  name                 = "resolver-outbound"
+  resource_group_name  = data.azurerm_resource_group.group.name
+  virtual_network_name = data.azurerm_virtual_network.app.name
+  address_prefixes     = [local.subnets_cidrs[4]]
+
+  delegation {
+    name = "delegation"
+
+    service_delegation {
+      name    = "Microsoft.Network/dnsResolvers"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
     }
   }
 }

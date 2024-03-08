@@ -11,8 +11,8 @@ resource "azurerm_postgresql_flexible_server" "database" {
   storage_mb            = "32768"
   auto_grow_enabled     = true
   backup_retention_days = "14"
-  delegated_subnet_id   = azurerm_subnet.database.id
-  private_dns_zone_id   = azurerm_private_dns_zone.dns_zone.id
+  delegated_subnet_id   = local.cdc_domain_environment ? azurerm_subnet.database.id : null
+  private_dns_zone_id   = local.cdc_domain_environment ? azurerm_private_dns_zone.dns_zone.id : null
 
   authentication {
     password_auth_enabled         = "false"
@@ -30,14 +30,14 @@ resource "azurerm_postgresql_flexible_server" "database" {
   }
 }
 
-#resource "azurerm_postgresql_flexible_server_active_directory_administrator" "admin_for_deployer" {
-#  server_name         = azurerm_postgresql_flexible_server.database.name
-#  resource_group_name = data.azurerm_resource_group.group.name
-#  tenant_id           = data.azurerm_client_config.current.tenant_id
-#  object_id           = var.deployer_id
-#  principal_name      = "cdcti-github"
-#  principal_type      = "ServicePrincipal"
-#}
+resource "azurerm_postgresql_flexible_server_active_directory_administrator" "admin_for_deployer" {
+  server_name         = azurerm_postgresql_flexible_server.database.name
+  resource_group_name = data.azurerm_resource_group.group.name
+  tenant_id           = data.azurerm_client_config.current.tenant_id
+  object_id           = var.deployer_id
+  principal_name      = "cdcti-github"
+  principal_type      = "ServicePrincipal"
+}
 
 resource "azurerm_postgresql_flexible_server_active_directory_administrator" "admin_for_app" {
   server_name         = azurerm_postgresql_flexible_server.database.name
@@ -48,9 +48,10 @@ resource "azurerm_postgresql_flexible_server_active_directory_administrator" "ad
   principal_type      = "ServicePrincipal"
 }
 
-#resource "azurerm_postgresql_flexible_server_firewall_rule" "db_firewall_5" {
-#  name             = "AllowAzure"
-#  server_id        = azurerm_postgresql_flexible_server.database.id
-#  start_ip_address = "0.0.0.0"
-#  end_ip_address   = "0.0.0.0"
-#}
+resource "azurerm_postgresql_flexible_server_firewall_rule" "db_firewall_5" {
+  count            = local.cdc_domain_environment ? 0 : 1
+  name             = "AllowAzure"
+  server_id        = azurerm_postgresql_flexible_server.database.id
+  start_ip_address = "0.0.0.0"
+  end_ip_address   = "0.0.0.0"
+}

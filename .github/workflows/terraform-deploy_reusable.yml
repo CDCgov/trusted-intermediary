@@ -24,6 +24,14 @@ on:
         required: true
       AZURE_SUBSCRIPTION_ID:
         required: true
+      VPN_TLS_KEY:
+        required: false
+      VPN_CA_CERTIFICATE:
+        required: false
+      VPN_GITHUB_CERTIFICATE:
+        required: false
+      VPN_GITHUB_SECRET_KEY:
+        required: false
     outputs:
       REGISTRY:
         description: The container registry
@@ -85,13 +93,39 @@ jobs:
           echo "DATABASE_HOSTNAME=$DATABASE_HOSTNAME" >> "$GITHUB_ENV"
           echo "DATABASE_PASSWORD=$DATABASE_PASSWORD" >> "$GITHUB_ENV"
 
-      - name: Run Db migration
-        uses: liquibase-github-actions/update@v4.26.0
+      - name: Connect to VPN
+        uses: josiahsiegel/action-connect-ovpn@v2.0.2
+        id: connect_vpn
+        if: inputs.ENVIRONMENT != 'internal' && inputs.ENVIRONMENT != 'pr'
         with:
-          changelogFile: ./etor/databaseMigrations/root.yml
-          url: "jdbc:postgresql://${{ env.DATABASE_HOSTNAME }}:5432/postgres"
-          username: cdcti-github
-          password: ${{ env.DATABASE_PASSWORD }}
+          PING_URL: ${{ env.DATABASE_HOSTNAME }}
+          FILE_OVPN: ./operations/vpn/${{ inputs.ENVIRONMENT }}.ovpn
+          TLS_KEY: ${{ secrets.VPN_TLS_KEY }}
+        env:
+          CA_CRT: ${{ secrets.VPN_CA_CERTIFICATE }}
+          USER_CRT: ${{ secrets.VPN_GITHUB_CERTIFICATE }}
+          USER_KEY: ${{ secrets.VPN_GITHUB_SECRET_KEY }}
+
+      - name: Fail if VPN isn't Connected
+        if: inputs.ENVIRONMENT != 'internal' && inputs.ENVIRONMENT != 'pr' && steps.connect_vpn.outputs.STATUS != 'true'
+        run: |
+          echo 'VPN connected: ${{ steps.connect_vpn.outputs.STATUS }}'
+          exit 1
+
+      - name: Install Liquibase
+        run: |
+          wget -O- https://repo.liquibase.com/liquibase.asc | gpg --dearmor > liquibase-keyring.gpg && \cat liquibase-keyring.gpg | sudo tee /usr/share/keyrings/liquibase-keyring.gpg > /dev/null && \echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/liquibase-keyring.gpg] https://repo.liquibase.com stable main' | sudo tee /etc/apt/sources.list.d/liquibase.list
+          sudo apt-get update
+          sudo apt-get install liquibase
+          liquibase -v
+
+      - name: Run Db migration
+        working-directory: ./
+        run: liquibase update --changelog-file ./etor/databaseMigrations/root.yml --url 'jdbc:postgresql://${{ env.DATABASE_HOSTNAME }}:5432/postgres' --username cdcti-github --password '${{ env.DATABASE_PASSWORD }}'
+
+      - name: Disconnect VPN
+        if: inputs.ENVIRONMENT != 'internal' && inputs.ENVIRONMENT != 'pr' && always()
+        run: sudo killall openvpn
 
       - id: export-terraform-output
         name: Export Terraform Output

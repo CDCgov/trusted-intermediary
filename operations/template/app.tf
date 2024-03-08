@@ -26,23 +26,31 @@ resource "azurerm_linux_web_app" "api" {
 
   https_only = true
 
-  virtual_network_subnet_id = azurerm_subnet.app.id
+  virtual_network_subnet_id = local.cdc_domain_environment ? azurerm_subnet.app.id : null
 
   site_config {
-    scm_use_main_ip_restriction = true
+    scm_use_main_ip_restriction = local.cdc_domain_environment ? true : null
 
-    ip_restriction {
-      name       = "deny_all_ipv4"
-      action     = "Deny"
-      ip_address = "0.0.0.0/0"
-      priority   = "200"
+    dynamic "ip_restriction" {
+      for_each = local.cdc_domain_environment ? [1] : []
+
+      content {
+        name       = "deny_all_ipv4"
+        action     = "Deny"
+        ip_address = "0.0.0.0/0"
+        priority   = "200"
+      }
     }
 
-    ip_restriction {
-      name       = "deny_all_ipv6"
-      action     = "Deny"
-      ip_address = "::/0"
-      priority   = "201"
+    dynamic "ip_restriction" {
+      for_each = local.cdc_domain_environment ? [1] : []
+
+      content {
+        name       = "deny_all_ipv6"
+        action     = "Deny"
+        ip_address = "::/0"
+        priority   = "201"
+      }
     }
   }
 
