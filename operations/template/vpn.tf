@@ -20,7 +20,7 @@ resource "azurerm_virtual_network_gateway" "vpn" {
   sku           = "VpnGw1"
 
   ip_configuration {
-    public_ip_address_id          = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_public_ip.vpn.id : null
+    public_ip_address_id          = azurerm_public_ip.vpn.id
     private_ip_address_allocation = "Dynamic"
     subnet_id                     = azurerm_subnet.vpn.id
   }
