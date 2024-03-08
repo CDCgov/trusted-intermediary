@@ -130,14 +130,14 @@ resource "azurerm_route_table" "database" {
 resource "azurerm_route" "entra_internet" {
   name                = "entra_internet"
   resource_group_name = data.azurerm_resource_group.group.name
-  route_table_name    = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_route_table.database.name : null
+  route_table_name    = azurerm_route_table.database.name
   address_prefix      = "AzureActiveDirectory"
   next_hop_type       = "Internet"
 }
 
 resource "azurerm_subnet_route_table_association" "database_database" {
   subnet_id      = azurerm_subnet.database.id
-  route_table_id = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_route_table.database.name : null ? azurerm_route_table.database.id : null
+  route_table_id = azurerm_route_table.database.id
 }
 
 resource "azurerm_network_security_rule" "DB_Splunk_UF_omhsinf" {
