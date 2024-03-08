@@ -30,9 +30,13 @@ resource "azurerm_virtual_network_gateway" "vpn" {
     vpn_auth_types = ["Certificate"]
     vpn_client_protocols = ["OpenVPN"]
 
-    root_certificate {
-      name = "vpn-cert"
-      public_cert_data = var.vpn_root_certificate
+    dynamic "root_certificate" {
+      for_each = var.vpn_root_certificate != null ? [1] : []
+
+      content {
+        name = "vpn-cert"
+        public_cert_data = var.vpn_root_certificate
+      }
     }
   }
 }

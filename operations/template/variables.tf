@@ -10,5 +10,6 @@ variable "deployer_id" {
 
 variable "vpn_root_certificate" {
   type     = string
-  nullable = false
+  nullable = true
+  default = null
 }
