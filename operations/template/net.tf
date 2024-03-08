@@ -322,7 +322,6 @@ resource "azurerm_network_security_rule" "App_Allow_All_Out_omhsinf" {
 }
 
 resource "azurerm_subnet_network_security_group_association" "app_security_group" {
-  count                       = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   subnet_id                 = azurerm_subnet.app.id
   network_security_group_id = azurerm_network_security_group.app_security_group.id
 }
