@@ -28,12 +28,12 @@ resource "azurerm_virtual_network_gateway" "vpn" {
   dynamic "vpn_client_configuration" {
     for_each = var.vpn_root_certificate != null ? [1] : []
     content {
-      address_space = ["192.168.0.0/16"]
-      vpn_auth_types = ["Certificate"]
+      address_space        = ["192.168.0.0/16"]
+      vpn_auth_types       = ["Certificate"]
       vpn_client_protocols = ["OpenVPN"]
 
       root_certificate {
-        name = "vpn-cert"
+        name             = "vpn-cert"
         public_cert_data = var.vpn_root_certificate
       }
     }
@@ -50,8 +50,8 @@ resource "azurerm_private_dns_resolver" "private_zone_resolver" {
 
 resource "azurerm_private_dns_resolver_inbound_endpoint" "resolver_inbound_endpoint" {
   name                    = "endpoint-inbound-${var.environment}"
-  private_dns_resolver_id =  azurerm_private_dns_resolver.private_zone_resolver.id
-  location                =  azurerm_private_dns_resolver.private_zone_resolver.location
+  private_dns_resolver_id = azurerm_private_dns_resolver.private_zone_resolver.id
+  location                = azurerm_private_dns_resolver.private_zone_resolver.location
 
   ip_configurations {
     private_ip_allocation_method = "Dynamic"
@@ -61,7 +61,7 @@ resource "azurerm_private_dns_resolver_inbound_endpoint" "resolver_inbound_endpo
 
 resource "azurerm_private_dns_resolver_outbound_endpoint" "resolver_outbound_endpoint" {
   name                    = "endpoint-outbound-${var.environment}"
-  private_dns_resolver_id =  azurerm_private_dns_resolver.private_zone_resolver.id
-  location                =  azurerm_private_dns_resolver.private_zone_resolver.location
+  private_dns_resolver_id = azurerm_private_dns_resolver.private_zone_resolver.id
+  location                = azurerm_private_dns_resolver.private_zone_resolver.location
   subnet_id               = azurerm_subnet.resolver_outbound.id
 }

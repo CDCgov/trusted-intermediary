@@ -29,8 +29,8 @@ resource "azurerm_resource_group" "group" { //create the PR resource group becau
 }
 
 resource "azurerm_virtual_network" "vnet" { //create the PR resource group because it has a dynamic name that cannot be always pre-created
-  name     = "csels-rsti-pr${var.pr_number}-moderate-app-vnet"
-  location = azurerm_resource_group.group.location
+  name                = "csels-rsti-pr${var.pr_number}-moderate-app-vnet"
+  location            = azurerm_resource_group.group.location
   resource_group_name = azurerm_resource_group.group.name
 
   address_space = ["10.0.0.0/25"]
