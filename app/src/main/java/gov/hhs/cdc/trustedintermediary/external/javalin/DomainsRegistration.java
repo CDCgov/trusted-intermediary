@@ -183,7 +183,6 @@ public class DomainsRegistration {
                                         entry -> entry.getKey().toLowerCase(),
                                         Map.Entry::getValue));
 
-        LOGGER.logInfo(ctx.ip());
         request.setBody(ctx.body());
         request.setUrl(ctx.url());
         request.setHeaders(caseInsensitiveHeaderMap);
