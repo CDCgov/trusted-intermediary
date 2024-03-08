@@ -151,7 +151,7 @@ resource "azurerm_network_security_rule" "DB_Splunk_UF_omhsinf" {
   source_address_prefixes     = ["10.65.8.211/32", "10.65.8.212/32", "10.65.7.212/32", "10.65.7.211/32", "10.65.8.210/32", "10.65.7.210/32"]
   destination_address_prefix  = "*"
   resource_group_name         = data.azurerm_resource_group.group.name
-  network_security_group_name = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_network_security_group.db_security_group.name : null
+  network_security_group_name = azurerm_network_security_group.db_security_group.name
 }
 
 resource "azurerm_network_security_rule" "DB_Splunk_Indexer_Discovery_omhsinf" {
@@ -165,7 +165,7 @@ resource "azurerm_network_security_rule" "DB_Splunk_Indexer_Discovery_omhsinf" {
   source_address_prefix       = "10.11.7.22/32"
   destination_address_prefix  = "*"
   resource_group_name         = data.azurerm_resource_group.group.name
-  network_security_group_name = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_network_security_group.db_security_group.name : null
+  network_security_group_name = azurerm_network_security_group.db_security_group.name
 }
 
 
@@ -180,7 +180,7 @@ resource "azurerm_network_security_rule" "DB_Safe_Encase_Monitoring_omhsinf" {
   source_address_prefix       = "10.11.6.145/32"
   destination_address_prefix  = "*"
   resource_group_name         = data.azurerm_resource_group.group.name
-  network_security_group_name = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_network_security_group.db_security_group.name : null
+  network_security_group_name = azurerm_network_security_group.db_security_group.name
 }
 
 resource "azurerm_network_security_rule" "DB_ForeScout_Manager_omhsinf" {
@@ -194,7 +194,7 @@ resource "azurerm_network_security_rule" "DB_ForeScout_Manager_omhsinf" {
   source_address_prefixes     = ["10.64.8.184", "10.64.8.180/32"]
   destination_address_prefix  = "*"
   resource_group_name         = data.azurerm_resource_group.group.name
-  network_security_group_name = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_network_security_group.db_security_group.name : null
+  network_security_group_name = azurerm_network_security_group.db_security_group.name
 }
 
 resource "azurerm_network_security_rule" "DB_BigFix_omhsinf" {
@@ -208,7 +208,7 @@ resource "azurerm_network_security_rule" "DB_BigFix_omhsinf" {
   source_address_prefix       = "10.11.4.84/32"
   destination_address_prefix  = "*"
   resource_group_name         = data.azurerm_resource_group.group.name
-  network_security_group_name = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_network_security_group.db_security_group.name : null
+  network_security_group_name = azurerm_network_security_group.db_security_group.name
 }
 
 resource "azurerm_network_security_rule" "DB_Allow_All_Out_omhsinf" {
@@ -222,7 +222,7 @@ resource "azurerm_network_security_rule" "DB_Allow_All_Out_omhsinf" {
   source_address_prefix       = "*"
   destination_address_prefix  = "*"
   resource_group_name         = data.azurerm_resource_group.group.name
-  network_security_group_name = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_network_security_group.db_security_group.name : null
+  network_security_group_name = azurerm_network_security_group.db_security_group.name
 }
 
 resource "azurerm_subnet_network_security_group_association" "database_security_group" {
@@ -247,7 +247,7 @@ resource "azurerm_network_security_rule" "App_Splunk_UF_omhsinf" {
   source_address_prefixes     = ["10.65.8.211/32", "10.65.8.212/32", "10.65.7.212/32", "10.65.7.211/32", "10.65.8.210/32", "10.65.7.210/32"]
   destination_address_prefix  = "*"
   resource_group_name         = data.azurerm_resource_group.group.name
-  network_security_group_name = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_network_security_group.app_security_group.name : null
+  network_security_group_name = azurerm_network_security_group.app_security_group.name
 }
 
 resource "azurerm_network_security_rule" "App_Splunk_Indexer_Discovery_omhsinf" {
@@ -261,7 +261,7 @@ resource "azurerm_network_security_rule" "App_Splunk_Indexer_Discovery_omhsinf" 
   source_address_prefix       = "10.11.7.22/32"
   destination_address_prefix  = "*"
   resource_group_name         = data.azurerm_resource_group.group.name
-  network_security_group_name = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_network_security_group.app_security_group.name : null
+  network_security_group_name = azurerm_network_security_group.app_security_group.name
 }
 
 
@@ -276,7 +276,7 @@ resource "azurerm_network_security_rule" "App_Safe_Encase_Monitoring_omhsinf" {
   source_address_prefix       = "10.11.6.145/32"
   destination_address_prefix  = "*"
   resource_group_name         = data.azurerm_resource_group.group.name
-  network_security_group_name = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_network_security_group.app_security_group.name : null
+  network_security_group_name = azurerm_network_security_group.app_security_group.name
 }
 
 resource "azurerm_network_security_rule" "App_ForeScout_Manager_omhsinf" {
@@ -290,7 +290,7 @@ resource "azurerm_network_security_rule" "App_ForeScout_Manager_omhsinf" {
   source_address_prefixes     = ["10.64.8.184", "10.64.8.180/32"]
   destination_address_prefix  = "*"
   resource_group_name         = data.azurerm_resource_group.group.name
-  network_security_group_name = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_network_security_group.app_security_group.name : null
+  network_security_group_name = azurerm_network_security_group.app_security_group.name
 }
 
 resource "azurerm_network_security_rule" "App_BigFix_omhsinf" {
@@ -304,7 +304,7 @@ resource "azurerm_network_security_rule" "App_BigFix_omhsinf" {
   source_address_prefix       = "10.11.4.84/32"
   destination_address_prefix  = "*"
   resource_group_name         = data.azurerm_resource_group.group.name
-  network_security_group_name = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_network_security_group.app_security_group.name : null
+  network_security_group_name = azurerm_network_security_group.app_security_group.name
 }
 
 resource "azurerm_network_security_rule" "App_Allow_All_Out_omhsinf" {
@@ -318,7 +318,7 @@ resource "azurerm_network_security_rule" "App_Allow_All_Out_omhsinf" {
   source_address_prefix       = "*"
   destination_address_prefix  = "*"
   resource_group_name         = data.azurerm_resource_group.group.name
-  network_security_group_name = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_network_security_group.app_security_group.name : null
+  network_security_group_name = azurerm_network_security_group.app_security_group.name
 }
 
 resource "azurerm_subnet_network_security_group_association" "app_security_group" {

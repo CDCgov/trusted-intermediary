@@ -8,7 +8,6 @@ resource "azurerm_public_ip" "vpn" {
 }
 
 resource "azurerm_virtual_network_gateway" "vpn" {
-  count               = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                = "${var.environment}-vpn"
   location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
@@ -48,8 +47,8 @@ resource "azurerm_private_dns_resolver" "private_zone_resolver" {
 
 resource "azurerm_private_dns_resolver_inbound_endpoint" "resolver_inbound_endpoint" {
   name                    = "endpoint-inbound-${var.environment}"
-  private_dns_resolver_id = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_private_dns_resolver.private_zone_resolver.id : null
-  location                = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_private_dns_resolver.private_zone_resolver.location : null
+  private_dns_resolver_id =  azurerm_private_dns_resolver.private_zone_resolver.id
+  location                =  azurerm_private_dns_resolver.private_zone_resolver.location
 
   ip_configurations {
     private_ip_allocation_method = "Dynamic"
@@ -59,7 +58,7 @@ resource "azurerm_private_dns_resolver_inbound_endpoint" "resolver_inbound_endpo
 
 resource "azurerm_private_dns_resolver_outbound_endpoint" "resolver_outbound_endpoint" {
   name                    = "endpoint-outbound-${var.environment}"
-  private_dns_resolver_id = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_private_dns_resolver.private_zone_resolver.id : null
-  location                = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_private_dns_resolver.private_zone_resolver.location: null
+  private_dns_resolver_id =  azurerm_private_dns_resolver.private_zone_resolver.id
+  location                =  azurerm_private_dns_resolver.private_zone_resolver.location
   subnet_id               = azurerm_subnet.resolver_outbound.id
 }
