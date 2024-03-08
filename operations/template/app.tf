@@ -28,21 +28,24 @@ resource "azurerm_linux_web_app" "api" {
 
   virtual_network_subnet_id = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_subnet.app.id : null
 
-  site_config {
-    scm_use_main_ip_restriction = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? true : false
+  dynamic "site_config" {
+    for_each = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? [1] : []
+    content {
+      scm_use_main_ip_restriction = true
 
-    ip_restriction {
-      name       = "deny_all_ipv4"
-      action     = "Deny"
-      ip_address = "0.0.0.0/0"
-      priority   = "200"
-    }
+      ip_restriction {
+        name       = "deny_all_ipv4"
+        action     = "Deny"
+        ip_address = "0.0.0.0/0"
+        priority   = "200"
+      }
 
-    ip_restriction {
-      name       = "deny_all_ipv6"
-      action     = "Deny"
-      ip_address = "::/0"
-      priority   = "201"
+      ip_restriction {
+        name       = "deny_all_ipv6"
+        action     = "Deny"
+        ip_address = "::/0"
+        priority   = "201"
+      }
     }
   }
 
