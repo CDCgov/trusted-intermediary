@@ -11,8 +11,8 @@ resource "azurerm_postgresql_flexible_server" "database" {
   storage_mb            = "32768"
   auto_grow_enabled     = true
   backup_retention_days = "14"
-  delegated_subnet_id   = azurerm_subnet.database.id
-  private_dns_zone_id   = azurerm_private_dns_zone.dns_zone.id
+  delegated_subnet_id   = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_subnet.database.id : null
+  private_dns_zone_id   = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_private_dns_zone.dns_zone.id : null
 
   authentication {
     password_auth_enabled         = "false"
@@ -48,9 +48,10 @@ resource "azurerm_postgresql_flexible_server_active_directory_administrator" "ad
   principal_type      = "ServicePrincipal"
 }
 
-#resource "azurerm_postgresql_flexible_server_firewall_rule" "db_firewall_5" {
-#  name             = "AllowAzure"
-#  server_id        = azurerm_postgresql_flexible_server.database.id
-#  start_ip_address = "0.0.0.0"
-#  end_ip_address   = "0.0.0.0"
-#}
+resource "azurerm_postgresql_flexible_server_firewall_rule" "db_firewall_5" {
+  count            = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 0 : 1
+  name             = "AllowAzure"
+  server_id        = azurerm_postgresql_flexible_server.database.id
+  start_ip_address = "0.0.0.0"
+  end_ip_address   = "0.0.0.0"
+}

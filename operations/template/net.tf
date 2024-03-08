@@ -64,6 +64,7 @@ resource "azurerm_subnet" "database" {
 }
 
 resource "azurerm_subnet" "vpn" {
+  count                = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                 = "GatewaySubnet"
   resource_group_name  = data.azurerm_resource_group.group.name
   virtual_network_name = data.azurerm_virtual_network.app.name
@@ -71,6 +72,7 @@ resource "azurerm_subnet" "vpn" {
 }
 
 resource "azurerm_subnet" "resolver_inbound" {
+count                  = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                 = "resolver-inbound"
   resource_group_name  = data.azurerm_resource_group.group.name
   virtual_network_name = data.azurerm_virtual_network.app.name
@@ -87,6 +89,7 @@ resource "azurerm_subnet" "resolver_inbound" {
 }
 
 resource "azurerm_subnet" "resolver_outbound" {
+  count                = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                 = "resolver-outbound"
   resource_group_name  = data.azurerm_resource_group.group.name
   virtual_network_name = data.azurerm_virtual_network.app.name
@@ -116,18 +119,21 @@ resource "azurerm_private_dns_zone_virtual_network_link" "db_network_link" {
 }
 
 resource "azurerm_network_security_group" "db_security_group" {
+  count               = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                = "database-security-group"
   location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
 }
 
 resource "azurerm_route_table" "database" {
+  count               = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                = "database-route-table"
   location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
 }
 
 resource "azurerm_route" "entra_internet" {
+  count               = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                = "entra_internet"
   resource_group_name = data.azurerm_resource_group.group.name
   route_table_name    = azurerm_route_table.database.name
@@ -136,11 +142,13 @@ resource "azurerm_route" "entra_internet" {
 }
 
 resource "azurerm_subnet_route_table_association" "database_database" {
+count            = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   subnet_id      = azurerm_subnet.database.id
   route_table_id = azurerm_route_table.database.id
 }
 
 resource "azurerm_network_security_rule" "DB_Splunk_UF_omhsinf" {
+  count                       = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                        = "Splunk_UF_omhsinf"
   priority                    = 103
   direction                   = "Inbound"
@@ -155,6 +163,7 @@ resource "azurerm_network_security_rule" "DB_Splunk_UF_omhsinf" {
 }
 
 resource "azurerm_network_security_rule" "DB_Splunk_Indexer_Discovery_omhsinf" {
+  count                       = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                        = "Splunk_Indexer_Discovery_omhsinf"
   priority                    = 104
   direction                   = "Inbound"
@@ -170,6 +179,7 @@ resource "azurerm_network_security_rule" "DB_Splunk_Indexer_Discovery_omhsinf" {
 
 
 resource "azurerm_network_security_rule" "DB_Safe_Encase_Monitoring_omhsinf" {
+  count                       = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                        = "Safe_Encase_Monitoring_omhsinf"
   priority                    = 105
   direction                   = "Inbound"
@@ -184,6 +194,7 @@ resource "azurerm_network_security_rule" "DB_Safe_Encase_Monitoring_omhsinf" {
 }
 
 resource "azurerm_network_security_rule" "DB_ForeScout_Manager_omhsinf" {
+  count                       = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                        = "ForeScout_Manager_omhsinf"
   priority                    = 106
   direction                   = "Inbound"
@@ -198,6 +209,7 @@ resource "azurerm_network_security_rule" "DB_ForeScout_Manager_omhsinf" {
 }
 
 resource "azurerm_network_security_rule" "DB_BigFix_omhsinf" {
+  count                       = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                        = "BigFix_omhsinf"
   priority                    = 107
   direction                   = "Inbound"
@@ -212,6 +224,7 @@ resource "azurerm_network_security_rule" "DB_BigFix_omhsinf" {
 }
 
 resource "azurerm_network_security_rule" "DB_Allow_All_Out_omhsinf" {
+  count                       = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                        = "Allow_All_Out_omhsinf"
   priority                    = 109
   direction                   = "Outbound"
@@ -226,17 +239,20 @@ resource "azurerm_network_security_rule" "DB_Allow_All_Out_omhsinf" {
 }
 
 resource "azurerm_subnet_network_security_group_association" "database_security_group" {
+count                       = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   subnet_id                 = azurerm_subnet.database.id
   network_security_group_id = azurerm_network_security_group.db_security_group.id
 }
 
 resource "azurerm_network_security_group" "app_security_group" {
+count                 = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                = "app-security-group"
   location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
 }
 
 resource "azurerm_network_security_rule" "App_Splunk_UF_omhsinf" {
+  count                       = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                        = "Splunk_UF_omhsinf"
   priority                    = 103
   direction                   = "Inbound"
@@ -251,6 +267,7 @@ resource "azurerm_network_security_rule" "App_Splunk_UF_omhsinf" {
 }
 
 resource "azurerm_network_security_rule" "App_Splunk_Indexer_Discovery_omhsinf" {
+  count                       = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                        = "Splunk_Indexer_Discovery_omhsinf"
   priority                    = 104
   direction                   = "Inbound"
@@ -266,6 +283,7 @@ resource "azurerm_network_security_rule" "App_Splunk_Indexer_Discovery_omhsinf" 
 
 
 resource "azurerm_network_security_rule" "App_Safe_Encase_Monitoring_omhsinf" {
+  count                       = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                        = "Safe_Encase_Monitoring_omhsinf"
   priority                    = 105
   direction                   = "Inbound"
@@ -280,6 +298,7 @@ resource "azurerm_network_security_rule" "App_Safe_Encase_Monitoring_omhsinf" {
 }
 
 resource "azurerm_network_security_rule" "App_ForeScout_Manager_omhsinf" {
+  count                       = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                        = "ForeScout_Manager_omhsinf"
   priority                    = 106
   direction                   = "Inbound"
@@ -294,6 +313,7 @@ resource "azurerm_network_security_rule" "App_ForeScout_Manager_omhsinf" {
 }
 
 resource "azurerm_network_security_rule" "App_BigFix_omhsinf" {
+  count                       = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                        = "BigFix_omhsinf"
   priority                    = 107
   direction                   = "Inbound"
@@ -308,6 +328,7 @@ resource "azurerm_network_security_rule" "App_BigFix_omhsinf" {
 }
 
 resource "azurerm_network_security_rule" "App_Allow_All_Out_omhsinf" {
+  count                       = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                        = "Allow_All_Out_omhsinf"
   priority                    = 109
   direction                   = "Outbound"
@@ -322,6 +343,7 @@ resource "azurerm_network_security_rule" "App_Allow_All_Out_omhsinf" {
 }
 
 resource "azurerm_subnet_network_security_group_association" "app_security_group" {
+  count                       = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   subnet_id                 = azurerm_subnet.app.id
   network_security_group_id = azurerm_network_security_group.app_security_group.id
 }

@@ -26,12 +26,13 @@ resource "azurerm_linux_web_app" "api" {
 
   https_only = true
 
-  virtual_network_subnet_id = azurerm_subnet.app.id
+  virtual_network_subnet_id = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_subnet.app.id : null
 
   site_config {
-    scm_use_main_ip_restriction = true
+    scm_use_main_ip_restriction = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? true : false
 
     ip_restriction {
+      count      = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
       name       = "deny_all_ipv4"
       action     = "Deny"
       ip_address = "0.0.0.0/0"
@@ -39,6 +40,7 @@ resource "azurerm_linux_web_app" "api" {
     }
 
     ip_restriction {
+      count      = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
       name       = "deny_all_ipv6"
       action     = "Deny"
       ip_address = "::/0"
