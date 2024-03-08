@@ -96,6 +96,7 @@ jobs:
       - name: Connect to VPN
         uses: josiahsiegel/action-connect-ovpn@v2.0.2
         id: connect_vpn
+        if: inputs.ENVIRONMENT != 'internal' && inputs.ENVIRONMENT != 'pr'
         with:
           PING_URL: ${{ env.DATABASE_HOSTNAME }}
           FILE_OVPN: ./operations/vpn/${{ inputs.ENVIRONMENT }}.ovpn
@@ -106,7 +107,7 @@ jobs:
           USER_KEY: ${{ secrets.VPN_GITHUB_SECRET_KEY }}
 
       - name: Fail if VPN isn't Connected
-        if: steps.connect_vpn.outputs.STATUS != 'true'
+        if: inputs.ENVIRONMENT != 'internal' && inputs.ENVIRONMENT != 'pr' && steps.connect_vpn.outputs.STATUS != 'true'
         run: |
           echo 'VPN connected: ${{ steps.connect_vpn.outputs.STATUS }}'
           exit 1
@@ -123,7 +124,7 @@ jobs:
         run: liquibase update --changelog-file ./etor/databaseMigrations/root.yml --url 'jdbc:postgresql://${{ env.DATABASE_HOSTNAME }}:5432/postgres' --username cdcti-github --password '${{ env.DATABASE_PASSWORD }}'
 
       - name: Disconnect VPN
-        if: always()
+        if: inputs.ENVIRONMENT != 'internal' && inputs.ENVIRONMENT != 'pr' && always()
         run: sudo killall openvpn
 
       - id: export-terraform-output
