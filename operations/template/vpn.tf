@@ -25,15 +25,14 @@ resource "azurerm_virtual_network_gateway" "vpn" {
     subnet_id                     = azurerm_subnet.vpn.id
   }
 
-  vpn_client_configuration {
-    address_space = ["192.168.0.0/16"]
-    vpn_auth_types = ["Certificate"]
-    vpn_client_protocols = ["OpenVPN"]
+  dynamic "vpn_client_configuration" {
+    for_each = var.vpn_root_certificate != null ? [1] : []
+    content {
+      address_space = ["192.168.0.0/16"]
+      vpn_auth_types = ["Certificate"]
+      vpn_client_protocols = ["OpenVPN"]
 
-    dynamic "root_certificate" {
-      for_each = var.vpn_root_certificate != null ? [1] : []
-
-      content {
+      root_certificate {
         name = "vpn-cert"
         public_cert_data = var.vpn_root_certificate
       }
