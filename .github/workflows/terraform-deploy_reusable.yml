@@ -25,13 +25,13 @@ on:
       AZURE_SUBSCRIPTION_ID:
         required: true
       VPN_TLS_KEY:
-        required: true
+        required: false
       VPN_CA_CERTIFICATE:
-        required: true
+        required: false
       VPN_GITHUB_CERTIFICATE:
-        required: true
+        required: false
       VPN_GITHUB_SECRET_KEY:
-        required: true
+        required: false
     outputs:
       REGISTRY:
         description: The container registry
