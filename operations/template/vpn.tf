@@ -1,6 +1,5 @@
 
 resource "azurerm_public_ip" "vpn" {
-  count               = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                = "vpn-public-ip"
   location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
@@ -22,7 +21,7 @@ resource "azurerm_virtual_network_gateway" "vpn" {
   sku           = "VpnGw1"
 
   ip_configuration {
-    public_ip_address_id          = azurerm_public_ip.vpn.id
+    public_ip_address_id          = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_public_ip.vpn.id : null
     private_ip_address_allocation = "Dynamic"
     subnet_id                     = azurerm_subnet.vpn.id
   }
@@ -40,7 +39,6 @@ resource "azurerm_virtual_network_gateway" "vpn" {
 }
 
 resource "azurerm_private_dns_resolver" "private_zone_resolver" {
-  count               = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                = "private-resolve-${var.environment}"
   resource_group_name = data.azurerm_resource_group.group.name
   location            = data.azurerm_resource_group.group.location
@@ -49,10 +47,9 @@ resource "azurerm_private_dns_resolver" "private_zone_resolver" {
 
 
 resource "azurerm_private_dns_resolver_inbound_endpoint" "resolver_inbound_endpoint" {
-  count                   = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                    = "endpoint-inbound-${var.environment}"
-  private_dns_resolver_id = azurerm_private_dns_resolver.private_zone_resolver.id
-  location                = azurerm_private_dns_resolver.private_zone_resolver.location
+  private_dns_resolver_id = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_private_dns_resolver.private_zone_resolver.id : null
+  location                = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_private_dns_resolver.private_zone_resolver.location : null
 
   ip_configurations {
     private_ip_allocation_method = "Dynamic"
@@ -61,9 +58,8 @@ resource "azurerm_private_dns_resolver_inbound_endpoint" "resolver_inbound_endpo
 }
 
 resource "azurerm_private_dns_resolver_outbound_endpoint" "resolver_outbound_endpoint" {
-  count                   = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
   name                    = "endpoint-outbound-${var.environment}"
-  private_dns_resolver_id = azurerm_private_dns_resolver.private_zone_resolver.id
-  location                = azurerm_private_dns_resolver.private_zone_resolver.location
+  private_dns_resolver_id = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_private_dns_resolver.private_zone_resolver.id : null
+  location                = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? azurerm_private_dns_resolver.private_zone_resolver.location: null
   subnet_id               = azurerm_subnet.resolver_outbound.id
 }

@@ -32,7 +32,6 @@ resource "azurerm_linux_web_app" "api" {
     scm_use_main_ip_restriction = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? true : false
 
     ip_restriction {
-      count      = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
       name       = "deny_all_ipv4"
       action     = "Deny"
       ip_address = "0.0.0.0/0"
@@ -40,7 +39,6 @@ resource "azurerm_linux_web_app" "api" {
     }
 
     ip_restriction {
-      count      = var.environment == "dev" || var.environment == "stg" || var.environment == "prd" ? 1 : 0
       name       = "deny_all_ipv6"
       action     = "Deny"
       ip_address = "::/0"
