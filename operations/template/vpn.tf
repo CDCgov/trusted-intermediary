@@ -1,4 +1,3 @@
-
 resource "azurerm_public_ip" "vpn" {
   name                = "vpn-public-ip"
   location            = data.azurerm_resource_group.group.location
@@ -38,6 +37,8 @@ resource "azurerm_virtual_network_gateway" "vpn" {
       }
     }
   }
+
+  depends_on = [azurerm_subnet.app, azurerm_subnet.database, azurerm_subnet.resolver_inbound, azurerm_subnet.resolver_outbound, azurerm_subnet_network_security_group_association.app_security_group, azurerm_subnet_network_security_group_association.database_security_group, azurerm_subnet_route_table_association.database_database] # the VPN "locks" the subnets, so the VPN should wait until the subnet edits are done
 }
 
 resource "azurerm_private_dns_resolver" "private_zone_resolver" {
