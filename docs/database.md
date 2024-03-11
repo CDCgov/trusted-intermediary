@@ -17,17 +17,19 @@ Choose a Postgres client, [pgAdmin](https://www.pgadmin.org/) is the most full f
 6. Upon creating the table for the first time you may have to instruct your client to refresh (In pgAdmin right-click on the left hand menu and select Refresh)
 
 ## Connecting to an Azure Hosted Database
-1. Install the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
-2. Open the azure environment you are trying to access from within your browser and navigate to the database
-3. Inside of the Azure database page select the Networking option from the left hand nav
-4. Click the link that says `Add current client IP address` and then save the page
+1. For a CDC domain-hosted environment, connect to the VPN.  See the
+   [VPN documentation](https://www.notion.so/flexion-cdc-ti/DRAFT-Azure-VPN-pieces-d814ddcb87b1467f93ccf473e9cdb69c?pvs=4).
+2. Install the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
+3. Open the Azure environment you are trying to access from within your browser and navigate to the database
+4. Inside of the Azure database page select the Networking option from the left hand nav
+5. Click the link that says `Add current client IP address` and then save the page
     1. NOTE: You should only add your local IP address on a temporary basis, you should remove it after the verification is complete
-5. On the left hand navigation select Authentication and select the `Add Microsoft Entra Admins` link to add your user to the list. Select Okay and then save the underlying page
+6. On the left hand navigation select Authentication and select the `Add Microsoft Entra Admins` link to add your user to the list. Select Okay and then save the underlying page
     1. NOTE: This permission should only be added temporarily and removed after you are finished with verification
-6. Enter new connection settings from Azure into your db client of choice
+7. Enter new connection settings from Azure into your db client of choice
    1. Password will come from step 8 of these instructions and can be left blank
-7. Run `az login` inside of your local terminal
-8. Run `az account get-access-token --resource https://ossrdbms-aad.database.windows.net` to get a temporary password
+8. Run `az login` inside of your local terminal
+9. Run `az account get-access-token --resource https://ossrdbms-aad.database.windows.net` to get a temporary password
 
 ## Modifying the database schema
 To modify the schema there are a few locations in the code we need to update.
