@@ -139,7 +139,7 @@ resource "azurerm_subnet_route_table_association" "database_database" {
   subnet_id      = azurerm_subnet.database.id
   route_table_id = azurerm_route_table.database.id
 
-  depends_on = [azurerm_virtual_network_gateway.vpn]  # the VPN "locks" the subnets, so any edits to the subnet should wait until after the VPN is created.
+  depends_on = [azurerm_virtual_network_gateway.vpn] # the VPN "locks" the subnets, so any edits to the subnet should wait until after the VPN is created.
 }
 
 resource "azurerm_network_security_rule" "DB_Splunk_UF_omhsinf" {
@@ -231,7 +231,7 @@ resource "azurerm_subnet_network_security_group_association" "database_security_
   subnet_id                 = azurerm_subnet.database.id
   network_security_group_id = azurerm_network_security_group.db_security_group.id
 
-  depends_on = [azurerm_virtual_network_gateway.vpn]  # the VPN "locks" the subnets, so any edits to the subnet should wait until after the VPN is created.
+  depends_on = [azurerm_virtual_network_gateway.vpn] # the VPN "locks" the subnets, so any edits to the subnet should wait until after the VPN is created.
 }
 
 resource "azurerm_network_security_group" "app_security_group" {
@@ -329,5 +329,5 @@ resource "azurerm_subnet_network_security_group_association" "app_security_group
   subnet_id                 = azurerm_subnet.app.id
   network_security_group_id = azurerm_network_security_group.app_security_group.id
 
-  depends_on = [azurerm_virtual_network_gateway.vpn]  # the VPN "locks" the subnets, so any edits to the subnet should wait until after the VPN is created.
+  depends_on = [azurerm_virtual_network_gateway.vpn] # the VPN "locks" the subnets, so any edits to the subnet should wait until after the VPN is created.
 }
