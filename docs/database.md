@@ -22,7 +22,7 @@ Choose a Postgres client, [pgAdmin](https://www.pgadmin.org/) is the most full f
 2. Install the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
 3. Open the Azure environment you are trying to access from within your browser and navigate to the database
 4. Inside of the Azure database page select the Networking option from the left hand nav
-5. Click the link that says `Add current client IP address` and then save the page
+5. For a Flexion domain-hosted environment, click the link that says `Add current client IP address` and then save the page
     1. NOTE: You should only add your local IP address on a temporary basis, you should remove it after the verification is complete
 6. On the left hand navigation select Authentication and select the `Add Microsoft Entra Admins` link to add your user to the list. Select Okay and then save the underlying page
     1. NOTE: This permission should only be added temporarily and removed after you are finished with verification
