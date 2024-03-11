@@ -238,7 +238,7 @@ you are done.
 
 You will need to connect to the VPN for the given environment first, and then you can interact with the database.
 Notion contains the
-[instructions for connecting to the VPN](https://www.notion.so/flexion-cdc-ti/DRAFT-Azure-VPN-pieces-d814ddcb87b1467f93ccf473e9cdb69c?pvs=4).
+[instructions for connecting to the VPN](https://www.notion.so/flexion-cdc-ti/Azure-VPN-pieces-d814ddcb87b1467f93ccf473e9cdb69c?pvs=4).
 After connecting, you can follow the [database documentation](docs/database.md) to gain access.
 
 ### Pre-Commit Hooks

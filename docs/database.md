@@ -18,7 +18,7 @@ Choose a Postgres client, [pgAdmin](https://www.pgadmin.org/) is the most full f
 
 ## Connecting to an Azure Hosted Database
 1. For a CDC domain-hosted environment, connect to the VPN.  See the
-   [VPN documentation](https://www.notion.so/flexion-cdc-ti/DRAFT-Azure-VPN-pieces-d814ddcb87b1467f93ccf473e9cdb69c?pvs=4).
+   [VPN documentation](https://www.notion.so/flexion-cdc-ti/Azure-VPN-pieces-d814ddcb87b1467f93ccf473e9cdb69c?pvs=4).
 2. Install the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
 3. Open the Azure environment you are trying to access from within your browser and navigate to the database
 4. Inside of the Azure database page select the Networking option from the left hand nav
