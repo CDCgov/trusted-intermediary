@@ -1,0 +1,12 @@
+{
+  "rules": [ {
+      "name": "patientName",
+      "conditions": [
+        "Patient.name.exists()"
+      ],
+      "validations": [
+        "Patient.name.where(use='usual').given.exists()"
+      ]
+    }
+  ]
+}
