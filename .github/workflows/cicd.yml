@@ -25,6 +25,10 @@ jobs:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CDC_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_CDC_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_CDC_DMZ_C1_SUBSCRIPTION_ID }}
+      VPN_TLS_KEY: ${{ secrets.VPN_TLS_KEY }}
+      VPN_CA_CERTIFICATE: ${{ secrets.VPN_CA_CERTIFICATE }}
+      VPN_GITHUB_CERTIFICATE: ${{ secrets.VPN_GITHUB_CERTIFICATE}}
+      VPN_GITHUB_SECRET_KEY: ${{ secrets.VPN_GITHUB_SECRET_KEY }}
 
   staging-deploy:
     name: Staging Application Deploy

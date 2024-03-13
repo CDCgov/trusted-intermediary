@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "3.94.0"
+      version = "3.95.0"
     }
   }
 
@@ -28,11 +28,19 @@ resource "azurerm_resource_group" "group" { //create the PR resource group becau
   location = "East US"
 }
 
+resource "azurerm_virtual_network" "vnet" { //create the PR Vnet because it has a dynamic name that cannot be always pre-created
+  name                = "csels-rsti-pr${var.pr_number}-moderate-app-vnet"
+  location            = azurerm_resource_group.group.location
+  resource_group_name = azurerm_resource_group.group.name
+
+  address_space = ["10.0.0.0/25"]
+}
+
 module "template" {
   source = "../../template/"
 
   environment = "pr${var.pr_number}"
   deployer_id = "d59c2c86-de5e-41b7-a752-0869a73f5a60" //github app registration in Flexion Azure Entra
 
-  depends_on = [azurerm_resource_group.group]
+  depends_on = [azurerm_resource_group.group, azurerm_virtual_network.vnet]
 }

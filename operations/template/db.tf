@@ -11,12 +11,16 @@ resource "azurerm_postgresql_flexible_server" "database" {
   storage_mb            = "32768"
   auto_grow_enabled     = true
   backup_retention_days = "14"
+  delegated_subnet_id   = local.cdc_domain_environment ? azurerm_subnet.database.id : null
+  private_dns_zone_id   = local.cdc_domain_environment ? azurerm_private_dns_zone.dns_zone.id : null
 
   authentication {
     password_auth_enabled         = "false"
     active_directory_auth_enabled = "true"
     tenant_id                     = data.azurerm_client_config.current.tenant_id
   }
+
+  depends_on = [azurerm_private_dns_zone_virtual_network_link.db_network_link]
 
   lifecycle {
     ignore_changes = [
@@ -45,6 +49,7 @@ resource "azurerm_postgresql_flexible_server_active_directory_administrator" "ad
 }
 
 resource "azurerm_postgresql_flexible_server_firewall_rule" "db_firewall_5" {
+  count            = local.cdc_domain_environment ? 0 : 1
   name             = "AllowAzure"
   server_id        = azurerm_postgresql_flexible_server.database.id
   start_ip_address = "0.0.0.0"
