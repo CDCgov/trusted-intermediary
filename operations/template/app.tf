@@ -14,7 +14,7 @@ resource "azurerm_service_plan" "plan" {
   location               = data.azurerm_resource_group.group.location
   os_type                = "Linux"
   sku_name               = local.higher_environment_level ? "P1v3" : "P0v3"
-  zone_balancing_enabled = true
+  zone_balancing_enabled = local.higher_environment_level
 }
 
 # Create the staging App Service
@@ -26,7 +26,33 @@ resource "azurerm_linux_web_app" "api" {
 
   https_only = true
 
-  site_config {}
+  virtual_network_subnet_id = local.cdc_domain_environment ? azurerm_subnet.app.id : null
+
+  site_config {
+    scm_use_main_ip_restriction = local.cdc_domain_environment ? true : null
+
+    dynamic "ip_restriction" {
+      for_each = local.cdc_domain_environment ? [1] : []
+
+      content {
+        name       = "deny_all_ipv4"
+        action     = "Deny"
+        ip_address = "0.0.0.0/0"
+        priority   = "200"
+      }
+    }
+
+    dynamic "ip_restriction" {
+      for_each = local.cdc_domain_environment ? [1] : []
+
+      content {
+        name       = "deny_all_ipv6"
+        action     = "Deny"
+        ip_address = "::/0"
+        priority   = "201"
+      }
+    }
+  }
 
   app_settings = {
     DOCKER_REGISTRY_SERVER_URL      = "https://${azurerm_container_registry.registry.login_server}"

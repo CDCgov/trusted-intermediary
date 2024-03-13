@@ -174,13 +174,14 @@ is also meant to be the Wild West.  Dev deploys similarly to the Internal enviro
 
 ##### Staging
 
-The Staging environment is production-like and meant to be stable.  It deploys to a non-CDC Azure Entra domain and
+The Staging environment is production-like and meant to be stable.  It deploys to a CDC Azure Entra domain and
 subscription.  Deployments occur when a commit is made to the `main` branch.  `main` is a protected branch and requires
 PR reviews before merge.
 
 ##### Prod
 
-The Prod environment does not exist yet.
+The Production environment is the real deal.  It deploys to a CDC Azure Entra domain and subscription.  Deployments
+occur when a release is published.
 
 #### Initial Azure and GitHub Configuration
 
@@ -209,6 +210,36 @@ Entra domains and subscriptions.
 7. Create a GitHub Action workflow so that automatic deploys can occur.  You can take inspiration from our
    [Internal environment deployment](./.github/workflows/internal-deploy.yml).  Make sure you set the `AZURE_CLIENT_ID`,
    `AZURE_TENANT_ID`, and `AZURE_SUBSCRIPTION_ID` based on the secrets created previously.
+
+#### Interacting with Deployed Environments
+
+The PR and Internal environment is available on the public Internet and able to be interacted with directly.
+
+The Dev, Staging, and Prod environment are deployed inside a Vnet and require special steps to interact with these.
+
+##### Application
+
+The application basically has a firewall in place.  You need to add (and remove when you're done) your IP address to the
+firewall allow list.
+
+1. Log into CyberArk and then into Azure with your -SU account.
+2. Navigate to the environment's app service.
+3. Click on Networking in the left pane.
+4. Click on the "Enabled with access restrictions" link under "Inbound traffic configuration".
+5. Add a new rule to allow your _public_ IP address.  Provide an appropriate name with your name.  The priority will
+   need a lower number than the existing denies.  It will look like your IP address with a `/32` appended.  E.g.
+   `192.168.0.1/32`.
+6. Click "Save".
+
+You will now be able to interact with that environment's application.  Don't forget to remove your rule and save when
+you are done.
+
+##### Database
+
+You will need to connect to the VPN for the given environment first, and then you can interact with the database.
+Notion contains the
+[instructions for connecting to the VPN](https://www.notion.so/flexion-cdc-ti/Azure-VPN-pieces-d814ddcb87b1467f93ccf473e9cdb69c?pvs=4).
+After connecting, you can follow the [database documentation](docs/database.md) to gain access.
 
 ### Pre-Commit Hooks
 
