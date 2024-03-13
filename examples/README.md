@@ -37,3 +37,9 @@
 - `hl7/OML_021.hl7` => `NewSTEPs/001_NewSTEPs_OML_021.hl7`
 - `hl7/ORU_R01.hl7` => `NewSTEPs/002_NewSTEPs_ORU_R01.hl7`
 - `hl7/ADT_A01.txt` => `Other/001_ADT_A01.hl7`
+
+## Notes
+
+- The `ORM` messages with ids `003`, `004`, `005`, `006`, `007`, `008`, `009`, `010` in the `Test/Orders` folder were modified to comply with current requirements for ReportStream, as it doesn't yet support HL7 `2.3`:
+  - Added `MSH-9.3`
+  - Changed `MSH-10` to `2.5.1`
