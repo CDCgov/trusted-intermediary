@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingExc
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
@@ -14,6 +15,7 @@ import javax.inject.Inject;
 
 public class RuleLoader {
 
+    private final String RULES_CONFIG_FILE_NAME = "rule_definitions.json";
     private static final RuleLoader INSTANCE = new RuleLoader();
     @Inject Formatter formatter;
     @Inject Logger logger;
@@ -24,11 +26,17 @@ public class RuleLoader {
         return INSTANCE;
     }
 
-    List<ValidationRule> loadRules(String configPath) throws RuleLoaderException {
-        // configPath = "etor/src/main/resources/rule_defintions.json";
+    List<ValidationRule> loadRules() throws RuleLoaderException {
+        var fileUrl = getClass().getClassLoader().getResource(RULES_CONFIG_FILE_NAME);
+        if (fileUrl == null) {
+            throw new IllegalArgumentException("File not found: " + RULES_CONFIG_FILE_NAME);
+        }
+        return loadRules(Paths.get(fileUrl.getPath()));
+    }
 
+    List<ValidationRule> loadRules(Path configPath) throws RuleLoaderException {
         try {
-            String fileContent = Files.readString(Paths.get(configPath));
+            String fileContent = Files.readString(configPath);
             Map<String, List<ValidationRule>> jsonObj =
                     formatter.convertJsonToObject(fileContent, new TypeReference<>() {});
             return jsonObj.getOrDefault("rules", Collections.emptyList());

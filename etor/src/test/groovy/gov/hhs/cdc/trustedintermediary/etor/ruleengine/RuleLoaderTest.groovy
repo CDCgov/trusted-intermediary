@@ -43,7 +43,7 @@ class RuleLoaderTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        List<Rule> rules = RuleLoader.getInstance().loadRules(tempRulesFilePath.toString())
+        List<Rule> rules = RuleLoader.getInstance().loadRules(tempRulesFilePath)
 
         then:
         rules.size() == 1
