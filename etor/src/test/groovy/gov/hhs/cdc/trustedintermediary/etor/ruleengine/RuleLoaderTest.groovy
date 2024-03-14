@@ -54,4 +54,12 @@ class RuleLoaderTest extends Specification {
             "Patient.name.where(use='usual').given.exists()"
         ]
     }
+
+    def "handle IOException when loading rules from file"() {
+        when:
+        RuleLoader.getInstance().loadRules("DogCow")
+
+        then:
+        thrown(RuleLoaderException)
+    }
 }
