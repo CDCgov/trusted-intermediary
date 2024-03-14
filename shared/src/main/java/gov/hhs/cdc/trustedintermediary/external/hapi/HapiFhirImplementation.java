@@ -56,21 +56,22 @@ public class HapiFhirImplementation implements HapiFhir {
         return pathEngine.parse(fhirPath);
     }
 
-    public Boolean evaluateCondition(Base root, String expression) throws Exception {
+    public Boolean evaluateCondition(IBaseResource root, String expression) throws Exception {
         var expressionNode = parsePath(expression);
+        var base = (Base) root;
 
         List<Base> value;
         if (expressionNode == null) {
             value = new ArrayList<>();
         } else {
-            value = pathEngine.evaluate(root, expressionNode);
+            value = pathEngine.evaluate(base, expressionNode);
         }
 
         boolean retVal;
         if (value.size() == 1 && value.get(0).isBooleanPrimitive()) {
             retVal =
                     value.get(0)
-                            .castToBoolean(root)
+                            .castToBoolean(base)
                             .booleanValue(); // not sure if resource is the right param here...
         } else if (value.isEmpty()) {
             // The FHIR utilities that test for booleans only return one if the resource exists
