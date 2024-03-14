@@ -57,7 +57,7 @@ dependencies {
     implementation 'io.github.cdimascio:dotenv-java:3.0.0'
 
     // postgres
-    implementation 'org.postgresql:postgresql:42.7.2'
+    implementation 'org.postgresql:postgresql:42.7.3'
 
     // hikari connection pool
     implementation 'com.zaxxer:HikariCP:5.1.0'
