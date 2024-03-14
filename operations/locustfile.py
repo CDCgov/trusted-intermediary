@@ -153,17 +153,17 @@ def get_auth_request_body():
 
 def get_demographics_request_body():
     # read the sample request body for the demographics endpoint
-    with open("examples/Test/Patient_NBS.fhir", "r") as f:
+    with open("examples/Test/Demographics/001_Patient_NBS.fhir", "r") as f:
         return f.read()
 
 
 def get_orders_request_body():
     # read the sample request body for the orders endpoint
-    with open("examples/Test/OML_O21_short.fhir", "r") as f:
+    with open("examples/Test/Orders/001_OML_O21_short.fhir", "r") as f:
         return f.read()
 
 
 def get_results_request_body():
     # read the sample request body for the results endpoint
-    with open("examples/Test/ORU_R01_short.fhir", "r") as f:
+    with open("examples/Test/Results/001_ORU_R01_short.fhir", "r") as f:
         return f.read()
