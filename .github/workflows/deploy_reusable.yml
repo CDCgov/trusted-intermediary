@@ -60,7 +60,7 @@ jobs:
 
     - name: Retrieve registry password
       id: retrieve-registry-password
-      uses: azure/CLI@v1
+      uses: azure/CLI@v2
       with:
         inlineScript: |
           ACR_PASSWORD=$(az acr login --name ${{ inputs.REGISTRY }} --expose-token --output tsv --query accessToken)
@@ -118,7 +118,7 @@ jobs:
 
     - name: Retrieve registry password
       id: retrieve-registry-password
-      uses: azure/CLI@v1
+      uses: azure/CLI@v2
       with:
         inlineScript: |
           ACR_PASSWORD=$(az acr login --name ${{ inputs.REGISTRY }} --expose-token --output tsv --query accessToken)
@@ -140,7 +140,7 @@ jobs:
         path: /trusted-intermediary/output/.
 
     - name: Upload docs to blob storage
-      uses: azure/CLI@v1
+      uses: azure/CLI@v2
       with:
         inlineScript: |
           if [ "${{ inputs.ENVIRONMENT }}" == "pr" ]; then
