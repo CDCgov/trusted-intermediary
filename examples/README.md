@@ -17,9 +17,9 @@
 
 ## Previously renamed files
 
-- `fhir/MN NBS FHIR Order Message.json` => `Test/ORM_O01.fhir`
-- `fhir/lab_order.json` => `Test/OML_O21_short.fhir`
-- `fhir/newborn_patient.json` => `Test/Patient_NBS.fhir`
+- `fhir/MN NBS FHIR Order Message.json` => `Test/Orders/002_ORM_O01.fhir`
+- `fhir/lab_order.json` => `Test/Orders/001_OML_O21_short.fhir`
+- `fhir/newborn_patient.json` => `Test/Demographics/001_Patient_NBS.fhir`
 - `fhir/oml_message.json` => `Other/004_OML_O21.fhir`
 - `hl7/AL/Baptist ORM 1.txt` => `Oracle/001_Oracle_ORM_O01.hl7`
 - `hl7/AL/Baptist ORM 2.txt` => `Oracle/002_Oracle_ORM_O01.hl7`
@@ -37,3 +37,9 @@
 - `hl7/OML_021.hl7` => `NewSTEPs/001_NewSTEPs_OML_021.hl7`
 - `hl7/ORU_R01.hl7` => `NewSTEPs/002_NewSTEPs_ORU_R01.hl7`
 - `hl7/ADT_A01.txt` => `Other/001_ADT_A01.hl7`
+
+## Notes
+
+- The `ORM` messages with ids `003`, `004`, `005`, `006`, `007`, `008`, `009`, `010` in the `Test/Orders` folder were modified to comply with current requirements for ReportStream, as it doesn't yet support HL7 `2.3`:
+  - Added `MSH-9.3`
+  - Changed `MSH-10` to `2.5.1`
