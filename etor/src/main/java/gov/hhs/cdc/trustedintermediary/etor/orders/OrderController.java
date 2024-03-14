@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.orders;
 
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleEngine;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrder;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
@@ -18,6 +19,7 @@ public class OrderController {
     @Inject HapiFhir fhir;
     @Inject Logger logger;
     @Inject MetricMetadata metadata;
+    @Inject RuleEngine ruleEngine;
 
     private OrderController() {}
 
@@ -28,6 +30,7 @@ public class OrderController {
     public Order<?> parseOrders(DomainRequest request) throws FhirParseException {
         logger.logInfo("Parsing orders");
         var fhirBundle = fhir.parseResource(request.getBody(), Bundle.class);
+        ruleEngine.validate(fhirBundle);
         metadata.put(fhirBundle.getId(), EtorMetadataStep.RECEIVED_FROM_REPORT_STREAM);
         return new HapiOrder(fhirBundle);
     }
