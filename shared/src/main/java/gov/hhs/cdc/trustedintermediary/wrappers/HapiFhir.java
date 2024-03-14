@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.wrappers;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.ExpressionNode;
 
 /**
  * An interface that wraps around the Hapi FHIR library. It is Hapi-specific because making it
@@ -14,5 +15,7 @@ public interface HapiFhir {
 
     String encodeResourceToJson(Object resource);
 
-    Boolean evaluateCondition(IBaseResource resource, String expression);
+    ExpressionNode parsePath(String fhirPath);
+
+    Boolean evaluateCondition(IBaseResource resource, String expression) throws Exception;
 }
