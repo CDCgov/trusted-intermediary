@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.List;
 import javax.inject.Inject;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 
 public class ValidationRule implements Rule {
     private String name;
@@ -37,13 +38,13 @@ public class ValidationRule implements Rule {
     }
 
     @Override
-    public boolean isValid(String resource) {
+    public boolean isValid(IBaseResource resource) {
         return validations.stream()
                 .allMatch(validation -> fhir.evaluateCondition(resource, validation));
     }
 
     @Override
-    public boolean appliesTo(String resource) {
+    public boolean appliesTo(IBaseResource resource) {
         return conditions.stream()
                 .allMatch(condition -> fhir.evaluateCondition(resource, condition));
     }

@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine;
 
 import java.util.List;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 
 public interface Rule {
     String getName();
@@ -9,7 +10,7 @@ public interface Rule {
 
     List<String> getValidations();
 
-    boolean isValid(String resource);
+    boolean isValid(IBaseResource resource);
 
-    boolean appliesTo(String resource);
+    boolean appliesTo(IBaseResource resource);
 }

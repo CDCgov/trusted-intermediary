@@ -10,7 +10,7 @@ public class RuleEngine {
         this.rules.add(rule);
     }
 
-    public void validate(String resource) {
+    public void validate(IBaseResource resource) {
         for (Rule rule : rules) {
             if (rule.appliesTo(resource)) {
                 rule.isValid(resource);
