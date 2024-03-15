@@ -44,10 +44,7 @@ public class HapiFhirEngineImplementation implements HapiFhirEngine {
 
         boolean retVal;
         if (value.size() == 1 && value.get(0).isBooleanPrimitive()) {
-            retVal =
-                    value.get(0)
-                            .castToBoolean(base)
-                            .booleanValue(); // not sure if resource is the right param here...
+            retVal = base.castToBoolean(value.get(0)).booleanValue();
         } else if (value.isEmpty()) {
             // The FHIR utilities that test for booleans only return one if the resource exists
             // if the resource does not exist, they return []
