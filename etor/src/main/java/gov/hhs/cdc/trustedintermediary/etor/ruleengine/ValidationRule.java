@@ -1,6 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine;
 
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirEngineImplementation;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
+import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhirEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.List;
 import javax.inject.Inject;
@@ -12,6 +14,8 @@ public class ValidationRule implements Rule {
     private List<String> validations;
     @Inject HapiFhir fhir;
     @Inject Logger logger;
+
+    private final HapiFhirEngine fhirEngine = new HapiFhirEngineImplementation();
 
     public ValidationRule() {}
 
@@ -40,12 +44,26 @@ public class ValidationRule implements Rule {
     @Override
     public boolean isValid(IBaseResource resource) {
         return validations.stream()
-                .allMatch(validation -> fhir.evaluateCondition(resource, validation));
+                .allMatch(
+                        validation -> {
+                            try {
+                                return fhirEngine.evaluateCondition(resource, validation);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e); // @todo use more accurate exception
+                            }
+                        });
     }
 
     @Override
     public boolean appliesTo(IBaseResource resource) {
         return conditions.stream()
-                .allMatch(condition -> fhir.evaluateCondition(resource, condition));
+                .allMatch(
+                        condition -> {
+                            try {
+                                return fhirEngine.evaluateCondition(resource, condition);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e); // @todo use more accurate exception
+                            }
+                        });
     }
 }
