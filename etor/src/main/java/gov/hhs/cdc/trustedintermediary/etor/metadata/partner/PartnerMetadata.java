@@ -61,6 +61,21 @@ public record PartnerMetadata(
         this(receivedSubmissionId, null, null, null, null, null, null, deliveryStatus, null, null);
     }
 
+    public PartnerMetadata(
+            String receivedSubmissionId, PartnerMetadataStatus deliveryStatus, String messageType) {
+        this(
+                receivedSubmissionId,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                deliveryStatus,
+                null,
+                messageType);
+    }
+
     public PartnerMetadata withSentSubmissionId(String sentSubmissionId) {
         return new PartnerMetadata(
                 this.receivedSubmissionId,
