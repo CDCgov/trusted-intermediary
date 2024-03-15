@@ -50,7 +50,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> [sender: sender, timestamp: timestamp, actualCompletionAt: timeDelivered]
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, hashCode)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(receivedSubmissionId, hashCode)
 
         then:
         1 * mockClient.getRsToken() >> bearerToken
@@ -64,7 +64,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def sentSubmissionId = null
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentOrder(receivedSubmissionId, sentSubmissionId)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentMessage(receivedSubmissionId, sentSubmissionId)
 
         then:
         0 * mockPartnerMetadataStorage.readMetadata(receivedSubmissionId)
@@ -78,7 +78,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         mockPartnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.empty()
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentOrder(receivedSubmissionId, sentSubmissionId)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentMessage(receivedSubmissionId, sentSubmissionId)
 
         then:
         0 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata)
@@ -105,7 +105,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         mockClient.requestHistoryEndpoint(_ as String, _ as String) >> { throw new ReportStreamEndpointClientException("Client error", new Exception()) }
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, "hash")
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(receivedSubmissionId, "hash")
 
         then:
         1 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata) >> { PartnerMetadata metadata ->
@@ -124,7 +124,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> { throw new FormatterProcessingException("Formatter error", new Exception()) }
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, "hash")
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(receivedSubmissionId, "hash")
 
         then:
         thrown(PartnerMetadataException)
@@ -140,7 +140,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         mockFormatter.convertJsonToObject(wrongFormatResponse, _ as TypeReference) >> [someotherkey: "value"]
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedOrder(receivedSubmissionId, "hash")
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(receivedSubmissionId, "hash")
 
         then:
         thrown(PartnerMetadataException)
@@ -154,7 +154,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def updatedPartnerMetadata = partnerMetadata.withSentSubmissionId(sentSubmissionId)
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentOrder(receivedSubmissionId, sentSubmissionId)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentMessage(receivedSubmissionId, sentSubmissionId)
 
         then:
         1 * mockPartnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(partnerMetadata)
@@ -167,7 +167,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def sentSubmissionId = null
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentOrder(receivedSubmissionId, sentSubmissionId)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentMessage(receivedSubmissionId, sentSubmissionId)
 
         then:
         0 * mockPartnerMetadataStorage.readMetadata(receivedSubmissionId)

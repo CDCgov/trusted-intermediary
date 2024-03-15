@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.etor.demographics;
 
-import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter;
@@ -11,7 +10,7 @@ import javax.inject.Inject;
  * The overall logic that handles receiving patient demographics, converting it to a lab order, and
  * sending it on its way.
  */
-public class ConvertAndSendDemographicsUsecase implements SendMessageUseCase<Demographics<?>> {
+public class ConvertAndSendDemographicsUsecase {
 
     private static final ConvertAndSendDemographicsUsecase INSTANCE =
             new ConvertAndSendDemographicsUsecase();
@@ -26,7 +25,6 @@ public class ConvertAndSendDemographicsUsecase implements SendMessageUseCase<Dem
 
     private ConvertAndSendDemographicsUsecase() {}
 
-    @Override
     public void convertAndSend(Demographics<?> demographics) throws UnableToSendMessageException {
         Order<?> order = converter.convertToOrder(demographics);
         sender.send(order);

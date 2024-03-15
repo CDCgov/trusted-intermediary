@@ -187,7 +187,7 @@ public class EtorDomainRegistration implements DomainConnector {
                 request,
                 receivedSubmissionId -> {
                     Result<?> results = resultController.parseResults(request);
-                    sendResultUseCase.convertAndSend(results);
+                    sendResultUseCase.convertAndSend(results, receivedSubmissionId);
                     return domainResponseHelper.constructOkResponse(new ResultResponse(results));
                 },
                 "results",

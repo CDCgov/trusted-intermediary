@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.results;
 
+import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageHelper;
 import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
@@ -14,6 +15,9 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
     @Inject ResultConverter converter;
     @Inject ResultSender sender;
     @Inject MetricMetadata metadata;
+
+    @Inject SendMessageHelper sendMessageHelper;
+
     @Inject Logger logger;
 
     private SendResultUseCase() {}
@@ -23,10 +27,10 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
     }
 
     @Override
-    public void convertAndSend(Result<?> result) throws UnableToSendMessageException {
-
-        // todo: for story #650 (results metadata)
-        // savePartnerMetadataForReceivedResult(receivedSubmissionId, result)
+    public void convertAndSend(Result<?> result, String receivedSubmissionId)
+            throws UnableToSendMessageException {
+        sendMessageHelper.savePartnerMetadataForReceivedMessage(
+                receivedSubmissionId, result.hashCode());
 
         var convertedResult = converter.addEtorProcessingTag(result);
         metadata.put(
@@ -36,7 +40,6 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
         String sentSubmissionId = sender.send(convertedResult).orElse(null);
         logger.logInfo("Sent result submissionId: {}", sentSubmissionId);
 
-        // todo: for story #650 (results metadata)
-        // saveSentResultSubmissionId(receivedSubmissionId, bundleId)
+        sendMessageHelper.saveSentMessageSubmissionId(receivedSubmissionId, sentSubmissionId);
     }
 }

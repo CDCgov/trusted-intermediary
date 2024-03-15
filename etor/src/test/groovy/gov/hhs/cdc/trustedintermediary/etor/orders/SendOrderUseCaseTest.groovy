@@ -2,7 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.orders
 
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender
+import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageHelper
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
@@ -24,6 +24,7 @@ class SendOrderUseCaseTest extends Specification {
         TestApplicationContext.register(SendOrderUseCase, SendOrderUseCase.getInstance())
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
         TestApplicationContext.register(PartnerMetadataOrchestrator, mockOrchestrator)
+        TestApplicationContext.register(SendMessageHelper, SendMessageHelper.getInstance())
         TestApplicationContext.register(OrderConverter, mockConverter)
         TestApplicationContext.register(OrderSender, mockSender)
         TestApplicationContext.register(Logger, mockLogger)
@@ -51,8 +52,8 @@ class SendOrderUseCaseTest extends Specification {
         1 * sendOrder.metadata.put(_, EtorMetadataStep.ORDER_CONVERTED_TO_OML)
         1 * sendOrder.metadata.put(_, EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT)
         1 * sendOrder.metadata.put(_, EtorMetadataStep.ETOR_PROCESSING_TAG_ADDED_TO_MESSAGE_HEADER)
-        1 * mockOrchestrator.updateMetadataForReceivedOrder(receivedSubmissionId, _ as String)
-        1 * mockOrchestrator.updateMetadataForSentOrder(receivedSubmissionId, sentSubmissionId)
+        1 * mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String)
+        1 * mockOrchestrator.updateMetadataForSentMessage(receivedSubmissionId, sentSubmissionId)
     }
 
     def "send fails to send"() {
@@ -77,7 +78,7 @@ class SendOrderUseCaseTest extends Specification {
 
         then:
         2 * mockLogger.logWarning(_)
-        0 * mockOrchestrator.updateMetadataForReceivedOrder(_, _)
+        0 * mockOrchestrator.updateMetadataForReceivedMessage(_, _)
     }
 
     def "convertAndSend logs error and continues when updateMetadataForReceivedOrder throws exception"() {
@@ -85,7 +86,7 @@ class SendOrderUseCaseTest extends Specification {
         def order = Mock(Order)
         def omlOrder = Mock(Order)
         def receivedSubmissionId = "receivedId"
-        mockOrchestrator.updateMetadataForReceivedOrder(receivedSubmissionId, _ as String) >> { throw new PartnerMetadataException("Error") }
+        mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String) >> { throw new PartnerMetadataException("Error") }
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -104,7 +105,7 @@ class SendOrderUseCaseTest extends Specification {
         def order = Mock(Order)
         def omlOrder = Mock(Order)
         def partnerMetadataException = new PartnerMetadataException("Error")
-        mockOrchestrator.updateMetadataForSentOrder("receivedId", _) >> { throw  partnerMetadataException}
+        mockOrchestrator.updateMetadataForSentMessage("receivedId", _) >> { throw  partnerMetadataException}
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -130,6 +131,6 @@ class SendOrderUseCaseTest extends Specification {
 
         then:
         1 * mockLogger.logWarning(_)
-        0 * mockOrchestrator.updateMetadataForSentOrder(_ as String, _ as String)
+        0 * mockOrchestrator.updateMetadataForSentMessage(_ as String, _ as String)
     }
 }
