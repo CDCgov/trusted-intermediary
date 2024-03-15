@@ -176,7 +176,7 @@ class PostgresDaoTest extends Specification {
         mockResultSet.getString("receiver") >> receiver
         mockResultSet.getTimestamp("time_received") >> timestampForMock
         mockResultSet.getTimestamp("time_delivered") >> mockDeliveredTimestamp
-        mockResultSet.getString("hash_of_order") >> hash
+        mockResultSet.getString("hash_of_message") >> hash
         mockResultSet.getString("delivery_status") >> status.toString()
         mockResultSet.getString("failure_reason") >> reason
         mockPreparedStatement.executeQuery() >> mockResultSet

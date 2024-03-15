@@ -52,3 +52,22 @@ databaseChangeLog:
               - column:
                   name: failure_reason
                   type: varchar(1000)
+
+  - changeSet:
+      id: 3
+      author: samuel.aquino
+      labels: update-metadata-table
+      context: metadata
+      comment: update partner metadata table
+      changes:
+        - renameColumn:
+            columnDataType: varchar(1000)
+            oldColumnName: hash_of_order
+            newColumnName: hash_of_message
+            tableName: metadata
+        - addColumn:
+            tableName: metadata
+            columns:
+              - column:
+                  name: message_type
+                  type: varchar(15)
