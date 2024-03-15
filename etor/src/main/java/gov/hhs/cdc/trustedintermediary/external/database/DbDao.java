@@ -17,7 +17,8 @@ public interface DbDao {
             Instant timeReceived,
             Instant timeDelivered,
             PartnerMetadataStatus deliveryStatus,
-            String failureReason)
+            String failureReason,
+            String messageType)
             throws SQLException;
 
     Set<PartnerMetadata> fetchMetadataForSender(String sender) throws SQLException;

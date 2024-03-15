@@ -37,14 +37,15 @@ public class PostgresDao implements DbDao {
             Instant timeReceived,
             Instant timeDelivered,
             PartnerMetadataStatus deliveryStatus,
-            String failureReason)
+            String failureReason,
+            String messageType)
             throws SQLException {
 
         try (Connection conn = connectionPool.getConnection();
                 PreparedStatement statement =
                         conn.prepareStatement(
                                 """
-                                INSERT INTO metadata VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                INSERT INTO metadata VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                                 ON CONFLICT (received_message_id) DO UPDATE SET receiver = EXCLUDED.receiver, sent_message_id = EXCLUDED.sent_message_id, time_delivered = EXCLUDED.time_delivered, delivery_status = EXCLUDED.delivery_status, failure_reason = EXCLUDED.failure_reason
                                 """)) {
 
@@ -75,6 +76,8 @@ public class PostgresDao implements DbDao {
             statement.setObject(8, deliveryStatusString, Types.OTHER);
 
             statement.setString(9, failureReason);
+
+            statement.setString(10, messageType);
 
             statement.executeUpdate();
         }

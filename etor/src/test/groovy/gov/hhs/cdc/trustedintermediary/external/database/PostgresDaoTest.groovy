@@ -47,6 +47,7 @@ class PostgresDaoTest extends Specification {
         def timestamp = Instant.now()
         def status = PartnerMetadataStatus.PENDING
         def failureReason = "failure reason"
+        def messageType = "message type"
 
         mockConnPool.getConnection() >>  mockConn
         mockConn.prepareStatement(_ as String) >> mockPreparedStatement
