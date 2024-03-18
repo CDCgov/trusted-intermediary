@@ -31,6 +31,25 @@ public class HapiFhirEngineImplementation implements HapiFhirEngine {
         return pathEngine.parse(fhirPath);
     }
 
+    public List<Base> evaluate(IBaseResource root, String expression) {
+        var expressionNode = parsePath(expression);
+        var base = (Base) root;
+
+        List<Base> retVal;
+        if (expressionNode == null) {
+            retVal = new ArrayList<>();
+        } else {
+            try {
+                retVal = pathEngine.evaluate(base, expressionNode);
+            } catch (Exception e) {
+                // log exception
+                retVal = new ArrayList<>();
+            }
+        }
+
+        return retVal;
+    }
+
     public Boolean evaluateCondition(IBaseResource root, String expression) throws Exception {
         var expressionNode = parsePath(expression);
         var base = (Base) root;
@@ -51,7 +70,8 @@ public class HapiFhirEngineImplementation implements HapiFhirEngine {
             // for the purposes of the evaluating a schema condition that is the same as being false
             retVal = false;
         } else {
-            throw new Exception("add here");
+            throw new Exception(
+                    "add here"); // @todo consider defaulting to false and just logging the error
             // throw new FhirParseException("FHIR Path expression did not evaluate to a boolean
             // type: $expression", new Exception());
         }

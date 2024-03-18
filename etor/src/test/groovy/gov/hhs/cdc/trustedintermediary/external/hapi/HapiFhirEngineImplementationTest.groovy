@@ -4,6 +4,8 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhirEngine
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.DiagnosticReport
+import org.hl7.fhir.r4.model.ServiceRequest
 import org.hl7.fhir.r4.utils.FHIRLexer
 import spock.lang.Specification
 
@@ -11,6 +13,8 @@ import spock.lang.Specification
 class HapiFhirEngineImplementationTest extends Specification {
     HapiFhirEngine engine
     Bundle bundle
+    DiagnosticReport diaReport
+    ServiceRequest servRequest
 
     def setup() {
         TestApplicationContext.reset()
@@ -21,6 +25,19 @@ class HapiFhirEngineImplementationTest extends Specification {
 
         bundle = new Bundle()
         bundle.id = "abc123"
+
+        diaReport = new DiagnosticReport()
+        diaReport.id = "ghi789"
+        servRequest = new ServiceRequest()
+        servRequest.id = "def456"
+
+        def entry1 = new Bundle.BundleEntryComponent()
+        entry1.resource = diaReport
+        bundle.addEntry(entry1)
+
+        def entry2 = new Bundle.BundleEntryComponent()
+        entry2.resource = servRequest
+        bundle.addEntry(entry2)
     }
 
     def cleanup() {
@@ -61,7 +78,7 @@ class HapiFhirEngineImplementationTest extends Specification {
 
     def "parsePath throws FHIRLexerException on fake method"() {
         given:
-        def path = "Bundle.entry.resource.BADMETHOD(MessageHeader)"
+        def path = "Bundle.entry.resource.BadMethod(MessageHeader)"
 
         when:
         engine.parsePath(path)
@@ -124,4 +141,29 @@ class HapiFhirEngineImplementationTest extends Specification {
         then:
         result == false
     }
+
+    def "evaluateCondition throws FHIRLexerException on fake method"() {
+        given:
+        def path = "Bundle.entry[0].resource.BadMethod('blah')"
+
+        when:
+        engine.evaluateCondition(bundle as IBaseResource, path)
+
+        then:
+        thrown(FHIRLexer.FHIRLexerException)
+    }
+
+    def "evaluate returns the correct resource if it's available"() {
+        given:
+        def path = "Bundle.entry.resource.ofType(DiagnosticReport)[0]"
+
+        when:
+        def result = engine.evaluate(bundle as IBaseResource, path)
+
+        then:
+        result.size() == 1
+        result.first().class == DiagnosticReport.class
+        (result.first() as DiagnosticReport).id == diaReport.id
+    }
+
 }
