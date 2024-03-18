@@ -1,8 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine;
 
-import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirEngineImplementation;
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
-import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhirEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.List;
 import javax.inject.Inject;
@@ -15,7 +14,7 @@ public class ValidationRule implements Rule {
     @Inject HapiFhir fhir;
     @Inject Logger logger;
 
-    private final HapiFhirEngine fhirEngine = new HapiFhirEngineImplementation();
+    private final HapiFhir fhirEngine = HapiFhirImplementation.getInstance();
 
     public ValidationRule() {}
 
