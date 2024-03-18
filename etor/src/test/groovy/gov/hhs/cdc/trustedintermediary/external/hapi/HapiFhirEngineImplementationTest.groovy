@@ -166,4 +166,26 @@ class HapiFhirEngineImplementationTest extends Specification {
         (result.first() as DiagnosticReport).id == diaReport.id
     }
 
+    def "evaluate returns empty response on bad extension names"() {
+        given:
+        def path = "Bundle.extension('blah').value"
+
+        when:
+        def result = engine.evaluate(bundle as IBaseResource, path)
+
+        then:
+        result.isEmpty()
+    }
+
+    def "evaluate returns empty response on empty path"() {
+        given:
+        def path = ""
+
+        when:
+        def result = engine.evaluate(bundle as IBaseResource, path)
+
+        then:
+        result.isEmpty()
+    }
+
 }
