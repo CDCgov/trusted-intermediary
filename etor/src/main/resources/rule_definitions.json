@@ -1,11 +1,10 @@
 {
   "rules": [ {
-      "name": "patientName",
-      "conditions": [
-        "Patient.name.exists()"
-      ],
+      "name": "requiredReceiverId",
+      "description": "Message has required receiver id",
+      "conditions": [ ],
       "validations": [
-        "Patient.name.where(use='usual').given.exists()"
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.value.exists()"
       ]
     }
   ]
