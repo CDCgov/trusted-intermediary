@@ -24,7 +24,7 @@ public record PartnerMetadata(
         String hash,
         PartnerMetadataStatus deliveryStatus,
         String failureReason,
-        String messageType) {
+        PartnerMetadataMessageType messageType) {
 
     // Below is for defaulting status when null
     public PartnerMetadata {
@@ -57,12 +57,19 @@ public record PartnerMetadata(
         this(receivedSubmissionId, null, null, null, null, null, hash, null, null, null);
     }
 
+    public PartnerMetadata(
+            String receivedSubmissionId, String hash, PartnerMetadataMessageType messageType) {
+        this(receivedSubmissionId, null, null, null, null, null, hash, null, null, messageType);
+    }
+
     public PartnerMetadata(String receivedSubmissionId, PartnerMetadataStatus deliveryStatus) {
         this(receivedSubmissionId, null, null, null, null, null, null, deliveryStatus, null, null);
     }
 
     public PartnerMetadata(
-            String receivedSubmissionId, PartnerMetadataStatus deliveryStatus, String messageType) {
+            String receivedSubmissionId,
+            PartnerMetadataStatus deliveryStatus,
+            PartnerMetadataMessageType messageType) {
         this(
                 receivedSubmissionId,
                 null,

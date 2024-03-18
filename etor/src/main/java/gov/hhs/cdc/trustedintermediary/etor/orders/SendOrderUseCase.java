@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageHelper;
 import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import javax.inject.Inject;
@@ -27,7 +28,7 @@ public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
             throws UnableToSendMessageException {
 
         sendMessageHelper.savePartnerMetadataForReceivedMessage(
-                receivedSubmissionId, order.hashCode());
+                receivedSubmissionId, order.hashCode(), PartnerMetadataMessageType.ORDER);
 
         var omlOrder = converter.convertToOmlOrder(order);
         metadata.put(order.getFhirResourceId(), EtorMetadataStep.ORDER_CONVERTED_TO_OML);

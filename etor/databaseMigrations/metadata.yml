@@ -55,6 +55,16 @@ databaseChangeLog:
 
   - changeSet:
       id: 3
+      author: james.herr
+      labels: create-type
+      context: metadata
+      comment: create message type
+      changes:
+       - sql:
+           sql: CREATE TYPE message_type AS ENUM ('RESULT', 'ORDER')
+
+  - changeSet:
+      id: 4
       author: samuel.aquino
       labels: update-metadata-table
       context: metadata
@@ -70,4 +80,4 @@ databaseChangeLog:
             columns:
               - column:
                   name: message_type
-                  type: varchar(15)
+                  type: message_type

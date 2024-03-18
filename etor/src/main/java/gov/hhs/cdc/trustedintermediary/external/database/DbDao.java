@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.database;
 
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
 import java.sql.SQLException;
 import java.time.Instant;
@@ -18,7 +19,7 @@ public interface DbDao {
             Instant timeDelivered,
             PartnerMetadataStatus deliveryStatus,
             String failureReason,
-            String messageType)
+            PartnerMetadataMessageType messageType)
             throws SQLException;
 
     Set<PartnerMetadata> fetchMetadataForSender(String sender) throws SQLException;

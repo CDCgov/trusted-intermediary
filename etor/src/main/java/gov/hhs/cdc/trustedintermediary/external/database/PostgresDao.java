@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.database;
 
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
 import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool;
 import java.sql.Connection;
@@ -38,7 +39,7 @@ public class PostgresDao implements DbDao {
             Instant timeDelivered,
             PartnerMetadataStatus deliveryStatus,
             String failureReason,
-            String messageType)
+            PartnerMetadataMessageType messageType)
             throws SQLException {
 
         try (Connection conn = connectionPool.getConnection();
@@ -77,7 +78,12 @@ public class PostgresDao implements DbDao {
 
             statement.setString(9, failureReason);
 
-            statement.setString(10, messageType);
+            String messageTypeString = null;
+            if (messageType != null) {
+                messageTypeString = messageType.toString();
+            }
+
+            statement.setString(10, messageTypeString);
 
             statement.executeUpdate();
         }
@@ -145,6 +151,6 @@ public class PostgresDao implements DbDao {
                 resultSet.getString("hash_of_message"),
                 PartnerMetadataStatus.valueOf(resultSet.getString("delivery_status")),
                 resultSet.getString("failure_reason"),
-                resultSet.getString("message_type"));
+                PartnerMetadataMessageType.valueOf(resultSet.getString("message_type")));
     }
 }
