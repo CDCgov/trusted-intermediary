@@ -1,7 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
@@ -15,6 +15,7 @@ public class RuleEngine {
     private static final RuleEngine INSTANCE = new RuleEngine();
 
     @Inject Logger logger;
+    @Inject RuleLoader ruleLoader;
 
     private RuleEngine() {}
 
@@ -23,12 +24,9 @@ public class RuleEngine {
     }
 
     public void loadRules() {
-        var fileUrl = getClass().getClassLoader().getResource(RULES_CONFIG_FILE_NAME);
-        if (fileUrl == null) {
-            throw new IllegalArgumentException("File not found: " + RULES_CONFIG_FILE_NAME);
-        }
         try {
-            var loadedRules = RuleLoader.getInstance().loadRules(Paths.get(fileUrl.getPath()));
+            var rulesDefinitionPath = Path.of("../etor/src/main/resources", RULES_CONFIG_FILE_NAME);
+            var loadedRules = ruleLoader.loadRules(rulesDefinitionPath);
             rules.addAll(loadedRules);
         } catch (RuleLoaderException e) {
             throw new RuntimeException(e);
