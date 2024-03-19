@@ -7,6 +7,7 @@ import spock.lang.Specification
 
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 
 class RuleLoaderTest extends Specification {
 
@@ -57,7 +58,7 @@ class RuleLoaderTest extends Specification {
 
     def "handle IOException when loading rules from file"() {
         when:
-        RuleLoader.getInstance().loadRules("DogCow")
+        RuleLoader.getInstance().loadRules(Paths.get("DogCow"))
 
         then:
         thrown(RuleLoaderException)
