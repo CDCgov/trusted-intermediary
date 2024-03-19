@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageHelper
 import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageUseCase
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
@@ -60,7 +61,8 @@ class SendResultUseCaseTest extends Specification {
         given:
         def result = Mock(Result)
         def receivedSubmissionId = "receivedId"
-        mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String) >> { throw new PartnerMetadataException("Error") }
+        def messageType = PartnerMetadataMessageType.RESULT
+        mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String, messageType) >> { throw new PartnerMetadataException("Error") }
         TestApplicationContext.injectRegisteredImplementations()
 
         when:

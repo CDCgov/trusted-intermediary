@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.database
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
 import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool
 import gov.hhs.cdc.trustedintermediary.wrappers.database.DatabaseCredentialsProvider
@@ -47,7 +48,7 @@ class PostgresDaoTest extends Specification {
         def timestamp = Instant.now()
         def status = PartnerMetadataStatus.PENDING
         def failureReason = "failure reason"
-        def messageType = "message type"
+        def messageType = PartnerMetadataMessageType.RESULT
 
         mockConnPool.getConnection() >>  mockConn
         mockConn.prepareStatement(_ as String) >> mockPreparedStatement
@@ -56,7 +57,7 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PostgresDao.getInstance().upsertMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, hash, timestamp, timestamp, status, failureReason)
+        PostgresDao.getInstance().upsertMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, hash, timestamp, timestamp, status, failureReason, messageType)
 
         then:
         1 * mockPreparedStatement.setString(1, receivedSubmissionId)
@@ -80,7 +81,7 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PostgresDao.getInstance().upsertMetadata("mock_id_receiver", "mock_id_sender", "mock_sender", "mock_receiver", "mock_hash", Instant.now(), Instant.now(), PartnerMetadataStatus.DELIVERED, "mock_failure_reason")
+        PostgresDao.getInstance().upsertMetadata("mock_id_receiver", "mock_id_sender", "mock_sender", "mock_receiver", "mock_hash", Instant.now(), Instant.now(), PartnerMetadataStatus.DELIVERED, "mock_failure_reason", PartnerMetadataMessageType.RESULT)
 
         then:
         thrown(SQLException)
@@ -95,7 +96,7 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PostgresDao.getInstance().upsertMetadata("mock_id_receiver", "mock_id_sender", "mock_sender", "mock_receiver", "mock_hash", null, null, PartnerMetadataStatus.DELIVERED, "mock_failure_reason")
+        PostgresDao.getInstance().upsertMetadata("mock_id_receiver", "mock_id_sender", "mock_sender", "mock_receiver", "mock_hash", null, null, PartnerMetadataStatus.DELIVERED, "mock_failure_reason", PartnerMetadataMessageType.RESULT)
 
         then:
         mockPreparedStatement.setTimestamp(_ as Integer, _ as Timestamp) >> { Integer parameterIndex, Timestamp timestamp ->
@@ -166,7 +167,8 @@ class PostgresDaoTest extends Specification {
         def hash = sender.hashCode().toString()
         def status = PartnerMetadataStatus.PENDING
         def reason = "It done Goofed"
-        def expected = new PartnerMetadata(receivedMessageId, sentMessageId, sender, receiver, timeReceived, timeDelivered, hash, status, reason)
+        def messageType = PartnerMetadataMessageType.RESULT
+        def expected = new PartnerMetadata(receivedMessageId, sentMessageId, sender, receiver, timeReceived, timeDelivered, hash, status, reason, messageType)
 
         mockConnPool.getConnection() >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
@@ -214,8 +216,9 @@ class PostgresDaoTest extends Specification {
     def "fetchMetadataForSender retrieves a set of PartnerMetadata"() {
         given:
         def sender = "DogCow"
-        def expected1 = new PartnerMetadata("12345", "7890", sender, "You'll get your just reward", Instant.parse("2024-01-03T15:45:33.30Z"),Instant.parse("2024-01-03T15:45:33.30Z"),  sender.hashCode().toString(), PartnerMetadataStatus.PENDING, "It done Goofed")
-        def expected2 = new PartnerMetadata("doreyme", "fasole", sender, "receiver", Instant.now(), Instant.now(), "gobeltygoook", PartnerMetadataStatus.DELIVERED, "cause I said so")
+        def messageType = PartnerMetadataMessageType.RESULT
+        def expected1 = new PartnerMetadata("12345", "7890", sender, "You'll get your just reward", Instant.parse("2024-01-03T15:45:33.30Z"),Instant.parse("2024-01-03T15:45:33.30Z"),  sender.hashCode().toString(), PartnerMetadataStatus.PENDING, "It done Goofed", messageType)
+        def expected2 = new PartnerMetadata("doreyme", "fasole", sender, "receiver", Instant.now(), Instant.now(), "gobeltygoook", PartnerMetadataStatus.DELIVERED, "cause I said so", messageType)
 
         mockConnPool.getConnection() >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement

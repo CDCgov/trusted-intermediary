@@ -28,10 +28,11 @@ class PartnerMetadataTest extends Specification {
         def hash = "abcd"
         def status = PartnerMetadataStatus.DELIVERED
         def failureReason = "failure reason"
+        def messageType = PartnerMetadataMessageType.RESULT
 
 
         when:
-        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, timeDelivered, hash, PartnerMetadataStatus.DELIVERED, failureReason)
+        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, timeDelivered, hash, PartnerMetadataStatus.DELIVERED, failureReason, messageType)
 
         then:
         metadata.receivedSubmissionId() == receivedSubmissionId
@@ -113,11 +114,12 @@ class PartnerMetadataTest extends Specification {
         def sentSubmissionId = "sentSubmissionId"
         def sender = "sender"
         def receiver = "receiver"
+        def messageType = PartnerMetadataMessageType.RESULT
         def timeReceived = Instant.now()
         def hash = "abcd"
         def status = PartnerMetadataStatus.DELIVERED
         def failureReason = "DogCow goes boom"
-        def metadata = new PartnerMetadata(receivedSubmissionId, null, sender, null, timeReceived, null, hash, status, failureReason)
+        def metadata = new PartnerMetadata(receivedSubmissionId, null, sender, null, timeReceived, null, hash, status, failureReason, messageType)
 
         when:
         def updatedMetadata = metadata.withSentSubmissionId(sentSubmissionId).withReceiver(receiver)
@@ -140,9 +142,10 @@ class PartnerMetadataTest extends Specification {
         def receiver = "receiver"
         def timeReceived = Instant.now()
         def timeDelivered = null
+        def messageType = PartnerMetadataMessageType.RESULT
         def hash = "abcd"
         def failureReason = "DogCow goes boom"
-        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, timeDelivered, hash, PartnerMetadataStatus.PENDING, failureReason)
+        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, timeDelivered, hash, PartnerMetadataStatus.PENDING, failureReason, messageType)
 
         when:
         def newStatus = PartnerMetadataStatus.DELIVERED
@@ -168,9 +171,10 @@ class PartnerMetadataTest extends Specification {
         def receiver = "receiver"
         def timeReceived = Instant.now()
         def timeDelivered = Instant.now()
+        def messageType = PartnerMetadataMessageType.RESULT
         def hash = "abcd"
         def failureReason = "DogCow goes boom"
-        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, null, hash, PartnerMetadataStatus.PENDING, failureReason)
+        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, null, hash, PartnerMetadataStatus.PENDING, failureReason, messageType)
 
         when:
         def updatedMetadata = metadata.withTimeDelivered(timeDelivered)

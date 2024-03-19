@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageHelper
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
@@ -34,6 +35,7 @@ class SendOrderUseCaseTest extends Specification {
         given:
         def receivedSubmissionId = "receivedId"
         def sentSubmissionId = "sentId"
+        def messageType = PartnerMetadataMessageType.ORDER
 
         def sendOrder = SendOrderUseCase.getInstance()
         def mockOrder = new OrderMock(null, null, null)
@@ -52,7 +54,7 @@ class SendOrderUseCaseTest extends Specification {
         1 * sendOrder.metadata.put(_, EtorMetadataStep.ORDER_CONVERTED_TO_OML)
         1 * sendOrder.metadata.put(_, EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT)
         1 * sendOrder.metadata.put(_, EtorMetadataStep.ETOR_PROCESSING_TAG_ADDED_TO_MESSAGE_HEADER)
-        1 * mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String)
+        1 * mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String, messageType)
         1 * mockOrchestrator.updateMetadataForSentMessage(receivedSubmissionId, sentSubmissionId)
     }
 
@@ -86,7 +88,8 @@ class SendOrderUseCaseTest extends Specification {
         def order = Mock(Order)
         def omlOrder = Mock(Order)
         def receivedSubmissionId = "receivedId"
-        mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String) >> { throw new PartnerMetadataException("Error") }
+        def messageType = PartnerMetadataMessageType.ORDER
+        mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String, messageType) >> { throw new PartnerMetadataException("Error") }
         TestApplicationContext.injectRegisteredImplementations()
 
         when:

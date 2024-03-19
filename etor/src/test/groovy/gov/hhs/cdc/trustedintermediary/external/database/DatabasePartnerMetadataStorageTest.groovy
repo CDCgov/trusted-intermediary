@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.database
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStorage
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
 import spock.lang.Specification
@@ -28,7 +29,8 @@ class DatabasePartnerMetadataStorageTest extends Specification {
     def "readMetadata happy path works"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
-        def mockMetadata = new PartnerMetadata(receivedSubmissionId, "sentSubmissionId", "sender", "receiver", Instant.now(), Instant.now(), "hash", PartnerMetadataStatus.PENDING, null)
+        def messageType = PartnerMetadataMessageType.RESULT
+        def mockMetadata = new PartnerMetadata(receivedSubmissionId, "sentSubmissionId", "sender", "receiver", Instant.now(), Instant.now(), "hash", PartnerMetadataStatus.PENDING, null, messageType)
         def expectedResult = Optional.of(mockMetadata)
 
         mockDao.fetchMetadata(_ as String) >> mockMetadata
@@ -55,6 +57,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
     def "saveMetadata happy path works"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
+        def messageType = PartnerMetadataMessageType.RESULT
         def mockMetadata = new PartnerMetadata(
                 receivedSubmissionId,
                 "sentSubmissionId",
@@ -64,7 +67,8 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 Instant.now(),
                 "hash",
                 PartnerMetadataStatus.PENDING,
-                "DogCow failure"
+                "DogCow failure",
+                messageType
                 )
 
         when:
@@ -80,13 +84,15 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 mockMetadata.timeReceived(),
                 mockMetadata.timeDelivered(),
                 mockMetadata.deliveryStatus(),
-                mockMetadata.failureReason()
+                mockMetadata.failureReason(),
+                mockMetadata.messageType()
                 )
     }
 
     def "saveMetadata unhappy path works"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
+        def messageType = PartnerMetadataMessageType.ORDER
         def mockMetadata = new PartnerMetadata(
                 receivedSubmissionId,
                 "sentSubmissionId",
@@ -96,7 +102,8 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 Instant.now(),
                 "hash",
                 PartnerMetadataStatus.FAILED,
-                "DogCow failure"
+                "DogCow failure",
+                messageType
                 )
 
         mockDao.upsertMetadata(
@@ -108,7 +115,8 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 mockMetadata.timeReceived(),
                 mockMetadata.timeDelivered(),
                 mockMetadata.deliveryStatus(),
-                mockMetadata.failureReason()
+                mockMetadata.failureReason(),
+                mockMetadata.messageType()
                 ) >> { throw new SQLException("Something went wrong!") }
 
         when:

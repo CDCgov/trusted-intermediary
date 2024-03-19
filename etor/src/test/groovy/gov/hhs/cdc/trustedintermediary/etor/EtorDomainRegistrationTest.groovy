@@ -217,7 +217,7 @@ class EtorDomainRegistrationTest extends Specification {
 
         then:
         1 * mockController.parseResults(request) >> resultMock
-        1 * mockUseCase.convertAndSend(resultMock)
+        1 * mockUseCase.convertAndSend(resultMock, request.headers.get("recordid"))
         1 * mockResponseHelper.constructOkResponse(_ as ResultResponse)
     }
 
