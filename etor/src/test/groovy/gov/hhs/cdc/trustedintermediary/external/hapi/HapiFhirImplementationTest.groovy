@@ -8,16 +8,11 @@ import org.hl7.fhir.r4.model.DiagnosticReport
 import org.hl7.fhir.r4.model.ServiceRequest
 import spock.lang.Specification
 
-import java.nio.file.Files
-import java.nio.file.Path
-
 class HapiFhirImplementationTest extends Specification {
     Bundle bundle
     DiagnosticReport diaReport
     ServiceRequest servRequest
-    HapiFhirImplementation engine = HapiFhirImplementation.getInstance()
-
-    String labOrderJsonFileString
+    HapiFhirImplementation fhir = HapiFhirImplementation.getInstance()
 
     def setup() {
         TestApplicationContext.reset()
@@ -41,8 +36,6 @@ class HapiFhirImplementationTest extends Specification {
         def entry2 = new Bundle.BundleEntryComponent()
         entry2.resource = servRequest
         bundle.addEntry(entry2)
-
-        labOrderJsonFileString = Files.readString(Path.of("/Users/turke/Documents/GitHub/trusted-intermediary/examples/Test/Orders/003_AL_ORM_O01_NBS_Fully_Populated_1_hl7_translation.fhir"))
     }
 
     def "evaluate returns the correct resource if it's available"() {
@@ -50,7 +43,7 @@ class HapiFhirImplementationTest extends Specification {
         def path = "Bundle.entry.resource.ofType(DiagnosticReport)[0]"
 
         when:
-        def result = engine.evaluate(bundle as IBaseResource, path)
+        def result = fhir.evaluate(bundle as IBaseResource, path)
 
         then:
         result.size() == 1
@@ -63,7 +56,7 @@ class HapiFhirImplementationTest extends Specification {
         def path = "Bundle.extension('blah').value"
 
         when:
-        def result = engine.evaluate(bundle as IBaseResource, path)
+        def result = fhir.evaluate(bundle as IBaseResource, path)
 
         then:
         result.isEmpty()
@@ -74,7 +67,7 @@ class HapiFhirImplementationTest extends Specification {
         def path = ""
 
         when:
-        engine.evaluate(bundle as IBaseResource, path)
+        fhir.evaluate(bundle as IBaseResource, path)
 
         then:
         thrown(FhirPathExecutionException)
@@ -85,7 +78,7 @@ class HapiFhirImplementationTest extends Specification {
         def path = "Bundle.entry.resource.ofType(DiagnosticReport)[0].exists()"
 
         when:
-        def result = engine.evaluate(bundle as IBaseResource, path)
+        def result = fhir.evaluate(bundle as IBaseResource, path)
 
         then:
         result[0].primitiveValue() == "true"
@@ -96,7 +89,7 @@ class HapiFhirImplementationTest extends Specification {
         def path = "Bundle.entry.resource.ofType(Practitioner)[0].exists()"
 
         when:
-        def result = engine.evaluate(bundle as IBaseResource, path)
+        def result = fhir.evaluate(bundle as IBaseResource, path)
 
         then:
         result[0].primitiveValue() == "false"
@@ -107,7 +100,7 @@ class HapiFhirImplementationTest extends Specification {
         def path = "Bundle.entry.resource.ofType(SomeFakeType)[0].exists()"
 
         when:
-        engine.evaluate(bundle as IBaseResource, path)
+        fhir.evaluate(bundle as IBaseResource, path)
 
         then:
         thrown(FhirPathExecutionException)
@@ -119,7 +112,7 @@ class HapiFhirImplementationTest extends Specification {
         def path = "Bundle.id.exists()"
 
         when:
-        def result = engine.evaluateCondition(bundle as IBaseResource, path)
+        def result = fhir.evaluateCondition(bundle as IBaseResource, path)
 
         then:
         result == true
@@ -130,7 +123,7 @@ class HapiFhirImplementationTest extends Specification {
         def path = "Bundle.timestamp.exists()"
 
         when:
-        def result = engine.evaluateCondition(bundle as IBaseResource, path)
+        def result = fhir.evaluateCondition(bundle as IBaseResource, path)
 
         then:
         result == false
@@ -141,7 +134,7 @@ class HapiFhirImplementationTest extends Specification {
         def path = "Bundle.entry[0].resource.extension('blah')"
 
         when:
-        def result = engine.evaluateCondition(bundle as IBaseResource, path)
+        def result = fhir.evaluateCondition(bundle as IBaseResource, path)
 
         then:
         result == false
@@ -152,7 +145,7 @@ class HapiFhirImplementationTest extends Specification {
         def path = ""
 
         when:
-        engine.evaluateCondition(bundle as IBaseResource, path)
+        fhir.evaluateCondition(bundle as IBaseResource, path)
 
         then:
         thrown(FhirPathExecutionException)
@@ -163,7 +156,7 @@ class HapiFhirImplementationTest extends Specification {
         def path = "Bundle.entry[0].resource.BadMethod('blah')"
 
         when:
-        engine.evaluateCondition(bundle as IBaseResource, path)
+        fhir.evaluateCondition(bundle as IBaseResource, path)
 
         then:
         thrown(FhirPathExecutionException)
