@@ -6,6 +6,16 @@
       "validations": [
         "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.value.exists()"
       ]
+    },
+    {
+      "name": "requiredReceiverId",
+      "description": "ORM has required Card Number",
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'O01'"
+      ],
+      "validations": [
+        "Bundle.entry.resource.ofType(Observation).where(code.coding.code = '57723-9').valueCodeableConcept.coding.code.exists()"
+      ]
     }
   ]
 }
