@@ -6,6 +6,10 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 public interface Rule {
     String getName();
 
+    String getDescription();
+
+    String getWarningMessage();
+
     List<String> getConditions();
 
     List<String> getValidations();

@@ -2,25 +2,29 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine;
 
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
-import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.List;
-import javax.inject.Inject;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 public class ValidationRule implements Rule {
     private String name;
+    private String description;
+    private String warningMessage;
     private List<String> conditions;
     private List<String> validations;
-    @Inject HapiFhir fhir;
-    @Inject Logger logger;
 
     private final HapiFhir fhirEngine = HapiFhirImplementation.getInstance();
 
     public ValidationRule() {}
 
     public ValidationRule(
-            String ruleName, List<String> ruleConditions, List<String> ruleValidations) {
+            String ruleName,
+            String ruleDescription,
+            String ruleWarningMessage,
+            List<String> ruleConditions,
+            List<String> ruleValidations) {
         name = ruleName;
+        description = ruleDescription;
+        warningMessage = ruleWarningMessage;
         conditions = ruleConditions;
         validations = ruleValidations;
     }
@@ -28,6 +32,16 @@ public class ValidationRule implements Rule {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public String getWarningMessage() {
+        return warningMessage;
     }
 
     @Override
