@@ -30,7 +30,6 @@ public class OrderController {
     public Order<?> parseOrders(DomainRequest request) throws FhirParseException {
         logger.logInfo("Parsing orders");
         var fhirBundle = fhir.parseResource(request.getBody(), Bundle.class);
-        ruleEngine.loadRules();
         ruleEngine.validate(fhirBundle);
         metadata.put(fhirBundle.getId(), EtorMetadataStep.RECEIVED_FROM_REPORT_STREAM);
         return new HapiOrder(fhirBundle);

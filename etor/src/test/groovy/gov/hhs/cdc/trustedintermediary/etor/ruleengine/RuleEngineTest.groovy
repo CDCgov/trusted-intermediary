@@ -37,7 +37,6 @@ class RuleEngineTest extends Specification {
         def bundle = fhir.parseResource(fhirBody, Bundle)
 
         when:
-        engine.loadRules()
         engine.validate(bundle)
 
         then:

@@ -11,6 +11,7 @@ public class RuleEngine {
 
     private final String RULES_CONFIG_FILE_NAME = "rule_definitions.json";
     private final List<Rule> rules = new ArrayList<>();
+    private boolean rulesLoaded = false;
 
     private static final RuleEngine INSTANCE = new RuleEngine();
 
@@ -23,13 +24,16 @@ public class RuleEngine {
         return INSTANCE;
     }
 
-    public void loadRules() {
-        var rulesDefinitionPath = Path.of("../etor/src/main/resources", RULES_CONFIG_FILE_NAME);
-        try {
-            var loadedRules = ruleLoader.loadRules(rulesDefinitionPath);
-            rules.addAll(loadedRules);
-        } catch (RuleLoaderException e) {
-            logger.logError("Failed to load rules definitions from: " + rulesDefinitionPath, e);
+    public void ensureRulesLoaded() {
+        if (!rulesLoaded) {
+            var rulesDefinitionPath = Path.of("../etor/src/main/resources", RULES_CONFIG_FILE_NAME);
+            try {
+                var loadedRules = ruleLoader.loadRules(rulesDefinitionPath);
+                rules.addAll(loadedRules);
+                rulesLoaded = true;
+            } catch (RuleLoaderException e) {
+                logger.logError("Failed to load rules definitions from: " + rulesDefinitionPath, e);
+            }
         }
     }
 
@@ -38,6 +42,7 @@ public class RuleEngine {
     }
 
     public void validate(IBaseResource resource) {
+        ensureRulesLoaded();
         for (Rule rule : rules) {
             if (rule.appliesTo(resource)) {
                 if (!rule.isValid(resource)) {
