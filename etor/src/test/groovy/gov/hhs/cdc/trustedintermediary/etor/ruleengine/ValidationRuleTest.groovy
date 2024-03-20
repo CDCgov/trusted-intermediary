@@ -2,6 +2,8 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation
+import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
 
@@ -10,6 +12,7 @@ class ValidationRuleTest extends Specification {
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
+        TestApplicationContext.register(Logger, Mock(Logger))
         TestApplicationContext.injectRegisteredImplementations()
     }
 
@@ -23,6 +26,8 @@ class ValidationRuleTest extends Specification {
 
         when:
         def rule = new ValidationRule(ruleName, ruleDescription, ruleWarningMessage, conditions, validations)
+        TestApplicationContext.register(ValidationRule, rule)
+        TestApplicationContext.injectRegisteredImplementations()
 
         then:
         rule.getName() == ruleName
@@ -41,10 +46,14 @@ class ValidationRuleTest extends Specification {
             secondCondition
         ], null)
 
+        TestApplicationContext.register(ValidationRule, validationRule)
+
         def mockFhir = Mock(HapiFhirImplementation)
         mockFhir.evaluateCondition(fhirResource, trueCondition) >> true
         mockFhir.evaluateCondition(fhirResource, secondCondition) >> conditionResult
-        validationRule.fhirEngine = mockFhir
+        TestApplicationContext.register(HapiFhir, mockFhir)
+
+        TestApplicationContext.injectRegisteredImplementations()
 
         expect:
         validationRule.appliesTo(fhirResource) == applies
@@ -63,11 +72,14 @@ class ValidationRuleTest extends Specification {
             trueValidation,
             secondValidation
         ])
+        TestApplicationContext.register(ValidationRule, validationRule)
 
         def mockFhir = Mock(HapiFhirImplementation)
         mockFhir.evaluateCondition(fhirResource, trueValidation) >> true
         mockFhir.evaluateCondition(fhirResource, secondValidation) >> validationResult
-        validationRule.fhirEngine = mockFhir
+        TestApplicationContext.register(HapiFhir, mockFhir)
+
+        TestApplicationContext.injectRegisteredImplementations()
 
         expect:
         validationRule.isValid(fhirResource) == valid

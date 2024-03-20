@@ -1,20 +1,21 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine;
 
-import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.List;
+import javax.inject.Inject;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 public class ValidationRule implements Rule {
+
+    private static final ValidationRule INSTANCE = new ValidationRule();
     private String name;
     private String description;
     private String warningMessage;
     private List<String> conditions;
     private List<String> validations;
 
-    HapiFhir fhirEngine = HapiFhirImplementation.getInstance();
-
-    public ValidationRule() {}
+    private ValidationRule() {}
 
     public ValidationRule(
             String ruleName,
@@ -27,6 +28,13 @@ public class ValidationRule implements Rule {
         warningMessage = ruleWarningMessage;
         conditions = ruleConditions;
         validations = ruleValidations;
+    }
+
+    @Inject HapiFhir fhirEngine;
+    @Inject Logger logger;
+
+    public static ValidationRule getInstance() {
+        return INSTANCE;
     }
 
     @Override
@@ -62,7 +70,11 @@ public class ValidationRule implements Rule {
                             try {
                                 return fhirEngine.evaluateCondition(resource, validation);
                             } catch (Exception e) {
-                                throw new RuntimeException(e); // @todo use more accurate exception
+                                logger.logError(
+                                        "An error occurred while evaluating the validation: "
+                                                + validation,
+                                        e);
+                                return false;
                             }
                         });
     }
@@ -75,7 +87,11 @@ public class ValidationRule implements Rule {
                             try {
                                 return fhirEngine.evaluateCondition(resource, condition);
                             } catch (Exception e) {
-                                throw new RuntimeException(e); // @todo use more accurate exception
+                                logger.logError(
+                                        "An error occurred while evaluating the condition: "
+                                                + condition,
+                                        e);
+                                return false;
                             }
                         });
     }
