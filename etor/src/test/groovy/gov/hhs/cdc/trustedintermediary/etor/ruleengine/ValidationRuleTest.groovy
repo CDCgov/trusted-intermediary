@@ -64,6 +64,29 @@ class ValidationRuleTest extends Specification {
         "secondCondition" | false           | false
     }
 
+    def "appliesTo logs an error and returns false if an exception happens when evaluating a condition"() {
+        given:
+        def fhirResource = new Bundle()
+        def validationRule = new ValidationRule(null, null, null, ["condition"], null)
+        TestApplicationContext.register(ValidationRule, validationRule)
+
+        def mockFhir = Mock(HapiFhirImplementation)
+        mockFhir.evaluateCondition(fhirResource, "condition") >> { throw new Exception() }
+        TestApplicationContext.register(HapiFhir, mockFhir)
+
+        def mockLogger = Mock(Logger)
+        TestApplicationContext.register(Logger, mockLogger)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def applies = validationRule.appliesTo(fhirResource)
+
+        then:
+        1 * mockLogger.logError(_ as String, _ as Exception)
+        !applies
+    }
+
     def "isValid returns expected boolean depending on validations"() {
         given:
         def trueValidation = "trueValidation"
@@ -88,5 +111,28 @@ class ValidationRuleTest extends Specification {
         secondValidation   | validationResult | valid
         "secondValidation" | true             | true
         "secondValidation" | false            | false
+    }
+
+    def "isValid logs an error and returns false if an exception happens when evaluating a validation"() {
+        given:
+        def fhirResource = new Bundle()
+        def validationRule = new ValidationRule(null, null, null, null, ["validation"])
+        TestApplicationContext.register(ValidationRule, validationRule)
+
+        def mockFhir = Mock(HapiFhirImplementation)
+        mockFhir.evaluateCondition(fhirResource, "condition") >> { throw new Exception() }
+        TestApplicationContext.register(HapiFhir, mockFhir)
+
+        def mockLogger = Mock(Logger)
+        TestApplicationContext.register(Logger, mockLogger)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def valid = validationRule.isValid(fhirResource)
+
+        then:
+        1 * mockLogger.logError(_ as String, _ as Exception)
+        !valid
     }
 }
