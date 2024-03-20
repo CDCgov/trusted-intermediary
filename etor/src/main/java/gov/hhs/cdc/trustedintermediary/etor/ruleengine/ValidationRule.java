@@ -1,13 +1,16 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine;
 
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.List;
-import javax.inject.Inject;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 public class ValidationRule implements Rule {
 
+    private static final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
+    private static final HapiFhir FHIR_ENGINE =
+            ApplicationContext.getImplementation(HapiFhir.class);
     private String name;
     private String description;
     private String warningMessage;
@@ -28,9 +31,6 @@ public class ValidationRule implements Rule {
         conditions = ruleConditions;
         validations = ruleValidations;
     }
-
-    @Inject HapiFhir fhirEngine;
-    @Inject Logger logger;
 
     @Override
     public String getName() {
@@ -63,9 +63,9 @@ public class ValidationRule implements Rule {
                 .allMatch(
                         validation -> {
                             try {
-                                return fhirEngine.evaluateCondition(resource, validation);
+                                return FHIR_ENGINE.evaluateCondition(resource, validation);
                             } catch (Exception e) {
-                                logger.logError(
+                                LOGGER.logError(
                                         "An error occurred while evaluating the validation: "
                                                 + validation,
                                         e);
@@ -80,9 +80,9 @@ public class ValidationRule implements Rule {
                 .allMatch(
                         condition -> {
                             try {
-                                return fhirEngine.evaluateCondition(resource, condition);
+                                return FHIR_ENGINE.evaluateCondition(resource, condition);
                             } catch (Exception e) {
-                                logger.logError(
+                                LOGGER.logError(
                                         "An error occurred while evaluating the condition: "
                                                 + condition,
                                         e);
