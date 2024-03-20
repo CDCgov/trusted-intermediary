@@ -112,6 +112,7 @@ class PostgresDaoTest extends Specification {
         mockResultSet.next() >> true
         mockResultSet.getTimestamp(_ as String) >> Timestamp.from(Instant.now())
         mockResultSet.getString("delivery_status") >> "DELIVERED"
+        mockResultSet.getString("message_type") >> "RESULT"
         TestApplicationContext.register(ConnectionPool, mockConnPool)
         TestApplicationContext.injectRegisteredImplementations()
 
@@ -182,6 +183,7 @@ class PostgresDaoTest extends Specification {
         mockResultSet.getString("hash_of_message") >> hash
         mockResultSet.getString("delivery_status") >> status.toString()
         mockResultSet.getString("failure_reason") >> reason
+        mockResultSet.getString("message_type") >> messageType.toString()
         mockPreparedStatement.executeQuery() >> mockResultSet
 
         TestApplicationContext.register(ConnectionPool, mockConnPool)
@@ -202,6 +204,7 @@ class PostgresDaoTest extends Specification {
         mockResultSet.next() >> true
         mockResultSet.getTimestamp("time_received") >> null
         mockResultSet.getString("delivery_status") >> "DELIVERED"
+        mockResultSet.getString("message_type") >> "RESULT"
         mockResultSet.getString("failure_reason") >> "Your time is up"
         TestApplicationContext.register(ConnectionPool, mockConnPool)
         TestApplicationContext.injectRegisteredImplementations()
@@ -247,7 +250,7 @@ class PostgresDaoTest extends Specification {
             Timestamp.from(expected1.timeDelivered()),
             Timestamp.from(expected2.timeDelivered())
         ]
-        mockResultSet.getString("hash_of_order") >>> [
+        mockResultSet.getString("hash_of_message") >>> [
             expected1.hash(),
             expected2.hash()
         ]
@@ -258,6 +261,10 @@ class PostgresDaoTest extends Specification {
         mockResultSet.getString("failure_reason") >>> [
             expected1.failureReason(),
             expected2.failureReason()
+        ]
+        mockResultSet.getString("message_type") >>> [
+            expected1.messageType().toString(),
+            expected2.messageType().toString()
         ]
         mockPreparedStatement.executeQuery() >> mockResultSet
 
