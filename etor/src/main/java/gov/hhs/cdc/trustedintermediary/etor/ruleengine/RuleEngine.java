@@ -24,12 +24,12 @@ public class RuleEngine {
     }
 
     public void loadRules() {
+        var rulesDefinitionPath = Path.of("../etor/src/main/resources", RULES_CONFIG_FILE_NAME);
         try {
-            var rulesDefinitionPath = Path.of("../etor/src/main/resources", RULES_CONFIG_FILE_NAME);
             var loadedRules = ruleLoader.loadRules(rulesDefinitionPath);
             rules.addAll(loadedRules);
         } catch (RuleLoaderException e) {
-            throw new RuntimeException(e);
+            logger.logError("Failed to load rules definitions from: " + rulesDefinitionPath, e);
         }
     }
 

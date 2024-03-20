@@ -31,7 +31,7 @@ public class RuleLoader {
             return jsonObj.getOrDefault("rules", Collections.emptyList());
         } catch (IOException | FormatterProcessingException e) {
             throw new RuleLoaderException(
-                    "Failed to load rules from config path: " + configPath, e);
+                    "Failed to load rules definitions from: " + configPath, e);
         }
     }
 }
