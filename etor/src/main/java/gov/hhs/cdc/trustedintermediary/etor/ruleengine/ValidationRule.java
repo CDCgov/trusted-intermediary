@@ -8,14 +8,13 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 
 public class ValidationRule implements Rule {
 
-    private static final ValidationRule INSTANCE = new ValidationRule();
     private String name;
     private String description;
     private String warningMessage;
     private List<String> conditions;
     private List<String> validations;
 
-    private ValidationRule() {}
+    public ValidationRule() {}
 
     public ValidationRule(
             String ruleName,
@@ -32,10 +31,6 @@ public class ValidationRule implements Rule {
 
     @Inject HapiFhir fhirEngine;
     @Inject Logger logger;
-
-    public static ValidationRule getInstance() {
-        return INSTANCE;
-    }
 
     @Override
     public String getName() {
