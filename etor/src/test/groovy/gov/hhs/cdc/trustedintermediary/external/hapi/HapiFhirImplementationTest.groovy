@@ -105,7 +105,6 @@ class HapiFhirImplementationTest extends Specification {
         then:
         thrown(FhirPathExecutionException)
     }
-    //    Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.value.exists()
 
     def "evaluateCondition returns true on finding existing value"() {
         given:
