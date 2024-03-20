@@ -26,8 +26,6 @@ class ValidationRuleTest extends Specification {
 
         when:
         def rule = new ValidationRule(ruleName, ruleDescription, ruleWarningMessage, conditions, validations)
-        TestApplicationContext.register(ValidationRule, rule)
-        TestApplicationContext.injectRegisteredImplementations()
 
         then:
         rule.getName() == ruleName

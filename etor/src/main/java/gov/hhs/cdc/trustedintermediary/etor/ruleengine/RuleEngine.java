@@ -37,10 +37,6 @@ public class RuleEngine {
         }
     }
 
-    public void addRule(Rule rule) {
-        this.rules.add(rule);
-    }
-
     public void validate(IBaseResource resource) {
         ensureRulesLoaded();
         for (Rule rule : rules) {
