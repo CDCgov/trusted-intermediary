@@ -12,7 +12,7 @@ public class ValidationRule implements Rule {
     private List<String> conditions;
     private List<String> validations;
 
-    private final HapiFhir fhirEngine = HapiFhirImplementation.getInstance();
+    HapiFhir fhirEngine = HapiFhirImplementation.getInstance();
 
     public ValidationRule() {}
 
