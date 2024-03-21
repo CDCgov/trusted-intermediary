@@ -13,7 +13,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 class RuleEngineTest extends Specification {
-
     def ruleEngine = RuleEngine.getInstance()
     def mockRuleLoader = Mock(RuleLoader)
     def mockLogger = Mock(Logger)
@@ -37,9 +36,9 @@ class RuleEngineTest extends Specification {
         ruleEngine.rules.size() == 1
     }
 
-    def "ensureRulesLoaded loads rules only once"() {
+    def "ensureRulesLoaded loads rules only once by default"() {
         when:
-        ruleEngine.ensureRulesLoaded()
+        ruleEngine.ensureRulesLoaded(true)
         ruleEngine.ensureRulesLoaded() // Call twice to test if rules are loaded only once
 
         then:
@@ -52,7 +51,7 @@ class RuleEngineTest extends Specification {
         mockRuleLoader.loadRules(_ as Path) >> { throw exception }
 
         when:
-        ruleEngine.validate(Mock(Bundle))
+        ruleEngine.validate(Mock(Bundle), true)
 
         then:
         1 * mockLogger.logError(_ as String, exception)
@@ -69,7 +68,7 @@ class RuleEngineTest extends Specification {
         when:
         invalidRule.appliesTo(fhirBundle) >> true
         invalidRule.isValid(fhirBundle) >> false
-        ruleEngine.validate(fhirBundle)
+        ruleEngine.validate(fhirBundle, true)
 
         then:
         1 * mockLogger.logWarning(ruleWarningMessage)
@@ -77,7 +76,7 @@ class RuleEngineTest extends Specification {
         when:
         invalidRule.appliesTo(fhirBundle) >> true
         invalidRule.isValid(fhirBundle) >> true
-        ruleEngine.validate(fhirBundle)
+        ruleEngine.validate(fhirBundle, true)
 
         then:
         0 * mockLogger.logWarning(ruleWarningMessage)
@@ -85,7 +84,7 @@ class RuleEngineTest extends Specification {
         when:
         invalidRule.appliesTo(fhirBundle) >> false
         invalidRule.isValid(fhirBundle) >> false
-        ruleEngine.validate(fhirBundle)
+        ruleEngine.validate(fhirBundle, true)
 
         then:
         0 * mockLogger.logWarning(ruleWarningMessage)

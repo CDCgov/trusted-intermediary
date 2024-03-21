@@ -28,7 +28,11 @@ public class RuleEngine {
     }
 
     public void ensureRulesLoaded() {
-        if (!rulesLoaded) {
+        ensureRulesLoaded(false);
+    }
+
+    public void ensureRulesLoaded(boolean forceUpdate) {
+        if (forceUpdate || !rulesLoaded) {
             logger.logDebug("Loading rules definitions from " + RULES_DEFINITIONS_PATH);
             try {
                 var loadedRules = ruleLoader.loadRules(RULES_DEFINITIONS_PATH);
@@ -42,8 +46,12 @@ public class RuleEngine {
     }
 
     public void validate(IBaseResource resource) {
+        validate(resource, false);
+    }
+
+    public void validate(IBaseResource resource, boolean forceRulesUpdate) {
         logger.logDebug("Validating FHIR resource");
-        ensureRulesLoaded();
+        ensureRulesLoaded(forceRulesUpdate);
         for (Rule rule : rules) {
             if (rule.appliesTo(resource)) {
                 if (!rule.isValid(resource)) {
