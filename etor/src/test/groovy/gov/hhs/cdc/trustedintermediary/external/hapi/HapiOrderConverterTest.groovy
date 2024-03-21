@@ -351,6 +351,6 @@ class HapiOrderConverterTest extends Specification {
         result.getIssue().get(4).diagnostics == time.toString()
         result.getIssue().get(5).diagnostics == PartnerMetadataStatus.DELIVERED.toString()
         result.getIssue().get(6).diagnostics == failureReason
-        result.getIssue().get(4).details.text.contains(messageType.toString())
+        result.getIssue().get(4).details.text.contains(messageType.toString().toLowerCase())
     }
 }
