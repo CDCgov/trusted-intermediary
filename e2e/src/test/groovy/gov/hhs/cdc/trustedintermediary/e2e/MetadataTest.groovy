@@ -60,7 +60,7 @@ class MetadataTest extends Specification {
         def inboundSubmissionId = UUID.randomUUID().toString()
         def outboundSubmissionId = "1234567890"
         def resultClient = new EndpointClient("/v1/etor/results")
-        def labResult = Files.readString(Path.of("../examples/Test/Results/ORU_R01.fhir"))
+        def labResult = Files.readString(Path.of("../examples/Test/Results/001_ORU_R01.fhir"))
 
         when:
         def resultResponse = resultClient.submit(labResult, inboundSubmissionId, true)
