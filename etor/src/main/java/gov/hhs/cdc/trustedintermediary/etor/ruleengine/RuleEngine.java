@@ -7,6 +7,7 @@ import java.util.List;
 import javax.inject.Inject;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
+/** Manages the application of rules loaded from a definitions file using the RuleLoader. */
 public class RuleEngine {
 
     private final String RULES_CONFIG_FILE_NAME = "rule_definitions.json";

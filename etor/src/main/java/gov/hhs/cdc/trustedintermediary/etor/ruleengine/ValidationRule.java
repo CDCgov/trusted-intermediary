@@ -6,6 +6,11 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.List;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
+/**
+ * Implements the Rule interface. It represents a rule with a name, description, warning message,
+ * conditions, and validations. It uses the HapiFhir engine to evaluate the conditions and
+ * validations.
+ */
 public class ValidationRule implements Rule {
 
     private static final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
