@@ -218,23 +218,29 @@ public class HapiOrderConverter implements OrderConverter {
                 .getIssue()
                 .add(createInformationIssueComponent("receiver name", metadata.receiver()));
 
-        String orderIngestion = null;
-        String orderDelivered = null;
+        String ingestion = null;
+        String delivered = null;
         if (metadata.timeReceived() != null) {
-            orderIngestion = metadata.timeReceived().toString();
+            ingestion = metadata.timeReceived().toString();
         }
         if (metadata.timeDelivered() != null) {
-            orderDelivered = metadata.timeDelivered().toString();
+            delivered = metadata.timeDelivered().toString();
         }
 
         operation
                 .getIssue()
-                .add(createInformationIssueComponent("order ingestion", orderIngestion));
+                .add(
+                        createInformationIssueComponent(
+                                String.format("%s ingestion", metadata.messageType().toString()),
+                                ingestion));
 
         operation.getIssue().add(createInformationIssueComponent("payload hash", metadata.hash()));
         operation
                 .getIssue()
-                .add(createInformationIssueComponent("order delivered", orderDelivered));
+                .add(
+                        createInformationIssueComponent(
+                                String.format("%s delivered", metadata.messageType().toString()),
+                                delivered));
         operation
                 .getIssue()
                 .add(
