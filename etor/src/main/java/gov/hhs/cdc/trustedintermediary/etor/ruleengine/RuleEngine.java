@@ -10,7 +10,8 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 /** Manages the application of rules loaded from a definitions file using the RuleLoader. */
 public class RuleEngine {
 
-    private final String RULES_CONFIG_FILE_NAME = "rule_definitions.json";
+    private final Path RULES_DEFINITIONS_PATH =
+            Path.of("../etor/src/main/resources/rule_definitions.json");
     private final List<Rule> rules = new ArrayList<>();
     private boolean rulesLoaded = false;
 
@@ -27,14 +28,14 @@ public class RuleEngine {
 
     public void ensureRulesLoaded() {
         if (!rulesLoaded) {
-            var rulesDefinitionPath = Path.of("../etor/src/main/resources", RULES_CONFIG_FILE_NAME);
-            logger.logDebug("Loading rules definitions from " + rulesDefinitionPath);
+            logger.logDebug("Loading rules definitions from " + RULES_DEFINITIONS_PATH);
             try {
-                var loadedRules = ruleLoader.loadRules(rulesDefinitionPath);
+                var loadedRules = ruleLoader.loadRules(RULES_DEFINITIONS_PATH);
                 rules.addAll(loadedRules);
                 rulesLoaded = true;
             } catch (RuleLoaderException e) {
-                logger.logError("Failed to load rules definitions from: " + rulesDefinitionPath, e);
+                logger.logError(
+                        "Failed to load rules definitions from: " + RULES_DEFINITIONS_PATH, e);
             }
         }
     }
