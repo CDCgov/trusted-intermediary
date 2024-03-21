@@ -83,7 +83,7 @@ public class PostgresDao implements DbDao {
                 messageTypeString = messageType.toString();
             }
 
-            statement.setString(10, messageTypeString);
+            statement.setObject(10, messageTypeString, Types.OTHER);
 
             statement.executeUpdate();
         }

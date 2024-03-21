@@ -62,6 +62,9 @@ databaseChangeLog:
       changes:
        - sql:
            sql: CREATE TYPE message_type AS ENUM ('RESULT', 'ORDER')
+      rollback:
+        - sql:
+            sql: DROP TYPE message_type
 
   - changeSet:
       id: 4
