@@ -12,10 +12,11 @@ public class RuleEngine {
 
     private final Path RULES_DEFINITIONS_PATH =
             Path.of("../etor/src/main/resources/rule_definitions.json");
-    private final List<Rule> rules = new ArrayList<>();
     private boolean rulesLoaded = false;
 
     private static final RuleEngine INSTANCE = new RuleEngine();
+
+    final List<Rule> rules = new ArrayList<>();
 
     @Inject Logger logger;
     @Inject RuleLoader ruleLoader;

@@ -13,45 +13,81 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 class RuleEngineTest extends Specification {
-    def fhir = HapiFhirImplementation.getInstance()
-    def engine = RuleEngine.getInstance()
-    def mockLogger = Mock(Logger)
 
-    String fhirBody
+    def ruleEngine = RuleEngine.getInstance()
+    def mockRuleLoader = Mock(RuleLoader)
+    def mockLogger = Mock(Logger)
 
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
-
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.register(HapiFhir, fhir)
-        TestApplicationContext.register(RuleEngine, engine)
-        TestApplicationContext.register(RuleLoader, RuleLoader.getInstance())
+        TestApplicationContext.register(RuleLoader, mockRuleLoader)
         TestApplicationContext.register(Logger, mockLogger)
+        TestApplicationContext.register(RuleEngine, ruleEngine)
 
         TestApplicationContext.injectRegisteredImplementations()
     }
 
-    def "validation logs a warning when a validation fails"() {
-        given:
-        fhirBody = Files.readString(Path.of("../examples/Test/Orders/001_OML_O21_short.fhir"))
-        def bundle = fhir.parseResource(fhirBody, Bundle)
-
+    def "ensureRulesLoaded happy path"() {
         when:
-        engine.validate(bundle)
+        ruleEngine.ensureRulesLoaded()
 
         then:
-        1 * mockLogger.logWarning(_ as String)
+        1 * mockRuleLoader.loadRules(_ as Path) >> [Mock(Rule)]
+        ruleEngine.rules.size() == 1
     }
-    /*
-     def "Validation doesn't log a warning when a validation passes"() {
-     given:
-     fhirBody = Files.readString(Path.of("../examples/Test/Orders/001_OML_O21_short.fhir"))
-     def bundle = fhir.parseResource(fhirBody, Bundle)
-     when:
-     engine.validate(bundle)
-     then:
-     0 * mockLogger.logWarning(_ as String)
-     }
-     */
+
+    def "ensureRulesLoaded loads rules only once"() {
+        when:
+        ruleEngine.ensureRulesLoaded()
+        ruleEngine.ensureRulesLoaded() // Call twice to test if rules are loaded only once
+
+        then:
+        1 * mockRuleLoader.loadRules(_ as Path) >> [Mock(Rule)]
+    }
+
+    def "ensureRulesLoaded logs an error if there is an exception loading the rules"() {
+        given:
+        def exception = new RuleLoaderException("Error loading rules")
+        mockRuleLoader.loadRules(_ as Path) >> { throw exception }
+
+        when:
+        ruleEngine.validate(Mock(Bundle))
+
+        then:
+        1 * mockLogger.logError(_ as String, exception)
+    }
+
+    def "validate handles logging warning correctly"() {
+        given:
+        def ruleWarningMessage = "Rule warning message"
+        def fhirBundle = Mock(Bundle)
+        def invalidRule = Mock(Rule)
+        invalidRule.getWarningMessage() >> ruleWarningMessage
+        mockRuleLoader.loadRules(_ as Path) >> [invalidRule]
+
+        when:
+        invalidRule.appliesTo(fhirBundle) >> true
+        invalidRule.isValid(fhirBundle) >> false
+        ruleEngine.validate(fhirBundle)
+
+        then:
+        1 * mockLogger.logWarning(ruleWarningMessage)
+
+        when:
+        invalidRule.appliesTo(fhirBundle) >> true
+        invalidRule.isValid(fhirBundle) >> true
+        ruleEngine.validate(fhirBundle)
+
+        then:
+        0 * mockLogger.logWarning(ruleWarningMessage)
+
+        when:
+        invalidRule.appliesTo(fhirBundle) >> false
+        invalidRule.isValid(fhirBundle) >> false
+        ruleEngine.validate(fhirBundle)
+
+        then:
+        0 * mockLogger.logWarning(ruleWarningMessage)
+    }
 }
