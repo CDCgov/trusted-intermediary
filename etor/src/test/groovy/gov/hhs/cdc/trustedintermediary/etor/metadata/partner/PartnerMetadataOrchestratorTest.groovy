@@ -56,7 +56,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         then:
         1 * mockClient.getRsToken() >> bearerToken
         1 * mockClient.requestHistoryEndpoint(receivedSubmissionId, bearerToken) >> rsHistoryApiResponse
-        1 * mockPartnerMetadataStorage.saveMetadata(new PartnerMetadata(receivedSubmissionId, sender, Instant.parse(timestamp), null, hashCode, deliveryStatus))
+        1 * mockPartnerMetadataStorage.saveMetadata(new PartnerMetadata(receivedSubmissionId, sender, Instant.parse(timestamp), null, hashCode, deliveryStatus, messageType))
     }
 
     def "updateMetadataForSentOrder test case when sentSubmissionId is null"() {
@@ -154,7 +154,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
         def sentSubmissionId = "sentSubmissionId"
-        def partnerMetadata = new PartnerMetadata(receivedSubmissionId, "sender", Instant.now(), null, "hash", PartnerMetadataStatus.PENDING)
+        def partnerMetadata = new PartnerMetadata(receivedSubmissionId, "sender", Instant.now(), null, "hash", PartnerMetadataStatus.PENDING, PartnerMetadataMessageType.ORDER)
         def updatedPartnerMetadata = partnerMetadata.withSentSubmissionId(sentSubmissionId)
 
         when:

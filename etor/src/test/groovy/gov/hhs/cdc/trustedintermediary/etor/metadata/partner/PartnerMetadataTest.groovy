@@ -56,7 +56,7 @@ class PartnerMetadataTest extends Specification {
         def status = PartnerMetadataStatus.DELIVERED
 
         when:
-        def metadata = new PartnerMetadata(receivedSubmissionId, sender, timeReceived, timeDelivered, hash, PartnerMetadataStatus.DELIVERED)
+        def metadata = new PartnerMetadata(receivedSubmissionId, sender, timeReceived, timeDelivered, hash, PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER)
 
         then:
         metadata.receivedSubmissionId() == receivedSubmissionId

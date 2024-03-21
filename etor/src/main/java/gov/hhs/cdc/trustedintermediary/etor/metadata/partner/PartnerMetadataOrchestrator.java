@@ -39,7 +39,6 @@ public class PartnerMetadataOrchestrator {
             throws PartnerMetadataException {
         // currently blocked by: https://github.com/CDCgov/prime-reportstream/issues/12624
         // once we get the right receivedSubmissionId from RS, this method should work
-        // add MessageType into PartnerMetadata
         logger.logInfo(
                 "Looking up sender name and timeReceived from RS history API for receivedSubmissionId: {}",
                 receivedSubmissionId);
@@ -82,7 +81,8 @@ public class PartnerMetadataOrchestrator {
                         timeReceived,
                         null,
                         messageHash,
-                        PartnerMetadataStatus.PENDING);
+                        PartnerMetadataStatus.PENDING,
+                        messageType);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 

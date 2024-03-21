@@ -39,7 +39,8 @@ public record PartnerMetadata(
             Instant timeReceived,
             Instant timeDelivered,
             String hash,
-            PartnerMetadataStatus deliveryStatus) {
+            PartnerMetadataStatus deliveryStatus,
+            PartnerMetadataMessageType messageType) {
         this(
                 receivedSubmissionId,
                 null,
@@ -50,7 +51,7 @@ public record PartnerMetadata(
                 hash,
                 deliveryStatus,
                 null,
-                null);
+                messageType);
     }
 
     public PartnerMetadata(String receivedSubmissionId, String hash) {
