@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
 
+/** Manages the loading of rules from a definitions file. */
 public class RuleLoader {
     private static final RuleLoader INSTANCE = new RuleLoader();
     @Inject Formatter formatter;

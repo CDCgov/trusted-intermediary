@@ -4,15 +4,19 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
+import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
 
 class ValidationRuleTest extends Specification {
 
+    def mockLogger = Mock(Logger)
+
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
-        TestApplicationContext.register(Logger, Mock(Logger))
+        TestApplicationContext.register(HapiFhir, Mock(HapiFhirImplementation))
+        TestApplicationContext.register(Logger, mockLogger)
         TestApplicationContext.injectRegisteredImplementations()
     }
 
@@ -38,23 +42,46 @@ class ValidationRuleTest extends Specification {
     def "appliesTo returns expected boolean depending on conditions"() {
         given:
         def trueCondition = "trueCondition"
-        def fhirResource = new Bundle()
-        def validationRule = new ValidationRule(null, null, null, [
+        IBaseResource fhirResource = new Bundle()
+
+        def mockFhir = Mock(HapiFhir)
+        mockFhir.evaluateCondition(fhirResource, trueCondition) >> true
+        mockFhir.evaluateCondition(fhirResource, secondCondition) >> conditionResult
+        TestApplicationContext.register(HapiFhir, mockFhir)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        def rule = new ValidationRule(null, null, null, [
             trueCondition,
             secondCondition
         ], null)
 
-        TestApplicationContext.register(ValidationRule, validationRule)
+        expect:
+        rule.appliesTo(fhirResource) == applies
+
+        where:
+        secondCondition   | conditionResult | applies
+        "secondCondition" | true            | true
+        "secondCondition" | false           | false
+    }
+
+    def "appliesTo returns expected boolean depending on conditions"() {
+        given:
+        def trueCondition = "trueCondition"
+        IBaseResource fhirResource = new Bundle()
 
         def mockFhir = Mock(HapiFhirImplementation)
-        mockFhir.evaluateCondition(fhirResource, trueCondition) >> true
-        mockFhir.evaluateCondition(fhirResource, secondCondition) >> conditionResult
+        mockFhir.evaluateCondition(_ as IBaseResource, trueCondition) >> true
+        mockFhir.evaluateCondition(_ as IBaseResource, secondCondition) >> conditionResult
         TestApplicationContext.register(HapiFhir, mockFhir)
-
         TestApplicationContext.injectRegisteredImplementations()
 
+        def rule = new ValidationRule(null, null, null, [
+            trueCondition,
+            secondCondition
+        ], null)
+
         expect:
-        validationRule.appliesTo(fhirResource) == applies
+        rule.appliesTo(fhirResource) == applies
 
         where:
         secondCondition   | conditionResult | applies
@@ -65,20 +92,16 @@ class ValidationRuleTest extends Specification {
     def "appliesTo logs an error and returns false if an exception happens when evaluating a condition"() {
         given:
         def fhirResource = new Bundle()
-        def validationRule = new ValidationRule(null, null, null, ["condition"], null)
-        TestApplicationContext.register(ValidationRule, validationRule)
 
         def mockFhir = Mock(HapiFhirImplementation)
         mockFhir.evaluateCondition(fhirResource, "condition") >> { throw new Exception() }
         TestApplicationContext.register(HapiFhir, mockFhir)
-
-        def mockLogger = Mock(Logger)
-        TestApplicationContext.register(Logger, mockLogger)
-
         TestApplicationContext.injectRegisteredImplementations()
 
+        def rule = new ValidationRule(null, null, null, ["condition"], null)
+
         when:
-        def applies = validationRule.appliesTo(fhirResource)
+        def applies = rule.appliesTo(fhirResource)
 
         then:
         1 * mockLogger.logError(_ as String, _ as Exception)
@@ -89,21 +112,20 @@ class ValidationRuleTest extends Specification {
         given:
         def trueValidation = "trueValidation"
         def fhirResource = new Bundle()
-        def validationRule = new ValidationRule(null, null, null, null, [
-            trueValidation,
-            secondValidation
-        ])
-        TestApplicationContext.register(ValidationRule, validationRule)
 
         def mockFhir = Mock(HapiFhirImplementation)
         mockFhir.evaluateCondition(fhirResource, trueValidation) >> true
         mockFhir.evaluateCondition(fhirResource, secondValidation) >> validationResult
         TestApplicationContext.register(HapiFhir, mockFhir)
-
         TestApplicationContext.injectRegisteredImplementations()
 
+        def rule = new ValidationRule(null, null, null, null, [
+            trueValidation,
+            secondValidation
+        ])
+
         expect:
-        validationRule.isValid(fhirResource) == valid
+        rule.isValid(fhirResource) == valid
 
         where:
         secondValidation   | validationResult | valid
@@ -114,20 +136,16 @@ class ValidationRuleTest extends Specification {
     def "isValid logs an error and returns false if an exception happens when evaluating a validation"() {
         given:
         def fhirResource = new Bundle()
-        def validationRule = new ValidationRule(null, null, null, null, ["validation"])
-        TestApplicationContext.register(ValidationRule, validationRule)
 
         def mockFhir = Mock(HapiFhirImplementation)
         mockFhir.evaluateCondition(fhirResource, "condition") >> { throw new Exception() }
         TestApplicationContext.register(HapiFhir, mockFhir)
-
-        def mockLogger = Mock(Logger)
-        TestApplicationContext.register(Logger, mockLogger)
-
         TestApplicationContext.injectRegisteredImplementations()
 
+        def rule = new ValidationRule(null, null, null, null, ["validation"])
+
         when:
-        def valid = validationRule.isValid(fhirResource)
+        def valid = rule.isValid(fhirResource)
 
         then:
         1 * mockLogger.logError(_ as String, _ as Exception)
