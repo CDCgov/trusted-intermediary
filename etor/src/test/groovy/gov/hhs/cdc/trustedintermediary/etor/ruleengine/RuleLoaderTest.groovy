@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
+import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import spock.lang.Specification
 
@@ -40,6 +41,7 @@ class RuleLoaderTest extends Specification {
 
     def "load rules from file"() {
         given:
+        TestApplicationContext.register(HapiFhir, Mock(HapiFhir))
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 

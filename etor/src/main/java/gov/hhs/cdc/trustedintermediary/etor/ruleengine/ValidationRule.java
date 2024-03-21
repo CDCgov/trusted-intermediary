@@ -13,9 +13,8 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
  */
 public class ValidationRule implements Rule {
 
-    private static final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
-    private static final HapiFhir FHIR_ENGINE =
-            ApplicationContext.getImplementation(HapiFhir.class);
+    private final Logger logger = ApplicationContext.getImplementation(Logger.class);
+    private final HapiFhir fhirEngine = ApplicationContext.getImplementation(HapiFhir.class);
     private String name;
     private String description;
     private String warningMessage;
@@ -68,9 +67,9 @@ public class ValidationRule implements Rule {
                 .allMatch(
                         validation -> {
                             try {
-                                return FHIR_ENGINE.evaluateCondition(resource, validation);
+                                return fhirEngine.evaluateCondition(resource, validation);
                             } catch (Exception e) {
-                                LOGGER.logError(
+                                logger.logError(
                                         "An error occurred while evaluating the validation: "
                                                 + validation,
                                         e);
@@ -85,9 +84,9 @@ public class ValidationRule implements Rule {
                 .allMatch(
                         condition -> {
                             try {
-                                return FHIR_ENGINE.evaluateCondition(resource, condition);
+                                return fhirEngine.evaluateCondition(resource, condition);
                             } catch (Exception e) {
-                                LOGGER.logError(
+                                logger.logError(
                                         "An error occurred while evaluating the condition: "
                                                 + condition,
                                         e);
