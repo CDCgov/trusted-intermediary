@@ -231,7 +231,9 @@ public class HapiOrderConverter implements OrderConverter {
                 .getIssue()
                 .add(
                         createInformationIssueComponent(
-                                String.format("%s ingestion", metadata.messageType().toString()),
+                                String.format(
+                                        "%s ingestion",
+                                        metadata.messageType().toString().toLowerCase()),
                                 ingestion));
 
         operation.getIssue().add(createInformationIssueComponent("payload hash", metadata.hash()));
@@ -239,7 +241,9 @@ public class HapiOrderConverter implements OrderConverter {
                 .getIssue()
                 .add(
                         createInformationIssueComponent(
-                                String.format("%s delivered", metadata.messageType().toString()),
+                                String.format(
+                                        "%s delivered",
+                                        metadata.messageType().toString().toLowerCase()),
                                 delivered));
         operation
                 .getIssue()
