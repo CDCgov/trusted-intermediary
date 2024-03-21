@@ -28,6 +28,7 @@ public class RuleEngine {
     public void ensureRulesLoaded() {
         if (!rulesLoaded) {
             var rulesDefinitionPath = Path.of("../etor/src/main/resources", RULES_CONFIG_FILE_NAME);
+            logger.logDebug("Loading rules definitions from " + rulesDefinitionPath);
             try {
                 var loadedRules = ruleLoader.loadRules(rulesDefinitionPath);
                 rules.addAll(loadedRules);
@@ -39,6 +40,7 @@ public class RuleEngine {
     }
 
     public void validate(IBaseResource resource) {
+        logger.logDebug("Validating FHIR resource");
         ensureRulesLoaded();
         for (Rule rule : rules) {
             if (rule.appliesTo(resource)) {
