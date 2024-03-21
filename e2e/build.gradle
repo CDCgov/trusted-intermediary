@@ -15,10 +15,10 @@ dependencies {
     implementation 'org.apache.httpcomponents.client5:httpclient5-fluent:5.3.1'
 
     //jackson
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.16.2'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.2'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.17.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
 
-    testImplementation 'org.apache.groovy:groovy:4.0.19'
+    testImplementation 'org.apache.groovy:groovy:4.0.20'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
 }
 

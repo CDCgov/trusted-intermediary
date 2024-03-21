@@ -48,7 +48,7 @@ jobs:
           terraform init
 
       - name: Login via Azure CLI
-        uses: azure/login@v1
+        uses: azure/login@v2
         with:
           client-id: ${{ github.event.inputs.environment == 'internal' && secrets.AZURE_CLIENT_ID || secrets.AZURE_CDC_CLIENT_ID }}
           tenant-id: ${{ github.event.inputs.environment == 'internal' && secrets.AZURE_TENANT_ID || secrets.AZURE_CDC_TENANT_ID}}
