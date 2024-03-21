@@ -18,6 +18,8 @@ class RuleEngineTest extends Specification {
     def mockLogger = Mock(Logger)
 
     def setup() {
+        ruleEngine.unloadRules()
+
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(RuleLoader, mockRuleLoader)
@@ -38,7 +40,7 @@ class RuleEngineTest extends Specification {
 
     def "ensureRulesLoaded loads rules only once by default"() {
         when:
-        ruleEngine.ensureRulesLoaded(true)
+        ruleEngine.ensureRulesLoaded()
         ruleEngine.ensureRulesLoaded() // Call twice to test if rules are loaded only once
 
         then:
@@ -51,7 +53,7 @@ class RuleEngineTest extends Specification {
         mockRuleLoader.loadRules(_ as Path) >> { throw exception }
 
         when:
-        ruleEngine.validate(Mock(Bundle), true)
+        ruleEngine.validate(Mock(Bundle))
 
         then:
         1 * mockLogger.logError(_ as String, exception)
@@ -68,7 +70,7 @@ class RuleEngineTest extends Specification {
         when:
         invalidRule.appliesTo(fhirBundle) >> true
         invalidRule.isValid(fhirBundle) >> false
-        ruleEngine.validate(fhirBundle, true)
+        ruleEngine.validate(fhirBundle)
 
         then:
         1 * mockLogger.logWarning(ruleWarningMessage)
@@ -76,7 +78,7 @@ class RuleEngineTest extends Specification {
         when:
         invalidRule.appliesTo(fhirBundle) >> true
         invalidRule.isValid(fhirBundle) >> true
-        ruleEngine.validate(fhirBundle, true)
+        ruleEngine.validate(fhirBundle)
 
         then:
         0 * mockLogger.logWarning(ruleWarningMessage)
@@ -84,7 +86,7 @@ class RuleEngineTest extends Specification {
         when:
         invalidRule.appliesTo(fhirBundle) >> false
         invalidRule.isValid(fhirBundle) >> false
-        ruleEngine.validate(fhirBundle, true)
+        ruleEngine.validate(fhirBundle)
 
         then:
         0 * mockLogger.logWarning(ruleWarningMessage)

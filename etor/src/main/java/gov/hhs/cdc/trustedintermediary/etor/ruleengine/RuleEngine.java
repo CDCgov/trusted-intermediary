@@ -27,12 +27,13 @@ public class RuleEngine {
         return INSTANCE;
     }
 
-    public void ensureRulesLoaded() {
-        ensureRulesLoaded(false);
+    public void unloadRules() {
+        rulesLoaded = false;
+        rules.clear();
     }
 
-    public void ensureRulesLoaded(boolean forceUpdate) {
-        if (forceUpdate || !rulesLoaded) {
+    public void ensureRulesLoaded() {
+        if (!rulesLoaded) {
             logger.logDebug("Loading rules definitions from " + RULES_DEFINITIONS_PATH);
             try {
                 var loadedRules = ruleLoader.loadRules(RULES_DEFINITIONS_PATH);
@@ -46,12 +47,8 @@ public class RuleEngine {
     }
 
     public void validate(IBaseResource resource) {
-        validate(resource, false);
-    }
-
-    public void validate(IBaseResource resource, boolean forceRulesUpdate) {
         logger.logDebug("Validating FHIR resource");
-        ensureRulesLoaded(forceRulesUpdate);
+        ensureRulesLoaded();
         for (Rule rule : rules) {
             if (rule.appliesTo(resource)) {
                 if (!rule.isValid(resource)) {
