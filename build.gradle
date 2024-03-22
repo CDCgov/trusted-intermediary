@@ -92,7 +92,6 @@ ext.jacoco_excludes = [
         '**/slf4j/LocalLogger*',
         '**/slf4j/DeployedLogger*',
         '**/slf4j/LoggerHelper*',
-        '**/hapi/HapiFhirImplementation*',
         '**/jjwt/JjwtEngine*',
         '**/apache/ApacheClient*',
         '**/azure/AzureSecrets*',
