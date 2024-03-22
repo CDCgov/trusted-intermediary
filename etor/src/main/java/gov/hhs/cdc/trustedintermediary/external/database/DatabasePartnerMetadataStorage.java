@@ -48,7 +48,8 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                     metadata.timeReceived(),
                     metadata.timeDelivered(),
                     metadata.deliveryStatus(),
-                    metadata.failureReason());
+                    metadata.failureReason(),
+                    metadata.messageType());
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error saving metadata", e);
         }

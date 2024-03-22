@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.reportstream;
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
@@ -29,16 +30,16 @@ public class ReportStreamSenderHelper {
 
     public Optional<String> sendOrderToReportStream(String body, String fhirResourceId)
             throws UnableToSendMessageException {
-        return sendToReportStream(body, fhirResourceId, "order");
+        return sendToReportStream(body, fhirResourceId, PartnerMetadataMessageType.ORDER);
     }
 
     public Optional<String> sendResultToReportStream(String body, String fhirResourceId)
             throws UnableToSendMessageException {
-        return sendToReportStream(body, fhirResourceId, "result");
+        return sendToReportStream(body, fhirResourceId, PartnerMetadataMessageType.RESULT);
     }
 
     protected Optional<String> sendToReportStream(
-            String body, String fhirResourceId, String messageType)
+            String body, String fhirResourceId, PartnerMetadataMessageType messageType)
             throws UnableToSendMessageException {
         String bearerToken;
         String rsResponseBody;

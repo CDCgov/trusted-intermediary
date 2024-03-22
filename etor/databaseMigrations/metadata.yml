@@ -52,3 +52,35 @@ databaseChangeLog:
               - column:
                   name: failure_reason
                   type: varchar(1000)
+
+  - changeSet:
+      id: 3
+      author: james.herr
+      labels: create-type
+      context: metadata
+      comment: create message type
+      changes:
+       - sql:
+           sql: CREATE TYPE message_type AS ENUM ('RESULT', 'ORDER')
+      rollback:
+        - sql:
+            sql: DROP TYPE message_type
+
+  - changeSet:
+      id: 4
+      author: samuel.aquino
+      labels: update-metadata-table
+      context: metadata
+      comment: update partner metadata table
+      changes:
+        - renameColumn:
+            columnDataType: varchar(1000)
+            oldColumnName: hash_of_order
+            newColumnName: hash_of_message
+            tableName: metadata
+        - addColumn:
+            tableName: metadata
+            columns:
+              - column:
+                  name: message_type
+                  type: message_type

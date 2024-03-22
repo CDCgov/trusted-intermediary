@@ -16,6 +16,7 @@ import gov.hhs.cdc.trustedintermediary.etor.messages.MessageRequestHandler
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
 import gov.hhs.cdc.trustedintermediary.etor.operationoutcomes.FhirMetadata
@@ -217,7 +218,7 @@ class EtorDomainRegistrationTest extends Specification {
 
         then:
         1 * mockController.parseResults(request) >> resultMock
-        1 * mockUseCase.convertAndSend(resultMock)
+        1 * mockUseCase.convertAndSend(resultMock, request.headers.get("recordid"))
         1 * mockResponseHelper.constructOkResponse(_ as ResultResponse)
     }
 
@@ -232,7 +233,7 @@ class EtorDomainRegistrationTest extends Specification {
         request.setPathParams(["id": "metadataId"])
 
         def mockPartnerMetadataOrchestrator = Mock(PartnerMetadataOrchestrator)
-        mockPartnerMetadataOrchestrator.getMetadata(_ as String) >> Optional.ofNullable(new PartnerMetadata("receivedSubmissionId", "sender", Instant.now(), null, "hash", PartnerMetadataStatus.DELIVERED))
+        mockPartnerMetadataOrchestrator.getMetadata(_ as String) >> Optional.ofNullable(new PartnerMetadata("receivedSubmissionId", "sender", Instant.now(), null, "hash", PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER))
         TestApplicationContext.register(PartnerMetadataOrchestrator, mockPartnerMetadataOrchestrator)
 
         def mockResponseHelper = Mock(DomainResponseHelper)

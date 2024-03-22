@@ -34,7 +34,8 @@ public class PartnerMetadataOrchestrator {
 
     private PartnerMetadataOrchestrator() {}
 
-    public void updateMetadataForReceivedOrder(String receivedSubmissionId, String orderHash)
+    public void updateMetadataForReceivedMessage(
+            String receivedSubmissionId, String messageHash, PartnerMetadataMessageType messageType)
             throws PartnerMetadataException {
         // currently blocked by: https://github.com/CDCgov/prime-reportstream/issues/12624
         // once we get the right receivedSubmissionId from RS, this method should work
@@ -61,7 +62,8 @@ public class PartnerMetadataOrchestrator {
             logger.logWarning(
                     "Unable to retrieve metadata from RS history API, but writing basic metadata entry anyway for received submission ID {}",
                     receivedSubmissionId);
-            PartnerMetadata partnerMetadata = new PartnerMetadata(receivedSubmissionId, orderHash);
+            PartnerMetadata partnerMetadata =
+                    new PartnerMetadata(receivedSubmissionId, messageHash, messageType);
             partnerMetadataStorage.saveMetadata(partnerMetadata);
 
             throw new PartnerMetadataException(
@@ -78,12 +80,13 @@ public class PartnerMetadataOrchestrator {
                         sender,
                         timeReceived,
                         null,
-                        orderHash,
-                        PartnerMetadataStatus.PENDING);
+                        messageHash,
+                        PartnerMetadataStatus.PENDING,
+                        messageType);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
-    public void updateMetadataForSentOrder(String receivedSubmissionId, String sentSubmissionId)
+    public void updateMetadataForSentMessage(String receivedSubmissionId, String sentSubmissionId)
             throws PartnerMetadataException {
 
         if (sentSubmissionId == null) {

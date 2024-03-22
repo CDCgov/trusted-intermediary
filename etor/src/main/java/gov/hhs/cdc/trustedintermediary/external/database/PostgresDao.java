@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.database;
 
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
 import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool;
 import java.sql.Connection;
@@ -37,14 +38,15 @@ public class PostgresDao implements DbDao {
             Instant timeReceived,
             Instant timeDelivered,
             PartnerMetadataStatus deliveryStatus,
-            String failureReason)
+            String failureReason,
+            PartnerMetadataMessageType messageType)
             throws SQLException {
 
         try (Connection conn = connectionPool.getConnection();
                 PreparedStatement statement =
                         conn.prepareStatement(
                                 """
-                                INSERT INTO metadata VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                INSERT INTO metadata VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                                 ON CONFLICT (received_message_id) DO UPDATE SET receiver = EXCLUDED.receiver, sent_message_id = EXCLUDED.sent_message_id, time_delivered = EXCLUDED.time_delivered, delivery_status = EXCLUDED.delivery_status, failure_reason = EXCLUDED.failure_reason
                                 """)) {
 
@@ -75,6 +77,13 @@ public class PostgresDao implements DbDao {
             statement.setObject(8, deliveryStatusString, Types.OTHER);
 
             statement.setString(9, failureReason);
+
+            String messageTypeString = null;
+            if (messageType != null) {
+                messageTypeString = messageType.toString();
+            }
+
+            statement.setObject(10, messageTypeString, Types.OTHER);
 
             statement.executeUpdate();
         }
@@ -139,8 +148,9 @@ public class PostgresDao implements DbDao {
                 resultSet.getString("receiver"),
                 timeReceived,
                 timeDelivered,
-                resultSet.getString("hash_of_order"),
+                resultSet.getString("hash_of_message"),
                 PartnerMetadataStatus.valueOf(resultSet.getString("delivery_status")),
-                resultSet.getString("failure_reason"));
+                resultSet.getString("failure_reason"),
+                PartnerMetadataMessageType.valueOf(resultSet.getString("message_type")));
     }
 }
