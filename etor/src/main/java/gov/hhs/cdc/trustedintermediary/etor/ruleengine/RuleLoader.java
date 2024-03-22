@@ -4,9 +4,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -24,15 +21,14 @@ public class RuleLoader {
         return INSTANCE;
     }
 
-    List<ValidationRule> loadRules(Path configPath) throws RuleLoaderException {
+    public List<ValidationRule> loadRules(String ruleStream) throws RuleLoaderException {
         try {
-            String fileContent = Files.readString(configPath);
             Map<String, List<ValidationRule>> jsonObj =
-                    formatter.convertJsonToObject(fileContent, new TypeReference<>() {});
+                    formatter.convertJsonToObject(ruleStream, new TypeReference<>() {});
             return jsonObj.getOrDefault("rules", Collections.emptyList());
-        } catch (IOException | FormatterProcessingException e) {
+        } catch (FormatterProcessingException e) {
             throw new RuleLoaderException(
-                    "Failed to load rules definitions from: " + configPath, e);
+                    "Failed to load rules definitions for provided stream", e);
         }
     }
 }

@@ -5,8 +5,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
 
-import java.nio.file.Path
-
 class RuleEngineTest extends Specification {
     def ruleEngine = RuleEngine.getInstance()
     def mockRuleLoader = Mock(RuleLoader)
@@ -29,7 +27,7 @@ class RuleEngineTest extends Specification {
         ruleEngine.ensureRulesLoaded()
 
         then:
-        1 * mockRuleLoader.loadRules(_ as Path) >> [Mock(Rule)]
+        1 * mockRuleLoader.loadRules(_ as String) >> [Mock(Rule)]
         ruleEngine.rules.size() == 1
     }
 
@@ -39,13 +37,13 @@ class RuleEngineTest extends Specification {
         ruleEngine.ensureRulesLoaded() // Call twice to test if rules are loaded only once
 
         then:
-        1 * mockRuleLoader.loadRules(_ as Path) >> [Mock(Rule)]
+        1 * mockRuleLoader.loadRules(_ as String) >> [Mock(Rule)]
     }
 
     def "ensureRulesLoaded logs an error if there is an exception loading the rules"() {
         given:
         def exception = new RuleLoaderException("Error loading rules", new Exception())
-        mockRuleLoader.loadRules(_ as Path) >> { throw exception }
+        mockRuleLoader.loadRules(_ as String) >> { throw exception }
 
         when:
         ruleEngine.validate(Mock(Bundle))
@@ -61,7 +59,7 @@ class RuleEngineTest extends Specification {
         def fhirBundle = Mock(Bundle)
         def invalidRule = Mock(Rule)
         invalidRule.getViolationMessage() >> ruleViolationMessage
-        mockRuleLoader.loadRules(_ as Path) >> [invalidRule]
+        mockRuleLoader.loadRules(_ as String) >> [invalidRule]
 
         when:
         invalidRule.appliesTo(fhirBundle) >> true

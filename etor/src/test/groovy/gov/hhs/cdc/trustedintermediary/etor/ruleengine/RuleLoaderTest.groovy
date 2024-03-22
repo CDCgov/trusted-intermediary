@@ -12,7 +12,7 @@ import java.nio.file.Paths
 
 class RuleLoaderTest extends Specification {
 
-    Path tempRulesFilePath
+    String fileContents
 
     def setup() {
         TestApplicationContext.reset()
@@ -20,8 +20,7 @@ class RuleLoaderTest extends Specification {
         TestApplicationContext.register(RuleLoader, RuleLoader.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
-        tempRulesFilePath = Files.createTempFile("rules", ".json")
-        String jsonContent = """
+        fileContents = """
             {
               "rules": [
                 {
@@ -32,11 +31,6 @@ class RuleLoaderTest extends Specification {
               ]
             }
             """
-        Files.writeString(tempRulesFilePath, jsonContent)
-    }
-
-    def cleanup() {
-        Files.deleteIfExists(tempRulesFilePath)
     }
 
     def "load rules from file"() {
@@ -46,7 +40,7 @@ class RuleLoaderTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        List<Rule> rules = RuleLoader.getInstance().loadRules(tempRulesFilePath)
+        List<Rule> rules = RuleLoader.getInstance().loadRules(fileContents)
 
         then:
         rules.size() == 1
@@ -58,9 +52,9 @@ class RuleLoaderTest extends Specification {
         ]
     }
 
-    def "handle IOException when loading rules from file"() {
+    def "handle FormatterProcessingException when loading rules from file"() {
         when:
-        RuleLoader.getInstance().loadRules(Paths.get("DogCow"))
+        RuleLoader.getInstance().loadRules("!K@WJ#8uhy")
 
         then:
         thrown(RuleLoaderException)

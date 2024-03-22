@@ -1,7 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import java.nio.file.Path;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
@@ -9,9 +11,6 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 
 /** Manages the application of rules loaded from a definitions file using the RuleLoader. */
 public class RuleEngine {
-
-    private final Path RULES_DEFINITIONS_PATH =
-            Path.of("../etor/src/main/resources/rule_definitions.json");
 
     private static final RuleEngine INSTANCE = new RuleEngine();
 
@@ -37,12 +36,15 @@ public class RuleEngine {
     }
 
     private synchronized void loadRules() {
-        logger.logInfo("Loading rules definitions from " + RULES_DEFINITIONS_PATH);
-        try {
-            var loadedRules = ruleLoader.loadRules(RULES_DEFINITIONS_PATH);
-            rules.addAll(loadedRules);
-        } catch (RuleLoaderException e) {
-            logger.logError("Failed to load rules definitions from: " + RULES_DEFINITIONS_PATH, e);
+        String fileName = "rule_definitions.json";
+        try (InputStream ruleDefinitionStream =
+                getClass().getClassLoader().getResourceAsStream(fileName)) {
+            assert ruleDefinitionStream != null;
+            var ruleStream =
+                    new String(ruleDefinitionStream.readAllBytes(), StandardCharsets.UTF_8);
+            rules.addAll(ruleLoader.loadRules(ruleStream));
+        } catch (IOException | RuleLoaderException e) {
+            logger.logError("Failed to load rules definitions from: " + fileName, e);
         }
     }
 
