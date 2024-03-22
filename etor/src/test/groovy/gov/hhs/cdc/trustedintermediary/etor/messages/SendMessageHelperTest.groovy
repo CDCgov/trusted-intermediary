@@ -25,7 +25,6 @@ class SendMessageHelperTest extends Specification {
         def hashCode = new Random().nextInt()
         def messageType = PartnerMetadataMessageType.RESULT
         def receivedSubmissionId = "receivedId"
-        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage(receivedSubmissionId, hashCode, messageType)
@@ -52,8 +51,8 @@ class SendMessageHelperTest extends Specification {
         def hashCode = new Random().nextInt()
         def messageType = PartnerMetadataMessageType.RESULT
         def receivedSubmissionId = "receivedId"
-        TestApplicationContext.injectRegisteredImplementations()
         mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String, messageType) >> { throw new PartnerMetadataException("Error") }
+        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage(receivedSubmissionId, hashCode, messageType)
@@ -66,8 +65,8 @@ class SendMessageHelperTest extends Specification {
         given:
         def sentSubmissionId = "sentId"
         def receivedSubmissionId = "receivedId"
-        TestApplicationContext.injectRegisteredImplementations()
         mockOrchestrator.updateMetadataForSentMessage(receivedSubmissionId, _ as String) >> { throw new PartnerMetadataException("Error") }
+        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         SendMessageHelper.getInstance().saveSentMessageSubmissionId(receivedSubmissionId, sentSubmissionId)
@@ -92,8 +91,8 @@ class SendMessageHelperTest extends Specification {
         given:
         def sentSubmissionId = "sentId"
         def receivedSubmissionId = "receivedId"
-        TestApplicationContext.injectRegisteredImplementations()
         mockOrchestrator.updateMetadataForSentMessage(receivedSubmissionId, _ as String) >> { throw new PartnerMetadataException("Error") }
+        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         SendMessageHelper.getInstance().saveSentMessageSubmissionId(receivedSubmissionId, sentSubmissionId)
