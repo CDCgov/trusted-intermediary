@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
@@ -38,7 +39,7 @@ class RuleEngineIntegrationTest extends Specification {
         def bundle = fhir.parseResource(fhirBody, Bundle)
 
         when:
-        engine.validate(bundle)
+        engine.validate(new HapiFhirResource(bundle))
 
         then:
         1 * mockLogger.logWarning(_ as String)

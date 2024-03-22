@@ -2,7 +2,6 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
-import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
 
 class RuleEngineTest extends Specification {
@@ -46,7 +45,7 @@ class RuleEngineTest extends Specification {
         mockRuleLoader.loadRules(_ as String) >> { throw exception }
 
         when:
-        ruleEngine.validate(Mock(Bundle))
+        ruleEngine.validate(Mock(FhirResource))
 
         then:
         1 * mockLogger.logError(_ as String, exception)
@@ -56,7 +55,7 @@ class RuleEngineTest extends Specification {
         given:
         def ruleViolationMessage = "Rule violation message"
         def fullRuleViolationMessage = "Rule violation: " + ruleViolationMessage
-        def fhirBundle = Mock(Bundle)
+        def fhirBundle = Mock(FhirResource)
         def invalidRule = Mock(Rule)
         invalidRule.getViolationMessage() >> ruleViolationMessage
         mockRuleLoader.loadRules(_ as String) >> [invalidRule]
