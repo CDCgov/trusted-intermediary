@@ -44,7 +44,7 @@ class RuleEngineTest extends Specification {
 
     def "ensureRulesLoaded logs an error if there is an exception loading the rules"() {
         given:
-        def exception = new RuleLoaderException("Error loading rules")
+        def exception = new RuleLoaderException("Error loading rules", new Exception())
         mockRuleLoader.loadRules(_ as Path) >> { throw exception }
 
         when:

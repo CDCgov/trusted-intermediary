@@ -6,8 +6,4 @@ public class RuleLoaderException extends Exception {
     public RuleLoaderException(String message, Throwable cause) {
         super(message, cause);
     }
-
-    public RuleLoaderException(String message) {
-        super(message);
-    }
 }

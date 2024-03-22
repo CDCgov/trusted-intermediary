@@ -12,7 +12,7 @@ class RuleLoaderExceptionTest extends Specification {
 
         when:
         def exceptionWithCause = new RuleLoaderException(message, cause)
-        def exceptionWithout = new RuleLoaderException(message)
+        def exceptionWithout = new RuleLoaderException(message, new Exception())
 
         then:
         exceptionWithCause.getMessage() == message
