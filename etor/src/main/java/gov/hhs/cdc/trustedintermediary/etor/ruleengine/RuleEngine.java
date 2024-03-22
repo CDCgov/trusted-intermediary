@@ -34,7 +34,7 @@ public class RuleEngine {
         if (!rules.isEmpty()) {
             return;
         }
-        logger.logDebug("Loading rules definitions from " + RULES_DEFINITIONS_PATH);
+        logger.logInfo("Loading rules definitions from " + RULES_DEFINITIONS_PATH);
         try {
             var loadedRules = ruleLoader.loadRules(RULES_DEFINITIONS_PATH);
             rules.addAll(loadedRules);
