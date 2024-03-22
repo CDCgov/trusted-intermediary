@@ -50,13 +50,14 @@ public class HapiFhirImplementation implements HapiFhir {
     /**
      * Evaluate a FHIR Path expression for a given Resource to find if the expression has matches
      *
-     * @param root FHIR resource the evaluation starts from.
+     * @param resource FHIR resource the evaluation starts from.
      * @param expression FHIR Path statement to run evaluations on.
      * @return True if the expression has at least one match for the given root, else false.
      */
     @Override
-    public Boolean evaluateCondition(IBaseResource root, String expression) {
-        var result = PATH_ENGINE.evaluateFirst(root, expression, BooleanType.class);
+    public Boolean evaluateCondition(Object resource, String expression) {
+        var result =
+                PATH_ENGINE.evaluateFirst((IBaseResource) resource, expression, BooleanType.class);
         return result.map(BooleanType::booleanValue).orElse(false);
     }
 }

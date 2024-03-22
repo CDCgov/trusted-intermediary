@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 
 /** Manages the application of rules loaded from a definitions file using the RuleLoader. */
 public class RuleEngine {
@@ -48,7 +47,7 @@ public class RuleEngine {
         }
     }
 
-    public void validate(IBaseResource resource) {
+    public void validate(FhirResource<?> resource) {
         logger.logDebug("Validating FHIR resource");
         ensureRulesLoaded();
         for (Rule rule : rules) {

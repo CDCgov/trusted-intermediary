@@ -4,7 +4,6 @@ import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.List;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 
 /**
  * Implements the Rule interface. It represents a rule with a name, description, warning message,
@@ -62,12 +61,13 @@ public class ValidationRule implements Rule {
     }
 
     @Override
-    public boolean isValid(IBaseResource resource) {
+    public boolean isValid(FhirResource<?> resource) {
         return validations.stream()
                 .allMatch(
                         validation -> {
                             try {
-                                return fhirEngine.evaluateCondition(resource, validation);
+                                return fhirEngine.evaluateCondition(
+                                        resource.getUnderlyingResource(), validation);
                             } catch (Exception e) {
                                 logger.logError(
                                         "Rule ["
@@ -82,12 +82,13 @@ public class ValidationRule implements Rule {
     }
 
     @Override
-    public boolean appliesTo(IBaseResource resource) {
+    public boolean appliesTo(FhirResource<?> resource) {
         return conditions.stream()
                 .allMatch(
                         condition -> {
                             try {
-                                return fhirEngine.evaluateCondition(resource, condition);
+                                return fhirEngine.evaluateCondition(
+                                        resource.getUnderlyingResource(), condition);
                             } catch (Exception e) {
                                 logger.logError(
                                         "Rule ["

@@ -14,5 +14,5 @@ public interface HapiFhir {
 
     String encodeResourceToJson(Object resource);
 
-    Boolean evaluateCondition(IBaseResource root, String expression);
+    Boolean evaluateCondition(Object resource, String expression);
 }
