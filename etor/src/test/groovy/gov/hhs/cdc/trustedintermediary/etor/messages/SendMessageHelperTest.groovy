@@ -37,7 +37,6 @@ class SendMessageHelperTest extends Specification {
         given:
         def hashCode = new Random().nextInt()
         def messageType = PartnerMetadataMessageType.RESULT
-        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage(null, hashCode, messageType)
@@ -52,7 +51,6 @@ class SendMessageHelperTest extends Specification {
         def messageType = PartnerMetadataMessageType.RESULT
         def receivedSubmissionId = "receivedId"
         mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String, messageType) >> { throw new PartnerMetadataException("Error") }
-        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage(receivedSubmissionId, hashCode, messageType)
@@ -66,7 +64,6 @@ class SendMessageHelperTest extends Specification {
         def sentSubmissionId = "sentId"
         def receivedSubmissionId = "receivedId"
         mockOrchestrator.updateMetadataForSentMessage(receivedSubmissionId, _ as String) >> { throw new PartnerMetadataException("Error") }
-        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         SendMessageHelper.getInstance().saveSentMessageSubmissionId(receivedSubmissionId, sentSubmissionId)
@@ -78,7 +75,6 @@ class SendMessageHelperTest extends Specification {
     def "saveSentMessageSubmissionId should log warnings for null receivedSubmissionId"() {
         given:
         def receivedSubmissionId = "receivedId"
-        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         SendMessageHelper.getInstance().saveSentMessageSubmissionId(null, receivedSubmissionId)
@@ -92,7 +88,6 @@ class SendMessageHelperTest extends Specification {
         def sentSubmissionId = "sentId"
         def receivedSubmissionId = "receivedId"
         mockOrchestrator.updateMetadataForSentMessage(receivedSubmissionId, _ as String) >> { throw new PartnerMetadataException("Error") }
-        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         SendMessageHelper.getInstance().saveSentMessageSubmissionId(receivedSubmissionId, sentSubmissionId)
