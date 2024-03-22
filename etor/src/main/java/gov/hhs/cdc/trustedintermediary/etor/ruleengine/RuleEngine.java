@@ -31,15 +31,15 @@ public class RuleEngine {
     }
 
     public void ensureRulesLoaded() {
-        if (rules.isEmpty()) {
-            logger.logDebug("Loading rules definitions from " + RULES_DEFINITIONS_PATH);
-            try {
-                var loadedRules = ruleLoader.loadRules(RULES_DEFINITIONS_PATH);
-                rules.addAll(loadedRules);
-            } catch (RuleLoaderException e) {
-                logger.logError(
-                        "Failed to load rules definitions from: " + RULES_DEFINITIONS_PATH, e);
-            }
+        if (!rules.isEmpty()) {
+            return;
+        }
+        logger.logDebug("Loading rules definitions from " + RULES_DEFINITIONS_PATH);
+        try {
+            var loadedRules = ruleLoader.loadRules(RULES_DEFINITIONS_PATH);
+            rules.addAll(loadedRules);
+        } catch (RuleLoaderException e) {
+            logger.logError("Failed to load rules definitions from: " + RULES_DEFINITIONS_PATH, e);
         }
     }
 
