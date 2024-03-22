@@ -47,10 +47,8 @@ public class RuleEngine {
         logger.logDebug("Validating FHIR resource");
         ensureRulesLoaded();
         for (Rule rule : rules) {
-            if (rule.appliesTo(resource)) {
-                if (!rule.isValid(resource)) {
-                    logger.logWarning(rule.getWarningMessage());
-                }
+            if (rule.appliesTo(resource) && !rule.isValid(resource)) {
+                logger.logWarning(rule.getWarningMessage());
             }
         }
     }
