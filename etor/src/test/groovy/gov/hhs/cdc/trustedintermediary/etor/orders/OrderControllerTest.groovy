@@ -11,13 +11,14 @@ import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
 
 class OrderControllerTest extends Specification {
+    def ruleEngine = Mock(RuleEngine)
 
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(OrderController, OrderController.getInstance())
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
-        TestApplicationContext.register(RuleEngine, Mock(RuleEngine))
+        TestApplicationContext.register(RuleEngine, ruleEngine)
     }
 
     def "parseOrders happy path works"() {
@@ -35,6 +36,7 @@ class OrderControllerTest extends Specification {
 
         then:
         actualBundle == expectedBundle
+        (1.._) * ruleEngine.validate(_)
     }
 
     def "parseOrders registers a metadata step"() {
