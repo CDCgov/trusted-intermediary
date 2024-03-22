@@ -12,7 +12,6 @@ public class RuleEngine {
 
     private final Path RULES_DEFINITIONS_PATH =
             Path.of("../etor/src/main/resources/rule_definitions.json");
-    private boolean rulesLoaded = false;
 
     private static final RuleEngine INSTANCE = new RuleEngine();
 
@@ -28,17 +27,15 @@ public class RuleEngine {
     }
 
     public void unloadRules() {
-        rulesLoaded = false;
         rules.clear();
     }
 
     public void ensureRulesLoaded() {
-        if (!rulesLoaded) {
+        if (rules.isEmpty()) {
             logger.logDebug("Loading rules definitions from " + RULES_DEFINITIONS_PATH);
             try {
                 var loadedRules = ruleLoader.loadRules(RULES_DEFINITIONS_PATH);
                 rules.addAll(loadedRules);
-                rulesLoaded = true;
             } catch (RuleLoaderException e) {
                 logger.logError(
                         "Failed to load rules definitions from: " + RULES_DEFINITIONS_PATH, e);
