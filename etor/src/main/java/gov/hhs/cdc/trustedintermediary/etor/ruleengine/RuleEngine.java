@@ -48,7 +48,7 @@ public class RuleEngine {
         ensureRulesLoaded();
         for (Rule rule : rules) {
             if (rule.appliesTo(resource) && !rule.isValid(resource)) {
-                logger.logWarning("Rule violation: " + rule.getWarningMessage());
+                logger.logWarning("Rule violation: " + rule.getViolationMessage());
             }
         }
     }

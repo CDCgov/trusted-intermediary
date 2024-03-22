@@ -1,15 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation
-import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
-import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
 
-import java.nio.file.Files
 import java.nio.file.Path
 
 class RuleEngineTest extends Specification {
@@ -61,10 +56,11 @@ class RuleEngineTest extends Specification {
 
     def "validate handles logging warning correctly"() {
         given:
-        def ruleWarningMessage = "Rule warning message"
+        def ruleViolationMessage = "Rule violation message"
+        def fullRuleViolationMessage = "Rule violation: " + ruleViolationMessage
         def fhirBundle = Mock(Bundle)
         def invalidRule = Mock(Rule)
-        invalidRule.getWarningMessage() >> ruleWarningMessage
+        invalidRule.getViolationMessage() >> ruleViolationMessage
         mockRuleLoader.loadRules(_ as Path) >> [invalidRule]
 
         when:
@@ -73,7 +69,7 @@ class RuleEngineTest extends Specification {
         ruleEngine.validate(fhirBundle)
 
         then:
-        1 * mockLogger.logWarning(ruleWarningMessage)
+        1 * mockLogger.logWarning(fullRuleViolationMessage)
 
         when:
         invalidRule.appliesTo(fhirBundle) >> true
@@ -81,7 +77,7 @@ class RuleEngineTest extends Specification {
         ruleEngine.validate(fhirBundle)
 
         then:
-        0 * mockLogger.logWarning(ruleWarningMessage)
+        0 * mockLogger.logWarning(fullRuleViolationMessage)
 
         when:
         invalidRule.appliesTo(fhirBundle) >> false
@@ -89,6 +85,6 @@ class RuleEngineTest extends Specification {
         ruleEngine.validate(fhirBundle)
 
         then:
-        0 * mockLogger.logWarning(ruleWarningMessage)
+        0 * mockLogger.logWarning(fullRuleViolationMessage)
     }
 }

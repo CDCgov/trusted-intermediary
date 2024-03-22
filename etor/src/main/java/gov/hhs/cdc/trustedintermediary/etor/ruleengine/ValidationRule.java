@@ -17,7 +17,7 @@ public class ValidationRule implements Rule {
     private final HapiFhir fhirEngine = ApplicationContext.getImplementation(HapiFhir.class);
     private String name;
     private String description;
-    private String warningMessage;
+    private String violationMessage;
     private List<String> conditions;
     private List<String> validations;
 
@@ -31,7 +31,7 @@ public class ValidationRule implements Rule {
             List<String> ruleValidations) {
         name = ruleName;
         description = ruleDescription;
-        warningMessage = ruleWarningMessage;
+        violationMessage = ruleWarningMessage;
         conditions = ruleConditions;
         validations = ruleValidations;
     }
@@ -47,8 +47,8 @@ public class ValidationRule implements Rule {
     }
 
     @Override
-    public String getWarningMessage() {
-        return warningMessage;
+    public String getViolationMessage() {
+        return violationMessage;
     }
 
     @Override

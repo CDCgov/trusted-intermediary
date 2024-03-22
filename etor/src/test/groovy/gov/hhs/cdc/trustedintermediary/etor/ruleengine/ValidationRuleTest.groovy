@@ -34,7 +34,7 @@ class ValidationRuleTest extends Specification {
         then:
         rule.getName() == ruleName
         rule.getDescription() == ruleDescription
-        rule.getWarningMessage() == ruleWarningMessage
+        rule.getViolationMessage() == ruleWarningMessage
         rule.getConditions() == conditions
         rule.getValidations() == validations
     }

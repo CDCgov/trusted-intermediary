@@ -13,7 +13,7 @@ public interface Rule {
 
     String getDescription();
 
-    String getWarningMessage();
+    String getViolationMessage();
 
     List<String> getConditions();
 
