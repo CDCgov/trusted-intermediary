@@ -5,9 +5,7 @@ import ca.uhn.fhir.fhirpath.IFhirPath;
 import ca.uhn.fhir.parser.IParser;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
-import java.util.List;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.Base;
 import org.hl7.fhir.r4.model.BooleanType;
 
 /** Concrete implementation that calls the Hapi FHIR library. */
@@ -47,18 +45,6 @@ public class HapiFhirImplementation implements HapiFhir {
     public String encodeResourceToJson(Object resource) {
         IParser encodeResourceParser = CONTEXT.newJsonParser();
         return encodeResourceParser.encodeResourceToString((IBaseResource) resource);
-    }
-
-    /**
-     * Evaluate a FHIR Path expression for a given Resource to find matching elements.
-     *
-     * @param root FHIR resource the evaluation starts from.
-     * @param expression FHIR Path statement to run evaluations on.
-     * @return A list of matching Resources within root for the given expression.
-     */
-    @Override
-    public List<Base> evaluate(IBaseResource root, String expression) {
-        return PATH_ENGINE.evaluate(root, expression, Base.class);
     }
 
     /**
