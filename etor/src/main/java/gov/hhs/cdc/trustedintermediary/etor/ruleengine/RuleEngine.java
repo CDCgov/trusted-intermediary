@@ -31,9 +31,12 @@ public class RuleEngine {
     }
 
     public void ensureRulesLoaded() {
-        if (!rules.isEmpty()) {
-            return;
+        if (rules.isEmpty()) {
+            loadRules();
         }
+    }
+
+    private synchronized void loadRules() {
         logger.logInfo("Loading rules definitions from " + RULES_DEFINITIONS_PATH);
         try {
             var loadedRules = ruleLoader.loadRules(RULES_DEFINITIONS_PATH);
