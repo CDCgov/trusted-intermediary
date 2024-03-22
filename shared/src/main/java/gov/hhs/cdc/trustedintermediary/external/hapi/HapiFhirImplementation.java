@@ -15,7 +15,7 @@ public class HapiFhirImplementation implements HapiFhir {
 
     private static final HapiFhirImplementation INSTANCE = new HapiFhirImplementation();
     private static final FhirContext CONTEXT = FhirContext.forR4();
-    private static final IFhirPath pathEngine = CONTEXT.newFhirPath();
+    private static final IFhirPath PATH_ENGINE = CONTEXT.newFhirPath();
 
     private HapiFhirImplementation() {}
 
@@ -58,7 +58,7 @@ public class HapiFhirImplementation implements HapiFhir {
      */
     @Override
     public List<Base> evaluate(IBaseResource root, String expression) {
-        return pathEngine.evaluate(root, expression, Base.class);
+        return PATH_ENGINE.evaluate(root, expression, Base.class);
     }
 
     /**
@@ -70,7 +70,7 @@ public class HapiFhirImplementation implements HapiFhir {
      */
     @Override
     public Boolean evaluateCondition(IBaseResource root, String expression) {
-        var result = pathEngine.evaluateFirst(root, expression, BooleanType.class);
+        var result = PATH_ENGINE.evaluateFirst(root, expression, BooleanType.class);
         return result.map(BooleanType::booleanValue).orElse(false);
     }
 }
