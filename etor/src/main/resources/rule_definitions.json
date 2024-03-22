@@ -2,7 +2,7 @@
   "rules": [ {
       "name": "requiredReceiverId",
       "description": "Message has required receiver id",
-      "warningMessage": "Message doesn't have required receiver id",
+      "violationMessage": "Message doesn't have required receiver id",
       "conditions": [ ],
       "validations": [
         "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.value.exists()"
@@ -11,7 +11,7 @@
     {
       "name": "requiredReceiverId",
       "description": "ORM has required Card Number",
-      "warningMessage": "ORM doesn't have required Card Number",
+      "violationMessage": "ORM doesn't have required Card Number",
       "conditions": [
         "Bundle.entry.resource.ofType(MessageHeader).event.code = 'O01'"
       ],
