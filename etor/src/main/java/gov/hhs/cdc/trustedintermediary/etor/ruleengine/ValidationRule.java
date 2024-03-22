@@ -70,7 +70,10 @@ public class ValidationRule implements Rule {
                                 return fhirEngine.evaluateCondition(resource, validation);
                             } catch (Exception e) {
                                 logger.logError(
-                                        "An error occurred while evaluating the validation: "
+                                        "Rule ["
+                                                + name
+                                                + "]: "
+                                                + "An error occurred while evaluating the validation: "
                                                 + validation,
                                         e);
                                 return false;
@@ -87,7 +90,10 @@ public class ValidationRule implements Rule {
                                 return fhirEngine.evaluateCondition(resource, condition);
                             } catch (Exception e) {
                                 logger.logError(
-                                        "An error occurred while evaluating the condition: "
+                                        "Rule ["
+                                                + name
+                                                + "]: "
+                                                + "An error occurred while evaluating the condition: "
                                                 + condition,
                                         e);
                                 return false;
