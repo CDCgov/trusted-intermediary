@@ -13,6 +13,10 @@ public interface Rule {
 
     String getDescription();
 
+    /**
+     * Descriptive message when there's a rule violation Note: When implementing this method, make
+     * sure that no PII or PHI is included in the message!
+     */
     String getViolationMessage();
 
     List<String> getConditions();
