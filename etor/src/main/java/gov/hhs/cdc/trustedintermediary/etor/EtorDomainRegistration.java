@@ -12,6 +12,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageRequestHandler;
+import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageHelper;
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException;
@@ -125,6 +126,8 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(RuleLoader.class, RuleLoader.getInstance());
         ApplicationContext.register(RuleEngine.class, RuleEngine.getInstance());
 
+        ApplicationContext.register(SendMessageHelper.class, SendMessageHelper.getInstance());
+
         if (ApplicationContext.getProperty("DB_URL") != null) {
             ApplicationContext.register(DbDao.class, PostgresDao.getInstance());
             ApplicationContext.register(
@@ -192,7 +195,7 @@ public class EtorDomainRegistration implements DomainConnector {
                 request,
                 receivedSubmissionId -> {
                     Result<?> results = resultController.parseResults(request);
-                    sendResultUseCase.convertAndSend(results);
+                    sendResultUseCase.convertAndSend(results, receivedSubmissionId);
                     return domainResponseHelper.constructOkResponse(new ResultResponse(results));
                 },
                 "results",

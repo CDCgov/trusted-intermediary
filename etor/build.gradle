@@ -13,7 +13,7 @@ dependencies {
     implementation project(':shared')
     testImplementation testFixtures(project(':shared'))
 
-    implementation 'com.azure:azure-storage-blob:12.25.2'
+    implementation 'com.azure:azure-storage-blob:12.25.3'
     implementation 'com.azure:azure-identity:1.11.4'
 
     testImplementation 'org.apache.groovy:groovy:4.0.20'

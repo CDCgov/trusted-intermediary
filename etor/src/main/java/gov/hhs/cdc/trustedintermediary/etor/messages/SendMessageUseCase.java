@@ -8,5 +8,6 @@ package gov.hhs.cdc.trustedintermediary.etor.messages;
  */
 public interface SendMessageUseCase<T> {
 
-    void convertAndSend(final T message) throws UnableToSendMessageException;
+    void convertAndSend(final T message, final String submissionId)
+            throws UnableToSendMessageException;
 }

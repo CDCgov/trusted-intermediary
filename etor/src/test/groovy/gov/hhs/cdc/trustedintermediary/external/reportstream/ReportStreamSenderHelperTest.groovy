@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.external.localfile.MockRSEndpointClient
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
@@ -27,6 +28,7 @@ class ReportStreamSenderHelperTest extends Specification {
         def requestBody = "testBody"
         def bearerToken = "fake-token"
         def responseBody = """{"submissionId": "fake-id"}"""
+        def messageType = PartnerMetadataMessageType.ORDER
 
         def mockFormatter = Mock(Formatter)
         TestApplicationContext.register(Formatter, mockFormatter)
@@ -37,7 +39,7 @@ class ReportStreamSenderHelperTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        ReportStreamSenderHelper.getInstance().sendToReportStream(requestBody, _ as String, _ as String)
+        ReportStreamSenderHelper.getInstance().sendToReportStream(requestBody, _ as String, messageType)
 
         then:
         1 * mockRsClient.getRsToken() >> "fake-token"
@@ -51,6 +53,7 @@ class ReportStreamSenderHelperTest extends Specification {
         def body = "testBody"
         def fhirResourceId = "testId"
         def expected = Optional.of("result")
+        def messageType = PartnerMetadataMessageType.ORDER
 
         def senderHelper = Spy(ReportStreamSenderHelper.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
@@ -60,7 +63,7 @@ class ReportStreamSenderHelperTest extends Specification {
 
         then:
         order.get() == expected.get()
-        1 * senderHelper.sendToReportStream(body, fhirResourceId, "order") >> expected
+        1 * senderHelper.sendToReportStream(body, fhirResourceId, messageType) >> expected
     }
 
     def "sendResultToReportStream works"() {
@@ -68,6 +71,7 @@ class ReportStreamSenderHelperTest extends Specification {
         def body = "testBody"
         def fhirResourceId = "testId"
         def expected = Optional.of("result")
+        def messageType = PartnerMetadataMessageType.RESULT
 
         def senderHelper = Spy(ReportStreamSenderHelper.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
@@ -77,7 +81,7 @@ class ReportStreamSenderHelperTest extends Specification {
 
         then:
         result.get() == expected.get()
-        1 * senderHelper.sendToReportStream(body, fhirResourceId, "result") >> expected
+        1 * senderHelper.sendToReportStream(body, fhirResourceId, PartnerMetadataMessageType.RESULT) >> expected
     }
 
     def "sendToReportStream throws exception if RS client fails"() {
@@ -89,7 +93,7 @@ class ReportStreamSenderHelperTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        ReportStreamSenderHelper.getInstance().sendToReportStream("testBody", "testId", "testType")
+        ReportStreamSenderHelper.getInstance().sendToReportStream("testBody", "testId", PartnerMetadataMessageType.ORDER)
 
         then:
         thrown(UnableToSendMessageException)
