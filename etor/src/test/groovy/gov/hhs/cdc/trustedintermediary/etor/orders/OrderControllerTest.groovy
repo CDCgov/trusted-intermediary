@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.etor.orders
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
@@ -10,12 +11,14 @@ import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
 
 class OrderControllerTest extends Specification {
+    def ruleEngine = Mock(RuleEngine)
 
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(OrderController, OrderController.getInstance())
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
+        TestApplicationContext.register(RuleEngine, ruleEngine)
     }
 
     def "parseOrders happy path works"() {
@@ -33,6 +36,7 @@ class OrderControllerTest extends Specification {
 
         then:
         actualBundle == expectedBundle
+        (1.._) * ruleEngine.validate(_)
     }
 
     def "parseOrders registers a metadata step"() {
