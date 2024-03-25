@@ -2,11 +2,15 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 
 import ca.uhn.fhir.fhirpath.FhirPathExecutionException
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DiagnosticReport
 import org.hl7.fhir.r4.model.ServiceRequest
 import spock.lang.Specification
+
+import java.nio.file.Files
+import java.nio.file.Path
 
 class HapiFhirImplementationTest extends Specification {
     Bundle bundle
@@ -91,5 +95,32 @@ class HapiFhirImplementationTest extends Specification {
 
         then:
         thrown(FhirPathExecutionException)
+    }
+
+    def "parseResource can convert a valid string to Bundle"() {
+        given:
+        def fhirBody = Files.readString(Path.of("../examples/Test/Orders/001_OML_O21_short.fhir"))
+
+        when:
+        def parsedBundle = fhir.parseResource(fhirBody, Bundle.class)
+
+        then:
+        parsedBundle.class == Bundle.class
+    }
+
+    def "parseResource throws FhirParseException on an invalid string"() {
+        when:
+        fhir.parseResource("badString", Bundle.class)
+
+        then:
+        thrown(FhirParseException)
+    }
+
+    def "encodeResourceToJson successfully converts a Bundle to a string" () {
+        when:
+        def encodedBundle = fhir.encodeResourceToJson(bundle)
+
+        then:
+        encodedBundle.class == String.class
     }
 }
