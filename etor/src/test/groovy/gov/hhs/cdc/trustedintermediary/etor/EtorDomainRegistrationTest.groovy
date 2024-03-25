@@ -15,6 +15,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResp
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageRequestHandler
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataConverter
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator
@@ -240,9 +241,9 @@ class EtorDomainRegistrationTest extends Specification {
         mockResponseHelper.constructOkResponseFromString(_ as String) >> new DomainResponse(expectedStatusCode)
         TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
 
-        def mockOrderConverter = Mock(OrderConverter)
-        mockOrderConverter.extractPublicMetadataToOperationOutcome(_ as PartnerMetadata, _ as String) >> Mock(FhirMetadata)
-        TestApplicationContext.register(OrderConverter, mockOrderConverter)
+        def mockPartnerMetadataConverter = Mock(PartnerMetadataConverter)
+        mockPartnerMetadataConverter.extractPublicMetadataToOperationOutcome(_ as PartnerMetadata, _ as String) >> Mock(FhirMetadata)
+        TestApplicationContext.register(PartnerMetadataConverter, mockPartnerMetadataConverter)
 
         def mockFhir = Mock(HapiFhir)
         mockFhir.encodeResourceToJson(_) >> ""

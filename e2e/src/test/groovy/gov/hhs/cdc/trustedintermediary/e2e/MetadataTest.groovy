@@ -17,7 +17,6 @@ class MetadataTest extends Specification {
         given:
         def expectedStatusCode = 200
         def inboundSubmissionId = UUID.randomUUID().toString()
-        def outboundSubmissionId = "1234567890"
         def orderClient = new EndpointClient("/v1/etor/orders")
         def labOrderJsonFileString = Files.readString(Path.of("../examples/Test/Orders/002_ORM_O01.fhir"))
 
@@ -29,15 +28,11 @@ class MetadataTest extends Specification {
 
         when:
         def inboundMetadataResponse = metadataClient.get(inboundSubmissionId, true)
-        def outboundMetadataResponse = metadataClient.get(outboundSubmissionId, true)
         def inboundParsedJsonBody = JsonParsing.parseContent(inboundMetadataResponse)
-        def outboundParsedJsonBody = JsonParsing.parseContent(outboundMetadataResponse)
 
         then:
         inboundMetadataResponse.getCode() == expectedStatusCode
-        outboundMetadataResponse.getCode() == expectedStatusCode
         inboundParsedJsonBody.get("id") == inboundSubmissionId
-        outboundParsedJsonBody.get("id") == outboundSubmissionId
 
         [
             "sender name",
@@ -46,7 +41,8 @@ class MetadataTest extends Specification {
             "payload hash",
             "delivery status",
             "status message",
-            "message type"
+            "message type",
+            "sent submission id"
         ].each { String metadataKey ->
             println(metadataKey)
             def issue = (inboundParsedJsonBody.issue as List).find( {issue -> issue.details.text == metadataKey })
@@ -60,7 +56,6 @@ class MetadataTest extends Specification {
         given:
         def expectedStatusCode = 200
         def inboundSubmissionId = UUID.randomUUID().toString()
-        def outboundSubmissionId = "1234567890"
         def resultClient = new EndpointClient("/v1/etor/results")
         def labResult = Files.readString(Path.of("../examples/Test/Results/001_ORU_R01.fhir"))
 
@@ -72,15 +67,11 @@ class MetadataTest extends Specification {
 
         when:
         def inboundMetadataResponse = metadataClient.get(inboundSubmissionId, true)
-        def outboundMetadataResponse = metadataClient.get(outboundSubmissionId, true)
         def inboundParsedJsonBody = JsonParsing.parseContent(inboundMetadataResponse)
-        def outboundParsedJsonBody = JsonParsing.parseContent(outboundMetadataResponse)
 
         then:
         inboundMetadataResponse.getCode() == expectedStatusCode
-        outboundMetadataResponse.getCode() == expectedStatusCode
         inboundParsedJsonBody.get("id") == inboundSubmissionId
-        outboundParsedJsonBody.get("id") == outboundSubmissionId
 
         [
             "sender name",
@@ -89,7 +80,8 @@ class MetadataTest extends Specification {
             "payload hash",
             "delivery status",
             "status message",
-            "message type"
+            "message type",
+            "sent submission id"
         ].each { String metadataKey ->
             def issue = (inboundParsedJsonBody.issue as List).find( {issue -> issue.details.text == metadataKey })
             assert issue != null

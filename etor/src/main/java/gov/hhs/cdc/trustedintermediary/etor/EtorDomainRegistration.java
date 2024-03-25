@@ -15,6 +15,7 @@ import gov.hhs.cdc.trustedintermediary.etor.messages.MessageRequestHandler;
 import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageHelper;
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataConverter;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStorage;
@@ -36,6 +37,7 @@ import gov.hhs.cdc.trustedintermediary.external.database.DbDao;
 import gov.hhs.cdc.trustedintermediary.external.database.PostgresDao;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiMessageConverterHelper;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiPartnerMetadataConverter;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiResultConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.FilePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.localfile.MockRSEndpointClient;
@@ -79,8 +81,7 @@ public class EtorDomainRegistration implements DomainConnector {
     @Inject Logger logger;
     @Inject DomainResponseHelper domainResponseHelper;
     @Inject PartnerMetadataOrchestrator partnerMetadataOrchestrator;
-
-    @Inject OrderConverter orderConverter;
+    @Inject PartnerMetadataConverter partnerMetadataConverter;
 
     @Inject HapiFhir fhir;
 
@@ -120,6 +121,8 @@ public class EtorDomainRegistration implements DomainConnector {
         // Metadata
         ApplicationContext.register(
                 PartnerMetadataOrchestrator.class, PartnerMetadataOrchestrator.getInstance());
+        ApplicationContext.register(
+                PartnerMetadataConverter.class, HapiPartnerMetadataConverter.getInstance());
 
         ApplicationContext.register(SendMessageHelper.class, SendMessageHelper.getInstance());
 
@@ -209,7 +212,7 @@ public class EtorDomainRegistration implements DomainConnector {
             }
 
             FhirMetadata<?> responseObject =
-                    orderConverter.extractPublicMetadataToOperationOutcome(
+                    partnerMetadataConverter.extractPublicMetadataToOperationOutcome(
                             metadata.get(), metadataId);
 
             return domainResponseHelper.constructOkResponseFromString(
