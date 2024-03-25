@@ -227,24 +227,10 @@ public class HapiOrderConverter implements OrderConverter {
             delivered = metadata.timeDelivered().toString();
         }
 
-        operation
-                .getIssue()
-                .add(
-                        createInformationIssueComponent(
-                                String.format(
-                                        "%s ingestion",
-                                        metadata.messageType().toString().toLowerCase()),
-                                ingestion));
+        operation.getIssue().add(createInformationIssueComponent("ingestion", ingestion));
 
         operation.getIssue().add(createInformationIssueComponent("payload hash", metadata.hash()));
-        operation
-                .getIssue()
-                .add(
-                        createInformationIssueComponent(
-                                String.format(
-                                        "%s delivered",
-                                        metadata.messageType().toString().toLowerCase()),
-                                delivered));
+        operation.getIssue().add(createInformationIssueComponent("delivered", delivered));
         operation
                 .getIssue()
                 .add(
@@ -254,6 +240,12 @@ public class HapiOrderConverter implements OrderConverter {
         operation
                 .getIssue()
                 .add(createInformationIssueComponent("status message", metadata.failureReason()));
+
+        operation
+                .getIssue()
+                .add(
+                        createInformationIssueComponent(
+                                "message type", metadata.messageType().toString()));
 
         return new HapiFhirMetadata(operation);
     }
