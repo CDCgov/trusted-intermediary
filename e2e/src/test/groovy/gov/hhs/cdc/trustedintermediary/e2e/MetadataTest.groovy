@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.e2e
 
+import org.apache.hc.core5.http.io.entity.EntityUtils
 import spock.lang.Specification
 
 import java.nio.file.Files
@@ -29,6 +30,7 @@ class MetadataTest extends Specification {
 
         when:
         def inboundMetadataResponse = metadataClient.get(inboundSubmissionId, true)
+        def body = JsonParsing.parseContent(inboundMetadataResponse)
         def outboundMetadataResponse = metadataClient.get(outboundSubmissionId, true)
         def inboundParsedJsonBody = JsonParsing.parseContent(inboundMetadataResponse)
         def outboundParsedJsonBody = JsonParsing.parseContent(outboundMetadataResponse)
