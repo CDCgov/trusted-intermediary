@@ -42,11 +42,13 @@ class MetadataTest extends Specification {
         [
             "sender name",
             "receiver name",
-            "order ingestion",
+            "ingestion",
             "payload hash",
             "delivery status",
-            "status message"
+            "status message",
+            "message type"
         ].each { String metadataKey ->
+            println(metadataKey)
             def issue = (inboundParsedJsonBody.issue as List).find( {issue -> issue.details.text == metadataKey })
             assert issue != null
             assert issue.diagnostics != null
@@ -83,10 +85,11 @@ class MetadataTest extends Specification {
         [
             "sender name",
             "receiver name",
-            "result ingestion",
+            "ingestion",
             "payload hash",
             "delivery status",
-            "status message"
+            "status message",
+            "message type"
         ].each { String metadataKey ->
             def issue = (inboundParsedJsonBody.issue as List).find( {issue -> issue.details.text == metadataKey })
             assert issue != null
