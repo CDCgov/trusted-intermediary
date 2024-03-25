@@ -20,6 +20,10 @@ public class ValidationRule implements Rule {
     private List<String> conditions;
     private List<String> validations;
 
+    /**
+     * Do not delete this constructor! It is used for JSON deserialization when loading rules from a
+     * file.
+     */
     public ValidationRule() {}
 
     public ValidationRule(

@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine;
 
-import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
@@ -13,7 +12,6 @@ import javax.inject.Inject;
 public class RuleLoader {
     private static final RuleLoader INSTANCE = new RuleLoader();
     @Inject Formatter formatter;
-    @Inject Logger logger;
 
     private RuleLoader() {}
 
