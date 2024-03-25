@@ -16,7 +16,7 @@
         "Bundle.entry.resource.ofType(MessageHeader).event.code = 'O01'"
       ],
       "validations": [
-        "Bundle.entry.resource.ofType(Observation).where(code.coding.code = '57723-9').valueCodeableConcept.coding.code.exists()"
+        "Bundle.entry.resource.ofType(Observation).where(code.coding.code = '57723-9').value.coding.code.exists()"
       ]
     }
   ]
