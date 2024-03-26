@@ -281,13 +281,11 @@ For database documentation [go here](/docs/database.md)
       ApplicationContext.register(RSEndpointClient.class, MockRSEndpointClient.getInstance());
    } else {
       ApplicationContext.register(RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
-      ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
    }
    ```
    with:
    ```Java
    ApplicationContext.register(RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
-   ApplicationContext.register(AzureClient.class, AzureClient.getInstance());
    ```
 3. Run TI with `./gradlew clean app:run`
 
@@ -331,8 +329,30 @@ with this option enabled.
          "apiKey": "Contents of file at trusted-intermediary/mock_credentials/organization-report-stream-private-key-local.pem",
          "user": "flexion"
          }
+         ```
+      3. Create secret for `DEFAULT-SFTP`
+         1. Path for this secret: `DEFAULT-SFTP`
+         2. JSON data:
+         ```
+         {
+         "@type": "UserPass",
+         "user": "user",
+         "pass": "pass"
+         }
+         ```
 
 #### Submit request to ReportStream
+
+In order to submit a request, you'll need to authenticate with ReportStream using JWT auth:
+1. Create a JWT for the sender (e.g. `flexion.simulated-hospital`) using the sender's private key. You may use [this CLI tool](https://github.com/mike-engel/jwt-cli) to create the JWT:
+   ```
+   jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 -k <sender> -i <sender> -s <sender> -a staging.prime.cdc.gov --no-iat -S @/path/to/sender_private.pem
+   ```
+2. Use the generated JWT to authenticate with ReportStream and get the token, which will be in the `access_token` response
+   ```
+   curl --header 'Content-Type: application/x-www-form-urlencoded' --data 'scope=flexion.*.report' --data 'client_assertion=<jwt>' --data 'client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer' --data 'grant_type=client_credentials' 'http://localhost:7071/api/token'
+   ```
+3. Submit an Order or Result using the returned token
 
 ##### Orders
 
