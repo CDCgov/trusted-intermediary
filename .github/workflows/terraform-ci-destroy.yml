@@ -50,7 +50,6 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Terraform Init
-        id: init
         run: terraform init -backend-config="key=pr_${{ github.event.number }}.tfstate"
 
       - name: Terraform Destroy
