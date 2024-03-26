@@ -45,5 +45,6 @@ class HapiMetadataConverterTest extends Specification {
         result.getIssue().get(6).diagnostics == failureReason
         result.getIssue().get(7).diagnostics == messageType.toString()
         result.getIssue().get(8).diagnostics == "sentSubmissionId"
+        result.getIssue().get(9).diagnostics == "receivedSubmissionId"
     }
 }
