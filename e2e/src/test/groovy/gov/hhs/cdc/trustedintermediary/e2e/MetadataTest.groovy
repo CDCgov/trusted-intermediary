@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.e2e
 
-import org.apache.hc.core5.http.io.entity.EntityUtils
+
 import spock.lang.Specification
 
 import java.nio.file.Files
@@ -30,10 +30,15 @@ class MetadataTest extends Specification {
         when:
         def inboundMetadataResponse = metadataClient.get(inboundSubmissionId, true)
         def inboundParsedJsonBody = JsonParsing.parseContent(inboundMetadataResponse)
+        def outboundSubmissionId = inboundParsedJsonBody.issue[8].diagnostics
+        def outboundMetadataResponse = metadataClient.get(outboundSubmissionId, true)
+        def outboundParsedJsonBody = JsonParsing.parseContent(outboundMetadataResponse)
 
         then:
         inboundMetadataResponse.getCode() == expectedStatusCode
+        outboundMetadataResponse.getCode() == expectedStatusCode
         inboundParsedJsonBody.get("id") == inboundSubmissionId
+        outboundParsedJsonBody.get("id") == outboundSubmissionId
 
         [
             "sender name",
@@ -43,9 +48,9 @@ class MetadataTest extends Specification {
             "delivery status",
             "status message",
             "message type",
-            "sent submission id"
+            "outbound submission id",
+            "inbound submission id"
         ].each { String metadataKey ->
-            println(metadataKey)
             def issue = (inboundParsedJsonBody.issue as List).find( {issue -> issue.details.text == metadataKey })
             assert issue != null
             assert issue.diagnostics != null
@@ -69,10 +74,15 @@ class MetadataTest extends Specification {
         when:
         def inboundMetadataResponse = metadataClient.get(inboundSubmissionId, true)
         def inboundParsedJsonBody = JsonParsing.parseContent(inboundMetadataResponse)
+        def outboundSubmissionId = inboundParsedJsonBody.issue[8].diagnostics
+        def outboundMetadataResponse = metadataClient.get(outboundSubmissionId, true)
+        def outboundParsedJsonBody = JsonParsing.parseContent(outboundMetadataResponse)
 
         then:
         inboundMetadataResponse.getCode() == expectedStatusCode
+        outboundMetadataResponse.getCode() == expectedStatusCode
         inboundParsedJsonBody.get("id") == inboundSubmissionId
+        outboundParsedJsonBody.get("id") == outboundSubmissionId
 
         [
             "sender name",
@@ -82,7 +92,8 @@ class MetadataTest extends Specification {
             "delivery status",
             "status message",
             "message type",
-            "sent submission id"
+            "outbound submission id",
+            "inbound submission id"
         ].each { String metadataKey ->
             def issue = (inboundParsedJsonBody.issue as List).find( {issue -> issue.details.text == metadataKey })
             assert issue != null

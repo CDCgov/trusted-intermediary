@@ -16,6 +16,7 @@ public class HapiPartnerMetadataConverter implements PartnerMetadataConverter {
 
     private HapiPartnerMetadataConverter() {}
 
+    @Override
     public FhirMetadata<?> extractPublicMetadataToOperationOutcome(
             PartnerMetadata metadata, String requestedId) {
         var operation = new OperationOutcome();
@@ -59,7 +60,13 @@ public class HapiPartnerMetadataConverter implements PartnerMetadataConverter {
                 .getIssue()
                 .add(
                         createInformationIssueComponent(
-                                "sent submission id", metadata.sentSubmissionId()));
+                                "outbound submission id", metadata.sentSubmissionId()));
+
+        operation
+                .getIssue()
+                .add(
+                        createInformationIssueComponent(
+                                "inbound submission id", metadata.receivedSubmissionId()));
 
         return new HapiFhirMetadata(operation);
     }
