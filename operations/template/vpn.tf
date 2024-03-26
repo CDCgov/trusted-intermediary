@@ -3,7 +3,8 @@ resource "azurerm_public_ip" "vpn" {
   location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
 
-  allocation_method = "Dynamic"
+  sku = "Standard"
+  allocation_method = "Static"
 }
 
 resource "azurerm_virtual_network_gateway" "vpn" {
