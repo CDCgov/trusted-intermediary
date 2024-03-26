@@ -13,4 +13,6 @@ public interface HapiFhir {
             throws FhirParseException;
 
     String encodeResourceToJson(Object resource);
+
+    Boolean evaluateCondition(Object resource, String expression);
 }
