@@ -17,6 +17,7 @@ jobs:
 
       - uses: actions/checkout@v4
 
+      # keep in sync with terraform-ci-destroy.yml
       - uses: dorny/paths-filter@v3
         id: filter
         with:
@@ -74,36 +75,3 @@ jobs:
       - paths-filter
     uses: ./.github/workflows/deploy_reusable-skip.yml
     if: needs.paths-filter.outputs.operations != 'true'
-
-
-  destroy-environment:
-    name: Destroy PR Environment
-    environment:
-      name: pr
-    needs:
-      - pr-deploy
-      - paths-filter
-    if: needs.paths-filter.outputs.operations == 'true' && always()
-    runs-on: ubuntu-latest
-    env:
-      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      ARM_USE_OIDC: true
-    permissions:
-      id-token: write
-      contents: read
-    defaults:
-      run:
-        working-directory: operations/environments/pr
-
-    steps:
-
-      - uses: actions/checkout@v4
-
-      - name: Terraform Init
-        id: init
-        run: terraform init -backend-config="key=pr_${{ github.event.number }}.tfstate"
-
-      - name: Terraform Destroy
-        run: terraform destroy -auto-approve -input=false -var="pr_number=${{ github.event.number }}"
