@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 /**
  * A mock implementation of the RSEndpointClient interface that doesn't require a connection to
@@ -37,7 +38,7 @@ public class MockRSEndpointClient implements RSEndpointClient {
         } catch (IOException e) {
             throw new ReportStreamEndpointClientException("Error writing the lab order", e);
         }
-        return "{ \"submissionId\": \"1234567890\" }";
+        return "{ \"submissionId\": \"" + UUID.randomUUID() + "\" }";
     }
 
     @Override
