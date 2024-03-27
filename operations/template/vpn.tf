@@ -1,5 +1,5 @@
-resource "azurerm_public_ip" "vpn" {
-  name                = "vpn-public-ip"
+resource "azurerm_public_ip" "vpn2" {
+  name                = "vpn-public-ip2"
   location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
 
@@ -20,7 +20,7 @@ resource "azurerm_virtual_network_gateway" "vpn" {
   sku           = "VpnGw1"
 
   ip_configuration {
-    public_ip_address_id          = azurerm_public_ip.vpn.id
+    public_ip_address_id          = azurerm_public_ip.vpn2.id
     private_ip_address_allocation = "Dynamic"
     subnet_id                     = azurerm_subnet.vpn.id
   }
