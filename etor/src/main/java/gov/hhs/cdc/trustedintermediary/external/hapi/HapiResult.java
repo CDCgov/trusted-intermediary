@@ -21,4 +21,29 @@ public class HapiResult implements Result<Bundle> {
     public String getFhirResourceId() {
         return innerResult.getId();
     }
+
+    @Override
+    public String getPlacerOrderNumber() {
+        return null;
+    }
+
+    @Override
+    public String getSendingApplicationId() {
+        return null;
+    }
+
+    @Override
+    public String getSendingFacilityId() {
+        return null;
+    }
+
+    @Override
+    public String getReceivingApplicationId() {
+        return null;
+    }
+
+    @Override
+    public String getReceivingFacilityId() {
+        return null;
+    }
 }

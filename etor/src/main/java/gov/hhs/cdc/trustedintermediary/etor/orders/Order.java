@@ -11,4 +11,14 @@ public interface Order<T> {
     String getFhirResourceId();
 
     String getPatientId();
+
+    String getPlacerOrderNumber();
+
+    String getSendingApplicationId();
+
+    String getSendingFacilityId();
+
+    String getReceivingApplicationId();
+
+    String getReceivingFacilityId();
 }

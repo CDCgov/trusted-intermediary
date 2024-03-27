@@ -42,4 +42,29 @@ public class HapiOrder implements Order<Bundle> {
                 .findFirst()
                 .orElse("");
     }
+
+    @Override
+    public String getPlacerOrderNumber() {
+        return null;
+    }
+
+    @Override
+    public String getSendingApplicationId() {
+        return null;
+    }
+
+    @Override
+    public String getSendingFacilityId() {
+        return null;
+    }
+
+    @Override
+    public String getReceivingApplicationId() {
+        return null;
+    }
+
+    @Override
+    public String getReceivingFacilityId() {
+        return null;
+    }
 }
