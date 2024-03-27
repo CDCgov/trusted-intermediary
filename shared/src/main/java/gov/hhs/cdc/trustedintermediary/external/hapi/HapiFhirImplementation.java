@@ -1,19 +1,21 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.fhirpath.IFhirPath;
 import ca.uhn.fhir.parser.IParser;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.BooleanType;
+import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext;
+import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.utils.FHIRPathEngine;
 
 /** Concrete implementation that calls the Hapi FHIR library. */
 public class HapiFhirImplementation implements HapiFhir {
 
     private static final HapiFhirImplementation INSTANCE = new HapiFhirImplementation();
     private static final FhirContext CONTEXT = FhirContext.forR4();
-    private static final IFhirPath PATH_ENGINE = CONTEXT.newFhirPath();
+    private static final FHIRPathEngine PATH_ENGINE =
+            new FHIRPathEngine(new HapiWorkerContext(CONTEXT, CONTEXT.getValidationSupport()));
 
     private HapiFhirImplementation() {}
 
@@ -56,8 +58,16 @@ public class HapiFhirImplementation implements HapiFhir {
      */
     @Override
     public Boolean evaluateCondition(Object resource, String expression) {
+        var node = PATH_ENGINE.parse(expression);
+
         var result =
-                PATH_ENGINE.evaluateFirst((IBaseResource) resource, expression, BooleanType.class);
-        return result.map(BooleanType::booleanValue).orElse(false);
+                PATH_ENGINE.evaluateToBoolean(
+                        (Resource) resource, (Resource) resource, (Resource) resource, node);
+
+        //        var result =
+        //                PATH_ENGINE.evaluateFirst((IBaseResource) resource, expression,
+        // BooleanType.class);
+        //        return result.map(BooleanType::booleanValue).orElse(false);
+        return result;
     }
 }
