@@ -24,4 +24,29 @@ class ResultMock<T> implements Result<T> {
     String getFhirResourceId() {
         return fhirResourceId
     }
+
+    @Override
+    String getPlacerOrderNumber() {
+        return null
+    }
+
+    @Override
+    String getSendingApplicationId() {
+        return null
+    }
+
+    @Override
+    String getSendingFacilityId() {
+        return null
+    }
+
+    @Override
+    String getReceivingApplicationId() {
+        return null
+    }
+
+    @Override
+    String getReceivingFacilityId() {
+        return null
+    }
 }
