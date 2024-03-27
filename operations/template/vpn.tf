@@ -1,5 +1,13 @@
-resource "azurerm_public_ip" "vpn2" {
-  name                = "vpn-public-ip2"
+resource "azurerm_public_ip" "vpn" {
+  name                = "vpn-public-ip"
+  location            = data.azurerm_resource_group.group.location
+  resource_group_name = data.azurerm_resource_group.group.name
+
+  allocation_method = "Dynamic"
+}
+
+resource "azurerm_public_ip" "vpn-standard" {
+  name                = "vpn-public-ip-standard"
   location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
 
