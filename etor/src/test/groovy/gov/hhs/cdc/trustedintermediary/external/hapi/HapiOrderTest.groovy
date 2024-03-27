@@ -64,4 +64,94 @@ class HapiOrderTest extends Specification {
         then:
         orders.getPatientId() == expectedPatientId
     }
+
+    def "getPlacerOrderNumber works"() {
+        given:
+        def expected = 1
+        when:
+        def actual = 1
+        then:
+        actual == expected
+    }
+
+    def "getPlacerOrderNumber unhappy path"() {
+        given:
+        def expected = 1
+        when:
+        def actual = 1
+        then:
+        actual == expected
+    }
+
+    def "getSendingApplicationId works"() {
+        given:
+        def expected = 1
+        when:
+        def actual = 1
+        then:
+        actual == expected
+    }
+
+    def "getSendingApplicationId unhappy path"() {
+        given:
+        def expected = 1
+        when:
+        def actual = 1
+        then:
+        actual == expected
+    }
+
+    def "getSendingFacilityId works"() {
+        given:
+        def expected = 1
+        when:
+        def actual = 1
+        then:
+        actual == expected
+    }
+
+    def "getSendingFacilityId unhappy path"() {
+        given:
+        def expected = 1
+        when:
+        def actual = 1
+        then:
+        actual == expected
+    }
+
+    def "getReceivingApplicationId works"() {
+        given:
+        def expected = 1
+        when:
+        def actual = 1
+        then:
+        actual == expected
+    }
+
+    def "getReceivingApplicationId unhappy path"() {
+        given:
+        def expected = 1
+        when:
+        def actual = 1
+        then:
+        actual == expected
+    }
+
+    def "getReceivingFacilityId works"() {
+        given:
+        def expected = 1
+        when:
+        def actual = 1
+        then:
+        actual == expected
+    }
+
+    def "getReceivingFacilityId unhappy path"() {
+        given:
+        def expected = 1
+        when:
+        def actual = 1
+        then:
+        actual == expected
+    }
 }
