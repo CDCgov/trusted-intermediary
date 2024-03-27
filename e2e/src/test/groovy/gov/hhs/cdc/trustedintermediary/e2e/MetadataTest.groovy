@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.e2e
 
+
 import spock.lang.Specification
 
 import java.nio.file.Files
@@ -17,7 +18,6 @@ class MetadataTest extends Specification {
         given:
         def expectedStatusCode = 200
         def inboundSubmissionId = UUID.randomUUID().toString()
-        def outboundSubmissionId = "1234567890"
         def orderClient = new EndpointClient("/v1/etor/orders")
         def labOrderJsonFileString = Files.readString(Path.of("../examples/Test/Orders/002_ORM_O01.fhir"))
 
@@ -29,8 +29,9 @@ class MetadataTest extends Specification {
 
         when:
         def inboundMetadataResponse = metadataClient.get(inboundSubmissionId, true)
-        def outboundMetadataResponse = metadataClient.get(outboundSubmissionId, true)
         def inboundParsedJsonBody = JsonParsing.parseContent(inboundMetadataResponse)
+        def outboundSubmissionId = inboundParsedJsonBody.issue[8].diagnostics
+        def outboundMetadataResponse = metadataClient.get(outboundSubmissionId, true)
         def outboundParsedJsonBody = JsonParsing.parseContent(outboundMetadataResponse)
 
         then:
@@ -42,10 +43,13 @@ class MetadataTest extends Specification {
         [
             "sender name",
             "receiver name",
-            "order ingestion",
+            "ingestion",
             "payload hash",
             "delivery status",
-            "status message"
+            "status message",
+            "message type",
+            "outbound submission id",
+            "inbound submission id"
         ].each { String metadataKey ->
             def issue = (inboundParsedJsonBody.issue as List).find( {issue -> issue.details.text == metadataKey })
             assert issue != null
@@ -58,7 +62,6 @@ class MetadataTest extends Specification {
         given:
         def expectedStatusCode = 200
         def inboundSubmissionId = UUID.randomUUID().toString()
-        def outboundSubmissionId = "1234567890"
         def resultClient = new EndpointClient("/v1/etor/results")
         def labResult = Files.readString(Path.of("../examples/Test/Results/001_ORU_R01.fhir"))
 
@@ -70,8 +73,9 @@ class MetadataTest extends Specification {
 
         when:
         def inboundMetadataResponse = metadataClient.get(inboundSubmissionId, true)
-        def outboundMetadataResponse = metadataClient.get(outboundSubmissionId, true)
         def inboundParsedJsonBody = JsonParsing.parseContent(inboundMetadataResponse)
+        def outboundSubmissionId = inboundParsedJsonBody.issue[8].diagnostics
+        def outboundMetadataResponse = metadataClient.get(outboundSubmissionId, true)
         def outboundParsedJsonBody = JsonParsing.parseContent(outboundMetadataResponse)
 
         then:
@@ -83,10 +87,13 @@ class MetadataTest extends Specification {
         [
             "sender name",
             "receiver name",
-            "result ingestion",
+            "ingestion",
             "payload hash",
             "delivery status",
-            "status message"
+            "status message",
+            "message type",
+            "outbound submission id",
+            "inbound submission id"
         ].each { String metadataKey ->
             def issue = (inboundParsedJsonBody.issue as List).find( {issue -> issue.details.text == metadataKey })
             assert issue != null

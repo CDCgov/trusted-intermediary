@@ -1,9 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
-import gov.hhs.cdc.trustedintermediary.etor.operationoutcomes.FhirMetadata;
-import gov.hhs.cdc.trustedintermediary.etor.operationoutcomes.HapiFhirMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -18,7 +15,6 @@ import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
-import org.hl7.fhir.r4.model.OperationOutcome;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Provenance;
 import org.hl7.fhir.r4.model.Reference;
@@ -205,69 +201,5 @@ public class HapiOrderConverter implements OrderConverter {
         provenance.setActivity(new CodeableConcept(OML_CODING));
 
         return provenance;
-    }
-
-    @Override
-    public FhirMetadata<?> extractPublicMetadataToOperationOutcome(
-            PartnerMetadata metadata, String requestedId) {
-        var operation = new OperationOutcome();
-
-        operation.setId(requestedId);
-        operation.getIssue().add(createInformationIssueComponent("sender name", metadata.sender()));
-        operation
-                .getIssue()
-                .add(createInformationIssueComponent("receiver name", metadata.receiver()));
-
-        String ingestion = null;
-        String delivered = null;
-        if (metadata.timeReceived() != null) {
-            ingestion = metadata.timeReceived().toString();
-        }
-        if (metadata.timeDelivered() != null) {
-            delivered = metadata.timeDelivered().toString();
-        }
-
-        operation
-                .getIssue()
-                .add(
-                        createInformationIssueComponent(
-                                String.format(
-                                        "%s ingestion",
-                                        metadata.messageType().toString().toLowerCase()),
-                                ingestion));
-
-        operation.getIssue().add(createInformationIssueComponent("payload hash", metadata.hash()));
-        operation
-                .getIssue()
-                .add(
-                        createInformationIssueComponent(
-                                String.format(
-                                        "%s delivered",
-                                        metadata.messageType().toString().toLowerCase()),
-                                delivered));
-        operation
-                .getIssue()
-                .add(
-                        createInformationIssueComponent(
-                                "delivery status", metadata.deliveryStatus().toString()));
-
-        operation
-                .getIssue()
-                .add(createInformationIssueComponent("status message", metadata.failureReason()));
-
-        return new HapiFhirMetadata(operation);
-    }
-
-    protected OperationOutcome.OperationOutcomeIssueComponent createInformationIssueComponent(
-            String details, String diagnostics) {
-        OperationOutcome.OperationOutcomeIssueComponent issue =
-                new OperationOutcome.OperationOutcomeIssueComponent();
-
-        issue.setSeverity(OperationOutcome.IssueSeverity.INFORMATION);
-        issue.setCode(OperationOutcome.IssueType.INFORMATIONAL);
-        issue.getDetails().setText(details);
-        issue.setDiagnostics(diagnostics);
-
-        return issue;
     }
 }
