@@ -3,7 +3,7 @@ resource "azurerm_public_ip" "vpn" {
   location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
 
-  sku = "Standard"
+  sku               = "Standard"
   allocation_method = "Static"
 }
 
