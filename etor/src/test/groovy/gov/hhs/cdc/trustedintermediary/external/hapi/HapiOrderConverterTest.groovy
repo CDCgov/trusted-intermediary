@@ -44,7 +44,7 @@ class HapiOrderConverterTest extends Specification {
         mockDemographics = new DemographicsMock("fhirResourceId", "patientId", mockDemographicsBundle)
 
         mockOrderBundle = new Bundle().addEntry(new Bundle.BundleEntryComponent().setResource(mockPatient))
-        mockOrder = new OrderMock("fhirResourceId", "patientId", mockOrderBundle)
+        mockOrder = new OrderMock("fhirResourceId", "patientId", mockOrderBundle, null, null, null, null, null)
     }
 
     def "the converter fills in gaps of any missing data in the Bundle"() {

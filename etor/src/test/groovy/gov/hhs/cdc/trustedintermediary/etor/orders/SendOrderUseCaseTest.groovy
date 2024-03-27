@@ -38,7 +38,7 @@ class SendOrderUseCaseTest extends Specification {
         def messageType = PartnerMetadataMessageType.ORDER
 
         def sendOrder = SendOrderUseCase.getInstance()
-        def mockOrder = new OrderMock(null, null, null)
+        def mockOrder = new OrderMock(null, null, null, null, null, null, null, null)
         def mockOmlOrder = Mock(Order)
 
         TestApplicationContext.injectRegisteredImplementations()

@@ -169,7 +169,7 @@ class EtorDomainRegistrationTest extends Specification {
 
     def "handleOrders happy path"() {
         given:
-        def orderMock = new OrderMock<?>("resource id", "a patient ID", "orders")
+        def orderMock = new OrderMock<?>("resource id", "a patient ID", "orders", null, null, null, null, null)
         def request = new DomainRequest(headers: ["recordid": "recordId"])
 
         def connector = new EtorDomainRegistration()
