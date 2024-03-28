@@ -1,10 +1,13 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
+import java.util.Objects;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
+import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Reference;
 
 /**
  * A concrete implementation of a {@link Order} that uses the Hapi FHIR bundle as its underlying
@@ -64,7 +67,31 @@ public class HapiOrder implements Order<Bundle> {
 
     @Override
     public String getSendingFacilityId() {
-        return null;
+        String organizationReference =
+                HapiHelper.resourcesInBundle(innerOrder, MessageHeader.class)
+                        .map(MessageHeader::getSender)
+                        .filter(Objects::nonNull)
+                        .map(Reference::getReference)
+                        .filter(Objects::nonNull)
+                        .findFirst()
+                        .orElse(null);
+
+        if (organizationReference == null || organizationReference.isEmpty()) {
+            return "";
+        }
+
+        // Extract from Organization/{id}
+        String orgId =
+                organizationReference.contains("/")
+                        ? organizationReference.split("/")[1]
+                        : organizationReference;
+
+        // Get the corresponding Organization resource in the Bundle by ID
+        return HapiHelper.resourcesInBundle(innerOrder, Organization.class)
+                .filter(org -> orgId.equals(org.getIdElement().getIdPart()))
+                .map(Organization::getName) // This gives the organization's name as the ID
+                .findFirst()
+                .orElse("");
     }
 
     @Override
