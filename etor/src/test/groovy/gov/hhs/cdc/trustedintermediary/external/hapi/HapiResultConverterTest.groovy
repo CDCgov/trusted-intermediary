@@ -24,7 +24,7 @@ class HapiResultConverterTest extends Specification {
 
         mockPatient = new Patient()
         mockResultBundle = new Bundle().addEntry(new Bundle.BundleEntryComponent().setResource(mockPatient))
-        mockResult = new ResultMock("mockFhirResourceId", mockResultBundle)
+        mockResult = new ResultMock("mockFhirResourceId", mockResultBundle, null, null, null, null, null)
     }
 
     def "add etor processing tag to messageHeader resource"() {

@@ -18,7 +18,7 @@ class ReportStreamResultSenderTest extends Specification {
         given:
         def fhirResourceId = null
         def underlyingResult = "Mock result"
-        def mockResult = new ResultMock(fhirResourceId, underlyingResult)
+        def mockResult = new ResultMock(fhirResourceId, underlyingResult, null, null, null, null, null)
 
         def senderHelper = Mock(ReportStreamSenderHelper)
         senderHelper.sendResultToReportStream(underlyingResult, fhirResourceId) >> Optional.of("fake-id")

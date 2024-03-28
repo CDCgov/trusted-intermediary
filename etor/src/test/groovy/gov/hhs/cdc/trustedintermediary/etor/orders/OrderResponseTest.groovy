@@ -19,7 +19,7 @@ class OrderResponseTest extends Specification {
         def expectedResourceId = "67890asdfg"
         def expectedPatientId = "fthgyu687"
 
-        def orders = new OrderMock(expectedResourceId, expectedPatientId, null)
+        def orders = new OrderMock(expectedResourceId, expectedPatientId, null, null, null, null, null, null)
 
         when:
         def actual = new OrderResponse(orders)

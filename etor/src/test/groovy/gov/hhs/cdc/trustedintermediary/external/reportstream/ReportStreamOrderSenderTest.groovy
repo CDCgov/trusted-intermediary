@@ -23,7 +23,7 @@ class ReportStreamOrderSenderTest extends Specification {
         given:
         def fhirResourceId = null
         def underlyingOrder = "Mock order"
-        def mockOrder = new OrderMock(fhirResourceId, "patient-id", underlyingOrder)
+        def mockOrder = new OrderMock(fhirResourceId, "patient-id", underlyingOrder, null, null, null, null, null)
 
         def senderHelper = Mock(ReportStreamSenderHelper)
         senderHelper.sendOrderToReportStream(underlyingOrder, fhirResourceId) >> Optional.of("fake-id")

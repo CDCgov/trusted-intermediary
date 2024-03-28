@@ -9,4 +9,14 @@ public interface Result<T> {
     T getUnderlyingResult();
 
     String getFhirResourceId();
+
+    String getPlacerOrderNumber();
+
+    String getSendingApplicationId();
+
+    String getSendingFacilityId();
+
+    String getReceivingApplicationId();
+
+    String getReceivingFacilityId();
 }

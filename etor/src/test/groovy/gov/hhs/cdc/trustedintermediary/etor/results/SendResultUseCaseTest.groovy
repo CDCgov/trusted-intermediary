@@ -34,7 +34,7 @@ class SendResultUseCaseTest extends Specification {
 
     def "convertAndSend works"() {
         given:
-        def mockResult = new ResultMock(null, "Mock result")
+        def mockResult = new ResultMock(null, "Mock result", null, null, null, null, null)
         def receivedSubmissionId = "receivedId"
 
         when:
