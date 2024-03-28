@@ -2,6 +2,8 @@ package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import gov.hhs.cdc.trustedintermediary.etor.results.Result;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.ServiceRequest;
 
 /** Filler concrete implementation of a {@link Result} using the Hapi FHIR library */
 public class HapiResult implements Result<Bundle> {
@@ -24,7 +26,18 @@ public class HapiResult implements Result<Bundle> {
 
     @Override
     public String getPlacerOrderNumber() {
-        return null;
+        return HapiHelper.resourcesInBundle(innerResult, ServiceRequest.class)
+                .flatMap(serviceRequest -> serviceRequest.getIdentifier().stream())
+                .filter(
+                        identifier ->
+                                identifier
+                                        .getType()
+                                        .hasCoding(
+                                                "http://terminology.hl7.org/CodeSystem/v2-0203",
+                                                "PLAC"))
+                .map(Identifier::getValue)
+                .findFirst()
+                .orElse("");
     }
 
     @Override

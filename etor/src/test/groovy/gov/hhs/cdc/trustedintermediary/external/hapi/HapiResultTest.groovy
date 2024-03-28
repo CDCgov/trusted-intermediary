@@ -1,6 +1,12 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi
 
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.Identifier
+import org.hl7.fhir.r4.model.ServiceRequest
+import org.hl7.fhir.r4.model.StringType
 import spock.lang.Specification
 
 class HapiResultTest extends Specification{
@@ -31,11 +37,19 @@ class HapiResultTest extends Specification{
 
     def "getPlacerOrderNumber works"() {
         given:
-        def expected = 1
+        def expectedPlacerOrderNumber = "mock-placer-order-number"
+        def bundle = new Bundle()
+        def serviceRequest = new ServiceRequest().addIdentifier(new Identifier()
+                .setValue(expectedPlacerOrderNumber)
+                .setType(new CodeableConcept().addCoding(new Coding("http://terminology.hl7.org/CodeSystem/v2-0203", "PLAC", "Placer Identifier"))))
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(serviceRequest))
+        def result = new HapiResult(bundle)
+
         when:
-        def actual = 1
+        def actualPlacerOrderNumber = result.getPlacerOrderNumber()
+
         then:
-        actual == expected
+        actualPlacerOrderNumber == expectedPlacerOrderNumber
     }
 
     def "getPlacerOrderNumber unhappy path"() {
