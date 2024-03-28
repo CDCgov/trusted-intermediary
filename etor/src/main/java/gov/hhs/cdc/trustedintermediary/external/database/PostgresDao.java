@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.database;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,6 +13,7 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.inject.Inject;
 
@@ -19,6 +21,7 @@ import javax.inject.Inject;
 public class PostgresDao implements DbDao {
 
     private static final PostgresDao INSTANCE = new PostgresDao();
+    @Inject Logger logger;
 
     @Inject ConnectionPool connectionPool;
 
@@ -84,6 +87,61 @@ public class PostgresDao implements DbDao {
             }
 
             statement.setObject(10, messageTypeString, Types.OTHER);
+
+            statement.executeUpdate();
+        }
+    }
+
+    @Override
+    public void upsertData(String tableName, List<DbColumn> values, String conflictColumnName)
+            throws SQLException {
+        StringBuilder sqlStatementBuilder =
+                new StringBuilder("INSERT INTO ").append(tableName).append(" VALUES (");
+
+        sqlStatementBuilder.append("?, ".repeat(values.size()));
+        sqlStatementBuilder.delete(sqlStatementBuilder.length() - 2, sqlStatementBuilder.length());
+        sqlStatementBuilder.append(")");
+
+        boolean wantsUpsert = values.stream().anyMatch(DbColumn::upsertOverwrite);
+
+        if (wantsUpsert) {
+            sqlStatementBuilder
+                    .append(" ON CONFLICT (")
+                    .append(conflictColumnName)
+                    .append(") DO UPDATE SET ");
+
+            for (int i = 0; i < values.size(); i++) {
+                DbColumn column = values.get(i);
+
+                if (!column.upsertOverwrite()) {
+                    continue;
+                }
+
+                sqlStatementBuilder.append(column.name()).append(" = EXCLUDED.");
+                sqlStatementBuilder.append(column.name());
+                sqlStatementBuilder.append(", ");
+            }
+
+            sqlStatementBuilder.delete(
+                    sqlStatementBuilder.length() - 2, sqlStatementBuilder.length());
+        }
+
+        String sqlStatement = sqlStatementBuilder.toString();
+
+        try (Connection conn = connectionPool.getConnection();
+                PreparedStatement statement = conn.prepareStatement(sqlStatement)) {
+
+            for (int i = 0; i < values.size(); i++) {
+                DbColumn column = values.get(i);
+                Object value = column.value();
+                int type = column.type();
+
+                if (value != null) {
+                    statement.setObject(i + 1, value, type);
+                } else {
+                    statement.setNull(i + 1, type);
+                }
+            }
 
             statement.executeUpdate();
         }

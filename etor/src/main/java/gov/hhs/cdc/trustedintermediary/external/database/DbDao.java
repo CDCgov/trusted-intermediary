@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMess
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 
 /** Interface for accessing the database for metadata */
@@ -20,6 +21,9 @@ public interface DbDao {
             PartnerMetadataStatus deliveryStatus,
             String failureReason,
             PartnerMetadataMessageType messageType)
+            throws SQLException;
+
+    void upsertData(String tableName, List<DbColumn> values, String conflictColumnName)
             throws SQLException;
 
     Set<PartnerMetadata> fetchMetadataForSender(String sender) throws SQLException;
