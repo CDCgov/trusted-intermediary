@@ -296,55 +296,54 @@ After enabling this option it is recommended that you delete all docker images a
 with this option enabled.
 
 1. Checkout `master` branch for `CDCgov/prime-reportstream`
-2. CD to `prime-reportstream/prime-router`
-3. Run the `./cleanslate` script. For more information you can refer to the [ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/docs-deprecated/getting-started/getting-started.md#building-the-baseline)
-4. Run RS with `docker compose up --build -d`
-5. Run `./gradlew resetDB && ./gradlew reloadTable && ./gradlew reloadSettings`
-6. Edit `/settings/staging/0166-flexion-staging-results-handling.yml`
-   1. Comment the lines related to staging settings, and uncomment the ones for local settings:
-      1. `authTokenUrl`, `reportUrl`, `authHeaders.host` under REST `transport` in `receivers`
-      2. `type` and `credentialName` under SFTP `transport` in `receivers`
-7. Run `./prime multiple-settings set -i ./settings/staging/0166-flexion-staging-results-handling.yml`
-8. Run `./prime organization addkey --public-key /path/to/trusted-intermediary/mock_credentials/organization-trusted-intermediary-public-key-local.pem --scope "flexion.*.report" --orgName flexion --kid flexion.etor-service-sender --doit`
-9. Setup local vault secret
-   1. Go to: `http://localhost:8200/`
-   2. Use token in `prime-router/.vault/env/.env.local` to authenticate
-   3. Go to `Secrets engines` > `secret/` > `Create secret`
-      1. Create secret for `flexion.etor-service-receiver-orders`
-         1. Path for this secret: `FLEXION--ETOR-SERVICE-RECEIVER-ORDERS`
-         2. JSON data:
-         ```
-         {
-            "@type": "UserApiKey",
-            "apiKey": "Contents of file at trusted-intermediary/mock_credentials/organization-report-stream-private-key-local.pem",
-            "user": "flexion"
-         }
-         ```
-      2. Create secret for `flexion.etor-service-receiver-results`
-         1. Path for this secret: `FLEXION--ETOR-SERVICE-RECEIVER-RESULTS`
-         2. JSON data:
-         ```
-         {
-         "@type": "UserApiKey",
-         "apiKey": "Contents of file at trusted-intermediary/mock_credentials/organization-report-stream-private-key-local.pem",
-         "user": "flexion"
-         }
-         ```
-      3. Create secret for `DEFAULT-SFTP`
-         1. Path for this secret: `DEFAULT-SFTP`
-         2. JSON data:
-         ```
-         {
-         "@type": "UserPass",
-         "user": "user",
-         "pass": "pass"
-         }
-         ```
+2. Copy all the scripts found at `scripts/rs` to `prime-reportstream/prime-router`
+   - **Note**: update the `path_to_cdcti` variable in the scripts to point to the path for the `trusted-intermediary` codebase in your machine
+3. CD to `prime-reportstream/prime-router`
+4. Run the `./cleanslate` script. For more information you can refer to the [ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/docs-deprecated/getting-started/getting-started.md#building-the-baseline)
+5. Run RS with `docker compose up --build -d`
+6. Edit `/settings/staging/0166-flexion-staging-results-handling.yml` to comment the lines related to staging settings, and uncomment the ones for local settings:
+   - `authTokenUrl`, `reportUrl`, `authHeaders.host` under REST `transport` in `receivers`
+   - `type` and `credentialName` under SFTP `transport` in `receivers`
+7. Run the `./reset.sh` script to reset the database and apply the flexion org settings
+8. Run the `./setup-vault.sh` script to set up the local vault secrets
+   - You can verify that the script created the secrets succesfully by going to `http://localhost:8200/` in your browser, use the token in `prime-router/.vault/env/.env.local` to authenticate, and then go to `Secrets engines` > `secret/` to check the available secrets
 
 #### Submit request to ReportStream
 
+##### Locally
+
+###### Orders
+
+To test sending from a simulated hospital:
+```
+curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-hospital' --header 'Authorization: Bearer dummy_token' --data-binary '@/path/to/orm_message.hl7' 'http://localhost:7071/api/waters'
+```
+
+
+To test sending from TI:
+```
+curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.etor-service-sender' --header 'Authorization: Bearer dummy_token' --data-binary '@/path/to/oml_message.fhir' 'http://localhost:7071/api/waters'
+```
+
+###### Results
+
+To test sending from a simulated lab:
+```
+curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-lab' --header 'Authorization: Bearer dummy_token' --data-binary '@/path/to/oru_message.hl7' 'http://localhost:7071/api/waters'
+```
+
+
+To test sending from TI:
+```
+curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.etor-service-sender' --header 'Authorization: Bearer dummy_token' --data-binary '@/path/to/oru_message.fhir' 'http://localhost:7071/api/waters'
+```
+
+After one or two minutes, check that hl7 files have been dropped to `prime-reportstream/prime-router/build/sftp` folder
+
+##### Staging
+
 In order to submit a request, you'll need to authenticate with ReportStream using JWT auth:
-1. Create a JWT for the sender (e.g. `flexion.simulated-hospital`) using the sender's private key. You may use [this CLI tool](https://github.com/mike-engel/jwt-cli) to create the JWT:
+1. Create a JWT for the sender (e.g. `flexion.simulated-hospital`) using the sender's private key, which should be stored in Keybase. You may use [this CLI tool](https://github.com/mike-engel/jwt-cli) to create the JWT:
    ```
    jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 -k <sender> -i <sender> -s <sender> -a staging.prime.cdc.gov --no-iat -S @/path/to/sender_private.pem
    ```
@@ -352,37 +351,7 @@ In order to submit a request, you'll need to authenticate with ReportStream usin
    ```
    curl --header 'Content-Type: application/x-www-form-urlencoded' --data 'scope=flexion.*.report' --data 'client_assertion=<jwt>' --data 'client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer' --data 'grant_type=client_credentials' 'http://localhost:7071/api/token'
    ```
-3. Submit an Order or Result using the returned token
-
-##### Orders
-
-To test sending from a simulated hospital:
-```
-curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-hospital' --header 'Authorization: Bearer <token>' --data-binary '@/path/to/orm_message.hl7' 'http://localhost:7071/api/waters'
-```
-
-
-To test sending from TI:
-```
-curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.etor-service-sender' --header 'Authorization: Bearer <token>' --data-binary '@/path/to/oml_message.fhir' 'http://localhost:7071/api/waters'
-```
-
-##### Results
-
-To test sending from a simulated lab:
-```
-curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-lab' --header 'Authorization: Bearer <token>' --data-binary '@/path/to/oru_message.hl7' 'http://localhost:7071/api/waters'
-```
-
-
-To test sending from TI:
-```
-curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.etor-service-sender' --header 'Authorization: Bearer <token>' --data-binary '@/path/to/oru_message.fhir' 'http://localhost:7071/api/waters'
-```
-
-After one or two minutes, check that hl7 files have been dropped to `prime-reportstream/prime-router/build/sftp` folder
-
-**Note**: `<token>` should be replaced by the bearer token received from the `/api/token` endpoint
+3. Submit an Order or Result using the returned token in the `'Authorization: Bearer <token>'` header
 
 ## DORA Metrics
 
