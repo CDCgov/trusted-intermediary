@@ -128,7 +128,12 @@ public record PartnerMetadata(
                 this.hash,
                 this.deliveryStatus,
                 this.failureReason,
-                this.messageType);
+                this.messageType,
+                this.sendingApplicationId,
+                this.sendingFacilityId,
+                this.receivingApplicationId,
+                this.receivingFacilityId,
+                this.placerOrderNumber);
     }
 
     public PartnerMetadata withReceiver(String receiver) {
@@ -142,7 +147,12 @@ public record PartnerMetadata(
                 this.hash,
                 this.deliveryStatus,
                 this.failureReason,
-                this.messageType);
+                this.messageType,
+                this.sendingApplicationId,
+                this.sendingFacilityId,
+                this.receivingApplicationId,
+                this.receivingFacilityId,
+                this.placerOrderNumber);
     }
 
     public PartnerMetadata withTimeDelivered(Instant timeDelivered) {
@@ -156,7 +166,12 @@ public record PartnerMetadata(
                 this.hash,
                 this.deliveryStatus,
                 this.failureReason,
-                this.messageType);
+                this.messageType,
+                this.sendingApplicationId,
+                this.sendingFacilityId,
+                this.receivingApplicationId,
+                this.receivingFacilityId,
+                this.placerOrderNumber);
     }
 
     public PartnerMetadata withDeliveryStatus(PartnerMetadataStatus deliveryStatus) {
@@ -170,7 +185,12 @@ public record PartnerMetadata(
                 this.hash,
                 deliveryStatus,
                 this.failureReason,
-                this.messageType);
+                this.messageType,
+                this.sendingApplicationId,
+                this.sendingFacilityId,
+                this.receivingApplicationId,
+                this.receivingFacilityId,
+                this.placerOrderNumber);
     }
 
     public PartnerMetadata withFailureMessage(String failureMessage) {
@@ -184,6 +204,11 @@ public record PartnerMetadata(
                 this.hash,
                 this.deliveryStatus,
                 failureMessage,
-                this.messageType);
+                this.messageType,
+                this.sendingApplicationId,
+                this.sendingFacilityId,
+                this.receivingApplicationId,
+                this.receivingFacilityId,
+                this.placerOrderNumber);
     }
 }
