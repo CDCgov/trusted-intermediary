@@ -97,13 +97,6 @@ public record PartnerMetadata(
     }
 
     public PartnerMetadata(String receivedSubmissionId, PartnerMetadataStatus deliveryStatus) {
-        this(receivedSubmissionId, null, null, null, null, null, null, deliveryStatus, null, null);
-    }
-
-    public PartnerMetadata(
-            String receivedSubmissionId,
-            PartnerMetadataStatus deliveryStatus,
-            PartnerMetadataMessageType messageType) {
         this(
                 receivedSubmissionId,
                 null,
@@ -114,7 +107,12 @@ public record PartnerMetadata(
                 null,
                 deliveryStatus,
                 null,
-                messageType);
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
     }
 
     public PartnerMetadata withSentSubmissionId(String sentSubmissionId) {
