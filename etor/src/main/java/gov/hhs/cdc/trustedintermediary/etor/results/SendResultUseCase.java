@@ -31,7 +31,14 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
     public void convertAndSend(Result<?> result, String receivedSubmissionId)
             throws UnableToSendMessageException {
         sendMessageHelper.savePartnerMetadataForReceivedMessage(
-                receivedSubmissionId, result.hashCode(), PartnerMetadataMessageType.RESULT);
+                receivedSubmissionId,
+                result.hashCode(),
+                PartnerMetadataMessageType.RESULT,
+                "result.getSendingApplicationId()",
+                "result.getSendingFacilityId()",
+                "result.getReceivingApplicationId()",
+                "result.getReceivingFacilityId()",
+                "result.getPlacerOrderNumber()");
 
         var convertedResult = converter.addEtorProcessingTag(result);
         metadata.put(

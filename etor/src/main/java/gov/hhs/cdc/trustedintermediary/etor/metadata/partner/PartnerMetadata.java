@@ -24,7 +24,12 @@ public record PartnerMetadata(
         String hash,
         PartnerMetadataStatus deliveryStatus,
         String failureReason,
-        PartnerMetadataMessageType messageType) {
+        PartnerMetadataMessageType messageType,
+        String sendingApplicationId,
+        String sendingFacilityId,
+        String receivingApplicationId,
+        String receivingFacilityId,
+        String placerOrderNumber) {
 
     // Below is for defaulting status when null
     public PartnerMetadata {
@@ -40,7 +45,12 @@ public record PartnerMetadata(
             Instant timeDelivered,
             String hash,
             PartnerMetadataStatus deliveryStatus,
-            PartnerMetadataMessageType messageType) {
+            PartnerMetadataMessageType messageType,
+            String sendingApplicationId,
+            String sendingFacilityId,
+            String receivingApplicationId,
+            String receivingFacilityId,
+            String placerOrderNumber) {
         this(
                 receivedSubmissionId,
                 null,
@@ -51,26 +61,42 @@ public record PartnerMetadata(
                 hash,
                 deliveryStatus,
                 null,
-                messageType);
-    }
-
-    public PartnerMetadata(String receivedSubmissionId, String hash) {
-        this(receivedSubmissionId, null, null, null, null, null, hash, null, null, null);
-    }
-
-    public PartnerMetadata(
-            String receivedSubmissionId, String hash, PartnerMetadataMessageType messageType) {
-        this(receivedSubmissionId, null, null, null, null, null, hash, null, null, messageType);
-    }
-
-    public PartnerMetadata(String receivedSubmissionId, PartnerMetadataStatus deliveryStatus) {
-        this(receivedSubmissionId, null, null, null, null, null, null, deliveryStatus, null, null);
+                messageType,
+                sendingApplicationId,
+                sendingFacilityId,
+                receivingApplicationId,
+                receivingFacilityId,
+                placerOrderNumber);
     }
 
     public PartnerMetadata(
             String receivedSubmissionId,
-            PartnerMetadataStatus deliveryStatus,
-            PartnerMetadataMessageType messageType) {
+            String hash,
+            PartnerMetadataMessageType messageType,
+            String sendingApplicationId,
+            String sendingFacilityId,
+            String receivingApplicationId,
+            String receivingFacilityId,
+            String placerOrderNumber) {
+        this(
+                receivedSubmissionId,
+                null,
+                null,
+                null,
+                null,
+                null,
+                hash,
+                null,
+                null,
+                messageType,
+                sendingApplicationId,
+                sendingFacilityId,
+                receivingApplicationId,
+                receivingFacilityId,
+                placerOrderNumber);
+    }
+
+    public PartnerMetadata(String receivedSubmissionId, PartnerMetadataStatus deliveryStatus) {
         this(
                 receivedSubmissionId,
                 null,
@@ -81,7 +107,12 @@ public record PartnerMetadata(
                 null,
                 deliveryStatus,
                 null,
-                messageType);
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
     }
 
     public PartnerMetadata withSentSubmissionId(String sentSubmissionId) {
@@ -95,7 +126,12 @@ public record PartnerMetadata(
                 this.hash,
                 this.deliveryStatus,
                 this.failureReason,
-                this.messageType);
+                this.messageType,
+                this.sendingApplicationId,
+                this.sendingFacilityId,
+                this.receivingApplicationId,
+                this.receivingFacilityId,
+                this.placerOrderNumber);
     }
 
     public PartnerMetadata withReceiver(String receiver) {
@@ -109,7 +145,12 @@ public record PartnerMetadata(
                 this.hash,
                 this.deliveryStatus,
                 this.failureReason,
-                this.messageType);
+                this.messageType,
+                this.sendingApplicationId,
+                this.sendingFacilityId,
+                this.receivingApplicationId,
+                this.receivingFacilityId,
+                this.placerOrderNumber);
     }
 
     public PartnerMetadata withTimeDelivered(Instant timeDelivered) {
@@ -123,7 +164,12 @@ public record PartnerMetadata(
                 this.hash,
                 this.deliveryStatus,
                 this.failureReason,
-                this.messageType);
+                this.messageType,
+                this.sendingApplicationId,
+                this.sendingFacilityId,
+                this.receivingApplicationId,
+                this.receivingFacilityId,
+                this.placerOrderNumber);
     }
 
     public PartnerMetadata withDeliveryStatus(PartnerMetadataStatus deliveryStatus) {
@@ -137,7 +183,12 @@ public record PartnerMetadata(
                 this.hash,
                 deliveryStatus,
                 this.failureReason,
-                this.messageType);
+                this.messageType,
+                this.sendingApplicationId,
+                this.sendingFacilityId,
+                this.receivingApplicationId,
+                this.receivingFacilityId,
+                this.placerOrderNumber);
     }
 
     public PartnerMetadata withFailureMessage(String failureMessage) {
@@ -151,6 +202,11 @@ public record PartnerMetadata(
                 this.hash,
                 this.deliveryStatus,
                 failureMessage,
-                this.messageType);
+                this.messageType,
+                this.sendingApplicationId,
+                this.sendingFacilityId,
+                this.receivingApplicationId,
+                this.receivingFacilityId,
+                this.placerOrderNumber);
     }
 }
