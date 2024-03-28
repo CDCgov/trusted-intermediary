@@ -69,10 +69,6 @@ public record PartnerMetadata(
                 placerOrderNumber);
     }
 
-    public PartnerMetadata(String receivedSubmissionId, String hash) {
-        this(receivedSubmissionId, null, null, null, null, null, hash, null, null, null);
-    }
-
     public PartnerMetadata(
             String receivedSubmissionId,
             String hash,

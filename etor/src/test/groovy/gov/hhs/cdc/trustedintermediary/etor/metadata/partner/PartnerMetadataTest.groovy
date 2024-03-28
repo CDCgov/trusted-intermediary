@@ -1,10 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata.partner
 
-
 import gov.hhs.cdc.trustedintermediary.PojoTestUtils
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
-
 import java.time.Instant
 import spock.lang.Specification
 
@@ -67,26 +63,6 @@ class PartnerMetadataTest extends Specification {
         metadata.timeDelivered() == timeDelivered
         metadata.hash() == hash
         metadata.deliveryStatus() == status
-    }
-
-    def "test constructor with only received submission ID and hash"() {
-        given:
-        def receivedSubmissionId = "receivedSubmissionId"
-        def hash = "abcd"
-
-        when:
-        def metadata = new PartnerMetadata(receivedSubmissionId, hash)
-
-        then:
-        metadata.receivedSubmissionId() == receivedSubmissionId
-        metadata.sentSubmissionId() == null
-        metadata.sender() == null
-        metadata.receiver() == null
-        metadata.timeReceived() == null
-        metadata.timeDelivered() == null
-        metadata.hash() == hash
-        //Status should default to PENDING
-        metadata.deliveryStatus() == PartnerMetadataStatus.PENDING
     }
 
     def "test constructor with only received submission ID and status"() {
