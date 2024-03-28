@@ -44,13 +44,13 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
         logger.logInfo("saving the metadata");
         List<DbColumn> values = new ArrayList<>();
 
-        var dbColumn =
+        DbColumn dbColumn1 =
                 new DbColumn(
                         "received_message_id",
                         metadata.receivedSubmissionId(),
                         false,
                         Types.VARCHAR);
-        values.add(dbColumn);
+        values.add(dbColumn1);
 
         DbColumn dbColumn2 =
                 new DbColumn("sent_message_id", metadata.sentSubmissionId(), true, Types.VARCHAR);
