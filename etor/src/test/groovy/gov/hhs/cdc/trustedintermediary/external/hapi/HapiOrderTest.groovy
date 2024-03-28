@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi
 
+import gov.hhs.cdc.trustedintermediary.organizations.Organization
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -10,6 +11,8 @@ import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
 import spock.lang.Specification
+
+import java.sql.Ref
 
 class HapiOrderTest extends Specification {
     def "getUnderlyingOrder Works"() {
@@ -90,15 +93,16 @@ class HapiOrderTest extends Specification {
     def "getSendingApplicationId happy path works"() {
         given:
         def expectedApplicationId = "mock-application-id"
-        def bundle = new Bundle()
+        def innerOrders = new Bundle()
         def messageHeader = new MessageHeader()
         def extension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id", new StringType(expectedApplicationId))
-        messageHeader.setSource(new MessageHeader.MessageSourceComponent().addExtension(extension))
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
-        def orders = new HapiOrder(bundle)
+        messageHeader.setSource(new MessageHeader.MessageSourceComponent().addExtension(extension) as MessageHeader.MessageSourceComponent)
+        innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
+        def orders = new HapiOrder(innerOrders)
 
         when:
         def actualApplicationId = orders.getSendingApplicationId()
+
         then:
         actualApplicationId == expectedApplicationId
     }
@@ -115,7 +119,46 @@ class HapiOrderTest extends Specification {
         actualApplicationId == expectedApplicationId
     }
 
-    def "getSendingFacilityId works"() {
+    def "getSendingFacilityId happy path works"() {
+        given:
+        def expectedFacilityId = "mock-facility-id"
+        def innerOrders = new Bundle()
+
+        def messageHeader = new MessageHeader()
+        messageHeader.setSender(new Reference("Organization/mock-id"))
+        innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
+
+        def organization = new org.hl7.fhir.r4.model.Organization()
+        organization.setId("mock-id")
+        organization.setName(expectedFacilityId)
+        innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(organization))
+
+        def orders = new HapiOrder(innerOrders)
+
+        when:
+        def actualFacilityId = orders.getSendingFacilityId()
+
+        then:
+        actualFacilityId == expectedFacilityId
+    }
+
+    def "getSendingFacilityId unhappy path works"() {
+        given:
+        def innerOrders = new Bundle()
+        def expectedFacilityId = ""
+        def messageHeader = new MessageHeader()
+        innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
+
+        def orders = new HapiOrder(innerOrders)
+
+        when:
+        def actualFacilityId = orders.getSendingFacilityId()
+
+        then:
+        actualFacilityId == expectedFacilityId
+    }
+
+    def "getReceivingApplicationId happy path works"() {
         given:
         def expected = 1
         when:
@@ -124,7 +167,7 @@ class HapiOrderTest extends Specification {
         actual == expected
     }
 
-    def "getSendingFacilityId unhappy path"() {
+    def "getReceivingApplicationId unhappy path works"() {
         given:
         def expected = 1
         when:
@@ -133,7 +176,7 @@ class HapiOrderTest extends Specification {
         actual == expected
     }
 
-    def "getReceivingApplicationId works"() {
+    def "getReceivingFacilityId happy path works"() {
         given:
         def expected = 1
         when:
@@ -142,25 +185,7 @@ class HapiOrderTest extends Specification {
         actual == expected
     }
 
-    def "getReceivingApplicationId unhappy path"() {
-        given:
-        def expected = 1
-        when:
-        def actual = 1
-        then:
-        actual == expected
-    }
-
-    def "getReceivingFacilityId works"() {
-        given:
-        def expected = 1
-        when:
-        def actual = 1
-        then:
-        actual == expected
-    }
-
-    def "getReceivingFacilityId unhappy path"() {
+    def "getReceivingFacilityId unhappy path works"() {
         given:
         def expected = 1
         when:
