@@ -10,9 +10,12 @@ import org.hl7.fhir.r4.model.Reference;
 public class HapiFhirCustomEvaluationContext implements IFhirPathEvaluationContext {
 
     /**
+     * When a FHIR path includes the "resolve()" method, this function is called to parse that into
+     * a Resource.
+     *
      * @param theReference Id-based reference to the resource we're attempting to resolve.
      * @param theContext Internally converted resource version of theReference.
-     * @return Reference resource
+     * @return Reference resource if available, else null.
      */
     @Override
     public IBase resolveReference(@Nonnull IIdType theReference, @Nullable IBase theContext) {

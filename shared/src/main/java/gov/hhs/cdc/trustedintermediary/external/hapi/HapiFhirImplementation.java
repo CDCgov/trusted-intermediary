@@ -18,6 +18,11 @@ public class HapiFhirImplementation implements HapiFhir {
 
     private HapiFhirImplementation() {}
 
+    /**
+     * Creates FHIRPath engine with a custom evaluation context.
+     *
+     * @return Configured engine.
+     */
     private static IFhirPath createEngine() {
         var engine = CONTEXT.newFhirPath();
         engine.setEvaluationContext(new HapiFhirCustomEvaluationContext());
