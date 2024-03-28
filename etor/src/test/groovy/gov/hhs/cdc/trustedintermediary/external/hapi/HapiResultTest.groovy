@@ -5,6 +5,7 @@ import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Identifier
+import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.ServiceRequest
 import org.hl7.fhir.r4.model.StringType
 import spock.lang.Specification
@@ -54,29 +55,45 @@ class HapiResultTest extends Specification{
 
     def "getPlacerOrderNumber unhappy path"() {
         given:
-        def expected = 1
+        def expectedPlacerOrderNumber = ""
+        def bundle = new Bundle()
+        def result = new HapiResult(bundle)
+
         when:
-        def actual = 1
+        def actualPlacerOrderNumber = result.getPlacerOrderNumber()
+
         then:
-        actual == expected
+        actualPlacerOrderNumber == expectedPlacerOrderNumber
     }
 
     def "getSendingApplicationId works"() {
         given:
-        def expected = 1
+        def expectedSendingApplicationId = "mock-sending-application-id"
+        def bundle = new Bundle()
+        def messageHeader = new MessageHeader()
+        def extension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id", new StringType(expectedSendingApplicationId))
+        messageHeader.setSource(new MessageHeader.MessageSourceComponent().addExtension(extension) as MessageHeader.MessageSourceComponent)
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
+        def result = new HapiResult(bundle)
+
         when:
-        def actual = 1
+        def actualSendingApplicationId = result.getSendingApplicationId()
+
         then:
-        actual == expected
+        actualSendingApplicationId == expectedSendingApplicationId
     }
 
     def "getSendingApplicationId unhappy path"() {
         given:
-        def expected = 1
+        def expectedSendingApplicationId = ""
+        def bundle = new Bundle()
+        def result = new HapiResult(bundle)
+
         when:
-        def actual = 1
+        def actualSendingApplicationId = result.getSendingApplicationId()
+
         then:
-        actual == expected
+        actualSendingApplicationId == expectedSendingApplicationId
     }
 
     def "getSendingFacilityId works"() {
