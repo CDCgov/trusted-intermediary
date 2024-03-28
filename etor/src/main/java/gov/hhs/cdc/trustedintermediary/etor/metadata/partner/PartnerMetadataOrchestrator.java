@@ -97,7 +97,12 @@ public class PartnerMetadataOrchestrator {
                         null,
                         messageHash,
                         PartnerMetadataStatus.PENDING,
-                        messageType);
+                        messageType,
+                        sendingApplicationId,
+                        sendingFacilityId,
+                        receivingApplicationId,
+                        receivingFacilityId,
+                        placerOrderNumber);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
