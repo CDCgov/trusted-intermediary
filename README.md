@@ -343,7 +343,7 @@ After one or two minutes, check that hl7 files have been dropped to `prime-repor
 ##### Staging
 
 In order to submit a request, you'll need to authenticate with ReportStream using JWT auth:
-1. Create a JWT for the sender (e.g. `flexion.simulated-hospital`) using the sender's private key. You may use [this CLI tool](https://github.com/mike-engel/jwt-cli) to create the JWT:
+1. Create a JWT for the sender (e.g. `flexion.simulated-hospital`) using the sender's private key, which should be stored in Keybase. You may use [this CLI tool](https://github.com/mike-engel/jwt-cli) to create the JWT:
    ```
    jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 -k <sender> -i <sender> -s <sender> -a staging.prime.cdc.gov --no-iat -S @/path/to/sender_private.pem
    ```
