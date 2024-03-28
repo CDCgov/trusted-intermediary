@@ -52,7 +52,12 @@ public class HapiOrder implements Order<Bundle> {
     @Override
     public String getSendingApplicationId() {
         return HapiHelper.resourcesInBundle(innerOrder, MessageHeader.class)
-                .map(header -> header.getSender().getIdentifier().getValue())
+                .flatMap(header -> header.getSource().getExtension().stream())
+                .filter(
+                        extension ->
+                                "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id"
+                                        .equals(extension.getUrl()))
+                .map(extension -> extension.getValue().toString())
                 .findFirst()
                 .orElse("");
     }

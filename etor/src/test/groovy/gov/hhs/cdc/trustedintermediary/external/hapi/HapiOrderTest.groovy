@@ -3,10 +3,12 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.StringType
 import spock.lang.Specification
 
 class HapiOrderTest extends Specification {
@@ -88,11 +90,12 @@ class HapiOrderTest extends Specification {
     def "getSendingApplicationId happy path works"() {
         given:
         def expectedApplicationId = "mock-application-id"
+        def bundle = new Bundle()
         def messageHeader = new MessageHeader()
-        messageHeader.setSender(new Reference().setIdentifier(new Identifier().setValue(expectedApplicationId)))
-        def innerOrders = new Bundle()
-        innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
-        def orders = new HapiOrder(innerOrders)
+        def extension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id", new StringType(expectedApplicationId))
+        messageHeader.setSource(new MessageHeader.MessageSourceComponent().addExtension(extension))
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
+        def orders = new HapiOrder(bundle)
 
         when:
         def actualApplicationId = orders.getSendingApplicationId()
