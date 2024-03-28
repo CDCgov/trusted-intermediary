@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.hapi;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Patient;
 
 /**
@@ -50,7 +51,10 @@ public class HapiOrder implements Order<Bundle> {
 
     @Override
     public String getSendingApplicationId() {
-        return null;
+        return HapiHelper.resourcesInBundle(innerOrder, MessageHeader.class)
+                .map(header -> header.getSender().getIdentifier().getValue())
+                .findFirst()
+                .orElse("");
     }
 
     @Override

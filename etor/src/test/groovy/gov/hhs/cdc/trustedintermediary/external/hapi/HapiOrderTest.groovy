@@ -4,7 +4,9 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Identifier
+import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Reference
 import spock.lang.Specification
 
 class HapiOrderTest extends Specification {
@@ -83,22 +85,31 @@ class HapiOrderTest extends Specification {
         actual == expected
     }
 
-    def "getSendingApplicationId works"() {
+    def "getSendingApplicationId happy path works"() {
         given:
-        def expected = 1
+        def expectedApplicationId = "mock-application-id"
+        def messageHeader = new MessageHeader()
+        messageHeader.setSender(new Reference().setIdentifier(new Identifier().setValue(expectedApplicationId)))
+        def innerOrders = new Bundle()
+        innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
+        def orders = new HapiOrder(innerOrders)
+
         when:
-        def actual = 1
+        def actualApplicationId = orders.getSendingApplicationId()
         then:
-        actual == expected
+        actualApplicationId == expectedApplicationId
     }
 
-    def "getSendingApplicationId unhappy path"() {
+    def "getSendingApplicationId unhappy path works"() {
         given:
-        def expected = 1
+        def expectedApplicationId = ""
+        def innerOrders = new Bundle()
+        def orders = new HapiOrder(innerOrders)
+
         when:
-        def actual = 1
+        def actualApplicationId = orders.getSendingApplicationId()
         then:
-        actual == expected
+        actualApplicationId == expectedApplicationId
     }
 
     def "getSendingFacilityId works"() {
