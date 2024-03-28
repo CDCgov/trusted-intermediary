@@ -18,8 +18,6 @@ class RuleEngineIntegrationTest extends Specification {
     def engine = RuleEngine.getInstance()
     def mockLogger = Mock(Logger)
 
-    String fhirBody
-
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
@@ -33,15 +31,36 @@ class RuleEngineIntegrationTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
     }
 
-    def "validation logs a warning when a validation fails"() {
+    def "validation logs a warning when at least one validation fails"() {
         given:
-        fhirBody = Files.readString(Path.of("../examples/Test/Orders/001_OML_O21_short.fhir"))
-        def bundle = fhir.parseResource(fhirBody, Bundle)
+        def bundle = new Bundle()
 
         when:
         engine.validate(new HapiFhirResource(bundle))
 
         then:
-        1 * mockLogger.logWarning(_ as String)
+        (1.._) * mockLogger.logWarning(_ as String)
+    }
+
+    def "validation doesn't break for any of the sample test messages"() {
+        given:
+        def exampleFhirFiles = getExampleFhirFiles("Orders")
+
+        when:
+        exampleFhirFiles.each { fhirString ->
+            def bundle = fhir.parseResource(fhirString as String, Bundle)
+            engine.validate(new HapiFhirResource(bundle))
+        }
+
+        then:
+        noExceptionThrown()
+    }
+
+    def getExampleFhirFiles(String messageType = "") {
+        def exampleFilesPath = "../examples/Test"
+        return Files.walk(Path.of(exampleFilesPath, messageType))
+                .filter { it.toString().endsWith(".fhir") }
+                .map { Files.readString(it) }
+                .collect()
     }
 }
