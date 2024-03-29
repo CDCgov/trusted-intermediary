@@ -20,7 +20,10 @@ public class HapiFhirCustomEvaluationContext implements IFhirPathEvaluationConte
     @Override
     public IBase resolveReference(@Nonnull IIdType theReference, @Nullable IBase theContext) {
         if (theContext != null) {
-            return ((Reference) theContext).getResource();
+            if (theContext.getClass() == Reference.class) {
+                return ((Reference) theContext).getResource();
+            }
+            return theContext;
         }
         return IFhirPathEvaluationContext.super.resolveReference(theReference, null);
     }
