@@ -157,6 +157,33 @@ public class PostgresDao implements DbDao {
         }
     }
 
+    @Override
+    public Set<PartnerMetadata> fetchLinkedMessages(String messageId) throws SQLException {
+        var sql =
+                """
+                SELECT *
+                FROM message_link
+                WHERE link_id = (
+                    SELECT link_id
+                    FROM message_link
+                    WHERE message_id = ?);
+                """;
+
+        try (Connection conn = connectionPool.getConnection();
+                PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setString(1, messageId);
+            ResultSet resultSet = statement.executeQuery();
+
+            Set<PartnerMetadata> metadataSet = new HashSet<>();
+
+            while (resultSet.next()) {
+                metadataSet.add(partnerMetadataFromResultSet(resultSet));
+            }
+
+            return metadataSet;
+        }
+    }
+
     private PartnerMetadata partnerMetadataFromResultSet(ResultSet resultSet) throws SQLException {
         Instant timeReceived = null;
         Instant timeDelivered = null;

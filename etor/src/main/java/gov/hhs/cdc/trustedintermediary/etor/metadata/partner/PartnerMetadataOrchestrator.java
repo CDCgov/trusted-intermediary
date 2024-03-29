@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata.partner;
 
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
+import gov.hhs.cdc.trustedintermediary.external.database.DatabaseLinkedMessageStorage;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
@@ -25,6 +26,7 @@ public class PartnerMetadataOrchestrator {
     private static final PartnerMetadataOrchestrator INSTANCE = new PartnerMetadataOrchestrator();
 
     @Inject PartnerMetadataStorage partnerMetadataStorage;
+    @Inject DatabaseLinkedMessageStorage linkedMessageStorage;
     @Inject RSEndpointClient rsclient;
     @Inject Formatter formatter;
     @Inject Logger logger;
@@ -322,9 +324,9 @@ public class PartnerMetadataOrchestrator {
         };
     }
 
-    boolean isMessageLinked(String receivedSubmissionId) {
-        // check for link entries in message_link table
-        return false;
+    boolean isMessageLinked(String receivedSubmissionId) throws Exception {
+        var linkedMessageSet = linkedMessageStorage.readLinkedMessages(receivedSubmissionId);
+        return !linkedMessageSet.isEmpty();
     }
 
     Set<String> findMessagesToLink(String receivedSubmissionId) throws PartnerMetadataException {

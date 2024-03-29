@@ -27,4 +27,6 @@ public interface DbDao {
     Set<PartnerMetadata> fetchMetadataForSender(String sender) throws SQLException;
 
     Set<PartnerMetadata> fetchMetadataForMessageLinking(String submissionId) throws SQLException;
+
+    Set<PartnerMetadata> fetchLinkedMessages(String messageId) throws SQLException;
 }
