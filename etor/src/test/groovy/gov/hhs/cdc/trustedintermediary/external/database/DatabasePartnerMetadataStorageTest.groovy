@@ -125,4 +125,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         then:
         thrown(PartnerMetadataException)
     }
+
+    def "saveMetadata writes null timestamp"() {
+    }
 }

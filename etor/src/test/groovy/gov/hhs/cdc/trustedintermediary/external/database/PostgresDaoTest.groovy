@@ -38,41 +38,76 @@ class PostgresDaoTest extends Specification {
     }
 
 
-    def "upsertMetadata works"() {
+    def "upsertData works"() {
         given:
-        def receivedSubmissionId = "mock_id_receiver"
-        def sentSubmissionId = "mock_id_sender"
-        def sender = "mock_sender"
-        def receiver = "mock_receiver"
-        def hash = "mock_hash"
-        def timestamp = Instant.now()
-        def status = PartnerMetadataStatus.PENDING
-        def failureReason = "failure reason"
-        def messageType = PartnerMetadataMessageType.RESULT
+        def tableName = "DogCow"
+        def pkColumnName = "Moof"
+        def columns = [
+            new DbColumn(pkColumnName, "Clarus", false, Types.VARCHAR),
+            new DbColumn("second_column_with_upsert_overwrite", Timestamp.from(Instant.now()), true, Types.TIMESTAMP_WITH_TIMEZONE),
+            new DbColumn("third_column", Timestamp.from(Instant.now()), false, Types.TIMESTAMP_WITH_TIMEZONE),
+            new DbColumn("fourth_column_null", null, false, Types.VARCHAR),
+        ]
+        def conflictColumnName = pkColumnName
 
         mockConnPool.getConnection() >>  mockConn
-        mockConn.prepareStatement(_ as String) >> mockPreparedStatement
 
         TestApplicationContext.register(ConnectionPool, mockConnPool)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PostgresDao.getInstance().upsertMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, hash, timestamp, timestamp, status, failureReason, messageType)
+        PostgresDao.getInstance().upsertData(tableName, columns, conflictColumnName)
 
         then:
-        1 * mockPreparedStatement.setString(1, receivedSubmissionId)
-        1 * mockPreparedStatement.setString(2, sentSubmissionId)
-        1 * mockPreparedStatement.setString(3, sender)
-        1 * mockPreparedStatement.setString(4, receiver)
-        1 * mockPreparedStatement.setString(5, hash)
-        1 * mockPreparedStatement.setTimestamp(6, Timestamp.from(timestamp))
-        1 * mockPreparedStatement.setTimestamp(7, Timestamp.from(timestamp))
-        1 * mockPreparedStatement.setObject(8, status.toString(), Types.OTHER)
-        1 * mockPreparedStatement.setString(9, failureReason)
+        mockConn.prepareStatement(_ as String) >> { String sqlStatement ->
+            assert sqlStatement.contains(tableName)
+            assert sqlStatement.count("?") == columns.size()
+            assert sqlStatement.contains("ON CONFLICT (" + pkColumnName + ")")
+
+            columns.forEach {
+                if (!it.upsertOverwrite()) {
+                    return
+                }
+                assert sqlStatement.contains(it.name() + " = EXCLUDED." + it.name())
+            }
+
+            return mockPreparedStatement
+        }
+        (columns.size() - 1)  * mockPreparedStatement.setObject(_ as Integer, _, _ as Integer)
+        1 * mockPreparedStatement.setNull(4, Types.VARCHAR)
         1 * mockPreparedStatement.executeUpdate()
     }
 
-    def "upsertMetadata unhappy path throws exception"() {
+    def "upsertData doesn't do any upserts if there is no upsertOverwrite"() {
+        given:
+        def tableName = "DogCow"
+        def columns = [
+            new DbColumn("Moof", "Clarus", false, Types.VARCHAR),
+            new DbColumn("second_column_with_upsert_overwrite", Timestamp.from(Instant.now()), false, Types.TIMESTAMP_WITH_TIMEZONE),
+        ]
+
+        mockConnPool.getConnection() >>  mockConn
+
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        PostgresDao.getInstance().upsertData(tableName, columns, null)
+
+        then:
+        mockConn.prepareStatement(_ as String) >> { String sqlStatement ->
+            assert sqlStatement.contains(tableName)
+            assert sqlStatement.count("?") == columns.size()
+            assert !sqlStatement.contains("ON CONFLICT")
+            assert !sqlStatement.contains("EXCLUDED")
+
+            return mockPreparedStatement
+        }
+        columns.size()  * mockPreparedStatement.setObject(_ as Integer, _, _ as Integer)
+        1 * mockPreparedStatement.executeUpdate()
+    }
+
+    def "upsertData unhappy path throws exception"() {
         given:
         mockConnPool.getConnection() >> mockConn
         mockConn.prepareStatement(_ as String) >> { throw new SQLException() }
@@ -81,79 +116,15 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PostgresDao.getInstance().upsertMetadata("mock_id_receiver", "mock_id_sender", "mock_sender", "mock_receiver", "mock_hash", Instant.now(), Instant.now(), PartnerMetadataStatus.DELIVERED, "mock_failure_reason", PartnerMetadataMessageType.RESULT)
+        PostgresDao.getInstance().upsertData("DogCow", [
+            new DbColumn("", "", false, Types.VARCHAR)
+        ], null)
 
         then:
         thrown(SQLException)
     }
 
-    def "upsertMetadata writes null timestamp"() {
-        given:
-        mockConnPool.getConnection() >>  mockConn
-        mockConn.prepareStatement(_ as String) >> mockPreparedStatement
-
-        TestApplicationContext.register(ConnectionPool, mockConnPool)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        PartnerMetadata metadata = new PartnerMetadata("receivedSubmissionId", "sentSubmissionId","sender", "receiver", Instant.now(), Instant.now(), "abcd", PartnerMetadataStatus.DELIVERED, null, PartnerMetadataMessageType.ORDER)
-        List<DbColumn> values = new ArrayList<>()
-
-        DbColumn dbColumn = new DbColumn("received_message_id", metadata.receivedSubmissionId(), false, Types.VARCHAR)
-        values.add(dbColumn)
-
-        dbColumn = new DbColumn("sent_message_id", metadata.sentSubmissionId(), true, Types.VARCHAR)
-        values.add(dbColumn)
-
-        dbColumn = new DbColumn("sender", metadata.sender(), false, Types.VARCHAR)
-        values.add(dbColumn)
-
-        dbColumn = new DbColumn("receiver", metadata.receiver(), true, Types.VARCHAR)
-        values.add(dbColumn)
-
-        dbColumn = new DbColumn("hash_of_order", metadata.hash(), false, Types.VARCHAR)
-        values.add(dbColumn)
-
-        Timestamp timestampReceived = null
-        if (metadata.timeReceived() != null) {
-            timestampReceived = Timestamp.from(metadata.timeReceived())
-        }
-        dbColumn = new DbColumn("time_received", timestampReceived, false, Types.TIMESTAMP)
-        values.add(dbColumn)
-
-        Timestamp timestampDelivered = null
-        if (metadata.timeDelivered() != null) {
-            timestampDelivered = Timestamp.from(metadata.timeDelivered())
-        }
-        dbColumn = new DbColumn("time_delivered", timestampDelivered, true, Types.TIMESTAMP)
-        values.add(dbColumn)
-
-        String deliveryStatusString = null
-        if (metadata.deliveryStatus() != null) {
-            deliveryStatusString = metadata.deliveryStatus().toString()
-        }
-        dbColumn = new DbColumn("delivery_status", deliveryStatusString, true, Types.OTHER)
-        values.add(dbColumn)
-
-        dbColumn = new DbColumn("failure_reason", metadata.failureReason(), true, Types.VARCHAR)
-        values.add(dbColumn)
-
-        String messageTypeString = null
-        if (metadata.messageType() != null) {
-            messageTypeString = metadata.messageType().toString()
-        }
-        dbColumn = new DbColumn("message_type", messageTypeString, false, Types.OTHER)
-        values.add(dbColumn)
-
-        when:
-        PostgresDao.getInstance().upsertData("metadata", values, "received_message_id")
-
-        then:
-        mockPreparedStatement.setTimestamp(_ as Integer, _ as Timestamp) >> { Integer parameterIndex, Timestamp timestamp ->
-            assert timestamp == null
-        }
-    }
-
-    def "select metadata retrieves data"(){
+    def "select metadata retrieves data"() {
         given:
         mockConnPool.getConnection() >> mockConn
         mockConn.prepareStatement(_ as String) >> mockPreparedStatement
