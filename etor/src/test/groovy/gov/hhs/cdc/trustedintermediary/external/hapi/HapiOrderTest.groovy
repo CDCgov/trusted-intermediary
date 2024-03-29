@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi
 
-import gov.hhs.cdc.trustedintermediary.organizations.Organization
+
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -11,8 +11,6 @@ import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
 import spock.lang.Specification
-
-import java.sql.Ref
 
 class HapiOrderTest extends Specification {
     def "getUnderlyingOrder Works"() {
@@ -158,34 +156,41 @@ class HapiOrderTest extends Specification {
         actualFacilityId == expectedFacilityId
     }
 
-    def "getReceivingApplicationId happy path works"() {
+    def "getReceivingApplicationDetails happy path works"() {
         given:
         def innerOrders = new Bundle()
         def messageHeader = new MessageHeader()
         def destination = new MessageHeader.MessageDestinationComponent()
-        def expectedApplicationId = "mock-application-id"
+        def endpoint = "urn:oid:1.2.840.114350.1.13.145.2.7.2.695071"
+        def name = "Epic"
+        def universalIdType = "ISO"
+        def extension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type", new StringType(universalIdType))
+        def expectedApplicationDetails = "$name^$endpoint^$universalIdType"
 
-        destination.setEndpoint(expectedApplicationId)
+        destination.setName(name)
+        destination.setEndpoint(endpoint)
+        destination.addExtension(extension)
         messageHeader.setDestination([destination])
         innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
         def orders = new HapiOrder(innerOrders)
 
         when:
-        def actualApplicationId = orders.getReceivingApplicationId()
+        def actualApplicationDetails = orders.getReceivingApplicationDetails()
+
         then:
-        actualApplicationId == expectedApplicationId
+        actualApplicationDetails == expectedApplicationDetails
     }
 
-    def "getReceivingApplicationId unhappy path works"() {
+    def "getReceivingApplicationDetails unhappy path works"() {
         given:
         def innerOrders = new Bundle()
         def orders = new HapiOrder(innerOrders)
-        def expectedApplicationId = ""
+        def expectedApplicationDetails = ""
 
         when:
-        def actualApplicationId = orders.getReceivingApplicationId()
+        def actualApplicationDetails = orders.getReceivingApplicationDetails()
         then:
-        actualApplicationId == expectedApplicationId
+        actualApplicationDetails == expectedApplicationDetails
     }
 
     def "getReceivingFacilityId happy path works"() {

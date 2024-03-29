@@ -18,7 +18,7 @@ public interface Order<T> {
 
     String getSendingFacilityId();
 
-    String getReceivingApplicationId();
+    String getReceivingApplicationDetails();
 
     String getReceivingFacilityId();
 }

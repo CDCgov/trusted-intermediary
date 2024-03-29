@@ -1,7 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
@@ -95,17 +97,48 @@ public class HapiOrder implements Order<Bundle> {
     }
 
     @Override
-    public String getReceivingApplicationId() {
+    public String getReceivingApplicationDetails() {
         return HapiHelper.resourcesInBundle(innerOrder, MessageHeader.class)
-                .flatMap(header -> header.getDestination().stream())
-                .map(MessageHeader.MessageDestinationComponent::getEndpoint)
                 .filter(Objects::nonNull)
                 .findFirst()
+                .flatMap(
+                        messageHeader ->
+                                messageHeader.getDestination().stream()
+                                        .filter(Objects::nonNull)
+                                        .findFirst())
+                .map(
+                        destination -> {
+                            // Direct extraction and concatenation, with null checks integrated into
+                            // the stream.
+                            String name = Objects.toString(destination.getName(), "");
+                            String endpoint = Objects.toString(destination.getEndpoint(), "");
+                            String universalIdType =
+                                    destination.getExtension().stream()
+                                            .filter(
+                                                    ext ->
+                                                            "https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type"
+                                                                    .equals(ext.getUrl()))
+                                            .findFirst()
+                                            .map(
+                                                    ext ->
+                                                            Objects.toString(
+                                                                    ext.getValue().primitiveValue(),
+                                                                    ""))
+                                            .orElse("");
+
+                            return concatenateWithCaret(name, endpoint, universalIdType);
+                        })
                 .orElse("");
     }
 
     @Override
     public String getReceivingFacilityId() {
         return null;
+    }
+
+    private String concatenateWithCaret(String... values) {
+        return Arrays.stream(values)
+                .filter(Objects::nonNull) // Ensure null values are ignored
+                .collect(Collectors.joining("^"));
     }
 }
