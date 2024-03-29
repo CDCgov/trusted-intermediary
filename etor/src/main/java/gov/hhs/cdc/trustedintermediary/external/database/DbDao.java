@@ -22,7 +22,9 @@ public interface DbDao {
             PartnerMetadataMessageType messageType)
             throws SQLException;
 
+    Object fetchMetadata(String uniqueId) throws SQLException;
+
     Set<PartnerMetadata> fetchMetadataForSender(String sender) throws SQLException;
 
-    Object fetchMetadata(String uniqueId) throws SQLException;
+    Set<PartnerMetadata> fetchMetadataForMessageLinking(String submissionId) throws SQLException;
 }

@@ -66,4 +66,16 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
         }
         return consolidatedMetadata;
     }
+
+    @Override
+    public Set<PartnerMetadata> readMetadataForLinkingMessages(String submissionId)
+            throws PartnerMetadataException {
+        Set<PartnerMetadata> metadataSet;
+        try {
+            metadataSet = dao.fetchMetadataForMessageLinking(submissionId);
+        } catch (SQLException e) {
+            throw new PartnerMetadataException("Error retrieving metadata", e);
+        }
+        return metadataSet;
+    }
 }

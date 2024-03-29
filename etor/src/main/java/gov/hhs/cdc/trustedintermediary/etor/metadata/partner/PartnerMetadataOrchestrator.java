@@ -9,9 +9,9 @@ import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 
@@ -327,14 +327,15 @@ public class PartnerMetadataOrchestrator {
         return false;
     }
 
-    List<String> findMessagesToLink(String receivedSubmissionId) {
-        // find messages to link in metadata table,
-        // using placerOrderNumber, sendingApplicationId, and sendingFacilityId
-        // return list of linked receivedSubmissionIds
-        return new ArrayList<>();
+    Set<String> findMessagesToLink(String receivedSubmissionId) throws PartnerMetadataException {
+        var metadataSet =
+                partnerMetadataStorage.readMetadataForLinkingMessages(receivedSubmissionId);
+        return metadataSet.stream()
+                .map(PartnerMetadata::receivedSubmissionId)
+                .collect(Collectors.toSet());
     }
 
-    void linkMessages(List<String> messagesToLink) {
+    void linkMessages(Set<String> messagesToLink) {
         // create entries in message_link table using receivedSubmissionIds in messagesToLink
     }
 

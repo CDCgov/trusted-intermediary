@@ -30,4 +30,7 @@ public interface PartnerMetadataStorage {
      * @return a set of {@link PartnerMetadata}s.
      */
     Set<PartnerMetadata> readMetadataForSender(String sender) throws PartnerMetadataException;
+
+    Set<PartnerMetadata> readMetadataForLinkingMessages(String submissionId)
+            throws PartnerMetadataException;
 }
