@@ -7,9 +7,11 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.MessageHeader
+import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.model.UrlType
 import spock.lang.Specification
 
 class HapiOrderTest extends Specification {
@@ -88,33 +90,45 @@ class HapiOrderTest extends Specification {
         actual == expected
     }
 
-    def "getSendingApplicationId happy path works"() {
+    def "getSendingApplicationDetails happy path works"() {
         given:
-        def expectedApplicationId = "mock-application-id"
+        def nameSpaceId = "Natus"
         def innerOrders = new Bundle()
         def messageHeader = new MessageHeader()
-        def extension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id", new StringType(expectedApplicationId))
-        messageHeader.setSource(new MessageHeader.MessageSourceComponent().addExtension(extension) as MessageHeader.MessageSourceComponent)
+        def endpoint = "urn:dns:natus.health.state.mn.us"
+        messageHeader.setSource(new MessageHeader.MessageSourceComponent(new UrlType(endpoint)))
+        def nameSpaceIdExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id", new StringType(nameSpaceId))
+        messageHeader.getSource().addExtension(nameSpaceIdExtension)
+        def universalId = "natus.health.state.mn.us"
+        def universalIdExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id", new StringType(universalId))
+        messageHeader.getSource().addExtension(universalIdExtension)
+        def universalIdType = "DNS"
+        def universalIdTypeExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type", new StringType(universalIdType))
+        messageHeader.getSource().addExtension(universalIdTypeExtension)
+        def expectedApplicationDetails = "$nameSpaceId^$universalId^$universalIdType^$endpoint"
+
         innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
         def orders = new HapiOrder(innerOrders)
 
         when:
-        def actualApplicationId = orders.getSendingApplicationId()
+        def actualApplicationDetails = orders.getSendingApplicationDetails()
 
         then:
-        actualApplicationId == expectedApplicationId
+        actualApplicationDetails == expectedApplicationDetails
     }
 
-    def "getSendingApplicationId unhappy path works"() {
+    def "getSendingApplicationDetails unhappy path works"() {
         given:
-        def expectedApplicationId = ""
+        def expectedApplicationDetails = ""
         def innerOrders = new Bundle()
+        MessageHeader messageHeader = new MessageHeader()
+        innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
         def orders = new HapiOrder(innerOrders)
 
         when:
-        def actualApplicationId = orders.getSendingApplicationId()
+        def actualApplicationDetails = orders.getSendingApplicationDetails()
         then:
-        actualApplicationId == expectedApplicationId
+        actualApplicationDetails == expectedApplicationDetails
     }
 
     def "getSendingFacilityId happy path works"() {
@@ -126,7 +140,7 @@ class HapiOrderTest extends Specification {
         messageHeader.setSender(new Reference("Organization/mock-id"))
         innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
 
-        def organization = new org.hl7.fhir.r4.model.Organization()
+        def organization = new Organization()
         organization.setId("mock-id")
         organization.setName(expectedFacilityId)
         innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(organization))

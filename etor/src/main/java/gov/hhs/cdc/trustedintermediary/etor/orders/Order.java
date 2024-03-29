@@ -14,7 +14,7 @@ public interface Order<T> {
 
     String getPlacerOrderNumber();
 
-    String getSendingApplicationId();
+    String getSendingApplicationDetails();
 
     String getSendingFacilityId();
 

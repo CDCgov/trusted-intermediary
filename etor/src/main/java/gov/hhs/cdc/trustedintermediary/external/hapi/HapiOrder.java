@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Organization;
@@ -55,15 +56,39 @@ public class HapiOrder implements Order<Bundle> {
     }
 
     @Override
-    public String getSendingApplicationId() {
+    public String getSendingApplicationDetails() {
         return HapiHelper.resourcesInBundle(innerOrder, MessageHeader.class)
-                .flatMap(header -> header.getSource().getExtension().stream())
-                .filter(
-                        extension ->
-                                "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id"
-                                        .equals(extension.getUrl()))
-                .map(extension -> extension.getValue().toString())
+                .filter(Objects::nonNull)
                 .findFirst()
+                .map(
+                        messageHeader -> {
+                            String namespaceId = null;
+                            String universalId = null;
+                            String universalIdType = null;
+                            String endpoint = messageHeader.getSource().getEndpoint();
+
+                            for (Extension extension : messageHeader.getSource().getExtension()) {
+                                if ("https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id"
+                                        .equals(extension.getUrl())) {
+                                    namespaceId =
+                                            Objects.toString(
+                                                    extension.getValue().primitiveValue(), "");
+                                } else if ("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id"
+                                        .equals(extension.getUrl())) {
+                                    universalId =
+                                            Objects.toString(
+                                                    extension.getValue().primitiveValue(), "");
+                                } else if ("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type"
+                                        .equals(extension.getUrl())) {
+                                    universalIdType =
+                                            Objects.toString(
+                                                    extension.getValue().primitiveValue(), "");
+                                }
+                            }
+
+                            return concatenateWithCaret(
+                                    namespaceId, universalId, universalIdType, endpoint);
+                        })
                 .orElse("");
     }
 

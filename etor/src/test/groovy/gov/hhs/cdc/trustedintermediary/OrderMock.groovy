@@ -49,7 +49,7 @@ class OrderMock<T> implements Order<T> {
     }
 
     @Override
-    String getSendingApplicationId() {
+    String getSendingApplicationDetails() {
         return this.sendingApplicationId
     }
 
