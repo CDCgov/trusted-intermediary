@@ -7,7 +7,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -42,62 +41,55 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
     @Override
     public void saveMetadata(final PartnerMetadata metadata) throws PartnerMetadataException {
         logger.logInfo("saving the metadata");
-        List<DbColumn> values = new ArrayList<>();
 
-        DbColumn dbColumn =
-                new DbColumn(
-                        "received_message_id",
-                        metadata.receivedSubmissionId(),
-                        false,
-                        Types.VARCHAR);
-        values.add(dbColumn);
-
-        dbColumn =
-                new DbColumn("sent_message_id", metadata.sentSubmissionId(), true, Types.VARCHAR);
-        values.add(dbColumn);
-
-        dbColumn = new DbColumn("sender", metadata.sender(), false, Types.VARCHAR);
-        values.add(dbColumn);
-
-        dbColumn = new DbColumn("receiver", metadata.receiver(), true, Types.VARCHAR);
-        values.add(dbColumn);
-
-        dbColumn = new DbColumn("hash_of_order", metadata.hash(), false, Types.VARCHAR);
-        values.add(dbColumn);
-
-        Timestamp timestampReceived = null;
-        if (metadata.timeReceived() != null) {
-            timestampReceived = Timestamp.from(metadata.timeReceived());
-        }
-        dbColumn = new DbColumn("time_received", timestampReceived, false, Types.TIMESTAMP);
-        values.add(dbColumn);
-
-        Timestamp timestampDelivered = null;
-        if (metadata.timeDelivered() != null) {
-            timestampDelivered = Timestamp.from(metadata.timeDelivered());
-        }
-        dbColumn = new DbColumn("time_delivered", timestampDelivered, true, Types.TIMESTAMP);
-        values.add(dbColumn);
-
-        String deliveryStatusString = null;
-        if (metadata.deliveryStatus() != null) {
-            deliveryStatusString = metadata.deliveryStatus().toString();
-        }
-        dbColumn = new DbColumn("delivery_status", deliveryStatusString, true, Types.OTHER);
-        values.add(dbColumn);
-
-        dbColumn = new DbColumn("failure_reason", metadata.failureReason(), true, Types.VARCHAR);
-        values.add(dbColumn);
-
-        String messageTypeString = null;
-        if (metadata.messageType() != null) {
-            messageTypeString = metadata.messageType().toString();
-        }
-        dbColumn = new DbColumn("message_type", messageTypeString, false, Types.OTHER);
-        values.add(dbColumn);
+        List<DbColumn> columns =
+                List.of(
+                        new DbColumn(
+                                "received_message_id",
+                                metadata.receivedSubmissionId(),
+                                false,
+                                Types.VARCHAR),
+                        new DbColumn(
+                                "sent_message_id",
+                                metadata.sentSubmissionId(),
+                                true,
+                                Types.VARCHAR),
+                        new DbColumn("sender", metadata.sender(), false, Types.VARCHAR),
+                        new DbColumn("receiver", metadata.receiver(), true, Types.VARCHAR),
+                        new DbColumn("hash_of_order", metadata.hash(), false, Types.VARCHAR),
+                        new DbColumn(
+                                "time_received",
+                                metadata.timeReceived() != null
+                                        ? Timestamp.from(metadata.timeReceived())
+                                        : null,
+                                false,
+                                Types.TIMESTAMP),
+                        new DbColumn(
+                                "time_delivered",
+                                metadata.timeDelivered() != null
+                                        ? Timestamp.from(metadata.timeDelivered())
+                                        : null,
+                                true,
+                                Types.TIMESTAMP),
+                        new DbColumn(
+                                "delivery_status",
+                                metadata.deliveryStatus() != null
+                                        ? metadata.deliveryStatus().toString()
+                                        : null,
+                                true,
+                                Types.OTHER),
+                        new DbColumn(
+                                "failure_reason", metadata.failureReason(), true, Types.VARCHAR),
+                        new DbColumn(
+                                "message_type",
+                                metadata.messageType() != null
+                                        ? metadata.messageType().toString()
+                                        : null,
+                                false,
+                                Types.OTHER));
 
         try {
-            dao.upsertData("metadata", values, "received_message_id");
+            dao.upsertData("metadata", columns, "received_message_id");
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error saving metadata", e);
         }
