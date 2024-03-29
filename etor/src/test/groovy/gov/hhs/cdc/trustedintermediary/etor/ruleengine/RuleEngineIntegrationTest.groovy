@@ -81,6 +81,7 @@ class RuleEngineIntegrationTest extends Specification {
         testFile | validation
         "Orders/001_OML_O21_short.fhir"                                    | "Bundle.entry.resource.ofType(MessageHeader).focus.resolve().category.exists()"
         "Orders/003_AL_ORM_O01_NBS_Fully_Populated_1_hl7_translation.fhir" | "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.value.exists()"
+        // Once we fix the mapping for ORM from story #900, we can uncomment this line
         // "Orders/003_AL_ORM_O01_NBS_Fully_Populated_1_hl7_translation.fhir" | "Bundle.entry.resource.ofType(Observation).where(code.coding.code = '57723-9').value.coding.code.exists()"
     }
 
