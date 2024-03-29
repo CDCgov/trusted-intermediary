@@ -10,6 +10,7 @@ import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.ServiceRequest
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.UrlType
 import spock.lang.Specification
@@ -74,20 +75,32 @@ class HapiOrderTest extends Specification {
 
     def "getPlacerOrderNumber works"() {
         given:
-        def expected = 1
+        def expectedPlacerOrderNumber = "mock-placer-order-number"
+        def bundle = new Bundle()
+        def serviceRequest = new ServiceRequest().addIdentifier(new Identifier()
+                .setValue(expectedPlacerOrderNumber)
+                .setType(new CodeableConcept().addCoding(new Coding("http://terminology.hl7.org/CodeSystem/v2-0203", "PLAC", "Placer Identifier"))))
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(serviceRequest))
+        def order = new HapiOrder(bundle)
+
         when:
-        def actual = 1
+        def actualPlacerOrderNumber = order.getPlacerOrderNumber()
+
         then:
-        actual == expected
+        actualPlacerOrderNumber == expectedPlacerOrderNumber
     }
 
     def "getPlacerOrderNumber unhappy path"() {
         given:
-        def expected = 1
+        def innerOrders = new Bundle()
+        def orders = new HapiOrder(innerOrders)
+        def expectedPlacerOrderNumber = ""
+
         when:
-        def actual = 1
+        def actualPlacerOrderNumber = orders.getPlacerOrderNumber()
+
         then:
-        actual == expected
+        actualPlacerOrderNumber == expectedPlacerOrderNumber
     }
 
     def "getSendingApplicationDetails happy path works"() {
