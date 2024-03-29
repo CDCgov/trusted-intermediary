@@ -46,9 +46,7 @@ public class PostgresDao implements DbDao {
                     .append(conflictColumnName)
                     .append(") DO UPDATE SET ");
 
-            for (int i = 0; i < values.size(); i++) {
-                DbColumn column = values.get(i);
-
+            for (DbColumn column : values) {
                 if (!column.upsertOverwrite()) {
                     continue;
                 }
