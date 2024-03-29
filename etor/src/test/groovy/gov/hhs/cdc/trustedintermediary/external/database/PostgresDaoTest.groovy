@@ -95,8 +95,57 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.register(ConnectionPool, mockConnPool)
         TestApplicationContext.injectRegisteredImplementations()
 
+        PartnerMetadata metadata = new PartnerMetadata("receivedSubmissionId", "sentSubmissionId","sender", "receiver", Instant.now(), Instant.now(), "abcd", PartnerMetadataStatus.DELIVERED, null, PartnerMetadataMessageType.ORDER)
+        List<DbColumn> values = new ArrayList<>()
+
+        DbColumn dbColumn = new DbColumn("received_message_id", metadata.receivedSubmissionId(), false, Types.VARCHAR)
+        values.add(dbColumn)
+
+        dbColumn = new DbColumn("sent_message_id", metadata.sentSubmissionId(), true, Types.VARCHAR)
+        values.add(dbColumn)
+
+        dbColumn = new DbColumn("sender", metadata.sender(), false, Types.VARCHAR)
+        values.add(dbColumn)
+
+        dbColumn = new DbColumn("receiver", metadata.receiver(), true, Types.VARCHAR)
+        values.add(dbColumn)
+
+        dbColumn = new DbColumn("hash_of_order", metadata.hash(), false, Types.VARCHAR)
+        values.add(dbColumn)
+
+        Timestamp timestampReceived = null
+        if (metadata.timeReceived() != null) {
+            timestampReceived = Timestamp.from(metadata.timeReceived())
+        }
+        dbColumn = new DbColumn("time_received", timestampReceived, false, Types.TIMESTAMP)
+        values.add(dbColumn)
+
+        Timestamp timestampDelivered = null
+        if (metadata.timeDelivered() != null) {
+            timestampDelivered = Timestamp.from(metadata.timeDelivered())
+        }
+        dbColumn = new DbColumn("time_delivered", timestampDelivered, true, Types.TIMESTAMP)
+        values.add(dbColumn)
+
+        String deliveryStatusString = null
+        if (metadata.deliveryStatus() != null) {
+            deliveryStatusString = metadata.deliveryStatus().toString()
+        }
+        dbColumn = new DbColumn("delivery_status", deliveryStatusString, true, Types.OTHER)
+        values.add(dbColumn)
+
+        dbColumn = new DbColumn("failure_reason", metadata.failureReason(), true, Types.VARCHAR)
+        values.add(dbColumn)
+
+        String messageTypeString = null
+        if (metadata.messageType() != null) {
+            messageTypeString = metadata.messageType().toString()
+        }
+        dbColumn = new DbColumn("message_type", messageTypeString, false, Types.OTHER)
+        values.add(dbColumn)
+
         when:
-        PostgresDao.getInstance().upsertMetadata("mock_id_receiver", "mock_id_sender", "mock_sender", "mock_receiver", "mock_hash", null, null, PartnerMetadataStatus.DELIVERED, "mock_failure_reason", PartnerMetadataMessageType.RESULT)
+        PostgresDao.getInstance().upsertData("metadata", values, "received_message_id")
 
         then:
         mockPreparedStatement.setTimestamp(_ as Integer, _ as Timestamp) >> { Integer parameterIndex, Timestamp timestamp ->

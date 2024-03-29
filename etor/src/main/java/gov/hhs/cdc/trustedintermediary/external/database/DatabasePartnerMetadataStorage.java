@@ -44,61 +44,57 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
         logger.logInfo("saving the metadata");
         List<DbColumn> values = new ArrayList<>();
 
-        DbColumn dbColumn1 =
+        DbColumn dbColumn =
                 new DbColumn(
                         "received_message_id",
                         metadata.receivedSubmissionId(),
                         false,
                         Types.VARCHAR);
-        values.add(dbColumn1);
+        values.add(dbColumn);
 
-        DbColumn dbColumn2 =
+        dbColumn =
                 new DbColumn("sent_message_id", metadata.sentSubmissionId(), true, Types.VARCHAR);
-        values.add(dbColumn2);
+        values.add(dbColumn);
 
-        DbColumn dbColumn3 = new DbColumn("sender", metadata.sender(), false, Types.VARCHAR);
-        values.add(dbColumn3);
+        dbColumn = new DbColumn("sender", metadata.sender(), false, Types.VARCHAR);
+        values.add(dbColumn);
 
-        DbColumn dbColumn4 = new DbColumn("receiver", metadata.receiver(), true, Types.VARCHAR);
-        values.add(dbColumn4);
+        dbColumn = new DbColumn("receiver", metadata.receiver(), true, Types.VARCHAR);
+        values.add(dbColumn);
 
-        DbColumn dbColumn5 = new DbColumn("hash_of_order", metadata.hash(), false, Types.VARCHAR);
-        values.add(dbColumn5);
+        dbColumn = new DbColumn("hash_of_order", metadata.hash(), false, Types.VARCHAR);
+        values.add(dbColumn);
 
         Timestamp timestampReceived = null;
         if (metadata.timeReceived() != null) {
             timestampReceived = Timestamp.from(metadata.timeReceived());
         }
-        DbColumn dbColumn6 =
-                new DbColumn("time_received", timestampReceived, false, Types.TIMESTAMP);
-        values.add(dbColumn6);
+        dbColumn = new DbColumn("time_received", timestampReceived, false, Types.TIMESTAMP);
+        values.add(dbColumn);
 
         Timestamp timestampDelivered = null;
         if (metadata.timeDelivered() != null) {
             timestampDelivered = Timestamp.from(metadata.timeDelivered());
         }
-        DbColumn dbColumn7 =
-                new DbColumn("time_delivered", timestampDelivered, true, Types.TIMESTAMP);
-        values.add(dbColumn7);
+        dbColumn = new DbColumn("time_delivered", timestampDelivered, true, Types.TIMESTAMP);
+        values.add(dbColumn);
 
         String deliveryStatusString = null;
         if (metadata.deliveryStatus() != null) {
             deliveryStatusString = metadata.deliveryStatus().toString();
         }
-        DbColumn dbColumn8 =
-                new DbColumn("delivery_status", deliveryStatusString, true, Types.OTHER);
-        values.add(dbColumn8);
+        dbColumn = new DbColumn("delivery_status", deliveryStatusString, true, Types.OTHER);
+        values.add(dbColumn);
 
-        DbColumn dbColumn9 =
-                new DbColumn("failure_reason", metadata.failureReason(), true, Types.VARCHAR);
-        values.add(dbColumn9);
+        dbColumn = new DbColumn("failure_reason", metadata.failureReason(), true, Types.VARCHAR);
+        values.add(dbColumn);
 
         String messageTypeString = null;
         if (metadata.messageType() != null) {
             messageTypeString = metadata.messageType().toString();
         }
-        DbColumn dbColumn10 = new DbColumn("message_type", messageTypeString, false, Types.OTHER);
-        values.add(dbColumn10);
+        dbColumn = new DbColumn("message_type", messageTypeString, false, Types.OTHER);
+        values.add(dbColumn);
 
         try {
             dao.upsertData("metadata", values, "received_message_id");
