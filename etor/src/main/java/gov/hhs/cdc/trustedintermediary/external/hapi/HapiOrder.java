@@ -96,7 +96,12 @@ public class HapiOrder implements Order<Bundle> {
 
     @Override
     public String getReceivingApplicationId() {
-        return null;
+        return HapiHelper.resourcesInBundle(innerOrder, MessageHeader.class)
+                .flatMap(header -> header.getDestination().stream())
+                .map(MessageHeader.MessageDestinationComponent::getEndpoint)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse("");
     }
 
     @Override

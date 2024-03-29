@@ -160,20 +160,32 @@ class HapiOrderTest extends Specification {
 
     def "getReceivingApplicationId happy path works"() {
         given:
-        def expected = 1
+        def innerOrders = new Bundle()
+        def messageHeader = new MessageHeader()
+        def destination = new MessageHeader.MessageDestinationComponent()
+        def expectedApplicationId = "mock-application-id"
+
+        destination.setEndpoint(expectedApplicationId)
+        messageHeader.setDestination([destination])
+        innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
+        def orders = new HapiOrder(innerOrders)
+
         when:
-        def actual = 1
+        def actualApplicationId = orders.getReceivingApplicationId()
         then:
-        actual == expected
+        actualApplicationId == expectedApplicationId
     }
 
     def "getReceivingApplicationId unhappy path works"() {
         given:
-        def expected = 1
+        def innerOrders = new Bundle()
+        def orders = new HapiOrder(innerOrders)
+        def expectedApplicationId = ""
+
         when:
-        def actual = 1
+        def actualApplicationId = orders.getReceivingApplicationId()
         then:
-        actual == expected
+        actualApplicationId == expectedApplicationId
     }
 
     def "getReceivingFacilityId happy path works"() {
