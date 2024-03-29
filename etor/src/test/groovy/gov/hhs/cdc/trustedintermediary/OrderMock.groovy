@@ -54,7 +54,7 @@ class OrderMock<T> implements Order<T> {
     }
 
     @Override
-    String getSendingFacilityId() {
+    String getSendingFacilityDetails() {
         return this.sendingFacilityId
     }
 

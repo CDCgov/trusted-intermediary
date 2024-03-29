@@ -131,43 +131,63 @@ class HapiOrderTest extends Specification {
         actualApplicationDetails == expectedApplicationDetails
     }
 
-    def "getSendingFacilityId happy path works"() {
+    def "getSendingFacilityDetails happy path works"() {
         given:
-        def expectedFacilityId = "mock-facility-id"
         def innerOrders = new Bundle()
 
         def messageHeader = new MessageHeader()
-        messageHeader.setSender(new Reference("Organization/mock-id"))
+        def orgReference = "Organization/1708034743302204787.82104dfb-e854-47de-b7ce-19a2b71e61db"
+        messageHeader.setSender(new Reference(orgReference))
         innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
 
         def organization = new Organization()
-        organization.setId("mock-id")
-        organization.setName(expectedFacilityId)
-        innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(organization))
+        organization.setId("1708034743302204787.82104dfb-e854-47de-b7ce-19a2b71e61db")
+        // facility name
+        def facilityIdentifier = new Identifier()
+        def facilityName = "MN Public Health Lab"
+        def facilityNameExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field", new StringType("HD.1"))
+        facilityIdentifier.addExtension(facilityNameExtension)
+        facilityIdentifier.setValue(facilityName)
+        // universal id
+        def universalIdIdentifier = new Identifier()
+        def universalIdIdentifierValue = "2.16.840.1.114222.4.1.10080"
+        def universalIdExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field", new StringType("HD.2,HD.3"))
+        universalIdIdentifier.addExtension(universalIdExtension)
+        universalIdIdentifier.setValue(universalIdIdentifierValue)
+        // Type
+        def typeConcept = new CodeableConcept()
+        def theCode = "ISO"
+        def coding = new Coding("http://terminology.hl7.org/CodeSystem/v2-0301", theCode, null)
+        typeConcept.addCoding(coding)
+        universalIdIdentifier.setType(typeConcept)
 
+        organization.addIdentifier(facilityIdentifier)
+        organization.addIdentifier(universalIdIdentifier)
+        innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(organization))
         def orders = new HapiOrder(innerOrders)
+        def expectedFacilityDetails = "$facilityName^$universalIdIdentifierValue^$theCode"
 
         when:
-        def actualFacilityId = orders.getSendingFacilityId()
+        def actualFacilityDetails = orders.getSendingFacilityDetails()
 
         then:
-        actualFacilityId == expectedFacilityId
+        actualFacilityDetails == expectedFacilityDetails
     }
 
-    def "getSendingFacilityId unhappy path works"() {
+    def "getSendingFacilityDetails unhappy path works"() {
         given:
         def innerOrders = new Bundle()
-        def expectedFacilityId = ""
+        def expectedFacilityDetails = ""
         def messageHeader = new MessageHeader()
         innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
 
         def orders = new HapiOrder(innerOrders)
 
         when:
-        def actualFacilityId = orders.getSendingFacilityId()
+        def actualFacilityDetails = orders.getSendingFacilityDetails()
 
         then:
-        actualFacilityId == expectedFacilityId
+        actualFacilityDetails == expectedFacilityDetails
     }
 
     def "getReceivingApplicationDetails happy path works"() {
@@ -175,15 +195,16 @@ class HapiOrderTest extends Specification {
         def innerOrders = new Bundle()
         def messageHeader = new MessageHeader()
         def destination = new MessageHeader.MessageDestinationComponent()
-        def endpoint = "urn:oid:1.2.840.114350.1.13.145.2.7.2.695071"
+        def universalId = "1.2.840.114350.1.13.145.2.7.2.695071"
         def name = "Epic"
         def universalIdType = "ISO"
-        def extension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type", new StringType(universalIdType))
-        def expectedApplicationDetails = "$name^$endpoint^$universalIdType"
+        def universalIdExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id", new StringType(universalId))
+        def universalIdTypeExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type", new StringType(universalIdType))
+        def expectedApplicationDetails = "$name^$universalId^$universalIdType"
 
         destination.setName(name)
-        destination.setEndpoint(endpoint)
-        destination.addExtension(extension)
+        destination.addExtension(universalIdExtension)
+        destination.addExtension(universalIdTypeExtension)
         messageHeader.setDestination([destination])
         innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
         def orders = new HapiOrder(innerOrders)

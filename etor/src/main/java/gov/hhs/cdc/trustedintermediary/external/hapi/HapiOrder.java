@@ -11,6 +11,7 @@ import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.StringType;
 
 /**
  * A concrete implementation of a {@link Order} that uses the Hapi FHIR bundle as its underlying
@@ -93,7 +94,7 @@ public class HapiOrder implements Order<Bundle> {
     }
 
     @Override
-    public String getSendingFacilityId() {
+    public String getSendingFacilityDetails() {
         String organizationReference =
                 HapiHelper.resourcesInBundle(innerOrder, MessageHeader.class)
                         .map(MessageHeader::getSender)
@@ -113,11 +114,50 @@ public class HapiOrder implements Order<Bundle> {
                         ? organizationReference.split("/")[1]
                         : organizationReference;
 
-        // Get the corresponding Organization resource in the Bundle by ID
         return HapiHelper.resourcesInBundle(innerOrder, Organization.class)
                 .filter(org -> orgId.equals(org.getIdElement().getIdPart()))
-                .map(Organization::getName) // This gives the organization's name as the ID
                 .findFirst()
+                .map(
+                        org -> {
+                            String facilityName = "", identifierValue = "", typeCode = "";
+
+                            for (Identifier identifier : org.getIdentifier()) {
+                                String extensionValue =
+                                        identifier.getExtension().stream()
+                                                .filter(
+                                                        ext ->
+                                                                "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field"
+                                                                        .equals(ext.getUrl()))
+                                                .findFirst()
+                                                .map(
+                                                        ext ->
+                                                                ((StringType) ext.getValue())
+                                                                        .getValue())
+                                                .orElse("");
+
+                                // HD.1: namespace id
+                                if ("HD.1".equals(extensionValue)) {
+                                    facilityName = identifier.getValue();
+                                } else if ("HD.2,HD.3".equals(extensionValue)) {
+                                    identifierValue = identifier.getValue();
+                                    // HD.2: universal Id, HD.3: universal id type
+                                    typeCode =
+                                            identifier.getType() != null
+                                                            && !identifier
+                                                                    .getType()
+                                                                    .getCoding()
+                                                                    .isEmpty()
+                                                    ? identifier
+                                                            .getType()
+                                                            .getCoding()
+                                                            .get(0)
+                                                            .getCode()
+                                                    : "";
+                                }
+                            }
+
+                            return concatenateWithCaret(facilityName, identifierValue, typeCode);
+                        })
                 .orElse("");
     }
 
@@ -133,10 +173,20 @@ public class HapiOrder implements Order<Bundle> {
                                         .findFirst())
                 .map(
                         destination -> {
-                            // Direct extraction and concatenation, with null checks integrated into
-                            // the stream.
                             String name = Objects.toString(destination.getName(), "");
-                            String endpoint = Objects.toString(destination.getEndpoint(), "");
+                            String universalId =
+                                    destination.getExtension().stream()
+                                            .filter(
+                                                    ext ->
+                                                            "https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id"
+                                                                    .equals(ext.getUrl()))
+                                            .findFirst()
+                                            .map(
+                                                    ext ->
+                                                            Objects.toString(
+                                                                    ext.getValue().primitiveValue(),
+                                                                    ""))
+                                            .orElse("");
                             String universalIdType =
                                     destination.getExtension().stream()
                                             .filter(
@@ -151,7 +201,7 @@ public class HapiOrder implements Order<Bundle> {
                                                                     ""))
                                             .orElse("");
 
-                            return concatenateWithCaret(name, endpoint, universalIdType);
+                            return concatenateWithCaret(name, universalId, universalIdType);
                         })
                 .orElse("");
     }
