@@ -9,7 +9,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.sql.Types;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
@@ -27,67 +26,6 @@ public class PostgresDao implements DbDao {
 
     public static PostgresDao getInstance() {
         return INSTANCE;
-    }
-
-    @Override
-    public void upsertMetadata(
-            String receivedSubmissionId,
-            String sentSubmissionId,
-            String sender,
-            String receiver,
-            String hash,
-            Instant timeReceived,
-            Instant timeDelivered,
-            PartnerMetadataStatus deliveryStatus,
-            String failureReason,
-            PartnerMetadataMessageType messageType)
-            throws SQLException {
-
-        try (Connection conn = connectionPool.getConnection();
-                PreparedStatement statement =
-                        conn.prepareStatement(
-                                """
-                                INSERT INTO metadata VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                                ON CONFLICT (received_message_id) DO UPDATE SET receiver = EXCLUDED.receiver, sent_message_id = EXCLUDED.sent_message_id, time_delivered = EXCLUDED.time_delivered, delivery_status = EXCLUDED.delivery_status, failure_reason = EXCLUDED.failure_reason
-                                """)) {
-
-            statement.setString(1, receivedSubmissionId);
-            statement.setString(2, sentSubmissionId);
-            statement.setString(3, sender);
-            statement.setString(4, receiver);
-            statement.setString(5, hash);
-
-            Timestamp timestampReceived = null;
-            if (timeReceived != null) {
-                timestampReceived = Timestamp.from(timeReceived);
-            }
-            statement.setTimestamp(6, timestampReceived);
-
-            Timestamp timestampDelivered = null;
-
-            if (timeDelivered != null) {
-                timestampDelivered = Timestamp.from(timeDelivered);
-            }
-            statement.setTimestamp(7, timestampDelivered);
-
-            String deliveryStatusString = null;
-            if (deliveryStatus != null) {
-                deliveryStatusString = deliveryStatus.toString();
-            }
-
-            statement.setObject(8, deliveryStatusString, Types.OTHER);
-
-            statement.setString(9, failureReason);
-
-            String messageTypeString = null;
-            if (messageType != null) {
-                messageTypeString = messageType.toString();
-            }
-
-            statement.setObject(10, messageTypeString, Types.OTHER);
-
-            statement.executeUpdate();
-        }
     }
 
     @Override
