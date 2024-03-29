@@ -9,6 +9,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -319,6 +320,22 @@ public class PartnerMetadataOrchestrator {
             case "Delivered" -> PartnerMetadataStatus.DELIVERED;
             default -> PartnerMetadataStatus.PENDING;
         };
+    }
+
+    boolean isMessageLinked(String receivedSubmissionId) {
+        // check for link entries in message_link table
+        return false;
+    }
+
+    List<String> findMessagesToLink(String receivedSubmissionId) {
+        // find messages to link in metadata table,
+        // using placerOrderNumber, sendingApplicationId, and sendingFacilityId
+        // return list of linked receivedSubmissionIds
+        return new ArrayList<>();
+    }
+
+    void linkMessages(List<String> messagesToLink) {
+        // create entries in message_link table using receivedSubmissionIds in messagesToLink
     }
 
     private boolean metadataIsStale(PartnerMetadata partnerMetadata) {
