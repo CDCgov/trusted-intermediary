@@ -37,15 +37,14 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.register(PostgresDao, PostgresDao.getInstance())
     }
 
-
     def "upsertData works"() {
         given:
         def tableName = "DogCow"
         def pkColumnName = "Moof"
         def columns = [
             new DbColumn(pkColumnName, "Clarus", false, Types.VARCHAR),
-            new DbColumn("second_column_with_upsert_overwrite", Timestamp.from(Instant.now()), true, Types.TIMESTAMP_WITH_TIMEZONE),
             new DbColumn("third_column", Timestamp.from(Instant.now()), false, Types.TIMESTAMP_WITH_TIMEZONE),
+            new DbColumn("second_column_with_upsert_overwrite", Timestamp.from(Instant.now()), true, Types.TIMESTAMP_WITH_TIMEZONE),
             new DbColumn("fourth_column_null", null, false, Types.VARCHAR),
         ]
         def conflictColumnName = pkColumnName
@@ -63,6 +62,18 @@ class PostgresDaoTest extends Specification {
             assert sqlStatement.contains(tableName)
             assert sqlStatement.count("?") == columns.size()
             assert sqlStatement.contains("ON CONFLICT (" + pkColumnName + ")")
+
+            // assert that the column names in the SQL statement are in the same order as the list of DbColumns argument
+            def beginningOfColumnNamesString = tableName + " ("
+            def beginningOfColumnNamesIndex = sqlStatement.indexOf(beginningOfColumnNamesString) + beginningOfColumnNamesString.length()
+            def endingOfColumnNamesIndex = sqlStatement.indexOf(")")
+            def columnNames = sqlStatement.substring(beginningOfColumnNamesIndex, endingOfColumnNamesIndex)
+            def lastFoundColumnNameIndex = -1
+            for (int lcv = 0; lcv < columns.size(); lcv++) {
+                def columnNameIndex = columnNames.indexOf(columns.get(lcv).name())
+                assert columnNameIndex > lastFoundColumnNameIndex
+                lastFoundColumnNameIndex = columnNameIndex
+            }
 
             columns.forEach {
                 if (!it.upsertOverwrite()) {
