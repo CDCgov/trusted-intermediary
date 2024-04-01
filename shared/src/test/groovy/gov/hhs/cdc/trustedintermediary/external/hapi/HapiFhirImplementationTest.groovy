@@ -97,6 +97,18 @@ class HapiFhirImplementationTest extends Specification {
         thrown(FhirPathExecutionException)
     }
 
+    def "getStringFromFhirPath returns correct string value for existing path"() {
+        given:
+        def path = "Bundle.entry[0].resource.id"
+        def expected = diaReport.id
+
+        when:
+        def actual = fhir.getStringFromFhirPath(bundle as IBaseResource, path)
+
+        then:
+        actual == expected
+    }
+
     def "parseResource can convert a valid string to Bundle"() {
         given:
         def fhirBody = Files.readString(Path.of("../examples/Test/Orders/001_OML_O21_short.fhir"))
