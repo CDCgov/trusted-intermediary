@@ -146,44 +146,42 @@ public class PartnerMetadataOrchestrator {
 
         PartnerMetadata partnerMetadata = optionalPartnerMetadata.get();
         var sentSubmissionId = partnerMetadata.sentSubmissionId();
+        if (metadataIsStale(partnerMetadata) && sentSubmissionId != null) {
+            logger.logInfo(
+                    "Receiver name not found in metadata or delivery status still pending, looking up {} from RS history API",
+                    sentSubmissionId);
 
-        if (!metadataIsStale(partnerMetadata) || sentSubmissionId == null) {
-            return Optional.of(partnerMetadata);
+            String receiver;
+            String rsStatus;
+            String rsMessage = "";
+            String timeDelivered;
+            try {
+                String bearerToken = rsclient.getRsToken();
+                String responseBody =
+                        rsclient.requestHistoryEndpoint(sentSubmissionId, bearerToken);
+                var parsedResponseBody = getDataFromReportStream(responseBody);
+                receiver = parsedResponseBody[0];
+                rsStatus = parsedResponseBody[1];
+                rsMessage = parsedResponseBody[2];
+                timeDelivered = parsedResponseBody[3];
+            } catch (ReportStreamEndpointClientException | FormatterProcessingException e) {
+                throw new PartnerMetadataException(
+                        "Unable to retrieve metadata from RS history API", e);
+            }
+
+            var ourStatus = ourStatusFromReportStreamStatus(rsStatus);
+
+            logger.logInfo("Updating metadata with receiver {} and status {}", receiver, ourStatus);
+            partnerMetadata = partnerMetadata.withReceiver(receiver).withDeliveryStatus(ourStatus);
+
+            if (ourStatus == PartnerMetadataStatus.FAILED) {
+                partnerMetadata = partnerMetadata.withFailureMessage(rsMessage);
+            } else if (ourStatus == PartnerMetadataStatus.DELIVERED && timeDelivered != null) {
+                partnerMetadata = partnerMetadata.withTimeDelivered(Instant.parse(timeDelivered));
+            }
+
+            partnerMetadataStorage.saveMetadata(partnerMetadata);
         }
-
-        logger.logInfo(
-                "Receiver name not found in metadata or delivery status still pending, looking up {} from RS history API",
-                sentSubmissionId);
-
-        String receiver;
-        String rsStatus;
-        String rsMessage;
-        String timeDelivered;
-        try {
-            String bearerToken = rsclient.getRsToken();
-            String responseBody = rsclient.requestHistoryEndpoint(sentSubmissionId, bearerToken);
-            var parsedResponseBody = getDataFromReportStream(responseBody);
-            receiver = parsedResponseBody[0];
-            rsStatus = parsedResponseBody[1];
-            rsMessage = parsedResponseBody[2];
-            timeDelivered = parsedResponseBody[3];
-        } catch (ReportStreamEndpointClientException | FormatterProcessingException e) {
-            throw new PartnerMetadataException(
-                    "Unable to retrieve metadata from RS history API", e);
-        }
-
-        var ourStatus = ourStatusFromReportStreamStatus(rsStatus);
-
-        logger.logInfo("Updating metadata with receiver {} and status {}", receiver, ourStatus);
-        partnerMetadata = partnerMetadata.withReceiver(receiver).withDeliveryStatus(ourStatus);
-
-        if (ourStatus == PartnerMetadataStatus.FAILED) {
-            partnerMetadata = partnerMetadata.withFailureMessage(rsMessage);
-        } else if (ourStatus == PartnerMetadataStatus.DELIVERED && timeDelivered != null) {
-            partnerMetadata = partnerMetadata.withTimeDelivered(Instant.parse(timeDelivered));
-        }
-
-        partnerMetadataStorage.saveMetadata(partnerMetadata);
 
         return Optional.of(partnerMetadata);
     }
