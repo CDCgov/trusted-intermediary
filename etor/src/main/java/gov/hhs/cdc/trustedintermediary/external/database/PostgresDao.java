@@ -32,10 +32,19 @@ public class PostgresDao implements DbDao {
     public void upsertData(String tableName, List<DbColumn> values, String conflictColumnName)
             throws SQLException {
         StringBuilder sqlStatementBuilder =
-                new StringBuilder("INSERT INTO ").append(tableName).append(" VALUES (");
+                new StringBuilder("INSERT INTO ").append(tableName).append(" (");
+
+        values.forEach(dbColumn -> sqlStatementBuilder.append(dbColumn.name()).append(", "));
+        sqlStatementBuilder.delete(
+                sqlStatementBuilder.length() - 2,
+                sqlStatementBuilder.length()); // remove the last ", "
+
+        sqlStatementBuilder.append(") VALUES (");
 
         sqlStatementBuilder.append("?, ".repeat(values.size()));
-        sqlStatementBuilder.delete(sqlStatementBuilder.length() - 2, sqlStatementBuilder.length());
+        sqlStatementBuilder.delete(
+                sqlStatementBuilder.length() - 2,
+                sqlStatementBuilder.length()); // remove the last ", "
         sqlStatementBuilder.append(")");
 
         boolean wantsUpsert = values.stream().anyMatch(DbColumn::upsertOverwrite);
