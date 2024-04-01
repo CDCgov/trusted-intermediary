@@ -162,12 +162,10 @@ public class PostgresDao implements DbDao {
     public Set<String> fetchLinkedMessages(String messageId) throws SQLException {
         var sql =
                 """
-                SELECT link_id
-                FROM message_link
-                WHERE link_id = (
-                    SELECT link_id
-                    FROM message_link
-                    WHERE message_id = ?);
+                SELECT ml1.*
+                FROM message_link AS ml1
+                JOIN message_link AS ml2 ON ml1.link_id = ml2.link_id
+                WHERE ml2.message_id = ?;
                 """;
 
         try (Connection conn = connectionPool.getConnection();
