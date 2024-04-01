@@ -64,7 +64,7 @@ public class HapiFhirImplementation implements HapiFhir {
 
     @Override
     public String getStringFromFhirPath(Object resource, String expression) {
-        var results = PATH_ENGINE.evaluate((IBaseResource) resource, expression, Base.class);
-        return results.isEmpty() ? "" : results.get(0).primitiveValue();
+        var result = PATH_ENGINE.evaluateFirst((IBaseResource) resource, expression, Base.class);
+        return result.map(Base::primitiveValue).orElse("");
     }
 }
