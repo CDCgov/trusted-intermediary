@@ -7,6 +7,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DiagnosticReport
 import org.hl7.fhir.r4.model.ServiceRequest
+import org.hl7.fhir.r4.model.StringType
 import spock.lang.Specification
 
 import java.nio.file.Files
@@ -113,6 +114,21 @@ class HapiFhirImplementationTest extends Specification {
         given:
         def path = "Bundle.entry[0].resource.nonExistingProperty"
         def expected = ""
+
+        when:
+        def actual = fhir.getStringFromFhirPath(bundle as IBaseResource, path)
+
+        then:
+        actual == expected
+    }
+
+    def "getStringFromFhirPath handles complex paths correctly"() {
+        given:
+        def extensionUrl = "http://example.org/fhir/StructureDefinition/testExtension"
+        def extensionValue = "DogCow"
+        servRequest.addExtension(extensionUrl, new StringType(extensionValue))
+        def path = "Bundle.entry.resource.ofType(ServiceRequest).extension('http://example.org/fhir/StructureDefinition/testExtension').value"
+        def expected = extensionValue
 
         when:
         def actual = fhir.getStringFromFhirPath(bundle as IBaseResource, path)
