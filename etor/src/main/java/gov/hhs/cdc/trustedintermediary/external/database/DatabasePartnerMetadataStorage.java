@@ -5,6 +5,9 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataExce
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
@@ -38,18 +41,53 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
     @Override
     public void saveMetadata(final PartnerMetadata metadata) throws PartnerMetadataException {
         logger.logInfo("saving the metadata");
+
+        List<DbColumn> columns =
+                List.of(
+                        new DbColumn(
+                                "received_message_id",
+                                metadata.receivedSubmissionId(),
+                                false,
+                                Types.VARCHAR),
+                        new DbColumn(
+                                "sent_message_id",
+                                metadata.sentSubmissionId(),
+                                true,
+                                Types.VARCHAR),
+                        new DbColumn("sender", metadata.sender(), false, Types.VARCHAR),
+                        new DbColumn("receiver", metadata.receiver(), true, Types.VARCHAR),
+                        new DbColumn("hash_of_order", metadata.hash(), false, Types.VARCHAR),
+                        new DbColumn(
+                                "time_received",
+                                metadata.timeReceived() != null
+                                        ? Timestamp.from(metadata.timeReceived())
+                                        : null,
+                                false,
+                                Types.TIMESTAMP),
+                        new DbColumn(
+                                "time_delivered",
+                                metadata.timeDelivered() != null
+                                        ? Timestamp.from(metadata.timeDelivered())
+                                        : null,
+                                true,
+                                Types.TIMESTAMP),
+                        new DbColumn(
+                                "delivery_status",
+                                metadata.deliveryStatus().toString(),
+                                true,
+                                Types.OTHER),
+                        new DbColumn(
+                                "failure_reason", metadata.failureReason(), true, Types.VARCHAR),
+                        new DbColumn(
+                                "message_type",
+                                metadata.messageType() != null
+                                        ? metadata.messageType().toString()
+                                        : null,
+                                false,
+                                Types.OTHER));
+
         try {
-            dao.upsertMetadata(
-                    metadata.receivedSubmissionId(),
-                    metadata.sentSubmissionId(),
-                    metadata.sender(),
-                    metadata.receiver(),
-                    metadata.hash(),
-                    metadata.timeReceived(),
-                    metadata.timeDelivered(),
-                    metadata.deliveryStatus(),
-                    metadata.failureReason(),
-                    metadata.messageType());
+            dao.upsertData("metadata", columns, "received_message_id");
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error saving metadata", e);
         }
