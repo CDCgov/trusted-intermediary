@@ -152,6 +152,11 @@ public class PostgresDao implements DbDao {
                 resultSet.getString("hash_of_message"),
                 PartnerMetadataStatus.valueOf(resultSet.getString("delivery_status")),
                 resultSet.getString("failure_reason"),
-                PartnerMetadataMessageType.valueOf(resultSet.getString("message_type")));
+                PartnerMetadataMessageType.valueOf(resultSet.getString("message_type")),
+                resultSet.getString("sending_application_id"),
+                resultSet.getString("sending_facility_id"),
+                resultSet.getString("receiving_application_id"),
+                resultSet.getString("receiving_facility_id"),
+                resultSet.getString("placer_order_number"));
     }
 }
