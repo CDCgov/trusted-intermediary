@@ -3,10 +3,10 @@ package gov.hhs.cdc.trustedintermediary.etor.messages
 import gov.hhs.cdc.trustedintermediary.PojoTestUtils
 import spock.lang.Specification
 
-class MessageDetailsTest extends Specification {
+class MessageHdDataTypeTest extends Specification {
     def "test getters and setters"() {
         when:
-        PojoTestUtils.validateGettersAndSetters(MessageDetails)
+        PojoTestUtils.validateGettersAndSetters(MessageHdDataType)
 
         then:
         noExceptionThrown()
@@ -20,7 +20,7 @@ class MessageDetailsTest extends Specification {
         def expected = "${namespace}^${universalId}^${universalIdType}"
 
         when:
-        def messageDetails = new MessageDetails(namespace, universalId, universalIdType)
+        def messageDetails = new MessageHdDataType(namespace, universalId, universalIdType)
         def actual = messageDetails.toString()
 
         then:
@@ -35,7 +35,7 @@ class MessageDetailsTest extends Specification {
         def expected = "${namespace}^${universalIdType}"
 
         when:
-        def messageDetails = new MessageDetails(namespace, universalId, universalIdType)
+        def messageDetails = new MessageHdDataType(namespace, universalId, universalIdType)
         def actual = messageDetails.toString()
 
         then:
@@ -50,7 +50,7 @@ class MessageDetailsTest extends Specification {
         def expected = ""
 
         when:
-        def messageDetails = new MessageDetails(namespace, universalId, universalIdType)
+        def messageDetails = new MessageHdDataType(namespace, universalId, universalIdType)
         def actual = messageDetails.toString()
 
         then:

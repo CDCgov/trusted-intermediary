@@ -8,14 +8,15 @@ import java.util.stream.Stream;
  * This class represents the result of evaluating a FHIRPath expression, encapsulating specific
  * details extracted from a FHIR resource. This class holds values for namespace, universal
  * identifier (ID), and the type of the universal ID, providing a mechanism to output these details
- * in a concatenated string format.
+ * in a concatenated string format. HD rer:
+ * https://hl7-definition.caristix.com/v2/HL7v2.5.1/DataTypes/HD
  */
-public class MessageDetails {
+public class MessageHdDataType {
     private String namespace;
     private String universalId;
     private String universalIdType;
 
-    public MessageDetails(String namespace, String universalId, String universalIdType) {
+    public MessageHdDataType(String namespace, String universalId, String universalIdType) {
         this.namespace = namespace;
         this.universalId = universalId;
         this.universalIdType = universalIdType;
