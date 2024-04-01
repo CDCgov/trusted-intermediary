@@ -335,8 +335,12 @@ public class PartnerMetadataOrchestrator {
                 .collect(Collectors.toSet());
     }
 
-    void linkMessages(Set<String> messagesToLink) {
-        // create entries in message_link table using receivedSubmissionIds in messagesToLink
+    void linkMessages(String receivedSubmissionId) throws Exception {
+        var linkedMessageSet = linkedMessageStorage.readLinkedMessages(receivedSubmissionId);
+        if (linkedMessageSet.isEmpty()) {
+            return;
+        }
+        linkedMessageStorage.saveLinkedMessages(linkedMessageSet);
     }
 
     private boolean metadataIsStale(PartnerMetadata partnerMetadata) {

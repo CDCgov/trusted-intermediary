@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMess
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.Set;
 
 /** Interface for accessing the database for metadata */
@@ -28,5 +29,7 @@ public interface DbDao {
 
     Set<PartnerMetadata> fetchMetadataForMessageLinking(String submissionId) throws SQLException;
 
-    Set<PartnerMetadata> fetchLinkedMessages(String messageId) throws SQLException;
+    Set<String> fetchLinkedMessages(String messageId) throws SQLException;
+
+    void insertLinkedMessages(Set<String> messageIds, Optional<Integer> linkId) throws SQLException;
 }

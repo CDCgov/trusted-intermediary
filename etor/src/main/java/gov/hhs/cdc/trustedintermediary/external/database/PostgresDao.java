@@ -12,6 +12,7 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
 
@@ -158,10 +159,10 @@ public class PostgresDao implements DbDao {
     }
 
     @Override
-    public Set<PartnerMetadata> fetchLinkedMessages(String messageId) throws SQLException {
+    public Set<String> fetchLinkedMessages(String messageId) throws SQLException {
         var sql =
                 """
-                SELECT *
+                SELECT link_id
                 FROM message_link
                 WHERE link_id = (
                     SELECT link_id
@@ -172,15 +173,34 @@ public class PostgresDao implements DbDao {
         try (Connection conn = connectionPool.getConnection();
                 PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setString(1, messageId);
-            ResultSet resultSet = statement.executeQuery();
+            return (Set<String>) statement.executeQuery();
+        }
+    }
 
-            Set<PartnerMetadata> metadataSet = new HashSet<>();
+    @Override
+    public void insertLinkedMessages(Set<String> messageIds, Optional<Integer> linkId)
+            throws SQLException {
+        // todo: still need to deal with race condition
+        var sql =
+                """
+                INSERT INTO message_link (link_id, message_id)
+                VALUES (
+                    COALESCE(
+                        ?,
+                        (SELECT COALESCE(MAX(link_id), 0) + 1 FROM message_link)
+                    ),
+                    ?
+                );
+                """;
 
-            while (resultSet.next()) {
-                metadataSet.add(partnerMetadataFromResultSet(resultSet));
+        try (Connection conn = connectionPool.getConnection();
+                PreparedStatement statement = conn.prepareStatement(sql)) {
+
+            for (String messageId : messageIds) {
+                statement.setObject(1, linkId.orElse(null), Types.INTEGER);
+                statement.setString(2, messageId);
+                statement.executeUpdate();
             }
-
-            return metadataSet;
         }
     }
 
