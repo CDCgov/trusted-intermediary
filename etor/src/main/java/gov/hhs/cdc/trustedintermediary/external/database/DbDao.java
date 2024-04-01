@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.database;
 
+import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
@@ -29,7 +30,7 @@ public interface DbDao {
 
     Set<PartnerMetadata> fetchMetadataForMessageLinking(String submissionId) throws SQLException;
 
-    Set<String> fetchLinkedMessages(String messageId) throws SQLException;
+    Set<MessageLink> fetchLinkedMessages(String messageId) throws SQLException;
 
     void insertLinkedMessages(Set<String> messageIds, Optional<Integer> linkId) throws SQLException;
 }

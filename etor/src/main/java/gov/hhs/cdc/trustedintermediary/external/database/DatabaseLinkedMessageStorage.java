@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.database;
 
+import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.sql.SQLException;
@@ -21,14 +22,14 @@ public class DatabaseLinkedMessageStorage {
         return INSTANCE;
     }
 
-    public Set<String> readLinkedMessages(String submissionId) throws Exception {
-        Set<String> linkedMessageSet;
+    public Set<MessageLink> readLinkedMessages(String submissionId) throws Exception {
+        Set<MessageLink> messageLinkSet;
         try {
-            linkedMessageSet = dao.fetchLinkedMessages(submissionId);
+            messageLinkSet = dao.fetchLinkedMessages(submissionId);
         } catch (SQLException e) {
             throw new Exception("Error retrieving metadata", e);
         }
-        return linkedMessageSet;
+        return messageLinkSet;
     }
 
     public void saveLinkedMessages(Set<String> messageIds) throws PartnerMetadataException {

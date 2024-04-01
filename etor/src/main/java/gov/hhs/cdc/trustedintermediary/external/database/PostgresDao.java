@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.database;
 
+import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
@@ -159,7 +160,7 @@ public class PostgresDao implements DbDao {
     }
 
     @Override
-    public Set<String> fetchLinkedMessages(String messageId) throws SQLException {
+    public Set<MessageLink> fetchLinkedMessages(String messageId) throws SQLException {
         var sql =
                 """
                 SELECT ml1.*
@@ -171,7 +172,19 @@ public class PostgresDao implements DbDao {
         try (Connection conn = connectionPool.getConnection();
                 PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setString(1, messageId);
-            return (Set<String>) statement.executeQuery();
+
+            Set<MessageLink> messageLinkSet = new HashSet<>();
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    MessageLink messageLink =
+                            new MessageLink(
+                                    resultSet.getInt("id"),
+                                    resultSet.getString("link_id"),
+                                    resultSet.getString("message_id"));
+                    messageLinkSet.add(messageLink);
+                }
+            }
+            return messageLinkSet;
         }
     }
 
