@@ -73,9 +73,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                                 Types.TIMESTAMP),
                         new DbColumn(
                                 "delivery_status",
-                                metadata.deliveryStatus() != null
-                                        ? metadata.deliveryStatus().toString()
-                                        : null,
+                                metadata.deliveryStatus().toString(),
                                 true,
                                 Types.OTHER),
                         new DbColumn(
