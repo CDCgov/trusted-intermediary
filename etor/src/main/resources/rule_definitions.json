@@ -5,7 +5,7 @@
       "violationMessage": "Message doesn't have required receiver id",
       "conditions": [ ],
       "validations": [
-        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.value.exists()"
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.valueString = 'HD.2,HD.3').value.exists()"
       ]
     },
     {
