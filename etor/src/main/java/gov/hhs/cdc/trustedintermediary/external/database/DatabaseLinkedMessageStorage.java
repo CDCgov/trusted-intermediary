@@ -4,7 +4,6 @@ import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.sql.SQLException;
-import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
 
@@ -22,20 +21,19 @@ public class DatabaseLinkedMessageStorage {
         return INSTANCE;
     }
 
-    public Set<MessageLink> readLinkedMessages(String submissionId) throws Exception {
-        Set<MessageLink> messageLinkSet;
+    public MessageLink getMessageLink(String submissionId) throws Exception {
         try {
-            messageLinkSet = dao.fetchLinkedMessages(submissionId);
+            return dao.fetchMessageLink(submissionId);
         } catch (SQLException e) {
             throw new Exception("Error retrieving metadata", e);
         }
-        return messageLinkSet;
     }
 
-    public void saveLinkedMessages(Set<String> messageIds) throws PartnerMetadataException {
+    public void saveLinkedMessages(Set<String> messageIds, int linkId)
+            throws PartnerMetadataException {
         logger.logInfo("Saving message links");
         try {
-            dao.insertLinkedMessages(messageIds, Optional.empty());
+            dao.insertMessageLink(messageIds, linkId);
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error saving message links", e);
         }

@@ -13,7 +13,6 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.Instant;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
 
@@ -160,37 +159,29 @@ public class PostgresDao implements DbDao {
     }
 
     @Override
-    public Set<MessageLink> fetchLinkedMessages(String messageId) throws SQLException {
+    public MessageLink fetchMessageLink(String messageId) throws SQLException {
         var sql =
                 """
-                SELECT ml1.*
-                FROM message_link AS ml1
-                JOIN message_link AS ml2 ON ml1.link_id = ml2.link_id
-                WHERE ml2.message_id = ?;
+                SELECT *
+                FROM message_link
+                WHERE message_id = ?;
                 """;
 
         try (Connection conn = connectionPool.getConnection();
                 PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setString(1, messageId);
 
-            Set<MessageLink> messageLinkSet = new HashSet<>();
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    MessageLink messageLink =
-                            new MessageLink(
-                                    resultSet.getInt("id"),
-                                    resultSet.getString("link_id"),
-                                    resultSet.getString("message_id"));
-                    messageLinkSet.add(messageLink);
-                }
+            try (ResultSet result = statement.executeQuery()) {
+                return new MessageLink(
+                        result.getInt("id"),
+                        result.getInt("link_id"),
+                        result.getString("message_id"));
             }
-            return messageLinkSet;
         }
     }
 
     @Override
-    public void insertLinkedMessages(Set<String> messageIds, Optional<Integer> linkId)
-            throws SQLException {
+    public void insertMessageLink(Set<String> messageIds, int linkId) throws SQLException {
         // todo: still need to deal with race condition
         var sql =
                 """
@@ -208,7 +199,7 @@ public class PostgresDao implements DbDao {
                 PreparedStatement statement = conn.prepareStatement(sql)) {
 
             for (String messageId : messageIds) {
-                statement.setObject(1, linkId.orElse(null), Types.INTEGER);
+                statement.setInt(1, linkId);
                 statement.setString(2, messageId);
                 statement.executeUpdate();
             }

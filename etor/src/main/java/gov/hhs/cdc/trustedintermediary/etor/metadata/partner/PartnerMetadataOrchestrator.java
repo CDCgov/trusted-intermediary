@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata.partner;
 
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
-import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink;
 import gov.hhs.cdc.trustedintermediary.external.database.DatabaseLinkedMessageStorage;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -323,26 +322,17 @@ public class PartnerMetadataOrchestrator {
         };
     }
 
-    boolean isMessageLinked(String receivedSubmissionId) throws Exception {
-        var linkedMessageSet = linkedMessageStorage.readLinkedMessages(receivedSubmissionId);
-        return !linkedMessageSet.isEmpty();
-    }
-
-    Set<String> findMessagesToLink(String receivedSubmissionId) throws PartnerMetadataException {
+    Set<String> findMessagesIdsToLink(String receivedSubmissionId) throws PartnerMetadataException {
         var metadataSet =
-                partnerMetadataStorage.readMetadataForLinkingMessages(receivedSubmissionId);
+                partnerMetadataStorage.readMetadataForMessageLinking(receivedSubmissionId);
         return metadataSet.stream()
                 .map(PartnerMetadata::receivedSubmissionId)
                 .collect(Collectors.toSet());
     }
 
-    void linkMessages(String receivedSubmissionId) throws Exception {
-        var linkedMessageSet = linkedMessageStorage.readLinkedMessages(receivedSubmissionId);
-        if (linkedMessageSet.isEmpty()) {
-            return;
-        }
-        linkedMessageStorage.saveLinkedMessages(
-                linkedMessageSet.stream().map(MessageLink::messageId).collect(Collectors.toSet()));
+    void linkMessages(Set<String> messageIds) throws Exception {
+        var messageLink = linkedMessageStorage.getMessageLink(messageIds.iterator().next());
+        linkedMessageStorage.saveLinkedMessages(messageIds, messageLink.linkId());
     }
 
     private boolean metadataIsStale(PartnerMetadata partnerMetadata) {

@@ -68,7 +68,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
     }
 
     @Override
-    public Set<PartnerMetadata> readMetadataForLinkingMessages(String submissionId)
+    public Set<PartnerMetadata> readMetadataForMessageLinking(String submissionId)
             throws PartnerMetadataException {
         Set<PartnerMetadata> metadataSet;
         try {

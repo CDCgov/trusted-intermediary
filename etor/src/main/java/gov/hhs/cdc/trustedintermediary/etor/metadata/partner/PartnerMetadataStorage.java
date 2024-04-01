@@ -31,6 +31,6 @@ public interface PartnerMetadataStorage {
      */
     Set<PartnerMetadata> readMetadataForSender(String sender) throws PartnerMetadataException;
 
-    Set<PartnerMetadata> readMetadataForLinkingMessages(String submissionId)
+    Set<PartnerMetadata> readMetadataForMessageLinking(String submissionId)
             throws PartnerMetadataException;
 }
