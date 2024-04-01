@@ -4,20 +4,20 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
-import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.Reference;
-import org.hl7.fhir.r4.model.StringType;
 
 /**
  * A concrete implementation of a {@link Order} that uses the Hapi FHIR bundle as its underlying
  * type.
  */
 public class HapiOrder implements Order<Bundle> {
+
+    @Inject HapiMessageHelper hapiMessageHelper;
 
     private final Bundle innerOrder;
 
@@ -91,74 +91,12 @@ public class HapiOrder implements Order<Bundle> {
                                     namespaceId, universalId, universalIdType, endpoint);
                         })
                 .orElse("");
+        // extract into SendingApplicationDetail Object
     }
 
     @Override
     public String getSendingFacilityDetails() {
-        String organizationReference =
-                HapiHelper.resourcesInBundle(innerOrder, MessageHeader.class)
-                        .map(MessageHeader::getSender)
-                        .filter(Objects::nonNull)
-                        .map(Reference::getReference)
-                        .filter(Objects::nonNull)
-                        .findFirst()
-                        .orElse(null);
-
-        if (organizationReference == null || organizationReference.isEmpty()) {
-            return "";
-        }
-
-        // Extract from Organization/{id}
-        String orgId =
-                organizationReference.contains("/")
-                        ? organizationReference.split("/")[1]
-                        : organizationReference;
-
-        return HapiHelper.resourcesInBundle(innerOrder, Organization.class)
-                .filter(org -> orgId.equals(org.getIdElement().getIdPart()))
-                .findFirst()
-                .map(
-                        org -> {
-                            String facilityName = "", identifierValue = "", typeCode = "";
-
-                            for (Identifier identifier : org.getIdentifier()) {
-                                String extensionValue =
-                                        identifier.getExtension().stream()
-                                                .filter(
-                                                        ext ->
-                                                                "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field"
-                                                                        .equals(ext.getUrl()))
-                                                .findFirst()
-                                                .map(
-                                                        ext ->
-                                                                ((StringType) ext.getValue())
-                                                                        .getValue())
-                                                .orElse("");
-
-                                // HD.1: namespace id
-                                if ("HD.1".equals(extensionValue)) {
-                                    facilityName = identifier.getValue();
-                                } else if ("HD.2,HD.3".equals(extensionValue)) {
-                                    identifierValue = identifier.getValue();
-                                    // HD.2: universal Id, HD.3: universal id type
-                                    typeCode =
-                                            identifier.getType() != null
-                                                            && !identifier
-                                                                    .getType()
-                                                                    .getCoding()
-                                                                    .isEmpty()
-                                                    ? identifier
-                                                            .getType()
-                                                            .getCoding()
-                                                            .get(0)
-                                                            .getCode()
-                                                    : "";
-                                }
-                            }
-
-                            return concatenateWithCaret(facilityName, identifierValue, typeCode);
-                        })
-                .orElse("");
+        return HapiMessageHelper.getInstance().extractSendingFacilityDetails(innerOrder);
     }
 
     @Override

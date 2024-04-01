@@ -7,6 +7,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.BooleanType;
+import org.hl7.fhir.r4.model.StringType;
 
 /** Concrete implementation that calls the Hapi FHIR library. */
 public class HapiFhirImplementation implements HapiFhir {
@@ -59,5 +60,18 @@ public class HapiFhirImplementation implements HapiFhir {
         var result =
                 PATH_ENGINE.evaluateFirst((IBaseResource) resource, expression, BooleanType.class);
         return result.map(BooleanType::booleanValue).orElse(false);
+    }
+
+    /**
+     * Evaluate a FHIR Path expression for a given Resource to find a specific value
+     *
+     * @param resource FHIR resource that is evaluated
+     * @param expression FHIR Path statement to evaluate resources on
+     * @return Given value of the expression, else empty string
+     */
+    public String evaluateAsString(Object resource, String expression) {
+        var result =
+                PATH_ENGINE.evaluateFirst((IBaseResource) resource, expression, StringType.class);
+        return result.map(StringType::getValue).orElse("");
     }
 }
