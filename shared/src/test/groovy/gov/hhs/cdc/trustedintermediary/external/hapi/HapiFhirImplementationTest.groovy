@@ -109,6 +109,18 @@ class HapiFhirImplementationTest extends Specification {
         actual == expected
     }
 
+    def "getStringFromFhirPath returns empty string fro non-existing path"() {
+        given:
+        def path = "Bundle.entry[0].resource.nonExistingProperty"
+        def expected = ""
+
+        when:
+        def actual = fhir.getStringFromFhirPath(bundle as IBaseResource, path)
+
+        then:
+        actual == expected
+    }
+
     def "parseResource can convert a valid string to Bundle"() {
         given:
         def fhirBody = Files.readString(Path.of("../examples/Test/Orders/001_OML_O21_short.fhir"))
