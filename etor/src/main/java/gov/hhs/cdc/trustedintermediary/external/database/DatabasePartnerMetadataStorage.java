@@ -84,7 +84,32 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                                         ? metadata.messageType().toString()
                                         : null,
                                 false,
-                                Types.OTHER));
+                                Types.OTHER),
+                        new DbColumn(
+                                "placer_order_number",
+                                metadata.placerOrderNumber(),
+                                false,
+                                Types.VARCHAR),
+                        new DbColumn(
+                                "sending_application_id",
+                                metadata.sendingApplicationId(),
+                                false,
+                                Types.VARCHAR),
+                        new DbColumn(
+                                "sending_facility_id",
+                                metadata.sendingFacilityId(),
+                                false,
+                                Types.VARCHAR),
+                        new DbColumn(
+                                "receiving_application_id",
+                                metadata.receivingApplicationId(),
+                                false,
+                                Types.VARCHAR),
+                        new DbColumn(
+                                "receiving_facility_id",
+                                metadata.receivingFacilityId(),
+                                false,
+                                Types.VARCHAR));
 
         try {
             dao.upsertData("metadata", columns, "received_message_id");
