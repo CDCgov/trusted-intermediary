@@ -4,6 +4,12 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * This class represents the result of evaluating a FHIRPath expression, encapsulating specific
+ * details extracted from a FHIR resource. This class holds values for namespace, universal
+ * identifier (ID), and the type of the universal ID, providing a mechanism to output these details
+ * in a concatenated string format.
+ */
 public class MessageDetails {
     private String namespace;
     private String universalId;
