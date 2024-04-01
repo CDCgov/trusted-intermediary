@@ -56,7 +56,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                                 Types.VARCHAR),
                         new DbColumn("sender", metadata.sender(), false, Types.VARCHAR),
                         new DbColumn("receiver", metadata.receiver(), true, Types.VARCHAR),
-                        new DbColumn("hash_of_order", metadata.hash(), false, Types.VARCHAR),
+                        new DbColumn("hash_of_message", metadata.hash(), false, Types.VARCHAR),
                         new DbColumn(
                                 "time_received",
                                 metadata.timeReceived() != null
