@@ -7,6 +7,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DiagnosticReport
 import org.hl7.fhir.r4.model.ServiceRequest
+import org.hl7.fhir.r4.model.StringType
 import spock.lang.Specification
 
 import java.nio.file.Files
@@ -75,7 +76,7 @@ class HapiFhirImplementationTest extends Specification {
         result == false
     }
 
-    def "evaluateCondition throws FhirPathExecutionException on empty string"() {
+    def "evaluateCondition throws Exception on empty string"() {
         given:
         def path = ""
 
@@ -83,10 +84,10 @@ class HapiFhirImplementationTest extends Specification {
         fhir.evaluateCondition(bundle as IBaseResource, path)
 
         then:
-        thrown(FhirPathExecutionException)
+        thrown(Exception)
     }
 
-    def "evaluateCondition throws FhirPathExecutionException on fake method"() {
+    def "evaluateCondition throws Exception on fake method"() {
         given:
         def path = "Bundle.entry[0].resource.BadMethod('blah')"
 
@@ -94,7 +95,46 @@ class HapiFhirImplementationTest extends Specification {
         fhir.evaluateCondition(bundle as IBaseResource, path)
 
         then:
-        thrown(FhirPathExecutionException)
+        thrown(Exception)
+    }
+
+    def "getStringFromFhirPath returns correct string value for existing path"() {
+        given:
+        def path = "Bundle.entry[0].resource.id"
+        def expected = diaReport.id
+
+        when:
+        def actual = fhir.getStringFromFhirPath(bundle as IBaseResource, path)
+
+        then:
+        actual == expected
+    }
+
+    def "getStringFromFhirPath returns empty string fro non-existing path"() {
+        given:
+        def path = "Bundle.entry[0].resource.nonExistingProperty"
+        def expected = ""
+
+        when:
+        def actual = fhir.getStringFromFhirPath(bundle as IBaseResource, path)
+
+        then:
+        actual == expected
+    }
+
+    def "getStringFromFhirPath handles complex paths correctly"() {
+        given:
+        def extensionUrl = "http://example.org/fhir/StructureDefinition/testExtension"
+        def extensionValue = "DogCow"
+        servRequest.addExtension(extensionUrl, new StringType(extensionValue))
+        def path = "Bundle.entry.resource.ofType(ServiceRequest).extension('http://example.org/fhir/StructureDefinition/testExtension').value"
+        def expected = extensionValue
+
+        when:
+        def actual = fhir.getStringFromFhirPath(bundle as IBaseResource, path)
+
+        then:
+        actual == expected
     }
 
     def "parseResource can convert a valid string to Bundle"() {

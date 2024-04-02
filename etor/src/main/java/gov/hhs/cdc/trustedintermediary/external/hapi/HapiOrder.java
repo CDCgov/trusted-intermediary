@@ -53,7 +53,18 @@ public class HapiOrder implements Order<Bundle> {
 
     @Override
     public String getPlacerOrderNumber() {
-        return null;
+        return HapiHelper.resourcesInBundle(innerOrder, ServiceRequest.class)
+                .flatMap(serviceRequest -> serviceRequest.getIdentifier().stream())
+                .filter(
+                        identifier ->
+                                identifier
+                                        .getType()
+                                        .hasCoding(
+                                                "http://terminology.hl7.org/CodeSystem/v2-0203",
+                                                "PLAC"))
+                .map(Identifier::getValue)
+                .findFirst()
+                .orElse("");
     }
 
     @Override

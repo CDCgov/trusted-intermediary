@@ -296,8 +296,8 @@ After enabling this option it is recommended that you delete all docker images a
 with this option enabled.
 
 1. Checkout `master` branch for `CDCgov/prime-reportstream`
-2. Copy all the scripts found at `scripts/rs` to `prime-reportstream/prime-router`
-   - **Note**: update the `path_to_cdcti` variable in the scripts to point to the path for the `trusted-intermediary` codebase in your machine
+2. Copy the scripts found at [/scripts/rs](/scripts/rs) to `prime-reportstream/prime-router`
+   - **Note**: follow the instructions in [/scripts/rs/readme.md](/scripts/rs/readme.md) to set up the environment variable
 3. CD to `prime-reportstream/prime-router`
 4. Run the `./cleanslate` script. For more information you can refer to the [ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/docs-deprecated/getting-started/getting-started.md#building-the-baseline)
 5. Run RS with `docker compose up --build -d`
@@ -319,7 +319,6 @@ To test sending from a simulated hospital:
 curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-hospital' --header 'Authorization: Bearer dummy_token' --data-binary '@/path/to/orm_message.hl7' 'http://localhost:7071/api/waters'
 ```
 
-
 To test sending from TI:
 ```
 curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.etor-service-sender' --header 'Authorization: Bearer dummy_token' --data-binary '@/path/to/oml_message.fhir' 'http://localhost:7071/api/waters'
@@ -331,7 +330,6 @@ To test sending from a simulated lab:
 ```
 curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-lab' --header 'Authorization: Bearer dummy_token' --data-binary '@/path/to/oru_message.hl7' 'http://localhost:7071/api/waters'
 ```
-
 
 To test sending from TI:
 ```

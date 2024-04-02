@@ -16,5 +16,5 @@ public interface HapiFhir {
 
     Boolean evaluateCondition(Object resource, String expression);
 
-    String evaluateAsString(Object resource, String expression);
+    String getStringFromFhirPath(Object resource, String expression);
 }
