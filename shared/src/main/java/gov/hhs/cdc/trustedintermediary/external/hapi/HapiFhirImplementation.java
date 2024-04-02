@@ -6,8 +6,8 @@ import ca.uhn.fhir.parser.IParser;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.Base;
 import org.hl7.fhir.r4.model.BooleanType;
-import org.hl7.fhir.r4.model.StringType;
 
 /** Concrete implementation that calls the Hapi FHIR library. */
 public class HapiFhirImplementation implements HapiFhir {
@@ -92,8 +92,7 @@ public class HapiFhirImplementation implements HapiFhir {
      */
     @Override
     public String getStringFromFhirPath(Object resource, String expression) {
-        var result =
-                PATH_ENGINE.evaluateFirst((IBaseResource) resource, expression, StringType.class);
-        return result.map(StringType::getValue).orElse("");
+        var result = PATH_ENGINE.evaluateFirst((IBaseResource) resource, expression, Base.class);
+        return result.map(Base::primitiveValue).orElse("");
     }
 }
