@@ -49,34 +49,34 @@ public class HapiOrder implements Order<Bundle> {
 
     @Override
     public String getPlacerOrderNumber() {
-        return HapiMessageHelper.getInstance().extractPlacerOrderNumber(innerOrder);
+        return hapiMessageHelper.getInstance().extractPlacerOrderNumber(innerOrder);
     }
 
     @Override
     public String getSendingApplicationDetails() {
         MessageHdDataType sendingApplicationDetails =
-                HapiMessageHelper.getInstance().extractSendingApplicationDetails(innerOrder);
+                hapiMessageHelper.getInstance().extractSendingApplicationDetails(innerOrder);
         return sendingApplicationDetails.toString();
     }
 
     @Override
     public String getSendingFacilityDetails() {
         MessageHdDataType sendingFacilityDetails =
-                HapiMessageHelper.getInstance().extractSendingFacilityDetails(innerOrder);
+                hapiMessageHelper.getInstance().extractSendingFacilityDetails(innerOrder);
         return sendingFacilityDetails.toString();
     }
 
     @Override
     public String getReceivingApplicationDetails() {
         MessageHdDataType receivingApplicationDetails =
-                HapiMessageHelper.getInstance().extractReceivingApplicationDetails(innerOrder);
+                hapiMessageHelper.getInstance().extractReceivingApplicationDetails(innerOrder);
         return receivingApplicationDetails.toString();
     }
 
     @Override
     public String getReceivingFacilityDetails() {
         MessageHdDataType receivingFacilityDetails =
-                HapiMessageHelper.getInstance().extractReceivingFacilityDetails(innerOrder);
+                hapiMessageHelper.getInstance().extractReceivingFacilityDetails(innerOrder);
         return receivingFacilityDetails.toString();
     }
 }

@@ -28,34 +28,34 @@ public class HapiResult implements Result<Bundle> {
 
     @Override
     public String getPlacerOrderNumber() {
-        return HapiMessageHelper.getInstance().extractPlacerOrderNumber(innerResult);
+        return hapiMessageHelper.getInstance().extractPlacerOrderNumber(innerResult);
     }
 
     @Override
     public String getSendingApplicationDetails() {
         MessageHdDataType sendingApplicationDetails =
-                HapiMessageHelper.getInstance().extractSendingApplicationDetails(innerResult);
+                hapiMessageHelper.getInstance().extractSendingApplicationDetails(innerResult);
         return sendingApplicationDetails.toString();
     }
 
     @Override
     public String getSendingFacilityDetails() {
         MessageHdDataType sendingFacilityDetails =
-                HapiMessageHelper.getInstance().extractSendingFacilityDetails(innerResult);
+                hapiMessageHelper.getInstance().extractSendingFacilityDetails(innerResult);
         return sendingFacilityDetails.toString();
     }
 
     @Override
     public String getReceivingApplicationDetails() {
         MessageHdDataType receivingApplicationDetails =
-                HapiMessageHelper.getInstance().extractReceivingApplicationDetails(innerResult);
+                hapiMessageHelper.getInstance().extractReceivingApplicationDetails(innerResult);
         return receivingApplicationDetails.toString();
     }
 
     @Override
     public String getReceivingFacilityDetails() {
         MessageHdDataType receivingFacilityDetails =
-                HapiMessageHelper.getInstance().extractReceivingFacilityDetails(innerResult);
+                hapiMessageHelper.getInstance().extractReceivingFacilityDetails(innerResult);
         return receivingFacilityDetails.toString();
     }
 }
