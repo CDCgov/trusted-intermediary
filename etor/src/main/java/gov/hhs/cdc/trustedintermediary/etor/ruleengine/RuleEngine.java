@@ -28,9 +28,13 @@ public class RuleEngine {
         rules.clear();
     }
 
-    public synchronized void ensureRulesLoaded() {
+    public void ensureRulesLoaded() {
         if (rules.isEmpty()) {
-            loadRules();
+            synchronized (this) {
+                if (rules.isEmpty()) {
+                    loadRules();
+                }
+            }
         }
     }
 
