@@ -6,8 +6,8 @@ import ca.uhn.fhir.parser.IParser;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.Base;
 import org.hl7.fhir.r4.model.BooleanType;
+import org.hl7.fhir.r4.model.StringType;
 
 /** Concrete implementation that calls the Hapi FHIR library. */
 public class HapiFhirImplementation implements HapiFhir {
@@ -74,9 +74,26 @@ public class HapiFhirImplementation implements HapiFhir {
         return result.map(BooleanType::booleanValue).orElse(false);
     }
 
+    /**
+     * Retrieves a string result by evaluating a specified FHIRPath expression against a given FHIR
+     * resource. This method simplifies accessing textual data within FHIR resources by directly
+     * returning the string representation of the first matching element found by the FHIRPath
+     * expression. If no match is found, or the first result cannot be represented as a string, an
+     * empty string is returned.
+     *
+     * @param resource The FHIR resource upon which the FHIRPath expression will be evaluated. This
+     *     resource acts as the context for the FHIRPath evaluation.
+     * @param expression The FHIRPath expression to be evaluated against the resource. The
+     *     expression should be crafted to select textual data or elements that can be represented
+     *     as text.
+     * @return The string representation of the first matching result of the FHIRPath expression
+     *     evaluation. Returns an empty string if no matching element is found, or if the first
+     *     result cannot be represented as a string.
+     */
     @Override
     public String getStringFromFhirPath(Object resource, String expression) {
-        var result = PATH_ENGINE.evaluateFirst((IBaseResource) resource, expression, Base.class);
-        return result.map(Base::primitiveValue).orElse("");
+        var result =
+                PATH_ENGINE.evaluateFirst((IBaseResource) resource, expression, StringType.class);
+        return result.map(StringType::getValue).orElse("");
     }
 }
