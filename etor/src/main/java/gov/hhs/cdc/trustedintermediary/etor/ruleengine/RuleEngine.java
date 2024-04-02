@@ -30,7 +30,11 @@ public class RuleEngine {
 
     public void ensureRulesLoaded() {
         if (rules.isEmpty()) {
-            loadRules();
+            synchronized (this) {
+                if (rules.isEmpty()) {
+                    loadRules();
+                }
+            }
         }
     }
 
