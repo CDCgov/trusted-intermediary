@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi
 
-
+import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -16,6 +17,13 @@ import org.hl7.fhir.r4.model.UrlType
 import spock.lang.Specification
 
 class HapiOrderTest extends Specification {
+
+    def setup() {
+        TestApplicationContext.reset()
+        TestApplicationContext.injectRegisteredImplementations()
+        TestApplicationContext.register(HapiFhir.class, HapiFhirImplementation.getInstance())
+    }
+
     def "getUnderlyingOrder Works"() {
         given:
         def expectedInnerOrder = new Bundle()
