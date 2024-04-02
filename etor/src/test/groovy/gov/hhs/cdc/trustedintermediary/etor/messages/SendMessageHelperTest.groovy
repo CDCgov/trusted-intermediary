@@ -21,25 +21,16 @@ class SendMessageHelperTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
     }
     def "savePartnerMetadataForReceivedMessage works"() {
-        given:
-        def hashCode = new Random().nextInt()
-        def messageType = PartnerMetadataMessageType.RESULT
-        def receivedSubmissionId = "receivedId"
-
         when:
-        SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage(receivedSubmissionId, hashCode, messageType)
+        SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage("receivedId", new Random().nextInt(), PartnerMetadataMessageType.RESULT,"sending_app", "sending_facility", "receiving_app", "receiving_facility", "placer_order_number")
 
         then:
-        1 * mockOrchestrator.updateMetadataForReceivedMessage(_, _, _)
+        1 * mockOrchestrator.updateMetadataForReceivedMessage(_, _, _, _, _, _, _, _)
     }
 
     def "savePartnerMetadataForReceivedMessage should log warnings for null receivedSubmissionId"() {
-        given:
-        def hashCode = new Random().nextInt()
-        def messageType = PartnerMetadataMessageType.RESULT
-
         when:
-        SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage(null, hashCode, messageType)
+        SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage(null, new Random().nextInt(), PartnerMetadataMessageType.RESULT, "sending_app", "sending_facility", "receiving_app", "receiving_facility", "placer_order_number")
 
         then:
         1 * mockLogger.logWarning(_)
@@ -50,10 +41,15 @@ class SendMessageHelperTest extends Specification {
         def hashCode = new Random().nextInt()
         def messageType = PartnerMetadataMessageType.RESULT
         def receivedSubmissionId = "receivedId"
-        mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String, messageType) >> { throw new PartnerMetadataException("Error") }
+        def sendingApp = "sending_app"
+        def sendingFacility = "sending_facility"
+        def receivingApp = "receiving_app"
+        def receivingFacility = "receiving_facility"
+        def placerOrderNumber = "placer_order_number"
+        mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String, messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber) >> { throw new PartnerMetadataException("Error") }
 
         when:
-        SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage(receivedSubmissionId, hashCode, messageType)
+        SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage(receivedSubmissionId, hashCode, messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
 
         then:
         1 * mockLogger.logError(_, _)

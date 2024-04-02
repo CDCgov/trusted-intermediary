@@ -84,3 +84,28 @@ databaseChangeLog:
               - column:
                   name: message_type
                   type: message_type
+  - changeSet:
+      id: 5
+      author: halprin
+      labels: update-metadata-table
+      context: metadata
+      comment: update partner metadata table for order and result linking
+      changes:
+        - addColumn:
+            tableName: metadata
+            columns:  # the size of the varchars below are based on the field's HL7 spec size
+              - column:
+                  name: placer_order_number
+                  type: varchar(427)
+              - column:
+                  name: sending_application_id
+                  type: varchar(227)
+              - column:
+                  name: sending_facility_id
+                  type: varchar(227)
+              - column:
+                  name: receiving_application_id
+                  type: varchar(227)
+              - column:
+                  name: receiving_facility_id
+                  type: varchar(227)

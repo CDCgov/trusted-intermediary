@@ -1,6 +1,6 @@
 {
   "rules": [ {
-      "name": "requiredReceiverId",
+      "name": "messageHasRequiredReceiverId",
       "description": "Message has required receiver id",
       "violationMessage": "Message doesn't have required receiver id",
       "conditions": [ ],
@@ -9,7 +9,7 @@
       ]
     },
     {
-      "name": "requiredReceiverId",
+      "name": "ORMHasRequiredCardNumber",
       "description": "ORM has required Card Number",
       "violationMessage": "ORM doesn't have required Card Number",
       "conditions": [

@@ -13,12 +13,24 @@ public class HapiFhirImplementation implements HapiFhir {
 
     private static final HapiFhirImplementation INSTANCE = new HapiFhirImplementation();
     private static final FhirContext CONTEXT = FhirContext.forR4();
-    private static final IFhirPath PATH_ENGINE = CONTEXT.newFhirPath();
+
+    private static final IFhirPath PATH_ENGINE = createEngine();
 
     private HapiFhirImplementation() {}
 
     public static HapiFhirImplementation getInstance() {
         return INSTANCE;
+    }
+
+    /**
+     * Creates FHIRPath engine with a custom evaluation context.
+     *
+     * @return Configured engine.
+     */
+    private static IFhirPath createEngine() {
+        var engine = CONTEXT.newFhirPath();
+        engine.setEvaluationContext(new HapiFhirCustomEvaluationContext());
+        return engine;
     }
 
     @Override
