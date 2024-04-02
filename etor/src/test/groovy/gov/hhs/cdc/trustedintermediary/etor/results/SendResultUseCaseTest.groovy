@@ -62,7 +62,11 @@ class SendResultUseCaseTest extends Specification {
         def result = Mock(Result)
         def receivedSubmissionId = "receivedId"
         def messageType = PartnerMetadataMessageType.RESULT
-        mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String, messageType) >> { throw new PartnerMetadataException("Error") }
+        mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String, messageType,"result.getSendingApplicationId()",
+                "result.getSendingFacilityId()",
+                "result.getReceivingApplicationId()",
+                "result.getReceivingFacilityId()",
+                "result.getPlacerOrderNumber()") >> { throw new PartnerMetadataException("Error") }
         TestApplicationContext.injectRegisteredImplementations()
 
         when:

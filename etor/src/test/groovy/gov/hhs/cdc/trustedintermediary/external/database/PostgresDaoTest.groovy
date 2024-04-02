@@ -202,7 +202,12 @@ class PostgresDaoTest extends Specification {
         def status = PartnerMetadataStatus.PENDING
         def reason = "It done Goofed"
         def messageType = PartnerMetadataMessageType.RESULT
-        def expected = new PartnerMetadata(receivedMessageId, sentMessageId, sender, receiver, timeReceived, timeDelivered, hash, status, reason, messageType)
+        def sendingApp = "sending_app"
+        def sendingFacility = "sending_facility"
+        def receivingApp = "receiving_app"
+        def receivingFacility = "receiving_facility"
+        def placerOrderNumber = "placer_order_number"
+        def expected = new PartnerMetadata(receivedMessageId, sentMessageId, sender, receiver, timeReceived, timeDelivered, hash, status, reason, messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
 
         mockConnPool.getConnection() >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
@@ -217,6 +222,11 @@ class PostgresDaoTest extends Specification {
         mockResultSet.getString("delivery_status") >> status.toString()
         mockResultSet.getString("failure_reason") >> reason
         mockResultSet.getString("message_type") >> messageType.toString()
+        mockResultSet.getString("sending_application_id") >> sendingApp
+        mockResultSet.getString("sending_facility_id") >> sendingFacility
+        mockResultSet.getString("receiving_application_id") >> receivingApp
+        mockResultSet.getString("receiving_facility_id") >> receivingFacility
+        mockResultSet.getString("placer_order_number") >> placerOrderNumber
         mockPreparedStatement.executeQuery() >> mockResultSet
 
         TestApplicationContext.register(ConnectionPool, mockConnPool)
@@ -253,8 +263,8 @@ class PostgresDaoTest extends Specification {
         given:
         def sender = "DogCow"
         def messageType = PartnerMetadataMessageType.RESULT
-        def expected1 = new PartnerMetadata("12345", "7890", sender, "You'll get your just reward", Instant.parse("2024-01-03T15:45:33.30Z"),Instant.parse("2024-01-03T15:45:33.30Z"),  sender.hashCode().toString(), PartnerMetadataStatus.PENDING, "It done Goofed", messageType)
-        def expected2 = new PartnerMetadata("doreyme", "fasole", sender, "receiver", Instant.now(), Instant.now(), "gobeltygoook", PartnerMetadataStatus.DELIVERED, "cause I said so", messageType)
+        def expected1 = new PartnerMetadata("12345", "7890", sender, "You'll get your just reward", Instant.parse("2024-01-03T15:45:33.30Z"),Instant.parse("2024-01-03T15:45:33.30Z"),  sender.hashCode().toString(), PartnerMetadataStatus.PENDING, "It done Goofed", messageType, "sending_app", "sending_facility", "receiving_app", "receiving_facility", "placer_order_number")
+        def expected2 = new PartnerMetadata("doreyme", "fasole", sender, "receiver", Instant.now(), Instant.now(), "gobeltygoook", PartnerMetadataStatus.DELIVERED, "cause I said so", messageType, "sending_app", "sending_facility", "receiving_app", "receiving_facility", "placer_order_number")
 
         mockConnPool.getConnection() >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
@@ -298,6 +308,26 @@ class PostgresDaoTest extends Specification {
         mockResultSet.getString("message_type") >>> [
             expected1.messageType().toString(),
             expected2.messageType().toString()
+        ]
+        mockResultSet.getString("sending_application_id") >>> [
+            expected1.sendingApplicationId(),
+            expected2.sendingApplicationId()
+        ]
+        mockResultSet.getString("sending_facility_id") >>> [
+            expected1.sendingFacilityId(),
+            expected2.sendingFacilityId()
+        ]
+        mockResultSet.getString("receiving_application_id") >>> [
+            expected1.receivingApplicationId(),
+            expected2.receivingApplicationId()
+        ]
+        mockResultSet.getString("receiving_facility_id") >>> [
+            expected1.receivingFacilityId(),
+            expected2.receivingFacilityId()
+        ]
+        mockResultSet.getString("placer_order_number") >>> [
+            expected1.placerOrderNumber(),
+            expected2.placerOrderNumber()
         ]
         mockPreparedStatement.executeQuery() >> mockResultSet
 

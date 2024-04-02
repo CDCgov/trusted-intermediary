@@ -4,31 +4,19 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStorage
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
-import spock.lang.Specification
-
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStorage
 import java.sql.SQLException
 import java.sql.Timestamp
 import java.sql.Types
 import java.time.Instant
+import spock.lang.Specification
 
 class DatabasePartnerMetadataStorageTest extends Specification {
 
     private def mockDao
 
-    def mockMetadata = new PartnerMetadata(
-    "receivedSubmissionId",
-    "sentSubmissionId",
-    "sender",
-    "receiver",
-    Instant.now(),
-    Instant.now(),
-    "hash",
-    PartnerMetadataStatus.PENDING,
-    "DogCow failure",
-    PartnerMetadataMessageType.RESULT
-    )
+    def mockMetadata = new PartnerMetadata("receivedSubmissionId", "sentSubmissionId","sender", "receiver", Instant.now(), Instant.now(), "hash", PartnerMetadataStatus.DELIVERED, "failure reason", PartnerMetadataMessageType.ORDER, "sending_app", "sending_facility", "receiving_app", "receiving_facility", "placer_order_number")
 
     def setup() {
         TestApplicationContext.reset()
@@ -78,7 +66,12 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 new DbColumn("time_delivered", Timestamp.from(mockMetadata.timeDelivered()),true, Types.TIMESTAMP),
                 new DbColumn("delivery_status", mockMetadata.deliveryStatus().toString(),true,Types.OTHER),
                 new DbColumn("failure_reason", mockMetadata.failureReason(), true, Types.VARCHAR),
-                new DbColumn("message_type", mockMetadata.messageType().toString(), false, Types.OTHER)
+                new DbColumn("message_type", mockMetadata.messageType().toString(), false, Types.OTHER),
+                new DbColumn("placer_order_number", mockMetadata.placerOrderNumber(), false, Types.VARCHAR),
+                new DbColumn("sending_application_id", mockMetadata.sendingApplicationId(), false, Types.VARCHAR),
+                new DbColumn("sending_facility_id", mockMetadata.sendingFacilityId(), false, Types.VARCHAR),
+                new DbColumn("receiving_application_id", mockMetadata.receivingApplicationId(), false, Types.VARCHAR),
+                new DbColumn("receiving_facility_id", mockMetadata.receivingFacilityId(), false, Types.VARCHAR)
                 )
 
         when:
@@ -111,7 +104,12 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 "hash",
                 null, // PartnerMetadata defaults deliveryStatus to PENDING on null, so that's why we're asserting not-null bellow
                 "DogCow failure",
-                null
+                null,
+                "sending_app",
+                "sending_facility",
+                "receiving_app",
+                "receiving_facility",
+                "placer_order_number"
                 )
 
         List<DbColumn> columns =
@@ -125,7 +123,12 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 new DbColumn("time_delivered", null,true, Types.TIMESTAMP),
                 new DbColumn("delivery_status", mockMetadata.deliveryStatus().toString(), true,Types.OTHER),
                 new DbColumn("failure_reason", mockMetadata.failureReason(), true, Types.VARCHAR),
-                new DbColumn("message_type", null, false, Types.OTHER)
+                new DbColumn("message_type", null, false, Types.OTHER),
+                new DbColumn("placer_order_number", mockMetadata.placerOrderNumber(), false, Types.VARCHAR),
+                new DbColumn("sending_application_id", mockMetadata.sendingApplicationId(), false, Types.VARCHAR),
+                new DbColumn("sending_facility_id", mockMetadata.sendingFacilityId(), false, Types.VARCHAR),
+                new DbColumn("receiving_application_id", mockMetadata.receivingApplicationId(), false, Types.VARCHAR),
+                new DbColumn("receiving_facility_id", mockMetadata.receivingFacilityId(), false, Types.VARCHAR)
                 )
 
         when:
