@@ -6,6 +6,9 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
 
 public class HapiMessageHelper {
@@ -31,7 +34,7 @@ public class HapiMessageHelper {
     private final Map<String, String> fhirPaths;
     private static final HapiMessageHelper INSTANCE = new HapiMessageHelper();
 
-    private final HapiFhir fhirEngine = ApplicationContext.getImplementation(HapiFhir.class);
+    @Inject private HapiFhir fhirEngine;
 
     public static HapiMessageHelper getInstance() {
         return INSTANCE;
@@ -83,6 +86,54 @@ public class HapiMessageHelper {
                         messageBundle, fhirPaths.get(RECEIVING_FACILITY_UNIVERSAL_ID)),
                 fhirEngine.getStringFromFhirPath(
                         messageBundle, fhirPaths.get(RECEIVING_FACILITY_UNIVERSAL_ID_TYPE)));
+    }
+
+    public String extractSendingFacilityNamespace() {
+        return null;
+    }
+
+    public String extractSendingFacilityUniversalId() {
+        return null;
+    }
+
+    public String extractSendingFacilityUniversalIdType() {
+        return null;
+    }
+
+    public String extractReceivingFacilityNamespace() {
+        return null;
+    }
+
+    public String extractReceivingFacilityUniversalId() {
+        return null;
+    }
+
+    public String extractReceivingFacilityUniversalIdType() {
+        return null;
+    }
+
+    public String extractSendingApplicationNamespace() {
+        return null;
+    }
+
+    public String extractSendingApplicationUniversalId() {
+        return null;
+    }
+
+    public String extractSendingApplicationUniversalIdType() {
+        return null;
+    }
+
+    public String extractReceivingApplicationNamespace() {
+        return null;
+    }
+
+    public String extractReceivingApplicationUniversalId() {
+        return null;
+    }
+
+    public String extractReceivingApplicationUniversalIdType() {
+        return null;
     }
 
     private Map<String, String> loadFhirPaths() {

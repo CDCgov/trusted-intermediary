@@ -20,8 +20,8 @@ class HapiOrderTest extends Specification {
 
     def setup() {
         TestApplicationContext.reset()
-        TestApplicationContext.injectRegisteredImplementations()
         TestApplicationContext.register(HapiFhir.class, HapiFhirImplementation.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
     }
 
     def "getUnderlyingOrder Works"() {
