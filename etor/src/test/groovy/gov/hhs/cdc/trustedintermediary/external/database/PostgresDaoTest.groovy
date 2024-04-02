@@ -63,6 +63,8 @@ class PostgresDaoTest extends Specification {
             assert sqlStatement.count("?") == columns.size()
             assert sqlStatement.contains("ON CONFLICT (" + pkColumnName + ")")
 
+            assert !sqlStatement.contains(", )")
+
             // assert that the column names in the SQL statement are in the same order as the list of DbColumns argument
             def beginningOfColumnNamesString = tableName + " ("
             def beginningOfColumnNamesIndex = sqlStatement.indexOf(beginningOfColumnNamesString) + beginningOfColumnNamesString.length()
