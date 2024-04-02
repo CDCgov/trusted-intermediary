@@ -1,13 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
-import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
 
