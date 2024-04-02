@@ -29,7 +29,7 @@ class HapiMetadataConverterTest extends Specification {
         def failureReason = "timed_out"
         def messageType =  PartnerMetadataMessageType.ORDER
         PartnerMetadata metadata = new PartnerMetadata(
-                "receivedSubmissionId", "sentSubmissionId", sender, receiver, time, time, hash, PartnerMetadataStatus.DELIVERED, failureReason, messageType)
+                "receivedSubmissionId", "sentSubmissionId", sender, receiver, time, time, hash, PartnerMetadataStatus.DELIVERED, failureReason, messageType, "sending_app", "sending_facility", "receiving_app", "receiving_facility", "placer_order_number")
 
         when:
         def result = HapiPartnerMetadataConverter.getInstance().extractPublicMetadataToOperationOutcome(metadata, "receivedSubmissionId").getUnderlyingOutcome() as OperationOutcome

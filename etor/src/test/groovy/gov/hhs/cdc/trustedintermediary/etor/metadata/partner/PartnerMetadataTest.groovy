@@ -28,7 +28,7 @@ class PartnerMetadataTest extends Specification {
 
 
         when:
-        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, timeDelivered, hash, PartnerMetadataStatus.DELIVERED, failureReason, messageType)
+        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, timeDelivered, hash, PartnerMetadataStatus.DELIVERED, failureReason, messageType, "sending_app", "sending_facility", "receiving_app", "receiving_facility", "placer_order_number")
 
         then:
         metadata.receivedSubmissionId() == receivedSubmissionId
@@ -52,7 +52,7 @@ class PartnerMetadataTest extends Specification {
         def status = PartnerMetadataStatus.DELIVERED
 
         when:
-        def metadata = new PartnerMetadata(receivedSubmissionId, sender, timeReceived, timeDelivered, hash, PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER)
+        def metadata = new PartnerMetadata(receivedSubmissionId, sender, timeReceived, timeDelivered, hash, PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER, "sending_app", "sending_facility", "receiving_app", "receiving_facility", "placer_order_number")
 
         then:
         metadata.receivedSubmissionId() == receivedSubmissionId
@@ -95,7 +95,7 @@ class PartnerMetadataTest extends Specification {
         def hash = "abcd"
         def status = PartnerMetadataStatus.DELIVERED
         def failureReason = "DogCow goes boom"
-        def metadata = new PartnerMetadata(receivedSubmissionId, null, sender, null, timeReceived, null, hash, status, failureReason, messageType)
+        def metadata = new PartnerMetadata(receivedSubmissionId, null, sender, null, timeReceived, null, hash, status, failureReason, messageType, "sending_app", "sending_facility", "receiving_app", "receiving_facility", "placer_order_number")
 
         when:
         def updatedMetadata = metadata.withSentSubmissionId(sentSubmissionId).withReceiver(receiver)
@@ -121,7 +121,7 @@ class PartnerMetadataTest extends Specification {
         def messageType = PartnerMetadataMessageType.RESULT
         def hash = "abcd"
         def failureReason = "DogCow goes boom"
-        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, timeDelivered, hash, PartnerMetadataStatus.PENDING, failureReason, messageType)
+        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, timeDelivered, hash, PartnerMetadataStatus.PENDING, failureReason, messageType, "sending_app", "sending_facility", "receiving_app", "receiving_facility", "placer_order_number")
 
         when:
         def newStatus = PartnerMetadataStatus.DELIVERED
@@ -150,7 +150,7 @@ class PartnerMetadataTest extends Specification {
         def messageType = PartnerMetadataMessageType.RESULT
         def hash = "abcd"
         def failureReason = "DogCow goes boom"
-        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, null, hash, PartnerMetadataStatus.PENDING, failureReason, messageType)
+        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, null, hash, PartnerMetadataStatus.PENDING, failureReason, messageType, "sending_app", "sending_facility", "receiving_app", "receiving_facility", "placer_order_number")
 
         when:
         def updatedMetadata = metadata.withTimeDelivered(timeDelivered)
