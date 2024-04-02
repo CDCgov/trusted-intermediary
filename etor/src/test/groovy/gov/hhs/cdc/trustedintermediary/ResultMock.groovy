@@ -43,22 +43,22 @@ class ResultMock<T> implements Result<T> {
     }
 
     @Override
-    String getSendingApplicationId() {
-        return this.sendingApplicationId
+    String getSendingApplicationDetails() {
+        return this.sendingApplicationDetails
     }
 
     @Override
-    String getSendingFacilityId() {
-        return this.sendingFacilityId
+    String getSendingFacilityDetails() {
+        return this.sendingFacilityDetails
     }
 
     @Override
-    String getReceivingApplicationId() {
-        return this.receivingApplicationId
+    String getReceivingApplicationDetails() {
+        return this.receivingApplicationDetails
     }
 
     @Override
-    String getReceivingFacilityId() {
-        return this.receivingFacilityId
+    String getReceivingFacilityDetails() {
+        return this.receivingFacilityDetails
     }
 }

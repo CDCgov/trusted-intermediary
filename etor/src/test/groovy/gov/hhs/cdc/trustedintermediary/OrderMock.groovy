@@ -11,21 +11,21 @@ class OrderMock<T> implements Order<T> {
     private String patientId
     private T underlyingOrders
     private String placerOrderNumber
-    private String sendingApplicationId
-    private String sendingFacilityId
-    private String receivingApplicationId
-    private String receivingFacilityId
+    private String sendingApplicationDetails
+    private String sendingFacilityDetails
+    private String receivingApplicationDetails
+    private String receivingFacilityDetails
 
     OrderMock(String fhirResourceId, String patientId, T underlyingOrders, String placerOrderNumber, String sendingApplicationId, String sendingFacilityId,
-    String receivingApplicationId, String receivingFacilityId) {
+    String receivingApplicationDetails, String receivingFacilityDetails) {
         this.fhirResourceId = fhirResourceId
         this.patientId = patientId
         this.underlyingOrders = underlyingOrders
         this.placerOrderNumber = placerOrderNumber
-        this.sendingApplicationId = sendingApplicationId
-        this.sendingFacilityId = sendingFacilityId
-        this.receivingApplicationId = receivingApplicationId
-        this.receivingFacilityId = receivingFacilityId
+        this.sendingApplicationDetails = sendingApplicationDetails
+        this.sendingFacilityDetails = sendingFacilityDetails
+        this.receivingApplicationDetails = receivingApplicationDetails
+        this.receivingFacilityDetails = receivingFacilityDetails
     }
 
     @Override
@@ -50,21 +50,21 @@ class OrderMock<T> implements Order<T> {
 
     @Override
     String getSendingApplicationDetails() {
-        return this.sendingApplicationId
+        return this.sendingApplicationDetails
     }
 
     @Override
     String getSendingFacilityDetails() {
-        return this.sendingFacilityId
+        return this.sendingFacilityDetails
     }
 
     @Override
     String getReceivingApplicationDetails() {
-        return this.receivingApplicationId
+        return this.receivingApplicationDetails
     }
 
     @Override
-    String getReceivingFacilityId() {
-        return this.receivingFacilityId
+    String getReceivingFacilityDetails() {
+        return this.receivingFacilityDetails
     }
 }
