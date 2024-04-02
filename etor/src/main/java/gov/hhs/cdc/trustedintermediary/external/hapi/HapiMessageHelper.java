@@ -85,52 +85,64 @@ public class HapiMessageHelper {
                         messageBundle, fhirPaths.get(RECEIVING_FACILITY_UNIVERSAL_ID_TYPE)));
     }
 
-    public String extractSendingFacilityNamespace() {
-        return null;
+    public String extractSendingFacilityNamespace(Bundle messageBundle) {
+        return fhirEngine.getStringFromFhirPath(
+                messageBundle, fhirPaths.get(SENDING_FACILITY_NAMESPACE));
     }
 
-    public String extractSendingFacilityUniversalId() {
-        return null;
+    public String extractSendingFacilityUniversalId(Bundle messageBundle) {
+        return fhirEngine.getStringFromFhirPath(
+                messageBundle, fhirPaths.get(SENDING_FACILITY_UNIVERSAL_ID));
     }
 
-    public String extractSendingFacilityUniversalIdType() {
-        return null;
+    public String extractSendingFacilityUniversalIdType(Bundle messageBundle) {
+        return fhirEngine.getStringFromFhirPath(
+                messageBundle, fhirPaths.get(SENDING_FACILITY_UNIVERSAL_ID_TYPE));
     }
 
-    public String extractReceivingFacilityNamespace() {
-        return null;
+    public String extractReceivingFacilityNamespace(Bundle messageBundle) {
+        return fhirEngine.getStringFromFhirPath(
+                messageBundle, fhirPaths.get(RECEIVING_FACILITY_NAMESPACE));
     }
 
-    public String extractReceivingFacilityUniversalId() {
-        return null;
+    public String extractReceivingFacilityUniversalId(Bundle messageBundle) {
+        return fhirEngine.getStringFromFhirPath(
+                messageBundle, fhirPaths.get(RECEIVING_FACILITY_UNIVERSAL_ID));
     }
 
-    public String extractReceivingFacilityUniversalIdType() {
-        return null;
+    public String extractReceivingFacilityUniversalIdType(Bundle messageBundle) {
+        return fhirEngine.getStringFromFhirPath(
+                messageBundle, fhirPaths.get(RECEIVING_FACILITY_UNIVERSAL_ID_TYPE));
     }
 
-    public String extractSendingApplicationNamespace() {
-        return null;
+    public String extractSendingApplicationNamespace(Bundle messageBundle) {
+        return fhirEngine.getStringFromFhirPath(
+                messageBundle, fhirPaths.get(SENDING_APPLICATION_NAMESPACE));
     }
 
-    public String extractSendingApplicationUniversalId() {
-        return null;
+    public String extractSendingApplicationUniversalId(Bundle messageBundle) {
+        return fhirEngine.getStringFromFhirPath(
+                messageBundle, fhirPaths.get(SENDING_APPLICATION_UNIVERSAL_ID));
     }
 
-    public String extractSendingApplicationUniversalIdType() {
-        return null;
+    public String extractSendingApplicationUniversalIdType(Bundle messageBundle) {
+        return fhirEngine.getStringFromFhirPath(
+                messageBundle, fhirPaths.get(SENDING_APPLICATION_UNIVERSAL_ID_TYPE));
     }
 
-    public String extractReceivingApplicationNamespace() {
-        return null;
+    public String extractReceivingApplicationNamespace(Bundle messageBundle) {
+        return fhirEngine.getStringFromFhirPath(
+                messageBundle, fhirPaths.get(RECEIVING_APPLICATION_NAMESPACE));
     }
 
-    public String extractReceivingApplicationUniversalId() {
-        return null;
+    public String extractReceivingApplicationUniversalId(Bundle messageBundle) {
+        return fhirEngine.getStringFromFhirPath(
+                messageBundle, fhirPaths.get(RECEIVING_APPLICATION_UNIVERSAL_ID));
     }
 
-    public String extractReceivingApplicationUniversalIdType() {
-        return null;
+    public String extractReceivingApplicationUniversalIdType(Bundle messageBundle) {
+        return fhirEngine.getStringFromFhirPath(
+                messageBundle, fhirPaths.get(RECEIVING_APPLICATION_UNIVERSAL_ID_TYPE));
     }
 
     private Map<String, String> loadFhirPaths() {
