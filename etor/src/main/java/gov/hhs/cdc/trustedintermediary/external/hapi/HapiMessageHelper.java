@@ -18,6 +18,62 @@ public class HapiMessageHelper {
     private String PLACER_ORDER_NUMBER_FHIR_PATH =
             "Bundle.entry.resource.ofType(ServiceRequest).identifier.where(type.coding.code = 'PLAC').value";
 
+    private final String RECEIVING_FACILITY_NAMESPACE =
+            """
+            MessageHeader.destination.receiver.resolve().identifier.where(
+                extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
+                extension.valueString = 'HD.1'
+            ).value""";
+    private final String RECEIVING_FACILITY_UNIVERSAL_ID =
+            """
+            MessageHeader.destination.receiver.resolve().identifier.where(
+                extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
+                extension.valueString = 'HD.2,HD.3'
+            ).value""";
+    private final String RECIVING_FACILITY_UNIVERSAL_ID_TYPE =
+            """
+            MessageHeader.destination.receiver.resolve().identifier.where(
+                extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
+                extension.valueString = 'HD.2,HD.3'
+            ).type.coding.code""";
+    private final String SENDING_FACILITY_NAMESPACE =
+            """
+    Bundle.entry.resource.ofType(MessageHeader).sender.resolve().identifier.where(
+        extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
+        extension.valueString = 'HD.1'
+    ).value
+    """;
+    private final String SENDING_FACILITY_UNIVERSAL_ID =
+            """
+            MessageHeader.sender.resolve().identifier.where(
+                extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
+                extension.valueString = 'HD.2,HD.3'
+            ).value""";
+    private final String SENDING_FACILITY_UNIVERSAL_ID_TYPE =
+            """
+            MessageHeader.sender.resolve().identifier.where(
+                extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
+                extension.valueString = 'HD.2,HD.3'
+            ).type.coding.code""";
+
+    private final String SENDING_APPLICATION_NAMESPACE =
+            """
+            Bundle.entry.resource.ofType(MessageHeader).source.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id').valueString""";
+    private final String SENDING_APPLICATION_UNIVERSAL_ID =
+            """
+            Bundle.entry.resource.ofType(MessageHeader).source.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id').valueString""";
+    private final String SENDING_APPLICATION_UNIVERSAL_ID_TYPE =
+            """
+            Bundle.entry.resource.ofType(MessageHeader).source.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type').valueString""";
+    private final String RECEIVING_APPLICATION_NAMESPACE =
+            """
+            Bundle.entry.resource.ofType(MessageHeader).destination.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id').valueString""";
+    private final String RECEIVING_APPLICATION_UNIVERSAL_ID =
+            """
+            Bundle.entry.resource.ofType(MessageHeader).destination.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id').valueString""";
+    private final String RECEIVING_APPLICATION_UNIVERSAL_ID_TYPE =
+            """
+            Bundle.entry.resource.ofType(MessageHeader).destination.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type').valueString""";
     private final HapiFhir fhirEngine = ApplicationContext.getImplementation(HapiFhir.class);
 
     public static HapiMessageHelper getInstance() {

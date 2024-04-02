@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi
 
-import ca.uhn.fhir.fhirpath.FhirPathExecutionException
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException
 import org.hl7.fhir.instance.model.api.IBaseResource
