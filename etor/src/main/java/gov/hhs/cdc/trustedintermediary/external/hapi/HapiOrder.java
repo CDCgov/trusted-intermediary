@@ -10,6 +10,7 @@ import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.ServiceRequest;
 
 /**
  * A concrete implementation of a {@link Order} that uses the Hapi FHIR bundle as its underlying
