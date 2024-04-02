@@ -41,7 +41,7 @@ class RuleEngineTest extends Specification {
 
     def "ensureRulesLoaded loads rules only once on multiple threads"() {
         given:
-        def threadsNum = 2
+        def threadsNum = 10
         def iterations = 4
 
         when:
