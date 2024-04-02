@@ -126,7 +126,7 @@ class HapiOrderTest extends Specification {
         def universalIdType = "DNS"
         def universalIdTypeExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type", new StringType(universalIdType))
         messageHeader.getSource().addExtension(universalIdTypeExtension)
-        def expectedApplicationDetails = "$nameSpaceId^$universalId^$universalIdType^$endpoint"
+        def expectedApplicationDetails = "$nameSpaceId^$universalId^$universalIdType"
 
         innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
         def orders = new HapiOrder(innerOrders)

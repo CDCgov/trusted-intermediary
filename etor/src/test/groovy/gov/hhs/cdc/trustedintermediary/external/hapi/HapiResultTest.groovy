@@ -66,7 +66,7 @@ class HapiResultTest extends Specification{
         actualPlacerOrderNumber == expectedPlacerOrderNumber
     }
 
-    def "getSendingApplicationId works"() {
+    def "getSendingApplicationDetails works"() {
         given:
         def expectedSendingApplicationId = "mock-sending-application-id"
         def bundle = new Bundle()
@@ -77,26 +77,26 @@ class HapiResultTest extends Specification{
         def result = new HapiResult(bundle)
 
         when:
-        def actualSendingApplicationId = result.getSendingApplicationId()
+        def actualSendingApplicationId = result.getSendingApplicationDetails()
 
         then:
         actualSendingApplicationId == expectedSendingApplicationId
     }
 
-    def "getSendingApplicationId unhappy path"() {
+    def "getSendingApplicationDetails unhappy path"() {
         given:
         def expectedSendingApplicationId = ""
         def bundle = new Bundle()
         def result = new HapiResult(bundle)
 
         when:
-        def actualSendingApplicationId = result.getSendingApplicationId()
+        def actualSendingApplicationId = result.getSendingApplicationDetails()
 
         then:
         actualSendingApplicationId == expectedSendingApplicationId
     }
 
-    def "getSendingFacilityId works"() {
+    def "getSendingFacilityDetails works"() {
         given:
         def expected = 1
         when:
@@ -105,7 +105,7 @@ class HapiResultTest extends Specification{
         actual == expected
     }
 
-    def "getSendingFacilityId unhappy path"() {
+    def "getSendingFacilityDetails unhappy path"() {
         given:
         def expected = 1
         when:
@@ -114,7 +114,7 @@ class HapiResultTest extends Specification{
         actual == expected
     }
 
-    def "getReceivingApplicationId works"() {
+    def "getReceivingApplicationDetails works"() {
         given:
         def expected = 1
         when:
@@ -123,7 +123,7 @@ class HapiResultTest extends Specification{
         actual == expected
     }
 
-    def "getReceivingApplicationId unhappy path"() {
+    def "getReceivingApplicationDetails unhappy path"() {
         given:
         def expected = 1
         when:
@@ -132,7 +132,7 @@ class HapiResultTest extends Specification{
         actual == expected
     }
 
-    def "getReceivingFacilityId works"() {
+    def "getReceivingFacilityDetails works"() {
         given:
         def expected = 1
         when:
@@ -141,7 +141,7 @@ class HapiResultTest extends Specification{
         actual == expected
     }
 
-    def "getReceivingFacilityId unhappy path"() {
+    def "getReceivingFacilityDetails unhappy path"() {
         given:
         def expected = 1
         when:

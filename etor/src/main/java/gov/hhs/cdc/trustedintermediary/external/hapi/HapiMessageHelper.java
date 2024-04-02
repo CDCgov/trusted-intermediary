@@ -133,15 +133,15 @@ public class HapiMessageHelper {
         tempPaths.put(
                 SENDING_APPLICATION_NAMESPACE,
                 """
-            Bundle.entry.resource.ofType(MessageHeader).source.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id').valueString""");
+            Bundle.entry.resource.ofType(MessageHeader).source.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id').value""");
         tempPaths.put(
                 SENDING_APPLICATION_UNIVERSAL_ID,
                 """
-            Bundle.entry.resource.ofType(MessageHeader).source.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id').valueString""");
+            Bundle.entry.resource.ofType(MessageHeader).source.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id').value""");
         tempPaths.put(
                 SENDING_APPLICATION_UNIVERSAL_ID_TYPE,
                 """
-            Bundle.entry.resource.ofType(MessageHeader).source.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type').valueString""");
+            Bundle.entry.resource.ofType(MessageHeader).source.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type').value""");
         tempPaths.put(
                 RECEIVING_APPLICATION_NAMESPACE,
                 """
