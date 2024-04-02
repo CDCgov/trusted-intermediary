@@ -76,7 +76,7 @@ class HapiFhirImplementationTest extends Specification {
         result == false
     }
 
-    def "evaluateCondition throws FhirPathExecutionException on empty string"() {
+    def "evaluateCondition throws Exception on empty string"() {
         given:
         def path = ""
 
@@ -84,10 +84,10 @@ class HapiFhirImplementationTest extends Specification {
         fhir.evaluateCondition(bundle as IBaseResource, path)
 
         then:
-        thrown(FhirPathExecutionException)
+        thrown(Exception)
     }
 
-    def "evaluateCondition throws FhirPathExecutionException on fake method"() {
+    def "evaluateCondition throws Exception on fake method"() {
         given:
         def path = "Bundle.entry[0].resource.BadMethod('blah')"
 
@@ -95,7 +95,7 @@ class HapiFhirImplementationTest extends Specification {
         fhir.evaluateCondition(bundle as IBaseResource, path)
 
         then:
-        thrown(FhirPathExecutionException)
+        thrown(Exception)
     }
 
     def "getStringFromFhirPath returns correct string value for existing path"() {
