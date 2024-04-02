@@ -5,7 +5,7 @@
       "violationMessage": "Message doesn't have required receiver id",
       "conditions": [ ],
       "validations": [
-        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.value.exists()"
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(system = 'urn:ietf:rfc:3986').value.exists()"
       ]
     },
     {
