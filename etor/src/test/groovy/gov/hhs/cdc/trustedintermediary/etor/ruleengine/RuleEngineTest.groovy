@@ -39,6 +39,27 @@ class RuleEngineTest extends Specification {
         1 * mockRuleLoader.loadRules(_ as String) >> [Mock(Rule)]
     }
 
+    def "ensureRulesLoaded loads rules only once on multiple threads"() {
+        given:
+        def threadsNum = 10
+        def iterations = 4
+
+        when:
+        List<Thread> threads = []
+        (1..threadsNum).each { threadId ->
+            threads.add(new Thread({
+                for (int i = 0; i < iterations; i++) {
+                    ruleEngine.ensureRulesLoaded()
+                }
+            }))
+        }
+        threads*.start()
+        threads*.join()
+
+        then:
+        1 * mockRuleLoader.loadRules(_ as String) >> [Mock(Rule)]
+    }
+
     def "ensureRulesLoaded logs an error if there is an exception loading the rules"() {
         given:
         def exception = new RuleLoaderException("Error loading rules", new Exception())
