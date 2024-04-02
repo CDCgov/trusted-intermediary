@@ -20,5 +20,5 @@ public interface Order<T> {
 
     String getReceivingApplicationDetails();
 
-    String getReceivingFacilityId();
+    String getReceivingFacilityDetails();
 }

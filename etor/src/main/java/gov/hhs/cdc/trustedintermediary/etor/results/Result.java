@@ -12,11 +12,11 @@ public interface Result<T> {
 
     String getPlacerOrderNumber();
 
-    String getSendingApplicationId();
+    String getSendingApplicationDetails();
 
-    String getSendingFacilityId();
+    String getSendingFacilityDetails();
 
-    String getReceivingApplicationId();
+    String getReceivingApplicationDetails();
 
-    String getReceivingFacilityId();
+    String getReceivingFacilityDetails();
 }

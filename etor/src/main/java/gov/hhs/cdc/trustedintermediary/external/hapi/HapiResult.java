@@ -1,13 +1,14 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType;
 import gov.hhs.cdc.trustedintermediary.etor.results.Result;
+import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.MessageHeader;
-import org.hl7.fhir.r4.model.ServiceRequest;
 
 /** Filler concrete implementation of a {@link Result} using the Hapi FHIR library */
 public class HapiResult implements Result<Bundle> {
+
+    @Inject HapiMessageHelper hapiMessageHelper;
 
     private final Bundle innerResult;
 
@@ -27,45 +28,34 @@ public class HapiResult implements Result<Bundle> {
 
     @Override
     public String getPlacerOrderNumber() {
-        return HapiHelper.resourcesInBundle(innerResult, ServiceRequest.class)
-                .flatMap(serviceRequest -> serviceRequest.getIdentifier().stream())
-                .filter(
-                        identifier ->
-                                identifier
-                                        .getType()
-                                        .hasCoding(
-                                                "http://terminology.hl7.org/CodeSystem/v2-0203",
-                                                "PLAC"))
-                .map(Identifier::getValue)
-                .findFirst()
-                .orElse("");
+        return HapiMessageHelper.getInstance().extractPlacerOrderNumber(innerResult);
     }
 
     @Override
-    public String getSendingApplicationId() {
-        return HapiHelper.resourcesInBundle(innerResult, MessageHeader.class)
-                .flatMap(header -> header.getSource().getExtension().stream())
-                .filter(
-                        extension ->
-                                "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id"
-                                        .equals(extension.getUrl()))
-                .map(extension -> extension.getValue().toString())
-                .findFirst()
-                .orElse("");
+    public String getSendingApplicationDetails() {
+        MessageHdDataType sendingApplicationDetails =
+                HapiMessageHelper.getInstance().extractSendingApplicationDetails(innerResult);
+        return sendingApplicationDetails.toString();
     }
 
     @Override
-    public String getSendingFacilityId() {
-        return null;
+    public String getSendingFacilityDetails() {
+        MessageHdDataType sendingFacilityDetails =
+                HapiMessageHelper.getInstance().extractSendingFacilityDetails(innerResult);
+        return sendingFacilityDetails.toString();
     }
 
     @Override
-    public String getReceivingApplicationId() {
-        return null;
+    public String getReceivingApplicationDetails() {
+        MessageHdDataType receivingApplicationDetails =
+                HapiMessageHelper.getInstance().extractReceivingApplicationDetails(innerResult);
+        return receivingApplicationDetails.toString();
     }
 
     @Override
-    public String getReceivingFacilityId() {
-        return null;
+    public String getReceivingFacilityDetails() {
+        MessageHdDataType receivingFacilityDetails =
+                HapiMessageHelper.getInstance().extractReceivingFacilityDetails(innerResult);
+        return receivingFacilityDetails.toString();
     }
 }
