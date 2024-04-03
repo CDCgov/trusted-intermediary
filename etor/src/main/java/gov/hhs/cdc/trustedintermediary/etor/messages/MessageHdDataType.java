@@ -1,9 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.etor.messages;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 /**
  * This class represents the result of evaluating a FHIRPath expression, encapsulating specific
  * details extracted from a FHIR resource. This class holds values for namespace, universal
@@ -46,14 +42,5 @@ public class MessageHdDataType {
 
     public void setUniversalIdType(String universalIdType) {
         this.universalIdType = universalIdType;
-    }
-
-    @Override
-    public String toString() {
-        List<String> filteredValues =
-                Stream.of(this.namespace, this.universalId, this.universalIdType)
-                        .filter(s -> s != null && !s.isEmpty())
-                        .collect(Collectors.toList());
-        return filteredValues.isEmpty() ? "" : String.join("^", filteredValues);
     }
 }
