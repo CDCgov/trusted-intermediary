@@ -11,6 +11,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemograph
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
+import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkStorage;
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageRequestHandler;
 import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageHelper;
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
@@ -34,6 +35,7 @@ import gov.hhs.cdc.trustedintermediary.etor.results.ResultSender;
 import gov.hhs.cdc.trustedintermediary.etor.results.SendResultUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleEngine;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader;
+import gov.hhs.cdc.trustedintermediary.external.database.DatabaseMessageLinkStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.DatabasePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.DbDao;
 import gov.hhs.cdc.trustedintermediary.external.database.PostgresDao;
@@ -41,6 +43,7 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiMessageConverterHelper;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiPartnerMetadataConverter;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiResultConverter;
+import gov.hhs.cdc.trustedintermediary.external.localfile.FileMessageLinkStorage;
 import gov.hhs.cdc.trustedintermediary.external.localfile.FilePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.localfile.MockRSEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClient;
@@ -135,9 +138,13 @@ public class EtorDomainRegistration implements DomainConnector {
             ApplicationContext.register(DbDao.class, PostgresDao.getInstance());
             ApplicationContext.register(
                     PartnerMetadataStorage.class, DatabasePartnerMetadataStorage.getInstance());
+            ApplicationContext.register(
+                    MessageLinkStorage.class, DatabaseMessageLinkStorage.getInstance());
         } else if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
             ApplicationContext.register(
                     PartnerMetadataStorage.class, FilePartnerMetadataStorage.getInstance());
+            ApplicationContext.register(
+                    MessageLinkStorage.class, FileMessageLinkStorage.getInstance());
         }
         if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
             ApplicationContext.register(RSEndpointClient.class, MockRSEndpointClient.getInstance());

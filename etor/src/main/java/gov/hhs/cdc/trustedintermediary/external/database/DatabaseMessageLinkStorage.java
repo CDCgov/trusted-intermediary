@@ -26,7 +26,7 @@ public class DatabaseMessageLinkStorage implements MessageLinkStorage {
         try {
             return dao.fetchMessageLink(submissionId);
         } catch (SQLException e) {
-            throw new MessageLinkException("Error retrieving metadata", e);
+            throw new MessageLinkException("Error retrieving message links", e);
         }
     }
 
