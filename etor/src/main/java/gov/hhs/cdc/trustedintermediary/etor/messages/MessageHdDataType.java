@@ -22,6 +22,8 @@ public class MessageHdDataType {
         this.universalIdType = universalIdType;
     }
 
+    public MessageHdDataType() {}
+
     public String getNamespace() {
         return namespace;
     }

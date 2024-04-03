@@ -5,8 +5,14 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.MessageHeader;
+import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.StringType;
 
 public class HapiMessageHelper {
 
@@ -53,10 +59,74 @@ public class HapiMessageHelper {
     }
 
     public MessageHdDataType extractSendingFacilityDetails(Bundle messageBundle) {
-        return new MessageHdDataType(
-                extractSendingFacilityNamespace(messageBundle),
-                extractSendingFacilityUniversalId(messageBundle),
-                extractSendingFacilityUniversalIdType(messageBundle));
+        //        return new MessageHdDataType(
+        //                extractSendingFacilityNamespace(messageBundle),
+        //                extractSendingFacilityUniversalId(messageBundle),
+        //                extractSendingFacilityUniversalIdType(messageBundle));
+        String organizationReference =
+                HapiHelper.resourcesInBundle(messageBundle, MessageHeader.class)
+                        .map(MessageHeader::getSender)
+                        .filter(Objects::nonNull)
+                        .map(Reference::getReference)
+                        .filter(Objects::nonNull)
+                        .findFirst()
+                        .orElse(null);
+
+        if (organizationReference == null || organizationReference.isEmpty()) {
+            return new MessageHdDataType();
+        }
+
+        // Extract from Organization/{id}
+        String orgId =
+                organizationReference.contains("/")
+                        ? organizationReference.split("/")[1]
+                        : organizationReference;
+
+        return HapiHelper.resourcesInBundle(messageBundle, Organization.class)
+                .filter(org -> orgId.equals(org.getIdElement().getIdPart()))
+                .findFirst()
+                .map(
+                        org -> {
+                            String facilityName = "", identifierValue = "", typeCode = "";
+
+                            for (Identifier identifier : org.getIdentifier()) {
+                                String extensionValue =
+                                        identifier.getExtension().stream()
+                                                .filter(
+                                                        ext ->
+                                                                "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field"
+                                                                        .equals(ext.getUrl()))
+                                                .findFirst()
+                                                .map(
+                                                        ext ->
+                                                                ((StringType) ext.getValue())
+                                                                        .getValue())
+                                                .orElse("");
+
+                                // HD.1: namespace id
+                                if ("HD.1".equals(extensionValue)) {
+                                    facilityName = identifier.getValue();
+                                } else if ("HD.2,HD.3".equals(extensionValue)) {
+                                    identifierValue = identifier.getValue();
+                                    // HD.2: universal Id, HD.3: universal id type
+                                    typeCode =
+                                            identifier.getType() != null
+                                                            && !identifier
+                                                                    .getType()
+                                                                    .getCoding()
+                                                                    .isEmpty()
+                                                    ? identifier
+                                                            .getType()
+                                                            .getCoding()
+                                                            .get(0)
+                                                            .getCode()
+                                                    : "";
+                                }
+                            }
+
+                            return new MessageHdDataType(facilityName, identifierValue, typeCode);
+                        })
+                .orElse(new MessageHdDataType());
     }
 
     public MessageHdDataType extractReceivingApplicationDetails(Bundle messageBundle) {
