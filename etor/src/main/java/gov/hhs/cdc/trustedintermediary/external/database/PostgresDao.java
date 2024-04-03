@@ -207,7 +207,7 @@ public class PostgresDao implements DbDao {
             }
         }
     }
-      
+
     private void removeLastTwoCharacters(StringBuilder stringBuilder) {
         stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
     }
