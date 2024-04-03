@@ -7,40 +7,4 @@ package gov.hhs.cdc.trustedintermediary.etor.messages;
  * in a concatenated string format. HD reference: <a
  * href="https://hl7-definition.caristix.com/v2/HL7v2.5.1/DataTypes/HD">HD-DataType</a>
  */
-public class MessageHdDataType {
-    private String namespace;
-    private String universalId;
-    private String universalIdType;
-
-    public MessageHdDataType(String namespace, String universalId, String universalIdType) {
-        this.namespace = namespace;
-        this.universalId = universalId;
-        this.universalIdType = universalIdType;
-    }
-
-    public MessageHdDataType() {}
-
-    public String getNamespace() {
-        return namespace;
-    }
-
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
-    }
-
-    public String getUniversalId() {
-        return universalId;
-    }
-
-    public void setUniversalId(String universalId) {
-        this.universalId = universalId;
-    }
-
-    public String getUniversalIdType() {
-        return universalIdType;
-    }
-
-    public void setUniversalIdType(String universalIdType) {
-        this.universalIdType = universalIdType;
-    }
-}
+public record MessageHdDataType(String namespace, String universalId, String universalIdType) {}

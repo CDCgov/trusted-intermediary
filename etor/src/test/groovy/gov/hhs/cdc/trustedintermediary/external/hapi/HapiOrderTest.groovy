@@ -2,7 +2,6 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
-import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataTypeTest
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -141,9 +140,9 @@ class HapiOrderTest extends Specification {
         def actualApplicationDetails = orders.getSendingApplicationDetails()
 
         then:
-        actualApplicationDetails.getNamespace() == expectedApplicationDetails.getNamespace()
-        actualApplicationDetails.getUniversalId() == expectedApplicationDetails.getUniversalId()
-        actualApplicationDetails.getUniversalIdType() == expectedApplicationDetails.getUniversalIdType()
+        actualApplicationDetails.namespace() == expectedApplicationDetails.namespace()
+        actualApplicationDetails.universalId() == expectedApplicationDetails.universalId()
+        actualApplicationDetails.universalIdType() == expectedApplicationDetails.universalIdType()
     }
 
     def "getSendingApplicationDetails unhappy path works"() {
@@ -158,9 +157,9 @@ class HapiOrderTest extends Specification {
         def actualApplicationDetails = orders.getSendingApplicationDetails()
 
         then:
-        actualApplicationDetails.getNamespace() == expectedApplicationDetails.getNamespace()
-        actualApplicationDetails.getUniversalId() == expectedApplicationDetails.getUniversalId()
-        actualApplicationDetails.getUniversalIdType() == expectedApplicationDetails.getUniversalIdType()
+        actualApplicationDetails.namespace() == expectedApplicationDetails.namespace()
+        actualApplicationDetails.universalId() == expectedApplicationDetails.universalId()
+        actualApplicationDetails.universalIdType() == expectedApplicationDetails.universalIdType()
     }
 
     def "getSendingFacilityDetails happy path works"() {
@@ -204,9 +203,9 @@ class HapiOrderTest extends Specification {
         def actualFacilityDetails = orders.getSendingFacilityDetails()
 
         then:
-        actualFacilityDetails.getNamespace() == expectedFacilityDetails.getNamespace()
-        actualFacilityDetails.getUniversalId() == expectedFacilityDetails.getUniversalId()
-        actualFacilityDetails.getUniversalIdType() == expectedFacilityDetails.getUniversalIdType()
+        actualFacilityDetails.namespace() == expectedFacilityDetails.namespace()
+        actualFacilityDetails.universalId() == expectedFacilityDetails.universalId()
+        actualFacilityDetails.universalIdType() == expectedFacilityDetails.universalIdType()
     }
 
     def "getSendingFacilityDetails unhappy path works"() {
@@ -222,9 +221,9 @@ class HapiOrderTest extends Specification {
         def actualFacilityDetails = orders.getSendingFacilityDetails()
 
         then:
-        actualFacilityDetails.getNamespace() == expectedFacilityDetails.getNamespace()
-        actualFacilityDetails.getUniversalId() == expectedFacilityDetails.getUniversalId()
-        actualFacilityDetails.getUniversalIdType() == expectedFacilityDetails.getUniversalIdType()
+        actualFacilityDetails.namespace() == expectedFacilityDetails.namespace()
+        actualFacilityDetails.universalId() == expectedFacilityDetails.universalId()
+        actualFacilityDetails.universalIdType() == expectedFacilityDetails.universalIdType()
     }
 
     def "getReceivingApplicationDetails happy path works"() {
@@ -250,9 +249,9 @@ class HapiOrderTest extends Specification {
         def actualApplicationDetails = orders.getReceivingApplicationDetails()
 
         then:
-        actualApplicationDetails.getNamespace() == expectedApplicationDetails.getNamespace()
-        actualApplicationDetails.getUniversalId() == expectedApplicationDetails.getUniversalId()
-        actualApplicationDetails.getUniversalIdType() == expectedApplicationDetails.getUniversalIdType()
+        actualApplicationDetails.namespace() == expectedApplicationDetails.namespace()
+        actualApplicationDetails.universalId() == expectedApplicationDetails.universalId()
+        actualApplicationDetails.universalIdType() == expectedApplicationDetails.universalIdType()
     }
 
     def "getReceivingApplicationDetails unhappy path works"() {
@@ -265,9 +264,9 @@ class HapiOrderTest extends Specification {
         def actualApplicationDetails = orders.getReceivingApplicationDetails()
 
         then:
-        actualApplicationDetails.getNamespace() == expectedApplicationDetails.getNamespace()
-        actualApplicationDetails.getUniversalId() == expectedApplicationDetails.getUniversalId()
-        actualApplicationDetails.getUniversalIdType() == expectedApplicationDetails.getUniversalIdType()
+        actualApplicationDetails.namespace() == expectedApplicationDetails.namespace()
+        actualApplicationDetails.universalId() == expectedApplicationDetails.universalId()
+        actualApplicationDetails.universalIdType() == expectedApplicationDetails.universalIdType()
     }
 
     def "getReceivingFacilityDetails happy path works"() {
