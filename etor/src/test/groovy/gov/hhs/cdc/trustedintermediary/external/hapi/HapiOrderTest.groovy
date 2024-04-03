@@ -21,6 +21,7 @@ class HapiOrderTest extends Specification {
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.register(HapiFhir.class, HapiFhirImplementation.getInstance())
+        TestApplicationContext.register(HapiMessageHelper.class, HapiMessageHelper.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
     }
 

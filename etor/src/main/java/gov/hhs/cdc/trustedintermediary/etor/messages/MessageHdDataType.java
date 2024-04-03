@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.messages;
 
-import java.util.Objects;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,8 +48,10 @@ public class MessageHdDataType {
 
     @Override
     public String toString() {
-        return Stream.of(this.namespace, this.universalId, this.universalIdType)
-                .filter(Objects::nonNull)
-                .collect(Collectors.joining("^"));
+        List<String> filteredValues =
+                Stream.of(this.namespace, this.universalId, this.universalIdType)
+                        .filter(s -> s != null && !s.isEmpty())
+                        .collect(Collectors.toList());
+        return filteredValues.isEmpty() ? "" : String.join("^", filteredValues);
     }
 }
