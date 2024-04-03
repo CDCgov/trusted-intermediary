@@ -10,9 +10,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.function.Function;
+import java.util.stream.Collector;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import javax.inject.Inject;
 
 /** Class for accessing and managing data for the postgres Database */
@@ -91,43 +95,93 @@ public class PostgresDao implements DbDao {
         }
     }
 
+    //    @Override
+    //    public Set<PartnerMetadata> fetchMetadataForSender(String sender) throws SQLException {
+    //
+    //        try (Connection conn = connectionPool.getConnection();
+    //                PreparedStatement statement =
+    //                        conn.prepareStatement("SELECT * FROM metadata WHERE sender = ?")) {
+    //            statement.setString(1, sender);
+    //            ResultSet resultSet = statement.executeQuery();
+    //
+    //            Set<PartnerMetadata> metadataSet = new HashSet<>();
+    //
+    //            while (resultSet.next()) {
+    //                metadataSet.add(partnerMetadataFromResultSet(resultSet));
+    //            }
+    //
+    //            return metadataSet;
+    //        }
+    //    }
+
+    //    @Override
+    //    public PartnerMetadata fetchMetadata(String submissionId) throws SQLException {
+    //        try (Connection conn = connectionPool.getConnection();
+    //                PreparedStatement statement =
+    //                        conn.prepareStatement(
+    //                                "SELECT * FROM metadata where received_message_id = ? OR
+    // sent_message_id = ?")) {
+    //
+    //            statement.setString(1, submissionId);
+    //            statement.setString(2, submissionId);
+    //
+    //            ResultSet result = statement.executeQuery();
+    //
+    //            if (!result.next()) {
+    //                return null;
+    //            }
+    //
+    //            return partnerMetadataFromResultSet(result);
+    //        }
+    //    }
+
     @Override
-    public Set<PartnerMetadata> fetchMetadataForSender(String sender) throws SQLException {
+    public <T> T fetchFirstData(
+            Function<Connection, PreparedStatement> sqlGenerator, Function<ResultSet, T> converter)
+            throws SQLException {
 
         try (Connection conn = connectionPool.getConnection();
-                PreparedStatement statement =
-                        conn.prepareStatement("SELECT * FROM metadata WHERE sender = ?")) {
-            statement.setString(1, sender);
-            ResultSet resultSet = statement.executeQuery();
+                PreparedStatement statement = sqlGenerator.apply(conn);
+                ResultSet resultSet = statement.executeQuery()) {
 
-            Set<PartnerMetadata> metadataSet = new HashSet<>();
-
-            while (resultSet.next()) {
-                metadataSet.add(partnerMetadataFromResultSet(resultSet));
-            }
-
-            return metadataSet;
+            return dataStreamFromResultSet(resultSet, converter).findFirst().orElse(null);
+        } catch (Exception e) {
+            throw new SQLException(
+                    "Some exception occurred while fetching the first data element from the database",
+                    e);
         }
     }
 
     @Override
-    public PartnerMetadata fetchMetadata(String submissionId) throws SQLException {
+    public <T, S> S fetchManyData(
+            Function<Connection, PreparedStatement> sqlGenerator,
+            Function<ResultSet, T> converter,
+            Collector<? super T, ?, S> collector)
+            throws SQLException {
+
         try (Connection conn = connectionPool.getConnection();
-                PreparedStatement statement =
-                        conn.prepareStatement(
-                                "SELECT * FROM metadata where received_message_id = ? OR sent_message_id = ?")) {
+                PreparedStatement statement = sqlGenerator.apply(conn);
+                ResultSet resultSet = statement.executeQuery()) {
 
-            statement.setString(1, submissionId);
-            statement.setString(2, submissionId);
-
-            ResultSet result = statement.executeQuery();
-
-            if (!result.next()) {
-                return null;
-            }
-
-            return partnerMetadataFromResultSet(result);
+            return dataStreamFromResultSet(resultSet, converter).collect(collector);
+        } catch (Exception e) {
+            throw new SQLException(
+                    "Some exception occurred while fetching many data elements from the database",
+                    e);
         }
+    }
+
+    private <T> Stream<T> dataStreamFromResultSet(
+            final ResultSet topLevelResultSet, final Function<ResultSet, T> converter) {
+
+        var resultSetIterator = new ResultSetIterator(topLevelResultSet);
+        var stream =
+                StreamSupport.stream(
+                        Spliterators.spliteratorUnknownSize(
+                                resultSetIterator, Spliterator.ORDERED | Spliterator.IMMUTABLE),
+                        false);
+
+        return stream.map(converter);
     }
 
     private void removeLastTwoCharacters(StringBuilder stringBuilder) {

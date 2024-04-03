@@ -2,24 +2,31 @@ package gov.hhs.cdc.trustedintermediary.external.database;
 
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 /** Implements the {@link PartnerMetadataStorage} using a database. */
 public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
 
+    private static final DatabasePartnerMetadataStorage INSTANCE =
+            new DatabasePartnerMetadataStorage();
+
     @Inject DbDao dao;
 
     @Inject Logger logger;
-    private static final DatabasePartnerMetadataStorage INSTANCE =
-            new DatabasePartnerMetadataStorage();
 
     private DatabasePartnerMetadataStorage() {}
 
@@ -31,8 +38,23 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
     public Optional<PartnerMetadata> readMetadata(final String uniqueId)
             throws PartnerMetadataException {
         try {
-            PartnerMetadata data = (PartnerMetadata) dao.fetchMetadata(uniqueId);
-            return Optional.ofNullable(data);
+            PartnerMetadata metadata =
+                    dao.fetchFirstData(
+                            connection -> {
+                                try {
+                                    PreparedStatement statement =
+                                            connection.prepareStatement(
+                                                    "SELECT * FROM metadata where received_message_id = ? OR sent_message_id = ?");
+                                    statement.setString(1, uniqueId);
+                                    statement.setString(2, uniqueId);
+                                    return statement;
+                                } catch (SQLException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            },
+                            this::partnerMetadataFromResultSet);
+
+            return Optional.ofNullable(metadata);
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error retrieving metadata", e);
         }
@@ -98,10 +120,56 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
             throws PartnerMetadataException {
         Set<PartnerMetadata> consolidatedMetadata;
         try {
-            consolidatedMetadata = dao.fetchMetadataForSender(sender);
+            consolidatedMetadata =
+                    dao.fetchManyData(
+                            connection -> {
+                                try {
+                                    PreparedStatement statement =
+                                            connection.prepareStatement(
+                                                    "SELECT * FROM metadata WHERE sender = ?");
+                                    statement.setString(1, sender);
+                                    return statement;
+                                } catch (SQLException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            },
+                            this::partnerMetadataFromResultSet,
+                            Collectors.toSet());
+
+            return consolidatedMetadata;
+
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error retrieving consolidated metadata", e);
         }
-        return consolidatedMetadata;
+    }
+
+    private PartnerMetadata partnerMetadataFromResultSet(ResultSet resultSet) {
+        try {
+            Instant timeReceived = null;
+            Instant timeDelivered = null;
+            Timestamp timestampReceived = resultSet.getTimestamp("time_received");
+            Timestamp timestampDelivered = resultSet.getTimestamp("time_delivered");
+            if (timestampReceived != null) {
+                timeReceived = timestampReceived.toInstant();
+            }
+
+            if (timestampDelivered != null) {
+                timeDelivered = timestampDelivered.toInstant();
+            }
+
+            return new PartnerMetadata(
+                    resultSet.getString("received_message_id"),
+                    resultSet.getString("sent_message_id"),
+                    resultSet.getString("sender"),
+                    resultSet.getString("receiver"),
+                    timeReceived,
+                    timeDelivered,
+                    resultSet.getString("hash_of_message"),
+                    PartnerMetadataStatus.valueOf(resultSet.getString("delivery_status")),
+                    resultSet.getString("failure_reason"),
+                    PartnerMetadataMessageType.valueOf(resultSet.getString("message_type")));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
