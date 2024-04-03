@@ -1,5 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.results;
 
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType;
+
 /**
  * Interface to wrap a third-party lab result class (Ex: Hapi FHIR Bundle)
  *
@@ -12,11 +14,11 @@ public interface Result<T> {
 
     String getPlacerOrderNumber();
 
-    String getSendingApplicationDetails();
+    MessageHdDataType getSendingApplicationDetails();
 
-    String getSendingFacilityDetails();
+    MessageHdDataType getSendingFacilityDetails();
 
-    String getReceivingApplicationDetails();
+    MessageHdDataType getReceivingApplicationDetails();
 
-    String getReceivingFacilityDetails();
+    MessageHdDataType getReceivingFacilityDetails();
 }

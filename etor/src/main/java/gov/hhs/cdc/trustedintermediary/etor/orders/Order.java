@@ -1,5 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders;
 
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType;
+
 /**
  * Interface to wrap a third-party lab order class (Ex: Hapi FHIR Bundle)
  *
@@ -14,11 +16,11 @@ public interface Order<T> {
 
     String getPlacerOrderNumber();
 
-    String getSendingApplicationDetails();
+    MessageHdDataType getSendingApplicationDetails();
 
-    String getSendingFacilityDetails();
+    MessageHdDataType getSendingFacilityDetails();
 
-    String getReceivingApplicationDetails();
+    MessageHdDataType getReceivingApplicationDetails();
 
-    String getReceivingFacilityDetails();
+    MessageHdDataType getReceivingFacilityDetails();
 }

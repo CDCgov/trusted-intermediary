@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary
 
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
 import gov.hhs.cdc.trustedintermediary.etor.results.Result
 
 /**
@@ -10,14 +11,14 @@ class ResultMock<T> implements Result<T> {
     private String fhirResourceId
     private T underlyingResult
     private String placerOrderNumber
-    private String sendingApplicationId
-    private String sendingFacilityId
-    private String receivingApplicationId
+    private MessageHdDataType sendingApplicationId
+    private MessageHdDataType sendingFacilityId
+    private MessageHdDataType receivingApplicationId
     private String receivingFacilityId
 
 
-    ResultMock(String fhirResourceId, T underlyingResult, String placerOrderNumber, String sendingApplicationId, String sendingFacilityId,
-    String receivingApplicationId, String receivingFacilityId) {
+    ResultMock(String fhirResourceId, T underlyingResult, String placerOrderNumber, MessageHdDataType sendingApplicationId, MessageHdDataType sendingFacilityId,
+    MessageHdDataType receivingApplicationId, MessageHdDataType receivingFacilityId) {
         this.fhirResourceId = fhirResourceId
         this.underlyingResult = underlyingResult
         this.placerOrderNumber = placerOrderNumber
@@ -43,22 +44,22 @@ class ResultMock<T> implements Result<T> {
     }
 
     @Override
-    String getSendingApplicationDetails() {
+    MessageHdDataType getSendingApplicationDetails() {
         return this.sendingApplicationDetails
     }
 
     @Override
-    String getSendingFacilityDetails() {
+    MessageHdDataType getSendingFacilityDetails() {
         return this.sendingFacilityDetails
     }
 
     @Override
-    String getReceivingApplicationDetails() {
+    MessageHdDataType getReceivingApplicationDetails() {
         return this.receivingApplicationDetails
     }
 
     @Override
-    String getReceivingFacilityDetails() {
+    MessageHdDataType getReceivingFacilityDetails() {
         return this.receivingFacilityDetails
     }
 }

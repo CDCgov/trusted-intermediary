@@ -1,6 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataTypeTest
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -130,7 +132,7 @@ class HapiOrderTest extends Specification {
         def universalIdType = "DNS"
         def universalIdTypeExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type", new StringType(universalIdType))
         messageHeader.getSource().addExtension(universalIdTypeExtension)
-        def expectedApplicationDetails = "$nameSpaceId^$universalId^$universalIdType"
+        def expectedApplicationDetails = new MessageHdDataType(nameSpaceId, universalId, universalIdType)
 
         innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
         def orders = new HapiOrder(innerOrders)
@@ -139,7 +141,9 @@ class HapiOrderTest extends Specification {
         def actualApplicationDetails = orders.getSendingApplicationDetails()
 
         then:
-        actualApplicationDetails == expectedApplicationDetails
+        actualApplicationDetails.getNamespace() == expectedApplicationDetails.getNamespace()
+        actualApplicationDetails.getUniversalId() == expectedApplicationDetails.getUniversalId()
+        actualApplicationDetails.getUniversalIdType() == expectedApplicationDetails.getUniversalIdType()
     }
 
     def "getSendingApplicationDetails unhappy path works"() {

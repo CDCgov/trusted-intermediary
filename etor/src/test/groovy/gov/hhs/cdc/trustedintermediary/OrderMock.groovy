@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary
 
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order
 
 /**
@@ -11,13 +12,13 @@ class OrderMock<T> implements Order<T> {
     private String patientId
     private T underlyingOrders
     private String placerOrderNumber
-    private String sendingApplicationDetails
-    private String sendingFacilityDetails
-    private String receivingApplicationDetails
-    private String receivingFacilityDetails
+    private MessageHdDataType sendingApplicationDetails
+    private MessageHdDataType sendingFacilityDetails
+    private MessageHdDataType receivingApplicationDetails
+    private MessageHdDataType receivingFacilityDetails
 
-    OrderMock(String fhirResourceId, String patientId, T underlyingOrders, String placerOrderNumber, String sendingApplicationId, String sendingFacilityId,
-    String receivingApplicationDetails, String receivingFacilityDetails) {
+    OrderMock(String fhirResourceId, String patientId, T underlyingOrders, String placerOrderNumber, MessageHdDataType sendingApplicationDetails, MessageHdDataType sendingFacilityDetails,
+    MessageHdDataType receivingApplicationDetails, MessageHdDataType receivingFacilityDetails) {
         this.fhirResourceId = fhirResourceId
         this.patientId = patientId
         this.underlyingOrders = underlyingOrders
@@ -49,22 +50,22 @@ class OrderMock<T> implements Order<T> {
     }
 
     @Override
-    String getSendingApplicationDetails() {
+    MessageHdDataType getSendingApplicationDetails() {
         return this.sendingApplicationDetails
     }
 
     @Override
-    String getSendingFacilityDetails() {
+    MessageHdDataType getSendingFacilityDetails() {
         return this.sendingFacilityDetails
     }
 
     @Override
-    String getReceivingApplicationDetails() {
+    MessageHdDataType getReceivingApplicationDetails() {
         return this.receivingApplicationDetails
     }
 
     @Override
-    String getReceivingFacilityDetails() {
+    MessageHdDataType getReceivingFacilityDetails() {
         return this.receivingFacilityDetails
     }
 }

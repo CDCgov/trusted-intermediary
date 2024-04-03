@@ -54,30 +54,62 @@ public class HapiOrder implements Order<Bundle> {
     }
 
     @Override
-    public String getSendingApplicationDetails() {
-        MessageHdDataType sendingApplicationDetails =
-                MESSAGE_HELPER.extractSendingApplicationDetails(innerOrder);
-        return sendingApplicationDetails.toString();
+    public MessageHdDataType getSendingApplicationDetails() {
+        String sendingApplicationNamespace =
+                MESSAGE_HELPER.extractSendingApplicationNamespace(innerOrder);
+        String sendingApplicationUniversalId =
+                MESSAGE_HELPER.extractSendingApplicationUniversalId(innerOrder);
+        String sendingApplicationUniversalIdType =
+                MESSAGE_HELPER.extractSendingApplicationUniversalIdType(innerOrder);
+
+        return new MessageHdDataType(
+                sendingApplicationNamespace,
+                sendingApplicationUniversalId,
+                sendingApplicationUniversalIdType);
     }
 
     @Override
-    public String getSendingFacilityDetails() {
-        MessageHdDataType sendingFacilityDetails =
-                MESSAGE_HELPER.extractSendingFacilityDetails(innerOrder);
-        return sendingFacilityDetails.toString();
+    public MessageHdDataType getSendingFacilityDetails() {
+        String sendingFacilityNamespace =
+                MESSAGE_HELPER.extractSendingFacilityNamespace(innerOrder);
+        String sendingFacilityUniversalId =
+                MESSAGE_HELPER.extractSendingFacilityUniversalId(innerOrder);
+        String sendingFacilityUniversalIdType =
+                MESSAGE_HELPER.extractSendingFacilityUniversalIdType(innerOrder);
+
+        return new MessageHdDataType(
+                sendingFacilityNamespace,
+                sendingFacilityUniversalId,
+                sendingFacilityUniversalIdType);
     }
 
     @Override
-    public String getReceivingApplicationDetails() {
-        MessageHdDataType receivingApplicationDetails =
-                MESSAGE_HELPER.extractReceivingApplicationDetails(innerOrder);
-        return receivingApplicationDetails.toString();
+    public MessageHdDataType getReceivingApplicationDetails() {
+        String receivingApplicationNamespace =
+                MESSAGE_HELPER.extractReceivingApplicationNamespace(innerOrder);
+        String receivingApplicationUniversalId =
+                MESSAGE_HELPER.extractReceivingApplicationUniversalId(innerOrder);
+        String receivingApplicationUniversalIdType =
+                MESSAGE_HELPER.extractReceivingApplicationUniversalIdType(innerOrder);
+
+        return new MessageHdDataType(
+                receivingApplicationNamespace,
+                receivingApplicationUniversalId,
+                receivingApplicationUniversalIdType);
     }
 
     @Override
-    public String getReceivingFacilityDetails() {
-        MessageHdDataType receivingFacilityDetails =
-                MESSAGE_HELPER.extractReceivingFacilityDetails(innerOrder);
-        return receivingFacilityDetails.toString();
+    public MessageHdDataType getReceivingFacilityDetails() {
+        String receivingFacilityNamespace =
+                MESSAGE_HELPER.extractReceivingFacilityNamespace(innerOrder);
+        String receivingFacilityUniversalId =
+                MESSAGE_HELPER.extractReceivingFacilityUniversalId(innerOrder);
+        String receivingFacilityUniversalIdType =
+                MESSAGE_HELPER.extractReceivingFacilityUniversalIdType(innerOrder);
+
+        return new MessageHdDataType(
+                receivingFacilityNamespace,
+                receivingFacilityUniversalId,
+                receivingFacilityUniversalIdType);
     }
 }
