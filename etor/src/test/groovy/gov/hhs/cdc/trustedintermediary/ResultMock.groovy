@@ -11,21 +11,21 @@ class ResultMock<T> implements Result<T> {
     private String fhirResourceId
     private T underlyingResult
     private String placerOrderNumber
-    private MessageHdDataType sendingApplicationId
-    private MessageHdDataType sendingFacilityId
-    private MessageHdDataType receivingApplicationId
-    private String receivingFacilityId
+    private MessageHdDataType sendingApplicationDetails
+    private MessageHdDataType sendingFacilityDetails
+    private MessageHdDataType receivingApplicationDetails
+    private MessageHdDataType receivingFacilityDetails
 
 
-    ResultMock(String fhirResourceId, T underlyingResult, String placerOrderNumber, MessageHdDataType sendingApplicationId, MessageHdDataType sendingFacilityId,
-    MessageHdDataType receivingApplicationId, MessageHdDataType receivingFacilityId) {
+    ResultMock(String fhirResourceId, T underlyingResult, String placerOrderNumber, MessageHdDataType sendingApplicationDetails, MessageHdDataType sendingFacilityDetails,
+    MessageHdDataType receivingApplicationDetails, MessageHdDataType receivingFacilityDetails) {
         this.fhirResourceId = fhirResourceId
         this.underlyingResult = underlyingResult
         this.placerOrderNumber = placerOrderNumber
-        this.sendingApplicationId = sendingApplicationId
-        this.sendingFacilityId = sendingFacilityId
-        this.receivingApplicationId = receivingApplicationId
-        this.receivingFacilityId = receivingFacilityId
+        this.sendingApplicationDetails = sendingApplicationDetails
+        this.sendingFacilityDetails = sendingFacilityDetails
+        this.receivingApplicationDetails = receivingApplicationDetails
+        this.receivingFacilityDetails = receivingFacilityDetails
     }
 
     @Override
