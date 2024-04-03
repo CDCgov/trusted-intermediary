@@ -148,7 +148,7 @@ class HapiOrderTest extends Specification {
 
     def "getSendingApplicationDetails unhappy path works"() {
         given:
-        def expectedApplicationDetails = ""
+        def expectedApplicationDetails = new MessageHdDataType("", "", "")
         def innerOrders = new Bundle()
         MessageHeader messageHeader = new MessageHeader()
         innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
@@ -156,8 +156,11 @@ class HapiOrderTest extends Specification {
 
         when:
         def actualApplicationDetails = orders.getSendingApplicationDetails()
+
         then:
-        actualApplicationDetails == expectedApplicationDetails
+        actualApplicationDetails.getNamespace() == expectedApplicationDetails.getNamespace()
+        actualApplicationDetails.getUniversalId() == expectedApplicationDetails.getUniversalId()
+        actualApplicationDetails.getUniversalIdType() == expectedApplicationDetails.getUniversalIdType()
     }
 
     def "getSendingFacilityDetails happy path works"() {
@@ -195,19 +198,21 @@ class HapiOrderTest extends Specification {
         innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(organization))
         def jsonOrders = fhirEngine.parseResource(fhirEngine.encodeResourceToJson(innerOrders), Bundle)
         def orders = new HapiOrder(jsonOrders)
-        def expectedFacilityDetails = "$facilityName^$universalIdIdentifierValue^$theCode"
+        def expectedFacilityDetails = new MessageHdDataType(facilityName, universalIdIdentifierValue, theCode)
 
         when:
         def actualFacilityDetails = orders.getSendingFacilityDetails()
 
         then:
-        actualFacilityDetails == expectedFacilityDetails
+        actualFacilityDetails.getNamespace() == expectedFacilityDetails.getNamespace()
+        actualFacilityDetails.getUniversalId() == expectedFacilityDetails.getUniversalId()
+        actualFacilityDetails.getUniversalIdType() == expectedFacilityDetails.getUniversalIdType()
     }
 
     def "getSendingFacilityDetails unhappy path works"() {
         given:
         def innerOrders = new Bundle()
-        def expectedFacilityDetails = ""
+        def expectedFacilityDetails = new MessageHdDataType("", "", "")
         def messageHeader = new MessageHeader()
         innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
 
@@ -217,7 +222,9 @@ class HapiOrderTest extends Specification {
         def actualFacilityDetails = orders.getSendingFacilityDetails()
 
         then:
-        actualFacilityDetails == expectedFacilityDetails
+        actualFacilityDetails.getNamespace() == expectedFacilityDetails.getNamespace()
+        actualFacilityDetails.getUniversalId() == expectedFacilityDetails.getUniversalId()
+        actualFacilityDetails.getUniversalIdType() == expectedFacilityDetails.getUniversalIdType()
     }
 
     def "getReceivingApplicationDetails happy path works"() {
@@ -230,7 +237,7 @@ class HapiOrderTest extends Specification {
         def universalIdType = "ISO"
         def universalIdExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id", new StringType(universalId))
         def universalIdTypeExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type", new StringType(universalIdType))
-        def expectedApplicationDetails = "$name^$universalId^$universalIdType"
+        def expectedApplicationDetails = new MessageHdDataType(name, universalId, universalIdType)
 
         destination.setName(name)
         destination.addExtension(universalIdExtension)
@@ -243,22 +250,27 @@ class HapiOrderTest extends Specification {
         def actualApplicationDetails = orders.getReceivingApplicationDetails()
 
         then:
-        actualApplicationDetails == expectedApplicationDetails
+        actualApplicationDetails.getNamespace() == expectedApplicationDetails.getNamespace()
+        actualApplicationDetails.getUniversalId() == expectedApplicationDetails.getUniversalId()
+        actualApplicationDetails.getUniversalIdType() == expectedApplicationDetails.getUniversalIdType()
     }
 
     def "getReceivingApplicationDetails unhappy path works"() {
         given:
         def innerOrders = new Bundle()
         def orders = new HapiOrder(innerOrders)
-        def expectedApplicationDetails = ""
+        def expectedApplicationDetails = new MessageHdDataType("", "", "")
 
         when:
         def actualApplicationDetails = orders.getReceivingApplicationDetails()
+
         then:
-        actualApplicationDetails == expectedApplicationDetails
+        actualApplicationDetails.getNamespace() == expectedApplicationDetails.getNamespace()
+        actualApplicationDetails.getUniversalId() == expectedApplicationDetails.getUniversalId()
+        actualApplicationDetails.getUniversalIdType() == expectedApplicationDetails.getUniversalIdType()
     }
 
-    def "getReceivingFacilityId happy path works"() {
+    def "getReceivingFacilityDetails happy path works"() {
         given:
         def expected = 1
         when:
@@ -267,7 +279,7 @@ class HapiOrderTest extends Specification {
         actual == expected
     }
 
-    def "getReceivingFacilityId unhappy path works"() {
+    def "getReceivingFacilityDetails unhappy path works"() {
         given:
         def expected = 1
         when:
