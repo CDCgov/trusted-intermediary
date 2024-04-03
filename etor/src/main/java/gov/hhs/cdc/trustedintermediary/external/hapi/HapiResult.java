@@ -1,14 +1,15 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType;
 import gov.hhs.cdc.trustedintermediary.etor.results.Result;
-import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
 
 /** Filler concrete implementation of a {@link Result} using the Hapi FHIR library */
 public class HapiResult implements Result<Bundle> {
 
-    @Inject HapiMessageHelper hapiMessageHelper;
+    private final HapiMessageHelper MESSAGE_HELPER =
+            ApplicationContext.getImplementation(HapiMessageHelper.class);
 
     private final Bundle innerResult;
 
@@ -28,34 +29,34 @@ public class HapiResult implements Result<Bundle> {
 
     @Override
     public String getPlacerOrderNumber() {
-        return hapiMessageHelper.getInstance().extractPlacerOrderNumber(innerResult);
+        return MESSAGE_HELPER.extractPlacerOrderNumber(innerResult);
     }
 
     @Override
     public String getSendingApplicationDetails() {
         MessageHdDataType sendingApplicationDetails =
-                hapiMessageHelper.getInstance().extractSendingApplicationDetails(innerResult);
+                MESSAGE_HELPER.extractSendingApplicationDetails(innerResult);
         return sendingApplicationDetails.toString();
     }
 
     @Override
     public String getSendingFacilityDetails() {
         MessageHdDataType sendingFacilityDetails =
-                hapiMessageHelper.getInstance().extractSendingFacilityDetails(innerResult);
+                MESSAGE_HELPER.extractSendingFacilityDetails(innerResult);
         return sendingFacilityDetails.toString();
     }
 
     @Override
     public String getReceivingApplicationDetails() {
         MessageHdDataType receivingApplicationDetails =
-                hapiMessageHelper.getInstance().extractReceivingApplicationDetails(innerResult);
+                MESSAGE_HELPER.extractReceivingApplicationDetails(innerResult);
         return receivingApplicationDetails.toString();
     }
 
     @Override
     public String getReceivingFacilityDetails() {
         MessageHdDataType receivingFacilityDetails =
-                hapiMessageHelper.getInstance().extractReceivingFacilityDetails(innerResult);
+                MESSAGE_HELPER.extractReceivingFacilityDetails(innerResult);
         return receivingFacilityDetails.toString();
     }
 }

@@ -1,5 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi
 
+import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -10,7 +12,18 @@ import org.hl7.fhir.r4.model.ServiceRequest
 import org.hl7.fhir.r4.model.StringType
 import spock.lang.Specification
 
-class HapiResultTest extends Specification{
+class HapiResultTest extends Specification {
+
+    def fhirEngine = HapiFhirImplementation.getInstance()
+
+    def setup() {
+        TestApplicationContext.reset()
+        TestApplicationContext.init()
+        TestApplicationContext.register(HapiFhir.class, fhirEngine)
+        TestApplicationContext.register(HapiMessageHelper.class, HapiMessageHelper.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+    }
+
     def "getUnderlyingResult works"() {
         given:
         def expectedResult = new Bundle()
