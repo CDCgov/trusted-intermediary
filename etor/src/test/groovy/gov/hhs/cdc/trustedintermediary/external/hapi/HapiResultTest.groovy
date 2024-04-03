@@ -14,12 +14,14 @@ import org.hl7.fhir.r4.model.ServiceRequest
 import org.hl7.fhir.r4.model.StringType
 import spock.lang.Specification
 
-class HapiResultTest extends Specification{
+class HapiResultTest extends Specification {
+
+    def fhirEngine = HapiFhirImplementation.getInstance()
 
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
-        TestApplicationContext.register(HapiFhir.class, HapiFhirImplementation.getInstance())
+        TestApplicationContext.register(HapiFhir.class, fhirEngine)
         TestApplicationContext.register(HapiMessageHelper.class, HapiMessageHelper.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
     }

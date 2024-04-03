@@ -18,10 +18,12 @@ import spock.lang.Specification
 
 class HapiOrderTest extends Specification {
 
+    def fhirEngine = HapiFhirImplementation.getInstance()
+
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
-        TestApplicationContext.register(HapiFhir.class, HapiFhirImplementation.getInstance())
+        TestApplicationContext.register(HapiFhir.class, fhirEngine)
         TestApplicationContext.register(HapiMessageHelper.class, HapiMessageHelper.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
     }
@@ -187,7 +189,8 @@ class HapiOrderTest extends Specification {
         organization.addIdentifier(facilityIdentifier)
         organization.addIdentifier(universalIdIdentifier)
         innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(organization))
-        def orders = new HapiOrder(innerOrders)
+        def jsonOrders = fhirEngine.parseResource(fhirEngine.encodeResourceToJson(innerOrders), Bundle)
+        def orders = new HapiOrder(jsonOrders)
         def expectedFacilityDetails = "$facilityName^$universalIdIdentifierValue^$theCode"
 
         when:
