@@ -1,7 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata.partner;
 
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
-import gov.hhs.cdc.trustedintermediary.external.database.DatabaseLinkedMessageStorage;
+import gov.hhs.cdc.trustedintermediary.external.database.DatabaseMessageLinkStorage;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
@@ -26,7 +26,7 @@ public class PartnerMetadataOrchestrator {
     private static final PartnerMetadataOrchestrator INSTANCE = new PartnerMetadataOrchestrator();
 
     @Inject PartnerMetadataStorage partnerMetadataStorage;
-    @Inject DatabaseLinkedMessageStorage linkedMessageStorage;
+    @Inject DatabaseMessageLinkStorage linkedMessageStorage;
     @Inject RSEndpointClient rsclient;
     @Inject Formatter formatter;
     @Inject Logger logger;
@@ -332,7 +332,7 @@ public class PartnerMetadataOrchestrator {
 
     void linkMessages(Set<String> messageIds) throws Exception {
         var messageLink = linkedMessageStorage.getMessageLink(messageIds.iterator().next());
-        linkedMessageStorage.saveLinkedMessages(messageIds, messageLink.linkId());
+        linkedMessageStorage.saveMessageLink(messageIds, messageLink.linkId());
     }
 
     private boolean metadataIsStale(PartnerMetadata partnerMetadata) {
