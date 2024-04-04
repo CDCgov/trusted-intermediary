@@ -12,6 +12,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
@@ -50,9 +52,17 @@ public class FileMessageLinkStorage implements MessageLinkStorage {
             throws MessageLinkException {
         try {
             Set<MessageLink> messageLinks = readMessageLinks();
-            return messageLinks.stream()
-                    .filter(link -> link.getMessageIds().contains(submissionId))
-                    .findFirst();
+            List<MessageLink> foundMessageLinks =
+                    messageLinks.stream()
+                            .filter(link -> link.getMessageIds().contains(submissionId))
+                            .toList();
+
+            if (foundMessageLinks.size() > 1) {
+                logger.logWarning(
+                        "More than one MessageLink found for submissionId: {}", submissionId);
+            }
+
+            return foundMessageLinks.stream().findFirst();
         } catch (IOException | FormatterProcessingException e) {
             throw new MessageLinkException("Error retrieving message links", e);
         }
@@ -73,16 +83,16 @@ public class FileMessageLinkStorage implements MessageLinkStorage {
                 messageLinks.add(messageLink);
             }
             writeMessageLinks(messageLinks);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (FormatterProcessingException e) {
+        } catch (IOException | FormatterProcessingException e) {
             throw new MessageLinkException("Error saving message links", e);
         }
     }
 
     private Set<MessageLink> readMessageLinks() throws IOException, FormatterProcessingException {
         String messageLinkContent = Files.readString(MESSAGE_LINK_FILE_PATH);
-        return formatter.convertJsonToObject(messageLinkContent, new TypeReference<>() {});
+        Set<MessageLink> messageLinks =
+                formatter.convertJsonToObject(messageLinkContent, new TypeReference<>() {});
+        return messageLinks != null ? messageLinks : new HashSet<>();
     }
 
     private void writeMessageLinks(Set<MessageLink> messageLinks)

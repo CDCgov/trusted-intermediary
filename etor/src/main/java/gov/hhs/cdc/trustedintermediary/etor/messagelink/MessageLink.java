@@ -5,26 +5,33 @@ import java.util.HashSet;
 import java.util.Set;
 
 public final class MessageLink {
-    private final Integer linkId;
-    private final Set<String> messageIds;
+    private Integer linkId;
+    private Set<String> messageIds;
 
-    public MessageLink(Integer linkId) {
-        this.linkId = linkId;
+    public MessageLink() {
         this.messageIds = new HashSet<>();
     }
 
     public MessageLink(Integer linkId, String messageId) {
-        this(linkId);
-        this.messageIds.add(messageId);
+        this.linkId = linkId;
+        this.messageIds = new HashSet<>(Collections.singleton(messageId));
     }
 
     public MessageLink(Integer linkId, Set<String> messageIds) {
-        this(linkId);
-        this.messageIds.addAll(messageIds);
+        this.linkId = linkId;
+        this.messageIds = new HashSet<>(messageIds);
+    }
+
+    public void setLinkId(Integer linkId) {
+        this.linkId = linkId;
     }
 
     public Integer getLinkId() {
         return linkId;
+    }
+
+    public void setMessageIds(Set<String> messageIds) {
+        this.messageIds = new HashSet<>(messageIds);
     }
 
     public Set<String> getMessageIds() {
