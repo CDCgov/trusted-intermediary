@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.metadata.partner;
 
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink;
+import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkException;
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkStorage;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -240,6 +241,23 @@ public class PartnerMetadataOrchestrator {
                                 }));
     }
 
+    public Set<String> findMessagesIdsToLink(String receivedSubmissionId)
+            throws PartnerMetadataException {
+        var metadataSet =
+                partnerMetadataStorage.readMetadataForMessageLinking(receivedSubmissionId);
+        return metadataSet.stream()
+                .map(PartnerMetadata::receivedSubmissionId)
+                .collect(Collectors.toSet());
+    }
+
+    public void linkMessages(Set<String> messageIds) throws MessageLinkException {
+        MessageLink messageLink =
+                messageLinkStorage
+                        .getMessageLink(messageIds.iterator().next())
+                        .orElseGet(() -> new MessageLink(null, messageIds));
+        messageLinkStorage.saveMessageLink(messageLink);
+    }
+
     String[] getDataFromReportStream(String responseBody) throws FormatterProcessingException {
         // the expected json structure for the response is:
         // {
@@ -321,22 +339,6 @@ public class PartnerMetadataOrchestrator {
             case "Delivered" -> PartnerMetadataStatus.DELIVERED;
             default -> PartnerMetadataStatus.PENDING;
         };
-    }
-
-    Set<String> findMessagesIdsToLink(String receivedSubmissionId) throws PartnerMetadataException {
-        var metadataSet =
-                partnerMetadataStorage.readMetadataForMessageLinking(receivedSubmissionId);
-        return metadataSet.stream()
-                .map(PartnerMetadata::receivedSubmissionId)
-                .collect(Collectors.toSet());
-    }
-
-    void linkMessages(Set<String> messageIds) throws Exception {
-        MessageLink messageLink =
-                messageLinkStorage
-                        .getMessageLink(messageIds.iterator().next())
-                        .orElseGet(() -> new MessageLink(null, messageIds));
-        messageLinkStorage.saveMessageLink(messageLink);
     }
 
     private boolean metadataIsStale(PartnerMetadata partnerMetadata) {
