@@ -9,7 +9,7 @@ public class HapiMessageHelper {
 
     private static final HapiMessageHelper INSTANCE = new HapiMessageHelper();
 
-    @Inject private HapiFhir fhirEngine;
+    @Inject HapiFhir fhirEngine;
 
     public static HapiMessageHelper getInstance() {
         return INSTANCE;
