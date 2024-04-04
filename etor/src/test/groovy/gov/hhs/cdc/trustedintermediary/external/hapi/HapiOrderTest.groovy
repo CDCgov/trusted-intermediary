@@ -271,11 +271,54 @@ class HapiOrderTest extends Specification {
 
     def "getReceivingFacilityDetails happy path works"() {
         given:
-        def expected = 1
+        def innerOrders = new Bundle()
+        def messageHeader = new MessageHeader()
+        def organizationReference = "Organization/1708034743312390878.b61e734a-4d65-4e25-b423-cdb19018d84a"
+        def destination = new MessageHeader.MessageDestinationComponent()
+        destination.setReceiver(new Reference(organizationReference))
+        messageHeader.addDestination(destination)
+        innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
+        def organization = new Organization()
+        organization.setId("1708034743312390878.b61e734a-4d65-4e25-b423-cdb19018d84a")
+
+        // Facility
+        def facilityName = "Central Hospital"
+        def identifierFacilityName = new Identifier()
+        def extensionFacilityName = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field", new StringType("HD.1"))
+        identifierFacilityName.addExtension(extensionFacilityName)
+        identifierFacilityName.setValue(facilityName)
+
+        // Universal ID
+        def universalId = "2.16.840.1.113883.3.4.5"
+        def identifierUniversalId = new Identifier()
+        def extensionUniversalId = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field", new StringType("HD.2,HD.3"))
+        identifierUniversalId.addExtension(extensionUniversalId)
+        identifierUniversalId.setValue(universalId)
+
+        // Universal ID type
+        def universalIdType = "ISO"
+        def coding = new Coding("http://terminology.hl7.org/CodeSystem/v2-0203", universalIdType, null)
+        def typeCodeableConcept = new CodeableConcept()
+        typeCodeableConcept.addCoding(coding)
+        identifierUniversalId.setType(typeCodeableConcept)
+
+        organization.addIdentifier(identifierFacilityName)
+        organization.addIdentifier(identifierUniversalId)
+        innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(organization))
+
+        // Convert orders to json so the reference is added as part of the bundle so we can use .resolve()
+        // as part of the fhir path.
+        def jsonOrders = fhirEngine.parseResource(fhirEngine.encodeResourceToJson(innerOrders), Bundle)
+        def orders = new HapiOrder(jsonOrders)
+
+        def expectedFacilityDetails = new MessageHdDataType(facilityName, universalId, universalIdType)
         when:
-        def actual = 1
+        def actualFacilityDetails = orders.getReceivingFacilityDetails()
+
         then:
-        actual == expected
+        actualFacilityDetails.namespace() == expectedFacilityDetails.namespace()
+        actualFacilityDetails.universalId() == expectedFacilityDetails.universalId()
+        actualFacilityDetails.universalIdType() == expectedFacilityDetails.universalIdType()
     }
 
     def "getReceivingFacilityDetails unhappy path works"() {
