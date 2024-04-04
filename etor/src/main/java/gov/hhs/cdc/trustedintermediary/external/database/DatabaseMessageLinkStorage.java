@@ -5,7 +5,7 @@ import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkException;
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkStorage;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.sql.SQLException;
-import java.util.Set;
+import java.util.Optional;
 import javax.inject.Inject;
 
 public class DatabaseMessageLinkStorage implements MessageLinkStorage {
@@ -22,7 +22,7 @@ public class DatabaseMessageLinkStorage implements MessageLinkStorage {
         return INSTANCE;
     }
 
-    public MessageLink getMessageLink(String submissionId) throws MessageLinkException {
+    public Optional<MessageLink> getMessageLink(String submissionId) throws MessageLinkException {
         try {
             return dao.fetchMessageLink(submissionId);
         } catch (SQLException e) {
@@ -30,10 +30,10 @@ public class DatabaseMessageLinkStorage implements MessageLinkStorage {
         }
     }
 
-    public void saveMessageLink(Set<String> messageIds, int linkId) throws MessageLinkException {
+    public void saveMessageLink(MessageLink messageLink) throws MessageLinkException {
         logger.logInfo("Saving message links");
         try {
-            dao.insertMessageLink(messageIds, linkId);
+            dao.insertMessageLink(messageLink);
         } catch (SQLException e) {
             throw new MessageLinkException("Error saving message links", e);
         }

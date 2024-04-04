@@ -1,7 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata.partner;
 
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
-import gov.hhs.cdc.trustedintermediary.external.database.DatabaseMessageLinkStorage;
+import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink;
+import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkStorage;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
@@ -26,7 +27,7 @@ public class PartnerMetadataOrchestrator {
     private static final PartnerMetadataOrchestrator INSTANCE = new PartnerMetadataOrchestrator();
 
     @Inject PartnerMetadataStorage partnerMetadataStorage;
-    @Inject DatabaseMessageLinkStorage linkedMessageStorage;
+    @Inject MessageLinkStorage messageLinkStorage;
     @Inject RSEndpointClient rsclient;
     @Inject Formatter formatter;
     @Inject Logger logger;
@@ -331,8 +332,11 @@ public class PartnerMetadataOrchestrator {
     }
 
     void linkMessages(Set<String> messageIds) throws Exception {
-        var messageLink = linkedMessageStorage.getMessageLink(messageIds.iterator().next());
-        linkedMessageStorage.saveMessageLink(messageIds, messageLink.linkId());
+        MessageLink messageLink =
+                messageLinkStorage
+                        .getMessageLink(messageIds.iterator().next())
+                        .orElseGet(() -> new MessageLink(null, messageIds));
+        messageLinkStorage.saveMessageLink(messageLink);
     }
 
     private boolean metadataIsStale(PartnerMetadata partnerMetadata) {

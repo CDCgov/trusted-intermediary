@@ -1,9 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.etor.messagelink;
 
-import java.util.Set;
+import java.util.Optional;
 
 public interface MessageLinkStorage {
-    MessageLink getMessageLink(String submissionId) throws MessageLinkException;
+    Optional<MessageLink> getMessageLink(String submissionId) throws MessageLinkException;
 
-    void saveMessageLink(Set<String> messageIds, int linkId) throws MessageLinkException;
+    void saveMessageLink(MessageLink messageLink) throws MessageLinkException;
 }

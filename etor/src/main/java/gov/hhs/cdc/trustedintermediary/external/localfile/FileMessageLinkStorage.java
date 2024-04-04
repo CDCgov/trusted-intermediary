@@ -12,8 +12,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 public class FileMessageLinkStorage implements MessageLinkStorage {
@@ -24,7 +24,6 @@ public class FileMessageLinkStorage implements MessageLinkStorage {
     @Inject Logger logger;
 
     static final Path MESSAGE_LINK_FILE_PATH;
-    private static int messageLinkId;
 
     static {
         try {
@@ -35,7 +34,6 @@ public class FileMessageLinkStorage implements MessageLinkStorage {
                     "[]",
                     StandardOpenOption.CREATE,
                     StandardOpenOption.TRUNCATE_EXISTING);
-            messageLinkId = 1;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -48,33 +46,32 @@ public class FileMessageLinkStorage implements MessageLinkStorage {
     }
 
     @Override
-    public synchronized MessageLink getMessageLink(String submissionId)
+    public synchronized Optional<MessageLink> getMessageLink(String submissionId)
             throws MessageLinkException {
         try {
             Set<MessageLink> messageLinks = readMessageLinks();
             return messageLinks.stream()
-                    .filter(link -> link.messageId().equals(submissionId))
-                    .findFirst()
-                    .orElseThrow(
-                            () ->
-                                    new MessageLinkException(
-                                            "MessageLink not found for submissionId: "
-                                                    + submissionId));
+                    .filter(link -> link.getMessageIds().contains(submissionId))
+                    .findFirst();
         } catch (IOException | FormatterProcessingException e) {
             throw new MessageLinkException("Error retrieving message links", e);
         }
     }
 
     @Override
-    public synchronized void saveMessageLink(Set<String> messageIds, int linkId)
-            throws MessageLinkException {
+    public synchronized void saveMessageLink(MessageLink messageLink) throws MessageLinkException {
         try {
             Set<MessageLink> messageLinks = readMessageLinks();
-            Set<MessageLink> newLinks =
-                    messageIds.stream()
-                            .map(messageId -> new MessageLink(messageLinkId++, linkId, messageId))
-                            .collect(Collectors.toSet());
-            messageLinks.addAll(newLinks);
+            Optional<MessageLink> existingLink =
+                    messageLinks.stream()
+                            .filter(link -> link.getLinkId().equals(messageLink.getLinkId()))
+                            .findFirst();
+            if (existingLink.isPresent()) {
+                MessageLink existing = existingLink.get();
+                existing.addMessageIds(messageLink.getMessageIds());
+            } else {
+                messageLinks.add(messageLink);
+            }
             writeMessageLinks(messageLinks);
         } catch (IOException e) {
             throw new RuntimeException(e);

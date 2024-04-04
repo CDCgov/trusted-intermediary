@@ -13,6 +13,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
 
@@ -161,7 +162,7 @@ public class PostgresDao implements DbDao {
     }
 
     @Override
-    public MessageLink fetchMessageLink(String messageId) throws SQLException {
+    public Optional<MessageLink> fetchMessageLink(String messageId) throws SQLException {
         var sql =
                 """
                 SELECT *
@@ -169,21 +170,31 @@ public class PostgresDao implements DbDao {
                 WHERE message_id = ?;
                 """;
 
+        int linkId = -1;
+        Set<String> messageIds = new HashSet<>();
         try (Connection conn = connectionPool.getConnection();
                 PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setString(1, messageId);
 
-            try (ResultSet result = statement.executeQuery()) {
-                return new MessageLink(
-                        result.getInt("id"),
-                        result.getInt("link_id"),
-                        result.getString("message_id"));
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    if (linkId == -1) {
+                        linkId = resultSet.getInt("link_id");
+                    }
+                    messageIds.add(resultSet.getString("message_id"));
+                }
             }
+        }
+
+        if (!messageIds.isEmpty() && linkId != -1) {
+            return Optional.of(new MessageLink(linkId, messageIds));
+        } else {
+            return Optional.empty();
         }
     }
 
     @Override
-    public void insertMessageLink(Set<String> messageIds, int linkId) throws SQLException {
+    public void insertMessageLink(MessageLink messageLink) throws SQLException {
         // todo: still need to deal with race condition
         var sql =
                 """
@@ -199,9 +210,12 @@ public class PostgresDao implements DbDao {
 
         try (Connection conn = connectionPool.getConnection();
                 PreparedStatement statement = conn.prepareStatement(sql)) {
-
-            for (String messageId : messageIds) {
-                statement.setInt(1, linkId);
+            if (messageLink.getLinkId() == null) {
+                statement.setNull(1, java.sql.Types.INTEGER);
+            } else {
+                statement.setInt(1, messageLink.getLinkId());
+            }
+            for (String messageId : messageLink.getMessageIds()) {
                 statement.setString(2, messageId);
                 statement.executeUpdate();
             }
