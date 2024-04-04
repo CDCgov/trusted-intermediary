@@ -17,6 +17,8 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.UrlType
 import spock.lang.Specification
 
+import javax.print.attribute.standard.Destination
+
 class HapiOrderTest extends Specification {
 
     def fhirEngine = HapiFhirImplementation.getInstance()
@@ -323,10 +325,26 @@ class HapiOrderTest extends Specification {
 
     def "getReceivingFacilityDetails unhappy path works"() {
         given:
-        def expected = 1
+        def innerOrders = new Bundle()
+        def messageHeader = new MessageHeader()
+        innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
+        def organizationReference = "Organization/missing"
+        def destination = new MessageHeader.MessageDestinationComponent()
+        destination.setReceiver(new Reference(organizationReference))
+        messageHeader.addDestination(destination)
+        def expectedFacilityDetails = new MessageHdDataType("", "", "")
+
+        // Convert orders to json so the reference is added as part of the bundle so we can use .resolve()
+        // as part of the fhir path.
+        def jsonOrders = fhirEngine.parseResource(fhirEngine.encodeResourceToJson(innerOrders), Bundle)
+        def orders = new HapiOrder(jsonOrders)
+
         when:
-        def actual = 1
+        def actualFacilityDetails = orders.getReceivingFacilityDetails()
+
         then:
-        actual == expected
+        actualFacilityDetails.namespace() == expectedFacilityDetails.namespace()
+        actualFacilityDetails.universalId() == expectedFacilityDetails.universalId()
+        actualFacilityDetails.universalIdType() == expectedFacilityDetails.universalIdType()
     }
 }
