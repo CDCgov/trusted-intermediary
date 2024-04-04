@@ -1,17 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
-import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.CodeableConcept
-import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.Extension
-import org.hl7.fhir.r4.model.Identifier
-import org.hl7.fhir.r4.model.MessageHeader
-import org.hl7.fhir.r4.model.Organization
-import org.hl7.fhir.r4.model.Reference
-import org.hl7.fhir.r4.model.ServiceRequest
-import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.model.*
 import spock.lang.Specification
 
 class HapiResultTest extends Specification {
@@ -83,32 +75,46 @@ class HapiResultTest extends Specification {
 
     def "getSendingApplicationDetails works"() {
         given:
-        def expectedSendingApplicationId = "mock-sending-application-id"
-        def bundle = new Bundle()
+        def nameSpaceId = "Natus"
+        def innerResults = new Bundle()
         def messageHeader = new MessageHeader()
-        def extension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id", new StringType(expectedSendingApplicationId))
-        messageHeader.setSource(new MessageHeader.MessageSourceComponent().addExtension(extension) as MessageHeader.MessageSourceComponent)
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
-        def result = new HapiResult(bundle)
+        def endpoint = "urn:dns:natus.health.state.mn.us"
+        messageHeader.setSource(new MessageHeader.MessageSourceComponent(new UrlType(endpoint)))
+        def nameSpaceIdExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id", new StringType(nameSpaceId))
+        messageHeader.getSource().addExtension(nameSpaceIdExtension)
+        def universalId = "natus.health.state.mn.us"
+        def universalIdExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id", new StringType(universalId))
+        messageHeader.getSource().addExtension(universalIdExtension)
+        def universalIdType = "DNS"
+        def universalIdTypeExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type", new StringType(universalIdType))
+        messageHeader.getSource().addExtension(universalIdTypeExtension)
+        def expectedApplicationDetails = new MessageHdDataType(nameSpaceId, universalId, universalIdType)
+
+        innerResults.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
+        def orders = new HapiResult(innerResults)
 
         when:
-        def actualSendingApplicationId = result.getSendingApplicationDetails()
+        def actualApplicationDetails = orders.getSendingApplicationDetails()
 
         then:
-        actualSendingApplicationId == expectedSendingApplicationId
+        actualApplicationDetails.namespace() == expectedApplicationDetails.namespace()
+        actualApplicationDetails.universalId() == expectedApplicationDetails.universalId()
+        actualApplicationDetails.universalIdType() == expectedApplicationDetails.universalIdType()
     }
 
     def "getSendingApplicationDetails unhappy path"() {
         given:
-        def expectedSendingApplicationId = ""
+        def expectedApplicationDetails = new MessageHdDataType("", "", "")
         def bundle = new Bundle()
         def result = new HapiResult(bundle)
 
         when:
-        def actualSendingApplicationId = result.getSendingApplicationDetails()
+        def actualApplicationDetails = result.getSendingApplicationDetails()
 
         then:
-        actualSendingApplicationId == expectedSendingApplicationId
+        actualApplicationDetails.namespace() == expectedApplicationDetails.namespace()
+        actualApplicationDetails.universalId() == expectedApplicationDetails.universalId()
+        actualApplicationDetails.universalIdType() == expectedApplicationDetails.universalIdType()
     }
 
     def "getSendingFacilityDetails happy path works"() {
@@ -144,65 +150,142 @@ class HapiResultTest extends Specification {
         organization.addIdentifier(facilityIdentifier)
         organization.addIdentifier(universalIdIdentifier)
         innerResults.addEntry(new Bundle.BundleEntryComponent().setResource(organization))
-        def orders = new HapiOrder(innerResults)
-        def expectedFacilityDetails = "$facilityName^$universalIdIdentifierValue^$theCode"
+        def parsedResults = fhirEngine.parseResource(fhirEngine.encodeResourceToJson(innerResults), Bundle)
+        def results = new HapiResult(parsedResults)
+        def expectedFacilityDetails = new MessageHdDataType(facilityName, universalIdIdentifierValue, theCode)
 
         when:
-        def actualFacilityDetails = orders.getSendingFacilityDetails()
+        def actualFacilityDetails = results.getSendingFacilityDetails()
 
         then:
-        actualFacilityDetails == expectedFacilityDetails
+        actualFacilityDetails.namespace() == expectedFacilityDetails.namespace()
+        actualFacilityDetails.universalId() == expectedFacilityDetails.universalId()
+        actualFacilityDetails.universalIdType() == expectedFacilityDetails.universalIdType()
     }
 
     def "getSendingFacilityDetails unhappy path works"() {
         given:
-        def innerOrders = new Bundle()
-        def expectedFacilityDetails = ""
+        def innerResults = new Bundle()
+        def expectedFacilityDetails = new MessageHdDataType("", "", "")
         def messageHeader = new MessageHeader()
-        innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
+        innerResults.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
 
-        def orders = new HapiOrder(innerOrders)
+        def orders = new HapiResult(innerResults)
 
         when:
         def actualFacilityDetails = orders.getSendingFacilityDetails()
 
         then:
-        actualFacilityDetails == expectedFacilityDetails
+        actualFacilityDetails.namespace() == expectedFacilityDetails.namespace()
+        actualFacilityDetails.universalId() == expectedFacilityDetails.universalId()
+        actualFacilityDetails.universalIdType() == expectedFacilityDetails.universalIdType()
     }
 
     def "getReceivingApplicationDetails works"() {
         given:
-        def expected = 1
+        def innerResults = new Bundle()
+        def messageHeader = new MessageHeader()
+        def destination = new MessageHeader.MessageDestinationComponent()
+        def universalId = "1.2.840.114350.1.13.145.2.7.2.695071"
+        def name = "Epic"
+        def universalIdType = "ISO"
+        def universalIdExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id", new StringType(universalId))
+        def universalIdTypeExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type", new StringType(universalIdType))
+        def expectedApplicationDetails = new MessageHdDataType(name, universalId, universalIdType)
+
+        destination.setName(name)
+        destination.addExtension(universalIdExtension)
+        destination.addExtension(universalIdTypeExtension)
+        messageHeader.setDestination([destination])
+        innerResults.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
+        def results = new HapiResult(innerResults)
+
         when:
-        def actual = 1
+        def actualApplicationDetails = results.getReceivingApplicationDetails()
+
         then:
-        actual == expected
+        actualApplicationDetails.namespace() == expectedApplicationDetails.namespace()
+        actualApplicationDetails.universalId() == expectedApplicationDetails.universalId()
+        actualApplicationDetails.universalIdType() == expectedApplicationDetails.universalIdType()
     }
 
     def "getReceivingApplicationDetails unhappy path"() {
         given:
-        def expected = 1
+        def innerResults = new Bundle()
+        def results = new HapiResult(innerResults)
+        def expectedApplicationDetails = new MessageHdDataType("", "", "")
+
         when:
-        def actual = 1
+        def actualApplicationDetails = results.getReceivingApplicationDetails()
+
         then:
-        actual == expected
+        actualApplicationDetails.namespace() == expectedApplicationDetails.namespace()
+        actualApplicationDetails.universalId() == expectedApplicationDetails.universalId()
+        actualApplicationDetails.universalIdType() == expectedApplicationDetails.universalIdType()
     }
 
     def "getReceivingFacilityDetails works"() {
         given:
-        def expected = 1
+        def innerResults = new Bundle()
+        def messageHeader = new MessageHeader()
+        def destination = new MessageHeader.MessageDestinationComponent(new UrlType("urn:oid:1.2.840.114350.1.13.145.2.7.2.695071"))
+        def orgReference = "Organization/1708034743302204787.82104dfb-e854-47de-b7ce-19a2b71e61db"
+        destination.setReceiver(new Reference(orgReference))
+        messageHeader.setDestination(Arrays.asList(destination))
+        innerResults.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
+
+        def organization = new Organization()
+        organization.setId("1708034743302204787.82104dfb-e854-47de-b7ce-19a2b71e61db")
+
+        // facility name
+        def facilityIdentifier = new Identifier()
+        def facilityName = "Samtracare"
+        def facilityNameExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field", new StringType("HD.1"))
+        facilityIdentifier.addExtension(facilityNameExtension)
+        facilityIdentifier.setValue(facilityName)
+
+        // universal id
+        def universalIdIdentifier = new Identifier()
+        def universalIdIdentifierValue = "Samtracare.com"
+        def universalIdExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field", new StringType("HD.2,HD.3"))
+        universalIdIdentifier.addExtension(universalIdExtension)
+        universalIdIdentifier.setValue(universalIdIdentifierValue)
+
+        // Type
+        def typeConcept = new CodeableConcept()
+        def theCode = "DNS"
+        def coding = new Coding("http://terminology.hl7.org/CodeSystem/v2-0301", theCode, null)
+        typeConcept.addCoding(coding)
+        universalIdIdentifier.setType(typeConcept)
+
+        organization.addIdentifier(facilityIdentifier)
+        organization.addIdentifier(universalIdIdentifier)
+        innerResults.addEntry(new Bundle.BundleEntryComponent().setResource(organization))
+        def parsedResults = fhirEngine.parseResource(fhirEngine.encodeResourceToJson(innerResults), Bundle)
+        def results = new HapiResult(parsedResults)
+        def expectedFacilityDetails = new MessageHdDataType(facilityName, universalIdIdentifierValue, theCode)
+
         when:
-        def actual = 1
+        def actualFacilityDetails = results.getReceivingFacilityDetails()
+
         then:
-        actual == expected
+        actualFacilityDetails.namespace() == expectedFacilityDetails.namespace()
+        actualFacilityDetails.universalId() == expectedFacilityDetails.universalId()
+        actualFacilityDetails.universalIdType() == expectedFacilityDetails.universalIdType()
     }
 
     def "getReceivingFacilityDetails unhappy path"() {
         given:
-        def expected = 1
+        def innerResults = new Bundle()
+        def results = new HapiResult(innerResults)
+        def expectedApplicationDetails = new MessageHdDataType("", "", "")
+
         when:
-        def actual = 1
+        def actualApplicationDetails = results.getReceivingFacilityDetails()
+
         then:
-        actual == expected
+        actualApplicationDetails.namespace() == expectedApplicationDetails.namespace()
+        actualApplicationDetails.universalId() == expectedApplicationDetails.universalId()
+        actualApplicationDetails.universalIdType() == expectedApplicationDetails.universalIdType()
     }
 }
