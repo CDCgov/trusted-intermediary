@@ -18,7 +18,7 @@ public class HapiResult implements Result<Bundle> {
     }
 
     @Override
-    public Bundle getUnderlyingResult() {
+    public Bundle getUnderlyingElement() {
         return innerResult;
     }
 

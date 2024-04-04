@@ -23,7 +23,7 @@ public class HapiOrder implements Order<Bundle> {
     }
 
     @Override
-    public Bundle getUnderlyingOrder() {
+    public Bundle getUnderlyingElement() {
         return innerOrder;
     }
 

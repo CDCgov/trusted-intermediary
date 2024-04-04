@@ -30,7 +30,7 @@ class OrderMock<T> implements Order<T> {
     }
 
     @Override
-    T getUnderlyingOrder() {
+    T getUnderlyingElement() {
         return this.underlyingOrders
     }
 
