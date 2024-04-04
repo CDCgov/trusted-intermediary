@@ -14,9 +14,9 @@ public class HapiMessageHelper {
     public static final String SENDING_FACILITY_NAMESPACE =
             """
             Bundle.entry.resource.ofType(MessageHeader).sender.resolve().identifier.where(
-			    extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
-			    extension.value = 'HD.1'
-		    ).value
+            extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
+            extension.value = 'HD.1'
+            ).value
         """;
     public static final String SENDING_FACILITY_UNIVERSAL_ID =
             """
@@ -54,16 +54,16 @@ public class HapiMessageHelper {
     public static final String RECEIVING_FACILITY_UNIVERSAL_ID =
             """
             Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(
-			    extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
-			    extension.value = 'HD.2,HD.3'
-		    ).value
+            extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
+            extension.value = 'HD.2,HD.3'
+            ).value
         """;
     public static final String RECEIVING_FACILITY_UNIVERSAL_ID_TYPE =
             """
             Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(
-			    extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
-			    extension.value = 'HD.2,HD.3'
-		    ).type.coding.code
+            extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
+            extension.value = 'HD.2,HD.3'
+            ).type.coding.code
         """;
     public static final String RECEIVING_APPLICATION_NAMESPACE =
             """
