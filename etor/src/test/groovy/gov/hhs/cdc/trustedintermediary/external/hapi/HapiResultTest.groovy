@@ -63,8 +63,7 @@ class HapiResultTest extends Specification {
     def "getPlacerOrderNumber unhappy path"() {
         given:
         def expectedPlacerOrderNumber = ""
-        def bundle = new Bundle()
-        def result = new HapiResult(bundle)
+        def result = setupOrderWithEmptyMessageHeader()
 
         when:
         def actualPlacerOrderNumber = result.getPlacerOrderNumber()
@@ -105,8 +104,7 @@ class HapiResultTest extends Specification {
     def "getSendingApplicationDetails unhappy path"() {
         given:
         def expectedApplicationDetails = new MessageHdDataType("", "", "")
-        def bundle = new Bundle()
-        def result = new HapiResult(bundle)
+        def result = setupOrderWithEmptyMessageHeader()
 
         when:
         def actualApplicationDetails = result.getSendingApplicationDetails()
@@ -165,12 +163,8 @@ class HapiResultTest extends Specification {
 
     def "getSendingFacilityDetails unhappy path works"() {
         given:
-        def innerResults = new Bundle()
         def expectedFacilityDetails = new MessageHdDataType("", "", "")
-        def messageHeader = new MessageHeader()
-        innerResults.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
-
-        def orders = new HapiResult(innerResults)
+        def orders = setupOrderWithEmptyMessageHeader()
 
         when:
         def actualFacilityDetails = orders.getSendingFacilityDetails()
@@ -211,8 +205,7 @@ class HapiResultTest extends Specification {
 
     def "getReceivingApplicationDetails unhappy path"() {
         given:
-        def innerResults = new Bundle()
-        def results = new HapiResult(innerResults)
+        def results = setupOrderWithEmptyMessageHeader()
         def expectedApplicationDetails = new MessageHdDataType("", "", "")
 
         when:
@@ -276,8 +269,7 @@ class HapiResultTest extends Specification {
 
     def "getReceivingFacilityDetails unhappy path"() {
         given:
-        def innerResults = new Bundle()
-        def results = new HapiResult(innerResults)
+        def results = setupOrderWithEmptyMessageHeader()
         def expectedApplicationDetails = new MessageHdDataType("", "", "")
 
         when:
