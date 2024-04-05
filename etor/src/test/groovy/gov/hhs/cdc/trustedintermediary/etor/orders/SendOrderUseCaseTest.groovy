@@ -39,7 +39,7 @@ class SendOrderUseCaseTest extends Specification {
         def messagesIdsToLink = Set.of("messageId1", "messageId2")
 
         def sendOrder = SendOrderUseCase.getInstance()
-        def mockOrder = new OrderMock(null, null, null)
+        def mockOrder = new OrderMock(null, null, null, null, null, null, null, null)
         def mockOmlOrder = Mock(Order)
 
         TestApplicationContext.injectRegisteredImplementations()

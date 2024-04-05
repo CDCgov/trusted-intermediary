@@ -2,8 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.results
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController
-import gov.hhs.cdc.trustedintermediary.etor.results.ResultController
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiMessageHelper
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
@@ -18,6 +17,8 @@ class ResultControllerTest extends Specification {
         TestApplicationContext.init()
         TestApplicationContext.register(ResultController, ResultController.getInstance())
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
+        TestApplicationContext.register(HapiMessageHelper, HapiMessageHelper.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
     }
 
     def "parseResults Happy path works"() {
@@ -31,7 +32,7 @@ class ResultControllerTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def actualBundle = controller.parseResults(new DomainRequest()).underlyingResult
+        def actualBundle = controller.parseResults(new DomainRequest()).underlyingResource
 
         then:
         actualBundle == expectedBundle

@@ -34,11 +34,11 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
                 receivedSubmissionId,
                 result.hashCode(),
                 PartnerMetadataMessageType.RESULT,
-                "result.getSendingApplicationId()",
-                "result.getSendingFacilityId()",
-                "result.getReceivingApplicationId()",
-                "result.getReceivingFacilityId()",
-                "result.getPlacerOrderNumber()");
+                result.getSendingApplicationDetails(),
+                result.getSendingFacilityDetails(),
+                result.getReceivingApplicationDetails(),
+                result.getReceivingFacilityDetails(),
+                result.getPlacerOrderNumber());
 
         var convertedResult = converter.addEtorProcessingTag(result);
         metadata.put(

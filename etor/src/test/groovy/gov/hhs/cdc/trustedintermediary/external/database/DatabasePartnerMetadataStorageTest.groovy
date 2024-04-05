@@ -68,10 +68,10 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 new DbColumn("failure_reason", mockMetadata.failureReason(), true, Types.VARCHAR),
                 new DbColumn("message_type", mockMetadata.messageType().toString(), false, Types.OTHER),
                 new DbColumn("placer_order_number", mockMetadata.placerOrderNumber(), false, Types.VARCHAR),
-                new DbColumn("sending_application_id", mockMetadata.sendingApplicationId(), false, Types.VARCHAR),
-                new DbColumn("sending_facility_id", mockMetadata.sendingFacilityId(), false, Types.VARCHAR),
-                new DbColumn("receiving_application_id", mockMetadata.receivingApplicationId(), false, Types.VARCHAR),
-                new DbColumn("receiving_facility_id", mockMetadata.receivingFacilityId(), false, Types.VARCHAR)
+                new DbColumn("sending_application_id", mockMetadata.sendingApplicationDetails(), false, Types.VARCHAR),
+                new DbColumn("sending_facility_id", mockMetadata.sendingFacilityDetails(), false, Types.VARCHAR),
+                new DbColumn("receiving_application_id", mockMetadata.receivingApplicationDetails(), false, Types.VARCHAR),
+                new DbColumn("receiving_facility_id", mockMetadata.receivingFacilityDetails(), false, Types.VARCHAR)
                 )
 
         when:
@@ -125,10 +125,10 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 new DbColumn("failure_reason", mockMetadata.failureReason(), true, Types.VARCHAR),
                 new DbColumn("message_type", null, false, Types.OTHER),
                 new DbColumn("placer_order_number", mockMetadata.placerOrderNumber(), false, Types.VARCHAR),
-                new DbColumn("sending_application_id", mockMetadata.sendingApplicationId(), false, Types.VARCHAR),
-                new DbColumn("sending_facility_id", mockMetadata.sendingFacilityId(), false, Types.VARCHAR),
-                new DbColumn("receiving_application_id", mockMetadata.receivingApplicationId(), false, Types.VARCHAR),
-                new DbColumn("receiving_facility_id", mockMetadata.receivingFacilityId(), false, Types.VARCHAR)
+                new DbColumn("sending_application_id", mockMetadata.sendingApplicationDetails(), false, Types.VARCHAR),
+                new DbColumn("sending_facility_id", mockMetadata.sendingFacilityDetails(), false, Types.VARCHAR),
+                new DbColumn("receiving_application_id", mockMetadata.receivingApplicationDetails(), false, Types.VARCHAR),
+                new DbColumn("receiving_facility_id", mockMetadata.receivingFacilityDetails(), false, Types.VARCHAR)
                 )
 
         when:

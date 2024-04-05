@@ -18,7 +18,7 @@ class ConvertAndSendDemographicsUsecaseTest extends Specification {
 
     def "ConvertAndSend"() {
         given:
-        def mockOrder = new OrderMock(null, null, null)
+        def mockOrder = new OrderMock(null, null, null, null, null, null, null, null)
         def mockConverter = Mock(OrderConverter)
         def mockSender = Mock(OrderSender)
 

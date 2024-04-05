@@ -1,11 +1,15 @@
 package gov.hhs.cdc.trustedintermediary.external.database;
 
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink;
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,6 +30,8 @@ public class PostgresDao implements DbDao {
 
     @Inject ConnectionPool connectionPool;
     @Inject Logger logger;
+
+    @Inject Formatter formatter;
 
     private PostgresDao() {}
 
@@ -97,7 +103,8 @@ public class PostgresDao implements DbDao {
     }
 
     @Override
-    public Set<PartnerMetadata> fetchMetadataForSender(String sender) throws SQLException {
+    public Set<PartnerMetadata> fetchMetadataForSender(String sender)
+            throws SQLException, FormatterProcessingException {
 
         try (Connection conn = connectionPool.getConnection();
                 PreparedStatement statement =
@@ -116,7 +123,8 @@ public class PostgresDao implements DbDao {
     }
 
     @Override
-    public PartnerMetadata fetchMetadata(String submissionId) throws SQLException {
+    public PartnerMetadata fetchMetadata(String submissionId)
+            throws SQLException, FormatterProcessingException {
         try (Connection conn = connectionPool.getConnection();
                 PreparedStatement statement =
                         conn.prepareStatement(
@@ -260,7 +268,8 @@ public class PostgresDao implements DbDao {
         stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
     }
 
-    private PartnerMetadata partnerMetadataFromResultSet(ResultSet resultSet) throws SQLException {
+    private PartnerMetadata partnerMetadataFromResultSet(ResultSet resultSet)
+            throws SQLException, FormatterProcessingException {
         Instant timeReceived = null;
         Instant timeDelivered = null;
         Timestamp timestampReceived = resultSet.getTimestamp("time_received");
@@ -284,10 +293,18 @@ public class PostgresDao implements DbDao {
                 PartnerMetadataStatus.valueOf(resultSet.getString("delivery_status")),
                 resultSet.getString("failure_reason"),
                 PartnerMetadataMessageType.valueOf(resultSet.getString("message_type")),
-                resultSet.getString("sending_application_id"),
-                resultSet.getString("sending_facility_id"),
-                resultSet.getString("receiving_application_id"),
-                resultSet.getString("receiving_facility_id"),
+                formatter.convertJsonToObject(
+                        resultSet.getString("sending_application_details"),
+                        new TypeReference<MessageHdDataType>() {}),
+                formatter.convertJsonToObject(
+                        resultSet.getString("sending_facility_details"),
+                        new TypeReference<MessageHdDataType>() {}),
+                formatter.convertJsonToObject(
+                        resultSet.getString("receiving_application_details"),
+                        new TypeReference<MessageHdDataType>() {}),
+                formatter.convertJsonToObject(
+                        resultSet.getString("receiving_facility_details"),
+                        new TypeReference<MessageHdDataType>() {}),
                 resultSet.getString("placer_order_number"));
     }
 }

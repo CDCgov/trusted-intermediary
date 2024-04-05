@@ -168,7 +168,7 @@ class EtorDomainRegistrationTest extends Specification {
 
     def "handleOrders happy path"() {
         given:
-        def orderMock = new OrderMock<?>("resource id", "a patient ID", "orders")
+        def orderMock = new OrderMock<?>("resource id", "a patient ID", "orders", null, null, null, null, null)
         def request = new DomainRequest(headers: ["recordid": "recordId"])
 
         def connector = new EtorDomainRegistration()
@@ -196,7 +196,7 @@ class EtorDomainRegistrationTest extends Specification {
 
     def "handleResults happy path"() {
         given:
-        def resultMock = new ResultMock<?>("resource id", "lab result")
+        def resultMock = new ResultMock<?>("resource id", "lab result", null, null, null, null, null)
         def request = new DomainRequest(headers: ["recordid": "recordId"])
 
         def connector = new EtorDomainRegistration()

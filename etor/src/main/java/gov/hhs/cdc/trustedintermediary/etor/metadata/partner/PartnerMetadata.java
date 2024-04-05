@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata.partner;
 
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType;
 import java.time.Instant;
 
 /**
@@ -25,10 +26,10 @@ public record PartnerMetadata(
         PartnerMetadataStatus deliveryStatus,
         String failureReason,
         PartnerMetadataMessageType messageType,
-        String sendingApplicationId,
-        String sendingFacilityId,
-        String receivingApplicationId,
-        String receivingFacilityId,
+        MessageHdDataType sendingApplicationDetails,
+        MessageHdDataType sendingFacilityDetails,
+        MessageHdDataType receivingApplicationDetails,
+        MessageHdDataType receivingFacilityDetails,
         String placerOrderNumber) {
 
     // Below is for defaulting status when null
@@ -46,10 +47,10 @@ public record PartnerMetadata(
             String hash,
             PartnerMetadataStatus deliveryStatus,
             PartnerMetadataMessageType messageType,
-            String sendingApplicationId,
-            String sendingFacilityId,
-            String receivingApplicationId,
-            String receivingFacilityId,
+            MessageHdDataType sendingApplicationDetails,
+            MessageHdDataType sendingFacilityDetails,
+            MessageHdDataType receivingApplicationDetails,
+            MessageHdDataType receivingFacilityDetails,
             String placerOrderNumber) {
         this(
                 receivedSubmissionId,
@@ -62,10 +63,10 @@ public record PartnerMetadata(
                 deliveryStatus,
                 null,
                 messageType,
-                sendingApplicationId,
-                sendingFacilityId,
-                receivingApplicationId,
-                receivingFacilityId,
+                sendingApplicationDetails,
+                sendingFacilityDetails,
+                receivingApplicationDetails,
+                receivingFacilityDetails,
                 placerOrderNumber);
     }
 
@@ -73,10 +74,10 @@ public record PartnerMetadata(
             String receivedSubmissionId,
             String hash,
             PartnerMetadataMessageType messageType,
-            String sendingApplicationId,
-            String sendingFacilityId,
-            String receivingApplicationId,
-            String receivingFacilityId,
+            MessageHdDataType sendingApplicationDetails,
+            MessageHdDataType sendingFacilityDetails,
+            MessageHdDataType receivingApplicationDetails,
+            MessageHdDataType receivingFacilityDetails,
             String placerOrderNumber) {
         this(
                 receivedSubmissionId,
@@ -89,10 +90,10 @@ public record PartnerMetadata(
                 null,
                 null,
                 messageType,
-                sendingApplicationId,
-                sendingFacilityId,
-                receivingApplicationId,
-                receivingFacilityId,
+                sendingApplicationDetails,
+                sendingFacilityDetails,
+                receivingApplicationDetails,
+                receivingFacilityDetails,
                 placerOrderNumber);
     }
 
@@ -127,10 +128,10 @@ public record PartnerMetadata(
                 this.deliveryStatus,
                 this.failureReason,
                 this.messageType,
-                this.sendingApplicationId,
-                this.sendingFacilityId,
-                this.receivingApplicationId,
-                this.receivingFacilityId,
+                this.sendingApplicationDetails,
+                this.sendingFacilityDetails,
+                this.receivingApplicationDetails,
+                this.receivingFacilityDetails,
                 this.placerOrderNumber);
     }
 
@@ -146,10 +147,10 @@ public record PartnerMetadata(
                 this.deliveryStatus,
                 this.failureReason,
                 this.messageType,
-                this.sendingApplicationId,
-                this.sendingFacilityId,
-                this.receivingApplicationId,
-                this.receivingFacilityId,
+                this.sendingApplicationDetails,
+                this.sendingFacilityDetails,
+                this.receivingApplicationDetails,
+                this.receivingFacilityDetails,
                 this.placerOrderNumber);
     }
 
@@ -165,10 +166,10 @@ public record PartnerMetadata(
                 this.deliveryStatus,
                 this.failureReason,
                 this.messageType,
-                this.sendingApplicationId,
-                this.sendingFacilityId,
-                this.receivingApplicationId,
-                this.receivingFacilityId,
+                this.sendingApplicationDetails,
+                this.sendingFacilityDetails,
+                this.receivingApplicationDetails,
+                this.receivingFacilityDetails,
                 this.placerOrderNumber);
     }
 
@@ -184,10 +185,10 @@ public record PartnerMetadata(
                 deliveryStatus,
                 this.failureReason,
                 this.messageType,
-                this.sendingApplicationId,
-                this.sendingFacilityId,
-                this.receivingApplicationId,
-                this.receivingFacilityId,
+                this.sendingApplicationDetails,
+                this.sendingFacilityDetails,
+                this.receivingApplicationDetails,
+                this.receivingFacilityDetails,
                 this.placerOrderNumber);
     }
 
@@ -203,10 +204,10 @@ public record PartnerMetadata(
                 this.deliveryStatus,
                 failureMessage,
                 this.messageType,
-                this.sendingApplicationId,
-                this.sendingFacilityId,
-                this.receivingApplicationId,
-                this.receivingFacilityId,
+                this.sendingApplicationDetails,
+                this.sendingFacilityDetails,
+                this.receivingApplicationDetails,
+                this.receivingFacilityDetails,
                 this.placerOrderNumber);
     }
 }

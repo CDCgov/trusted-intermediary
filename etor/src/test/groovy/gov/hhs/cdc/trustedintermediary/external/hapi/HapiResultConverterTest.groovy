@@ -20,11 +20,12 @@ class HapiResultConverterTest extends Specification {
         TestApplicationContext.init()
         TestApplicationContext.register(ResultConverter, HapiResultConverter.getInstance())
         TestApplicationContext.register(HapiMessageConverterHelper, HapiMessageConverterHelper.getInstance())
+        TestApplicationContext.register(HapiMessageHelper, HapiMessageHelper.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         mockPatient = new Patient()
         mockResultBundle = new Bundle().addEntry(new Bundle.BundleEntryComponent().setResource(mockPatient))
-        mockResult = new ResultMock("mockFhirResourceId", mockResultBundle)
+        mockResult = new ResultMock("mockFhirResourceId", mockResultBundle, null, null, null, null, null)
     }
 
     def "add etor processing tag to messageHeader resource"() {
@@ -37,10 +38,10 @@ class HapiResultConverterTest extends Specification {
         messageHeader.setId(UUID.randomUUID().toString())
         def messageHeaderEntry = new Bundle.BundleEntryComponent().setResource(messageHeader)
         mockResultBundle.getEntry().add(1, messageHeaderEntry)
-        mockResult.getUnderlyingResult() >> mockResultBundle
+        mockResult.getUnderlyingResource() >> mockResultBundle
 
         when:
-        def convertedResultBundle = HapiResultConverter.getInstance().addEtorProcessingTag(mockResult).getUnderlyingResult() as Bundle
+        def convertedResultBundle = HapiResultConverter.getInstance().addEtorProcessingTag(mockResult).getUnderlyingResource() as Bundle
 
         then:
         def messageHeaders = convertedResultBundle.getEntry().get(1).getResource() as MessageHeader

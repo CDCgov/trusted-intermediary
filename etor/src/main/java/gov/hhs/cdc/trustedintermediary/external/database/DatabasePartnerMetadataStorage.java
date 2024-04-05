@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -35,6 +36,8 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
             return Optional.ofNullable(data);
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error retrieving metadata", e);
+        } catch (FormatterProcessingException e) {
+            throw new PartnerMetadataException("Error formatting metadata", e);
         }
     }
 
@@ -92,22 +95,22 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                                 Types.VARCHAR),
                         new DbColumn(
                                 "sending_application_id",
-                                metadata.sendingApplicationId(),
+                                metadata.sendingApplicationDetails(),
                                 false,
                                 Types.VARCHAR),
                         new DbColumn(
                                 "sending_facility_id",
-                                metadata.sendingFacilityId(),
+                                metadata.sendingFacilityDetails(),
                                 false,
                                 Types.VARCHAR),
                         new DbColumn(
                                 "receiving_application_id",
-                                metadata.receivingApplicationId(),
+                                metadata.receivingApplicationDetails(),
                                 false,
                                 Types.VARCHAR),
                         new DbColumn(
                                 "receiving_facility_id",
-                                metadata.receivingFacilityId(),
+                                metadata.receivingFacilityDetails(),
                                 false,
                                 Types.VARCHAR));
 
@@ -126,6 +129,8 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
             consolidatedMetadata = dao.fetchMetadataForSender(sender);
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error retrieving consolidated metadata", e);
+        } catch (FormatterProcessingException e) {
+            throw new PartnerMetadataException("Error formatting consolidated metadata", e);
         }
         return consolidatedMetadata;
     }

@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink;
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkException;
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkStorage;
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
@@ -43,10 +44,10 @@ public class PartnerMetadataOrchestrator {
             String receivedSubmissionId,
             String messageHash,
             PartnerMetadataMessageType messageType,
-            String sendingApplicationId,
-            String sendingFacilityId,
-            String receivingApplicationId,
-            String receivingFacilityId,
+            MessageHdDataType sendingApplicationDetails,
+            MessageHdDataType sendingFacilityDetails,
+            MessageHdDataType receivingApplicationDetails,
+            MessageHdDataType receivingFacilityDetails,
             String placerOrderNumber)
             throws PartnerMetadataException {
         // currently blocked by: https://github.com/CDCgov/prime-reportstream/issues/12624
@@ -79,10 +80,10 @@ public class PartnerMetadataOrchestrator {
                             receivedSubmissionId,
                             messageHash,
                             messageType,
-                            sendingApplicationId,
-                            sendingFacilityId,
-                            receivingApplicationId,
-                            receivingFacilityId,
+                            sendingApplicationDetails,
+                            sendingFacilityDetails,
+                            receivingApplicationDetails,
+                            receivingFacilityDetails,
                             placerOrderNumber);
             partnerMetadataStorage.saveMetadata(partnerMetadata);
 
@@ -103,10 +104,10 @@ public class PartnerMetadataOrchestrator {
                         messageHash,
                         PartnerMetadataStatus.PENDING,
                         messageType,
-                        sendingApplicationId,
-                        sendingFacilityId,
-                        receivingApplicationId,
-                        receivingFacilityId,
+                        sendingApplicationDetails,
+                        sendingFacilityDetails,
+                        receivingApplicationDetails,
+                        receivingFacilityDetails,
                         placerOrderNumber);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
