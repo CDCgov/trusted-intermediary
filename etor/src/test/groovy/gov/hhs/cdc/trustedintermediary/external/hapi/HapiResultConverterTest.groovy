@@ -38,10 +38,10 @@ class HapiResultConverterTest extends Specification {
         messageHeader.setId(UUID.randomUUID().toString())
         def messageHeaderEntry = new Bundle.BundleEntryComponent().setResource(messageHeader)
         mockResultBundle.getEntry().add(1, messageHeaderEntry)
-        mockResult.getUnderlyingElement() >> mockResultBundle
+        mockResult.getUnderlyingResource() >> mockResultBundle
 
         when:
-        def convertedResultBundle = HapiResultConverter.getInstance().addEtorProcessingTag(mockResult).getUnderlyingElement() as Bundle
+        def convertedResultBundle = HapiResultConverter.getInstance().addEtorProcessingTag(mockResult).getUnderlyingResource() as Bundle
 
         then:
         def messageHeaders = convertedResultBundle.getEntry().get(1).getResource() as MessageHeader

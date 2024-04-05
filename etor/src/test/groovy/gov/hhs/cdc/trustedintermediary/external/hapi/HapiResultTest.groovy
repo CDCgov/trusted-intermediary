@@ -3,7 +3,17 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
-import org.hl7.fhir.r4.model.*
+import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.Identifier
+import org.hl7.fhir.r4.model.MessageHeader
+import org.hl7.fhir.r4.model.Organization
+import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.ServiceRequest
+import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.model.UrlType
 import spock.lang.Specification
 
 class HapiResultTest extends Specification {
@@ -18,13 +28,13 @@ class HapiResultTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
     }
 
-    def "getUnderlyingElement works"() {
+    def "getUnderlyingResource works"() {
         given:
         def expectedResult = new Bundle()
         def result = new HapiResult(expectedResult)
 
         when:
-        def actualResult = result.getUnderlyingElement()
+        def actualResult = result.getUnderlyingResource()
 
         then:
         actualResult == expectedResult
@@ -235,7 +245,7 @@ class HapiResultTest extends Specification {
         def innerOrders = new Bundle()
         def messageHeader = new MessageHeader()
         def orgReference = "Organization/1708034743302204787.82104dfb-e854-47de-b7ce-19a2b71e61db"
-        messageHeader.setSender(new Reference(orgReference))
+        messageHeader.setSender(new Reference(orgReference) as Reference)
         innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
         def organization = new Organization()
         organization.setId("1708034743302204787.82104dfb-e854-47de-b7ce-19a2b71e61db")

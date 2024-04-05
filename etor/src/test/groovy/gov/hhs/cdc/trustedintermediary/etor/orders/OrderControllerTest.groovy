@@ -34,7 +34,7 @@ class OrderControllerTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def actualBundle = controller.parseOrders(new DomainRequest()).underlyingElement
+        def actualBundle = controller.parseOrders(new DomainRequest()).underlyingResource
 
         then:
         actualBundle == expectedBundle

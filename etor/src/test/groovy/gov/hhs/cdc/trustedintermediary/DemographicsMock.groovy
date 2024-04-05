@@ -19,7 +19,7 @@ class DemographicsMock<T> implements Demographics<T> {
     }
 
     @Override
-    T getUnderlyingDemographics() {
+    T getUnderlyingResource() {
         return underlyingDemographics
     }
 

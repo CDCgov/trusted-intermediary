@@ -29,7 +29,7 @@ class ResultMock<T> implements Result<T> {
     }
 
     @Override
-    T getUnderlyingElement() {
+    T getUnderlyingResource() {
         return this.underlyingResult
     }
 
