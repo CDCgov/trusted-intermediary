@@ -18,13 +18,13 @@ class HapiResultTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
     }
 
-    def "getUnderlyingElement works"() {
+    def "getUnderlyingResource works"() {
         given:
         def expectedResult = new Bundle()
         def result = new HapiResult(expectedResult)
 
         when:
-        def actualResult = result.getUnderlyingElement()
+        def actualResult = result.getUnderlyingResource()
 
         then:
         actualResult == expectedResult

@@ -96,7 +96,7 @@ public class HapiOrderConverter implements OrderConverter {
         logger.logInfo("Converting order to have OML metadata");
 
         var hapiOrder = (Order<Bundle>) order;
-        var orderBundle = hapiOrder.getUnderlyingElement();
+        var orderBundle = hapiOrder.getUnderlyingResource();
         var messageHeader = hapiMessageConverterHelper.findOrInitializeMessageHeader(orderBundle);
 
         messageHeader.setEvent(OML_CODING);
@@ -109,7 +109,7 @@ public class HapiOrderConverter implements OrderConverter {
         logger.logInfo("Adding contact section in Patient resource");
 
         var hapiOrder = (Order<Bundle>) order;
-        var orderBundle = hapiOrder.getUnderlyingElement();
+        var orderBundle = hapiOrder.getUnderlyingResource();
 
         HapiHelper.resourcesInBundle(orderBundle, Patient.class)
                 .forEach(
@@ -159,7 +159,7 @@ public class HapiOrderConverter implements OrderConverter {
     @Override
     public Order<?> addEtorProcessingTag(Order<?> message) {
         var hapiOrder = (Order<Bundle>) message;
-        var messageBundle = hapiOrder.getUnderlyingElement();
+        var messageBundle = hapiOrder.getUnderlyingResource();
 
         hapiMessageConverterHelper.addEtorTagToBundle(messageBundle);
 

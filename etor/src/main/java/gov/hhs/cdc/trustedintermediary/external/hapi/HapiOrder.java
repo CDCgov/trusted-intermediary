@@ -24,7 +24,7 @@ public class HapiOrder implements Order<Bundle> {
     }
 
     @Override
-    public Bundle getUnderlyingElement() {
+    public Bundle getUnderlyingResource() {
         return innerOrder;
     }
 
