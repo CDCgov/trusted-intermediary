@@ -15,4 +15,6 @@ public interface HapiFhir {
     String encodeResourceToJson(Object resource);
 
     Boolean evaluateCondition(Object resource, String expression);
+
+    String getStringFromFhirPath(Object resource, String expression);
 }

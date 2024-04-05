@@ -29,7 +29,7 @@ public class ReportStreamResultSender implements ResultSender {
     @Override
     public Optional<String> send(Result<?> result) throws UnableToSendMessageException {
         logger.logInfo("Sending results to ReportStream");
-        String json = fhir.encodeResourceToJson(result.getUnderlyingResult());
+        String json = fhir.encodeResourceToJson(result.getUnderlyingResource());
         return sender.sendResultToReportStream(json, result.getFhirResourceId());
     }
 }

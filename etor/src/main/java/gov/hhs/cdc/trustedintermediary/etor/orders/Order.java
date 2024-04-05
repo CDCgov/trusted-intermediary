@@ -1,14 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders;
 
-/**
- * Interface to wrap a third-party lab order class (Ex: Hapi FHIR Bundle)
- *
- * @param <T> The underlying FHIR lab order type.
- */
-public interface Order<T> {
-    T getUnderlyingOrder();
+import gov.hhs.cdc.trustedintermediary.etor.messages.Message;
 
-    String getFhirResourceId();
-
+/** Interface to wrap a third-party lab order class (Ex: Hapi FHIR Bundle) */
+public interface Order<T> extends Message<T> {
     String getPatientId();
 }
