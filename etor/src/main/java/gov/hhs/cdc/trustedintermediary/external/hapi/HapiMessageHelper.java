@@ -5,6 +5,11 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
 
+/**
+ * Helper class for extracting various pieces of information from FHIR messages using defined FHIR
+ * paths. This class utilizes the {@link HapiFhir} engine to execute FHIR path expressions against a
+ * given {@link Bundle}.
+ */
 public class HapiMessageHelper {
 
     private static final HapiMessageHelper INSTANCE = new HapiMessageHelper();
