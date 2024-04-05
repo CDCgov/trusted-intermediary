@@ -133,10 +133,10 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
                     .filter(
                             metadata ->
                                     metadata.placerOrderNumber().equals(match.placerOrderNumber())
-                                            && metadata.sendingApplicationId()
-                                                    .equals(match.sendingApplicationId())
-                                            && metadata.sendingFacilityId()
-                                                    .equals(match.sendingFacilityId()))
+                                            && metadata.sendingApplicationDetails()
+                                                    .equals(match.sendingApplicationDetails())
+                                            && metadata.sendingFacilityDetails()
+                                                    .equals(match.sendingFacilityDetails()))
                     .collect(Collectors.toSet());
         } catch (Exception e) {
             throw new PartnerMetadataException(

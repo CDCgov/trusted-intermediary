@@ -18,7 +18,8 @@ public interface DbDao {
     Set<PartnerMetadata> fetchMetadataForSender(String sender)
             throws SQLException, FormatterProcessingException;
 
-    Set<PartnerMetadata> fetchMetadataForMessageLinking(String submissionId) throws SQLException;
+    Set<PartnerMetadata> fetchMetadataForMessageLinking(String submissionId)
+            throws SQLException, FormatterProcessingException;
 
     Optional<MessageLink> fetchMessageLink(String messageId) throws SQLException;
 

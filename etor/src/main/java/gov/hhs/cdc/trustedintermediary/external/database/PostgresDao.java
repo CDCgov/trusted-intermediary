@@ -145,7 +145,7 @@ public class PostgresDao implements DbDao {
 
     @Override
     public Set<PartnerMetadata> fetchMetadataForMessageLinking(String submissionId)
-            throws SQLException {
+            throws SQLException, FormatterProcessingException {
         var sql =
                 """
                 SELECT m2.*

@@ -141,7 +141,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
         Set<PartnerMetadata> metadataSet;
         try {
             metadataSet = dao.fetchMetadataForMessageLinking(submissionId);
-        } catch (SQLException e) {
+        } catch (SQLException | FormatterProcessingException e) {
             throw new PartnerMetadataException("Error retrieving metadata", e);
         }
         return metadataSet;
