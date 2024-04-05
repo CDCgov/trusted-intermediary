@@ -75,22 +75,10 @@ class HapiResultTest extends Specification {
     def "getSendingApplicationDetails works"() {
         given:
         def nameSpaceId = "Natus"
-        def innerResults = new Bundle()
-        def messageHeader = new MessageHeader()
-        def endpoint = "urn:dns:natus.health.state.mn.us"
-        messageHeader.setSource(new MessageHeader.MessageSourceComponent(new UrlType(endpoint)))
-        def nameSpaceIdExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id", new StringType(nameSpaceId))
-        messageHeader.getSource().addExtension(nameSpaceIdExtension)
         def universalId = "natus.health.state.mn.us"
-        def universalIdExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id", new StringType(universalId))
-        messageHeader.getSource().addExtension(universalIdExtension)
         def universalIdType = "DNS"
-        def universalIdTypeExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type", new StringType(universalIdType))
-        messageHeader.getSource().addExtension(universalIdTypeExtension)
         def expectedApplicationDetails = new MessageHdDataType(nameSpaceId, universalId, universalIdType)
-
-        innerResults.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
-        def orders = new HapiResult(innerResults)
+        def orders = setupOrderWithSendingApplicationDetails(nameSpaceId, universalId, universalIdType)
 
         when:
         def actualApplicationDetails = orders.getSendingApplicationDetails()
