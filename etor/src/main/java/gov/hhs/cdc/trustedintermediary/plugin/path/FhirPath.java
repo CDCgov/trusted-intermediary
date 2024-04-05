@@ -1,5 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.plugin.path;
 
+/**
+ * Enumerates FHIR path expressions for various data elements within a FHIR message. These paths can
+ * be used to extract specific pieces of data from a FHIR message, such as identifiers, namespaces,
+ * and codes related to sending and receiving facilities and applications.
+ */
 public enum FhirPath {
     PLACER_ORDER_NUMBER(
             """
