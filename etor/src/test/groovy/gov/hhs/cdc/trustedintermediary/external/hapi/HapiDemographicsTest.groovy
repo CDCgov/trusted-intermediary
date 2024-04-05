@@ -9,13 +9,13 @@ import spock.lang.Specification
 
 class HapiDemographicsTest extends Specification {
 
-    def "getUnderlyingDemographics works"() {
+    def "getUnderlyingResource works"() {
         given:
         def expectedInnerDemographics = new Bundle()
         def demographics = new HapiDemographics(expectedInnerDemographics)
 
         when:
-        def actualInnerDemographics = demographics.getUnderlyingDemographics()
+        def actualInnerDemographics = demographics.getUnderlyingResource()
 
         then:
         actualInnerDemographics == expectedInnerDemographics

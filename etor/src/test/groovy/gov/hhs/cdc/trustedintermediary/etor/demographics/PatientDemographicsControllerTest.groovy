@@ -27,7 +27,7 @@ class PatientDemographicsControllerTest extends Specification {
         def patientDemographics = PatientDemographicsController.getInstance().parseDemographics(new DomainRequest())
 
         then:
-        patientDemographics.getUnderlyingDemographics() == expectedBundle
+        patientDemographics.getUnderlyingResource() == expectedBundle
     }
 
     def "parseDemographics throws an exception when unable to parse de request"() {

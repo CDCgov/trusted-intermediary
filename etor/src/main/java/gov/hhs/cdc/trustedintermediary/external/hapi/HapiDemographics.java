@@ -18,7 +18,7 @@ public class HapiDemographics implements Demographics<Bundle> {
     }
 
     @Override
-    public Bundle getUnderlyingDemographics() {
+    public Bundle getUnderlyingResource() {
         return innerDemographics;
     }
 

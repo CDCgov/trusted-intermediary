@@ -54,7 +54,7 @@ public class HapiOrderConverter implements OrderConverter {
         logger.logInfo("Converting demographics to order");
 
         var hapiDemographics = (Demographics<Bundle>) demographics;
-        var demographicsBundle = hapiDemographics.getUnderlyingDemographics();
+        var demographicsBundle = hapiDemographics.getUnderlyingResource();
 
         var overallId = UUID.randomUUID().toString();
         if (!demographicsBundle.hasId()) {
