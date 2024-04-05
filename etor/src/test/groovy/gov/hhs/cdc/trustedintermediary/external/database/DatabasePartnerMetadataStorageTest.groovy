@@ -137,4 +137,52 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         then:
         1 * mockDao.upsertData("metadata", columns, "received_message_id")
     }
+
+    def "readMetadataForMessageLinking happy path works"() {
+        given:
+        def expectedResult = Set.of(mockMetadata)
+
+        mockDao.fetchMetadataForMessageLinking(_ as String) >> expectedResult
+
+        when:
+        def actualResult = DatabasePartnerMetadataStorage.getInstance().readMetadataForMessageLinking(mockMetadata.receivedSubmissionId())
+
+        then:
+        actualResult == expectedResult
+    }
+
+    def "readMetadataForMessageLinking unhappy path works"() {
+        given:
+        mockDao.fetchMetadataForMessageLinking(_ as String) >> { throw new SQLException("Something went wrong!") }
+
+        when:
+        DatabasePartnerMetadataStorage.getInstance().readMetadataForMessageLinking("receivedSubmissionId")
+
+        then:
+        thrown(PartnerMetadataException)
+    }
+
+    def "readMetadataForSender happy path works"() {
+        given:
+        def expectedResult = Set.of(mockMetadata)
+
+        mockDao.fetchMetadataForSender(_ as String) >> expectedResult
+
+        when:
+        def actualResult = DatabasePartnerMetadataStorage.getInstance().readMetadataForSender("TestSender")
+
+        then:
+        actualResult == expectedResult
+    }
+
+    def "readMetadataForSender unhappy path works"() {
+        given:
+        mockDao.fetchMetadataForSender(_ as String) >> { throw new SQLException("Something went wrong!") }
+
+        when:
+        DatabasePartnerMetadataStorage.getInstance().readMetadataForSender("TestSender")
+
+        then:
+        thrown(PartnerMetadataException)
+    }
 }
