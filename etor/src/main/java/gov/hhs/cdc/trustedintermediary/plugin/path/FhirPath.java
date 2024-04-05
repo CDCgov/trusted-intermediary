@@ -6,25 +6,25 @@ public enum FhirPath {
 		Bundle.entry.resource.ofType(ServiceRequest).identifier.where(type.coding.code = 'PLAC').value"""),
     SENDING_FACILITY_NAMESPACE(
             """
-		Bundle.entry.resource.ofType(MessageHeader).sender.resolve().identifier.where(
-			extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
-			extension.value = 'HD.1'
-		).value
-		"""),
+   Bundle.entry.resource.ofType(MessageHeader).sender.resolve().identifier.where(
+   extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
+   extension.value = 'HD.1'
+   ).value
+   """),
     SENDING_FACILITY_UNIVERSAL_ID(
             """
-		Bundle.entry.resource.ofType(MessageHeader).sender.resolve().identifier.where(
-			extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
-			extension.value = 'HD.2,HD.3'
-		).value
-	"""),
+   Bundle.entry.resource.ofType(MessageHeader).sender.resolve().identifier.where(
+   extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
+   extension.value = 'HD.2,HD.3'
+   ).value
+   """),
     SENDING_FACILITY_UNIVERSAL_ID_TYPE(
             """
-		Bundle.entry.resource.ofType(MessageHeader).sender.resolve().identifier.where(
-			extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
-			extension.value = 'HD.2,HD.3'
-		).type.coding.code
-	"""),
+   Bundle.entry.resource.ofType(MessageHeader).sender.resolve().identifier.where(
+   extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
+   extension.value = 'HD.2,HD.3'
+   ).type.coding.code
+   """),
     SENDING_APPLICATION_NAMESPACE(
             """
 		Bundle.entry.resource.ofType(MessageHeader).source.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id').value
@@ -39,25 +39,25 @@ public enum FhirPath {
 	"""),
     RECEIVING_FACILITY_NAMESPACE(
             """
-		Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(
-			extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
-			extension.value = 'HD.1'
-		).value
-	"""),
+   Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(
+   extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
+   extension.value = 'HD.1'
+   ).value
+   """),
     RECEIVING_FACILITY_UNIVERSAL_ID(
             """
-		Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(
-			extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
-			extension.value = 'HD.2,HD.3'
-		).value
-	"""),
+   Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(
+   extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
+   extension.value = 'HD.2,HD.3'
+   ).value
+   """),
     RECEIVING_FACILITY_UNIVERSAL_ID_TYPE(
             """
-		Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(
-			extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
-			extension.value = 'HD.2,HD.3'
-		).type.coding.code
-	"""),
+   Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(
+   extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and
+   extension.value = 'HD.2,HD.3'
+   ).type.coding.code
+   """),
     RECEIVING_APPLICATION_NAMESPACE(
             """
 		Bundle.entry.resource.ofType(MessageHeader).destination.name
