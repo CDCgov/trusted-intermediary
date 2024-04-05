@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 import javax.inject.Inject;
 
+/** Implements the {@link MessageLinkStorage} using a database. */
 public class DatabaseMessageLinkStorage implements MessageLinkStorage {
 
     @Inject DbDao dao;

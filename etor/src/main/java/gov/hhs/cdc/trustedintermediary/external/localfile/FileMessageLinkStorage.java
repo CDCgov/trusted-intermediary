@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
 
+/** Implements the {@link MessageLinkStorage} using local files. */
 public class FileMessageLinkStorage implements MessageLinkStorage {
 
     private static final FileMessageLinkStorage INSTANCE = new FileMessageLinkStorage();

@@ -4,6 +4,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * This class represents a link between messages. Each link has a unique ID and is associated with a
+ * set of message IDs to link.
+ */
 public final class MessageLink {
     private Integer linkId;
     private Set<String> messageIds;
