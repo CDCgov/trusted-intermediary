@@ -205,6 +205,9 @@ public class PostgresDao implements DbDao {
                         (SELECT COALESCE(MAX(link_id), 0) + 1 FROM message_link)
                     ),
                     ?
+                )
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM message_link WHERE message_id = ?
                 );
                 """;
 
@@ -217,6 +220,7 @@ public class PostgresDao implements DbDao {
             }
             for (String messageId : messageLink.getMessageIds()) {
                 statement.setString(2, messageId);
+                statement.setString(3, messageId); // can we use named parameters instead?
                 statement.executeUpdate();
             }
         }
