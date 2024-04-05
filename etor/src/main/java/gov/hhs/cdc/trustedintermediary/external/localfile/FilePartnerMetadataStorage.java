@@ -109,35 +109,35 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
     }
 
     @Override
-    public Set<PartnerMetadata> readMetadataForMessageLinking(String submissionId)
+    public Set<PartnerMetadata> readMetadataForMessageLinking(String receivedSubmissionId)
             throws PartnerMetadataException {
         try {
-            Optional<PartnerMetadata> matchingMetadata =
-                    getPartnerMetadata().stream()
-                            .filter(metadata -> metadata.sentSubmissionId().equals(submissionId))
-                            .findFirst();
+            Set<PartnerMetadata> existingMetadata = getPartnerMetadata();
+            PartnerMetadata match =
+                    existingMetadata.stream()
+                            .filter(
+                                    metadata ->
+                                            metadata.receivedSubmissionId()
+                                                    .equals(receivedSubmissionId))
+                            .findFirst()
+                            .orElse(null);
 
-            if (matchingMetadata.isEmpty()) {
+            if (match == null) {
                 return Set.of();
             }
 
-            PartnerMetadata match = matchingMetadata.get();
-            Set<PartnerMetadata> result =
-                    getPartnerMetadata().stream()
-                            .filter(
-                                    metadata ->
-                                            metadata.placerOrderNumber()
-                                                            .equals(match.placerOrderNumber())
-                                                    && metadata.sendingApplicationId()
-                                                            .equals(match.sendingApplicationId())
-                                                    && metadata.sendingFacilityId()
-                                                            .equals(match.sendingFacilityId()))
-                            .collect(Collectors.toSet());
-
-            return result;
+            return existingMetadata.stream()
+                    .filter(
+                            metadata ->
+                                    metadata.placerOrderNumber().equals(match.placerOrderNumber())
+                                            && metadata.sendingApplicationId()
+                                                    .equals(match.sendingApplicationId())
+                                            && metadata.sendingFacilityId()
+                                                    .equals(match.sendingFacilityId()))
+                    .collect(Collectors.toSet());
         } catch (Exception e) {
             throw new PartnerMetadataException(
-                    "Failed reading metadata for submissionId: " + submissionId, e);
+                    "Failed reading metadata for submissionId: " + receivedSubmissionId, e);
         }
     }
 

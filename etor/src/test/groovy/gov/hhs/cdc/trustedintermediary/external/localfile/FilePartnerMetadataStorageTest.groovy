@@ -101,4 +101,52 @@ class FilePartnerMetadataStorageTest extends Specification {
         then:
         metadataSet.containsAll(Set.of(metadata1, metadata2))
     }
+
+    def "readMetadataForMessageLinking returns a set of PartnerMetadata"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def placerOrderNumber = "placerOrderNumber"
+        def sendingApplicationId = "sendingApplicationId"
+        def sendingFacilityId = "sendingFacilityId"
+        PartnerMetadata metadata1 = new PartnerMetadata(receivedSubmissionId, null, null, null, null, null, null, null, null, null, sendingApplicationId, sendingFacilityId, null, null, placerOrderNumber)
+        PartnerMetadata metadata2 = new PartnerMetadata("2", null, null, null, null, null, null, null, null, null, sendingApplicationId, sendingFacilityId, null, null, placerOrderNumber)
+
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        FilePartnerMetadataStorage.getInstance().saveMetadata(metadata1)
+        FilePartnerMetadataStorage.getInstance().saveMetadata(metadata2)
+        def metadataSet = FilePartnerMetadataStorage.getInstance().readMetadataForMessageLinking(receivedSubmissionId)
+
+        then:
+        metadataSet.containsAll(Set.of(metadata1, metadata2))
+    }
+
+    def "readMetadataForMessageLinking returns an empty set when no metadata is found"() {
+        when:
+        def metadataSet = FilePartnerMetadataStorage.getInstance().readMetadataForMessageLinking("nonexistentId")
+
+        then:
+        metadataSet.isEmpty()
+    }
+
+    def "readMetadataForMessageLinking throws PartnerMetadataException when unable to parse file"() {
+        given:
+        def mockFormatter = Mock(Formatter)
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> {throw new FormatterProcessingException("error", new Exception())}
+        mockFormatter.convertToJsonString(_) >> "[]"
+        TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        def submissionId = "submissionId"
+        PartnerMetadata metadata = new PartnerMetadata(submissionId, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
+        FilePartnerMetadataStorage.getInstance().saveMetadata(metadata)
+
+        when:
+        FilePartnerMetadataStorage.getInstance().readMetadataForMessageLinking("submissionId")
+
+        then:
+        thrown(PartnerMetadataException)
+    }
 }
