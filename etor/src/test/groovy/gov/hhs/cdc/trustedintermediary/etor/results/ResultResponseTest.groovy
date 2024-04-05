@@ -18,7 +18,7 @@ class ResultResponseTest extends Specification {
         given:
         def expectedResourceId = "12345678"
 
-        def result = new ResultMock(expectedResourceId, null)
+        def result = new ResultMock(expectedResourceId, null, null, null, null, null, null)
 
         when:
         def actual = new ResultResponse(result)

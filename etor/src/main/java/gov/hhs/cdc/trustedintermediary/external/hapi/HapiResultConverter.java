@@ -27,7 +27,7 @@ public class HapiResultConverter implements ResultConverter {
     @Override
     public Result<?> addEtorProcessingTag(final Result<?> message) {
         var hapiResult = (Result<Bundle>) message;
-        var messageBundle = hapiResult.getUnderlyingResult();
+        var messageBundle = hapiResult.getUnderlyingElement();
 
         hapiMessageConverterHelper.addEtorTagToBundle(messageBundle);
 
