@@ -82,6 +82,13 @@ public class SendMessageHelper {
         try {
             Set<String> messageIdsToLink =
                     partnerMetadataOrchestrator.findMessagesIdsToLink(receivedSubmissionId);
+            if (messageIdsToLink.isEmpty()) {
+                return;
+            }
+            logger.logInfo(
+                    "Found messages to link for receivedSubmissionId {}: {}",
+                    receivedSubmissionId,
+                    messageIdsToLink);
             partnerMetadataOrchestrator.linkMessages(messageIdsToLink);
         } catch (PartnerMetadataException | MessageLinkException e) {
             logger.logError(

@@ -60,7 +60,7 @@ public class FileMessageLinkStorage implements MessageLinkStorage {
 
             if (foundMessageLinks.size() > 1) {
                 logger.logWarning(
-                        "More than one MessageLink found for submissionId: {}", submissionId);
+                        "More than one message link found for submissionId: {}", submissionId);
             }
 
             return foundMessageLinks.stream().findFirst();
