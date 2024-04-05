@@ -9,27 +9,15 @@ import org.hl7.fhir.r4.model.Patient;
  * A concrete implementation of a {@link Demographics} that uses the Hapi FHIR bundle as its
  * underlying type.
  */
-public class HapiDemographics implements Demographics<Bundle> {
-
-    private final Bundle innerDemographics;
+public class HapiDemographics extends HapiMessage implements Demographics<Bundle> {
 
     public HapiDemographics(Bundle innerDemographics) {
-        this.innerDemographics = innerDemographics;
-    }
-
-    @Override
-    public Bundle getUnderlyingResource() {
-        return innerDemographics;
-    }
-
-    @Override
-    public String getFhirResourceId() {
-        return innerDemographics.getId();
+        super(innerDemographics);
     }
 
     @Override
     public String getPatientId() {
-        return HapiHelper.resourcesInBundle(innerDemographics, Patient.class)
+        return HapiHelper.resourcesInBundle(innerResource, Patient.class)
                 .flatMap(patient -> patient.getIdentifier().stream())
                 .filter(
                         identifier ->

@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.demographics
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiMessageHelper
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import org.hl7.fhir.r4.model.Bundle
@@ -12,6 +13,7 @@ class PatientDemographicsControllerTest extends Specification {
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
+        TestApplicationContext.register(HapiMessageHelper, HapiMessageHelper.getInstance())
         TestApplicationContext.register(PatientDemographicsController, PatientDemographicsController.getInstance())
     }
 
