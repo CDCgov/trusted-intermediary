@@ -136,22 +136,11 @@ class HapiResultTest extends Specification {
 
     def "getReceivingApplicationDetails works"() {
         given:
-        def innerResults = new Bundle()
-        def messageHeader = new MessageHeader()
-        def destination = new MessageHeader.MessageDestinationComponent()
+        def namespaceId = "Epic"
         def universalId = "1.2.840.114350.1.13.145.2.7.2.695071"
-        def name = "Epic"
         def universalIdType = "ISO"
-        def universalIdExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id", new StringType(universalId))
-        def universalIdTypeExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type", new StringType(universalIdType))
-        def expectedApplicationDetails = new MessageHdDataType(name, universalId, universalIdType)
-
-        destination.setName(name)
-        destination.addExtension(universalIdExtension)
-        destination.addExtension(universalIdTypeExtension)
-        messageHeader.setDestination([destination])
-        innerResults.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
-        def results = new HapiResult(innerResults)
+        def expectedApplicationDetails = new MessageHdDataType(namespaceId, universalId, universalIdType)
+        def results = setupOrderWithReceivingApplicationDetails(namespaceId, universalId, universalIdType)
 
         when:
         def actualApplicationDetails = results.getReceivingApplicationDetails()
