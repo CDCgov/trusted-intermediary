@@ -241,6 +241,26 @@ class HapiOrderTest extends Specification {
         actualFacilityDetails.universalIdType() == expectedFacilityDetails.universalIdType()
     }
 
+    def "extractMessageHdDataType works" () {
+        given:
+        def namespace = "Central Hospital"
+        def universalId = "2.16.842.1.113883.4.5"
+        def universalIdType = "ISO"
+        def expectedDetails = new MessageHdDataType(namespace, universalId, universalIdType)
+        def hapiResult = new HapiResult(null)
+
+        when:
+        def actualDetails = hapiResult.extractMessageHdDataType(
+                {namespace},
+                {universalId},
+                {universalIdType})
+
+        then:
+        actualDetails.namespace() == expectedDetails.namespace()
+        actualDetails.universalId() == expectedDetails.universalId()
+        actualDetails.universalIdType() == expectedDetails.universalIdType()
+    }
+
     protected HapiOrder setupOrderWithSendingApplicationDetails(String nameSpaceId, String universalId, String universalIdType) {
         def innerOrders = new Bundle()
         def messageHeader = new MessageHeader()

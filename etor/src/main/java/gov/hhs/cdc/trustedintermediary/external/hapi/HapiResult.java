@@ -65,7 +65,7 @@ public class HapiResult implements Result<Bundle> {
                 () -> MESSAGE_HELPER.extractReceivingFacilityUniversalIdType(innerResult));
     }
 
-    private MessageHdDataType extractMessageHdDataType(
+    protected MessageHdDataType extractMessageHdDataType(
             Supplier<String> namespaceExtractor,
             Supplier<String> universalIdExtractor,
             Supplier<String> universalIdTypeExtractor) {

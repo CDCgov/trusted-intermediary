@@ -86,7 +86,7 @@ public class HapiOrder implements Order<Bundle> {
                 () -> MESSAGE_HELPER.extractReceivingFacilityUniversalIdType(innerOrder));
     }
 
-    private MessageHdDataType extractMessageHdDataType(
+    protected MessageHdDataType extractMessageHdDataType(
             Supplier<String> namespaceExtractor,
             Supplier<String> universalIdExtractor,
             Supplier<String> universalIdTypeExtractor) {

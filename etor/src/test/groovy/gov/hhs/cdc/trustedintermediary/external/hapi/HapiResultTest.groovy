@@ -6,6 +6,8 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import org.hl7.fhir.r4.model.*
 import spock.lang.Specification
 
+import java.util.function.Supplier
+
 class HapiResultTest extends Specification {
 
     def fhirEngine = HapiFhirImplementation.getInstance()
@@ -194,6 +196,26 @@ class HapiResultTest extends Specification {
         actualApplicationDetails.namespace() == expectedApplicationDetails.namespace()
         actualApplicationDetails.universalId() == expectedApplicationDetails.universalId()
         actualApplicationDetails.universalIdType() == expectedApplicationDetails.universalIdType()
+    }
+
+    def "extractMessageHdDataType works" () {
+        given:
+        def namespace = "Central Hospital"
+        def universalId = "2.16.842.1.113883.4.5"
+        def universalIdType = "ISO"
+        def expectedDetails = new MessageHdDataType(namespace, universalId, universalIdType)
+        def hapiResult = new HapiResult(null)
+
+        when:
+        def actualDetails = hapiResult.extractMessageHdDataType(
+                {namespace},
+                {universalId},
+                {universalIdType})
+
+        then:
+        actualDetails.namespace() == expectedDetails.namespace()
+        actualDetails.universalId() == expectedDetails.universalId()
+        actualDetails.universalIdType() == expectedDetails.universalIdType()
     }
 
     protected HapiOrder setupOrderWithSendingApplicationDetails(String nameSpaceId, String universalId, String universalIdType) {
