@@ -3,7 +3,16 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
-import org.hl7.fhir.r4.model.*
+import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.Identifier
+import org.hl7.fhir.r4.model.MessageHeader
+import org.hl7.fhir.r4.model.Organization
+import org.hl7.fhir.r4.model.ServiceRequest
+import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.model.UrlType
 import spock.lang.Specification
 
 class HapiResultTest extends Specification {
