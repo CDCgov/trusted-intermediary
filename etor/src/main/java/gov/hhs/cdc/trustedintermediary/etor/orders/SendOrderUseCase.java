@@ -31,11 +31,11 @@ public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
                 receivedSubmissionId,
                 order.hashCode(),
                 PartnerMetadataMessageType.ORDER,
-                "order.getSendingApplicationId()",
-                "order.getSendingFacilityId()",
-                "order.getReceivingApplicationId()",
-                "order.getReceivingFacilityId()",
-                "order.getPlacerOrderNumber()");
+                order.getSendingApplicationDetails(),
+                order.getSendingFacilityDetails(),
+                order.getReceivingApplicationDetails(),
+                order.getReceivingFacilityDetails(),
+                order.getPlacerOrderNumber());
 
         var omlOrder = converter.convertToOmlOrder(order);
         metadata.put(order.getFhirResourceId(), EtorMetadataStep.ORDER_CONVERTED_TO_OML);

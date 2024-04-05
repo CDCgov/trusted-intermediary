@@ -23,10 +23,10 @@ public class SendMessageHelper {
             String receivedSubmissionId,
             int messageHash,
             PartnerMetadataMessageType messageType,
-            String sendingApplicationId,
-            String sendingFacilityId,
-            String receivingApplicationId,
-            String receivingFacilityId,
+            MessageHdDataType sendingApplicationDetails,
+            MessageHdDataType sendingFacilityDetails,
+            MessageHdDataType receivingApplicationDetails,
+            MessageHdDataType receivingFacilityDetails,
             String placerOrderNumber) {
         if (receivedSubmissionId == null) {
             logger.logWarning(
@@ -40,10 +40,10 @@ public class SendMessageHelper {
                     receivedSubmissionId,
                     stringMessageHash,
                     messageType,
-                    sendingApplicationId,
-                    sendingFacilityId,
-                    receivingApplicationId,
-                    receivingFacilityId,
+                    sendingApplicationDetails,
+                    sendingFacilityDetails,
+                    receivingApplicationDetails,
+                    receivingFacilityDetails,
                     placerOrderNumber);
         } catch (PartnerMetadataException e) {
             logger.logError(

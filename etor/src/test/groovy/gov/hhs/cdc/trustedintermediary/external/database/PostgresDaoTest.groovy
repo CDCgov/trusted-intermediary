@@ -310,20 +310,20 @@ class PostgresDaoTest extends Specification {
             expected2.messageType().toString()
         ]
         mockResultSet.getString("sending_application_id") >>> [
-            expected1.sendingApplicationId(),
-            expected2.sendingApplicationId()
+            expected1.sendingApplicationDetails(),
+            expected2.sendingApplicationDetails()
         ]
         mockResultSet.getString("sending_facility_id") >>> [
-            expected1.sendingFacilityId(),
-            expected2.sendingFacilityId()
+            expected1.sendingFacilityDetails(),
+            expected2.sendingFacilityDetails()
         ]
         mockResultSet.getString("receiving_application_id") >>> [
-            expected1.receivingApplicationId(),
-            expected2.receivingApplicationId()
+            expected1.receivingApplicationDetails(),
+            expected2.receivingApplicationDetails()
         ]
         mockResultSet.getString("receiving_facility_id") >>> [
-            expected1.receivingFacilityId(),
-            expected2.receivingFacilityId()
+            expected1.receivingFacilityDetails(),
+            expected2.receivingFacilityDetails()
         ]
         mockResultSet.getString("placer_order_number") >>> [
             expected1.placerOrderNumber(),
