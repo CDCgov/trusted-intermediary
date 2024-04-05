@@ -4,11 +4,13 @@ import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.HashSet;
@@ -23,6 +25,7 @@ public class PostgresDao implements DbDao {
     private static final PostgresDao INSTANCE = new PostgresDao();
 
     @Inject ConnectionPool connectionPool;
+    @Inject Logger logger;
 
     private PostgresDao() {}
 
@@ -195,31 +198,60 @@ public class PostgresDao implements DbDao {
 
     @Override
     public void insertMessageLink(MessageLink messageLink) throws SQLException {
-        // todo: still need to deal with race condition
-        var sql =
+        var getMaxLinkIdSql =
+                "SELECT COALESCE(MAX(link_id), 0) + 1 AS next_link_id FROM message_link";
+        var insertSql =
                 """
                 INSERT INTO message_link (link_id, message_id)
-                SELECT COALESCE(
-                           ?,
-                           (SELECT COALESCE(MAX(link_id), 0) + 1 FROM message_link)
-                       ),
-                       ?
+                SELECT ?, ?
                 WHERE NOT EXISTS (
                     SELECT 1 FROM message_link WHERE message_id = ?
                 );
                 """;
 
-        try (Connection conn = connectionPool.getConnection();
-                PreparedStatement statement = conn.prepareStatement(sql)) {
-            if (messageLink.getLinkId() == null) {
-                statement.setNull(1, java.sql.Types.INTEGER);
-            } else {
-                statement.setInt(1, messageLink.getLinkId());
+        Connection conn = null;
+        try {
+            conn = connectionPool.getConnection();
+            // creating a transaction to ensure that the insert is atomic and avoid race condition
+            conn.setAutoCommit(false);
+            conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+
+            Integer linkId = messageLink.getLinkId();
+            if (linkId == null) {
+                try (Statement getMaxLinkIdStatement = conn.createStatement();
+                        ResultSet result = getMaxLinkIdStatement.executeQuery(getMaxLinkIdSql)) {
+                    if (result.next()) {
+                        linkId = result.getInt("next_link_id"); // Retrieve the next linkId
+                    }
+                }
             }
-            for (String messageId : messageLink.getMessageIds()) {
-                statement.setString(2, messageId);
-                statement.setString(3, messageId); // can we use named parameters instead?
-                statement.executeUpdate();
+
+            if (linkId == null) {
+                throw new SQLException("Failed to retrieve the next linkId");
+            }
+
+            try (PreparedStatement insertStatement = conn.prepareStatement(insertSql)) {
+                for (String messageId : messageLink.getMessageIds()) {
+                    insertStatement.setInt(1, linkId);
+                    insertStatement.setString(2, messageId);
+                    insertStatement.setString(3, messageId); // can we use named parameters instead?
+                    insertStatement.executeUpdate();
+                }
+            }
+
+            conn.commit();
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    logger.logError("Failed to rollback transaction", ex);
+                }
+            }
+            throw e;
+        } finally {
+            if (conn != null) {
+                conn.setAutoCommit(true);
             }
         }
     }
