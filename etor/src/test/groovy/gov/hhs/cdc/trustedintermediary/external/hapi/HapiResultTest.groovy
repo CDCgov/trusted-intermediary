@@ -10,6 +10,7 @@ import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Organization
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ServiceRequest
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.UrlType
@@ -244,7 +245,7 @@ class HapiResultTest extends Specification {
         def innerOrders = new Bundle()
         def messageHeader = new MessageHeader()
         def orgReference = "Organization/1708034743302204787.82104dfb-e854-47de-b7ce-19a2b71e61db"
-        messageHeader.setSender(new Reference(orgReference))
+        messageHeader.setSender(new Reference(orgReference) as Reference)
         innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
         def organization = new Organization()
         organization.setId("1708034743302204787.82104dfb-e854-47de-b7ce-19a2b71e61db")
