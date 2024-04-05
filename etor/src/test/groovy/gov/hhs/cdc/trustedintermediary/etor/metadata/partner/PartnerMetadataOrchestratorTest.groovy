@@ -616,4 +616,41 @@ class PartnerMetadataOrchestratorTest extends Specification {
         existingMessageLink.addMessageId(newMessageId)
         1 * mockMessageLinkStorage.saveMessageLink(existingMessageLink)
     }
+
+    def "linkMessages creates new message link there is no existing link"() {
+        given:
+        def messageId1 = "messageId1"
+        def messageId2 = "messageId2"
+        def messageIdsToLink = Set.of(messageId1, messageId2)
+        mockMessageLinkStorage.getMessageLink(messageId1) >> Optional.empty()
+        mockMessageLinkStorage.getMessageLink(messageId2) >> Optional.empty()
+
+        when:
+        PartnerMetadataOrchestrator.getInstance().linkMessages(messageIdsToLink)
+
+        then:
+        1 * mockMessageLinkStorage.saveMessageLink({ MessageLink ml ->
+            ml.getLinkId() == null && ml.getMessageIds() == messageIdsToLink
+        })
+    }
+
+    def "linkMessages uses existing link if one exists"() {
+        given:
+        def existingLinkId = 1
+        def matchingMessageId = "messageId"
+        def additionalMessageId = "additionalMessageId"
+        def newMessageId = "newMessageId"
+        def messageIdsToLink = Set.of(matchingMessageId, newMessageId)
+        def existingMessageLink = new MessageLink(existingLinkId, Set.of(matchingMessageId, additionalMessageId))
+        mockMessageLinkStorage.getMessageLink(matchingMessageId) >> Optional.of(existingMessageLink)
+        mockMessageLinkStorage.getMessageLink(newMessageId) >> Optional.empty()
+
+        when:
+        PartnerMetadataOrchestrator.getInstance().linkMessages(messageIdsToLink)
+
+        then:
+        1 * mockMessageLinkStorage.saveMessageLink({ MessageLink ml ->
+            ml.getLinkId() == existingLinkId && ml.getMessageIds() == Set.of(matchingMessageId, additionalMessageId, newMessageId)
+        })
+    }
 }
