@@ -341,4 +341,6 @@ class PostgresDaoTest extends Specification {
         then:
         actual.containsAll(Set.of(expected1, expected2))
     }
+
+    // def "throws exception for FormatterProcessingException"() {}
 }
