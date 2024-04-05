@@ -288,4 +288,111 @@ class HapiResultTest extends Specification {
         actualApplicationDetails.universalId() == expectedApplicationDetails.universalId()
         actualApplicationDetails.universalIdType() == expectedApplicationDetails.universalIdType()
     }
+
+    protected HapiOrder setupOrderWithSendingApplicationDetails(String nameSpaceId, String universalId, String universalIdType) {
+        def innerOrders = new Bundle()
+        def messageHeader = new MessageHeader()
+        def endpoint = "urn:dns:natus.health.state.mn.us"
+        messageHeader.setSource(new MessageHeader.MessageSourceComponent(new UrlType(endpoint)))
+        def nameSpaceIdExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id", new StringType(nameSpaceId))
+        messageHeader.getSource().addExtension(nameSpaceIdExtension)
+        def universalIdExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id", new StringType(universalId))
+        messageHeader.getSource().addExtension(universalIdExtension)
+        def universalIdTypeExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type", new StringType(universalIdType))
+        messageHeader.getSource().addExtension(universalIdTypeExtension)
+        innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
+        return new HapiOrder(innerOrders)
+    }
+
+    protected  HapiOrder setupOrderWithSendingFacilityDetails(String facilityName, String universalId, String universalIdType) {
+        def innerOrders = new Bundle()
+        def messageHeader = new MessageHeader()
+        def orgReference = "Organization/1708034743302204787.82104dfb-e854-47de-b7ce-19a2b71e61db"
+        messageHeader.setSender(new Reference(orgReference))
+        innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
+        def organization = new Organization()
+        organization.setId("1708034743302204787.82104dfb-e854-47de-b7ce-19a2b71e61db")
+        // facility name
+        def facilityIdentifier = new Identifier()
+        def facilityNameExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field", new StringType("HD.1"))
+        facilityIdentifier.addExtension(facilityNameExtension)
+        facilityIdentifier.setValue(facilityName)
+        // universal id
+        def universalIdIdentifier = new Identifier()
+        def universalIdExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field", new StringType("HD.2,HD.3"))
+        universalIdIdentifier.addExtension(universalIdExtension)
+        universalIdIdentifier.setValue(universalId)
+        // Type
+        def typeConcept = new CodeableConcept()
+        def coding = new Coding("http://terminology.hl7.org/CodeSystem/v2-0301", universalIdType, null)
+        typeConcept.addCoding(coding)
+        universalIdIdentifier.setType(typeConcept)
+
+        organization.addIdentifier(facilityIdentifier)
+        organization.addIdentifier(universalIdIdentifier)
+        innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(organization))
+
+        // Convert orders to json so the reference is added as part of the bundle so we can use .resolve()
+        // as part of the fhir path.
+        def jsonOrders = fhirEngine.parseResource(fhirEngine.encodeResourceToJson(innerOrders), Bundle)
+        return new HapiOrder(jsonOrders)
+    }
+
+    protected HapiOrder setupOrderWithReceivingApplicationDetails(String namespaceId, String universalId, String universalIdType) {
+        def innerOrders = new Bundle()
+        def messageHeader = new MessageHeader()
+        def destination = new MessageHeader.MessageDestinationComponent()
+        def universalIdExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id", new StringType(universalId))
+        def universalIdTypeExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type", new StringType(universalIdType))
+
+        destination.setName(namespaceId)
+        destination.addExtension(universalIdExtension)
+        destination.addExtension(universalIdTypeExtension)
+        messageHeader.setDestination([destination])
+        innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
+        return new HapiOrder(innerOrders)
+    }
+
+    protected HapiOrder setupOrderWithReceivingFacilityDetails(String facilityName, String universalId, String universalIdType) {
+        def innerOrders = new Bundle()
+        def messageHeader = new MessageHeader()
+        def organizationReference = "Organization/1708034743312390878.b61e734a-4d65-4e25-b423-cdb19018d84a"
+        def destination = new MessageHeader.MessageDestinationComponent()
+        destination.setReceiver(new Reference(organizationReference))
+        messageHeader.addDestination(destination)
+        innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
+        def organization = new Organization()
+        organization.setId("1708034743312390878.b61e734a-4d65-4e25-b423-cdb19018d84a")
+        // Facility
+        def identifierFacilityName = new Identifier()
+        def extensionFacilityName = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field", new StringType("HD.1"))
+        identifierFacilityName.addExtension(extensionFacilityName)
+        identifierFacilityName.setValue(facilityName)
+        // Universal ID
+        def identifierUniversalId = new Identifier()
+        def extensionUniversalId = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field", new StringType("HD.2,HD.3"))
+        identifierUniversalId.addExtension(extensionUniversalId)
+        identifierUniversalId.setValue(universalId)
+        // Universal ID type
+        def coding = new Coding("http://terminology.hl7.org/CodeSystem/v2-0203", universalIdType, null)
+        def typeCodeableConcept = new CodeableConcept()
+        typeCodeableConcept.addCoding(coding)
+        identifierUniversalId.setType(typeCodeableConcept)
+
+        organization.addIdentifier(identifierFacilityName)
+        organization.addIdentifier(identifierUniversalId)
+        innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(organization))
+
+        // Convert orders to json so the reference is added as part of the bundle so we can use .resolve()
+        // as part of the fhir path.
+        def jsonOrders = fhirEngine.parseResource(fhirEngine.encodeResourceToJson(innerOrders), Bundle)
+        return new HapiOrder(jsonOrders)
+    }
+
+    protected HapiOrder setupOrderWithEmptyMessageHeader() {
+        def innerOrders = new Bundle()
+        MessageHeader messageHeader = new MessageHeader()
+        innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
+        return new HapiOrder(innerOrders)
+    }
 }
