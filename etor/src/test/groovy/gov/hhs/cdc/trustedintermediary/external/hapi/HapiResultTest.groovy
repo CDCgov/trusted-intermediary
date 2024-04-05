@@ -105,40 +105,11 @@ class HapiResultTest extends Specification {
 
     def "getSendingFacilityDetails happy path works"() {
         given:
-        def innerResults = new Bundle()
-
-        def messageHeader = new MessageHeader()
-        def orgReference = "Organization/1708034743302204787.82104dfb-e854-47de-b7ce-19a2b71e61db"
-        messageHeader.setSender(new Reference(orgReference))
-        innerResults.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
-
-        def organization = new Organization()
-        organization.setId("1708034743302204787.82104dfb-e854-47de-b7ce-19a2b71e61db")
-        // facility name
-        def facilityIdentifier = new Identifier()
         def facilityName = "MN Public Health Lab"
-        def facilityNameExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field", new StringType("HD.1"))
-        facilityIdentifier.addExtension(facilityNameExtension)
-        facilityIdentifier.setValue(facilityName)
-        // universal id
-        def universalIdIdentifier = new Identifier()
-        def universalIdIdentifierValue = "2.16.840.1.114222.4.1.10080"
-        def universalIdExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field", new StringType("HD.2,HD.3"))
-        universalIdIdentifier.addExtension(universalIdExtension)
-        universalIdIdentifier.setValue(universalIdIdentifierValue)
-        // Type
-        def typeConcept = new CodeableConcept()
-        def theCode = "ISO"
-        def coding = new Coding("http://terminology.hl7.org/CodeSystem/v2-0301", theCode, null)
-        typeConcept.addCoding(coding)
-        universalIdIdentifier.setType(typeConcept)
-
-        organization.addIdentifier(facilityIdentifier)
-        organization.addIdentifier(universalIdIdentifier)
-        innerResults.addEntry(new Bundle.BundleEntryComponent().setResource(organization))
-        def parsedResults = fhirEngine.parseResource(fhirEngine.encodeResourceToJson(innerResults), Bundle)
-        def results = new HapiResult(parsedResults)
-        def expectedFacilityDetails = new MessageHdDataType(facilityName, universalIdIdentifierValue, theCode)
+        def universalId = "2.16.840.1.114222.4.1.10080"
+        def universalIdType = "ISO"
+        def results = setupOrderWithSendingFacilityDetails(facilityName, universalId, universalIdType)
+        def expectedFacilityDetails = new MessageHdDataType(facilityName, universalId, universalIdType)
 
         when:
         def actualFacilityDetails = results.getSendingFacilityDetails()
