@@ -123,6 +123,9 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
                             .orElse(null);
 
             if (match == null) {
+                logger.logWarning(
+                        "Matching metadata not found for receivedSubmissionId: {}",
+                        receivedSubmissionId);
                 return Set.of();
             }
 

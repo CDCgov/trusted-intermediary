@@ -260,12 +260,17 @@ public class PartnerMetadataOrchestrator {
         }
 
         if (existingMessageLink.isEmpty()) {
+            logger.logInfo("Saving new message link for messageIds: {}", messageIds);
             messageLinkStorage.saveMessageLink(new MessageLink(null, messageIds));
             return;
         }
 
         MessageLink messageLink = existingMessageLink.get();
         messageLink.addMessageIds(messageIds);
+        logger.logInfo(
+                "Updating existing message link {} with messageIds: {}",
+                messageLink.getLinkId(),
+                messageIds);
         messageLinkStorage.saveMessageLink(messageLink);
     }
 
