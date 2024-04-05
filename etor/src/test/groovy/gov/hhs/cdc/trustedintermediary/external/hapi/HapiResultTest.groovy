@@ -167,44 +167,11 @@ class HapiResultTest extends Specification {
 
     def "getReceivingFacilityDetails works"() {
         given:
-        def innerResults = new Bundle()
-        def messageHeader = new MessageHeader()
-        def destination = new MessageHeader.MessageDestinationComponent(new UrlType("urn:oid:1.2.840.114350.1.13.145.2.7.2.695071"))
-        def orgReference = "Organization/1708034743302204787.82104dfb-e854-47de-b7ce-19a2b71e61db"
-        destination.setReceiver(new Reference(orgReference))
-        messageHeader.setDestination(Arrays.asList(destination))
-        innerResults.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
-
-        def organization = new Organization()
-        organization.setId("1708034743302204787.82104dfb-e854-47de-b7ce-19a2b71e61db")
-
-        // facility name
-        def facilityIdentifier = new Identifier()
         def facilityName = "Samtracare"
-        def facilityNameExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field", new StringType("HD.1"))
-        facilityIdentifier.addExtension(facilityNameExtension)
-        facilityIdentifier.setValue(facilityName)
-
-        // universal id
-        def universalIdIdentifier = new Identifier()
-        def universalIdIdentifierValue = "Samtracare.com"
-        def universalIdExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field", new StringType("HD.2,HD.3"))
-        universalIdIdentifier.addExtension(universalIdExtension)
-        universalIdIdentifier.setValue(universalIdIdentifierValue)
-
-        // Type
-        def typeConcept = new CodeableConcept()
-        def theCode = "DNS"
-        def coding = new Coding("http://terminology.hl7.org/CodeSystem/v2-0301", theCode, null)
-        typeConcept.addCoding(coding)
-        universalIdIdentifier.setType(typeConcept)
-
-        organization.addIdentifier(facilityIdentifier)
-        organization.addIdentifier(universalIdIdentifier)
-        innerResults.addEntry(new Bundle.BundleEntryComponent().setResource(organization))
-        def parsedResults = fhirEngine.parseResource(fhirEngine.encodeResourceToJson(innerResults), Bundle)
-        def results = new HapiResult(parsedResults)
-        def expectedFacilityDetails = new MessageHdDataType(facilityName, universalIdIdentifierValue, theCode)
+        def universalId = "Samtracare.com"
+        def universalIdType = "DNS"
+        def expectedFacilityDetails = new MessageHdDataType(facilityName, universalId, universalIdType)
+        def results = setupOrderWithReceivingFacilityDetails(facilityName, universalId, universalIdType)
 
         when:
         def actualFacilityDetails = results.getReceivingFacilityDetails()
