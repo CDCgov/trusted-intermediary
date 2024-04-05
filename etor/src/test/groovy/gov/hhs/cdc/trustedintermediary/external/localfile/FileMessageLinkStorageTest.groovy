@@ -75,6 +75,24 @@ class FileMessageLinkStorageTest extends Specification {
         thrown(MessageLinkException)
     }
 
+    def "getMessageLink logs a warning when more than one message link is found for a message id"() {
+        given:
+        def repeatedMessageId = "messageId1"
+        def messageLink1 = new MessageLink(1, Set.of(repeatedMessageId, "messageId2"))
+        def messageLink2 = new MessageLink(2, Set.of(repeatedMessageId, "messageId3"))
+
+        def mockFormatter = Mock(Formatter)
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Set.of(messageLink1, messageLink2)
+        TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        messageLinkStorage.getMessageLink(repeatedMessageId)
+
+        then:
+        1 * mockLogger.logWarning(_ as String, repeatedMessageId)
+    }
+
     def "saveMessageLink throws MessageLinkException when unable to save file"() {
         given:
         def messageLink = new MessageLink(1, Set.of("messageId1", "messageId2"))
@@ -89,5 +107,31 @@ class FileMessageLinkStorageTest extends Specification {
 
         then:
         thrown(MessageLinkException)
+    }
+
+    def "saveMessageLink adds messageIds to existing message link"() {
+        given:
+        def linkId = 1
+        def messageId = "messageId"
+        def existingMessageIds = Set.of(messageId, "messageId2")
+        def existingMessageLink = new MessageLink(linkId, existingMessageIds)
+        def newMessageIds = Set.of(messageId, "messageId3")
+        def newMessageLink = new MessageLink(linkId, newMessageIds)
+
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+
+        messageLinkStorage.saveMessageLink(existingMessageLink)
+
+        when:
+        messageLinkStorage.saveMessageLink(newMessageLink)
+
+        then:
+        def mergedMessageLink = messageLinkStorage.getMessageLink(messageId)
+        mergedMessageLink.isPresent()
+        with(mergedMessageLink.get()) {
+            linkId == linkId
+            messageIds.containsAll(existingMessageLink.messageIds) && messageIds.containsAll(newMessageLink.messageIds)
+        }
     }
 }
