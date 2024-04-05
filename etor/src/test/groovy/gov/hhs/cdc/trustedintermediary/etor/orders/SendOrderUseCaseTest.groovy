@@ -36,7 +36,7 @@ class SendOrderUseCaseTest extends Specification {
         def receivedSubmissionId = "receivedId"
         def sentSubmissionId = "sentId"
         def messageType = PartnerMetadataMessageType.ORDER
-        def messagesIdsToLink = new HashSet<>()
+        def messagesIdsToLink = Set.of("messageId1", "messageId2")
 
         def sendOrder = SendOrderUseCase.getInstance()
         def mockOrder = new OrderMock(null, null, null)
@@ -116,6 +116,7 @@ class SendOrderUseCaseTest extends Specification {
         1 * mockConverter.convertToOmlOrder(order) >> omlOrder
         1 * mockConverter.addContactSectionToPatientResource(omlOrder) >> omlOrder
         1 * mockConverter.addEtorProcessingTag(omlOrder) >> omlOrder
+        1 * mockOrchestrator.findMessagesIdsToLink(receivedSubmissionId) >> Set.of()
         1 * mockSender.send(omlOrder) >> Optional.of("sentId")
     }
 
@@ -134,6 +135,7 @@ class SendOrderUseCaseTest extends Specification {
         1 * mockConverter.convertToOmlOrder(order) >> omlOrder
         1 * mockConverter.addContactSectionToPatientResource(omlOrder) >> omlOrder
         1 * mockConverter.addEtorProcessingTag(omlOrder) >> omlOrder
+        1 * mockOrchestrator.findMessagesIdsToLink(_ as String) >> Set.of()
         1 * mockSender.send(omlOrder) >> Optional.of("sentId")
         1 * mockLogger.logError(_, partnerMetadataException)
     }
@@ -150,6 +152,7 @@ class SendOrderUseCaseTest extends Specification {
 
         then:
         1 * mockLogger.logWarning(_)
+        1 * mockOrchestrator.findMessagesIdsToLink(_ as String) >> Set.of()
         0 * mockOrchestrator.updateMetadataForSentMessage(_ as String, _ as String)
     }
 }
