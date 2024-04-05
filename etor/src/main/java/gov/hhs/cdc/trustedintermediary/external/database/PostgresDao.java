@@ -199,13 +199,11 @@ public class PostgresDao implements DbDao {
         var sql =
                 """
                 INSERT INTO message_link (link_id, message_id)
-                VALUES (
-                    COALESCE(
-                        ?,
-                        (SELECT COALESCE(MAX(link_id), 0) + 1 FROM message_link)
-                    ),
-                    ?
-                )
+                SELECT COALESCE(
+                           ?,
+                           (SELECT COALESCE(MAX(link_id), 0) + 1 FROM message_link)
+                       ),
+                       ?
                 WHERE NOT EXISTS (
                     SELECT 1 FROM message_link WHERE message_id = ?
                 );
