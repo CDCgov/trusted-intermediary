@@ -36,6 +36,7 @@ class SendOrderUseCaseTest extends Specification {
         def receivedSubmissionId = "receivedId"
         def sentSubmissionId = "sentId"
         def messageType = PartnerMetadataMessageType.ORDER
+        def messagesIdsToLink = new HashSet<>()
 
         def sendOrder = SendOrderUseCase.getInstance()
         def mockOrder = new OrderMock(null, null, null)
@@ -64,6 +65,8 @@ class SendOrderUseCaseTest extends Specification {
                 "order.getReceivingFacilityId()",
                 "order.getPlacerOrderNumber()")
         1 * mockOrchestrator.updateMetadataForSentMessage(receivedSubmissionId, sentSubmissionId)
+        1 * mockOrchestrator.findMessagesIdsToLink(receivedSubmissionId) >> messagesIdsToLink
+        1 * mockOrchestrator.linkMessages(messagesIdsToLink)
     }
 
     def "send fails to send"() {

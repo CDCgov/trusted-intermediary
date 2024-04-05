@@ -2,6 +2,8 @@ package gov.hhs.cdc.trustedintermediary.etor.metadata.partner
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient
+import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink
+import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkStorage
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
@@ -15,6 +17,7 @@ import spock.lang.Specification
 class PartnerMetadataOrchestratorTest extends Specification {
 
     private def mockPartnerMetadataStorage
+    private def mockMessageLinkStorage
     private def mockClient
     private def mockFormatter
 
@@ -22,10 +25,12 @@ class PartnerMetadataOrchestratorTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         mockPartnerMetadataStorage = Mock(PartnerMetadataStorage)
+        mockMessageLinkStorage = Mock(MessageLinkStorage)
         mockFormatter = Mock(Formatter)
         mockClient = Mock(RSEndpointClient)
 
         TestApplicationContext.register(PartnerMetadataOrchestrator, PartnerMetadataOrchestrator.getInstance())
+        TestApplicationContext.register(MessageLinkStorage, mockMessageLinkStorage)
         TestApplicationContext.register(OrderConverter, HapiOrderConverter.getInstance())
         TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
 
@@ -571,5 +576,44 @@ class PartnerMetadataOrchestratorTest extends Specification {
         result["123456789"]["status"] == status.toString()
         result["123456789"]["stale"] == true
         result["123456789"]["failureReason"] == failure
+    }
+
+    def "findMessagesIdsToLink returns a list of message ids"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def placerOrderNumber = "placerOrderNumber"
+        def sendingApplicationId = "sendingApplicationId"
+        def sendingFacilityId = "sendingFacilityId"
+        def receivedSubmissionId1 = "1"
+        def receivedSubmissionId2 = "2"
+        def partnerMetadata1 = new PartnerMetadata(receivedSubmissionId1, "sender1", Instant.now(), null, "hash1", PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER, sendingApplicationId, sendingFacilityId, "receivingApplicationId1", "receivingFacility1", placerOrderNumber)
+        def partnerMetadata2 = new PartnerMetadata(receivedSubmissionId2, "sender2", Instant.now(), null, "hash2", PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.RESULT, sendingApplicationId, sendingFacilityId, "receivingApplicationId2", "receivingFacility2", placerOrderNumber)
+        def metadataSetForMessageLinking = Set.of(partnerMetadata1, partnerMetadata2)
+        mockPartnerMetadataStorage.readMetadataForMessageLinking(receivedSubmissionId) >> metadataSetForMessageLinking
+
+        when:
+        def result = PartnerMetadataOrchestrator.getInstance().findMessagesIdsToLink(receivedSubmissionId)
+
+        then:
+        result == Set.of(receivedSubmissionId1, receivedSubmissionId2)
+    }
+
+    def "linkMessages links messages successfully"() {
+        given:
+        def matchingMessageId = "matchingMessageId"
+        def additionalMessageId = "additionalMessageId"
+        def newMessageId = "newMessageId"
+        def messageIdsToLink = Set.of(matchingMessageId, newMessageId)
+        def existingLinkId = 1
+        def existingMessageLink = new MessageLink(existingLinkId, Set.of(matchingMessageId, additionalMessageId))
+        mockMessageLinkStorage.getMessageLink(newMessageId) >> Optional.empty()
+
+        when:
+        PartnerMetadataOrchestrator.getInstance().linkMessages(messageIdsToLink)
+
+        then:
+        1 * mockMessageLinkStorage.getMessageLink(matchingMessageId) >> Optional.of(existingMessageLink)
+        existingMessageLink.addMessageId(newMessageId)
+        1 * mockMessageLinkStorage.saveMessageLink(existingMessageLink)
     }
 }

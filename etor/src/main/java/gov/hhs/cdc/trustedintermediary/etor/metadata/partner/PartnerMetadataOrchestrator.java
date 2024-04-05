@@ -251,10 +251,21 @@ public class PartnerMetadataOrchestrator {
     }
 
     public void linkMessages(Set<String> messageIds) throws MessageLinkException {
-        MessageLink messageLink =
-                messageLinkStorage
-                        .getMessageLink(messageIds.iterator().next())
-                        .orElseGet(() -> new MessageLink(null, messageIds));
+        Optional<MessageLink> existingMessageLink = Optional.empty();
+        for (String messageId : messageIds) {
+            existingMessageLink = messageLinkStorage.getMessageLink(messageId);
+            if (existingMessageLink.isPresent()) {
+                break;
+            }
+        }
+
+        if (existingMessageLink.isEmpty()) {
+            messageLinkStorage.saveMessageLink(new MessageLink(null, messageIds));
+            return;
+        }
+
+        MessageLink messageLink = existingMessageLink.get();
+        messageLink.addMessageIds(messageIds);
         messageLinkStorage.saveMessageLink(messageLink);
     }
 
