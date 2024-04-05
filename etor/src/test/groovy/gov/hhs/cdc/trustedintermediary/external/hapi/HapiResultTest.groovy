@@ -6,8 +6,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import org.hl7.fhir.r4.model.*
 import spock.lang.Specification
 
-import java.util.function.Supplier
-
 class HapiResultTest extends Specification {
 
     def fhirEngine = HapiFhirImplementation.getInstance()
@@ -65,7 +63,7 @@ class HapiResultTest extends Specification {
     def "getPlacerOrderNumber unhappy path"() {
         given:
         def expectedPlacerOrderNumber = ""
-        def result = setupOrderWithEmptyMessageHeader()
+        def result = setupResultWithEmptyMessageHeader()
 
         when:
         def actualPlacerOrderNumber = result.getPlacerOrderNumber()
@@ -80,7 +78,7 @@ class HapiResultTest extends Specification {
         def universalId = "natus.health.state.mn.us"
         def universalIdType = "DNS"
         def expectedApplicationDetails = new MessageHdDataType(nameSpaceId, universalId, universalIdType)
-        def results = setupOrderWithSendingApplicationDetails(nameSpaceId, universalId, universalIdType)
+        def results = setupResultWithSendingApplicationDetails(nameSpaceId, universalId, universalIdType)
 
         when:
         def actualApplicationDetails = results.getSendingApplicationDetails()
@@ -94,7 +92,7 @@ class HapiResultTest extends Specification {
     def "getSendingApplicationDetails unhappy path"() {
         given:
         def expectedApplicationDetails = new MessageHdDataType("", "", "")
-        def results = setupOrderWithEmptyMessageHeader()
+        def results = setupResultWithEmptyMessageHeader()
 
         when:
         def actualApplicationDetails = results.getSendingApplicationDetails()
@@ -110,7 +108,7 @@ class HapiResultTest extends Specification {
         def facilityName = "MN Public Health Lab"
         def universalId = "2.16.840.1.114222.4.1.10080"
         def universalIdType = "ISO"
-        def results = setupOrderWithSendingFacilityDetails(facilityName, universalId, universalIdType)
+        def results = setupResultWithSendingFacilityDetails(facilityName, universalId, universalIdType)
         def expectedFacilityDetails = new MessageHdDataType(facilityName, universalId, universalIdType)
 
         when:
@@ -125,7 +123,7 @@ class HapiResultTest extends Specification {
     def "getSendingFacilityDetails unhappy path works"() {
         given:
         def expectedFacilityDetails = new MessageHdDataType("", "", "")
-        def results = setupOrderWithEmptyMessageHeader()
+        def results = setupResultWithEmptyMessageHeader()
 
         when:
         def actualFacilityDetails = results.getSendingFacilityDetails()
@@ -142,7 +140,7 @@ class HapiResultTest extends Specification {
         def universalId = "1.2.840.114350.1.13.145.2.7.2.695071"
         def universalIdType = "ISO"
         def expectedApplicationDetails = new MessageHdDataType(namespaceId, universalId, universalIdType)
-        def results = setupOrderWithReceivingApplicationDetails(namespaceId, universalId, universalIdType)
+        def results = setupResultWithReceivingApplicationDetails(namespaceId, universalId, universalIdType)
 
         when:
         def actualApplicationDetails = results.getReceivingApplicationDetails()
@@ -155,7 +153,7 @@ class HapiResultTest extends Specification {
 
     def "getReceivingApplicationDetails unhappy path"() {
         given:
-        def results = setupOrderWithEmptyMessageHeader()
+        def results = setupResultWithEmptyMessageHeader()
         def expectedApplicationDetails = new MessageHdDataType("", "", "")
 
         when:
@@ -173,7 +171,7 @@ class HapiResultTest extends Specification {
         def universalId = "Samtracare.com"
         def universalIdType = "DNS"
         def expectedFacilityDetails = new MessageHdDataType(facilityName, universalId, universalIdType)
-        def results = setupOrderWithReceivingFacilityDetails(facilityName, universalId, universalIdType)
+        def results = setupResultWithReceivingFacilityDetails(facilityName, universalId, universalIdType)
 
         when:
         def actualFacilityDetails = results.getReceivingFacilityDetails()
@@ -186,7 +184,7 @@ class HapiResultTest extends Specification {
 
     def "getReceivingFacilityDetails unhappy path"() {
         given:
-        def results = setupOrderWithEmptyMessageHeader()
+        def results = setupResultWithEmptyMessageHeader()
         def expectedApplicationDetails = new MessageHdDataType("", "", "")
 
         when:
@@ -218,7 +216,7 @@ class HapiResultTest extends Specification {
         actualDetails.universalIdType() == expectedDetails.universalIdType()
     }
 
-    protected HapiResult setupOrderWithSendingApplicationDetails(String nameSpaceId, String universalId, String universalIdType) {
+    protected HapiResult setupResultWithSendingApplicationDetails(String nameSpaceId, String universalId, String universalIdType) {
         def innerOrders = new Bundle()
         def messageHeader = new MessageHeader()
         def endpoint = "urn:dns:natus.health.state.mn.us"
@@ -233,7 +231,7 @@ class HapiResultTest extends Specification {
         return new HapiResult(innerOrders)
     }
 
-    protected  HapiResult setupOrderWithSendingFacilityDetails(String facilityName, String universalId, String universalIdType) {
+    protected  HapiResult setupResultWithSendingFacilityDetails(String facilityName, String universalId, String universalIdType) {
         def innerOrders = new Bundle()
         def messageHeader = new MessageHeader()
         def orgReference = "Organization/1708034743302204787.82104dfb-e854-47de-b7ce-19a2b71e61db"
@@ -267,7 +265,7 @@ class HapiResultTest extends Specification {
         return new HapiResult(jsonOrders)
     }
 
-    protected HapiResult setupOrderWithReceivingApplicationDetails(String namespaceId, String universalId, String universalIdType) {
+    protected HapiResult setupResultWithReceivingApplicationDetails(String namespaceId, String universalId, String universalIdType) {
         def innerOrders = new Bundle()
         def messageHeader = new MessageHeader()
         def destination = new MessageHeader.MessageDestinationComponent()
@@ -282,7 +280,7 @@ class HapiResultTest extends Specification {
         return new HapiResult(innerOrders)
     }
 
-    protected HapiResult setupOrderWithReceivingFacilityDetails(String facilityName, String universalId, String universalIdType) {
+    protected HapiResult setupResultWithReceivingFacilityDetails(String facilityName, String universalId, String universalIdType) {
         def innerOrders = new Bundle()
         def messageHeader = new MessageHeader()
         def organizationReference = "Organization/1708034743312390878.b61e734a-4d65-4e25-b423-cdb19018d84a"
@@ -318,7 +316,7 @@ class HapiResultTest extends Specification {
         return new HapiResult(jsonOrders)
     }
 
-    protected HapiResult setupOrderWithEmptyMessageHeader() {
+    protected HapiResult setupResultWithEmptyMessageHeader() {
         def innerOrders = new Bundle()
         MessageHeader messageHeader = new MessageHeader()
         innerOrders.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
