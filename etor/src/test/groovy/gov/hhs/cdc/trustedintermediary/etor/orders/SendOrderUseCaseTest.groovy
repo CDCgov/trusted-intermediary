@@ -90,7 +90,7 @@ class SendOrderUseCaseTest extends Specification {
         SendOrderUseCase.getInstance().convertAndSend(Mock(Order), null)
 
         then:
-        2 * mockLogger.logWarning(_)
+        3 * mockLogger.logWarning(_)
         0 * mockOrchestrator.updateMetadataForReceivedMessage(_, _)
     }
 
