@@ -3,7 +3,8 @@ package gov.hhs.cdc.trustedintermediary.plugin.path;
 public enum FhirPath {
     PLACER_ORDER_NUMBER(
             """
-		Bundle.entry.resource.ofType(ServiceRequest).identifier.where(type.coding.code = 'PLAC').value"""),
+     Bundle.entry.resource.ofType(ServiceRequest).identifier.where(type.coding.code = 'PLAC').value
+     """),
     SENDING_FACILITY_NAMESPACE(
             """
    Bundle.entry.resource.ofType(MessageHeader).sender.resolve().identifier.where(
@@ -27,16 +28,16 @@ public enum FhirPath {
    """),
     SENDING_APPLICATION_NAMESPACE(
             """
-		Bundle.entry.resource.ofType(MessageHeader).source.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id').value
-	"""),
+ Bundle.entry.resource.ofType(MessageHeader).source.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id').value
+ """),
     SENDING_APPLICATION_UNIVERSAL_ID(
             """
-		Bundle.entry.resource.ofType(MessageHeader).source.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id').value
-	"""),
+ Bundle.entry.resource.ofType(MessageHeader).source.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id').value
+ """),
     SENDING_APPLICATION_UNIVERSAL_ID_TYPE(
             """
-		Bundle.entry.resource.ofType(MessageHeader).source.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type').value
-	"""),
+ Bundle.entry.resource.ofType(MessageHeader).source.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type').value
+ """),
     RECEIVING_FACILITY_NAMESPACE(
             """
    Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(
@@ -60,16 +61,16 @@ public enum FhirPath {
    """),
     RECEIVING_APPLICATION_NAMESPACE(
             """
-		Bundle.entry.resource.ofType(MessageHeader).destination.name
-	"""),
+ Bundle.entry.resource.ofType(MessageHeader).destination.name
+ """),
     RECEIVING_APPLICATION_UNIVERSAL_ID(
             """
-		Bundle.entry.resource.ofType(MessageHeader).destination.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id').value
-	"""),
+ Bundle.entry.resource.ofType(MessageHeader).destination.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id').value
+ """),
     RECEIVING_APPLICATION_UNIVERSAL_ID_TYPE(
             """
-		Bundle.entry.resource.ofType(MessageHeader).destination.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type').value
-	""");
+ Bundle.entry.resource.ofType(MessageHeader).destination.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type').value
+ """);
 
     private final String path;
 
