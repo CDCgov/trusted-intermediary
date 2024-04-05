@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.hapi;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType;
 import gov.hhs.cdc.trustedintermediary.etor.results.Result;
+import java.util.function.Supplier;
 import org.hl7.fhir.r4.model.Bundle;
 
 /** Filler concrete implementation of a {@link Result} using the Hapi FHIR library */
@@ -34,61 +35,44 @@ public class HapiResult implements Result<Bundle> {
 
     @Override
     public MessageHdDataType getSendingApplicationDetails() {
-        String sendingApplicationNamespace =
-                MESSAGE_HELPER.extractSendingApplicationNamespace(innerResult);
-        String sendingApplicationUniversalId =
-                MESSAGE_HELPER.extractSendingApplicationUniversalId(innerResult);
-        String sendingApplicationUniversalIdType =
-                MESSAGE_HELPER.extractSendingApplicationUniversalIdType(innerResult);
-
-        return new MessageHdDataType(
-                sendingApplicationNamespace,
-                sendingApplicationUniversalId,
-                sendingApplicationUniversalIdType);
+        return extractMessageHdDataType(
+                () -> MESSAGE_HELPER.extractSendingApplicationNamespace(innerResult),
+                () -> MESSAGE_HELPER.extractSendingApplicationUniversalId(innerResult),
+                () -> MESSAGE_HELPER.extractSendingApplicationUniversalIdType(innerResult));
     }
 
     @Override
     public MessageHdDataType getSendingFacilityDetails() {
-        String sendingFacilityNamespace =
-                MESSAGE_HELPER.extractSendingFacilityNamespace(innerResult);
-        String sendingFacilityUniversalId =
-                MESSAGE_HELPER.extractSendingFacilityUniversalId(innerResult);
-        String sendingFacilityUniversalIdType =
-                MESSAGE_HELPER.extractSendingFacilityUniversalIdType(innerResult);
-
-        return new MessageHdDataType(
-                sendingFacilityNamespace,
-                sendingFacilityUniversalId,
-                sendingFacilityUniversalIdType);
+        return extractMessageHdDataType(
+                () -> MESSAGE_HELPER.extractSendingFacilityNamespace(innerResult),
+                () -> MESSAGE_HELPER.extractSendingFacilityUniversalId(innerResult),
+                () -> MESSAGE_HELPER.extractSendingFacilityUniversalIdType(innerResult));
     }
 
     @Override
     public MessageHdDataType getReceivingApplicationDetails() {
-        String receivingApplicationNamespace =
-                MESSAGE_HELPER.extractReceivingApplicationNamespace(innerResult);
-        String receivingApplicationUniversalId =
-                MESSAGE_HELPER.extractReceivingApplicationUniversalId(innerResult);
-        String receivingApplicationUniversalIdType =
-                MESSAGE_HELPER.extractReceivingApplicationUniversalIdType(innerResult);
-
-        return new MessageHdDataType(
-                receivingApplicationNamespace,
-                receivingApplicationUniversalId,
-                receivingApplicationUniversalIdType);
+        return extractMessageHdDataType(
+                () -> MESSAGE_HELPER.extractReceivingApplicationNamespace(innerResult),
+                () -> MESSAGE_HELPER.extractReceivingApplicationUniversalId(innerResult),
+                () -> MESSAGE_HELPER.extractReceivingApplicationUniversalIdType(innerResult));
     }
 
     @Override
     public MessageHdDataType getReceivingFacilityDetails() {
-        String receivingFacilityNamespace =
-                MESSAGE_HELPER.extractReceivingFacilityNamespace(innerResult);
-        String receivingFacilityUniversalId =
-                MESSAGE_HELPER.extractReceivingFacilityUniversalId(innerResult);
-        String receivingFacilityUniversalIdType =
-                MESSAGE_HELPER.extractReceivingFacilityUniversalIdType(innerResult);
+        return extractMessageHdDataType(
+                () -> MESSAGE_HELPER.extractReceivingFacilityNamespace(innerResult),
+                () -> MESSAGE_HELPER.extractReceivingFacilityUniversalId(innerResult),
+                () -> MESSAGE_HELPER.extractReceivingFacilityUniversalIdType(innerResult));
+    }
 
-        return new MessageHdDataType(
-                receivingFacilityNamespace,
-                receivingFacilityUniversalId,
-                receivingFacilityUniversalIdType);
+    private MessageHdDataType extractMessageHdDataType(
+            Supplier<String> namespaceExtractor,
+            Supplier<String> universalIdExtractor,
+            Supplier<String> universalIdTypeExtractor) {
+        String namespace = namespaceExtractor.get();
+        String universalId = universalIdExtractor.get();
+        String universalIdType = universalIdTypeExtractor.get();
+
+        return new MessageHdDataType(namespace, universalId, universalIdType);
     }
 }
