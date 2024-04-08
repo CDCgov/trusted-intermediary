@@ -59,11 +59,11 @@ class SendOrderUseCaseTest extends Specification {
                 receivedSubmissionId,
                 _ as String,
                 messageType,
-                "order.getSendingApplicationId()",
-                "order.getSendingFacilityId()",
-                "order.getReceivingApplicationId()",
-                "order.getReceivingFacilityId()",
-                "order.getPlacerOrderNumber()")
+                mockOmlOrder.getSendingApplicationDetails(),
+                mockOmlOrder.getSendingFacilityDetails(),
+                mockOmlOrder.getReceivingApplicationDetails(),
+                mockOmlOrder.getReceivingFacilityDetails(),
+                mockOmlOrder.getPlacerOrderNumber())
         1 * mockOrchestrator.updateMetadataForSentMessage(receivedSubmissionId, sentSubmissionId)
         1 * mockOrchestrator.findMessagesIdsToLink(receivedSubmissionId) >> messagesIdsToLink
         1 * mockOrchestrator.linkMessages(messagesIdsToLink)
@@ -101,11 +101,11 @@ class SendOrderUseCaseTest extends Specification {
         def receivedSubmissionId = "receivedId"
         def messageType = PartnerMetadataMessageType.ORDER
         mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String, messageType,
-                "order.getSendingApplicationId()",
-                "order.getSendingFacilityId()",
-                "order.getReceivingApplicationId()",
-                "order.getReceivingFacilityId()",
-                "order.getPlacerOrderNumber()") >> { throw new PartnerMetadataException("Error") }
+                order.getSendingApplicationDetails(),
+                order.getSendingFacilityDetails(),
+                order.getReceivingApplicationDetails(),
+                order.getReceivingFacilityDetails(),
+                order.getPlacerOrderNumber()) >> { throw new PartnerMetadataException("Error") }
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
