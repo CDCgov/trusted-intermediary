@@ -627,12 +627,14 @@ class PartnerMetadataOrchestratorTest extends Specification {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
         def placerOrderNumber = "placerOrderNumber"
-        def sendingApplicationId = "sendingApplicationId"
-        def sendingFacilityId = "sendingFacilityId"
         def receivedSubmissionId1 = "1"
         def receivedSubmissionId2 = "2"
-        def partnerMetadata1 = new PartnerMetadata(receivedSubmissionId1, "sender1", Instant.now(), null, "hash1", PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER, sendingApplicationId, sendingFacilityId, "receivingApplicationId1", "receivingFacility1", placerOrderNumber)
-        def partnerMetadata2 = new PartnerMetadata(receivedSubmissionId2, "sender2", Instant.now(), null, "hash2", PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.RESULT, sendingApplicationId, sendingFacilityId, "receivingApplicationId2", "receivingFacility2", placerOrderNumber)
+        def sendingAppDetails = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
+        def sendingFacilityDetails = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
+        def receivingAppDetails = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
+        def receivingFacilityDetails = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
+        def partnerMetadata1 = new PartnerMetadata(receivedSubmissionId1, "sender1", Instant.now(), null, "hash1", PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, placerOrderNumber)
+        def partnerMetadata2 = new PartnerMetadata(receivedSubmissionId2, "sender2", Instant.now(), null, "hash2", PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.RESULT, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, placerOrderNumber)
         def metadataSetForMessageLinking = Set.of(partnerMetadata1, partnerMetadata2)
         mockPartnerMetadataStorage.readMetadataForMessageLinking(receivedSubmissionId) >> metadataSetForMessageLinking
 
