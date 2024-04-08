@@ -16,9 +16,4 @@ public class HapiFhirResource implements FhirResource<IBaseResource> {
     public IBaseResource getUnderlyingResource() {
         return innerResource;
     }
-
-    @Override
-    public String getFhirResourceId() {
-        return innerResource.getIdElement().getIdPart();
-    }
 }
