@@ -58,11 +58,11 @@ class SendOrderUseCaseTest extends Specification {
                 receivedSubmissionId,
                 _ as String,
                 messageType,
-                "order.getSendingApplicationId()",
-                "order.getSendingFacilityId()",
-                "order.getReceivingApplicationId()",
-                "order.getReceivingFacilityId()",
-                "order.getPlacerOrderNumber()")
+                mockOrder.getSendingApplicationDetails(),
+                mockOrder.getSendingFacilityDetails(),
+                mockOrder.getReceivingApplicationDetails(),
+                mockOrder.getReceivingFacilityDetails(),
+                mockOrder.getPlacerOrderNumber())
         1 * mockOrchestrator.updateMetadataForSentMessage(receivedSubmissionId, sentSubmissionId)
     }
 
@@ -98,11 +98,11 @@ class SendOrderUseCaseTest extends Specification {
         def receivedSubmissionId = "receivedId"
         def messageType = PartnerMetadataMessageType.ORDER
         mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String, messageType,
-                "order.getSendingApplicationId()",
-                "order.getSendingFacilityId()",
-                "order.getReceivingApplicationId()",
-                "order.getReceivingFacilityId()",
-                "order.getPlacerOrderNumber()") >> { throw new PartnerMetadataException("Error") }
+                order.getSendingApplicationDetails(),
+                order.getSendingFacilityDetails(),
+                order.getReceivingApplicationDetails(),
+                order.getReceivingFacilityDetails(),
+                order.getPlacerOrderNumber()) >> { throw new PartnerMetadataException("Error") }
         TestApplicationContext.injectRegisteredImplementations()
 
         when:

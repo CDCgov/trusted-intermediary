@@ -94,22 +94,22 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                                 false,
                                 Types.VARCHAR),
                         new DbColumn(
-                                "sending_application_id",
+                                "sending_application_details",
                                 metadata.sendingApplicationDetails(),
                                 false,
                                 Types.VARCHAR),
                         new DbColumn(
-                                "sending_facility_id",
+                                "sending_facility_details",
                                 metadata.sendingFacilityDetails(),
                                 false,
                                 Types.VARCHAR),
                         new DbColumn(
-                                "receiving_application_id",
+                                "receiving_application_details",
                                 metadata.receivingApplicationDetails(),
                                 false,
                                 Types.VARCHAR),
                         new DbColumn(
-                                "receiving_facility_id",
+                                "receiving_facility_details",
                                 metadata.receivingFacilityDetails(),
                                 false,
                                 Types.VARCHAR));

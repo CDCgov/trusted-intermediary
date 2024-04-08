@@ -1,11 +1,15 @@
 package gov.hhs.cdc.trustedintermediary.external.database
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
+import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool
 import gov.hhs.cdc.trustedintermediary.wrappers.database.DatabaseCredentialsProvider
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
+
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -21,6 +25,7 @@ class PostgresDaoTest extends Specification {
     private Connection mockConn
     private PreparedStatement mockPreparedStatement
     private ResultSet mockResultSet
+    private String details
 
     def setup() {
         TestApplicationContext.reset()
@@ -35,6 +40,14 @@ class PostgresDaoTest extends Specification {
 
         TestApplicationContext.register(DatabaseCredentialsProvider, mockCredentialsProvider)
         TestApplicationContext.register(PostgresDao, PostgresDao.getInstance())
+
+        details = """
+            {
+                "namespace": "samSpaceId",
+                "universalId": "universalId",
+                "universalIdType": "universalIdType"
+            }
+            """
     }
 
     def "upsertData works"() {
@@ -146,7 +159,12 @@ class PostgresDaoTest extends Specification {
         mockResultSet.getTimestamp(_ as String) >> Timestamp.from(Instant.now())
         mockResultSet.getString("delivery_status") >> "DELIVERED"
         mockResultSet.getString("message_type") >> "RESULT"
+        mockResultSet.getString("sending_application_details") >> details
+        mockResultSet.getString("sending_facility_details") >> details
+        mockResultSet.getString("receiving_application_details") >> details
+        mockResultSet.getString("receiving_facility_details") >> details
         TestApplicationContext.register(ConnectionPool, mockConnPool)
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -202,10 +220,10 @@ class PostgresDaoTest extends Specification {
         def status = PartnerMetadataStatus.PENDING
         def reason = "It done Goofed"
         def messageType = PartnerMetadataMessageType.RESULT
-        def sendingApp = "sending_app"
-        def sendingFacility = "sending_facility"
-        def receivingApp = "receiving_app"
-        def receivingFacility = "receiving_facility"
+        def sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
+        def sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
+        def receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
+        def receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
         def placerOrderNumber = "placer_order_number"
         def expected = new PartnerMetadata(receivedMessageId, sentMessageId, sender, receiver, timeReceived, timeDelivered, hash, status, reason, messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
 
@@ -230,6 +248,7 @@ class PostgresDaoTest extends Specification {
         mockPreparedStatement.executeQuery() >> mockResultSet
 
         TestApplicationContext.register(ConnectionPool, mockConnPool)
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -249,7 +268,12 @@ class PostgresDaoTest extends Specification {
         mockResultSet.getString("delivery_status") >> "DELIVERED"
         mockResultSet.getString("message_type") >> "RESULT"
         mockResultSet.getString("failure_reason") >> "Your time is up"
+        mockResultSet.getString("sending_application_details") >> details
+        mockResultSet.getString("sending_facility_details") >> details
+        mockResultSet.getString("receiving_application_details") >> details
+        mockResultSet.getString("receiving_facility_details") >> details
         TestApplicationContext.register(ConnectionPool, mockConnPool)
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -263,8 +287,12 @@ class PostgresDaoTest extends Specification {
         given:
         def sender = "DogCow"
         def messageType = PartnerMetadataMessageType.RESULT
-        def expected1 = new PartnerMetadata("12345", "7890", sender, "You'll get your just reward", Instant.parse("2024-01-03T15:45:33.30Z"),Instant.parse("2024-01-03T15:45:33.30Z"),  sender.hashCode().toString(), PartnerMetadataStatus.PENDING, "It done Goofed", messageType, "sending_app", "sending_facility", "receiving_app", "receiving_facility", "placer_order_number")
-        def expected2 = new PartnerMetadata("doreyme", "fasole", sender, "receiver", Instant.now(), Instant.now(), "gobeltygoook", PartnerMetadataStatus.DELIVERED, "cause I said so", messageType, "sending_app", "sending_facility", "receiving_app", "receiving_facility", "placer_order_number")
+        def sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
+        def sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
+        def receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
+        def receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
+        def expected1 = new PartnerMetadata("12345", "7890", sender, "You'll get your just reward", Instant.parse("2024-01-03T15:45:33.30Z"),Instant.parse("2024-01-03T15:45:33.30Z"),  sender.hashCode().toString(), PartnerMetadataStatus.PENDING, "It done Goofed", messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
+        def expected2 = new PartnerMetadata("doreyme", "fasole", sender, "receiver", Instant.now(), Instant.now(), "gobeltygoook", PartnerMetadataStatus.DELIVERED, "cause I said so", messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
 
         mockConnPool.getConnection() >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
@@ -332,6 +360,7 @@ class PostgresDaoTest extends Specification {
         mockPreparedStatement.executeQuery() >> mockResultSet
 
         TestApplicationContext.register(ConnectionPool, mockConnPool)
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
 
