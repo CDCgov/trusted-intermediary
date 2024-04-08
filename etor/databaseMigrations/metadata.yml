@@ -98,14 +98,14 @@ databaseChangeLog:
                   name: placer_order_number
                   type: varchar(427)
               - column:
-                  name: sending_application_id
-                  type: varchar(227)
+                  name: sending_application_details
+                  type: jsonb
               - column:
-                  name: sending_facility_id
-                  type: varchar(227)
+                  name: sending_facility_details
+                  type: jsonb
               - column:
-                  name: receiving_application_id
-                  type: varchar(227)
+                  name: receiving_application_details
+                  type: jsonb
               - column:
-                  name: receiving_facility_id
-                  type: varchar(227)
+                  name: receiving_facility_details
+                  type: jsonb
