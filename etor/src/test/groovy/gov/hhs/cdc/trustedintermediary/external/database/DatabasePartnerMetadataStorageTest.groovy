@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.database
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
@@ -16,7 +17,11 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
     private def mockDao
 
-    def mockMetadata = new PartnerMetadata("receivedSubmissionId", "sentSubmissionId","sender", "receiver", Instant.now(), Instant.now(), "hash", PartnerMetadataStatus.DELIVERED, "failure reason", PartnerMetadataMessageType.ORDER, "sending_app", "sending_facility", "receiving_app", "receiving_facility", "placer_order_number")
+    def sendingAppDetails = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
+    def sendingFacilityDetails = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
+    def receivingAppDetails = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
+    def receivingFacilityDetails = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
+    def mockMetadata = new PartnerMetadata("receivedSubmissionId", "sentSubmissionId","sender", "receiver", Instant.now(), Instant.now(), "hash", PartnerMetadataStatus.DELIVERED, "failure reason", PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
 
     def setup() {
         TestApplicationContext.reset()
@@ -94,6 +99,10 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
     def "saveMetadata writes null timestamp"() {
         given:
+        def sendingAppDetails = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
+        def sendingFacilityDetails = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
+        def receivingAppDetails = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
+        def receivingFacilityDetails = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
         def mockMetadata = new PartnerMetadata(
                 "receivedSubmissionId",
                 "sentSubmissionId",
@@ -105,10 +114,10 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 null, // PartnerMetadata defaults deliveryStatus to PENDING on null, so that's why we're asserting not-null bellow
                 "DogCow failure",
                 null,
-                "sending_app",
-                "sending_facility",
-                "receiving_app",
-                "receiving_facility",
+                sendingAppDetails,
+                sendingFacilityDetails,
+                receivingAppDetails,
+                receivingFacilityDetails,
                 "placer_order_number"
                 )
 
