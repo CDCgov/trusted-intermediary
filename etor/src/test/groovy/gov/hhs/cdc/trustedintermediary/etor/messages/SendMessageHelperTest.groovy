@@ -9,9 +9,13 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import spock.lang.Specification
 
 class SendMessageHelperTest extends Specification {
-
     def mockOrchestrator = Mock(PartnerMetadataOrchestrator)
     def mockLogger = Mock(Logger)
+    private sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
+    private sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
+    private receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
+    private receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
+    private placerOrderNumber = "placer_order_number"
 
     def setup() {
         TestApplicationContext.reset()
@@ -22,28 +26,16 @@ class SendMessageHelperTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
     }
     def "savePartnerMetadataForReceivedMessage works"() {
-        given:
-        def sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        def receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-        def receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
-
         when:
-        SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage("receivedId", new Random().nextInt(), PartnerMetadataMessageType.RESULT,sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
+        SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage("receivedId", new Random().nextInt(), PartnerMetadataMessageType.RESULT,sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
 
         then:
         1 * mockOrchestrator.updateMetadataForReceivedMessage(_, _, _, _, _, _, _, _)
     }
 
     def "savePartnerMetadataForReceivedMessage should log warnings for null receivedSubmissionId"() {
-        given:
-        def sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        def receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-        def receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
-
         when:
-        SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage(null, new Random().nextInt(), PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility,"placer_order_number")
+        SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage(null, new Random().nextInt(), PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
 
         then:
         1 * mockLogger.logWarning(_)
@@ -54,11 +46,6 @@ class SendMessageHelperTest extends Specification {
         def hashCode = new Random().nextInt()
         def messageType = PartnerMetadataMessageType.RESULT
         def receivedSubmissionId = "receivedId"
-        def sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        def receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-        def receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
-        def placerOrderNumber = "placer_order_number"
         mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String, messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber) >> { throw new PartnerMetadataException("Error") }
 
         when:
