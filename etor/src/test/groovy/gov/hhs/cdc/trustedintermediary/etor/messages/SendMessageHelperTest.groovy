@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.messages
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator
@@ -102,5 +103,65 @@ class SendMessageHelperTest extends Specification {
 
         then:
         1 * mockLogger.logError(_, _)
+    }
+
+    def "linkMessage logs warning and ends silently when passed a null id"() {
+        when:
+        SendMessageHelper.getInstance().linkMessage(null)
+
+        then:
+        1 * mockLogger.logWarning(_, _)
+        notThrown(Exception)
+    }
+
+    def "linkMessage logs error when there's a PartnerMetadataException"() {
+        given:
+        mockOrchestrator.findMessagesIdsToLink(_ as String) >> {throw new PartnerMetadataException("")}
+
+        when:
+        SendMessageHelper.getInstance().linkMessage("1")
+
+        then:
+        1 * mockLogger.logError(_, _)
+        notThrown(PartnerMetadataException)
+    }
+
+    def "linkMessage logs error when there's a MessageLinkException"() {
+        given:
+        mockOrchestrator.findMessagesIdsToLink(_ as String) >> ["1"]
+        mockOrchestrator.linkMessages(_ as Set<String>) >> {throw new MessageLinkException("")}
+
+        when:
+        SendMessageHelper.getInstance().linkMessage("1")
+
+        then:
+        1 * mockLogger.logError(_, _)
+        notThrown(MessageLinkException)
+    }
+
+    def "linkMessage finishes silently if the list of message ids is null"() {
+        given:
+        mockOrchestrator.findMessagesIdsToLink(_ as String) >> null
+
+        when:
+        SendMessageHelper.getInstance().linkMessage("1")
+
+        then:
+        0 * mockLogger.logWarning(_, _)
+        0 * mockLogger.logError(_, _)
+        notThrown(Exception)
+    }
+
+    def "linkMessage finishes silently if the list of message ids is empty"() {
+        given:
+        mockOrchestrator.findMessagesIdsToLink(_ as String) >> []
+
+        when:
+        SendMessageHelper.getInstance().linkMessage("1")
+
+        then:
+        0 * mockLogger.logWarning(_, _)
+        0 * mockLogger.logError(_, _)
+        notThrown(Exception)
     }
 }

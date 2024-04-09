@@ -82,7 +82,8 @@ public class SendMessageHelper {
         try {
             Set<String> messageIdsToLink =
                     partnerMetadataOrchestrator.findMessagesIdsToLink(receivedSubmissionId);
-            if (messageIdsToLink.isEmpty()) {
+
+            if (messageIdsToLink == null || messageIdsToLink.isEmpty()) {
                 return;
             }
             logger.logInfo(
