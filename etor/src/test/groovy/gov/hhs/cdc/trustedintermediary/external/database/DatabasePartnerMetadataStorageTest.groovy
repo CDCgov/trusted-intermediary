@@ -84,7 +84,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         thrown(PartnerMetadataException)
     }
 
-    def "readMetadatForSender unhappy path triggers SQLException"() {
+    def "readMetadatForSender unhappy path triggers FormatterProcessingException"() {
         given:
         def sender = "testSender"
         mockDao.fetchMetadataForSender(sender) >> { throw new FormatterProcessingException("Format error", new Throwable()) }
@@ -94,6 +94,31 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
         then:
         thrown(PartnerMetadataException)
+    }
+
+    def "readMetadataForSender happy path works"() {
+        given:
+        def sender = "testSender"
+        def metadata1 = new PartnerMetadata(
+                "receivedSubmissionId1", "sentSubmissionId1", "sender1", "receiver1",
+                Instant.now(), Instant.now(), "hash1", PartnerMetadataStatus.DELIVERED,
+                "", PartnerMetadataMessageType.ORDER, null, null, null, null, "placer_order_number1")
+        def metadata2 = new PartnerMetadata(
+                "receivedSubmissionId2", "sentSubmissionId2", "sender2", "receiver2",
+                Instant.now(), Instant.now(), "hash2", PartnerMetadataStatus.DELIVERED,
+                "", PartnerMetadataMessageType.ORDER, null, null, null, null, "placer_order_number2")
+        def expectedMetadataSet = new HashSet<>()
+        expectedMetadataSet.add(metadata1)
+        expectedMetadataSet.add(metadata2)
+
+        mockDao.fetchMetadataForSender(sender) >> expectedMetadataSet
+
+        when:
+        def actualMetadataSet = DatabasePartnerMetadataStorage.getInstance().readMetadataForSender(sender)
+
+        then:
+        actualMetadataSet.size() == expectedMetadataSet.size()
+        actualMetadataSet.containsAll(expectedMetadataSet)
     }
 
     def "saveMetadata happy path works"() {
