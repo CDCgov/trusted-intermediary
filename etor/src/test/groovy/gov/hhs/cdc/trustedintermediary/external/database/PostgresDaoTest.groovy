@@ -405,4 +405,74 @@ class PostgresDaoTest extends Specification {
         then:
         actual.get().getLinkId() == expected.get().getLinkId()
     }
+
+    def "insertMessageLink unhappy path throws exception"() {
+        given:
+        mockConnPool.getConnection() >> mockConn
+        mockConn.prepareStatement(_ as String) >> { throw new SQLException() }
+
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        PostgresDao.getInstance().insertMessageLink(new MessageLink(1, "MessageId"))
+
+        then:
+        thrown(SQLException)
+    }
+
+    def "insertMessageLink successfully inserts message links"() {
+        given:
+        def linkId = 1
+        def messageIds = ["MessageId1", "MessageId2"]
+        def messageLink = new MessageLink(linkId, new HashSet<>(messageIds))
+        mockConnPool.getConnection() >> mockConn
+        mockConn.prepareStatement(_ as String, Statement.RETURN_GENERATED_KEYS) >> mockPreparedStatement
+        mockConn.prepareStatement(_ as String) >> mockPreparedStatement
+        mockPreparedStatement.executeQuery() >> mockResultSet
+        mockResultSet.next() >> true >> false // Simulate retrieving next_link_id
+        mockResultSet.getInt(1) >> linkId
+        // Setup for verifying the transaction is committed
+        mockConn.setAutoCommit(false)
+        mockConn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
+
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        PostgresDao.getInstance().insertMessageLink(messageLink)
+
+        then:
+        1 * mockConn.setAutoCommit(false)
+        1 * mockConn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
+        1 * mockConn.commit()
+        0 * mockConn.rollback()
+        messageIds.each { messageId ->
+            1 * mockPreparedStatement.setInt(1, linkId)
+            1 * mockPreparedStatement.setString(2, messageId)
+            1 * mockPreparedStatement.setString(3, messageId)
+        }
+        1 * mockConn.setAutoCommit(true)
+    }
+
+    def "insertMessageLink rolls back transaction on SQLException"() {
+        given:
+        def messageLink = new MessageLink(1, "MessageId")
+        mockConnPool.getConnection() >> mockConn
+        mockConn.prepareStatement(_ as String) >> { throw new SQLException("Simulated SQL failure") }
+        mockConn.setAutoCommit(false)
+        mockConn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
+
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        PostgresDao.getInstance().insertMessageLink(messageLink)
+
+        then:
+        thrown(SQLException)
+        1 * mockConn.setAutoCommit(false)
+        1 * mockConn.rollback()
+        1 * mockConn.setAutoCommit(true)
+    }
 }
