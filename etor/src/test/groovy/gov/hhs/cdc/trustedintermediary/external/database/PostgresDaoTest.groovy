@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.database
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
@@ -360,4 +361,48 @@ class PostgresDaoTest extends Specification {
     }
 
     // def "throws exception for FormatterProcessingException"() {}
+
+
+    def "fetchMessageLink returns empty optional when rows do not exist"() {
+        given:
+        mockConnPool.getConnection() >> mockConn
+        mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
+        mockResultSet.next() >> false
+        mockPreparedStatement.executeQuery() >> mockResultSet
+
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def actual = PostgresDao.getInstance().fetchMessageLink("mock_lookup")
+
+        then:
+        actual == Optional.empty()
+    }
+
+    def "fetchMessageLink returns partner metadata when rows exist"() {
+        given:
+        def messageLink = new MessageLink(1, "MessageId")
+        def expected = Optional.of(messageLink)
+        def linkId = 1
+        def messageIds = "MessageId"
+
+        mockConnPool.getConnection() >> mockConn
+        mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
+        // First run returns true, then return false
+        mockResultSet.next() >> true >> false
+        mockResultSet.getInt("link_id") >> linkId
+        mockResultSet.getString("message_id") >> messageIds
+
+        mockPreparedStatement.executeQuery() >> mockResultSet
+
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def actual = PostgresDao.getInstance().fetchMessageLink("MessageId")
+
+        then:
+        actual.get().getLinkId() == expected.get().getLinkId()
+    }
 }
