@@ -380,7 +380,7 @@ class PostgresDaoTest extends Specification {
         actual == Optional.empty()
     }
 
-    def "fetchMessageLink returns partner metadata when rows exist"() {
+    def "fetchMessageLink returns message link when rows exist"() {
         given:
         def messageLink = new MessageLink(1, "MessageId")
         def expected = Optional.of(messageLink)
