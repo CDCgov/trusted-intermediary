@@ -72,6 +72,18 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         thrown(PartnerMetadataException)
     }
 
+    def "readMetadatForSender unhappy path triggers FormatterProcessingException"() {
+        given:
+        def sender = "testSender"
+        mockDao.fetchMetadataForSender(sender) >> { throw new FormatterProcessingException("Format error", new Throwable()) }
+
+        when:
+        DatabasePartnerMetadataStorage.getInstance().readMetadataForSender(sender)
+
+        then:
+        thrown(PartnerMetadataException)
+    }
+
     def "saveMetadata happy path works"() {
         given:
         List<DbColumn> columns =
