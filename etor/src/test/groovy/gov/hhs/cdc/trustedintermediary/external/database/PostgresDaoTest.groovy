@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.database
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
@@ -360,4 +361,245 @@ class PostgresDaoTest extends Specification {
     }
 
     // def "throws exception for FormatterProcessingException"() {}
+
+
+    def "fetchMessageLink returns empty optional when rows do not exist"() {
+        given:
+        mockConnPool.getConnection() >> mockConn
+        mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
+        mockResultSet.next() >> false
+        mockPreparedStatement.executeQuery() >> mockResultSet
+
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def actual = PostgresDao.getInstance().fetchMessageLink("mock_lookup")
+
+        then:
+        actual == Optional.empty()
+    }
+
+    def "fetchMessageLink returns message link when rows exist"() {
+        given:
+        def messageLink = new MessageLink(1, "MessageId")
+        def expected = Optional.of(messageLink)
+        def linkId = 1
+        def messageIds = "MessageId"
+
+        mockConnPool.getConnection() >> mockConn
+        mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
+        // First run returns true, then return false
+        mockResultSet.next() >> true >> false
+        mockResultSet.getInt("link_id") >> linkId
+        mockResultSet.getString("message_id") >> messageIds
+
+        mockPreparedStatement.executeQuery() >> mockResultSet
+
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def actual = PostgresDao.getInstance().fetchMessageLink("MessageId")
+
+        then:
+        actual.get().getLinkId() == expected.get().getLinkId()
+    }
+
+    def "insertMessageLink unhappy path throws exception"() {
+        given:
+        mockConnPool.getConnection() >> mockConn
+        mockConn.prepareStatement(_ as String) >> { throw new SQLException() }
+
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        PostgresDao.getInstance().insertMessageLink(new MessageLink(1, "MessageId"))
+
+        then:
+        thrown(SQLException)
+    }
+
+    def "insertMessageLink successfully inserts message links"() {
+        given:
+        def linkId = 1
+        def messageIds = ["MessageId1", "MessageId2"]
+        def messageLink = new MessageLink(linkId, new HashSet<>(messageIds))
+        mockConnPool.getConnection() >> mockConn
+        mockConn.prepareStatement(_ as String, Statement.RETURN_GENERATED_KEYS) >> mockPreparedStatement
+        mockConn.prepareStatement(_ as String) >> mockPreparedStatement
+        mockPreparedStatement.executeQuery() >> mockResultSet
+        mockResultSet.next() >> true >> false // Simulate retrieving next_link_id
+        mockResultSet.getInt(1) >> linkId
+        // Setup for verifying the transaction is committed
+        mockConn.setAutoCommit(false)
+        mockConn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
+
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        PostgresDao.getInstance().insertMessageLink(messageLink)
+
+        then:
+        1 * mockConn.setAutoCommit(false)
+        1 * mockConn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
+        1 * mockConn.commit()
+        0 * mockConn.rollback()
+        messageIds.each { messageId ->
+            1 * mockPreparedStatement.setInt(1, linkId)
+            1 * mockPreparedStatement.setString(2, messageId)
+            1 * mockPreparedStatement.setString(3, messageId)
+        }
+        1 * mockConn.setAutoCommit(true)
+    }
+
+    def "insertMessageLink rolls back transaction on SQLException"() {
+        given:
+        def messageLink = new MessageLink(1, "MessageId")
+        mockConnPool.getConnection() >> mockConn
+        mockConn.prepareStatement(_ as String) >> { throw new SQLException("Simulated SQL failure") }
+        mockConn.setAutoCommit(false)
+        mockConn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
+
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        PostgresDao.getInstance().insertMessageLink(messageLink)
+
+        then:
+        thrown(SQLException)
+        1 * mockConn.setAutoCommit(false)
+        1 * mockConn.rollback()
+        1 * mockConn.setAutoCommit(true)
+    }
+
+    def "fetchMetadataForMessageLinking returns a set of PartnerMetadata when rows exist"() {
+        given:
+        def submissionId = "12345"
+        def expectedMetadataSet = new HashSet<PartnerMetadata>()
+        def sender = "DogCow"
+        def messageType = PartnerMetadataMessageType.RESULT
+        def partnerMetadata1 = new PartnerMetadata("12345", "7890", sender, "You'll get your just reward",
+                Instant.parse("2024-01-03T15:45:33.30Z"), Instant.parse("2024-01-03T15:45:33.30Z"),  sender.hashCode().toString(),
+                PartnerMetadataStatus.PENDING, "It done Goofed", messageType, sendingApp, sendingFacility,
+                receivingApp, receivingFacility, "placer_order_number")
+        def partnerMetadata2 = new PartnerMetadata("doreyme", "fasole", sender, "receiver",
+                Instant.now(), Instant.now(), "gobeltygoook",
+                PartnerMetadataStatus.DELIVERED, "cause I said so", messageType, sendingApp, sendingFacility,
+                receivingApp, receivingFacility, "placer_order_number")
+        expectedMetadataSet.add(partnerMetadata1)
+        expectedMetadataSet.add(partnerMetadata2)
+
+        mockConnPool.getConnection() >> mockConn
+        mockConn.prepareStatement(_ as String) >> mockPreparedStatement
+        mockPreparedStatement.executeQuery() >> mockResultSet
+        mockResultSet.next() >> true >> true >> false
+
+        mockResultSet.getString("received_message_id") >>> [
+            partnerMetadata1.receivedSubmissionId(),
+            partnerMetadata2.receivedSubmissionId()
+        ]
+        mockResultSet.getString("sent_message_id") >>> [
+            partnerMetadata1.sentSubmissionId(),
+            partnerMetadata2.sentSubmissionId()
+        ]
+        mockResultSet.getString("sender") >>> [
+            partnerMetadata1.sender(),
+            partnerMetadata2.sender()
+        ]
+        mockResultSet.getString("receiver") >>> [
+            partnerMetadata1.receiver(),
+            partnerMetadata2.receiver()
+        ]
+        mockResultSet.getTimestamp("time_received") >>> [
+            Timestamp.from(partnerMetadata1.timeReceived()),
+            Timestamp.from(partnerMetadata2.timeReceived())
+        ]
+        mockResultSet.getTimestamp("time_delivered") >>> [
+            Timestamp.from(partnerMetadata1.timeDelivered()),
+            Timestamp.from(partnerMetadata2.timeDelivered())
+        ]
+        mockResultSet.getString("hash_of_message") >>> [
+            partnerMetadata1.hash(),
+            partnerMetadata2.hash()
+        ]
+        mockResultSet.getString("delivery_status") >>> [
+            partnerMetadata1.deliveryStatus().toString(),
+            partnerMetadata2.deliveryStatus().toString()
+        ]
+        mockResultSet.getString("failure_reason") >>> [
+            partnerMetadata1.failureReason(),
+            partnerMetadata2.failureReason()
+        ]
+        mockResultSet.getString("message_type") >>> [
+            partnerMetadata1.messageType().toString(),
+            partnerMetadata2.messageType().toString()
+        ]
+        mockResultSet.getString("sending_application_id") >>> [
+            partnerMetadata1.sendingApplicationDetails(),
+            partnerMetadata2.sendingApplicationDetails()
+        ]
+        mockResultSet.getString("sending_facility_id") >>> [
+            partnerMetadata1.sendingFacilityDetails(),
+            partnerMetadata2.sendingFacilityDetails()
+        ]
+        mockResultSet.getString("receiving_application_id") >>> [
+            partnerMetadata1.receivingApplicationDetails(),
+            partnerMetadata2.receivingApplicationDetails()
+        ]
+        mockResultSet.getString("receiving_facility_id") >>> [
+            partnerMetadata1.receivingFacilityDetails(),
+            partnerMetadata2.receivingFacilityDetails()
+        ]
+        mockResultSet.getString("placer_order_number") >>> [
+            partnerMetadata1.placerOrderNumber(),
+            partnerMetadata2.placerOrderNumber()
+        ]
+
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def actualSet = PostgresDao.getInstance().fetchMetadataForMessageLinking(submissionId)
+
+        then:
+        actualSet == expectedMetadataSet
+    }
+
+    def "fetchMetadataForMessageLinking returns empty set when no rows exist"() {
+        given:
+        def submissionId = "noSuchId"
+        mockConnPool.getConnection() >> mockConn
+        mockConn.prepareStatement(_ as String) >> mockPreparedStatement
+        mockPreparedStatement.executeQuery() >> mockResultSet
+        mockResultSet.next() >> false // Simulate no rows found
+
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def actualSet = PostgresDao.getInstance().fetchMetadataForMessageLinking(submissionId)
+
+        then:
+        actualSet.isEmpty()
+    }
+
+    def "fetchMetadataForMessageLinking throws SQLException on database error"() {
+        given:
+        def submissionId = "willThrowException"
+        mockConnPool.getConnection() >> mockConn
+        mockConn.prepareStatement(_ as String) >> { throw new SQLException("Database error") }
+
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        PostgresDao.getInstance().fetchMetadataForMessageLinking(submissionId)
+
+        then:
+        thrown(SQLException)
+    }
 }
