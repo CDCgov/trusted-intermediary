@@ -99,14 +99,8 @@ class DatabasePartnerMetadataStorageTest extends Specification {
     def "readMetadataForSender happy path works"() {
         given:
         def sender = "testSender"
-        def metadata1 = new PartnerMetadata(
-                "receivedSubmissionId1", "sentSubmissionId1", "sender1", "receiver1",
-                Instant.now(), Instant.now(), "hash1", PartnerMetadataStatus.DELIVERED,
-                "", PartnerMetadataMessageType.ORDER, null, null, null, null, "placer_order_number1")
-        def metadata2 = new PartnerMetadata(
-                "receivedSubmissionId2", "sentSubmissionId2", "sender2", "receiver2",
-                Instant.now(), Instant.now(), "hash2", PartnerMetadataStatus.DELIVERED,
-                "", PartnerMetadataMessageType.ORDER, null, null, null, null, "placer_order_number2")
+        def metadata1 = mockMetadata
+        def metadata2 = mockMetadata
         def expectedMetadataSet = new HashSet<>()
         expectedMetadataSet.add(metadata1)
         expectedMetadataSet.add(metadata2)
