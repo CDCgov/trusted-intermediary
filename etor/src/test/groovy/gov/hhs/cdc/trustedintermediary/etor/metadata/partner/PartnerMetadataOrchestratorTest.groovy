@@ -69,7 +69,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         1 * mockPartnerMetadataStorage.saveMetadata(new PartnerMetadata(receivedSubmissionId, sender, Instant.parse(timestamp), null, hashCode, deliveryStatus, messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber))
     }
 
-    def "updateMetadataForSentOrder test case when sentSubmissionId is null"() {
+    def "updateMetadataForSentMessage test case when sentSubmissionId is null"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
         def sentSubmissionId = null
@@ -81,7 +81,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         0 * mockPartnerMetadataStorage.readMetadata(receivedSubmissionId)
     }
 
-    def "updateMetadataForSentOrder test case when PartnerMetadata returns no data"() {
+    def "updateMetadataForSentMessage test case when PartnerMetadata returns no data"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
         def sentSubmissionId = "sentSubmissionId"
@@ -167,7 +167,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         thrown(PartnerMetadataException)
     }
 
-    def "updateMetadataForSentOrder updates metadata successfully"() {
+    def "updateMetadataForSentMessage updates metadata successfully"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
         def sentSubmissionId = "sentSubmissionId"
@@ -186,7 +186,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         1 * mockPartnerMetadataStorage.saveMetadata(updatedPartnerMetadata)
     }
 
-    def "updateMetadataForSentOrder test case when sentSubmissionId is null"() {
+    def "updateMetadataForSentMessage test case when sentSubmissionId is null"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
         def sentSubmissionId = null
