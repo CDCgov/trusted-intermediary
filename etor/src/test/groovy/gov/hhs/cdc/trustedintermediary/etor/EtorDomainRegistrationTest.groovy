@@ -36,6 +36,11 @@ import spock.lang.Specification
 
 class EtorDomainRegistrationTest extends Specification {
 
+    private sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
+    private sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
+    private receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
+    private receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
+
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
@@ -48,11 +53,7 @@ class EtorDomainRegistrationTest extends Specification {
         def demographicsEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.DEMOGRAPHICS_API_ENDPOINT, true)
         def ordersEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.ORDERS_API_ENDPOINT, true)
         def metadataEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.METADATA_API_ENDPOINT, true)
-
         def consolidatedOrdersEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.CONSOLIDATED_SUMMARY_API_ENDPOINT, true)
-
-        def resultsEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.RESULTS_API_ENDPOINT, true)
-
 
         when:
         def endpoints = domainRegistration.domainRegistration()
@@ -234,11 +235,10 @@ class EtorDomainRegistrationTest extends Specification {
         request.setPathParams(["id": "metadataId"])
 
         def mockPartnerMetadataOrchestrator = Mock(PartnerMetadataOrchestrator)
-        def sendingAppDetails = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacilityDetails = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        def receivingAppDetails = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-        def receivingFacilityDetails = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
-        mockPartnerMetadataOrchestrator.getMetadata(_ as String) >> Optional.ofNullable(new PartnerMetadata("receivedSubmissionId", "sender", Instant.now(), null, "hash", PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number"))
+        mockPartnerMetadataOrchestrator.getMetadata(_ as String) >> Optional.ofNullable(
+                new PartnerMetadata("receivedSubmissionId", "sender", Instant.now(), null,
+                "hash", PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER,
+                sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number"))
         TestApplicationContext.register(PartnerMetadataOrchestrator, mockPartnerMetadataOrchestrator)
 
         def mockResponseHelper = Mock(DomainResponseHelper)

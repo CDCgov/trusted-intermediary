@@ -8,5 +8,7 @@ import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
  * @param <T> The underlying FHIR demographics type.
  */
 public interface Demographics<T> extends FhirResource<T> {
+    String getFhirResourceId();
+
     String getPatientId();
 }

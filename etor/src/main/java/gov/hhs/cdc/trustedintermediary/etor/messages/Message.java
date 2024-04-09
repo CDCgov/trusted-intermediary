@@ -8,6 +8,8 @@ import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
  * receiving applications and facilities, as well as order numbers.
  */
 public interface Message<T> extends FhirResource<T> {
+    String getFhirResourceId();
+
     String getPlacerOrderNumber();
 
     MessageHdDataType getSendingApplicationDetails();

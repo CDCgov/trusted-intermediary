@@ -73,10 +73,10 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 new DbColumn("failure_reason", mockMetadata.failureReason(), true, Types.VARCHAR),
                 new DbColumn("message_type", mockMetadata.messageType().toString(), false, Types.OTHER),
                 new DbColumn("placer_order_number", mockMetadata.placerOrderNumber(), false, Types.VARCHAR),
-                new DbColumn("sending_application_id", mockMetadata.sendingApplicationDetails(), false, Types.VARCHAR),
-                new DbColumn("sending_facility_id", mockMetadata.sendingFacilityDetails(), false, Types.VARCHAR),
-                new DbColumn("receiving_application_id", mockMetadata.receivingApplicationDetails(), false, Types.VARCHAR),
-                new DbColumn("receiving_facility_id", mockMetadata.receivingFacilityDetails(), false, Types.VARCHAR)
+                new DbColumn("sending_application_details", mockMetadata.sendingApplicationDetails(), false, Types.VARCHAR),
+                new DbColumn("sending_facility_details", mockMetadata.sendingFacilityDetails(), false, Types.VARCHAR),
+                new DbColumn("receiving_application_details", mockMetadata.receivingApplicationDetails(), false, Types.VARCHAR),
+                new DbColumn("receiving_facility_details", mockMetadata.receivingFacilityDetails(), false, Types.VARCHAR)
                 )
 
         when:
@@ -99,10 +99,6 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
     def "saveMetadata writes null timestamp"() {
         given:
-        def sendingAppDetails = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacilityDetails = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        def receivingAppDetails = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-        def receivingFacilityDetails = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
         def mockMetadata = new PartnerMetadata(
                 "receivedSubmissionId",
                 "sentSubmissionId",
@@ -134,10 +130,10 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 new DbColumn("failure_reason", mockMetadata.failureReason(), true, Types.VARCHAR),
                 new DbColumn("message_type", null, false, Types.OTHER),
                 new DbColumn("placer_order_number", mockMetadata.placerOrderNumber(), false, Types.VARCHAR),
-                new DbColumn("sending_application_id", mockMetadata.sendingApplicationDetails(), false, Types.VARCHAR),
-                new DbColumn("sending_facility_id", mockMetadata.sendingFacilityDetails(), false, Types.VARCHAR),
-                new DbColumn("receiving_application_id", mockMetadata.receivingApplicationDetails(), false, Types.VARCHAR),
-                new DbColumn("receiving_facility_id", mockMetadata.receivingFacilityDetails(), false, Types.VARCHAR)
+                new DbColumn("sending_application_details", mockMetadata.sendingApplicationDetails(), false, Types.VARCHAR),
+                new DbColumn("sending_facility_details", mockMetadata.sendingFacilityDetails(), false, Types.VARCHAR),
+                new DbColumn("receiving_application_details", mockMetadata.receivingApplicationDetails(), false, Types.VARCHAR),
+                new DbColumn("receiving_facility_details", mockMetadata.receivingFacilityDetails(), false, Types.VARCHAR)
                 )
 
         when:
