@@ -7,6 +7,8 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataExce
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStorage
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
+
 import java.sql.SQLException
 import java.sql.Timestamp
 import java.sql.Types
@@ -53,6 +55,18 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
         when:
         DatabasePartnerMetadataStorage.getInstance().readMetadata("receivedSubmissionId")
+
+        then:
+        thrown(PartnerMetadataException)
+    }
+
+    def "readMetadata unhappy path triggers FormatterProcessingException"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        mockDao.fetchMetadata(_ as String) >> { throw new FormatterProcessingException("Format error", new Throwable()) }
+
+        when:
+        DatabasePartnerMetadataStorage.getInstance().readMetadata(receivedSubmissionId)
 
         then:
         thrown(PartnerMetadataException)
