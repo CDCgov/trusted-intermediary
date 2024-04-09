@@ -47,8 +47,8 @@ dependencies {
     implementation 'com.azure:azure-security-keyvault-secrets:4.8.1'
     implementation 'com.azure:azure-identity:1.11.4'
 
-    testImplementation 'org.apache.groovy:groovy:4.0.20'
-    testFixturesImplementation 'org.apache.groovy:groovy:4.0.20'
+    testImplementation 'org.apache.groovy:groovy:4.0.21'
+    testFixturesImplementation 'org.apache.groovy:groovy:4.0.21'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
     testFixturesImplementation 'com.openpojo:openpojo:0.9.1'
     testFixturesImplementation 'nl.jqno.equalsverifier:equalsverifier:3.16.1'
