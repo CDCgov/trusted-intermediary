@@ -60,4 +60,24 @@ public class MockRSEndpointClient implements RSEndpointClient {
                     }]
                  }""";
     }
+
+    @Override
+    public String requestDeliveryEndpoint(String reportId, String bearerToken)
+            throws ReportStreamEndpointClientException {
+        return """
+                {
+                    "deliveryId": 458,
+                    "batchReadyAt": "2024-04-04T15:15:00.932Z",
+                    "expires": "2024-05-04T15:15:00.932Z",
+                    "receiver": "flexion.etor-service-receiver-orders",
+                    "receivingOrgSvcStatus": null,
+                    "reportId": "4e770ca2-cbc3-4530-bb05-b6c138aff43b",
+                    "topic": "etor-ti",
+                    "reportItemCount": 1,
+                    "fileName": "fhir-transform-sample.yml-4e770ca2-cbc3-4530-bb05-b6c138aff43b-20240404151501.fhir",
+                    "fileType": "FHIR",
+                    "ingestionTime": "2024-04-04T15:14:41.152Z"
+                }
+                """;
+    }
 }
