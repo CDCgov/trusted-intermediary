@@ -96,25 +96,22 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                                     Types.OTHER),
                             new DbColumn(
                                     "placer_order_number",
-                                    formatter.convertToJsonString(metadata.placerOrderNumber()),
+                                    metadata.placerOrderNumber(),
                                     false,
                                     Types.VARCHAR),
                             new DbColumn(
                                     "sending_application_details",
-                                    formatter.convertToJsonString(
-                                            metadata.sendingApplicationDetails()),
+                                    metadata.sendingApplicationDetails(),
                                     false,
                                     Types.VARCHAR),
                             new DbColumn(
                                     "sending_facility_details",
-                                    formatter.convertToJsonString(
-                                            metadata.sendingFacilityDetails()),
+                                    metadata.sendingFacilityDetails(),
                                     false,
                                     Types.VARCHAR),
                             new DbColumn(
                                     "receiving_application_details",
-                                    formatter.convertToJsonString(
-                                            metadata.receivingApplicationDetails()),
+                                    metadata.receivingApplicationDetails(),
                                     false,
                                     Types.VARCHAR),
                             new DbColumn(
