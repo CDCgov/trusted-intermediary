@@ -22,8 +22,8 @@ class PostgresDaoTest extends Specification {
     private Connection mockConn
     private PreparedStatement mockPreparedStatement
     private ResultSet mockResultSet
-    private String details
     private Formatter mockFormatter
+    private ObjectMapper testMapper
 
     private sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
     private sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
@@ -40,7 +40,7 @@ class PostgresDaoTest extends Specification {
         mockResultSet = Mock(ResultSet)
         mockFormatter = Mock(Formatter)
 
-        def testMapper = new ObjectMapper()
+        testMapper = new ObjectMapper()
         mockResultSet.getString("sending_application_details") >> testMapper.writeValueAsString(sendingApp)
         mockResultSet.getString("sending_facility_details") >> testMapper.writeValueAsString(sendingFacility)
         mockResultSet.getString("receiving_application_details") >> testMapper.writeValueAsString(receivingApp)
@@ -51,7 +51,7 @@ class PostgresDaoTest extends Specification {
 
         TestApplicationContext.register(DatabaseCredentialsProvider, mockCredentialsProvider)
         TestApplicationContext.register(PostgresDao, PostgresDao.getInstance())
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.register(Formatter, mockFormatter)
     }
 
     def "upsertData works"() {
@@ -63,6 +63,10 @@ class PostgresDaoTest extends Specification {
             new DbColumn("third_column", Timestamp.from(Instant.now()), false, Types.TIMESTAMP_WITH_TIMEZONE),
             new DbColumn("second_column_with_upsert_overwrite", Timestamp.from(Instant.now()), true, Types.TIMESTAMP_WITH_TIMEZONE),
             new DbColumn("fourth_column_null", null, false, Types.VARCHAR),
+            new DbColumn("sending_application_details", sendingApp, false, Types.OTHER),
+            new DbColumn("sending_facility_details", sendingFacility, false, Types.OTHER),
+            new DbColumn("receiving_application_details", receivingApp, false, Types.OTHER),
+            new DbColumn("receiving_facility_details", receivingFacility, false, Types.OTHER),
         ]
         def conflictColumnName = pkColumnName
 
@@ -103,7 +107,8 @@ class PostgresDaoTest extends Specification {
 
             return mockPreparedStatement
         }
-        (columns.size() - 1)  * mockPreparedStatement.setObject(_ as Integer, _, _ as Integer)
+        (columns.size() - 5)  * mockPreparedStatement.setObject(_ as Integer, _, _ as Integer)
+        4 * mockPreparedStatement.setObject(_ as Integer, _)
         1 * mockPreparedStatement.setNull(4, Types.VARCHAR)
         1 * mockPreparedStatement.executeUpdate()
     }
@@ -114,6 +119,10 @@ class PostgresDaoTest extends Specification {
         def columns = [
             new DbColumn("Moof", "Clarus", false, Types.VARCHAR),
             new DbColumn("second_column_with_upsert_overwrite", Timestamp.from(Instant.now()), false, Types.TIMESTAMP_WITH_TIMEZONE),
+            new DbColumn("sending_application_details", sendingApp, false, Types.OTHER),
+            new DbColumn("sending_facility_details", sendingFacility, false, Types.OTHER),
+            new DbColumn("receiving_application_details", receivingApp, false, Types.OTHER),
+            new DbColumn("receiving_facility_details", receivingFacility, false, Types.OTHER),
         ]
 
         mockConnPool.getConnection() >>  mockConn
@@ -133,7 +142,8 @@ class PostgresDaoTest extends Specification {
 
             return mockPreparedStatement
         }
-        columns.size()  * mockPreparedStatement.setObject(_ as Integer, _, _ as Integer)
+        2  * mockPreparedStatement.setObject(_ as Integer, _, _ as Integer)
+        4  * mockPreparedStatement.setObject(_ as Integer, _)
         1 * mockPreparedStatement.executeUpdate()
     }
 
@@ -147,11 +157,42 @@ class PostgresDaoTest extends Specification {
 
         when:
         PostgresDao.getInstance().upsertData("DogCow", [
-            new DbColumn("", "", false, Types.VARCHAR)
+            new DbColumn("", "", false, Types.VARCHAR),
+            new DbColumn("sending_application_details", sendingApp, false, Types.OTHER),
+            new DbColumn("sending_facility_details", sendingFacility, false, Types.OTHER),
+            new DbColumn("receiving_application_details", receivingApp, false, Types.OTHER),
+            new DbColumn("receiving_facility_details", receivingFacility, false, Types.OTHER),
         ], null)
 
         then:
         thrown(SQLException)
+    }
+
+    def "upsertData throws exception for FormatterProcessingException"() {
+        given:
+        def tableName = "DogCow"
+        def columns = [
+            new DbColumn("Moof", "Clarus", false, Types.VARCHAR),
+            new DbColumn("sending_application_details", sendingApp, false, Types.OTHER),
+            new DbColumn("sending_facility_details", sendingFacility, false, Types.OTHER),
+            new DbColumn("receiving_application_details", receivingApp, false, Types.OTHER),
+            new DbColumn("receiving_facility_details", receivingFacility, false, Types.OTHER),
+        ]
+        mockConnPool.getConnection() >> mockConn
+        mockConn.prepareStatement(_ as String) >> { String sqlStatement ->
+            return mockPreparedStatement
+        }
+        mockFormatter.convertToJsonString(_ as Object) >> { throw new FormatterProcessingException('error', new Throwable()) }
+
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
+        TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        PostgresDao.getInstance().upsertData(tableName, columns, null)
+
+        then:
+        thrown(FormatterProcessingException)
     }
 
     def "select metadata retrieves data"() {
@@ -221,9 +262,8 @@ class PostgresDaoTest extends Specification {
         def status = PartnerMetadataStatus.PENDING
         def reason = "It done Goofed"
         def messageType = PartnerMetadataMessageType.RESULT
-        def expectedHdDetails = new MessageHdDataType("samSpaceId", "universalId", "universalIdType")
         def placerOrderNumber = "placer_order_number"
-        def expected = new PartnerMetadata(receivedMessageId, sentMessageId, sender, receiver, timeReceived, timeDelivered, hash, status, reason, messageType, expectedHdDetails, expectedHdDetails, expectedHdDetails, expectedHdDetails, placerOrderNumber)
+        def expected = new PartnerMetadata(receivedMessageId, sentMessageId, sender, receiver, timeReceived, timeDelivered, hash, status, reason, messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
 
         mockConnPool.getConnection() >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
@@ -238,10 +278,6 @@ class PostgresDaoTest extends Specification {
         mockResultSet.getString("delivery_status") >> status.toString()
         mockResultSet.getString("failure_reason") >> reason
         mockResultSet.getString("message_type") >> messageType.toString()
-        mockResultSet.getString("sending_application_details") >> details
-        mockResultSet.getString("sending_facility_details") >> details
-        mockResultSet.getString("receiving_application_details") >> details
-        mockResultSet.getString("receiving_facility_details") >> details
         mockResultSet.getString("placer_order_number") >> placerOrderNumber
         mockPreparedStatement.executeQuery() >> mockResultSet
 
@@ -282,20 +318,6 @@ class PostgresDaoTest extends Specification {
         given:
         def sender = "DogCow"
         def messageType = PartnerMetadataMessageType.RESULT
-        def expectedDetails1 = """
-            {
-                "namespace": "samSpaceId",
-                "universalId": "universalId",
-                "universalIdType": "universalIdType"
-            }
-            """
-        def expectedDetails2 = """
-            {
-                "namespace": "samSpaceId2",
-                "universalId": "universalId2",
-                "universalIdType": "universalIdType2"
-            }
-            """
         def expected1 = new PartnerMetadata("12345", "7890", sender, "You'll get your just reward",
                 Instant.parse("2024-01-03T15:45:33.30Z"), Instant.parse("2024-01-03T15:45:33.30Z"),  sender.hashCode().toString(),
                 PartnerMetadataStatus.PENDING, "It done Goofed", messageType, sendingApp, sendingFacility,
@@ -349,20 +371,20 @@ class PostgresDaoTest extends Specification {
             expected2.messageType().toString()
         ]
         mockResultSet.getString("sending_application_details") >>> [
-            expectedDetails1,
-            expectedDetails2
+            testMapper.writeValueAsString(sendingApp),
+            testMapper.writeValueAsString(sendingApp)
         ]
         mockResultSet.getString("sending_facility_details") >>> [
-            expectedDetails1,
-            expectedDetails2
+            testMapper.writeValueAsString(sendingFacility),
+            testMapper.writeValueAsString(sendingFacility),
         ]
         mockResultSet.getString("receiving_application_details") >>> [
-            expectedDetails1,
-            expectedDetails2
+            testMapper.writeValueAsString(receivingApp),
+            testMapper.writeValueAsString(receivingApp)
         ]
         mockResultSet.getString("receiving_facility_details") >>> [
-            expectedDetails1,
-            expectedDetails2
+            testMapper.writeValueAsString(receivingFacility),
+            testMapper.writeValueAsString(receivingFacility)
         ]
         mockResultSet.getString("placer_order_number") >>> [
             expected1.placerOrderNumber(),
@@ -383,8 +405,18 @@ class PostgresDaoTest extends Specification {
 
     def "fetchMetadata throws exception for FormatterProcessingException"() {
         given:
-        mockFormatter.convertJsonToObject(_ as String, new TypeReference<MessageHdDataType>() {}) >> { throw new FormatterProcessingException('error', new Throwable()) }
+        mockConnPool.getConnection() >> mockConn
+        mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
+        mockPreparedStatement.executeQuery() >> mockResultSet
+        mockResultSet.next() >> true
+        mockResultSet.getTimestamp("time_received") >> null
+        mockResultSet.getString("delivery_status") >> "DELIVERED"
+        mockResultSet.getString("message_type") >> "RESULT"
+        mockResultSet.getString("failure_reason") >> "Your time is up"
+        mockResultSet.getString("placer_order_number") >> "TEST"
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> { throw new FormatterProcessingException('error', new Throwable()) }
 
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
         TestApplicationContext.register(Formatter, mockFormatter)
         TestApplicationContext.injectRegisteredImplementations()
 
@@ -394,8 +426,4 @@ class PostgresDaoTest extends Specification {
         then:
         thrown(FormatterProcessingException)
     }
-
-    // def "partnerMetadataFromResultSet throws exception for FormatterProcessingException"() {}
-
-    // def "partnerMetadataFromResultSet throws exception for FormatterProcessingException"() {}
 }

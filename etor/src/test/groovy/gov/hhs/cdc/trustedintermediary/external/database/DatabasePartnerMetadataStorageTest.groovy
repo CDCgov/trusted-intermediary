@@ -2,18 +2,14 @@ package gov.hhs.cdc.trustedintermediary.external.database
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStorage
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.*
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
+import spock.lang.Specification
 
 import java.sql.SQLException
 import java.sql.Timestamp
 import java.sql.Types
 import java.time.Instant
-import spock.lang.Specification
 
 class DatabasePartnerMetadataStorageTest extends Specification {
 
@@ -130,10 +126,10 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 new DbColumn("failure_reason", mockMetadata.failureReason(), true, Types.VARCHAR),
                 new DbColumn("message_type", mockMetadata.messageType().toString(), false, Types.OTHER),
                 new DbColumn("placer_order_number", mockMetadata.placerOrderNumber(), false, Types.VARCHAR),
-                new DbColumn("sending_application_details", mockMetadata.sendingApplicationDetails(), false, Types.VARCHAR),
-                new DbColumn("sending_facility_details", mockMetadata.sendingFacilityDetails(), false, Types.VARCHAR),
-                new DbColumn("receiving_application_details", mockMetadata.receivingApplicationDetails(), false, Types.VARCHAR),
-                new DbColumn("receiving_facility_details", mockMetadata.receivingFacilityDetails(), false, Types.VARCHAR)
+                new DbColumn("sending_application_details", mockMetadata.sendingApplicationDetails(), false, Types.OTHER),
+                new DbColumn("sending_facility_details", mockMetadata.sendingFacilityDetails(), false, Types.OTHER),
+                new DbColumn("receiving_application_details", mockMetadata.receivingApplicationDetails(), false, Types.OTHER),
+                new DbColumn("receiving_facility_details", mockMetadata.receivingFacilityDetails(), false, Types.OTHER)
                 )
 
         when:
@@ -191,10 +187,10 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 new DbColumn("failure_reason", mockMetadata.failureReason(), true, Types.VARCHAR),
                 new DbColumn("message_type", null, false, Types.OTHER),
                 new DbColumn("placer_order_number", mockMetadata.placerOrderNumber(), false, Types.VARCHAR),
-                new DbColumn("sending_application_details", mockMetadata.sendingApplicationDetails(), false, Types.VARCHAR),
-                new DbColumn("sending_facility_details", mockMetadata.sendingFacilityDetails(), false, Types.VARCHAR),
-                new DbColumn("receiving_application_details", mockMetadata.receivingApplicationDetails(), false, Types.VARCHAR),
-                new DbColumn("receiving_facility_details", mockMetadata.receivingFacilityDetails(), false, Types.VARCHAR)
+                new DbColumn("sending_application_details", mockMetadata.sendingApplicationDetails(), false, Types.OTHER),
+                new DbColumn("sending_facility_details", mockMetadata.sendingFacilityDetails(), false, Types.OTHER),
+                new DbColumn("receiving_application_details", mockMetadata.receivingApplicationDetails(), false, Types.OTHER),
+                new DbColumn("receiving_facility_details", mockMetadata.receivingFacilityDetails(), false, Types.OTHER)
                 )
 
         when:
