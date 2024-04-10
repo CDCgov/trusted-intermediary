@@ -7,6 +7,8 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataExce
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStorage
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
+
 import java.sql.SQLException
 import java.sql.Timestamp
 import java.sql.Types
@@ -56,6 +58,61 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
         then:
         thrown(PartnerMetadataException)
+    }
+
+    def "readMetadata unhappy path triggers FormatterProcessingException"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        mockDao.fetchMetadata(_ as String) >> { throw new FormatterProcessingException("Format error", new Throwable()) }
+
+        when:
+        DatabasePartnerMetadataStorage.getInstance().readMetadata(receivedSubmissionId)
+
+        then:
+        thrown(PartnerMetadataException)
+    }
+
+    def "readMetadatForSender unhappy path triggers SQLException"() {
+        given:
+        def sender = "testSender"
+        mockDao.fetchMetadataForSender(sender) >> { throw new SQLException("Database error has occur") }
+
+        when:
+        DatabasePartnerMetadataStorage.getInstance().readMetadataForSender(sender)
+
+        then:
+        thrown(PartnerMetadataException)
+    }
+
+    def "readMetadatForSender unhappy path triggers FormatterProcessingException"() {
+        given:
+        def sender = "testSender"
+        mockDao.fetchMetadataForSender(sender) >> { throw new FormatterProcessingException("Format error", new Throwable()) }
+
+        when:
+        DatabasePartnerMetadataStorage.getInstance().readMetadataForSender(sender)
+
+        then:
+        thrown(PartnerMetadataException)
+    }
+
+    def "readMetadataForSender happy path works"() {
+        given:
+        def sender = "testSender"
+        def metadata1 = mockMetadata
+        def metadata2 = mockMetadata
+        def expectedMetadataSet = new HashSet<>()
+        expectedMetadataSet.add(metadata1)
+        expectedMetadataSet.add(metadata2)
+
+        mockDao.fetchMetadataForSender(sender) >> expectedMetadataSet
+
+        when:
+        def actualMetadataSet = DatabasePartnerMetadataStorage.getInstance().readMetadataForSender(sender)
+
+        then:
+        actualMetadataSet.size() == expectedMetadataSet.size()
+        actualMetadataSet.containsAll(expectedMetadataSet)
     }
 
     def "saveMetadata happy path works"() {
