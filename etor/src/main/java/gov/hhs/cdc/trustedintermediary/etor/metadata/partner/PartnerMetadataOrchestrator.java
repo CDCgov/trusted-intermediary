@@ -79,7 +79,7 @@ public class PartnerMetadataOrchestrator {
                     "Unable to retrieve metadata from RS delivery API", e);
         }
 
-        String sender = "";
+        String sender = "PLACE_HOLDER";
         logger.logInfo(
                 "Updating metadata with sender: {}, timeReceived: {} and hash",
                 sender,
