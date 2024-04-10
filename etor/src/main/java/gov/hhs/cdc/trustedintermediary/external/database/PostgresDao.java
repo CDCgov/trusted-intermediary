@@ -252,14 +252,19 @@ public class PostgresDao implements DbDao {
             if (conn != null) {
                 try {
                     conn.rollback();
-                } catch (SQLException ex) {
-                    logger.logError("Failed to rollback transaction", ex);
+                } catch (SQLException exRollback) {
+                    logger.logError("Failed to rollback transaction", exRollback);
                 }
             }
             throw e;
         } finally {
             if (conn != null) {
-                conn.setAutoCommit(true);
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException exClose) {
+                    logger.logError("Failed to close the connection", exClose);
+                }
             }
         }
     }
