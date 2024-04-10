@@ -19,6 +19,7 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
+import java.sql.Statement
 import java.sql.Timestamp
 import java.time.Instant
 
@@ -638,5 +639,32 @@ class PostgresDaoTest extends Specification {
 
         then:
         thrown(FormatterProcessingException)
+    }
+
+    def "insertMessageLink successfully throws SQL Exception for null linkId"() {
+        given:
+        def linkId = null
+        def messageId = "MessageId"
+        def messageLink = new MessageLink(null, new HashSet<>([messageId]))
+        def mockIdStatement = Mock(Statement)
+        mockConnPool.getConnection() >> mockConn
+        mockConn.prepareStatement(_ as String) >> mockPreparedStatement
+        def mockIdResultSet = Mock(ResultSet)
+        mockIdStatement.executeQuery(_ as String) >> mockIdResultSet
+        mockConn.createStatement() >> mockIdStatement
+        mockPreparedStatement.executeQuery() >> mockResultSet
+        mockPreparedStatement.executeUpdate() >> 1
+        mockResultSet.next() >> true >> false // Simulate finding the next linkId, then no more rows
+        mockIdResultSet.next() >> false >> false
+        mockIdResultSet.getInt("next_link_id") >> null
+
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        PostgresDao.getInstance().insertMessageLink(messageLink)
+
+        then:
+        thrown(SQLException)
     }
 }
