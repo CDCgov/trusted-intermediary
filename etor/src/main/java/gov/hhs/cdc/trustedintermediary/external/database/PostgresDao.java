@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.external.database;
 
-import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
@@ -24,6 +23,13 @@ public class PostgresDao implements DbDao {
 
     private static final PostgresDao INSTANCE = new PostgresDao();
 
+    private static final Set<String> MESSAGE_HD_DB_COLUMNS =
+            Set.of(
+                    "sending_application_details",
+                    "sending_facility_details",
+                    "receiving_application_details",
+                    "receiving_facility_details");
+
     @Inject ConnectionPool connectionPool;
 
     @Inject Formatter formatter;
@@ -36,7 +42,7 @@ public class PostgresDao implements DbDao {
 
     @Override
     public void upsertData(String tableName, List<DbColumn> values, String conflictColumnName)
-            throws SQLException {
+            throws SQLException, FormatterProcessingException {
         // example SQL statement generated here:
         // INSERT INTO metadata_table (column_one, column_three, column_two, column_four)
         // VALUES (?, ?, ?, ?)
@@ -51,7 +57,8 @@ public class PostgresDao implements DbDao {
 
         sqlStatementBuilder.append(") VALUES (");
 
-        sqlStatementBuilder.append("?, ".repeat(values.size()));
+        sqlStatementBuilder.append("?, ".repeat(values.size() - 4));
+        sqlStatementBuilder.append("?::JSONB, ".repeat(MESSAGE_HD_DB_COLUMNS.size()));
         removeLastTwoCharacters(sqlStatementBuilder); // remove the last unused ", "
         sqlStatementBuilder.append(")");
 
@@ -86,7 +93,9 @@ public class PostgresDao implements DbDao {
                 Object value = column.value();
                 int type = column.type();
 
-                if (value != null) {
+                if (MESSAGE_HD_DB_COLUMNS.contains(column.name())) {
+                    statement.setObject(i + 1, formatter.convertToJsonString(value));
+                } else if (value != null) {
                     statement.setObject(i + 1, value, type);
                 } else {
                     statement.setNull(i + 1, type);
@@ -169,16 +178,15 @@ public class PostgresDao implements DbDao {
                 PartnerMetadataMessageType.valueOf(resultSet.getString("message_type")),
                 formatter.convertJsonToObject(
                         resultSet.getString("sending_application_details"),
-                        new TypeReference<MessageHdDataType>() {}),
+                        new TypeReference<>() {}),
                 formatter.convertJsonToObject(
-                        resultSet.getString("sending_facility_details"),
-                        new TypeReference<MessageHdDataType>() {}),
+                        resultSet.getString("sending_facility_details"), new TypeReference<>() {}),
                 formatter.convertJsonToObject(
                         resultSet.getString("receiving_application_details"),
-                        new TypeReference<MessageHdDataType>() {}),
+                        new TypeReference<>() {}),
                 formatter.convertJsonToObject(
                         resultSet.getString("receiving_facility_details"),
-                        new TypeReference<MessageHdDataType>() {}),
+                        new TypeReference<>() {}),
                 resultSet.getString("placer_order_number"));
     }
 }

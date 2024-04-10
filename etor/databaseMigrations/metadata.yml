@@ -6,8 +6,8 @@ databaseChangeLog:
       context: metadata
       comment: create status type
       changes:
-       - sql:
-           sql: CREATE TYPE message_status AS ENUM ('PENDING', 'DELIVERED', 'FAILED')
+        - sql:
+            sql: CREATE TYPE message_status AS ENUM ('PENDING', 'DELIVERED', 'FAILED')
       rollback:
         - sql:
             sql: DROP TYPE message_status
@@ -19,7 +19,7 @@ databaseChangeLog:
       context: metadata
       comment: create partner metadata table
       changes:
-       - createTable:
+        - createTable:
             tableName: metadata
             columns:
               - column:
@@ -60,8 +60,8 @@ databaseChangeLog:
       context: metadata
       comment: create message type
       changes:
-       - sql:
-           sql: CREATE TYPE message_type AS ENUM ('RESULT', 'ORDER')
+        - sql:
+            sql: CREATE TYPE message_type AS ENUM ('RESULT', 'ORDER')
       rollback:
         - sql:
             sql: DROP TYPE message_type
@@ -98,14 +98,57 @@ databaseChangeLog:
                   name: placer_order_number
                   type: varchar(427)
               - column:
-                  name: sending_application_details
-                  type: jsonb
+                  name: sending_application_id
+                  type: varchar(227)
               - column:
-                  name: sending_facility_details
-                  type: jsonb
+                  name: sending_facility_id
+                  type: varchar(227)
               - column:
-                  name: receiving_application_details
-                  type: jsonb
+                  name: receiving_application_id
+                  type: varchar(227)
               - column:
-                  name: receiving_facility_details
-                  type: jsonb
+                  name: receiving_facility_id
+                  type: varchar(227)
+  - changeSet:
+      id: 6
+      author: samuel.aquino
+      labels: update-metadata-table
+      context: metadata
+      comment: update partner metadata table for order and result linking using jsonb
+      changes:
+        - renameColumn:
+            columnDataType: varchar(227)
+            oldColumnName: sending_application_id
+            newColumnName: sending_application_details
+            tableName: metadata
+        - renameColumn:
+            columnDataType: varchar(227)
+            oldColumnName: sending_facility_id
+            newColumnName: sending_facility_details
+            tableName: metadata
+        - renameColumn:
+            columnDataType: varchar(227)
+            oldColumnName: receiving_application_id
+            newColumnName: receiving_application_details
+            tableName: metadata
+        - renameColumn:
+            columnDataType: varchar(227)
+            oldColumnName: receiving_facility_id
+            newColumnName: receiving_facility_details
+            tableName: metadata
+        - modifyDataType:
+            columnName: sending_application_details
+            newDataType: jsonb
+            tableName: metadata
+        - modifyDataType:
+            columnName: sending_facility_details
+            newDataType: jsonb
+            tableName: metadata
+        - modifyDataType:
+            columnName: receiving_application_details
+            newDataType: jsonb
+            tableName: metadata
+        - modifyDataType:
+            columnName: receiving_facility_details
+            newDataType: jsonb
+            tableName: metadata
