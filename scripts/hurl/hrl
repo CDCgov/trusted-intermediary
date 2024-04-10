@@ -1,0 +1,28 @@
+#!/bin/sh
+
+ENV=$1
+
+CLIENT_ID=flexion
+CLIENT_SENDER=simulated-lab
+
+# Shift command will shift the positional parameters to the left, discarding the first argument
+shift
+
+if [ "$CLIENT_ID" = "flexion" ]; then
+    if [ "$ENV" = "local" ]; then
+        secret="$CDCTI_HOME/mock_credentials/organization-trusted-intermediary-private-key-local.pem"
+    else
+        # secret="$CDCTI_HOME/path/to/staging/private/key"
+        echo "Please provide the staging private key"
+        exit 1
+    fi
+fi
+
+hurl \
+    --variables-file $ENV.env \
+    --variable client-id=$CLIENT_ID \
+    --variable client-sender=$CLIENT_SENDER \
+    --variable jwt=$(jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 -k $CLIENT_ID.$CLIENT_SENDER -i $CLIENT_ID.$CLIENT_SENDER -s $CLIENT_ID.$CLIENT_SENDER -a staging.prime.cdc.gov --no-iat -S @$secret) \
+    --file-root $CDCTI_HOME/examples/Test/ \
+    --include \
+    $@
