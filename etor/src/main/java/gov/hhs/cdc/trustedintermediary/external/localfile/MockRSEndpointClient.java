@@ -65,19 +65,30 @@ public class MockRSEndpointClient implements RSEndpointClient {
     public String requestDeliveryEndpoint(String reportId, String bearerToken)
             throws ReportStreamEndpointClientException {
         return """
-                {
-                    "deliveryId": 458,
-                    "batchReadyAt": "2024-04-04T15:15:00.932Z",
-                    "expires": "2024-05-04T15:15:00.932Z",
-                    "receiver": "flexion.etor-service-receiver-orders",
-                    "receivingOrgSvcStatus": null,
-                    "reportId": "4e770ca2-cbc3-4530-bb05-b6c138aff43b",
-                    "topic": "etor-ti",
-                    "reportItemCount": 1,
-                    "fileName": "fhir-transform-sample.yml-4e770ca2-cbc3-4530-bb05-b6c138aff43b-20240404151501.fhir",
-                    "fileType": "FHIR",
-                    "ingestionTime": "2024-04-04T15:14:41.152Z"
-                }
-                """;
+            {
+                "deliveryId": 20,
+                "batchReadyAt": "2024-04-09T18:19:00.431Z",
+                "expires": "2024-05-09T18:19:00.431Z",
+                "receiver": "flexion.etor-service-receiver-orders",
+                "receivingOrgSvcStatus": null,
+                "reportId": "ddfeb4e2-af58-433e-9297-a4be01957225",
+                "topic": "etor-ti",
+                "reportItemCount": 2,
+                "fileName": "fhir-transform-sample.yml-ddfeb4e2-af58-433e-9297-a4be01957225-20240409181900.fhir",
+                "fileType": "FHIR",
+                "originalIngestion": [
+                    {
+                        "reportId": "2f5f17e7-2161-44d9-b091-2d53c10f6e90",
+                        "ingestionTime": "2024-04-09T18:17:56.571Z",
+                        "sendingOrg": "DogCow Associates"
+                    },
+                    {
+                        "reportId": "e18c283e-e2e4-4804-bca3-33afe32e6b69",
+                        "ingestionTime": "2024-04-09T18:18:00.553Z",
+                        "sendingOrg": "DogCow Associates"
+                    }
+                ]
+            }
+        """;
     }
 }

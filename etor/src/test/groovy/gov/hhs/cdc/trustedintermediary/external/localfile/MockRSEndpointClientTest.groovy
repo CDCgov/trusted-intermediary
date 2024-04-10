@@ -77,6 +77,8 @@ class MockRSEndpointClientTest extends Specification {
                 Jackson.getInstance().convertJsonToObject(response, new TypeReference<Map<String, Object>>() {})
 
         then:
-        responseObject.get("ingestionTime") != null
+        responseObject.originalIngestion != null
+        responseObject.originalIngestion[0] != null
+        responseObject.originalIngestion[0].ingestionTime != null
     }
 }
