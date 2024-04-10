@@ -523,6 +523,13 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
     def "getDataFromReportStream throws FormatterProcessingException or returns null for unexpected format response"() {
         given:
+        def exception
+        def objectMapperMessage = "objectMapper failed to convert"
+        def noReceiverMessage = "Unable to extract receiver name"
+        def noStatusMessage = "Unable to extract overallStatus"
+        def noReasonMessage = "Unable to extract failure reason"
+        def noTimeMessage = "Unable to extract timeDelivered"
+
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
@@ -531,24 +538,28 @@ class PartnerMetadataOrchestratorTest extends Specification {
         PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(invalidJson)
 
         then:
-        thrown(FormatterProcessingException)
+        exception = thrown(FormatterProcessingException)
+        exception.getMessage().indexOf(objectMapperMessage) >= 0
 
         when:
         def emptyJson = "{}"
         PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(emptyJson)
 
         then:
-        thrown(FormatterProcessingException)
+        // @todo check what this should be
+        exception = thrown(FormatterProcessingException)
+        exception.getMessage().indexOf(noReceiverMessage) >= 0
 
         when:
         def jsonWithoutDestinations = "{\"someotherkey\": \"value\"}"
         PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithoutDestinations)
 
         then:
-        thrown(FormatterProcessingException)
+        // @todo check what this should be
+        exception = thrown(FormatterProcessingException)
+        exception.getMessage().indexOf(noReceiverMessage) >= 0
 
         when:
-
         def jsonWithEmptyDestinations = """{"destinations": [], "errors": []}"""
         def parsedData = PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithEmptyDestinations)
 
@@ -556,7 +567,6 @@ class PartnerMetadataOrchestratorTest extends Specification {
         parsedData[0] == null
 
         when:
-
         def jsonWithNoStatus = """{"destinations": [], "errors": []}"""
         parsedData = PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithNoStatus)
 
@@ -568,32 +578,43 @@ class PartnerMetadataOrchestratorTest extends Specification {
         PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithoutOrgId)
 
         then:
-        thrown(FormatterProcessingException)
+        // @todo check what this should be
+        exception = thrown(FormatterProcessingException)
+        exception.getMessage().indexOf(noReceiverMessage) >= 0
 
         when:
         def jsonWithoutService = "{\"destinations\":[{\"organization_id\":\"org_id\"}]}"
         PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithoutService)
 
         then:
-        thrown(FormatterProcessingException)
+        // @todo check what this should be
+        exception = thrown(FormatterProcessingException)
+        exception.getMessage().indexOf(noReceiverMessage) >= 0
 
         when:
         def jsonWithoutErrorMessageSubString = "{\"destinations\":[{\"organization_id\":\"org_id\", \"service\":\"service\"}], \"overallStatus\": \"Error\"}"
         PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithoutErrorMessageSubString)
 
         then:
-        thrown(FormatterProcessingException)
+        exception = thrown(FormatterProcessingException)
+        exception.getMessage().indexOf(noReasonMessage) >= 0
 
         when:
         def jsonWithBadCompletionDate = "{\"actualCompletionAt\": 123, \"destinations\":[{\"organization_id\":\"org_id\", \"service\":\"service\"}], \"overallStatus\": \"Error\"}"
         PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithBadCompletionDate)
+
         then:
-        thrown(FormatterProcessingException)
+        // @todo check what this should be
+        exception = thrown(FormatterProcessingException)
+        exception.getMessage().indexOf(noReasonMessage) >= 0
+
         when:
         def jsonWithBadStatus = "{\"overallStatus\": 123, \"destinations\":[{\"organization_id\":\"org_id\", \"service\":\"service\"}]}"
         PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithBadStatus)
+
         then:
-        thrown(FormatterProcessingException)
+        exception = thrown(FormatterProcessingException)
+        exception.getMessage().indexOf(noStatusMessage) >= 0
     }
 
     def "ourStatusFromReportStreamStatus returns FAILED"() {
