@@ -546,7 +546,6 @@ class PartnerMetadataOrchestratorTest extends Specification {
         PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(emptyJson)
 
         then:
-        // @todo check what this should be
         exception = thrown(FormatterProcessingException)
         exception.getMessage().indexOf(noReceiverMessage) >= 0
 
@@ -597,13 +596,12 @@ class PartnerMetadataOrchestratorTest extends Specification {
         exception.getMessage().indexOf(noReasonMessage) >= 0
 
         when:
-        def jsonWithBadCompletionDate = "{\"actualCompletionAt\": 123, \"destinations\":[{\"organization_id\":\"org_id\", \"service\":\"service\"}], \"overallStatus\": \"Error\"}"
+        def jsonWithBadCompletionDate = "{\"actualCompletionAt\": 123, \"destinations\":[{\"organization_id\":\"org_id\", \"service\":\"service\"}], \"overallStatus\": \"Error\", \"errors\": []}"
         PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithBadCompletionDate)
 
         then:
-        // @todo check what this should be
         exception = thrown(FormatterProcessingException)
-        exception.getMessage().indexOf(noReasonMessage) >= 0
+        exception.getMessage().indexOf(noTimeMessage) >= 0
 
         when:
         def jsonWithBadStatus = "{\"overallStatus\": 123, \"destinations\":[{\"organization_id\":\"org_id\", \"service\":\"service\"}]}"
