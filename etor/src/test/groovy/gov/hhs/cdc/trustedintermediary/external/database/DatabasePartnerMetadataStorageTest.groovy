@@ -166,6 +166,17 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         thrown(PartnerMetadataException)
     }
 
+    def "saveMetadata unhappy path triggers FormatterProcessingException"() {
+        given:
+        mockDao.upsertData(_ as String, _ as List, _ as String) >> { throw new FormatterProcessingException("Format error", new Throwable()) }
+
+        when:
+        DatabasePartnerMetadataStorage.getInstance().saveMetadata(mockMetadata)
+
+        then:
+        thrown(PartnerMetadataException)
+    }
+
     def "saveMetadata writes null timestamp"() {
         given:
         def testMapper = new ObjectMapper()
