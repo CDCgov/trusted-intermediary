@@ -27,13 +27,6 @@ public class PostgresDao implements DbDao {
 
     private static final PostgresDao INSTANCE = new PostgresDao();
 
-    private static final Set<String> MESSAGE_HD_DB_COLUMNS =
-            Set.of(
-                    "sending_application_details",
-                    "sending_facility_details",
-                    "receiving_application_details",
-                    "receiving_facility_details");
-
     @Inject ConnectionPool connectionPool;
     @Inject Logger logger;
 
@@ -47,7 +40,7 @@ public class PostgresDao implements DbDao {
 
     @Override
     public void upsertData(String tableName, List<DbColumn> values, String conflictColumnName)
-            throws SQLException, FormatterProcessingException {
+            throws SQLException {
         // example SQL statement generated here:
         // INSERT INTO metadata_table (column_one, column_three, column_two, column_four)
         // VALUES (?, ?, ?, ?)
@@ -62,8 +55,7 @@ public class PostgresDao implements DbDao {
 
         sqlStatementBuilder.append(") VALUES (");
 
-        sqlStatementBuilder.append("?, ".repeat(values.size() - MESSAGE_HD_DB_COLUMNS.size()));
-        sqlStatementBuilder.append("?::JSONB, ".repeat(MESSAGE_HD_DB_COLUMNS.size()));
+        sqlStatementBuilder.append("?, ".repeat(values.size()));
         removeLastTwoCharacters(sqlStatementBuilder); // remove the last unused ", "
         sqlStatementBuilder.append(")");
 
@@ -98,9 +90,7 @@ public class PostgresDao implements DbDao {
                 Object value = column.value();
                 int type = column.type();
 
-                if (MESSAGE_HD_DB_COLUMNS.contains(column.name())) {
-                    statement.setObject(i + 1, formatter.convertToJsonString(value));
-                } else if (value != null) {
+                if (value != null) {
                     statement.setObject(i + 1, value, type);
                 } else {
                     statement.setNull(i + 1, type);

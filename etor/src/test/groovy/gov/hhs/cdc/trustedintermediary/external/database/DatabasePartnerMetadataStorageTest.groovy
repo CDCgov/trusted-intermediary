@@ -1,8 +1,11 @@
 package gov.hhs.cdc.trustedintermediary.external.database
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.*
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
+import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
 import spock.lang.Specification
 
@@ -14,6 +17,7 @@ import java.time.Instant
 class DatabasePartnerMetadataStorageTest extends Specification {
 
     private def mockDao
+    private def mockFormatter
 
     def sendingAppDetails = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
     def sendingFacilityDetails = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
@@ -26,6 +30,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         TestApplicationContext.init()
 
         mockDao = Mock(DbDao)
+        mockFormatter = Mock(Formatter)
 
         TestApplicationContext.register(DbDao, mockDao)
         TestApplicationContext.register(PartnerMetadataStorage, DatabasePartnerMetadataStorage.getInstance())
@@ -68,7 +73,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         thrown(PartnerMetadataException)
     }
 
-    def "readMetadatForSender unhappy path triggers SQLException"() {
+    def "readMetadataForSender unhappy path triggers SQLException"() {
         given:
         def sender = "testSender"
         mockDao.fetchMetadataForSender(sender) >> { throw new SQLException("Database error has occur") }
@@ -80,7 +85,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         thrown(PartnerMetadataException)
     }
 
-    def "readMetadatForSender unhappy path triggers FormatterProcessingException"() {
+    def "readMetadataForSender unhappy path triggers FormatterProcessingException"() {
         given:
         def sender = "testSender"
         mockDao.fetchMetadataForSender(sender) >> { throw new FormatterProcessingException("Format error", new Throwable()) }
@@ -113,6 +118,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
     def "saveMetadata happy path works"() {
         given:
+        def testMapper = new ObjectMapper()
         List<DbColumn> columns =
                 List.of(
                 new DbColumn("received_message_id", mockMetadata.receivedSubmissionId(), false, Types.VARCHAR),
@@ -126,11 +132,13 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 new DbColumn("failure_reason", mockMetadata.failureReason(), true, Types.VARCHAR),
                 new DbColumn("message_type", mockMetadata.messageType().toString(), false, Types.OTHER),
                 new DbColumn("placer_order_number", mockMetadata.placerOrderNumber(), false, Types.VARCHAR),
-                new DbColumn("sending_application_details", mockMetadata.sendingApplicationDetails(), false, Types.OTHER),
-                new DbColumn("sending_facility_details", mockMetadata.sendingFacilityDetails(), false, Types.OTHER),
-                new DbColumn("receiving_application_details", mockMetadata.receivingApplicationDetails(), false, Types.OTHER),
-                new DbColumn("receiving_facility_details", mockMetadata.receivingFacilityDetails(), false, Types.OTHER)
+                new DbColumn("sending_application_details", testMapper.writeValueAsString(mockMetadata.sendingApplicationDetails()), false, Types.OTHER),
+                new DbColumn("sending_facility_details", testMapper.writeValueAsString(mockMetadata.sendingFacilityDetails()), false, Types.OTHER),
+                new DbColumn("receiving_application_details", testMapper.writeValueAsString(mockMetadata.receivingApplicationDetails()), false, Types.OTHER),
+                new DbColumn("receiving_facility_details", testMapper.writeValueAsString(mockMetadata.receivingFacilityDetails()), false, Types.OTHER)
                 )
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         DatabasePartnerMetadataStorage.getInstance().saveMetadata(mockMetadata)
@@ -142,6 +150,64 @@ class DatabasePartnerMetadataStorageTest extends Specification {
     def "saveMetadata unhappy path works"() {
         given:
         mockDao.upsertData(_ as String, _ as List, _ as String) >> { throw new SQLException("Something went wrong!") }
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        DatabasePartnerMetadataStorage.getInstance().saveMetadata(mockMetadata)
+
+        then:
+        thrown(PartnerMetadataException)
+    }
+
+    def "saveMetadata unhappy path first format call triggers FormatterProcessingException"() {
+        given:
+        mockFormatter.convertToJsonString(_ as MessageHdDataType) >> { throw new FormatterProcessingException('error', new Throwable()) }
+
+        TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        DatabasePartnerMetadataStorage.getInstance().saveMetadata(mockMetadata)
+
+        then:
+        thrown(PartnerMetadataException)
+    }
+
+    def "saveMetadata second unhappy path format call triggers FormatterProcessingException"() {
+        given:
+        mockFormatter.convertToJsonString(_ as MessageHdDataType) >> "ok" >> { throw new FormatterProcessingException('error', new Throwable()) }
+
+        TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        DatabasePartnerMetadataStorage.getInstance().saveMetadata(mockMetadata)
+
+        then:
+        thrown(PartnerMetadataException)
+    }
+
+    def "saveMetadata third unhappy path format call triggers FormatterProcessingException"() {
+        given:
+        mockFormatter.convertToJsonString(_ as MessageHdDataType) >> ["ok", "ok"] >> { throw new FormatterProcessingException('error', new Throwable()) }
+
+        TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        DatabasePartnerMetadataStorage.getInstance().saveMetadata(mockMetadata)
+
+        then:
+        thrown(PartnerMetadataException)
+    }
+
+    def "saveMetadata fourth unhappy path format call triggers FormatterProcessingException"() {
+        given:
+        mockFormatter.convertToJsonString(_ as MessageHdDataType) >> ["ok", "ok" , "ok"] >> { throw new FormatterProcessingException('error', new Throwable()) }
+
+        TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         DatabasePartnerMetadataStorage.getInstance().saveMetadata(mockMetadata)
@@ -152,6 +218,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
     def "saveMetadata writes null timestamp"() {
         given:
+        def testMapper = new ObjectMapper()
         def mockMetadata = new PartnerMetadata(
                 "receivedSubmissionId",
                 "sentSubmissionId",
@@ -183,11 +250,13 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 new DbColumn("failure_reason", mockMetadata.failureReason(), true, Types.VARCHAR),
                 new DbColumn("message_type", null, false, Types.OTHER),
                 new DbColumn("placer_order_number", mockMetadata.placerOrderNumber(), false, Types.VARCHAR),
-                new DbColumn("sending_application_details", mockMetadata.sendingApplicationDetails(), false, Types.OTHER),
-                new DbColumn("sending_facility_details", mockMetadata.sendingFacilityDetails(), false, Types.OTHER),
-                new DbColumn("receiving_application_details", mockMetadata.receivingApplicationDetails(), false, Types.OTHER),
-                new DbColumn("receiving_facility_details", mockMetadata.receivingFacilityDetails(), false, Types.OTHER)
+                new DbColumn("sending_application_details", testMapper.writeValueAsString(mockMetadata.sendingApplicationDetails()), false, Types.OTHER),
+                new DbColumn("sending_facility_details", testMapper.writeValueAsString(mockMetadata.sendingFacilityDetails()), false, Types.OTHER),
+                new DbColumn("receiving_application_details", testMapper.writeValueAsString(mockMetadata.receivingApplicationDetails()), false, Types.OTHER),
+                new DbColumn("receiving_facility_details", testMapper.writeValueAsString(mockMetadata.receivingFacilityDetails()), false, Types.OTHER)
                 )
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         DatabasePartnerMetadataStorage.getInstance().saveMetadata(mockMetadata)
