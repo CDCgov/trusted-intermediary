@@ -205,6 +205,7 @@ public class PostgresDao implements DbDao {
 
     @Override
     public void insertMessageLink(MessageLink messageLink) throws SQLException {
+        // todo: add an integration test for the race condition
         var getMaxLinkIdSql =
                 "SELECT COALESCE(MAX(link_id), 0) + 1 AS next_link_id FROM message_link";
         var insertSql =
