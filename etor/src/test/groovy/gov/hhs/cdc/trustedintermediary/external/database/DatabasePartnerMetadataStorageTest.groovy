@@ -2,11 +2,13 @@ package gov.hhs.cdc.trustedintermediary.external.database
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.messages.Message
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.*
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
 import spock.lang.Specification
 
 import java.sql.SQLException
@@ -160,9 +162,54 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         thrown(PartnerMetadataException)
     }
 
-    def "saveMetadata unhappy path triggers FormatterProcessingException"() {
+    def "saveMetadata unhappy path first format call triggers FormatterProcessingException"() {
         given:
-        mockDao.upsertData(_ as String, _ as List, _ as String) >> { throw new FormatterProcessingException("Format error", new Throwable()) }
+        mockFormatter.convertToJsonString(_ as MessageHdDataType) >> { throw new FormatterProcessingException('error', new Throwable()) }
+
+        TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        DatabasePartnerMetadataStorage.getInstance().saveMetadata(mockMetadata)
+
+        then:
+        thrown(PartnerMetadataException)
+    }
+
+    def "saveMetadata second unhappy path format call triggers FormatterProcessingException"() {
+        given:
+        mockFormatter.convertToJsonString(_ as MessageHdDataType) >> "ok" >> { throw new FormatterProcessingException('error', new Throwable()) }
+
+        TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        DatabasePartnerMetadataStorage.getInstance().saveMetadata(mockMetadata)
+
+        then:
+        thrown(PartnerMetadataException)
+    }
+
+    def "saveMetadata third unhappy path format call triggers FormatterProcessingException"() {
+        given:
+        mockFormatter.convertToJsonString(_ as MessageHdDataType) >> ["ok", "ok"] >> { throw new FormatterProcessingException('error', new Throwable()) }
+
+        TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        DatabasePartnerMetadataStorage.getInstance().saveMetadata(mockMetadata)
+
+        then:
+        thrown(PartnerMetadataException)
+    }
+
+    def "saveMetadata fourth unhappy path format call triggers FormatterProcessingException"() {
+        given:
+        mockFormatter.convertToJsonString(_ as MessageHdDataType) >> ["ok", "ok" , "ok"] >> { throw new FormatterProcessingException('error', new Throwable()) }
+
+        TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         DatabasePartnerMetadataStorage.getInstance().saveMetadata(mockMetadata)
