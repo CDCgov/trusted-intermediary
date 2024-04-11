@@ -32,12 +32,6 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         mockDao = Mock(DbDao)
         mockFormatter = Mock(Formatter)
 
-        //        testMapper = new ObjectMapper()
-        //        mockFormatter.convertToJsonString(_ as MessageHdDataType) >> testMapper.writeValueAsString(sendingApp)
-        //        mockResultSet.getString("sending_facility_details") >> testMapper.writeValueAsString(sendingFacility)
-        //        mockResultSet.getString("receiving_application_details") >> testMapper.writeValueAsString(receivingApp)
-        //        mockResultSet.getString("receiving_facility_details") >> testMapper.writeValueAsString(receivingFacility)
-
         TestApplicationContext.register(DbDao, mockDao)
         TestApplicationContext.register(PartnerMetadataStorage, DatabasePartnerMetadataStorage.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
@@ -79,7 +73,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         thrown(PartnerMetadataException)
     }
 
-    def "readMetadatForSender unhappy path triggers SQLException"() {
+    def "readMetadataForSender unhappy path triggers SQLException"() {
         given:
         def sender = "testSender"
         mockDao.fetchMetadataForSender(sender) >> { throw new SQLException("Database error has occur") }
@@ -91,7 +85,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         thrown(PartnerMetadataException)
     }
 
-    def "readMetadatForSender unhappy path triggers FormatterProcessingException"() {
+    def "readMetadataForSender unhappy path triggers FormatterProcessingException"() {
         given:
         def sender = "testSender"
         mockDao.fetchMetadataForSender(sender) >> { throw new FormatterProcessingException("Format error", new Throwable()) }
