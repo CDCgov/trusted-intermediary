@@ -23,6 +23,7 @@ public class DatabaseMessageLinkStorage implements MessageLinkStorage {
         return INSTANCE;
     }
 
+    @Override
     public Optional<MessageLink> getMessageLink(String submissionId) throws MessageLinkException {
         try {
             return dao.fetchMessageLink(submissionId);
@@ -31,6 +32,7 @@ public class DatabaseMessageLinkStorage implements MessageLinkStorage {
         }
     }
 
+    @Override
     public void saveMessageLink(MessageLink messageLink) throws MessageLinkException {
         logger.logInfo("Saving message links");
         try {
