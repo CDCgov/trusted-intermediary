@@ -12,6 +12,7 @@ import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemograph
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageRequestHandler
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
@@ -22,7 +23,6 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrch
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
 import gov.hhs.cdc.trustedintermediary.etor.operationoutcomes.FhirMetadata
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultController
@@ -233,8 +233,13 @@ class EtorDomainRegistrationTest extends Specification {
         def request = new DomainRequest()
         request.setPathParams(["id": "metadataId"])
 
+        def sendingAppDetails = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
+        def sendingFacilityDetails = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
+        def receivingAppDetails = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
+        def receivingFacilityDetails = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
+
         def mockPartnerMetadataOrchestrator = Mock(PartnerMetadataOrchestrator)
-        mockPartnerMetadataOrchestrator.getMetadata(_ as String) >> Optional.ofNullable(new PartnerMetadata("receivedSubmissionId", "sender", Instant.now(), null, "hash", PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER))
+        mockPartnerMetadataOrchestrator.getMetadata(_ as String) >> Optional.ofNullable(new PartnerMetadata("receivedSubmissionId", "sender", Instant.now(), null, "hash", PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number"))
         TestApplicationContext.register(PartnerMetadataOrchestrator, mockPartnerMetadataOrchestrator)
 
         def mockResponseHelper = Mock(DomainResponseHelper)

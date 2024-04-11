@@ -29,7 +29,14 @@ public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
             throws UnableToSendMessageException {
 
         sendMessageHelper.savePartnerMetadataForReceivedMessage(
-                receivedSubmissionId, order.hashCode(), PartnerMetadataMessageType.ORDER);
+                receivedSubmissionId,
+                order.hashCode(),
+                PartnerMetadataMessageType.ORDER,
+                order.getSendingApplicationDetails(),
+                order.getSendingFacilityDetails(),
+                order.getReceivingApplicationDetails(),
+                order.getReceivingFacilityDetails(),
+                order.getPlacerOrderNumber());
 
         var omlOrder = converter.convertToOmlOrder(order);
         metadata.put(order.getFhirResourceId(), EtorMetadataStep.ORDER_CONVERTED_TO_OML);

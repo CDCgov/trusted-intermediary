@@ -1,9 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata.partner
 
-
 import gov.hhs.cdc.trustedintermediary.PojoTestUtils
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
 
 import java.time.Instant
 import spock.lang.Specification
@@ -29,10 +27,13 @@ class PartnerMetadataTest extends Specification {
         def status = PartnerMetadataStatus.DELIVERED
         def failureReason = "failure reason"
         def messageType = PartnerMetadataMessageType.RESULT
-
+        def sendingAppDetails = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
+        def sendingFacilityDetails = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
+        def receivingAppDetails = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
+        def receivingFacilityDetails = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
 
         when:
-        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, timeDelivered, hash, PartnerMetadataStatus.DELIVERED, failureReason, messageType)
+        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, timeDelivered, hash, PartnerMetadataStatus.DELIVERED, failureReason, messageType, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
 
         then:
         metadata.receivedSubmissionId() == receivedSubmissionId
@@ -44,6 +45,10 @@ class PartnerMetadataTest extends Specification {
         metadata.hash() == hash
         metadata.deliveryStatus() == status
         metadata.failureReason() == failureReason
+        metadata.sendingApplicationDetails() == sendingAppDetails
+        metadata.sendingFacilityDetails() == sendingFacilityDetails
+        metadata.receivingApplicationDetails() == receivingAppDetails
+        metadata.receivingFacilityDetails() == receivingFacilityDetails
     }
 
     def "test overloaded constructor"() {
@@ -54,9 +59,13 @@ class PartnerMetadataTest extends Specification {
         def timeDelivered = Instant.now()
         def hash = "abcd"
         def status = PartnerMetadataStatus.DELIVERED
+        def sendingAppDetails = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
+        def sendingFacilityDetails = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
+        def receivingAppDetails = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
+        def receivingFacilityDetails = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
 
         when:
-        def metadata = new PartnerMetadata(receivedSubmissionId, sender, timeReceived, timeDelivered, hash, PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER)
+        def metadata = new PartnerMetadata(receivedSubmissionId, sender, timeReceived, timeDelivered, hash, PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
 
         then:
         metadata.receivedSubmissionId() == receivedSubmissionId
@@ -67,26 +76,10 @@ class PartnerMetadataTest extends Specification {
         metadata.timeDelivered() == timeDelivered
         metadata.hash() == hash
         metadata.deliveryStatus() == status
-    }
-
-    def "test constructor with only received submission ID and hash"() {
-        given:
-        def receivedSubmissionId = "receivedSubmissionId"
-        def hash = "abcd"
-
-        when:
-        def metadata = new PartnerMetadata(receivedSubmissionId, hash)
-
-        then:
-        metadata.receivedSubmissionId() == receivedSubmissionId
-        metadata.sentSubmissionId() == null
-        metadata.sender() == null
-        metadata.receiver() == null
-        metadata.timeReceived() == null
-        metadata.timeDelivered() == null
-        metadata.hash() == hash
-        //Status should default to PENDING
-        metadata.deliveryStatus() == PartnerMetadataStatus.PENDING
+        metadata.sendingApplicationDetails() == sendingAppDetails
+        metadata.sendingFacilityDetails() == sendingFacilityDetails
+        metadata.receivingApplicationDetails() == receivingAppDetails
+        metadata.receivingFacilityDetails() == receivingFacilityDetails
     }
 
     def "test constructor with only received submission ID and status"() {
@@ -119,7 +112,12 @@ class PartnerMetadataTest extends Specification {
         def hash = "abcd"
         def status = PartnerMetadataStatus.DELIVERED
         def failureReason = "DogCow goes boom"
-        def metadata = new PartnerMetadata(receivedSubmissionId, null, sender, null, timeReceived, null, hash, status, failureReason, messageType)
+        def sendingAppDetails = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
+        def sendingFacilityDetails = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
+        def receivingAppDetails = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
+        def receivingFacilityDetails = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
+
+        def metadata = new PartnerMetadata(receivedSubmissionId, null, sender, null, timeReceived, null, hash, status, failureReason, messageType, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
 
         when:
         def updatedMetadata = metadata.withSentSubmissionId(sentSubmissionId).withReceiver(receiver)
@@ -132,6 +130,10 @@ class PartnerMetadataTest extends Specification {
         updatedMetadata.timeReceived() == timeReceived
         updatedMetadata.hash() == hash
         updatedMetadata.deliveryStatus() == status
+        updatedMetadata.sendingApplicationDetails() == sendingAppDetails
+        updatedMetadata.sendingFacilityDetails() == sendingFacilityDetails
+        updatedMetadata.receivingApplicationDetails() == receivingAppDetails
+        updatedMetadata.receivingFacilityDetails() == receivingFacilityDetails
     }
 
     def "test withDeliveryStatus to update PartnerMetadata"() {
@@ -145,7 +147,11 @@ class PartnerMetadataTest extends Specification {
         def messageType = PartnerMetadataMessageType.RESULT
         def hash = "abcd"
         def failureReason = "DogCow goes boom"
-        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, timeDelivered, hash, PartnerMetadataStatus.PENDING, failureReason, messageType)
+        def sendingAppDetails = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
+        def sendingFacilityDetails = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
+        def receivingAppDetails = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
+        def receivingFacilityDetails = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
+        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, timeDelivered, hash, PartnerMetadataStatus.PENDING, failureReason, messageType, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
 
         when:
         def newStatus = PartnerMetadataStatus.DELIVERED
@@ -161,6 +167,10 @@ class PartnerMetadataTest extends Specification {
         updatedMetadata.hash() == hash
         updatedMetadata.deliveryStatus() == newStatus
         updatedMetadata.failureReason() == failureReason
+        updatedMetadata.sendingApplicationDetails() == sendingAppDetails
+        updatedMetadata.sendingFacilityDetails() == sendingFacilityDetails
+        updatedMetadata.receivingApplicationDetails() == receivingAppDetails
+        updatedMetadata.receivingFacilityDetails() == receivingFacilityDetails
     }
 
     def "test withTimeDelivered to update PartnerMetadata"() {
@@ -174,7 +184,11 @@ class PartnerMetadataTest extends Specification {
         def messageType = PartnerMetadataMessageType.RESULT
         def hash = "abcd"
         def failureReason = "DogCow goes boom"
-        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, null, hash, PartnerMetadataStatus.PENDING, failureReason, messageType)
+        def sendingAppDetails = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
+        def sendingFacilityDetails = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
+        def receivingAppDetails = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
+        def receivingFacilityDetails = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
+        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, null, hash, PartnerMetadataStatus.PENDING, failureReason, messageType, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
 
         when:
         def updatedMetadata = metadata.withTimeDelivered(timeDelivered)
@@ -188,5 +202,9 @@ class PartnerMetadataTest extends Specification {
         updatedMetadata.timeDelivered() == timeDelivered
         updatedMetadata.hash() == hash
         updatedMetadata.failureReason() == failureReason
+        updatedMetadata.sendingApplicationDetails() == sendingAppDetails
+        updatedMetadata.sendingFacilityDetails() == sendingFacilityDetails
+        updatedMetadata.receivingApplicationDetails() == receivingAppDetails
+        updatedMetadata.receivingFacilityDetails() == receivingFacilityDetails
     }
 }

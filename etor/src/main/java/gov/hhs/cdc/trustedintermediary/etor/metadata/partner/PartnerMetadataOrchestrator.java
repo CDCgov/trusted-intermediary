@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata.partner;
 
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
@@ -36,7 +37,14 @@ public class PartnerMetadataOrchestrator {
     private PartnerMetadataOrchestrator() {}
 
     public void updateMetadataForReceivedMessage(
-            String receivedSubmissionId, String messageHash, PartnerMetadataMessageType messageType)
+            String receivedSubmissionId,
+            String messageHash,
+            PartnerMetadataMessageType messageType,
+            MessageHdDataType sendingApplicationDetails,
+            MessageHdDataType sendingFacilityDetails,
+            MessageHdDataType receivingApplicationDetails,
+            MessageHdDataType receivingFacilityDetails,
+            String placerOrderNumber)
             throws PartnerMetadataException {
 
         logger.logInfo(
@@ -72,7 +80,15 @@ public class PartnerMetadataOrchestrator {
                     "Unable to retrieve metadata from RS delivery API, but writing basic metadata entry anyway for received submission ID {}",
                     receivedSubmissionId);
             PartnerMetadata partnerMetadata =
-                    new PartnerMetadata(receivedSubmissionId, messageHash, messageType);
+                    new PartnerMetadata(
+                            receivedSubmissionId,
+                            messageHash,
+                            messageType,
+                            sendingApplicationDetails,
+                            sendingFacilityDetails,
+                            receivingApplicationDetails,
+                            receivingFacilityDetails,
+                            placerOrderNumber);
             partnerMetadataStorage.saveMetadata(partnerMetadata);
 
             throw new PartnerMetadataException(
@@ -92,7 +108,12 @@ public class PartnerMetadataOrchestrator {
                         null,
                         messageHash,
                         PartnerMetadataStatus.PENDING,
-                        messageType);
+                        messageType,
+                        sendingApplicationDetails,
+                        sendingFacilityDetails,
+                        receivingApplicationDetails,
+                        receivingFacilityDetails,
+                        placerOrderNumber);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 

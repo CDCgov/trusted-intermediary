@@ -54,7 +54,15 @@ class SendOrderUseCaseTest extends Specification {
         1 * sendOrder.metadata.put(_, EtorMetadataStep.ORDER_CONVERTED_TO_OML)
         1 * sendOrder.metadata.put(_, EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT)
         1 * sendOrder.metadata.put(_, EtorMetadataStep.ETOR_PROCESSING_TAG_ADDED_TO_MESSAGE_HEADER)
-        1 * mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String, messageType)
+        1 * mockOrchestrator.updateMetadataForReceivedMessage(
+                receivedSubmissionId,
+                _ as String,
+                messageType,
+                mockOrder.getSendingApplicationDetails(),
+                mockOrder.getSendingFacilityDetails(),
+                mockOrder.getReceivingApplicationDetails(),
+                mockOrder.getReceivingFacilityDetails(),
+                mockOrder.getPlacerOrderNumber())
         1 * mockOrchestrator.updateMetadataForSentMessage(receivedSubmissionId, sentSubmissionId)
     }
 
@@ -89,7 +97,12 @@ class SendOrderUseCaseTest extends Specification {
         def omlOrder = Mock(Order)
         def receivedSubmissionId = "receivedId"
         def messageType = PartnerMetadataMessageType.ORDER
-        mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String, messageType) >> { throw new PartnerMetadataException("Error") }
+        mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String, messageType,
+                order.getSendingApplicationDetails(),
+                order.getSendingFacilityDetails(),
+                order.getReceivingApplicationDetails(),
+                order.getReceivingFacilityDetails(),
+                order.getPlacerOrderNumber()) >> { throw new PartnerMetadataException("Error") }
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
