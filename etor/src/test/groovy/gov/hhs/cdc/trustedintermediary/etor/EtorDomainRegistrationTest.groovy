@@ -3,7 +3,6 @@ package gov.hhs.cdc.trustedintermediary.etor
 import gov.hhs.cdc.trustedintermediary.DemographicsMock
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.ResultMock
-import gov.hhs.cdc.trustedintermediary.context.ApplicationContext
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
@@ -33,6 +32,7 @@ import gov.hhs.cdc.trustedintermediary.etor.results.SendResultUseCase
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
+
 import java.time.Instant
 import spock.lang.Specification
 
@@ -56,6 +56,25 @@ class EtorDomainRegistrationTest extends Specification {
         def ordersEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.ORDERS_API_ENDPOINT, true)
         def metadataEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.METADATA_API_ENDPOINT, true)
         def consolidatedOrdersEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.CONSOLIDATED_SUMMARY_API_ENDPOINT, true)
+        when:
+        def endpoints = domainRegistration.domainRegistration()
+
+        then:
+        !endpoints.isEmpty()
+        endpoints.get(demographicsEndpoint) != null
+        endpoints.get(ordersEndpoint) != null
+        endpoints.get(metadataEndpoint) != null
+        endpoints.get(consolidatedOrdersEndpoint) != null
+    }
+
+    def "domain registration has endpoints when DB_URL is not found"() {
+        given:
+        def domainRegistration = new EtorDomainRegistration()
+        def demographicsEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.DEMOGRAPHICS_API_ENDPOINT, true)
+        def ordersEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.ORDERS_API_ENDPOINT, true)
+        def metadataEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.METADATA_API_ENDPOINT, true)
+        def consolidatedOrdersEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.CONSOLIDATED_SUMMARY_API_ENDPOINT, true)
+        TestApplicationContext.addEnvironmentVariable("DB_URL", "")
 
         when:
         def endpoints = domainRegistration.domainRegistration()
