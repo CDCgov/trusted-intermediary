@@ -24,6 +24,7 @@ public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
         return INSTANCE;
     }
 
+    @Override
     public void convertAndSend(final Order<?> order, String receivedSubmissionId)
             throws UnableToSendMessageException {
 
