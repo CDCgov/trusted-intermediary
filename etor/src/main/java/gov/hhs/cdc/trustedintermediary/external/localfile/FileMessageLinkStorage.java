@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
@@ -75,7 +76,10 @@ public class FileMessageLinkStorage implements MessageLinkStorage {
             Set<MessageLink> messageLinks = readMessageLinks();
             Optional<MessageLink> existingLink =
                     messageLinks.stream()
-                            .filter(link -> link.getLinkId().equals(messageLink.getLinkId()))
+                            .filter(
+                                    link ->
+                                            Objects.equals(
+                                                    link.getLinkId(), messageLink.getLinkId()))
                             .findFirst();
             if (existingLink.isPresent()) {
                 MessageLink existing = existingLink.get();
