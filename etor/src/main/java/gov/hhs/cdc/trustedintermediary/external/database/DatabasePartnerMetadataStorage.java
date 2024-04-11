@@ -72,7 +72,8 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
         return consolidatedMetadata;
     }
 
-    private List<DbColumn> createDbColumnsFromMetadata(PartnerMetadata metadata) {
+    private List<DbColumn> createDbColumnsFromMetadata(PartnerMetadata metadata)
+            throws FormatterProcessingException {
         return List.of(
                 new DbColumn(
                         "received_message_id",
@@ -109,22 +110,22 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                         "placer_order_number", metadata.placerOrderNumber(), false, Types.VARCHAR),
                 new DbColumn(
                         "sending_application_details",
-                        metadata.sendingApplicationDetails(),
+                        formatter.convertToJsonString(metadata.sendingApplicationDetails()),
                         false,
                         Types.OTHER),
                 new DbColumn(
                         "sending_facility_details",
-                        metadata.sendingFacilityDetails(),
+                        formatter.convertToJsonString(metadata.sendingFacilityDetails()),
                         false,
                         Types.OTHER),
                 new DbColumn(
                         "receiving_application_details",
-                        metadata.receivingApplicationDetails(),
+                        formatter.convertToJsonString(metadata.receivingApplicationDetails()),
                         false,
                         Types.OTHER),
                 new DbColumn(
                         "receiving_facility_details",
-                        metadata.receivingFacilityDetails(),
+                        formatter.convertToJsonString(metadata.receivingFacilityDetails()),
                         false,
                         Types.OTHER));
     }

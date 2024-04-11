@@ -9,7 +9,7 @@ import java.util.Set;
 /** Interface for accessing the database for metadata */
 public interface DbDao {
     void upsertData(String tableName, List<DbColumn> values, String conflictColumnName)
-            throws SQLException, FormatterProcessingException;
+            throws SQLException;
 
     Set<PartnerMetadata> fetchMetadataForSender(String sender)
             throws SQLException, FormatterProcessingException;

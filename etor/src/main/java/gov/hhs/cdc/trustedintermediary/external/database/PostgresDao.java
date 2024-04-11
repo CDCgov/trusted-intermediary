@@ -35,7 +35,7 @@ public class PostgresDao implements DbDao {
 
     @Override
     public void upsertData(String tableName, List<DbColumn> values, String conflictColumnName)
-            throws SQLException, FormatterProcessingException {
+            throws SQLException {
         // example SQL statement generated here:
         // INSERT INTO metadata_table (column_one, column_three, column_two, column_four)
         // VALUES (?, ?, ?, ?)
