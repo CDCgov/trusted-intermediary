@@ -62,7 +62,7 @@ public class PostgresDao implements DbDao {
 
         sqlStatementBuilder.append(") VALUES (");
 
-        sqlStatementBuilder.append("?, ".repeat(values.size() - 4));
+        sqlStatementBuilder.append("?, ".repeat(values.size() - MESSAGE_HD_DB_COLUMNS.size()));
         sqlStatementBuilder.append("?::JSONB, ".repeat(MESSAGE_HD_DB_COLUMNS.size()));
         removeLastTwoCharacters(sqlStatementBuilder); // remove the last unused ", "
         sqlStatementBuilder.append(")");
