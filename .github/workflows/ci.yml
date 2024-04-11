@@ -80,7 +80,7 @@ jobs:
         run: ./gradlew spotlessCheck
 
       - name: Sonar
-        run: ./gradlew allBuilds testCodeCoverageReport sonar --info
+        run: ./gradlew allBuilds testCodeCoverageReport sonar --debug
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
