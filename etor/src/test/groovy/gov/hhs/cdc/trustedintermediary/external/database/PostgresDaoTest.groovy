@@ -107,8 +107,7 @@ class PostgresDaoTest extends Specification {
 
             return mockPreparedStatement
         }
-        (columns.size() - 5)  * mockPreparedStatement.setObject(_ as Integer, _, _ as Integer)
-        4 * mockPreparedStatement.setObject(_ as Integer, _)
+        (columns.size() - 1)  * mockPreparedStatement.setObject(_ as Integer, _, _ as Integer)
         1 * mockPreparedStatement.setNull(4, Types.VARCHAR)
         1 * mockPreparedStatement.executeUpdate()
     }
@@ -142,8 +141,7 @@ class PostgresDaoTest extends Specification {
 
             return mockPreparedStatement
         }
-        2  * mockPreparedStatement.setObject(_ as Integer, _, _ as Integer)
-        4  * mockPreparedStatement.setObject(_ as Integer, _)
+        6  * mockPreparedStatement.setObject(_ as Integer, _, _ as Integer)
         1 * mockPreparedStatement.executeUpdate()
     }
 
@@ -166,33 +164,6 @@ class PostgresDaoTest extends Specification {
 
         then:
         thrown(SQLException)
-    }
-
-    def "upsertData throws exception for FormatterProcessingException"() {
-        given:
-        def tableName = "DogCow"
-        def columns = [
-            new DbColumn("Moof", "Clarus", false, Types.VARCHAR),
-            new DbColumn("sending_application_details", sendingApp, false, Types.OTHER),
-            new DbColumn("sending_facility_details", sendingFacility, false, Types.OTHER),
-            new DbColumn("receiving_application_details", receivingApp, false, Types.OTHER),
-            new DbColumn("receiving_facility_details", receivingFacility, false, Types.OTHER),
-        ]
-        mockConnPool.getConnection() >> mockConn
-        mockConn.prepareStatement(_ as String) >> { String sqlStatement ->
-            return mockPreparedStatement
-        }
-        mockFormatter.convertToJsonString(_ as Object) >> { throw new FormatterProcessingException('error', new Throwable()) }
-
-        TestApplicationContext.register(ConnectionPool, mockConnPool)
-        TestApplicationContext.register(Formatter, mockFormatter)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        PostgresDao.getInstance().upsertData(tableName, columns, null)
-
-        then:
-        thrown(FormatterProcessingException)
     }
 
     def "select metadata retrieves data"() {
