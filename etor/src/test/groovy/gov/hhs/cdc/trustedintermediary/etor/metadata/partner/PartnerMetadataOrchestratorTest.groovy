@@ -555,7 +555,6 @@ class PartnerMetadataOrchestratorTest extends Specification {
         PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithoutDestinations)
 
         then:
-        // @todo check what this should be
         exception = thrown(FormatterProcessingException)
         exception.getMessage().indexOf(noReceiverMessage) >= 0
 
@@ -578,7 +577,6 @@ class PartnerMetadataOrchestratorTest extends Specification {
         PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithoutOrgId)
 
         then:
-        // @todo check what this should be
         exception = thrown(FormatterProcessingException)
         exception.getMessage().indexOf(noReceiverMessage) >= 0
 
@@ -587,7 +585,6 @@ class PartnerMetadataOrchestratorTest extends Specification {
         PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithoutService)
 
         then:
-        // @todo check what this should be
         exception = thrown(FormatterProcessingException)
         exception.getMessage().indexOf(noReceiverMessage) >= 0
 
