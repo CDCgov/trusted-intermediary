@@ -52,27 +52,52 @@ class PartnerMetadataOrchestratorTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
     }
 
-    def "updateMetadataForReceivedOrder updates metadata successfully"() {
+    def "updateMetadataForReceivedMessage updates metadata successfully"() {
         given:
+
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+
         def receivedSubmissionId = "receivedSubmissionId"
-        def sender = "senderName"
         def timestamp = "2020-01-01T00:00:00.000Z"
-        def timeDelivered = "2020-01-02T00:00:00.000Z"
         def hashCode = "123"
         def bearerToken = "token"
         def messageType = PartnerMetadataMessageType.RESULT
-        def rsHistoryApiResponse = "{\"actualCompletionAt\": \"2023-10-24T19:48:26.921Z\",\"sender\": \"${sender}\", \"timestamp\": \"${timestamp}\"}"
         def deliveryStatus = PartnerMetadataStatus.PENDING
-
-        mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> [sender: sender, timestamp: timestamp, actualCompletionAt: timeDelivered]
+        def rsDeliveryApiResponse = """
+            {
+                "deliveryId": 20,
+                "batchReadyAt": "2024-04-09T18:19:00.431Z",
+                "expires": "2024-05-09T18:19:00.431Z",
+                "receiver": "flexion.etor-service-receiver-orders",
+                "receivingOrgSvcStatus": null,
+                "reportId": "ddfeb4e2-af58-433e-9297-a4be01957225",
+                "topic": "etor-ti",
+                "reportItemCount": 2,
+                "fileName": "fhir-transform-sample.yml-ddfeb4e2-af58-433e-9297-a4be01957225-20240409181900.fhir",
+                "fileType": "FHIR",
+                "originalIngestion": [
+                    {
+                        "reportId": "2f5f17e7-2161-44d9-b091-2d53c10f6e90",
+                        "ingestionTime": "${timestamp}",
+                        "sendingOrg": "Clarus Doctors"
+                    },
+                    {
+                        "reportId": "e18c283e-e2e4-4804-bca3-33afe32e6b69",
+                        "ingestionTime": "2024-04-09T18:18:00.553Z",
+                        "sendingOrg": "DogCow Associates"
+                    }
+                ]
+            }
+        """
 
         when:
         PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(receivedSubmissionId, hashCode, messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
 
         then:
         1 * mockClient.getRsToken() >> bearerToken
-        1 * mockClient.requestHistoryEndpoint(receivedSubmissionId, bearerToken) >> rsHistoryApiResponse
-        1 * mockPartnerMetadataStorage.saveMetadata(new PartnerMetadata(receivedSubmissionId, sender, Instant.parse(timestamp), null, hashCode, deliveryStatus, messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber))
+        1 * mockClient.requestDeliveryEndpoint(receivedSubmissionId, bearerToken) >> rsDeliveryApiResponse
+        1 * mockPartnerMetadataStorage.saveMetadata(new PartnerMetadata(receivedSubmissionId, "PLACE_HOLDER", Instant.parse(timestamp), null, hashCode, deliveryStatus, messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber))
     }
 
     def "updateMetadataForSentMessage test case when sentSubmissionId is null"() {
@@ -129,12 +154,12 @@ class PartnerMetadataOrchestratorTest extends Specification {
         1 * mockPartnerMetadataStorage.readMetadata(receivedSubmissionId) >> mockMetadata
     }
 
-    def "updateMetadataForReceivedOrder throws PartnerMetadataException on client error"() {
+    def "updateMetadataForReceivedMessage throws PartnerMetadataException on client error"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
 
         mockClient.getRsToken() >> "token"
-        mockClient.requestHistoryEndpoint(_ as String, _ as String) >> { throw new ReportStreamEndpointClientException("Client error", new Exception()) }
+        mockClient.requestDeliveryEndpoint(_ as String, _ as String) >> { throw new ReportStreamEndpointClientException("Client error", new Exception()) }
 
         when:
         PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(receivedSubmissionId, "hash", PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
@@ -146,13 +171,30 @@ class PartnerMetadataOrchestratorTest extends Specification {
         thrown(PartnerMetadataException)
     }
 
-    def "updateMetadataForReceivedOrder throws PartnerMetadataException on formatter error"() {
+    def "updateMetadataForReceivedMessage throws PartnerMetadataException on formatter error"() {
         given:
-        def rsHistoryApiResponse = "{\"sender\": \"responseName\", \"timestamp\": \"2020-01-01T00:00:00.000Z\"}"
+        def receivedSubmissionId = "receivedSubmissionId"
+        def messageType = PartnerMetadataMessageType.RESULT
+        def rsDeliveryApiResponse = "{ASDF}"
 
         mockClient.getRsToken() >> "token"
-        mockClient.requestHistoryEndpoint(_ as String, _ as String) >> rsHistoryApiResponse
-        mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> { throw new FormatterProcessingException("Formatter error", new Exception()) }
+        mockClient.requestDeliveryEndpoint(_ as String, _ as String) >> rsDeliveryApiResponse
+        mockFormatter.convertJsonToObject(rsDeliveryApiResponse, _ as TypeReference) >> { throw new FormatterProcessingException("Formatter error", new Exception()) }
+
+        when:
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(receivedSubmissionId, "hash", messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
+
+        then:
+        thrown(PartnerMetadataException)
+    }
+
+    def "updateMetadataForReceivedMessage throws PartnerMetadataException on formatter error due to unexpected response format"() {
+        given:
+        def wrongFormatResponse = "{\"someotherkey\": \"value\"}"
+
+        mockClient.getRsToken() >> "token"
+        mockClient.requestDeliveryEndpoint(_ as String, _ as String) >> wrongFormatResponse
+        mockFormatter.convertJsonToObject(wrongFormatResponse, _ as TypeReference) >> [someotherkey: "value"]
 
         when:
         PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage("receivedSubmissionId", "hash", PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
@@ -161,16 +203,18 @@ class PartnerMetadataOrchestratorTest extends Specification {
         thrown(PartnerMetadataException)
     }
 
-    def "updateMetadataForReceivedOrder throws PartnerMetadataException on formatter error due to unexpected response format"() {
+    def "updateMetadataForReceivedMessage throws PartnerMetadataException due to 0 originalIngestions"() {
         given:
-        def wrongFormatResponse = "{\"someotherkey\": \"value\"}"
+        def receivedSubmissionId = "receivedSubmissionId"
+        def wrongFormatResponse = "{\"originalIngestion\": []}"
+        def messageType = PartnerMetadataMessageType.RESULT
 
         mockClient.getRsToken() >> "token"
-        mockClient.requestHistoryEndpoint(_ as String, _ as String) >> wrongFormatResponse
-        mockFormatter.convertJsonToObject(wrongFormatResponse, _ as TypeReference) >> [someotherkey: "value"]
+        mockClient.requestDeliveryEndpoint(_ as String, _ as String) >> wrongFormatResponse
+        mockFormatter.convertJsonToObject(wrongFormatResponse, _ as TypeReference) >> [originalIngestion: []]
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage("receivedSubmissionId", "hash", PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(receivedSubmissionId, "hash", messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
 
         then:
         thrown(PartnerMetadataException)
@@ -191,6 +235,18 @@ class PartnerMetadataOrchestratorTest extends Specification {
         1 * mockPartnerMetadataStorage.saveMetadata(updatedPartnerMetadata)
     }
 
+    def "updateMetadataForSentMessage test case when sentSubmissionId is null"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def sentSubmissionId = null
+
+        when:
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentMessage(receivedSubmissionId, sentSubmissionId)
+
+        then:
+        0 * mockPartnerMetadataStorage.readMetadata(receivedSubmissionId)
+    }
+
     def "getMetadata throws PartnerMetadataException on client error"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
@@ -198,7 +254,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
         mockPartnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(partnerMetadata)
         mockClient.getRsToken() >> "token"
-        mockClient.requestHistoryEndpoint(_ as String, _ as String) >> { throw new ReportStreamEndpointClientException("Client error", new Exception()) }
+        mockClient.requestDeliveryEndpoint(_ as String, _ as String) >> { throw new ReportStreamEndpointClientException("Client error", new Exception()) }
 
         when:
         PartnerMetadataOrchestrator.getInstance().getMetadata(receivedSubmissionId)
