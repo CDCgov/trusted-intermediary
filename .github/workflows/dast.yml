@@ -33,7 +33,7 @@ jobs:
         run: ./health-check.sh
 
       - name: Run ZAP API Scan
-        run: docker run -v $(pwd):/zap/wrk/:rw --user root -t owasp/zap2docker-stable zap-api-scan.py -t http://$(ip -f inet -o addr show docker0 | awk '{print $4}' | cut -d '/' -f 1):8080/openapi -f openapi -r api-scan-report.html
+        run: docker run -v $(pwd):/zap/wrk/:rw --user root -t ghcr.io/zaproxy/zaproxy:weekly zap-api-scan.py -t http://$(ip -f inet -o addr show docker0 | awk '{print $4}' | cut -d '/' -f 1):8080/openapi -f openapi -r api-scan-report.html
 
       - name: Upload Report
         uses: actions/upload-artifact@v4
