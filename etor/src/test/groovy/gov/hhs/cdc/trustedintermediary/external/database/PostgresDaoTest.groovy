@@ -577,6 +577,17 @@ class PostgresDaoTest extends Specification {
             partnerMetadata2.placerOrderNumber()
         ]
 
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >>> [
+            partnerMetadata1.sendingApplicationDetails(),
+            partnerMetadata1.sendingFacilityDetails(),
+            partnerMetadata1.receivingApplicationDetails(),
+            partnerMetadata1.receivingFacilityDetails(),
+            partnerMetadata2.sendingApplicationDetails(),
+            partnerMetadata2.sendingFacilityDetails(),
+            partnerMetadata2.receivingApplicationDetails(),
+            partnerMetadata2.receivingFacilityDetails(),
+        ]
+
         TestApplicationContext.register(ConnectionPool, mockConnPool)
         TestApplicationContext.injectRegisteredImplementations()
 
