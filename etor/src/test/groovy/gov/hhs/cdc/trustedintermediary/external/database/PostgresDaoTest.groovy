@@ -14,7 +14,11 @@ import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingExc
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
 import spock.lang.Specification
 
-import java.sql.*
+import java.sql.Connection
+import java.sql.PreparedStatement
+import java.sql.ResultSet
+import java.sql.SQLException
+import java.sql.Timestamp
 import java.time.Instant
 
 class PostgresDaoTest extends Specification {
