@@ -47,9 +47,9 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
     @Override
     public void saveMetadata(final PartnerMetadata metadata) throws PartnerMetadataException {
         logger.logInfo("saving the metadata");
-        
+
         try {
-                List<DbColumn> columns = createDbColumnsFromMetadata(metadata);
+            List<DbColumn> columns = createDbColumnsFromMetadata(metadata);
             dao.upsertData("metadata", columns, "received_message_id");
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error saving metadata", e);
