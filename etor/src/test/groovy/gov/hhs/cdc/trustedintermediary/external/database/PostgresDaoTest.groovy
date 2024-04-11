@@ -19,6 +19,7 @@ import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Timestamp
+import java.sql.Types
 import java.time.Instant
 
 class PostgresDaoTest extends Specification {
