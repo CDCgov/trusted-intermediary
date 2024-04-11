@@ -3,11 +3,13 @@ package gov.hhs.cdc.trustedintermediary.etor
 import gov.hhs.cdc.trustedintermediary.DemographicsMock
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.ResultMock
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
+import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecificationException
 import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemographicsUsecase
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController
@@ -77,6 +79,30 @@ class EtorDomainRegistrationTest extends Specification {
         noExceptionThrown()
         !openApiSpecification.isEmpty()
         openApiSpecification.contains("paths:")
+    }
+
+    def "correctly handles errors when loading OpenAPI"() {
+        given:
+        def domainRegistration = Spy(EtorDomainRegistration)
+        domainRegistration.openApiStream(_ as String) >> { throw new IOException()}
+
+        when:
+        domainRegistration.openApiSpecification()
+
+        then:
+        thrown(UnableToReadOpenApiSpecificationException)
+    }
+
+    def "openApiStream assertion behaves correctly with bad filenames"() {
+        given:
+        def domainRegistration = Spy(EtorDomainRegistration)
+        domainRegistration.openApiStream(_ as String) >> { throw new IOException()}
+
+        when:
+        domainRegistration.openApiStream("badFile")
+
+        then:
+        thrown(IOException)
     }
 
     def "stitches the demographics parsing to the response construction"() {

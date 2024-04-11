@@ -161,13 +161,17 @@ public class EtorDomainRegistration implements DomainConnector {
     @Override
     public String openApiSpecification() throws UnableToReadOpenApiSpecificationException {
         String fileName = "openapi_etor.yaml";
-        try (InputStream openApiStream =
-                getClass().getClassLoader().getResourceAsStream(fileName)) {
-            return new String(openApiStream.readAllBytes(), StandardCharsets.UTF_8);
+        try {
+            return openApiStream(fileName);
         } catch (IOException e) {
             throw new UnableToReadOpenApiSpecificationException(
                     "Failed to open OpenAPI specification for " + fileName, e);
         }
+    }
+
+    public String openApiStream(String fileName) throws IOException {
+        InputStream openApiStream = getClass().getClassLoader().getResourceAsStream(fileName);
+        return new String(openApiStream.readAllBytes(), StandardCharsets.UTF_8);
     }
 
     DomainResponse handleDemographics(DomainRequest request) {
