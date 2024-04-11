@@ -18,6 +18,11 @@ class PartnerMetadataOrchestratorTest extends Specification {
     private def mockPartnerMetadataStorage
     private def mockClient
     private def mockFormatter
+    private def sendingApp
+    private def sendingFacility
+    private def receivingApp
+    private def receivingFacility
+    private def placerOrderNumber
 
     def setup() {
         TestApplicationContext.reset()
@@ -25,6 +30,12 @@ class PartnerMetadataOrchestratorTest extends Specification {
         mockPartnerMetadataStorage = Mock(PartnerMetadataStorage)
         mockFormatter = Mock(Formatter)
         mockClient = Mock(RSEndpointClient)
+
+        sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
+        sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
+        receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
+        receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
+        placerOrderNumber = "placer_order_number"
 
         TestApplicationContext.register(PartnerMetadataOrchestrator, PartnerMetadataOrchestrator.getInstance())
         TestApplicationContext.register(OrderConverter, HapiOrderConverter.getInstance())
@@ -47,11 +58,6 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def messageType = PartnerMetadataMessageType.RESULT
         def rsHistoryApiResponse = "{\"actualCompletionAt\": \"2023-10-24T19:48:26.921Z\",\"sender\": \"${sender}\", \"timestamp\": \"${timestamp}\"}"
         def deliveryStatus = PartnerMetadataStatus.PENDING
-        def sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        def receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-        def receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
-        def placerOrderNumber = "placer_order_number"
 
         mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> [sender: sender, timestamp: timestamp, actualCompletionAt: timeDelivered]
 
@@ -106,16 +112,12 @@ class PartnerMetadataOrchestratorTest extends Specification {
     def "updateMetadataForReceivedOrder throws PartnerMetadataException on client error"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
-        def sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        def receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-        def receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
 
         mockClient.getRsToken() >> "token"
         mockClient.requestHistoryEndpoint(_ as String, _ as String) >> { throw new ReportStreamEndpointClientException("Client error", new Exception()) }
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(receivedSubmissionId, "hash", PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(receivedSubmissionId, "hash", PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
 
         then:
         1 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata) >> { PartnerMetadata metadata ->
@@ -127,17 +129,13 @@ class PartnerMetadataOrchestratorTest extends Specification {
     def "updateMetadataForReceivedOrder throws PartnerMetadataException on formatter error"() {
         given:
         def rsHistoryApiResponse = "{\"sender\": \"responseName\", \"timestamp\": \"2020-01-01T00:00:00.000Z\"}"
-        def sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        def receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-        def receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
 
         mockClient.getRsToken() >> "token"
         mockClient.requestHistoryEndpoint(_ as String, _ as String) >> rsHistoryApiResponse
         mockFormatter.convertJsonToObject(rsHistoryApiResponse, _ as TypeReference) >> { throw new FormatterProcessingException("Formatter error", new Exception()) }
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage("receivedSubmissionId", "hash", PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage("receivedSubmissionId", "hash", PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
 
         then:
         thrown(PartnerMetadataException)
@@ -146,17 +144,13 @@ class PartnerMetadataOrchestratorTest extends Specification {
     def "updateMetadataForReceivedOrder throws PartnerMetadataException on formatter error due to unexpected response format"() {
         given:
         def wrongFormatResponse = "{\"someotherkey\": \"value\"}"
-        def sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        def receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-        def receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
 
         mockClient.getRsToken() >> "token"
         mockClient.requestHistoryEndpoint(_ as String, _ as String) >> wrongFormatResponse
         mockFormatter.convertJsonToObject(wrongFormatResponse, _ as TypeReference) >> [someotherkey: "value"]
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage("receivedSubmissionId", "hash", PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage("receivedSubmissionId", "hash", PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
 
         then:
         thrown(PartnerMetadataException)
@@ -166,11 +160,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
         def sentSubmissionId = "sentSubmissionId"
-        def sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        def receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-        def receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
-        def partnerMetadata = new PartnerMetadata(receivedSubmissionId, "sender", Instant.now(), null, "hash", PartnerMetadataStatus.PENDING, PartnerMetadataMessageType.ORDER, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
+        def partnerMetadata = new PartnerMetadata(receivedSubmissionId, "sender", Instant.now(), null, "hash", PartnerMetadataStatus.PENDING, PartnerMetadataMessageType.ORDER, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
         def updatedPartnerMetadata = partnerMetadata.withSentSubmissionId(sentSubmissionId)
 
         when:
@@ -196,11 +186,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
     def "getMetadata throws PartnerMetadataException on client error"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
-        def sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        def receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-        def receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
-        def partnerMetadata = new PartnerMetadata(receivedSubmissionId, "sentSubmissionId", "sender", null, Instant.now(), null, "hash", PartnerMetadataStatus.PENDING, "failureReason", PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
+        def partnerMetadata = new PartnerMetadata(receivedSubmissionId, "sentSubmissionId", "sender", null, Instant.now(), null, "hash", PartnerMetadataStatus.PENDING, "failureReason", PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
 
         mockPartnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(partnerMetadata)
         mockClient.getRsToken() >> "token"
@@ -217,11 +203,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
         def rsHistoryApiResponse = "{\"destinations\": [{\"organization_id\": \"org\", \"service\": \"service\"}]}"
-        def sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        def receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-        def receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
-        def partnerMetadata = new PartnerMetadata(receivedSubmissionId, "sentSubmissionId", "sender", null, Instant.now(), null, "hash", PartnerMetadataStatus.PENDING, "failureReason", PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
+        def partnerMetadata = new PartnerMetadata(receivedSubmissionId, "sentSubmissionId", "sender", null, Instant.now(), null, "hash", PartnerMetadataStatus.PENDING, "failureReason", PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
 
         mockPartnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(partnerMetadata)
         mockClient.getRsToken() >> "token"
@@ -238,11 +220,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
     def "getMetadata retrieves metadata successfully with the sender already filled"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
-        def sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        def receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-        def receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
-        def metadata = new PartnerMetadata(receivedSubmissionId, "sentSubmissionId", "sender", "receiver", Instant.now(), null, "hash", PartnerMetadataStatus.DELIVERED, null, PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
+        def metadata = new PartnerMetadata(receivedSubmissionId, "sentSubmissionId", "sender", "receiver", Instant.now(), null, "hash", PartnerMetadataStatus.DELIVERED, null, PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
 
         when:
         def result = PartnerMetadataOrchestrator.getInstance().getMetadata(receivedSubmissionId)
@@ -257,11 +235,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
     def "getMetadata retrieves metadata successfully when receiver is present and sentSubmissionId is missing"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
-        def sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        def receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-        def receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
-        def metadata = new PartnerMetadata(receivedSubmissionId, null, "sender", "receiver", Instant.now(), null, "hash", PartnerMetadataStatus.DELIVERED, null, PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
+        def metadata = new PartnerMetadata(receivedSubmissionId, null, "sender", "receiver", Instant.now(), null, "hash", PartnerMetadataStatus.DELIVERED, null, PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
 
         when:
         def result = PartnerMetadataOrchestrator.getInstance().getMetadata(receivedSubmissionId)
@@ -282,11 +256,6 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def hashCode = "123"
         def bearerToken = "token"
         def messageType = PartnerMetadataMessageType.RESULT
-        def sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        def receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-        def receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
-        def placerOrderNumber = "placer_order_number"
         def rsHistoryApiResponse = "{\"actualCompletionAt\": \"2023-10-24T19:48:26.921Z\",\"destinations\": [{\"organization_id\": \"org\", \"service\": \"service\"}]}"
         def missingReceiverMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, null, timestamp, timeDelivered, hashCode, PartnerMetadataStatus.DELIVERED, "", messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
         def expectedMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, "org.service", timestamp, timeDelivered, hashCode, PartnerMetadataStatus.DELIVERED, "", messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
@@ -322,11 +291,6 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def hashCode = "123"
         def bearerToken = "token"
         def messageType = PartnerMetadataMessageType.RESULT
-        def sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        def receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-        def receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
-        def placerOrderNumber = "placer_order_number"
         def rsHistoryApiResponse = "{\"destinations\": [{\"organization_id\": \"org\", \"service\": \"service\"}]}"
         def missingReceiverMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timestamp, null, hashCode, PartnerMetadataStatus.PENDING, null, messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
         def expectedMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timestamp, null, hashCode, PartnerMetadataStatus.FAILED, "", messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
@@ -363,11 +327,6 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def bearerToken = "token"
         def rsHistoryApiResponse = "whatever"
         def messageType = PartnerMetadataMessageType.RESULT
-        def sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        def receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-        def receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
-        def placerOrderNumber = "placer_order_number"
         def missingReceiverMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timestamp, timeDelivered, hashCode, PartnerMetadataStatus.PENDING, null, messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
         def expectedMetadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timestamp, timeDelivered, hashCode, PartnerMetadataStatus.DELIVERED, null, messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
 
@@ -399,11 +358,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
     def "setMetadataStatusToFailed sets status to Failed"() {
         given:
         def submissionId = "13425"
-        def sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        def receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-        def receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
-        def optional = Optional.of(new PartnerMetadata("","","","",Instant.now(),null, "",PartnerMetadataStatus.PENDING, "Bad Message", PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number"))
+        def optional = Optional.of(new PartnerMetadata("","","","",Instant.now(),null, "",PartnerMetadataStatus.PENDING, "Bad Message", PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber))
         mockPartnerMetadataStorage.readMetadata(submissionId) >> optional
 
         when:
@@ -418,11 +373,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
     def "setMetadataStatusToFailed doesn't update status if status is the same"() {
         given:
         def submissionId = "13425"
-        def sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        def receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-        def receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
-        def optional = Optional.of(new PartnerMetadata("","","","",Instant.now(), null, "", PartnerMetadataStatus.FAILED, null, PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number"))
+        def optional = Optional.of(new PartnerMetadata("","","","",Instant.now(), null, "", PartnerMetadataStatus.FAILED, null, PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber))
         mockPartnerMetadataStorage.readMetadata(submissionId) >> optional
 
         when:
@@ -599,12 +550,8 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def senderName = "sender_name"
         def failure = "This thing is bonked"
         def status = PartnerMetadataStatus.PENDING
-        def sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        def receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-        def receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
         def mockMetadata = [
-            new PartnerMetadata("123456789", null, senderName, "receiver_name", Instant.now(), null, null, status, failure, PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
+            new PartnerMetadata("123456789", null, senderName, "receiver_name", Instant.now(), null, null, status, failure, PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
         ]
         mockPartnerMetadataStorage.readMetadataForSender(senderName) >> mockMetadata
 
