@@ -11,12 +11,15 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStor
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
-import spock.lang.Specification
-
+import java.sql.Connection
+import java.sql.PreparedStatement
+import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Timestamp
 import java.sql.Types
 import java.time.Instant
+import java.util.function.Function
+import spock.lang.Specification
 
 class DatabasePartnerMetadataStorageTest extends Specification {
 
@@ -45,7 +48,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         given:
         def expectedResult = Optional.of(mockMetadata)
 
-        mockDao.fetchMetadata(_ as String) >> mockMetadata
+        mockDao.fetchFirstData(_ as Function<Connection, PreparedStatement>, _ as Function<ResultSet, PartnerMetadata>) >> mockMetadata
 
         when:
         def actualResult = DatabasePartnerMetadataStorage.getInstance().readMetadata(mockMetadata.receivedSubmissionId())
@@ -56,7 +59,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
     def "readMetadata unhappy path works"() {
         given:
-        mockDao.fetchMetadata(_ as String) >> { throw new SQLException("Something went wrong!") }
+        mockDao.fetchFirstData(_ as Function<Connection, PreparedStatement>, _ as Function<ResultSet, PartnerMetadata>) >> { throw new SQLException("Something went wrong!") }
 
         when:
         DatabasePartnerMetadataStorage.getInstance().readMetadata("receivedSubmissionId")
@@ -65,37 +68,12 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         thrown(PartnerMetadataException)
     }
 
-    def "readMetadata unhappy path triggers FormatterProcessingException"() {
-        given:
-        def receivedSubmissionId = "receivedSubmissionId"
-        mockDao.fetchMetadata(_ as String) >> { throw new FormatterProcessingException("Format error", new Throwable()) }
-
-        when:
-        DatabasePartnerMetadataStorage.getInstance().readMetadata(receivedSubmissionId)
-
-        then:
-        thrown(PartnerMetadataException)
-    }
-
     def "readMetadataForSender unhappy path triggers SQLException"() {
         given:
-        def sender = "testSender"
-        mockDao.fetchMetadataForSender(sender) >> { throw new SQLException("Database error has occur") }
+        mockDao.fetchManyData(_ as Function<Connection, PreparedStatement>, _ as Function<ResultSet, PartnerMetadata>, _) >> { throw new SQLException("Database error has occur") }
 
         when:
-        DatabasePartnerMetadataStorage.getInstance().readMetadataForSender(sender)
-
-        then:
-        thrown(PartnerMetadataException)
-    }
-
-    def "readMetadataForSender unhappy path triggers FormatterProcessingException"() {
-        given:
-        def sender = "testSender"
-        mockDao.fetchMetadataForSender(sender) >> { throw new FormatterProcessingException("Format error", new Throwable()) }
-
-        when:
-        DatabasePartnerMetadataStorage.getInstance().readMetadataForSender(sender)
+        DatabasePartnerMetadataStorage.getInstance().readMetadataForSender("testSender")
 
         then:
         thrown(PartnerMetadataException)
@@ -103,17 +81,16 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
     def "readMetadataForSender happy path works"() {
         given:
-        def sender = "testSender"
         def metadata1 = mockMetadata
         def metadata2 = mockMetadata
         def expectedMetadataSet = new HashSet<>()
         expectedMetadataSet.add(metadata1)
         expectedMetadataSet.add(metadata2)
 
-        mockDao.fetchMetadataForSender(sender) >> expectedMetadataSet
+        mockDao.fetchManyData(_ as Function<Connection, PreparedStatement>, _ as Function<ResultSet, PartnerMetadata>, _) >> expectedMetadataSet
 
         when:
-        def actualMetadataSet = DatabasePartnerMetadataStorage.getInstance().readMetadataForSender(sender)
+        def actualMetadataSet = DatabasePartnerMetadataStorage.getInstance().readMetadataForSender("testSender")
 
         then:
         actualMetadataSet.size() == expectedMetadataSet.size()
