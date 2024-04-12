@@ -268,4 +268,73 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         def thrownException = thrown(RuntimeException)
         thrownException.getCause() == innerThrownException
     }
+
+    def "partnerMetadataFromResultSet returns partner metadata"() {
+        given:
+        def receivedMessageId = "12345"
+        def sentMessageId = "7890"
+        def sender = "DogCow"
+        def receiver = "You'll get your just reward"
+        Timestamp timestampForMock = Timestamp.from(Instant.parse("2024-01-03T15:45:33.30Z"))
+        Instant timeReceived = timestampForMock.toInstant()
+        Timestamp mockDeliveredTimestamp = Timestamp.from(Instant.parse("2024-01-31T11:07:53.00Z"))
+        Instant timeDelivered = mockDeliveredTimestamp.toInstant()
+        def hash = sender.hashCode().toString()
+        def status = PartnerMetadataStatus.PENDING
+        def reason = "It done Goofed"
+        def messageType = PartnerMetadataMessageType.RESULT
+        def placerOrderNumber = "placer_order_number"
+        def expected = new PartnerMetadata(receivedMessageId, sentMessageId, sender, receiver, timeReceived, timeDelivered, hash, status, reason, messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
+
+        def mockResultSet = Mock(ResultSet)
+        mockResultSet.next() >> true
+        mockResultSet.getString("received_message_id") >> receivedMessageId
+        mockResultSet.getString("sent_message_id") >> sentMessageId
+        mockResultSet.getString("sender") >> sender
+        mockResultSet.getString("receiver") >> receiver
+        mockResultSet.getTimestamp("time_received") >> timestampForMock
+        mockResultSet.getTimestamp("time_delivered") >> mockDeliveredTimestamp
+        mockResultSet.getString("hash_of_message") >> hash
+        mockResultSet.getString("delivery_status") >> status.toString()
+        mockResultSet.getString("failure_reason") >> reason
+        mockResultSet.getString("message_type") >> messageType.toString()
+        mockResultSet.getString("receiving_facility_details") >> "receiving_facility_details"
+        mockResultSet.getString("sending_application_details") >> "sending_application_details"
+        mockResultSet.getString("sending_facility_details") >> "sending_facility_details"
+        mockResultSet.getString("receiving_application_details") >> "receiving_application_details"
+        mockResultSet.getString("placer_order_number") >> placerOrderNumber
+
+        mockFormatter.convertJsonToObject("receiving_facility_details", _ as TypeReference) >> receivingFacility
+        mockFormatter.convertJsonToObject("sending_application_details", _ as TypeReference) >> sendingApp
+        mockFormatter.convertJsonToObject("sending_facility_details", _ as TypeReference) >> sendingFacility
+        mockFormatter.convertJsonToObject("receiving_application_details", _ as TypeReference) >> receivingApp
+
+        TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def actual = DatabasePartnerMetadataStorage.getInstance().partnerMetadataFromResultSet(mockResultSet)
+
+        then:
+        actual == expected
+    }
+
+    def "partnerMetadataFromResultSet successfully sets the received and delivered timestamp to null"() {
+        given:
+        def mockResultSet = Mock(ResultSet)
+        mockResultSet.next() >> true
+        mockResultSet.getTimestamp("time_received") >> null
+        mockResultSet.getTimestamp("time_delivered") >> null
+        mockResultSet.getString("delivery_status") >> "DELIVERED"
+        mockResultSet.getString("message_type") >> "RESULT"
+
+        TestApplicationContext.register(Formatter, Mock(Formatter))
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def actual = DatabasePartnerMetadataStorage.getInstance().partnerMetadataFromResultSet(mockResultSet)
+
+        then:
+        actual.timeReceived() == null
+    }
 }
