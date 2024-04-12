@@ -8,6 +8,7 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStor
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -61,8 +62,6 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
             return Optional.ofNullable(metadata);
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error retrieving metadata", e);
-        } catch (FormatterProcessingException e) {
-            throw new PartnerMetadataException("Error formatting metadata", e);
         }
     }
 
@@ -105,8 +104,6 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
 
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error retrieving consolidated metadata", e);
-        } catch (FormatterProcessingException e) {
-            throw new PartnerMetadataException("Error formatting consolidated metadata", e);
         }
     }
 
@@ -134,8 +131,21 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                     resultSet.getString("hash_of_message"),
                     PartnerMetadataStatus.valueOf(resultSet.getString("delivery_status")),
                     resultSet.getString("failure_reason"),
-                    PartnerMetadataMessageType.valueOf(resultSet.getString("message_type")));
-        } catch (SQLException e) {
+                    PartnerMetadataMessageType.valueOf(resultSet.getString("message_type")),
+                    formatter.convertJsonToObject(
+                            resultSet.getString("sending_application_details"),
+                            new TypeReference<>() {}),
+                    formatter.convertJsonToObject(
+                            resultSet.getString("sending_facility_details"),
+                            new TypeReference<>() {}),
+                    formatter.convertJsonToObject(
+                            resultSet.getString("receiving_application_details"),
+                            new TypeReference<>() {}),
+                    formatter.convertJsonToObject(
+                            resultSet.getString("receiving_facility_details"),
+                            new TypeReference<>() {}),
+                    resultSet.getString("placer_order_number"));
+        } catch (SQLException | FormatterProcessingException e) {
             throw new RuntimeException(e);
         }
     }
