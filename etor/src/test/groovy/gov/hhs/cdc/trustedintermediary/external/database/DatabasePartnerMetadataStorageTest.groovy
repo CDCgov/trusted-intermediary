@@ -11,6 +11,7 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStor
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -244,5 +245,27 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
         then:
         1 * mockDao.upsertData("metadata", columns, "received_message_id")
+    }
+
+    def "partnerMetadataFromResultSet throws exception due to FormatterProcessingException"() {
+        given:
+        def mockResultSet = Mock(ResultSet)
+        mockResultSet.next() >> true
+        mockResultSet.getString("delivery_status") >> "DELIVERED"
+        mockResultSet.getString("message_type") >> "RESULT"
+        mockResultSet.getString("sending_application_details") >> "TEST"
+
+        def innerThrownException = new FormatterProcessingException('error', new Throwable())
+
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> { throw innerThrownException }
+        TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        DatabasePartnerMetadataStorage.getInstance().partnerMetadataFromResultSet(mockResultSet)
+
+        then:
+        def thrownException = thrown(RuntimeException)
+        thrownException.getCause() == innerThrownException
     }
 }

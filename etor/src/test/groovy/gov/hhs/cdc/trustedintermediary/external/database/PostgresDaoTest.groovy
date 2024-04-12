@@ -10,10 +10,6 @@ import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool
 import gov.hhs.cdc.trustedintermediary.wrappers.database.DatabaseCredentialsProvider
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
-import spock.lang.Specification
-
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -21,6 +17,7 @@ import java.sql.SQLException
 import java.sql.Timestamp
 import java.sql.Types
 import java.time.Instant
+import spock.lang.Specification
 
 class PostgresDaoTest extends Specification {
     private ConnectionPool mockConnPool
@@ -377,29 +374,5 @@ class PostgresDaoTest extends Specification {
 
         then:
         actual.containsAll(Set.of(expected1, expected2))
-    }
-
-    def "fetchMetadata throws exception for FormatterProcessingException"() {
-        given:
-        mockConnPool.getConnection() >> mockConn
-        mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
-        mockPreparedStatement.executeQuery() >> mockResultSet
-        mockResultSet.next() >> true
-        mockResultSet.getTimestamp("time_received") >> null
-        mockResultSet.getString("delivery_status") >> "DELIVERED"
-        mockResultSet.getString("message_type") >> "RESULT"
-        mockResultSet.getString("failure_reason") >> "Your time is up"
-        mockResultSet.getString("placer_order_number") >> "TEST"
-        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> { throw new FormatterProcessingException('error', new Throwable()) }
-
-        TestApplicationContext.register(ConnectionPool, mockConnPool)
-        TestApplicationContext.register(Formatter, mockFormatter)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        PostgresDao.getInstance().fetchMetadata("mock_lookup")
-
-        then:
-        thrown(FormatterProcessingException)
     }
 }

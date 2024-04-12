@@ -107,7 +107,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
         }
     }
 
-    private PartnerMetadata partnerMetadataFromResultSet(ResultSet resultSet) {
+    PartnerMetadata partnerMetadataFromResultSet(ResultSet resultSet) {
         try {
             Instant timeReceived = null;
             Instant timeDelivered = null;
