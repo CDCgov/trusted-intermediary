@@ -764,7 +764,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def additionalMessageId = "additionalMessageId"
         def newMessageId = "newMessageId"
         def messageIdsToLink = Set.of(matchingMessageId, newMessageId)
-        def existingLinkId = 1
+        def existingLinkId = UUID.randomUUID()
         def existingMessageLink = new MessageLink(existingLinkId, Set.of(matchingMessageId, additionalMessageId))
         mockMessageLinkStorage.getMessageLink(newMessageId) >> Optional.empty()
 
@@ -796,7 +796,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
     def "linkMessages uses existing link if one exists"() {
         given:
-        def existingLinkId = 1
+        def existingLinkId = UUID.randomUUID()
         def matchingMessageId = "messageId"
         def additionalMessageId = "additionalMessageId"
         def newMessageId = "newMessageId"

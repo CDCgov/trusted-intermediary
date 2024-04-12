@@ -13,13 +13,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import javax.inject.Inject;
 
 /** Class for accessing and managing data for the postgres Database */
@@ -180,7 +180,7 @@ public class PostgresDao implements DbDao {
                 WHERE message_id = ?;
                 """;
 
-        int linkId = -1;
+        UUID linkId = null;
         Set<String> messageIds = new HashSet<>();
         try (Connection conn = connectionPool.getConnection();
                 PreparedStatement statement = conn.prepareStatement(sql)) {
@@ -188,15 +188,15 @@ public class PostgresDao implements DbDao {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    if (linkId == -1) {
-                        linkId = resultSet.getInt("link_id");
+                    if (linkId == null) {
+                        linkId = UUID.fromString(resultSet.getString("link_id"));
                     }
                     messageIds.add(resultSet.getString("message_id"));
                 }
             }
         }
 
-        if (!messageIds.isEmpty() && linkId != -1) {
+        if (!messageIds.isEmpty()) {
             return Optional.of(new MessageLink(linkId, messageIds));
         } else {
             return Optional.empty();
@@ -205,10 +205,7 @@ public class PostgresDao implements DbDao {
 
     @Override
     public void insertMessageLink(MessageLink messageLink) throws SQLException {
-        // todo: add an integration test for the race condition
-        var getMaxLinkIdSql =
-                "SELECT COALESCE(MAX(link_id), 0) + 1 AS next_link_id FROM message_link";
-        var insertSql =
+        var sql =
                 """
                 INSERT INTO message_link (link_id, message_id)
                 SELECT ?, ?
@@ -217,54 +214,15 @@ public class PostgresDao implements DbDao {
                 );
                 """;
 
-        Connection conn = null;
-        try {
-            conn = connectionPool.getConnection();
-            // creating a transaction to ensure that the insert is atomic and avoid race condition
-            conn.setAutoCommit(false);
-            conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+        try (Connection conn = connectionPool.getConnection();
+                PreparedStatement statement = conn.prepareStatement(sql)) {
+            UUID linkId = Optional.ofNullable(messageLink.getLinkId()).orElse(UUID.randomUUID());
 
-            Integer linkId = messageLink.getLinkId();
-            if (linkId == null) {
-                try (Statement getMaxLinkIdStatement = conn.createStatement();
-                        ResultSet result = getMaxLinkIdStatement.executeQuery(getMaxLinkIdSql)) {
-                    if (result.next()) {
-                        linkId = result.getInt("next_link_id"); // Retrieve the next linkId
-                    }
-                }
-            }
-
-            if (linkId == null) {
-                throw new SQLException("Failed to retrieve the next linkId");
-            }
-
-            try (PreparedStatement insertStatement = conn.prepareStatement(insertSql)) {
-                for (String messageId : messageLink.getMessageIds()) {
-                    insertStatement.setInt(1, linkId);
-                    insertStatement.setString(2, messageId);
-                    insertStatement.setString(3, messageId); // can we use named parameters instead?
-                    insertStatement.executeUpdate();
-                }
-            }
-
-            conn.commit();
-        } catch (SQLException e) {
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                } catch (SQLException exRollback) {
-                    logger.logError("Failed to rollback transaction", exRollback);
-                }
-            }
-            throw e;
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (SQLException exClose) {
-                    logger.logError("Failed to close the connection", exClose);
-                }
+            for (String messageId : messageLink.getMessageIds()) {
+                statement.setString(1, linkId.toString());
+                statement.setString(2, messageId);
+                statement.setString(3, messageId); // can we use named parameters instead?
+                statement.executeUpdate();
             }
         }
     }

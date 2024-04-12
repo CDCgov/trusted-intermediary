@@ -20,8 +20,8 @@ class MessageLinkTest extends Specification {
 
     def "constructor with linkId and single messageId initializes correctly"() {
         given:
-        Integer linkId = 1
-        String messageId = "messageId"
+        def linkId = UUID.randomUUID()
+        def messageId = "messageId"
 
         when:
         def messageLink = new MessageLink(linkId, messageId)
@@ -34,7 +34,7 @@ class MessageLinkTest extends Specification {
 
     def "constructor with linkId and messageId set initializes correctly"() {
         given:
-        def linkId = 1
+        def linkId = UUID.randomUUID()
         def messageIdSet = Set.of("messageId1", "messageId2")
 
         when:
@@ -75,7 +75,7 @@ class MessageLinkTest extends Specification {
         given:
         def existingMessageId = "messageId1"
         def messageIds = Set.of(existingMessageId, "messageId2")
-        def messageLink = new MessageLink(1, messageIds)
+        def messageLink = new MessageLink(UUID.randomUUID(), messageIds)
 
         when:
         messageLink.addMessageId(existingMessageId)
@@ -94,7 +94,7 @@ class MessageLinkTest extends Specification {
     def "setLinkId sets the linkId"() {
         given:
         def messageLink = new MessageLink()
-        def linkId = 10
+        def linkId = UUID.randomUUID()
 
         when:
         messageLink.setLinkId(linkId)
@@ -105,7 +105,7 @@ class MessageLinkTest extends Specification {
 
     def "setMessageIds replaces the entire messageIds set"() {
         given:
-        def messageLink = new MessageLink(1, "messageId")
+        def messageLink = new MessageLink(UUID.randomUUID(), "messageId")
         def newMessageIds = Set.of("messageId1", "messageId2")
 
         when:

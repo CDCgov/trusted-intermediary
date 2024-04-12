@@ -3,21 +3,13 @@ package gov.hhs.cdc.trustedintermediary.external.database
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkException
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStorage
 import java.sql.SQLException
-import java.sql.Timestamp
-import java.sql.Types
-import java.time.Instant
 import spock.lang.Specification
 class DatabaseMessageLinkStorageTest extends Specification {
 
     private def mockDao
 
-    def mockMessageLinkData = new MessageLink(1, "TestMessageId")
+    def mockMessageLinkData = new MessageLink(UUID.randomUUID(), "TestMessageId")
 
     def setup() {
         TestApplicationContext.reset()

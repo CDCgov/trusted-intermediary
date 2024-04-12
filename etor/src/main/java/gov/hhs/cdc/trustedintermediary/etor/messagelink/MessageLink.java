@@ -3,34 +3,35 @@ package gov.hhs.cdc.trustedintermediary.etor.messagelink;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * This class represents a link between messages. Each link has a unique ID and is associated with a
  * set of message IDs to link.
  */
 public final class MessageLink {
-    private Integer linkId;
+    private UUID linkId;
     private Set<String> messageIds;
 
     public MessageLink() {
         this.messageIds = new HashSet<>();
     }
 
-    public MessageLink(Integer linkId, String messageId) {
+    public MessageLink(UUID linkId, String messageId) {
         this.linkId = linkId;
         this.messageIds = new HashSet<>(Collections.singleton(messageId));
     }
 
-    public MessageLink(Integer linkId, Set<String> messageIds) {
+    public MessageLink(UUID linkId, Set<String> messageIds) {
         this.linkId = linkId;
         this.messageIds = new HashSet<>(messageIds);
     }
 
-    public void setLinkId(Integer linkId) {
+    public void setLinkId(UUID linkId) {
         this.linkId = linkId;
     }
 
-    public Integer getLinkId() {
+    public UUID getLinkId() {
         return linkId;
     }
 

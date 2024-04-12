@@ -400,16 +400,16 @@ class PostgresDaoTest extends Specification {
 
     def "fetchMessageLink returns message link when rows exist"() {
         given:
-        def messageLink = new MessageLink(1, "MessageId")
+        def linkId = UUID.randomUUID()
+        def messageLink = new MessageLink(linkId, "MessageId")
         def expected = Optional.of(messageLink)
-        def linkId = 1
         def messageIds = "MessageId"
 
         mockConnPool.getConnection() >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
         // First run returns true, then return false
         mockResultSet.next() >> true >> false
-        mockResultSet.getInt("link_id") >> linkId
+        mockResultSet.getString("link_id") >> linkId
         mockResultSet.getString("message_id") >> messageIds
 
         mockPreparedStatement.executeQuery() >> mockResultSet
@@ -433,7 +433,7 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PostgresDao.getInstance().insertMessageLink(new MessageLink(1, "MessageId"))
+        PostgresDao.getInstance().insertMessageLink(new MessageLink(UUID.randomUUID(), "MessageId"))
 
         then:
         thrown(SQLException)
@@ -441,57 +441,25 @@ class PostgresDaoTest extends Specification {
 
     def "insertMessageLink successfully inserts message links"() {
         given:
-        def linkId = 1
+        def linkId = UUID.randomUUID()
         def messageIds = ["MessageId1", "MessageId2"]
         def messageLink = new MessageLink(linkId, new HashSet<>(messageIds))
-        mockConnPool.getConnection() >> mockConn
-        mockConn.prepareStatement(_ as String, Statement.RETURN_GENERATED_KEYS) >> mockPreparedStatement
-        mockConn.prepareStatement(_ as String) >> mockPreparedStatement
-        mockPreparedStatement.executeQuery() >> mockResultSet
-        mockResultSet.next() >> true >> false // Simulate retrieving next_link_id
-        mockResultSet.getInt(1) >> linkId
-        // Setup for verifying the transaction is committed
-        mockConn.setAutoCommit(false)
-        mockConn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
 
+        mockConnPool.getConnection() >> mockConn
+        mockConn.prepareStatement(_ as String) >> mockPreparedStatement
         TestApplicationContext.register(ConnectionPool, mockConnPool)
+
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
         PostgresDao.getInstance().insertMessageLink(messageLink)
 
         then:
-        1 * mockConn.setAutoCommit(false)
-        1 * mockConn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
-        1 * mockConn.commit()
-        0 * mockConn.rollback()
         messageIds.each { messageId ->
-            1 * mockPreparedStatement.setInt(1, linkId)
+            1 * mockPreparedStatement.setString(1, linkId.toString())
             1 * mockPreparedStatement.setString(2, messageId)
             1 * mockPreparedStatement.setString(3, messageId)
         }
-        1 * mockConn.setAutoCommit(true)
-    }
-
-    def "insertMessageLink rolls back transaction on SQLException"() {
-        given:
-        def messageLink = new MessageLink(1, "MessageId")
-        mockConnPool.getConnection() >> mockConn
-        mockConn.prepareStatement(_ as String) >> { throw new SQLException("Simulated SQL failure") }
-        mockConn.setAutoCommit(false)
-        mockConn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
-
-        TestApplicationContext.register(ConnectionPool, mockConnPool)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        PostgresDao.getInstance().insertMessageLink(messageLink)
-
-        then:
-        thrown(SQLException)
-        1 * mockConn.setAutoCommit(false)
-        1 * mockConn.rollback()
-        1 * mockConn.setAutoCommit(true)
     }
 
     def "fetchMetadataForMessageLinking returns a set of PartnerMetadata when rows exist"() {
@@ -654,31 +622,5 @@ class PostgresDaoTest extends Specification {
 
         then:
         thrown(FormatterProcessingException)
-    }
-
-    def "insertMessageLink successfully throws SQL Exception for null linkId"() {
-        given:
-        def messageId = "MessageId"
-        def messageLink = new MessageLink(null, new HashSet<>([messageId]))
-        def mockIdStatement = Mock(Statement)
-        mockConnPool.getConnection() >> mockConn
-        mockConn.prepareStatement(_ as String) >> mockPreparedStatement
-        def mockIdResultSet = Mock(ResultSet)
-        mockIdStatement.executeQuery(_ as String) >> mockIdResultSet
-        mockConn.createStatement() >> mockIdStatement
-        mockPreparedStatement.executeQuery() >> mockResultSet
-        mockPreparedStatement.executeUpdate() >> 1
-        mockResultSet.next() >> true >> false // Simulate finding the next linkId, then no more rows
-        mockIdResultSet.next() >> false >> false
-        mockIdResultSet.getInt("next_link_id") >> null
-
-        TestApplicationContext.register(ConnectionPool, mockConnPool)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        PostgresDao.getInstance().insertMessageLink(messageLink)
-
-        then:
-        thrown(SQLException)
     }
 }

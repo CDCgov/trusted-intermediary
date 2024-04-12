@@ -29,7 +29,7 @@ class FileMessageLinkStorageTest extends Specification {
 
         when:
         def messageId1 = "messageId1"
-        var expectedMessageLink1 = new MessageLink(1, Set.of(messageId1, "additionalMessageId1"))
+        var expectedMessageLink1 = new MessageLink(UUID.randomUUID(), Set.of(messageId1, "additionalMessageId1"))
         messageLinkStorage.saveMessageLink(expectedMessageLink1)
         def actualMessageLink1 = messageLinkStorage.getMessageLink(messageId1)
 
@@ -43,7 +43,7 @@ class FileMessageLinkStorageTest extends Specification {
 
         when:
         def messageId2 = "messageId2"
-        var expectedMessageLink2 = new MessageLink(2, Set.of(messageId2, "additionalMessageId2"))
+        var expectedMessageLink2 = new MessageLink(UUID.randomUUID(), Set.of(messageId2, "additionalMessageId2"))
         messageLinkStorage.saveMessageLink(expectedMessageLink2)
         def actualMessageLink2 = messageLinkStorage.getMessageLink(messageId2)
 
@@ -65,7 +65,7 @@ class FileMessageLinkStorageTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         def submissionId = "submissionId"
-        def messageLink = new MessageLink(1, Set.of(submissionId, "messageId2"))
+        def messageLink = new MessageLink(UUID.randomUUID(), Set.of(submissionId, "messageId2"))
         messageLinkStorage.saveMessageLink(messageLink)
 
         when:
@@ -78,8 +78,8 @@ class FileMessageLinkStorageTest extends Specification {
     def "getMessageLink logs a warning when more than one message link is found for a message id"() {
         given:
         def repeatedMessageId = "messageId1"
-        def messageLink1 = new MessageLink(1, Set.of(repeatedMessageId, "messageId2"))
-        def messageLink2 = new MessageLink(2, Set.of(repeatedMessageId, "messageId3"))
+        def messageLink1 = new MessageLink(UUID.randomUUID(), Set.of(repeatedMessageId, "messageId2"))
+        def messageLink2 = new MessageLink(UUID.randomUUID(), Set.of(repeatedMessageId, "messageId3"))
 
         def mockFormatter = Mock(Formatter)
         mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> Set.of(messageLink1, messageLink2)
@@ -95,7 +95,7 @@ class FileMessageLinkStorageTest extends Specification {
 
     def "saveMessageLink throws MessageLinkException when unable to save file"() {
         given:
-        def messageLink = new MessageLink(1, Set.of("messageId1", "messageId2"))
+        def messageLink = new MessageLink(UUID.randomUUID(), Set.of("messageId1", "messageId2"))
 
         def mockFormatter = Mock(Formatter)
         mockFormatter.convertToJsonString(Set.of(messageLink)) >> {throw new FormatterProcessingException("error", new Exception())}
@@ -111,7 +111,7 @@ class FileMessageLinkStorageTest extends Specification {
 
     def "saveMessageLink adds messageIds to existing message link"() {
         given:
-        def linkId = 1
+        def linkId = UUID.randomUUID()
         def messageId = "messageId"
         def existingMessageIds = Set.of(messageId, "messageId2")
         def existingMessageLink = new MessageLink(linkId, existingMessageIds)
