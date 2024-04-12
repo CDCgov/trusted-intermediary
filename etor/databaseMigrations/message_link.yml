@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author:  basiliskus
+      labels: create-message_link-table
+      context: message_link
+      comment: create message_link table
+      changes:
+        - createTable:
+            tableName: message_link
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                  autoIncrement: true
+              - column:
+                  name: link_id
+                  type: uuid
+                  constraints:
+                      nullable: false
+              - column:
+                  name: message_id
+                  type: varchar(40)
+                  constraints:
+                    foreignKeyName: fk_metadata_received_message_id
+                    nullable: false
