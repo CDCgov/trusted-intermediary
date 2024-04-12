@@ -65,10 +65,6 @@ class PostgresDaoTest extends Specification {
             new DbColumn("third_column", Timestamp.from(Instant.now()), false, Types.TIMESTAMP_WITH_TIMEZONE),
             new DbColumn("second_column_with_upsert_overwrite", Timestamp.from(Instant.now()), true, Types.TIMESTAMP_WITH_TIMEZONE),
             new DbColumn("fourth_column_null", null, false, Types.VARCHAR),
-            new DbColumn("sending_application_details", sendingApp, false, Types.OTHER),
-            new DbColumn("sending_facility_details", sendingFacility, false, Types.OTHER),
-            new DbColumn("receiving_application_details", receivingApp, false, Types.OTHER),
-            new DbColumn("receiving_facility_details", receivingFacility, false, Types.OTHER),
         ]
         def conflictColumnName = pkColumnName
 
@@ -120,10 +116,6 @@ class PostgresDaoTest extends Specification {
         def columns = [
             new DbColumn("Moof", "Clarus", false, Types.VARCHAR),
             new DbColumn("second_column_with_upsert_overwrite", Timestamp.from(Instant.now()), false, Types.TIMESTAMP_WITH_TIMEZONE),
-            new DbColumn("sending_application_details", sendingApp, false, Types.OTHER),
-            new DbColumn("sending_facility_details", sendingFacility, false, Types.OTHER),
-            new DbColumn("receiving_application_details", receivingApp, false, Types.OTHER),
-            new DbColumn("receiving_facility_details", receivingFacility, false, Types.OTHER),
         ]
 
         mockConnPool.getConnection() >>  mockConn
@@ -143,7 +135,7 @@ class PostgresDaoTest extends Specification {
 
             return mockPreparedStatement
         }
-        6  * mockPreparedStatement.setObject(_ as Integer, _, _ as Integer)
+        columns.size()  * mockPreparedStatement.setObject(_ as Integer, _, _ as Integer)
         1 * mockPreparedStatement.executeUpdate()
     }
 
@@ -158,10 +150,6 @@ class PostgresDaoTest extends Specification {
         when:
         PostgresDao.getInstance().upsertData("DogCow", [
             new DbColumn("", "", false, Types.VARCHAR),
-            new DbColumn("sending_application_details", sendingApp, false, Types.OTHER),
-            new DbColumn("sending_facility_details", sendingFacility, false, Types.OTHER),
-            new DbColumn("receiving_application_details", receivingApp, false, Types.OTHER),
-            new DbColumn("receiving_facility_details", receivingFacility, false, Types.OTHER),
         ], null)
 
         then:
