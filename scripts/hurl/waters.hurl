@@ -1,4 +1,4 @@
-POST {{protocol}}://{{host}}/api/token
+POST {{url}}/api/token
 Content-Type: application/x-www-form-urlencoded
 [FormParams]
 scope: {{client-id}}.*.report
@@ -11,13 +11,13 @@ HTTP 200
 [Captures]
 token: jsonpath "$['access_token']"
 
-POST {{protocol}}://{{host}}/api/waters
+POST {{url}}/api/waters
 Content-Type: application/hl7-v2
 Client: {{client-id}}.{{client-sender}}
 Authorization: Bearer {{token}}
 file,Orders/003_AL_ORM_O01_NBS_Fully_Populated_0_initial_message.hl7;
 
-# POST {{protocol}}://{{host}}/api/waters
+# POST {{url}}/api/waters
 # Content-Type: application/fhir+ndjson
 # Client: {{client-id}}.{{client-sender}}
 # Authorization: Bearer {{token}}

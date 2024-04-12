@@ -1,4 +1,4 @@
-POST {{protocol}}://{{host}}/api/token
+POST {{url}}/api/token
 Content-Type: application/x-www-form-urlencoded
 [FormParams]
 scope: {{client-id}}.*.report
@@ -11,5 +11,5 @@ HTTP 200
 [Captures]
 token: jsonpath "$['access_token']"
 
-GET {{protocol}}://{{host}}/api/waters/report/{{submissionid}}/history
+GET {{url}}/api/waters/report/{{submissionid}}/history
 Authorization: Bearer {{token}}

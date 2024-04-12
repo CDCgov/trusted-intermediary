@@ -1,28 +1,41 @@
 #!/bin/sh
 
-ENV=$1
-
-CLIENT_ID=flexion
-CLIENT_SENDER=simulated-lab
+env=$1
+client_id=flexion
+client_sender=simulated-lab
 
 # Shift command will shift the positional parameters to the left, discarding the first argument
 shift
 
-if [ "$CLIENT_ID" = "flexion" ]; then
-    if [ "$ENV" = "local" ]; then
+if [ "$env" = "local" ]; then
+    host=localhost
+    url=http://$host:7071
+    if [ "$client_id" = "flexion" ]; then
         secret="$CDCTI_HOME/mock_credentials/organization-trusted-intermediary-private-key-local.pem"
-    else
-        # secret="$CDCTI_HOME/path/to/staging/private/key"
-        echo "Please provide the staging private key"
-        exit 1
     fi
+elif [ "$env" = "staging" ]; then
+    host=staging.prime.cdc.gov
+    url=https://$host:443
+    # uncomment lines below after setting the path to the staging private key
+    # if [ "$client_id" = "flexion" ]; then
+    #     secret="$CDCTI_HOME/path/to/flexion/staging/private/key"
+    # fi
+else
+    echo "Usage: $0 <local|staging> <command>"
+    exit 1
+fi
+
+# if $secret is not set, exit and prompt the user to provide the private key
+if [ -z "$secret" ]; then
+    echo "Please provide the private key for $client_id"
+    exit 1
 fi
 
 hurl \
-    --variables-file $ENV.env \
-    --variable client-id=$CLIENT_ID \
-    --variable client-sender=$CLIENT_SENDER \
-    --variable jwt=$(jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 -k $CLIENT_ID.$CLIENT_SENDER -i $CLIENT_ID.$CLIENT_SENDER -s $CLIENT_ID.$CLIENT_SENDER -a staging.prime.cdc.gov --no-iat -S @$secret) \
+    --variable url=$url \
+    --variable client-id=$client_id \
+    --variable client-sender=$client_sender \
+    --variable jwt=$(jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 -k $client_id.$client_sender -i $client_id.$client_sender -s $client_id.$client_sender -a $host --no-iat -S @$secret) \
     --file-root $CDCTI_HOME/examples/Test/ \
     --include \
     $@
