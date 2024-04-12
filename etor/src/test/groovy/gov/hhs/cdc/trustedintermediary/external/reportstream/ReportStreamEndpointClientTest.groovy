@@ -103,6 +103,33 @@ class ReportStreamEndpointClientTest extends Specification {
         thrown(ReportStreamEndpointClientException)
     }
 
+    def "requestDeliveryEndpoint works"() {
+        given:
+        def mockClient = Mock(HttpClient)
+        TestApplicationContext.register(HttpClient, mockClient)
+        TestApplicationContext.injectRegisteredImplementations()
+        when:
+        ReportStreamEndpointClient.getInstance().requestDeliveryEndpoint("report_id_1", "fake token")
+        ReportStreamEndpointClient.getInstance().requestDeliveryEndpoint("report_id_2", "fake token")
+
+        then:
+        2 * mockClient.get(_ as String, _ as Map<String, String>) >> "200"
+    }
+
+    def "requestDeliveryEndpoint fails due to HttpClientException"() {
+        given:
+        def mockClient = Mock(HttpClient)
+        mockClient.get(_ as String, _ as Map<String,String>) >> { throw new HttpClientException("404", new Exception()) }
+        TestApplicationContext.register(HttpClient, mockClient)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        ReportStreamEndpointClient.getInstance().requestDeliveryEndpoint("report_id", "fake token")
+
+        then:
+        thrown(ReportStreamEndpointClientException)
+    }
+
     def "requestToken works"() {
         given:
         def expected = "rs fake token"

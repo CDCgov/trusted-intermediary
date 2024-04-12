@@ -11,7 +11,7 @@ class FhirResourceMock<T> implements FhirResource<T> {
     }
 
     @Override
-    public T getUnderlyingResource() {
+    T getUnderlyingResource() {
         return innerResource
     }
 }

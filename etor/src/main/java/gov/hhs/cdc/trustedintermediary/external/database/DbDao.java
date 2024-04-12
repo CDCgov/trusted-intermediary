@@ -1,5 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.database;
 
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,10 +15,6 @@ public interface DbDao {
     void upsertData(String tableName, List<DbColumn> values, String conflictColumnName)
             throws SQLException;
 
-    //    Set<PartnerMetadata> fetchMetadataForSender(String sender) throws SQLException;
-    //
-    //    Object fetchMetadata(String uniqueId) throws SQLException;
-
     <T> T fetchFirstData(
             Function<Connection, PreparedStatement> sqlGenerator, Function<ResultSet, T> converter)
             throws SQLException;
@@ -26,4 +24,9 @@ public interface DbDao {
             Function<ResultSet, T> converter,
             Collector<? super T, ?, S> collector)
             throws SQLException;
+
+    Set<PartnerMetadata> fetchMetadataForSender(String sender)
+            throws SQLException, FormatterProcessingException;
+
+    Object fetchMetadata(String uniqueId) throws SQLException, FormatterProcessingException;
 }

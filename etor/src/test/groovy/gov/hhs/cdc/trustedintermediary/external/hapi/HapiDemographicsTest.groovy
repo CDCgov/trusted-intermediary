@@ -1,5 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi
 
+import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -9,13 +11,20 @@ import spock.lang.Specification
 
 class HapiDemographicsTest extends Specification {
 
-    def "getUnderlyingDemographics works"() {
+    def setup() {
+        TestApplicationContext.reset()
+        TestApplicationContext.init()
+        TestApplicationContext.register(HapiMessageHelper.class, HapiMessageHelper.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+    }
+
+    def "getUnderlyingResource works"() {
         given:
         def expectedInnerDemographics = new Bundle()
         def demographics = new HapiDemographics(expectedInnerDemographics)
 
         when:
-        def actualInnerDemographics = demographics.getUnderlyingDemographics()
+        def actualInnerDemographics = demographics.getUnderlyingResource()
 
         then:
         actualInnerDemographics == expectedInnerDemographics

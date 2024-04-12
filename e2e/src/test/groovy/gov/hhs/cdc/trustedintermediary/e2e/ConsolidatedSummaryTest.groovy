@@ -19,15 +19,18 @@ class ConsolidatedSummaryTest extends Specification {
 
         def orderClient = new EndpointClient("/v1/etor/orders")
         def labOrderJsonFileString = Files.readString(Path.of("../examples/Test/Orders/002_ORM_O01.fhir"))
-        def senderName = "flexion.simulated-hospital"
+        def senderName = "PLACE_HOLDER"  //TODO: when story #990 is implemented, update this to be the sender from the 002_ORM_O01.fhir message
+
         when:
         def orderResponse = orderClient.submit(labOrderJsonFileString, inboundSubmissionId, true)
+
         then:
         orderResponse.getCode() == expectedStatusCode
 
         when:
         def senderNameResponse = ConsolidatedSummaryClient.get(senderName, true)
         def jsonBody = JsonParsing.parseContent(senderNameResponse)
+
         then:
         jsonBody.get((jsonBody.keySet().toArray())[0]).stale != null
         jsonBody.get((jsonBody.keySet().toArray())[0]).failureReason == null

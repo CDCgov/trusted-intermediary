@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata.partner;
 
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
@@ -9,6 +10,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,41 +37,65 @@ public class PartnerMetadataOrchestrator {
     private PartnerMetadataOrchestrator() {}
 
     public void updateMetadataForReceivedMessage(
-            String receivedSubmissionId, String messageHash, PartnerMetadataMessageType messageType)
+            String receivedSubmissionId,
+            String messageHash,
+            PartnerMetadataMessageType messageType,
+            MessageHdDataType sendingApplicationDetails,
+            MessageHdDataType sendingFacilityDetails,
+            MessageHdDataType receivingApplicationDetails,
+            MessageHdDataType receivingFacilityDetails,
+            String placerOrderNumber)
             throws PartnerMetadataException {
-        // currently blocked by: https://github.com/CDCgov/prime-reportstream/issues/12624
-        // once we get the right receivedSubmissionId from RS, this method should work
+
         logger.logInfo(
-                "Looking up sender name and timeReceived from RS history API for receivedSubmissionId: {}",
+                "Looking up sender name and timeReceived from RS delivery API for receivedSubmissionId: {}",
                 receivedSubmissionId);
 
-        String sender;
         Instant timeReceived;
         try {
             String bearerToken = rsclient.getRsToken();
             String responseBody =
-                    rsclient.requestHistoryEndpoint(receivedSubmissionId, bearerToken);
+                    rsclient.requestDeliveryEndpoint(receivedSubmissionId, bearerToken);
             Map<String, Object> responseObject =
                     formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
 
-            sender = responseObject.get("sender").toString();
-            String timestamp = responseObject.get("timestamp").toString();
+            List<Map<String, String>> originalIngestion =
+                    (List<Map<String, String>>) responseObject.get("originalIngestion");
+
+            if (originalIngestion.size() > 1) {
+                logger.logWarning(
+                        "More than 1 report ids found in originalIngestion,"
+                                + " check to make sure batching wasn't turned on for receiver in RS");
+            }
+
+            // We should only have 1 object in originalIngestion, it is a list to support other RS
+            // use cases
+            String timestamp = originalIngestion.get(0).get("ingestionTime");
             timeReceived = Instant.parse(timestamp);
 
         } catch (Exception e) {
             // write the received submission ID so that the rest of the metadata flow works even if
             // some data is missing
             logger.logWarning(
-                    "Unable to retrieve metadata from RS history API, but writing basic metadata entry anyway for received submission ID {}",
+                    "Unable to retrieve metadata from RS delivery API, but writing basic metadata entry anyway for received submission ID {}",
                     receivedSubmissionId);
             PartnerMetadata partnerMetadata =
-                    new PartnerMetadata(receivedSubmissionId, messageHash, messageType);
+                    new PartnerMetadata(
+                            receivedSubmissionId,
+                            messageHash,
+                            messageType,
+                            sendingApplicationDetails,
+                            sendingFacilityDetails,
+                            receivingApplicationDetails,
+                            receivingFacilityDetails,
+                            placerOrderNumber);
             partnerMetadataStorage.saveMetadata(partnerMetadata);
 
             throw new PartnerMetadataException(
-                    "Unable to retrieve metadata from RS history API", e);
+                    "Unable to retrieve metadata from RS delivery API", e);
         }
 
+        String sender = "PLACE_HOLDER";
         logger.logInfo(
                 "Updating metadata with sender: {}, timeReceived: {} and hash",
                 sender,
@@ -82,7 +108,12 @@ public class PartnerMetadataOrchestrator {
                         null,
                         messageHash,
                         PartnerMetadataStatus.PENDING,
-                        messageType);
+                        messageType,
+                        sendingApplicationDetails,
+                        sendingFacilityDetails,
+                        receivingApplicationDetails,
+                        receivingFacilityDetails,
+                        placerOrderNumber);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 

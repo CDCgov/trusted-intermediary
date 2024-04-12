@@ -20,7 +20,14 @@ public class SendMessageHelper {
     private SendMessageHelper() {}
 
     public void savePartnerMetadataForReceivedMessage(
-            String receivedSubmissionId, int messageHash, PartnerMetadataMessageType messageType) {
+            String receivedSubmissionId,
+            int messageHash,
+            PartnerMetadataMessageType messageType,
+            MessageHdDataType sendingApplicationDetails,
+            MessageHdDataType sendingFacilityDetails,
+            MessageHdDataType receivingApplicationDetails,
+            MessageHdDataType receivingFacilityDetails,
+            String placerOrderNumber) {
         if (receivedSubmissionId == null) {
             logger.logWarning(
                     "Received submissionId is null so not saving metadata for received message");
@@ -30,7 +37,14 @@ public class SendMessageHelper {
             String stringMessageHash = String.valueOf(messageHash);
 
             partnerMetadataOrchestrator.updateMetadataForReceivedMessage(
-                    receivedSubmissionId, stringMessageHash, messageType);
+                    receivedSubmissionId,
+                    stringMessageHash,
+                    messageType,
+                    sendingApplicationDetails,
+                    sendingFacilityDetails,
+                    receivingApplicationDetails,
+                    receivingFacilityDetails,
+                    placerOrderNumber);
         } catch (PartnerMetadataException e) {
             logger.logError(
                     "Unable to save metadata for receivedSubmissionId " + receivedSubmissionId, e);

@@ -6,6 +6,8 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMess
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,6 +29,8 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
     @Inject DbDao dao;
 
     @Inject Logger logger;
+
+    @Inject Formatter formatter;
 
     private DatabasePartnerMetadataStorage() {}
 
@@ -57,6 +61,8 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
             return Optional.ofNullable(metadata);
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error retrieving metadata", e);
+        } catch (FormatterProcessingException e) {
+            throw new PartnerMetadataException("Error formatting metadata", e);
         }
     }
 
@@ -64,54 +70,13 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
     public void saveMetadata(final PartnerMetadata metadata) throws PartnerMetadataException {
         logger.logInfo("saving the metadata");
 
-        List<DbColumn> columns =
-                List.of(
-                        new DbColumn(
-                                "received_message_id",
-                                metadata.receivedSubmissionId(),
-                                false,
-                                Types.VARCHAR),
-                        new DbColumn(
-                                "sent_message_id",
-                                metadata.sentSubmissionId(),
-                                true,
-                                Types.VARCHAR),
-                        new DbColumn("sender", metadata.sender(), false, Types.VARCHAR),
-                        new DbColumn("receiver", metadata.receiver(), true, Types.VARCHAR),
-                        new DbColumn("hash_of_message", metadata.hash(), false, Types.VARCHAR),
-                        new DbColumn(
-                                "time_received",
-                                metadata.timeReceived() != null
-                                        ? Timestamp.from(metadata.timeReceived())
-                                        : null,
-                                false,
-                                Types.TIMESTAMP),
-                        new DbColumn(
-                                "time_delivered",
-                                metadata.timeDelivered() != null
-                                        ? Timestamp.from(metadata.timeDelivered())
-                                        : null,
-                                true,
-                                Types.TIMESTAMP),
-                        new DbColumn(
-                                "delivery_status",
-                                metadata.deliveryStatus().toString(),
-                                true,
-                                Types.OTHER),
-                        new DbColumn(
-                                "failure_reason", metadata.failureReason(), true, Types.VARCHAR),
-                        new DbColumn(
-                                "message_type",
-                                metadata.messageType() != null
-                                        ? metadata.messageType().toString()
-                                        : null,
-                                false,
-                                Types.OTHER));
-
         try {
+            List<DbColumn> columns = createDbColumnsFromMetadata(metadata);
             dao.upsertData("metadata", columns, "received_message_id");
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error saving metadata", e);
+        } catch (FormatterProcessingException e) {
+            throw new PartnerMetadataException("Error parsing metadata", e);
         }
     }
 
@@ -140,6 +105,8 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
 
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error retrieving consolidated metadata", e);
+        } catch (FormatterProcessingException e) {
+            throw new PartnerMetadataException("Error formatting consolidated metadata", e);
         }
     }
 
@@ -171,5 +138,63 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private List<DbColumn> createDbColumnsFromMetadata(PartnerMetadata metadata)
+            throws FormatterProcessingException {
+        return List.of(
+                new DbColumn(
+                        "received_message_id",
+                        metadata.receivedSubmissionId(),
+                        false,
+                        Types.VARCHAR),
+                new DbColumn("sent_message_id", metadata.sentSubmissionId(), true, Types.VARCHAR),
+                new DbColumn("sender", metadata.sender(), false, Types.VARCHAR),
+                new DbColumn("receiver", metadata.receiver(), true, Types.VARCHAR),
+                new DbColumn("hash_of_message", metadata.hash(), false, Types.VARCHAR),
+                new DbColumn(
+                        "time_received",
+                        metadata.timeReceived() != null
+                                ? Timestamp.from(metadata.timeReceived())
+                                : null,
+                        false,
+                        Types.TIMESTAMP),
+                new DbColumn(
+                        "time_delivered",
+                        metadata.timeDelivered() != null
+                                ? Timestamp.from(metadata.timeDelivered())
+                                : null,
+                        true,
+                        Types.TIMESTAMP),
+                new DbColumn(
+                        "delivery_status", metadata.deliveryStatus().toString(), true, Types.OTHER),
+                new DbColumn("failure_reason", metadata.failureReason(), true, Types.VARCHAR),
+                new DbColumn(
+                        "message_type",
+                        metadata.messageType() != null ? metadata.messageType().toString() : null,
+                        false,
+                        Types.OTHER),
+                new DbColumn(
+                        "placer_order_number", metadata.placerOrderNumber(), false, Types.VARCHAR),
+                new DbColumn(
+                        "sending_application_details",
+                        formatter.convertToJsonString(metadata.sendingApplicationDetails()),
+                        false,
+                        Types.OTHER),
+                new DbColumn(
+                        "sending_facility_details",
+                        formatter.convertToJsonString(metadata.sendingFacilityDetails()),
+                        false,
+                        Types.OTHER),
+                new DbColumn(
+                        "receiving_application_details",
+                        formatter.convertToJsonString(metadata.receivingApplicationDetails()),
+                        false,
+                        Types.OTHER),
+                new DbColumn(
+                        "receiving_facility_details",
+                        formatter.convertToJsonString(metadata.receivingFacilityDetails()),
+                        false,
+                        Types.OTHER));
     }
 }

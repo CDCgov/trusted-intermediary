@@ -34,7 +34,7 @@ class SendResultUseCaseTest extends Specification {
 
     def "convertAndSend works"() {
         given:
-        def mockResult = new ResultMock(null, "Mock result")
+        def mockResult = new ResultMock(null, "Mock result", null, null, null, null, null)
         def receivedSubmissionId = "receivedId"
 
         when:
@@ -62,7 +62,12 @@ class SendResultUseCaseTest extends Specification {
         def result = Mock(Result)
         def receivedSubmissionId = "receivedId"
         def messageType = PartnerMetadataMessageType.RESULT
-        mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String, messageType) >> { throw new PartnerMetadataException("Error") }
+        mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String, messageType,
+                result.getSendingApplicationDetails(),
+                result.getSendingFacilityDetails(),
+                result.getReceivingApplicationDetails(),
+                result.getReceivingFacilityDetails(),
+                result.getPlacerOrderNumber()) >> { throw new PartnerMetadataException("Error") }
         TestApplicationContext.injectRegisteredImplementations()
 
         when:

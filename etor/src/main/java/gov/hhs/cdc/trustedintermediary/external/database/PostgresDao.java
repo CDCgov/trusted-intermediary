@@ -4,6 +4,9 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
 import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,6 +28,8 @@ public class PostgresDao implements DbDao {
     private static final PostgresDao INSTANCE = new PostgresDao();
 
     @Inject ConnectionPool connectionPool;
+
+    @Inject Formatter formatter;
 
     private PostgresDao() {}
 
@@ -188,7 +193,8 @@ public class PostgresDao implements DbDao {
         stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
     }
 
-    private PartnerMetadata partnerMetadataFromResultSet(ResultSet resultSet) throws SQLException {
+    private PartnerMetadata partnerMetadataFromResultSet(ResultSet resultSet)
+            throws SQLException, FormatterProcessingException {
         Instant timeReceived = null;
         Instant timeDelivered = null;
         Timestamp timestampReceived = resultSet.getTimestamp("time_received");
@@ -211,6 +217,18 @@ public class PostgresDao implements DbDao {
                 resultSet.getString("hash_of_message"),
                 PartnerMetadataStatus.valueOf(resultSet.getString("delivery_status")),
                 resultSet.getString("failure_reason"),
-                PartnerMetadataMessageType.valueOf(resultSet.getString("message_type")));
+                PartnerMetadataMessageType.valueOf(resultSet.getString("message_type")),
+                formatter.convertJsonToObject(
+                        resultSet.getString("sending_application_details"),
+                        new TypeReference<>() {}),
+                formatter.convertJsonToObject(
+                        resultSet.getString("sending_facility_details"), new TypeReference<>() {}),
+                formatter.convertJsonToObject(
+                        resultSet.getString("receiving_application_details"),
+                        new TypeReference<>() {}),
+                formatter.convertJsonToObject(
+                        resultSet.getString("receiving_facility_details"),
+                        new TypeReference<>() {}),
+                resultSet.getString("placer_order_number"));
     }
 }
