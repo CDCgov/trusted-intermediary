@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 
@@ -277,7 +278,7 @@ public class PartnerMetadataOrchestrator {
 
         if (existingMessageLink.isEmpty()) {
             logger.logInfo("Saving new message link for messageIds: {}", messageIds);
-            messageLinkStorage.saveMessageLink(new MessageLink(null, messageIds));
+            messageLinkStorage.saveMessageLink(new MessageLink(UUID.randomUUID(), messageIds));
             return;
         }
 

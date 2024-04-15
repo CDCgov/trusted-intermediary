@@ -39,7 +39,7 @@ public class DatabaseMessageLinkStorage implements MessageLinkStorage {
     public void saveMessageLink(MessageLink messageLink) throws MessageLinkException {
         logger.logInfo("Saving message links");
         try {
-            UUID linkId = Optional.ofNullable(messageLink.getLinkId()).orElse(UUID.randomUUID());
+            UUID linkId = messageLink.getLinkId();
             List<DbColumn> columns;
             for (String messageId : messageLink.getMessageIds()) {
                 columns =

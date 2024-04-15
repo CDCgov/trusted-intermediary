@@ -824,7 +824,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
         then:
         1 * mockMessageLinkStorage.saveMessageLink({ MessageLink ml ->
-            ml.getLinkId() == null && ml.getMessageIds() == messageIdsToLink
+            ml.getLinkId() != null && ml.getMessageIds() == messageIdsToLink
         })
     }
 
