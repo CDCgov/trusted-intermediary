@@ -3,10 +3,6 @@ package gov.hhs.cdc.trustedintermediary.external.database
 import com.fasterxml.jackson.databind.ObjectMapper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
-import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool
 import gov.hhs.cdc.trustedintermediary.wrappers.database.DatabaseCredentialsProvider
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
@@ -17,6 +13,7 @@ import java.sql.SQLException
 import java.sql.Timestamp
 import java.sql.Types
 import java.time.Instant
+import java.util.stream.Collectors
 import spock.lang.Specification
 
 class PostgresDaoTest extends Specification {
@@ -267,92 +264,53 @@ class PostgresDaoTest extends Specification {
         result == null
     }
 
-    def "fetchMetadataForSender retrieves a set of PartnerMetadata"() {
+    def "fetchManyData retrieves a set of data"() {
         given:
-        def sender = "DogCow"
-        def messageType = PartnerMetadataMessageType.RESULT
-        def expected1 = new PartnerMetadata("12345", "7890", sender, "You'll get your just reward",
-                Instant.parse("2024-01-03T15:45:33.30Z"), Instant.parse("2024-01-03T15:45:33.30Z"),  sender.hashCode().toString(),
-                PartnerMetadataStatus.PENDING, "It done Goofed", messageType, sendingApp, sendingFacility,
-                receivingApp, receivingFacility, "placer_order_number")
-        def expected2 = new PartnerMetadata("doreyme", "fasole", sender, "receiver",
-                Instant.now(), Instant.now(), "gobeltygoook",
-                PartnerMetadataStatus.DELIVERED, "cause I said so", messageType, sendingApp, sendingFacility,
-                receivingApp, receivingFacility, "placer_order_number")
+        def id1 = "1234"
+        def id2 = "5678"
+        def value1 = "DogCow"
+        def value2 = "Moof!"
+
+        def expected1 = [
+            id: id1,
+            value: value1,
+        ]
+
+        def expected2 = [
+            id: id2,
+            value: value2,
+        ]
 
         mockConnPool.getConnection() >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
         mockResultSet.next() >>> [true, true, false]
-        mockResultSet.getString("received_message_id") >>> [
-            expected1.receivedSubmissionId(),
-            expected2.receivedSubmissionId()
+        mockResultSet.getString("id") >>> [
+            id1,
+            id2,
         ]
-        mockResultSet.getString("sent_message_id") >>> [
-            expected1.sentSubmissionId(),
-            expected2.sentSubmissionId()
-        ]
-        mockResultSet.getString("sender") >>> [
-            expected1.sender(),
-            expected2.sender()
-        ]
-        mockResultSet.getString("receiver") >>> [
-            expected1.receiver(),
-            expected2.receiver()
-        ]
-        mockResultSet.getTimestamp("time_received") >>> [
-            Timestamp.from(expected1.timeReceived()),
-            Timestamp.from(expected2.timeReceived())
-        ]
-        mockResultSet.getTimestamp("time_delivered") >>> [
-            Timestamp.from(expected1.timeDelivered()),
-            Timestamp.from(expected2.timeDelivered())
-        ]
-        mockResultSet.getString("hash_of_message") >>> [
-            expected1.hash(),
-            expected2.hash()
-        ]
-        mockResultSet.getString("delivery_status") >>> [
-            expected1.deliveryStatus().toString(),
-            expected2.deliveryStatus().toString()
-        ]
-        mockResultSet.getString("failure_reason") >>> [
-            expected1.failureReason(),
-            expected2.failureReason()
-        ]
-        mockResultSet.getString("message_type") >>> [
-            expected1.messageType().toString(),
-            expected2.messageType().toString()
-        ]
-        mockResultSet.getString("sending_application_details") >>> [
-            testMapper.writeValueAsString(sendingApp),
-            testMapper.writeValueAsString(sendingApp)
-        ]
-        mockResultSet.getString("sending_facility_details") >>> [
-            testMapper.writeValueAsString(sendingFacility),
-            testMapper.writeValueAsString(sendingFacility),
-        ]
-        mockResultSet.getString("receiving_application_details") >>> [
-            testMapper.writeValueAsString(receivingApp),
-            testMapper.writeValueAsString(receivingApp)
-        ]
-        mockResultSet.getString("receiving_facility_details") >>> [
-            testMapper.writeValueAsString(receivingFacility),
-            testMapper.writeValueAsString(receivingFacility)
-        ]
-        mockResultSet.getString("placer_order_number") >>> [
-            expected1.placerOrderNumber(),
-            expected2.placerOrderNumber()
+        mockResultSet.getString("value") >>> [
+            value1,
+            value2,
         ]
         mockPreparedStatement.executeQuery() >> mockResultSet
 
         TestApplicationContext.register(ConnectionPool, mockConnPool)
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
+        def sqlGenerator = { connection -> connection.prepareStatement("SELECT * FROM table") }
+
+        def converter = { resultSet ->
+            return [
+                id: resultSet.getString("id"),
+                value: resultSet.getString("value")
+            ]
+        }
+
         when:
-        def actual = PostgresDao.getInstance().fetchMetadataForSender("sender")
+        def actual = PostgresDao.getInstance().fetchManyData(sqlGenerator, converter, Collectors.toSet())
 
         then:
+        actual instanceof Set
         actual.containsAll(Set.of(expected1, expected2))
     }
 }
