@@ -117,8 +117,9 @@ class PostgresDaoTest extends Specification {
         1 * mockPreparedStatement.executeUpdate()
     }
 
-    def "upsertData doesn't do any upserts if there is no upsertOverwrite"() {
+    def "upsertData doesn't do any upserts if there is no upsertOverwrite and does nothing if conflict target is defined"() {
         given:
+        def conflictTarget
         def tableName = "DogCow"
         def columns = [
             new DbColumn("Moof", "Clarus", false, Types.VARCHAR),
@@ -135,18 +136,35 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PostgresDao.getInstance().upsertData(tableName, columns, null)
+        conflictTarget = null
+        PostgresDao.getInstance().upsertData(tableName, columns, conflictTarget)
 
         then:
         mockConn.prepareStatement(_ as String) >> { String sqlStatement ->
             assert sqlStatement.contains(tableName)
             assert sqlStatement.count("?") == columns.size()
             assert !sqlStatement.contains("ON CONFLICT")
-            assert !sqlStatement.contains("EXCLUDED")
 
             return mockPreparedStatement
         }
-        6  * mockPreparedStatement.setObject(_ as Integer, _, _ as Integer)
+        6 * mockPreparedStatement.setObject(_ as Integer, _, _ as Integer)
+        1 * mockPreparedStatement.executeUpdate()
+
+        when:
+        conflictTarget = "ON CONSTRAINT key"
+        PostgresDao.getInstance().upsertData(tableName, columns, conflictTarget)
+
+        then:
+        mockConn.prepareStatement(_ as String) >> { String sqlStatement ->
+            assert sqlStatement.contains(tableName)
+            assert sqlStatement.count("?") == columns.size()
+            assert sqlStatement.contains("ON CONFLICT")
+            assert sqlStatement.contains(conflictTarget)
+            assert sqlStatement.contains("DO NOTHING")
+
+            return mockPreparedStatement
+        }
+        6 * mockPreparedStatement.setObject(_ as Integer, _, _ as Integer)
         1 * mockPreparedStatement.executeUpdate()
     }
 
