@@ -62,6 +62,11 @@ public class PartnerMetadataOrchestrator {
             List<Map<String, String>> originalIngestion =
                     (List<Map<String, String>>) responseObject.get("originalIngestion");
 
+            if (originalIngestion == null || originalIngestion.isEmpty()) {
+                throw new PartnerMetadataException(
+                        "Ingestion time not found from RS delivery API response");
+            }
+
             if (originalIngestion.size() > 1) {
                 logger.logWarning(
                         "More than 1 report ids found in originalIngestion,"
