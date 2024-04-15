@@ -156,57 +156,115 @@ class PostgresDaoTest extends Specification {
         thrown(SQLException)
     }
 
-    def "select metadata retrieves data"() {
+    def "fetchFirstData retrieves data"() {
         given:
         mockConnPool.getConnection() >> mockConn
         mockConn.prepareStatement(_ as String) >> mockPreparedStatement
         mockPreparedStatement.executeQuery() >> mockResultSet
         mockResultSet.next() >> true
-        mockResultSet.getTimestamp(_ as String) >> Timestamp.from(Instant.now())
-        mockResultSet.getString("delivery_status") >> "DELIVERED"
-        mockResultSet.getString("message_type") >> "RESULT"
-        mockResultSet.getString("placer_order_number") >> "placer_order_number"
-        TestApplicationContext.register(ConnectionPool, mockConnPool)
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        PartnerMetadata result = (PartnerMetadata) PostgresDao.getInstance().fetchMetadata("mock_sender")
-
-        then:
-        result != null
-    }
-
-    def "fetchMetadata unhappy path throws exception"() {
-        given:
-        mockConnPool.getConnection() >> mockConn
-        mockConn.prepareStatement(_ as String) >> { throw new SQLException() }
+        mockResultSet.getString("id") >> "1234"
+        mockResultSet.getString("value") >> "DogCow"
 
         TestApplicationContext.register(ConnectionPool, mockConnPool)
+
         TestApplicationContext.injectRegisteredImplementations()
 
+        def sqlGenerator = { connection -> connection.prepareStatement("SELECT * FROM table") }
+
+        def converter = { resultSet ->
+            return [
+                id: resultSet.getString("id"),
+                value: resultSet.getString("value")
+            ]
+        }
+
         when:
-        PostgresDao.getInstance().fetchMetadata("mock_lookup")
+        def result = PostgresDao.getInstance().fetchFirstData(sqlGenerator, converter)
 
         then:
-        thrown(SQLException)
+        result.get("id") == "1234"
+        result.get("value") == "DogCow"
     }
 
-    def "fetchMetadata returns null when rows do not exist"() {
+    def "fetchFirstData fails from SQL generator"() {
         given:
         mockConnPool.getConnection() >> mockConn
-        mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
-        mockResultSet.next() >> false
+        mockConn.prepareStatement(_ as String) >> mockPreparedStatement
         mockPreparedStatement.executeQuery() >> mockResultSet
+        mockResultSet.next() >> true
 
         TestApplicationContext.register(ConnectionPool, mockConnPool)
+
         TestApplicationContext.injectRegisteredImplementations()
 
+        def originalException = new RuntimeException("oh no!")
+        def sqlGenerator = { connection -> throw originalException }
+
+        def converter = { resultSet ->
+            return [:]
+        }
+
         when:
-        def actual = PostgresDao.getInstance().fetchMetadata("mock_lookup")
+        PostgresDao.getInstance().fetchFirstData(sqlGenerator, converter)
 
         then:
-        actual == null
+        def thrownException = thrown(SQLException)
+        thrownException.getCause() == originalException
+    }
+
+    def "fetchFirstData fails from converter"() {
+        given:
+        mockConnPool.getConnection() >> mockConn
+        mockConn.prepareStatement(_ as String) >> mockPreparedStatement
+        mockPreparedStatement.executeQuery() >> mockResultSet
+        mockResultSet.next() >> true
+        mockResultSet.getString("id") >> "1234"
+        mockResultSet.getString("value") >> "DogCow"
+
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        def sqlGenerator = { connection -> connection.prepareStatement("SELECT * FROM table") }
+
+        def originalException = new RuntimeException("oh no!")
+        def converter = { resultSet -> throw originalException }
+
+        when:
+        PostgresDao.getInstance().fetchFirstData(sqlGenerator, converter)
+
+        then:
+        def thrownException = thrown(SQLException)
+        thrownException.getCause() == originalException
+    }
+
+    def "fetchFirstData returns null when rows do not exist"() {
+        given:
+        mockConnPool.getConnection() >> mockConn
+        mockConn.prepareStatement(_ as String) >> mockPreparedStatement
+        mockPreparedStatement.executeQuery() >> mockResultSet
+        mockResultSet.next() >> false
+        mockResultSet.getString("id") >> "1234"
+        mockResultSet.getString("value") >> "DogCow"
+
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        def sqlGenerator = { connection -> connection.prepareStatement("SELECT * FROM table") }
+
+        def converter = { resultSet ->
+            return [
+                id: resultSet.getString("id"),
+                value: resultSet.getString("value")
+            ]
+        }
+
+        when:
+        def result = PostgresDao.getInstance().fetchFirstData(sqlGenerator, converter)
+
+        then:
+        result == null
     }
 
     def "fetchMetadataForSender retrieves a set of PartnerMetadata"() {

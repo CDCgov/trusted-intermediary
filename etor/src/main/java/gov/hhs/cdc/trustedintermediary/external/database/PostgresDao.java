@@ -93,46 +93,6 @@ public class PostgresDao implements DbDao {
         }
     }
 
-    //    @Override
-    //    public Set<PartnerMetadata> fetchMetadataForSender(String sender) throws SQLException {
-    //
-    //        try (Connection conn = connectionPool.getConnection();
-    //                PreparedStatement statement =
-    //                        conn.prepareStatement("SELECT * FROM metadata WHERE sender = ?")) {
-    //            statement.setString(1, sender);
-    //            ResultSet resultSet = statement.executeQuery();
-    //
-    //            Set<PartnerMetadata> metadataSet = new HashSet<>();
-    //
-    //            while (resultSet.next()) {
-    //                metadataSet.add(partnerMetadataFromResultSet(resultSet));
-    //            }
-    //
-    //            return metadataSet;
-    //        }
-    //    }
-
-    //    @Override
-    //    public PartnerMetadata fetchMetadata(String submissionId) throws SQLException {
-    //        try (Connection conn = connectionPool.getConnection();
-    //                PreparedStatement statement =
-    //                        conn.prepareStatement(
-    //                                "SELECT * FROM metadata where received_message_id = ? OR
-    // sent_message_id = ?")) {
-    //
-    //            statement.setString(1, submissionId);
-    //            statement.setString(2, submissionId);
-    //
-    //            ResultSet result = statement.executeQuery();
-    //
-    //            if (!result.next()) {
-    //                return null;
-    //            }
-    //
-    //            return partnerMetadataFromResultSet(result);
-    //        }
-    //    }
-
     @Override
     public <T> T fetchFirstData(
             Function<Connection, PreparedStatement> sqlGenerator, Function<ResultSet, T> converter)
