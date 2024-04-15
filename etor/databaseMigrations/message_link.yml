@@ -25,5 +25,12 @@ databaseChangeLog:
                   name: message_id
                   type: varchar(40)
                   constraints:
-                    foreignKeyName: fk_metadata_received_message_id
                     nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: message_link
+            baseColumnNames: message_id
+            constraintName: fk_metadata_received_message_id
+            referencedTableName: metadata
+            referencedColumnNames: received_message_id
+            onDelete: CASCADE
+            onUpdate: CASCADE

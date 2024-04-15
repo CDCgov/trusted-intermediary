@@ -154,19 +154,3 @@ databaseChangeLog:
             columnName: receiving_facility_details
             newDataType: jsonb
             tableName: metadata
-
-  - changeSet:
-      id: 7
-      author: basiliskus
-      labels: add-received-message-id-foreign-key
-      context: metadata
-      comment: add foreign key constraint to received_message_id
-      changes:
-        - addForeignKeyConstraint:
-            baseColumnNames: received_message_id
-            baseTableName: metadata
-            constraintName: fk_metadata_received_message_id
-            referencedColumnNames: message_id
-            referencedTableName: message_link
-            onDelete: CASCADE
-            onUpdate: CASCADE
