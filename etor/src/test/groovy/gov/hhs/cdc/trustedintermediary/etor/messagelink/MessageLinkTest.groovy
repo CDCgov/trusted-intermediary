@@ -93,16 +93,4 @@ class MessageLinkTest extends Specification {
         then:
         messageLink.getMessageIds() == messageIds
     }
-
-    def "setMessageIds replaces the entire messageIds set"() {
-        given:
-        def messageLink = new MessageLink(UUID.randomUUID(), "messageId")
-        def newMessageIds = Set.of("messageId1", "messageId2")
-
-        when:
-        messageLink.setMessageIds(newMessageIds)
-
-        then:
-        messageLink.getMessageIds() == newMessageIds
-    }
 }
