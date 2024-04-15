@@ -1,8 +1,55 @@
 #!/bin/sh
 
-env=$1
+env=local
+path=$CDCTI_HOME/examples/Test/
 client_id=flexion
 client_sender=simulated-lab
+verbose=0
+
+show_help() {
+    echo "Usage: $(basename $0) [-e arg] [-c arg] [-s arg]"
+    echo
+    echo "    -e [local staging]  The environment to run the test in (Default: $env)"
+    echo "    -c <arg>  The client id to use"
+    echo "    -s <arg>  The client sender to use"
+    echo "    -v        Verbose mode"
+    echo "    -h        Display this help and exit"
+}
+
+while getopts ':e:c:s:vh' opt; do
+    case "$opt" in
+    e)
+        env="$OPTARG"
+        ;;
+    c)
+        client_id="$OPTARG"
+        ;;
+    s)
+        client_sender="$OPTARG"
+        ;;
+    p)
+        client_sender="$OPTARG"
+        ;;
+    v)
+        verbose=1
+        ;;
+    h)
+        show_help
+        exit 0
+        ;;
+    :)
+        echo -e "Option requires an argument"
+        show_help
+        exit 1
+        ;;
+    ?)
+        echo -e "Invalid command option"
+        show_help
+        exit 1
+        ;;
+    esac
+done
+shift "$(($OPTIND - 1))"
 
 # Shift command will shift the positional parameters to the left, discarding the first argument
 shift
