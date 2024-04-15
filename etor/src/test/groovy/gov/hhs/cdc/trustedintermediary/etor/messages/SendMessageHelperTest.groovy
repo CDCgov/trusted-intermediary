@@ -116,7 +116,7 @@ class SendMessageHelperTest extends Specification {
     def "linkMessage logs error when there's a MessageLinkException"() {
         given:
         mockOrchestrator.findMessagesIdsToLink(_ as String) >> ["1"]
-        mockOrchestrator.linkMessages(_ as Set<String>) >> {throw new MessageLinkException("")}
+        mockOrchestrator.linkMessages(_ as Set<String>) >> {throw new MessageLinkException("", new Exception())}
 
         when:
         SendMessageHelper.getInstance().linkMessage("1")

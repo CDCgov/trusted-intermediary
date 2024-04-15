@@ -10,7 +10,7 @@ class MessageLinkExceptionTest extends Specification {
         def cause = new FormatterProcessingException(message, new IOException())
 
         when:
-        def exceptionWithoutCause = new MessageLinkException(message)
+        def exceptionWithoutCause = new MessageLinkException(message, new Exception())
         def exceptionWithCause = new MessageLinkException(message, cause)
 
         then:

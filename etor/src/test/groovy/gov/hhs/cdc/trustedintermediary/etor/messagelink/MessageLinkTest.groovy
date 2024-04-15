@@ -1,13 +1,16 @@
 package gov.hhs.cdc.trustedintermediary.etor.messagelink
 
-import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.PojoTestUtils
 import spock.lang.Specification
 
 class MessageLinkTest extends Specification {
 
-    def setup() {
-        TestApplicationContext.reset()
-        TestApplicationContext.init()
+    def "test getters and setters"() {
+        when:
+        PojoTestUtils.validateGettersAndSetters(MessageLink.class)
+
+        then:
+        noExceptionThrown()
     }
 
     def "constructor without parameters initializes with empty messageIds"() {
@@ -89,18 +92,6 @@ class MessageLinkTest extends Specification {
 
         then:
         messageLink.getMessageIds() == messageIds
-    }
-
-    def "setLinkId sets the linkId"() {
-        given:
-        def messageLink = new MessageLink()
-        def linkId = UUID.randomUUID()
-
-        when:
-        messageLink.setLinkId(linkId)
-
-        then:
-        messageLink.getLinkId() == linkId
     }
 
     def "setMessageIds replaces the entire messageIds set"() {
