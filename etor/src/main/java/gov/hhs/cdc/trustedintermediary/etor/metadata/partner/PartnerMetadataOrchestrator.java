@@ -54,10 +54,14 @@ public class PartnerMetadataOrchestrator {
         String sender;
         Instant timeReceived;
         try {
+            String bearerToken = rsclient.getRsToken();
+            String responseBody =
+                    rsclient.requestHistoryEndpoint(receivedSubmissionId, bearerToken);
+            Map<String, Object> responseObject =
+                    formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
 
             sender = sendingFacilityDetails.namespace(); // This might not be the actual sender
-
-            String timestamp = Instant.now().toString(); // need to figure out what this will be
+            String timestamp = responseObject.get("timestamp").toString();
             timeReceived = Instant.parse(timestamp);
 
         } catch (Exception e) {
