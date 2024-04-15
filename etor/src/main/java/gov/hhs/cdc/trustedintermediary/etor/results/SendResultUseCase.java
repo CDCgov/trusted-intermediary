@@ -48,6 +48,8 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
         String sentSubmissionId = sender.send(convertedResult).orElse(null);
         logger.logInfo("Sent result submissionId: {}", sentSubmissionId);
 
+        sendMessageHelper.linkMessage(receivedSubmissionId);
+
         sendMessageHelper.saveSentMessageSubmissionId(receivedSubmissionId, sentSubmissionId);
     }
 }
