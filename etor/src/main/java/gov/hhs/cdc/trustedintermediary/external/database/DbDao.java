@@ -1,11 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.external.database;
 
-import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 /** Interface for accessing the database for metadata */
@@ -20,6 +18,4 @@ public interface DbDao {
 
     Set<PartnerMetadata> fetchMetadataForMessageLinking(String submissionId)
             throws SQLException, FormatterProcessingException;
-
-    Optional<MessageLink> fetchMessageLink(String messageId) throws SQLException;
 }

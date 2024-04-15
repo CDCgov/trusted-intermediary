@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.external.database;
 
-import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
@@ -17,9 +16,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import javax.inject.Inject;
 
 /** Class for accessing and managing data for the postgres Database */
@@ -168,38 +165,6 @@ public class PostgresDao implements DbDao {
             }
 
             return metadataSet;
-        }
-    }
-
-    @Override
-    public Optional<MessageLink> fetchMessageLink(String messageId) throws SQLException {
-        var sql =
-                """
-                SELECT *
-                FROM message_link
-                WHERE message_id = ?;
-                """;
-
-        UUID linkId = null;
-        Set<String> messageIds = new HashSet<>();
-        try (Connection conn = connectionPool.getConnection();
-                PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setString(1, messageId);
-
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    if (linkId == null) {
-                        linkId = UUID.fromString(resultSet.getString("link_id"));
-                    }
-                    messageIds.add(resultSet.getString("message_id"));
-                }
-            }
-        }
-
-        if (!messageIds.isEmpty()) {
-            return Optional.of(new MessageLink(linkId, messageIds));
-        } else {
-            return Optional.empty();
         }
     }
 

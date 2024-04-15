@@ -50,18 +50,17 @@ public class FileMessageLinkStorage implements MessageLinkStorage {
     }
 
     @Override
-    public synchronized Optional<MessageLink> getMessageLink(String submissionId)
+    public synchronized Optional<MessageLink> getMessageLink(String messageId)
             throws MessageLinkException {
         try {
             Set<MessageLink> messageLinks = readMessageLinks();
             List<MessageLink> foundMessageLinks =
                     messageLinks.stream()
-                            .filter(link -> link.getMessageIds().contains(submissionId))
+                            .filter(link -> link.getMessageIds().contains(messageId))
                             .toList();
 
             if (foundMessageLinks.size() > 1) {
-                logger.logWarning(
-                        "More than one message link found for submissionId: {}", submissionId);
+                logger.logWarning("More than one message link found for messageId: {}", messageId);
             }
 
             return foundMessageLinks.stream().findFirst();

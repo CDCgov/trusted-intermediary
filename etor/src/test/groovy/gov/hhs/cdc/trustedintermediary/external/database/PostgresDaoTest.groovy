@@ -2,7 +2,6 @@ package gov.hhs.cdc.trustedintermediary.external.database
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
@@ -19,7 +18,6 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
-import java.sql.Statement
 import java.sql.Timestamp
 import java.sql.Types
 import java.time.Instant
@@ -379,49 +377,6 @@ class PostgresDaoTest extends Specification {
 
         then:
         actual.containsAll(Set.of(expected1, expected2))
-    }
-
-    def "fetchMessageLink returns empty optional when rows do not exist"() {
-        given:
-        mockConnPool.getConnection() >> mockConn
-        mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
-        mockResultSet.next() >> false
-        mockPreparedStatement.executeQuery() >> mockResultSet
-
-        TestApplicationContext.register(ConnectionPool, mockConnPool)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        def actual = PostgresDao.getInstance().fetchMessageLink("mock_lookup")
-
-        then:
-        actual == Optional.empty()
-    }
-
-    def "fetchMessageLink returns message link when rows exist"() {
-        given:
-        def linkId = UUID.randomUUID()
-        def messageLink = new MessageLink(linkId, "MessageId")
-        def expected = Optional.of(messageLink)
-        def messageIds = "MessageId"
-
-        mockConnPool.getConnection() >> mockConn
-        mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
-        // First run returns true, then return false
-        mockResultSet.next() >> true >> false
-        mockResultSet.getString("link_id") >> linkId
-        mockResultSet.getString("message_id") >> messageIds
-
-        mockPreparedStatement.executeQuery() >> mockResultSet
-
-        TestApplicationContext.register(ConnectionPool, mockConnPool)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        def actual = PostgresDao.getInstance().fetchMessageLink("MessageId")
-
-        then:
-        actual.get().getLinkId() == expected.get().getLinkId()
     }
 
     def "fetchMetadataForMessageLinking returns a set of PartnerMetadata when rows exist"() {
