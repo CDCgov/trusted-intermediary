@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.etor.messagelink;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -19,12 +18,12 @@ public final class MessageLink {
 
     public MessageLink(UUID linkId, String messageId) {
         this.linkId = linkId;
-        this.messageIds = new HashSet<>(Collections.singleton(messageId));
+        this.messageIds = Set.of(messageId);
     }
 
     public MessageLink(UUID linkId, Set<String> messageIds) {
         this.linkId = linkId;
-        this.messageIds = new HashSet<>(messageIds);
+        this.messageIds = messageIds;
     }
 
     public void setLinkId(UUID linkId) {
@@ -36,11 +35,11 @@ public final class MessageLink {
     }
 
     public void setMessageIds(Set<String> messageIds) {
-        this.messageIds = new HashSet<>(messageIds);
+        this.messageIds = messageIds;
     }
 
     public Set<String> getMessageIds() {
-        return Collections.unmodifiableSet(messageIds);
+        return this.messageIds;
     }
 
     public void addMessageId(String messageId) {
