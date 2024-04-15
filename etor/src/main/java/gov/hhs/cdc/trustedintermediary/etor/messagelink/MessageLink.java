@@ -23,7 +23,7 @@ public final class MessageLink {
 
     public MessageLink(UUID linkId, Set<String> messageIds) {
         this.linkId = linkId;
-        this.messageIds = messageIds;
+        this.messageIds = new HashSet<>(messageIds);
     }
 
     public void setLinkId(UUID linkId) {
