@@ -27,6 +27,8 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
     private static final DatabasePartnerMetadataStorage INSTANCE =
             new DatabasePartnerMetadataStorage();
 
+    private static final String METADATA_TABLE_RECEIVED_MESSAGE_ID = "received_message_id";
+
     @Inject DbDao dao;
 
     @Inject Logger logger;
@@ -71,7 +73,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
 
         try {
             List<DbColumn> columns = createDbColumnsFromMetadata(metadata);
-            dao.upsertData("metadata", columns, "received_message_id");
+            dao.upsertData("metadata", columns, METADATA_TABLE_RECEIVED_MESSAGE_ID);
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error saving metadata", e);
         } catch (FormatterProcessingException e) {
@@ -122,7 +124,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
             }
 
             return new PartnerMetadata(
-                    resultSet.getString("received_message_id"),
+                    resultSet.getString(METADATA_TABLE_RECEIVED_MESSAGE_ID),
                     resultSet.getString("sent_message_id"),
                     resultSet.getString("sender"),
                     resultSet.getString("receiver"),
@@ -154,7 +156,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
             throws FormatterProcessingException {
         return List.of(
                 new DbColumn(
-                        "received_message_id",
+                        METADATA_TABLE_RECEIVED_MESSAGE_ID,
                         metadata.receivedSubmissionId(),
                         false,
                         Types.VARCHAR),
