@@ -148,7 +148,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         DatabasePartnerMetadataStorage.getInstance().saveMetadata(mockMetadata)
 
         then:
-        1 * mockDao.upsertData("metadata", columns, "received_message_id")
+        1 * mockDao.upsertData("metadata", columns, "(received_message_id)")
     }
 
     def "saveMetadata unhappy path works"() {
@@ -266,7 +266,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         DatabasePartnerMetadataStorage.getInstance().saveMetadata(mockMetadata)
 
         then:
-        1 * mockDao.upsertData("metadata", columns, "received_message_id")
+        1 * mockDao.upsertData("metadata", columns, "(received_message_id)")
     }
 
     def "readMetadataForMessageLinking happy path works"() {

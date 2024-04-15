@@ -26,10 +26,14 @@ databaseChangeLog:
                   type: varchar(40)
                   constraints:
                     nullable: false
+        - addUniqueConstraint:
+            tableName: message_link
+            columnNames: link_id, message_id
+            constraintName: message_link_link_id_message_id_key
         - addForeignKeyConstraint:
             baseTableName: message_link
             baseColumnNames: message_id
-            constraintName: fk_metadata_received_message_id
+            constraintName: metadata_received_message_id_fkey
             referencedTableName: metadata
             referencedColumnNames: received_message_id
             onDelete: CASCADE

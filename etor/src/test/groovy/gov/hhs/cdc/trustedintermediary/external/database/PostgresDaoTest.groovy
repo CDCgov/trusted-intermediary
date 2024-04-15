@@ -73,7 +73,7 @@ class PostgresDaoTest extends Specification {
             new DbColumn("receiving_application_details", receivingApp, false, Types.OTHER),
             new DbColumn("receiving_facility_details", receivingFacility, false, Types.OTHER),
         ]
-        def conflictColumnName = pkColumnName
+        def conflictTarget = "(" + pkColumnName + ")"
 
         mockConnPool.getConnection() >>  mockConn
 
@@ -81,7 +81,7 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PostgresDao.getInstance().upsertData(tableName, columns, conflictColumnName)
+        PostgresDao.getInstance().upsertData(tableName, columns, conflictTarget)
 
         then:
         mockConn.prepareStatement(_ as String) >> { String sqlStatement ->

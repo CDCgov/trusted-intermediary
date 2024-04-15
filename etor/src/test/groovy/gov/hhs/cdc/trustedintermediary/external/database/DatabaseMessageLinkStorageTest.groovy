@@ -128,12 +128,12 @@ class DatabaseMessageLinkStorageTest extends Specification {
         DatabaseMessageLinkStorage.getInstance().saveMessageLink(mockMessageLinkData)
 
         then:
-        messageIdCount * mockDao.upsertData("message_link", _ as List<DbColumn>, "message_id")
+        messageIdCount * mockDao.upsertData("message_link", _ as List<DbColumn>, _ as String)
     }
 
     def "saveMessageLink unhappy path works"() {
         given:
-        mockDao.upsertData("message_link", _ as List<DbColumn>, "message_id") >> { throw new SQLException("Something went wrong!") }
+        mockDao.upsertData("message_link", _ as List<DbColumn>, _ as String) >> { throw new SQLException("Something went wrong!") }
 
         when:
         DatabaseMessageLinkStorage.getInstance().saveMessageLink(mockMessageLinkData)

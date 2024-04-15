@@ -3,7 +3,6 @@ package gov.hhs.cdc.trustedintermediary.external.database;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus;
-import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
@@ -25,7 +24,6 @@ public class PostgresDao implements DbDao {
     private static final PostgresDao INSTANCE = new PostgresDao();
 
     @Inject ConnectionPool connectionPool;
-    @Inject Logger logger;
 
     @Inject Formatter formatter;
 
@@ -36,7 +34,7 @@ public class PostgresDao implements DbDao {
     }
 
     @Override
-    public void upsertData(String tableName, List<DbColumn> values, String conflictColumnName)
+    public void upsertData(String tableName, List<DbColumn> values, String conflictTarget)
             throws SQLException {
         // example SQL statement generated here:
         // INSERT INTO metadata_table (column_one, column_three, column_two, column_four)
@@ -56,25 +54,27 @@ public class PostgresDao implements DbDao {
         removeLastTwoCharacters(sqlStatementBuilder); // remove the last unused ", "
         sqlStatementBuilder.append(")");
 
-        boolean wantsUpsert = values.stream().anyMatch(DbColumn::upsertOverwrite);
+        if (conflictTarget != null) {
+            sqlStatementBuilder.append(" ON CONFLICT ").append(conflictTarget);
 
-        if (wantsUpsert) {
-            sqlStatementBuilder
-                    .append(" ON CONFLICT (")
-                    .append(conflictColumnName)
-                    .append(") DO UPDATE SET ");
+            boolean overwriteOnConflict = values.stream().anyMatch(DbColumn::upsertOverwrite);
+            if (overwriteOnConflict) {
+                sqlStatementBuilder.append(" DO UPDATE SET ");
 
-            for (DbColumn column : values) {
-                if (!column.upsertOverwrite()) {
-                    continue;
+                for (DbColumn column : values) {
+                    if (!column.upsertOverwrite()) {
+                        continue;
+                    }
+
+                    sqlStatementBuilder.append(column.name()).append(" = EXCLUDED.");
+                    sqlStatementBuilder.append(column.name());
+                    sqlStatementBuilder.append(", ");
                 }
 
-                sqlStatementBuilder.append(column.name()).append(" = EXCLUDED.");
-                sqlStatementBuilder.append(column.name());
-                sqlStatementBuilder.append(", ");
+                removeLastTwoCharacters(sqlStatementBuilder); // remove the last unused ", "
+            } else {
+                sqlStatementBuilder.append(" DO NOTHING");
             }
-
-            removeLastTwoCharacters(sqlStatementBuilder); // remove the last unused ", "
         }
 
         String sqlStatement = sqlStatementBuilder.toString();

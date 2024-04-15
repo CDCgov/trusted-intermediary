@@ -81,7 +81,10 @@ public class DatabaseMessageLinkStorage implements MessageLinkStorage {
                         List.of(
                                 new DbColumn("link_id", linkId, false, Types.VARCHAR),
                                 new DbColumn("message_id", messageId, false, Types.VARCHAR));
-                dao.upsertData("message_link", columns, "message_id");
+                dao.upsertData(
+                        "message_link",
+                        columns,
+                        "ON CONSTRAINT message_link_link_id_message_id_key");
             }
         } catch (SQLException e) {
             throw new MessageLinkException("Error saving message links", e);
