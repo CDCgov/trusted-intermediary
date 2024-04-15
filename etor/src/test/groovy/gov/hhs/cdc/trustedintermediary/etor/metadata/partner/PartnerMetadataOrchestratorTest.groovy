@@ -220,6 +220,40 @@ class PartnerMetadataOrchestratorTest extends Specification {
         thrown(PartnerMetadataException)
     }
 
+    def "updateMetadataForReceivedMessage throws PartnerMetadataException due to null originalIngestion"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def wrongFormatResponse = "{\"someOtherKey\": {}}"
+        def messageType = PartnerMetadataMessageType.RESULT
+
+        mockClient.getRsToken() >> "token"
+        mockClient.requestDeliveryEndpoint(_ as String, _ as String) >> wrongFormatResponse
+        mockFormatter.convertJsonToObject(wrongFormatResponse, _ as TypeReference) >> [someOtherKey:{}]
+
+        when:
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(receivedSubmissionId, "hash", messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
+
+        then:
+        thrown(PartnerMetadataException)
+    }
+
+    def "updateMetadataForReceivedMessage throws PartnerMetadataException due to empty originalIngestion"() {
+        given:
+        def receivedSubmissionId = "receivedSubmissionId"
+        def wrongFormatResponse = "{\"originalIngestion\": {}}"
+        def messageType = PartnerMetadataMessageType.RESULT
+
+        mockClient.getRsToken() >> "token"
+        mockClient.requestDeliveryEndpoint(_ as String, _ as String) >> wrongFormatResponse
+        mockFormatter.convertJsonToObject(wrongFormatResponse, _ as TypeReference) >> [originalIngestion:[]]
+
+        when:
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(receivedSubmissionId, "hash", messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
+
+        then:
+        thrown(PartnerMetadataException)
+    }
+
     def "updateMetadataForSentMessage updates metadata successfully"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
