@@ -35,8 +35,9 @@ class DatabaseMessageLinkStorageTest extends Specification {
     def "getMessageLink returns message link when rows exist"() {
         given:
         def linkId = UUID.randomUUID()
-        def messageId = "MessageId"
-        def messageLink = new MessageLink(linkId, messageId)
+        def getMessageId = "getMessageId"
+        def additionalMessageId = "additionalMessageId"
+        def messageLink = new MessageLink(linkId, Set.of(getMessageId, additionalMessageId))
         def expected = Optional.of(messageLink)
 
         def mockConn = Mock(Connection)
@@ -45,10 +46,7 @@ class DatabaseMessageLinkStorageTest extends Specification {
 
         mockConnPool.getConnection() >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
-        // First run returns true, then return false
-        mockResultSet.next() >> true >> false
-        mockResultSet.getString("link_id") >> linkId
-        mockResultSet.getString("message_id") >> messageId
+        mockResultSet.next() >> true >> true >> false
 
         mockPreparedStatement.executeQuery() >> mockResultSet
 
@@ -56,9 +54,12 @@ class DatabaseMessageLinkStorageTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def actual = DatabaseMessageLinkStorage.getInstance().getMessageLink(messageId)
+        def actual = DatabaseMessageLinkStorage.getInstance().getMessageLink(getMessageId)
 
         then:
+        1 * mockResultSet.getString("link_id") >> linkId
+        1 * mockResultSet.getString("message_id") >> getMessageId
+        1 * mockResultSet.getString("message_id") >> additionalMessageId
         actual.get().getLinkId() == expected.get().getLinkId()
     }
 
