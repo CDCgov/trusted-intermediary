@@ -5,7 +5,10 @@ import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkException;
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkStorage;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.sql.SQLException;
+import java.sql.Types;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import javax.inject.Inject;
 
 /** Implements the {@link MessageLinkStorage} using a database. */
@@ -36,7 +39,15 @@ public class DatabaseMessageLinkStorage implements MessageLinkStorage {
     public void saveMessageLink(MessageLink messageLink) throws MessageLinkException {
         logger.logInfo("Saving message links");
         try {
-            dao.insertMessageLink(messageLink);
+            UUID linkId = Optional.ofNullable(messageLink.getLinkId()).orElse(UUID.randomUUID());
+            List<DbColumn> columns;
+            for (String messageId : messageLink.getMessageIds()) {
+                columns =
+                        List.of(
+                                new DbColumn("link_id", linkId, false, Types.VARCHAR),
+                                new DbColumn("message_id", messageId, false, Types.VARCHAR));
+                dao.upsertData("message_link", columns, "message_id");
+            }
         } catch (SQLException e) {
             throw new MessageLinkException("Error saving message links", e);
         }

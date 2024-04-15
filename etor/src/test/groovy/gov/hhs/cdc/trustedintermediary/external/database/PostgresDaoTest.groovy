@@ -424,44 +424,6 @@ class PostgresDaoTest extends Specification {
         actual.get().getLinkId() == expected.get().getLinkId()
     }
 
-    def "insertMessageLink unhappy path throws exception"() {
-        given:
-        mockConnPool.getConnection() >> mockConn
-        mockConn.prepareStatement(_ as String) >> { throw new SQLException() }
-
-        TestApplicationContext.register(ConnectionPool, mockConnPool)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        PostgresDao.getInstance().insertMessageLink(new MessageLink(UUID.randomUUID(), "MessageId"))
-
-        then:
-        thrown(SQLException)
-    }
-
-    def "insertMessageLink successfully inserts message links"() {
-        given:
-        def linkId = UUID.randomUUID()
-        def messageIds = ["MessageId1", "MessageId2"]
-        def messageLink = new MessageLink(linkId, new HashSet<>(messageIds))
-
-        mockConnPool.getConnection() >> mockConn
-        mockConn.prepareStatement(_ as String) >> mockPreparedStatement
-        TestApplicationContext.register(ConnectionPool, mockConnPool)
-
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        PostgresDao.getInstance().insertMessageLink(messageLink)
-
-        then:
-        messageIds.each { messageId ->
-            1 * mockPreparedStatement.setString(1, linkId.toString())
-            1 * mockPreparedStatement.setString(2, messageId)
-            1 * mockPreparedStatement.setString(3, messageId)
-        }
-    }
-
     def "fetchMetadataForMessageLinking returns a set of PartnerMetadata when rows exist"() {
         given:
         def submissionId = "12345"

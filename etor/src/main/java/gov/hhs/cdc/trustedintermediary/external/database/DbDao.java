@@ -22,6 +22,4 @@ public interface DbDao {
             throws SQLException, FormatterProcessingException;
 
     Optional<MessageLink> fetchMessageLink(String messageId) throws SQLException;
-
-    void insertMessageLink(MessageLink messageLink) throws SQLException;
 }

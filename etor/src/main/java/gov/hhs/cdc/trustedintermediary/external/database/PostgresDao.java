@@ -203,30 +203,6 @@ public class PostgresDao implements DbDao {
         }
     }
 
-    @Override
-    public void insertMessageLink(MessageLink messageLink) throws SQLException {
-        var sql =
-                """
-                INSERT INTO message_link (link_id, message_id)
-                SELECT ?, ?
-                WHERE NOT EXISTS (
-                    SELECT 1 FROM message_link WHERE message_id = ?
-                );
-                """;
-
-        try (Connection conn = connectionPool.getConnection();
-                PreparedStatement statement = conn.prepareStatement(sql)) {
-            UUID linkId = Optional.ofNullable(messageLink.getLinkId()).orElse(UUID.randomUUID());
-
-            for (String messageId : messageLink.getMessageIds()) {
-                statement.setString(1, linkId.toString());
-                statement.setString(2, messageId);
-                statement.setString(3, messageId); // can we use named parameters instead?
-                statement.executeUpdate();
-            }
-        }
-    }
-
     private void removeLastTwoCharacters(StringBuilder stringBuilder) {
         stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
     }
