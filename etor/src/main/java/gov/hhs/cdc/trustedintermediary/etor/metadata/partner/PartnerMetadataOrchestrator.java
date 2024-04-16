@@ -1,6 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata.partner;
 
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
+import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink;
+import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkException;
+import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkStorage;
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -13,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 
@@ -26,6 +31,7 @@ public class PartnerMetadataOrchestrator {
     private static final PartnerMetadataOrchestrator INSTANCE = new PartnerMetadataOrchestrator();
 
     @Inject PartnerMetadataStorage partnerMetadataStorage;
+    @Inject MessageLinkStorage messageLinkStorage;
     @Inject RSEndpointClient rsclient;
     @Inject Formatter formatter;
     @Inject Logger logger;
@@ -250,6 +256,39 @@ public class PartnerMetadataOrchestrator {
 
                                     return innerMap;
                                 }));
+    }
+
+    public Set<String> findMessagesIdsToLink(String receivedSubmissionId)
+            throws PartnerMetadataException {
+        var metadataSet =
+                partnerMetadataStorage.readMetadataForMessageLinking(receivedSubmissionId);
+        return metadataSet.stream()
+                .map(PartnerMetadata::receivedSubmissionId)
+                .collect(Collectors.toSet());
+    }
+
+    public void linkMessages(Set<String> messageIds) throws MessageLinkException {
+        Optional<MessageLink> existingMessageLink = Optional.empty();
+        for (String messageId : messageIds) {
+            existingMessageLink = messageLinkStorage.getMessageLink(messageId);
+            if (existingMessageLink.isPresent()) {
+                break;
+            }
+        }
+
+        if (existingMessageLink.isEmpty()) {
+            logger.logInfo("Saving new message link for messageIds: {}", messageIds);
+            messageLinkStorage.saveMessageLink(new MessageLink(UUID.randomUUID(), messageIds));
+            return;
+        }
+
+        MessageLink messageLink = existingMessageLink.get();
+        messageLink.addMessageIds(messageIds);
+        logger.logInfo(
+                "Updating existing message link {} with messageIds: {}",
+                messageLink.getLinkId(),
+                messageIds);
+        messageLinkStorage.saveMessageLink(messageLink);
     }
 
     String[] getDataFromReportStream(String responseBody) throws FormatterProcessingException {

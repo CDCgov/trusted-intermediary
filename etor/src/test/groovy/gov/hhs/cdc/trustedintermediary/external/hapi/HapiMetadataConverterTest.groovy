@@ -10,6 +10,11 @@ import spock.lang.Specification
 import java.time.Instant
 
 class HapiMetadataConverterTest extends Specification {
+    def sendingAppDetails = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
+    def sendingFacilityDetails = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
+    def receivingAppDetails = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
+    def receivingFacilityDetails = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
+
     def "creating an issue returns a valid OperationOutcomeIssueComponent with Information level severity and code" () {
         when:
         def output = HapiPartnerMetadataConverter.getInstance().createInformationIssueComponent("test_details", "test_diagnostics")
@@ -29,12 +34,8 @@ class HapiMetadataConverterTest extends Specification {
         def hash = "hash"
         def failureReason = "timed_out"
         def messageType =  PartnerMetadataMessageType.ORDER
-        def sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        def receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-        def receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
         PartnerMetadata metadata = new PartnerMetadata(
-                "receivedSubmissionId", "sentSubmissionId", sender, receiver, time, time, hash, PartnerMetadataStatus.DELIVERED, failureReason, messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
+                "receivedSubmissionId", "sentSubmissionId", sender, receiver, time, time, hash, PartnerMetadataStatus.DELIVERED, failureReason, messageType, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
 
         when:
         def result = HapiPartnerMetadataConverter.getInstance().extractPublicMetadataToOperationOutcome(metadata, "receivedSubmissionId").getUnderlyingOutcome() as OperationOutcome

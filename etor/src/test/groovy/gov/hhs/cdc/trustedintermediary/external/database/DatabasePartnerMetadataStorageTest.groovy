@@ -23,11 +23,11 @@ class DatabasePartnerMetadataStorageTest extends Specification {
     private def mockDao
     private def mockFormatter
 
-    def sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-    def sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-    def receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-    def receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
-    def mockMetadata = new PartnerMetadata("receivedSubmissionId", "sentSubmissionId","sender", "receiver", Instant.now(), Instant.now(), "hash", PartnerMetadataStatus.DELIVERED, "failure reason", PartnerMetadataMessageType.ORDER, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
+    def sendingAppDetails = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
+    def sendingFacilityDetails = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
+    def receivingAppDetails = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
+    def receivingFacilityDetails = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
+    def mockMetadata = new PartnerMetadata("receivedSubmissionId", "sentSubmissionId","sender", "receiver", Instant.now(), Instant.now(), "hash", PartnerMetadataStatus.DELIVERED, "failure reason", PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
 
     def setup() {
         TestApplicationContext.reset()
@@ -148,7 +148,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         DatabasePartnerMetadataStorage.getInstance().saveMetadata(mockMetadata)
 
         then:
-        1 * mockDao.upsertData("metadata", columns, "received_message_id")
+        1 * mockDao.upsertData("metadata", columns, "(received_message_id)")
     }
 
     def "saveMetadata unhappy path works"() {
@@ -234,10 +234,10 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 null, // PartnerMetadata defaults deliveryStatus to PENDING on null, so that's why we're asserting not-null bellow
                 "DogCow failure",
                 null,
-                sendingApp,
-                sendingFacility,
-                receivingApp,
-                receivingFacility,
+                sendingAppDetails,
+                sendingFacilityDetails,
+                receivingAppDetails,
+                receivingFacilityDetails,
                 "placer_order_number"
                 )
 
@@ -266,6 +266,54 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         DatabasePartnerMetadataStorage.getInstance().saveMetadata(mockMetadata)
 
         then:
-        1 * mockDao.upsertData("metadata", columns, "received_message_id")
+        1 * mockDao.upsertData("metadata", columns, "(received_message_id)")
+    }
+
+    def "readMetadataForMessageLinking happy path works"() {
+        given:
+        def expectedResult = Set.of(mockMetadata)
+
+        mockDao.fetchMetadataForMessageLinking(_ as String) >> expectedResult
+
+        when:
+        def actualResult = DatabasePartnerMetadataStorage.getInstance().readMetadataForMessageLinking(mockMetadata.receivedSubmissionId())
+
+        then:
+        actualResult == expectedResult
+    }
+
+    def "readMetadataForMessageLinking unhappy path works"() {
+        given:
+        mockDao.fetchMetadataForMessageLinking(_ as String) >> { throw new SQLException("Something went wrong!") }
+
+        when:
+        DatabasePartnerMetadataStorage.getInstance().readMetadataForMessageLinking("receivedSubmissionId")
+
+        then:
+        thrown(PartnerMetadataException)
+    }
+
+    def "readMetadataForSender happy path works"() {
+        given:
+        def expectedResult = Set.of(mockMetadata)
+
+        mockDao.fetchMetadataForSender(_ as String) >> expectedResult
+
+        when:
+        def actualResult = DatabasePartnerMetadataStorage.getInstance().readMetadataForSender("TestSender")
+
+        then:
+        actualResult == expectedResult
+    }
+
+    def "readMetadataForSender unhappy path works"() {
+        given:
+        mockDao.fetchMetadataForSender(_ as String) >> { throw new SQLException("Something went wrong!") }
+
+        when:
+        DatabasePartnerMetadataStorage.getInstance().readMetadataForSender("TestSender")
+
+        then:
+        thrown(PartnerMetadataException)
     }
 }

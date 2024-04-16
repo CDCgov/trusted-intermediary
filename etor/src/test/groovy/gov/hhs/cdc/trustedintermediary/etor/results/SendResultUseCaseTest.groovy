@@ -62,8 +62,7 @@ class SendResultUseCaseTest extends Specification {
         def result = Mock(Result)
         def receivedSubmissionId = "receivedId"
         def messageType = PartnerMetadataMessageType.RESULT
-        mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String, messageType,
-                result.getSendingApplicationDetails(),
+        mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String, messageType,result.getSendingApplicationDetails(),
                 result.getSendingFacilityDetails(),
                 result.getReceivingApplicationDetails(),
                 result.getReceivingFacilityDetails(),

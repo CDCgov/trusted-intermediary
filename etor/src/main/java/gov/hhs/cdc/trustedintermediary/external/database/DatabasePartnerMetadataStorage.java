@@ -50,7 +50,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
 
         try {
             List<DbColumn> columns = createDbColumnsFromMetadata(metadata);
-            dao.upsertData("metadata", columns, "received_message_id");
+            dao.upsertData("metadata", columns, "(received_message_id)");
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error saving metadata", e);
         } catch (FormatterProcessingException e) {
@@ -70,6 +70,18 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
             throw new PartnerMetadataException("Error formatting consolidated metadata", e);
         }
         return consolidatedMetadata;
+    }
+
+    @Override
+    public Set<PartnerMetadata> readMetadataForMessageLinking(String submissionId)
+            throws PartnerMetadataException {
+        Set<PartnerMetadata> metadataSet;
+        try {
+            metadataSet = dao.fetchMetadataForMessageLinking(submissionId);
+        } catch (SQLException | FormatterProcessingException e) {
+            throw new PartnerMetadataException("Error retrieving metadata", e);
+        }
+        return metadataSet;
     }
 
     private List<DbColumn> createDbColumnsFromMetadata(PartnerMetadata metadata)

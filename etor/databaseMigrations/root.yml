@@ -1,6 +1,8 @@
 databaseChangeLog:
   - include:
       file: etor/databaseMigrations/metadata.yml
+  - include:
+      file: etor/databaseMigrations/message_link.yml
       # Please put all other migrations above this comment
   - include:
       file: etor/databaseMigrations/azure.yml

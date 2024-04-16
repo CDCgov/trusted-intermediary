@@ -34,7 +34,7 @@ public class PostgresDao implements DbDao {
     }
 
     @Override
-    public void upsertData(String tableName, List<DbColumn> values, String conflictColumnName)
+    public void upsertData(String tableName, List<DbColumn> values, String conflictTarget)
             throws SQLException {
         // example SQL statement generated here:
         // INSERT INTO metadata_table (column_one, column_three, column_two, column_four)
@@ -54,25 +54,27 @@ public class PostgresDao implements DbDao {
         removeLastTwoCharacters(sqlStatementBuilder); // remove the last unused ", "
         sqlStatementBuilder.append(")");
 
-        boolean wantsUpsert = values.stream().anyMatch(DbColumn::upsertOverwrite);
+        if (conflictTarget != null) {
+            sqlStatementBuilder.append(" ON CONFLICT ").append(conflictTarget);
 
-        if (wantsUpsert) {
-            sqlStatementBuilder
-                    .append(" ON CONFLICT (")
-                    .append(conflictColumnName)
-                    .append(") DO UPDATE SET ");
+            boolean overwriteOnConflict = values.stream().anyMatch(DbColumn::upsertOverwrite);
+            if (overwriteOnConflict) {
+                sqlStatementBuilder.append(" DO UPDATE SET ");
 
-            for (DbColumn column : values) {
-                if (!column.upsertOverwrite()) {
-                    continue;
+                for (DbColumn column : values) {
+                    if (!column.upsertOverwrite()) {
+                        continue;
+                    }
+
+                    sqlStatementBuilder.append(column.name()).append(" = EXCLUDED.");
+                    sqlStatementBuilder.append(column.name());
+                    sqlStatementBuilder.append(", ");
                 }
 
-                sqlStatementBuilder.append(column.name()).append(" = EXCLUDED.");
-                sqlStatementBuilder.append(column.name());
-                sqlStatementBuilder.append(", ");
+                removeLastTwoCharacters(sqlStatementBuilder); // remove the last unused ", "
+            } else {
+                sqlStatementBuilder.append(" DO NOTHING");
             }
-
-            removeLastTwoCharacters(sqlStatementBuilder); // remove the last unused ", "
         }
 
         String sqlStatement = sqlStatementBuilder.toString();
@@ -134,6 +136,35 @@ public class PostgresDao implements DbDao {
             }
 
             return partnerMetadataFromResultSet(result);
+        }
+    }
+
+    @Override
+    public Set<PartnerMetadata> fetchMetadataForMessageLinking(String submissionId)
+            throws SQLException, FormatterProcessingException {
+        var sql =
+                """
+                SELECT m2.*
+                FROM metadata m1
+                JOIN metadata m2
+                    ON m1.placer_order_number = m2.placer_order_number
+                        AND m1.sending_application_id = m2.sending_application_id
+                        AND m1.sending_facility_id = m2.sending_facility_id
+                WHERE m1.sent_message_id = ?;
+                """;
+
+        try (Connection conn = connectionPool.getConnection();
+                PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setString(1, submissionId);
+            ResultSet resultSet = statement.executeQuery();
+
+            Set<PartnerMetadata> metadataSet = new HashSet<>();
+
+            while (resultSet.next()) {
+                metadataSet.add(partnerMetadataFromResultSet(resultSet));
+            }
+
+            return metadataSet;
         }
     }
 
