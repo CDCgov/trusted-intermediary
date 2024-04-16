@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
 import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool
 import gov.hhs.cdc.trustedintermediary.wrappers.database.DatabaseCredentialsProvider
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -63,7 +64,7 @@ class PostgresDaoTest extends Specification {
             new DbColumn("second_column_with_upsert_overwrite", Timestamp.from(Instant.now()), true, Types.TIMESTAMP_WITH_TIMEZONE),
             new DbColumn("fourth_column_null", null, false, Types.VARCHAR),
         ]
-        def conflictColumnName = pkColumnName
+        def conflictTarget = "(" + pkColumnName + ")"
 
         mockConnPool.getConnection() >>  mockConn
 
@@ -71,7 +72,7 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PostgresDao.getInstance().upsertData(tableName, columns, conflictColumnName)
+        PostgresDao.getInstance().upsertData(tableName, columns, conflictTarget)
 
         then:
         mockConn.prepareStatement(_ as String) >> { String sqlStatement ->
@@ -107,8 +108,9 @@ class PostgresDaoTest extends Specification {
         1 * mockPreparedStatement.executeUpdate()
     }
 
-    def "upsertData doesn't do any upserts if there is no upsertOverwrite"() {
+    def "upsertData doesn't do any upserts if there is no upsertOverwrite and does nothing if conflict target is defined"() {
         given:
+        def conflictTarget
         def tableName = "DogCow"
         def columns = [
             new DbColumn("Moof", "Clarus", false, Types.VARCHAR),
@@ -121,18 +123,35 @@ class PostgresDaoTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        PostgresDao.getInstance().upsertData(tableName, columns, null)
+        conflictTarget = null
+        PostgresDao.getInstance().upsertData(tableName, columns, conflictTarget)
 
         then:
         mockConn.prepareStatement(_ as String) >> { String sqlStatement ->
             assert sqlStatement.contains(tableName)
             assert sqlStatement.count("?") == columns.size()
             assert !sqlStatement.contains("ON CONFLICT")
-            assert !sqlStatement.contains("EXCLUDED")
 
             return mockPreparedStatement
         }
-        columns.size()  * mockPreparedStatement.setObject(_ as Integer, _, _ as Integer)
+        columns.size() * mockPreparedStatement.setObject(_ as Integer, _, _ as Integer)
+        1 * mockPreparedStatement.executeUpdate()
+
+        when:
+        conflictTarget = "ON CONSTRAINT key"
+        PostgresDao.getInstance().upsertData(tableName, columns, conflictTarget)
+
+        then:
+        mockConn.prepareStatement(_ as String) >> { String sqlStatement ->
+            assert sqlStatement.contains(tableName)
+            assert sqlStatement.count("?") == columns.size()
+            assert sqlStatement.contains("ON CONFLICT")
+            assert sqlStatement.contains(conflictTarget)
+            assert sqlStatement.contains("DO NOTHING")
+
+            return mockPreparedStatement
+        }
+        columns.size() * mockPreparedStatement.setObject(_ as Integer, _, _ as Integer)
         1 * mockPreparedStatement.executeUpdate()
     }
 
@@ -338,5 +357,143 @@ class PostgresDaoTest extends Specification {
         then:
         def thrownException = thrown(SQLException)
         thrownException.getCause() == originalException
+    }
+
+    def "fetchMetadataForMessageLinking returns a set of PartnerMetadata when rows exist"() {
+        given:
+        def submissionId = "12345"
+        def expectedMetadataSet = new HashSet<PartnerMetadata>()
+        def sender = "DogCow"
+        def messageType = PartnerMetadataMessageType.RESULT
+        def partnerMetadata1 = new PartnerMetadata("12345", "7890", sender, "You'll get your just reward",
+                Instant.parse("2024-01-03T15:45:33.30Z"), Instant.parse("2024-01-03T15:45:33.30Z"),  sender.hashCode().toString(),
+                PartnerMetadataStatus.PENDING, "It done Goofed", messageType, sendingApp, sendingFacility,
+                receivingApp, receivingFacility, "placer_order_number")
+        def partnerMetadata2 = new PartnerMetadata("doreyme", "fasole", sender, "receiver",
+                Instant.now(), Instant.now(), "gobeltygoook",
+                PartnerMetadataStatus.DELIVERED, "cause I said so", messageType, sendingApp, sendingFacility,
+                receivingApp, receivingFacility, "placer_order_number")
+        expectedMetadataSet.add(partnerMetadata1)
+        expectedMetadataSet.add(partnerMetadata2)
+
+        mockConnPool.getConnection() >> mockConn
+        mockConn.prepareStatement(_ as String) >> mockPreparedStatement
+        mockPreparedStatement.executeQuery() >> mockResultSet
+        mockResultSet.next() >> true >> true >> false
+
+        mockResultSet.getString("received_message_id") >>> [
+            partnerMetadata1.receivedSubmissionId(),
+            partnerMetadata2.receivedSubmissionId()
+        ]
+        mockResultSet.getString("sent_message_id") >>> [
+            partnerMetadata1.sentSubmissionId(),
+            partnerMetadata2.sentSubmissionId()
+        ]
+        mockResultSet.getString("sender") >>> [
+            partnerMetadata1.sender(),
+            partnerMetadata2.sender()
+        ]
+        mockResultSet.getString("receiver") >>> [
+            partnerMetadata1.receiver(),
+            partnerMetadata2.receiver()
+        ]
+        mockResultSet.getTimestamp("time_received") >>> [
+            Timestamp.from(partnerMetadata1.timeReceived()),
+            Timestamp.from(partnerMetadata2.timeReceived())
+        ]
+        mockResultSet.getTimestamp("time_delivered") >>> [
+            Timestamp.from(partnerMetadata1.timeDelivered()),
+            Timestamp.from(partnerMetadata2.timeDelivered())
+        ]
+        mockResultSet.getString("hash_of_message") >>> [
+            partnerMetadata1.hash(),
+            partnerMetadata2.hash()
+        ]
+        mockResultSet.getString("delivery_status") >>> [
+            partnerMetadata1.deliveryStatus().toString(),
+            partnerMetadata2.deliveryStatus().toString()
+        ]
+        mockResultSet.getString("failure_reason") >>> [
+            partnerMetadata1.failureReason(),
+            partnerMetadata2.failureReason()
+        ]
+        mockResultSet.getString("message_type") >>> [
+            partnerMetadata1.messageType().toString(),
+            partnerMetadata2.messageType().toString()
+        ]
+        mockResultSet.getString("sending_application_id") >>> [
+            partnerMetadata1.sendingApplicationDetails(),
+            partnerMetadata2.sendingApplicationDetails()
+        ]
+        mockResultSet.getString("sending_facility_id") >>> [
+            partnerMetadata1.sendingFacilityDetails(),
+            partnerMetadata2.sendingFacilityDetails()
+        ]
+        mockResultSet.getString("receiving_application_id") >>> [
+            partnerMetadata1.receivingApplicationDetails(),
+            partnerMetadata2.receivingApplicationDetails()
+        ]
+        mockResultSet.getString("receiving_facility_id") >>> [
+            partnerMetadata1.receivingFacilityDetails(),
+            partnerMetadata2.receivingFacilityDetails()
+        ]
+        mockResultSet.getString("placer_order_number") >>> [
+            partnerMetadata1.placerOrderNumber(),
+            partnerMetadata2.placerOrderNumber()
+        ]
+
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >>> [
+            partnerMetadata1.sendingApplicationDetails(),
+            partnerMetadata1.sendingFacilityDetails(),
+            partnerMetadata1.receivingApplicationDetails(),
+            partnerMetadata1.receivingFacilityDetails(),
+            partnerMetadata2.sendingApplicationDetails(),
+            partnerMetadata2.sendingFacilityDetails(),
+            partnerMetadata2.receivingApplicationDetails(),
+            partnerMetadata2.receivingFacilityDetails(),
+        ]
+
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def actualSet = PostgresDao.getInstance().fetchMetadataForMessageLinking(submissionId)
+
+        then:
+        actualSet == expectedMetadataSet
+    }
+
+    def "fetchMetadataForMessageLinking returns empty set when no rows exist"() {
+        given:
+        def submissionId = "noSuchId"
+        mockConnPool.getConnection() >> mockConn
+        mockConn.prepareStatement(_ as String) >> mockPreparedStatement
+        mockPreparedStatement.executeQuery() >> mockResultSet
+        mockResultSet.next() >> false // Simulate no rows found
+
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def actualSet = PostgresDao.getInstance().fetchMetadataForMessageLinking(submissionId)
+
+        then:
+        actualSet.isEmpty()
+    }
+
+    def "fetchMetadataForMessageLinking throws SQLException on database error"() {
+        given:
+        def submissionId = "willThrowException"
+        mockConnPool.getConnection() >> mockConn
+        mockConn.prepareStatement(_ as String) >> { throw new SQLException("Database error") }
+
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        PostgresDao.getInstance().fetchMetadataForMessageLinking(submissionId)
+
+        then:
+        thrown(SQLException)
     }
 }

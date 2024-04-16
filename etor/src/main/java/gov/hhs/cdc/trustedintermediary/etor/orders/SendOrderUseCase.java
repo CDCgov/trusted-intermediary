@@ -50,6 +50,9 @@ public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
                 EtorMetadataStep.ETOR_PROCESSING_TAG_ADDED_TO_MESSAGE_HEADER);
 
         String sentSubmissionId = sender.send(omlOrder).orElse(null);
+        logger.logInfo("Sent order submissionId: {}", sentSubmissionId);
+
+        sendMessageHelper.linkMessage(receivedSubmissionId);
 
         sendMessageHelper.saveSentMessageSubmissionId(receivedSubmissionId, sentSubmissionId);
     }

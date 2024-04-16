@@ -84,6 +84,7 @@ databaseChangeLog:
               - column:
                   name: message_type
                   type: message_type
+
   - changeSet:
       id: 5
       author: halprin
@@ -109,6 +110,7 @@ databaseChangeLog:
               - column:
                   name: receiving_facility_id
                   type: varchar(227)
+
   - changeSet:
       id: 6
       author: samuel.aquino

@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author:  basiliskus
+      labels: create-message_link-table
+      context: message_link
+      comment: create message_link table
+      changes:
+        - createTable:
+            tableName: message_link
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                  autoIncrement: true
+              - column:
+                  name: link_id
+                  type: uuid
+                  constraints:
+                      nullable: false
+              - column:
+                  name: message_id
+                  type: varchar(40)
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: message_link
+            columnNames: link_id, message_id
+            constraintName: message_link_link_id_message_id_key
+        - addForeignKeyConstraint:
+            baseTableName: message_link
+            baseColumnNames: message_id
+            constraintName: metadata_received_message_id_fkey
+            referencedTableName: metadata
+            referencedColumnNames: received_message_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
