@@ -100,11 +100,11 @@ public class DatabaseMessageLinkStorage implements MessageLinkStorage {
         Set<String> messageIds = new HashSet<>();
 
         for (Map<UUID, String> partialMessageLink : partialMessageLinks) {
-            for (UUID id : partialMessageLink.keySet()) {
+            for (Map.Entry<UUID, String> entry : partialMessageLink.entrySet()) {
                 if (linkId == null) {
-                    linkId = id;
+                    linkId = entry.getKey();
                 }
-                messageIds.add(partialMessageLink.get(id));
+                messageIds.add(entry.getValue());
             }
         }
 
