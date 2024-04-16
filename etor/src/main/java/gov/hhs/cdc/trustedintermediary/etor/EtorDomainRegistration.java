@@ -59,7 +59,9 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 /**
@@ -220,18 +222,25 @@ public class EtorDomainRegistration implements DomainConnector {
 
     DomainResponse handleMetadata(DomainRequest request) {
         try {
-            String metadataId = request.getPathParams().get("id");
+            String receivedSubmissionId = request.getPathParams().get("id");
             Optional<PartnerMetadata> metadata =
-                    partnerMetadataOrchestrator.getMetadata(metadataId);
+                    partnerMetadataOrchestrator.getMetadata(receivedSubmissionId);
 
             if (metadata.isEmpty()) {
                 return domainResponseHelper.constructErrorResponse(
-                        404, "Metadata not found for ID: " + metadataId);
+                        404, "Metadata not found for ID: " + receivedSubmissionId);
             }
+
+            Set<String> messageIdsToLink =
+                    partnerMetadataOrchestrator.findMessagesIdsToLink(receivedSubmissionId);
+            Set<String> relevantMessageIds =
+                    messageIdsToLink.stream()
+                            .filter(s -> !s.equals(receivedSubmissionId))
+                            .collect(Collectors.toSet());
 
             FhirMetadata<?> responseObject =
                     partnerMetadataConverter.extractPublicMetadataToOperationOutcome(
-                            metadata.get(), metadataId);
+                            metadata.get(), receivedSubmissionId, relevantMessageIds);
 
             return domainResponseHelper.constructOkResponseFromString(
                     fhir.encodeResourceToJson(responseObject.getUnderlyingOutcome()));
