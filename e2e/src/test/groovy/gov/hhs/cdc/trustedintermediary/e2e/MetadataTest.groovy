@@ -30,7 +30,7 @@ class MetadataTest extends Specification {
         when:
         def inboundMetadataResponse = metadataClient.get(inboundSubmissionId, true)
         def inboundParsedJsonBody = JsonParsing.parseContent(inboundMetadataResponse)
-        def outboundSubmissionId = inboundParsedJsonBody.issue[8].diagnostics
+        def outboundSubmissionId = inboundParsedJsonBody.issue.find {it.details.text == 'outbound submission id' }.diagnostics
         def outboundMetadataResponse = metadataClient.get(outboundSubmissionId, true)
         def outboundParsedJsonBody = JsonParsing.parseContent(outboundMetadataResponse)
 
@@ -41,6 +41,7 @@ class MetadataTest extends Specification {
         outboundParsedJsonBody.get("id") == outboundSubmissionId
 
         [
+            "linked messages",
             "sender name",
             "receiver name",
             "ingestion",
@@ -74,7 +75,7 @@ class MetadataTest extends Specification {
         when:
         def inboundMetadataResponse = metadataClient.get(inboundSubmissionId, true)
         def inboundParsedJsonBody = JsonParsing.parseContent(inboundMetadataResponse)
-        def outboundSubmissionId = inboundParsedJsonBody.issue[8].diagnostics
+        def outboundSubmissionId = inboundParsedJsonBody.issue.find {it.details.text == 'outbound submission id' }.diagnostics
         def outboundMetadataResponse = metadataClient.get(outboundSubmissionId, true)
         def outboundParsedJsonBody = JsonParsing.parseContent(outboundMetadataResponse)
 
@@ -85,6 +86,7 @@ class MetadataTest extends Specification {
         outboundParsedJsonBody.get("id") == outboundSubmissionId
 
         [
+            "linked messages",
             "sender name",
             "receiver name",
             "ingestion",
