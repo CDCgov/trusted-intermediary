@@ -251,7 +251,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         given:
         def expectedResult = Set.of(mockMetadata)
 
-        mockDao.fetchMetadataForMessageLinking(_ as String) >> expectedResult
+        mockDao.fetchManyData(_ as Function<Connection, PreparedStatement>, _ as Function<ResultSet, PartnerMetadata>, _) >> expectedResult
 
         when:
         def actualResult = DatabasePartnerMetadataStorage.getInstance().readMetadataForMessageLinking(mockMetadata.receivedSubmissionId())
@@ -262,7 +262,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
     def "readMetadataForMessageLinking unhappy path works"() {
         given:
-        mockDao.fetchMetadataForMessageLinking(_ as String) >> { throw new SQLException("Something went wrong!") }
+        mockDao.fetchManyData(_ as Function<Connection, PreparedStatement>, _ as Function<ResultSet, PartnerMetadata>, _) >> { throw new SQLException("Something went wrong!") }
 
         when:
         DatabasePartnerMetadataStorage.getInstance().readMetadataForMessageLinking("receivedSubmissionId")
@@ -275,7 +275,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         given:
         def expectedResult = Set.of(mockMetadata)
 
-        mockDao.fetchMetadataForSender(_ as String) >> expectedResult
+        mockDao.fetchManyData(_ as Function<Connection, PreparedStatement>, _ as Function<ResultSet, PartnerMetadata>, _) >> expectedResult
 
         when:
         def actualResult = DatabasePartnerMetadataStorage.getInstance().readMetadataForSender("TestSender")
@@ -286,7 +286,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
     def "readMetadataForSender unhappy path works"() {
         given:
-        mockDao.fetchMetadataForSender(_ as String) >> { throw new SQLException("Something went wrong!") }
+        mockDao.fetchManyData(_ as Function<Connection, PreparedStatement>, _ as Function<ResultSet, PartnerMetadata>, _) >> { throw new SQLException("Something went wrong!") }
 
         when:
         DatabasePartnerMetadataStorage.getInstance().readMetadataForSender("TestSender")
@@ -332,7 +332,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         def reason = "It done Goofed"
         def messageType = PartnerMetadataMessageType.RESULT
         def placerOrderNumber = "placer_order_number"
-        def expected = new PartnerMetadata(receivedMessageId, sentMessageId, sender, receiver, timeReceived, timeDelivered, hash, status, reason, messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
+        def expected = new PartnerMetadata(receivedMessageId, sentMessageId, sender, receiver, timeReceived, timeDelivered, hash, status, reason, messageType, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, placerOrderNumber)
 
         def mockResultSet = Mock(ResultSet)
         mockResultSet.next() >> true
@@ -352,10 +352,10 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         mockResultSet.getString("receiving_application_details") >> "receiving_application_details"
         mockResultSet.getString("placer_order_number") >> placerOrderNumber
 
-        mockFormatter.convertJsonToObject("receiving_facility_details", _ as TypeReference) >> receivingFacility
-        mockFormatter.convertJsonToObject("sending_application_details", _ as TypeReference) >> sendingApp
-        mockFormatter.convertJsonToObject("sending_facility_details", _ as TypeReference) >> sendingFacility
-        mockFormatter.convertJsonToObject("receiving_application_details", _ as TypeReference) >> receivingApp
+        mockFormatter.convertJsonToObject("receiving_facility_details", _ as TypeReference) >> receivingFacilityDetails
+        mockFormatter.convertJsonToObject("sending_application_details", _ as TypeReference) >> sendingAppDetails
+        mockFormatter.convertJsonToObject("sending_facility_details", _ as TypeReference) >> sendingFacilityDetails
+        mockFormatter.convertJsonToObject("receiving_application_details", _ as TypeReference) >> receivingAppDetails
 
         TestApplicationContext.register(Formatter, mockFormatter)
         TestApplicationContext.injectRegisteredImplementations()
