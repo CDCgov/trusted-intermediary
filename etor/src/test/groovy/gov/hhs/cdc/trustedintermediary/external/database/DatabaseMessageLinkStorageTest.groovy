@@ -4,16 +4,15 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkException
 import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool
-
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
+import java.util.function.Function
 import spock.lang.Specification
 
 class DatabaseMessageLinkStorageTest extends Specification {
 
-    private ConnectionPool mockConnPool
     private DbDao mockDao
 
     def mockMessageLinkData = new MessageLink(UUID.randomUUID(), "TestMessageId")
@@ -23,14 +22,11 @@ class DatabaseMessageLinkStorageTest extends Specification {
         TestApplicationContext.init()
 
         mockDao = Mock(DbDao)
-        mockConnPool = Mock(ConnectionPool)
 
         TestApplicationContext.register(DbDao, mockDao)
-        TestApplicationContext.register(ConnectionPool, mockConnPool)
         TestApplicationContext.register(DatabaseMessageLinkStorage, DatabaseMessageLinkStorage.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
     }
-
 
     def "getMessageLink returns message link when rows exist"() {
         given:
@@ -38,29 +34,19 @@ class DatabaseMessageLinkStorageTest extends Specification {
         def getMessageId = "getMessageId"
         def additionalMessageId = "additionalMessageId"
         def messageLink = new MessageLink(linkId, Set.of(getMessageId, additionalMessageId))
-        def expected = Optional.of(messageLink)
 
-        def mockConn = Mock(Connection)
-        def mockPreparedStatement = Mock(PreparedStatement)
-        def mockResultSet = Mock(ResultSet)
+        mockDao.fetchManyData(_ as Function<Connection, PreparedStatement>, _ as Function<ResultSet, Map<UUID, String>>, _) >> [
+            [(linkId): getMessageId],
+            [(linkId): additionalMessageId]
+        ].toSet()
 
-        mockConnPool.getConnection() >> mockConn
-        mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
-        mockResultSet.next() >> true >> true >> false
-
-        mockPreparedStatement.executeQuery() >> mockResultSet
-
-        TestApplicationContext.register(ConnectionPool, mockConnPool)
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
         def actual = DatabaseMessageLinkStorage.getInstance().getMessageLink(getMessageId)
 
         then:
-        1 * mockResultSet.getString("link_id") >> linkId
-        1 * mockResultSet.getString("message_id") >> getMessageId
-        1 * mockResultSet.getString("message_id") >> additionalMessageId
-        actual.get().getLinkId() == expected.get().getLinkId()
+        actual.get() == messageLink
     }
 
 

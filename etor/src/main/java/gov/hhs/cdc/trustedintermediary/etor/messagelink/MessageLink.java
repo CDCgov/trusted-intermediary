@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.messagelink;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -48,5 +49,22 @@ public final class MessageLink {
 
     public void addMessageIds(Set<String> messageIds) {
         this.messageIds.addAll(messageIds);
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof final MessageLink that)) {
+            return false;
+        }
+        return Objects.equals(getLinkId(), that.getLinkId())
+                && Objects.equals(getMessageIds(), that.getMessageIds());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getLinkId(), getMessageIds());
     }
 }
