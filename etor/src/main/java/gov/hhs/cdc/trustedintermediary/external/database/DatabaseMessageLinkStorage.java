@@ -4,29 +4,27 @@ import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink;
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkException;
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkStorage;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 /** Implements the {@link MessageLinkStorage} using a database. */
 public class DatabaseMessageLinkStorage implements MessageLinkStorage {
 
+    private static final DatabaseMessageLinkStorage INSTANCE = new DatabaseMessageLinkStorage();
+
     @Inject DbDao dao;
 
-    @Inject ConnectionPool connectionPool;
-
     @Inject Logger logger;
-
-    private static final DatabaseMessageLinkStorage INSTANCE = new DatabaseMessageLinkStorage();
 
     private DatabaseMessageLinkStorage() {}
 
@@ -36,35 +34,31 @@ public class DatabaseMessageLinkStorage implements MessageLinkStorage {
 
     @Override
     public Optional<MessageLink> getMessageLink(String messageId) throws MessageLinkException {
-        var sql =
-                """
-                SELECT *
-                FROM message_link
-                WHERE message_id = ?;
-                """;
 
         try {
-            UUID linkId = null;
-            Set<String> messageIds = new HashSet<>();
-            try (Connection conn = connectionPool.getConnection();
-                    PreparedStatement statement = conn.prepareStatement(sql)) {
-                statement.setString(1, messageId);
+            Set<Map<UUID, String>> partialMessageLinks =
+                    dao.fetchManyData(
+                            connection -> {
+                                try {
+                                    PreparedStatement statement =
+                                            connection.prepareStatement(
+                                                    """
+                                    SELECT *
+                                    FROM message_link
+                                    WHERE message_id = ?;
+                                    """);
+                                    statement.setString(1, messageId);
+                                    return statement;
+                                } catch (SQLException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            },
+                            this::partialMessageLinkFromResultSet,
+                            Collectors.toSet());
 
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    while (resultSet.next()) {
-                        if (linkId == null) {
-                            linkId = UUID.fromString(resultSet.getString("link_id"));
-                        }
-                        messageIds.add(resultSet.getString("message_id"));
-                    }
-                }
-            }
+            final MessageLink messageLink = buildMessageLinkFromPartials(partialMessageLinks);
 
-            if (!messageIds.isEmpty()) {
-                return Optional.of(new MessageLink(linkId, messageIds));
-            } else {
-                return Optional.empty();
-            }
+            return Optional.ofNullable(messageLink);
         } catch (SQLException e) {
             throw new MessageLinkException("Error retrieving message links", e);
         }
@@ -89,5 +83,36 @@ public class DatabaseMessageLinkStorage implements MessageLinkStorage {
         } catch (SQLException e) {
             throw new MessageLinkException("Error saving message links", e);
         }
+    }
+
+    Map<UUID, String> partialMessageLinkFromResultSet(ResultSet resultSet) {
+        try {
+            UUID linkId = UUID.fromString(resultSet.getString("link_id"));
+            String messageId = resultSet.getString("message_id");
+            return Map.of(linkId, messageId);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    MessageLink buildMessageLinkFromPartials(final Set<Map<UUID, String>> partialMessageLinks) {
+        UUID linkId = null;
+        Set<String> messageIds = new HashSet<>();
+
+        for (Map<UUID, String> partialMessageLink : partialMessageLinks) {
+            for (UUID id : partialMessageLink.keySet()) {
+                if (linkId == null) {
+                    linkId = id;
+                }
+                messageIds.add(partialMessageLink.get(id));
+            }
+        }
+
+        MessageLink messageLink = null;
+        if (linkId != null) {
+            messageLink = new MessageLink(linkId, messageIds);
+        }
+
+        return messageLink;
     }
 }
