@@ -285,6 +285,7 @@ class EtorDomainRegistrationTest extends Specification {
                 new PartnerMetadata("receivedSubmissionId", "sender", Instant.now(), null,
                 "hash", PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER,
                 sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number"))
+        mockPartnerMetadataOrchestrator.findMessagesIdsToLink(_ as String) >> Set.of("Test")
         TestApplicationContext.register(PartnerMetadataOrchestrator, mockPartnerMetadataOrchestrator)
 
         def mockResponseHelper = Mock(DomainResponseHelper)
@@ -292,7 +293,7 @@ class EtorDomainRegistrationTest extends Specification {
         TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
 
         def mockPartnerMetadataConverter = Mock(PartnerMetadataConverter)
-        mockPartnerMetadataConverter.extractPublicMetadataToOperationOutcome(_ as PartnerMetadata, _ as String) >> Mock(FhirMetadata)
+        mockPartnerMetadataConverter.extractPublicMetadataToOperationOutcome(_ as PartnerMetadata, _ as String, _ as Set) >> Mock(FhirMetadata)
         TestApplicationContext.register(PartnerMetadataConverter, mockPartnerMetadataConverter)
 
         def mockFhir = Mock(HapiFhir)
