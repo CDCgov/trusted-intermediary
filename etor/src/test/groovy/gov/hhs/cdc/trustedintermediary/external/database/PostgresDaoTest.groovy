@@ -313,4 +313,30 @@ class PostgresDaoTest extends Specification {
         actual instanceof Set
         actual.containsAll(Set.of(expected1, expected2))
     }
+
+    def "fetchManyData also fails"() {
+        given:
+        mockConnPool.getConnection() >> mockConn
+        mockConn.prepareStatement(_ as String) >> mockPreparedStatement
+        mockPreparedStatement.executeQuery() >> mockResultSet
+        mockResultSet.next() >>> [true, false]
+        mockResultSet.getString("id") >> "1234"
+        mockResultSet.getString("value") >> "DogCow"
+
+        TestApplicationContext.register(ConnectionPool, mockConnPool)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        def sqlGenerator = { connection -> connection.prepareStatement("SELECT * FROM table") }
+
+        def originalException = new RuntimeException("oh no!")
+        def converter = { resultSet -> throw originalException }
+
+        when:
+        PostgresDao.getInstance().fetchManyData(sqlGenerator, converter, Collectors.toSet())
+
+        then:
+        def thrownException = thrown(SQLException)
+        thrownException.getCause() == originalException
+    }
 }
