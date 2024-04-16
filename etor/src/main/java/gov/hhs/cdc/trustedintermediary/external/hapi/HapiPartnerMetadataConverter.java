@@ -22,10 +22,16 @@ public class HapiPartnerMetadataConverter implements PartnerMetadataConverter {
         var operation = new OperationOutcome();
 
         operation.setId(requestedId);
-        operation.getIssue().add(createInformationIssueComponent("sender name", metadata.sender()));
         operation
                 .getIssue()
-                .add(createInformationIssueComponent("receiver name", metadata.receiver()));
+                .add(
+                        createInformationIssueComponent(
+                                "sender name", metadata.sendingFacilityDetails().namespace()));
+        operation
+                .getIssue()
+                .add(
+                        createInformationIssueComponent(
+                                "receiver name", metadata.receivingFacilityDetails().namespace()));
 
         String ingestion = null;
         String delivered = null;

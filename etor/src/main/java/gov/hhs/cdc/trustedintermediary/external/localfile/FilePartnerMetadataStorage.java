@@ -122,7 +122,11 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
                                             throw new RuntimeException(e);
                                         }
                                     })
-                            .filter(metadata -> metadata.sender().equals(sender))
+                            .filter(
+                                    metadata ->
+                                            metadata.sendingFacilityDetails()
+                                                    .namespace()
+                                                    .equals(sender))
                             .collect(Collectors.toSet());
         } catch (Exception e) {
             throw new PartnerMetadataException("Failed reading metadata for sender: " + sender, e);

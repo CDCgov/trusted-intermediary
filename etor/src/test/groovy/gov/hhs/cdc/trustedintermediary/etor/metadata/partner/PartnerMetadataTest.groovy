@@ -65,13 +65,11 @@ class PartnerMetadataTest extends Specification {
         def receivingFacilityDetails = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
 
         when:
-        def metadata = new PartnerMetadata(receivedSubmissionId, sender, timeReceived, timeDelivered, hash, PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
+        def metadata = new PartnerMetadata(receivedSubmissionId, timeReceived, timeDelivered, hash, PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
 
         then:
         metadata.receivedSubmissionId() == receivedSubmissionId
         metadata.sentSubmissionId() == null
-        metadata.sender() == sender
-        metadata.receiver() == null
         metadata.timeReceived() == timeReceived
         metadata.timeDelivered() == timeDelivered
         metadata.hash() == hash
@@ -93,47 +91,10 @@ class PartnerMetadataTest extends Specification {
         then:
         metadata.receivedSubmissionId() == receivedSubmissionId
         metadata.sentSubmissionId() == null
-        metadata.sender() == null
-        metadata.receiver() == null
         metadata.timeReceived() == null
         metadata.timeDelivered() == null
         metadata.hash() == null
         metadata.deliveryStatus() == deliverStatus
-    }
-
-    def "test withSentSubmissionId and withReceiver to update PartnerMetadata"() {
-        given:
-        def receivedSubmissionId = "receivedSubmissionId"
-        def sentSubmissionId = "sentSubmissionId"
-        def sender = "sender"
-        def receiver = "receiver"
-        def messageType = PartnerMetadataMessageType.RESULT
-        def timeReceived = Instant.now()
-        def hash = "abcd"
-        def status = PartnerMetadataStatus.DELIVERED
-        def failureReason = "DogCow goes boom"
-        def sendingAppDetails = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacilityDetails = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        def receivingAppDetails = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-        def receivingFacilityDetails = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
-
-        def metadata = new PartnerMetadata(receivedSubmissionId, null, sender, null, timeReceived, null, hash, status, failureReason, messageType, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
-
-        when:
-        def updatedMetadata = metadata.withSentSubmissionId(sentSubmissionId).withReceiver(receiver)
-
-        then:
-        updatedMetadata.receivedSubmissionId() == receivedSubmissionId
-        updatedMetadata.sentSubmissionId() == sentSubmissionId
-        updatedMetadata.sender() == sender
-        updatedMetadata.receiver() == receiver
-        updatedMetadata.timeReceived() == timeReceived
-        updatedMetadata.hash() == hash
-        updatedMetadata.deliveryStatus() == status
-        updatedMetadata.sendingApplicationDetails() == sendingAppDetails
-        updatedMetadata.sendingFacilityDetails() == sendingFacilityDetails
-        updatedMetadata.receivingApplicationDetails() == receivingAppDetails
-        updatedMetadata.receivingFacilityDetails() == receivingFacilityDetails
     }
 
     def "test withDeliveryStatus to update PartnerMetadata"() {

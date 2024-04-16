@@ -159,8 +159,6 @@ public class PostgresDao implements DbDao {
         return new PartnerMetadata(
                 resultSet.getString("received_message_id"),
                 resultSet.getString("sent_message_id"),
-                resultSet.getString("sender"),
-                resultSet.getString("receiver"),
                 timeReceived,
                 timeDelivered,
                 resultSet.getString("hash_of_message"),

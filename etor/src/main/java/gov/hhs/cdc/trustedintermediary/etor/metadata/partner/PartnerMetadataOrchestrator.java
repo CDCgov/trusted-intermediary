@@ -93,7 +93,6 @@ public class PartnerMetadataOrchestrator {
         PartnerMetadata partnerMetadata =
                 new PartnerMetadata(
                         receivedSubmissionId,
-                        sender,
                         timeReceived,
                         null,
                         messageHash,
@@ -321,7 +320,7 @@ public class PartnerMetadataOrchestrator {
     }
 
     private boolean metadataIsStale(PartnerMetadata partnerMetadata) {
-        return partnerMetadata.receiver() == null
+        return partnerMetadata.receivingFacilityDetails().namespace() == null
                 || partnerMetadata.deliveryStatus() == PartnerMetadataStatus.PENDING;
     }
 }
