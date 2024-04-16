@@ -1,13 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.external.database;
 
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collector;
 
@@ -25,7 +22,4 @@ public interface DbDao {
             Function<ResultSet, T> converter,
             Collector<? super T, ?, S> collector)
             throws SQLException;
-
-    Set<PartnerMetadata> fetchMetadataForMessageLinking(String submissionId)
-            throws SQLException, FormatterProcessingException;
 }

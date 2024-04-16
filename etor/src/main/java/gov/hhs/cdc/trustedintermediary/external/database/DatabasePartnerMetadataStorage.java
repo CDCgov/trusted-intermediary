@@ -109,6 +109,42 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
         }
     }
 
+    @Override
+    public Set<PartnerMetadata> readMetadataForMessageLinking(String submissionId)
+            throws PartnerMetadataException {
+
+        Set<PartnerMetadata> metadataSet;
+        try {
+            metadataSet =
+                    dao.fetchManyData(
+                            connection -> {
+                                try {
+                                    PreparedStatement statement =
+                                            connection.prepareStatement(
+                                                    """
+                                    SELECT m2.*
+                                    FROM metadata m1
+                                    JOIN metadata m2
+                                        ON m1.placer_order_number = m2.placer_order_number
+                                            AND m1.sending_application_id = m2.sending_application_id
+                                            AND m1.sending_facility_id = m2.sending_facility_id
+                                    WHERE m1.sent_message_id = ?;
+                                    """);
+                                    statement.setString(1, submissionId);
+                                    return statement;
+                                } catch (SQLException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            },
+                            this::partnerMetadataFromResultSet,
+                            Collectors.toSet());
+
+            return metadataSet;
+        } catch (SQLException e) {
+            throw new PartnerMetadataException("Error retrieving metadata", e);
+        }
+    }
+
     PartnerMetadata partnerMetadataFromResultSet(ResultSet resultSet) {
         try {
             Instant timeReceived = null;
@@ -150,18 +186,6 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
         } catch (SQLException | FormatterProcessingException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public Set<PartnerMetadata> readMetadataForMessageLinking(String submissionId)
-            throws PartnerMetadataException {
-        Set<PartnerMetadata> metadataSet;
-        try {
-            metadataSet = dao.fetchMetadataForMessageLinking(submissionId);
-        } catch (SQLException | FormatterProcessingException e) {
-            throw new PartnerMetadataException("Error retrieving metadata", e);
-        }
-        return metadataSet;
     }
 
     private List<DbColumn> createDbColumnsFromMetadata(PartnerMetadata metadata)

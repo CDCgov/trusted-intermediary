@@ -1,16 +1,12 @@
 package gov.hhs.cdc.trustedintermediary.external.database;
 
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Function;
@@ -146,35 +142,6 @@ public class PostgresDao implements DbDao {
                         false);
 
         return stream.map(converter);
-    }
-
-    @Override
-    public Set<PartnerMetadata> fetchMetadataForMessageLinking(String submissionId)
-            throws SQLException, FormatterProcessingException {
-        var sql =
-                """
-                SELECT m2.*
-                FROM metadata m1
-                JOIN metadata m2
-                    ON m1.placer_order_number = m2.placer_order_number
-                        AND m1.sending_application_id = m2.sending_application_id
-                        AND m1.sending_facility_id = m2.sending_facility_id
-                WHERE m1.sent_message_id = ?;
-                """;
-
-        try (Connection conn = connectionPool.getConnection();
-                PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setString(1, submissionId);
-            ResultSet resultSet = statement.executeQuery();
-
-            Set<PartnerMetadata> metadataSet = new HashSet<>();
-
-            while (resultSet.next()) {
-                metadataSet.add(partnerMetadataFromResultSet(resultSet));
-            }
-
-            return metadataSet;
-        }
     }
 
     private void removeLastTwoCharacters(StringBuilder stringBuilder) {
