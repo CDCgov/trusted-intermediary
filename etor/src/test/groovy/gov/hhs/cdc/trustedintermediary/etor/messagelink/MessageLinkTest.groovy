@@ -13,6 +13,14 @@ class MessageLinkTest extends Specification {
         noExceptionThrown()
     }
 
+    def "test equals and hashCode"() {
+        when:
+        PojoTestUtils.validateEqualsAndHashCode(MessageLink.class)
+
+        then:
+        noExceptionThrown()
+    }
+
     def "constructor without parameters initializes with empty messageIds"() {
         when:
         def messageLink = new MessageLink()

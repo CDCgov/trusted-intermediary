@@ -11,12 +11,16 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStor
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
-import spock.lang.Specification
-
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
+import java.sql.Connection
+import java.sql.PreparedStatement
+import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Timestamp
 import java.sql.Types
 import java.time.Instant
+import java.util.function.Function
+import spock.lang.Specification
 
 class DatabasePartnerMetadataStorageTest extends Specification {
 
@@ -45,7 +49,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         given:
         def expectedResult = Optional.of(mockMetadata)
 
-        mockDao.fetchMetadata(_ as String) >> mockMetadata
+        mockDao.fetchFirstData(_ as Function<Connection, PreparedStatement>, _ as Function<ResultSet, PartnerMetadata>) >> mockMetadata
 
         when:
         def actualResult = DatabasePartnerMetadataStorage.getInstance().readMetadata(mockMetadata.receivedSubmissionId())
@@ -56,7 +60,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
     def "readMetadata unhappy path works"() {
         given:
-        mockDao.fetchMetadata(_ as String) >> { throw new SQLException("Something went wrong!") }
+        mockDao.fetchFirstData(_ as Function<Connection, PreparedStatement>, _ as Function<ResultSet, PartnerMetadata>) >> { throw new SQLException("Something went wrong!") }
 
         when:
         DatabasePartnerMetadataStorage.getInstance().readMetadata("receivedSubmissionId")
@@ -65,37 +69,12 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         thrown(PartnerMetadataException)
     }
 
-    def "readMetadata unhappy path triggers FormatterProcessingException"() {
-        given:
-        def receivedSubmissionId = "receivedSubmissionId"
-        mockDao.fetchMetadata(_ as String) >> { throw new FormatterProcessingException("Format error", new Throwable()) }
-
-        when:
-        DatabasePartnerMetadataStorage.getInstance().readMetadata(receivedSubmissionId)
-
-        then:
-        thrown(PartnerMetadataException)
-    }
-
     def "readMetadataForSender unhappy path triggers SQLException"() {
         given:
-        def sender = "testSender"
-        mockDao.fetchMetadataForSender(sender) >> { throw new SQLException("Database error has occur") }
+        mockDao.fetchManyData(_ as Function<Connection, PreparedStatement>, _ as Function<ResultSet, PartnerMetadata>, _) >> { throw new SQLException("Database error has occur") }
 
         when:
-        DatabasePartnerMetadataStorage.getInstance().readMetadataForSender(sender)
-
-        then:
-        thrown(PartnerMetadataException)
-    }
-
-    def "readMetadataForSender unhappy path triggers FormatterProcessingException"() {
-        given:
-        def sender = "testSender"
-        mockDao.fetchMetadataForSender(sender) >> { throw new FormatterProcessingException("Format error", new Throwable()) }
-
-        when:
-        DatabasePartnerMetadataStorage.getInstance().readMetadataForSender(sender)
+        DatabasePartnerMetadataStorage.getInstance().readMetadataForSender("testSender")
 
         then:
         thrown(PartnerMetadataException)
@@ -103,17 +82,16 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
     def "readMetadataForSender happy path works"() {
         given:
-        def sender = "testSender"
         def metadata1 = mockMetadata
         def metadata2 = mockMetadata
         def expectedMetadataSet = new HashSet<>()
         expectedMetadataSet.add(metadata1)
         expectedMetadataSet.add(metadata2)
 
-        mockDao.fetchMetadataForSender(sender) >> expectedMetadataSet
+        mockDao.fetchManyData(_ as Function<Connection, PreparedStatement>, _ as Function<ResultSet, PartnerMetadata>, _) >> expectedMetadataSet
 
         when:
-        def actualMetadataSet = DatabasePartnerMetadataStorage.getInstance().readMetadataForSender(sender)
+        def actualMetadataSet = DatabasePartnerMetadataStorage.getInstance().readMetadataForSender("testSender")
 
         then:
         actualMetadataSet.size() == expectedMetadataSet.size()
@@ -273,7 +251,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         given:
         def expectedResult = Set.of(mockMetadata)
 
-        mockDao.fetchMetadataForMessageLinking(_ as String) >> expectedResult
+        mockDao.fetchManyData(_ as Function<Connection, PreparedStatement>, _ as Function<ResultSet, PartnerMetadata>, _) >> expectedResult
 
         when:
         def actualResult = DatabasePartnerMetadataStorage.getInstance().readMetadataForMessageLinking(mockMetadata.receivedSubmissionId())
@@ -284,7 +262,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
     def "readMetadataForMessageLinking unhappy path works"() {
         given:
-        mockDao.fetchMetadataForMessageLinking(_ as String) >> { throw new SQLException("Something went wrong!") }
+        mockDao.fetchManyData(_ as Function<Connection, PreparedStatement>, _ as Function<ResultSet, PartnerMetadata>, _) >> { throw new SQLException("Something went wrong!") }
 
         when:
         DatabasePartnerMetadataStorage.getInstance().readMetadataForMessageLinking("receivedSubmissionId")
@@ -297,7 +275,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         given:
         def expectedResult = Set.of(mockMetadata)
 
-        mockDao.fetchMetadataForSender(_ as String) >> expectedResult
+        mockDao.fetchManyData(_ as Function<Connection, PreparedStatement>, _ as Function<ResultSet, PartnerMetadata>, _) >> expectedResult
 
         when:
         def actualResult = DatabasePartnerMetadataStorage.getInstance().readMetadataForSender("TestSender")
@@ -308,12 +286,103 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
     def "readMetadataForSender unhappy path works"() {
         given:
-        mockDao.fetchMetadataForSender(_ as String) >> { throw new SQLException("Something went wrong!") }
+        mockDao.fetchManyData(_ as Function<Connection, PreparedStatement>, _ as Function<ResultSet, PartnerMetadata>, _) >> { throw new SQLException("Something went wrong!") }
 
         when:
         DatabasePartnerMetadataStorage.getInstance().readMetadataForSender("TestSender")
 
         then:
         thrown(PartnerMetadataException)
+    }
+
+    def "partnerMetadataFromResultSet throws exception due to FormatterProcessingException"() {
+        given:
+        def mockResultSet = Mock(ResultSet)
+        mockResultSet.next() >> true
+        mockResultSet.getString("delivery_status") >> "DELIVERED"
+        mockResultSet.getString("message_type") >> "RESULT"
+        mockResultSet.getString("sending_application_details") >> "TEST"
+
+        def innerThrownException = new FormatterProcessingException('error', new Throwable())
+
+        mockFormatter.convertJsonToObject(_ as String, _ as TypeReference) >> { throw innerThrownException }
+        TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        DatabasePartnerMetadataStorage.getInstance().partnerMetadataFromResultSet(mockResultSet)
+
+        then:
+        def thrownException = thrown(RuntimeException)
+        thrownException.getCause() == innerThrownException
+    }
+
+    def "partnerMetadataFromResultSet returns partner metadata"() {
+        given:
+        def receivedMessageId = "12345"
+        def sentMessageId = "7890"
+        def sender = "DogCow"
+        def receiver = "You'll get your just reward"
+        Timestamp timestampForMock = Timestamp.from(Instant.parse("2024-01-03T15:45:33.30Z"))
+        Instant timeReceived = timestampForMock.toInstant()
+        Timestamp mockDeliveredTimestamp = Timestamp.from(Instant.parse("2024-01-31T11:07:53.00Z"))
+        Instant timeDelivered = mockDeliveredTimestamp.toInstant()
+        def hash = sender.hashCode().toString()
+        def status = PartnerMetadataStatus.PENDING
+        def reason = "It done Goofed"
+        def messageType = PartnerMetadataMessageType.RESULT
+        def placerOrderNumber = "placer_order_number"
+        def expected = new PartnerMetadata(receivedMessageId, sentMessageId, sender, receiver, timeReceived, timeDelivered, hash, status, reason, messageType, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, placerOrderNumber)
+
+        def mockResultSet = Mock(ResultSet)
+        mockResultSet.next() >> true
+        mockResultSet.getString("received_message_id") >> receivedMessageId
+        mockResultSet.getString("sent_message_id") >> sentMessageId
+        mockResultSet.getString("sender") >> sender
+        mockResultSet.getString("receiver") >> receiver
+        mockResultSet.getTimestamp("time_received") >> timestampForMock
+        mockResultSet.getTimestamp("time_delivered") >> mockDeliveredTimestamp
+        mockResultSet.getString("hash_of_message") >> hash
+        mockResultSet.getString("delivery_status") >> status.toString()
+        mockResultSet.getString("failure_reason") >> reason
+        mockResultSet.getString("message_type") >> messageType.toString()
+        mockResultSet.getString("receiving_facility_details") >> "receiving_facility_details"
+        mockResultSet.getString("sending_application_details") >> "sending_application_details"
+        mockResultSet.getString("sending_facility_details") >> "sending_facility_details"
+        mockResultSet.getString("receiving_application_details") >> "receiving_application_details"
+        mockResultSet.getString("placer_order_number") >> placerOrderNumber
+
+        mockFormatter.convertJsonToObject("receiving_facility_details", _ as TypeReference) >> receivingFacilityDetails
+        mockFormatter.convertJsonToObject("sending_application_details", _ as TypeReference) >> sendingAppDetails
+        mockFormatter.convertJsonToObject("sending_facility_details", _ as TypeReference) >> sendingFacilityDetails
+        mockFormatter.convertJsonToObject("receiving_application_details", _ as TypeReference) >> receivingAppDetails
+
+        TestApplicationContext.register(Formatter, mockFormatter)
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def actual = DatabasePartnerMetadataStorage.getInstance().partnerMetadataFromResultSet(mockResultSet)
+
+        then:
+        actual == expected
+    }
+
+    def "partnerMetadataFromResultSet successfully sets the received and delivered timestamp to null"() {
+        given:
+        def mockResultSet = Mock(ResultSet)
+        mockResultSet.next() >> true
+        mockResultSet.getTimestamp("time_received") >> null
+        mockResultSet.getTimestamp("time_delivered") >> null
+        mockResultSet.getString("delivery_status") >> "DELIVERED"
+        mockResultSet.getString("message_type") >> "RESULT"
+
+        TestApplicationContext.register(Formatter, Mock(Formatter))
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        def actual = DatabasePartnerMetadataStorage.getInstance().partnerMetadataFromResultSet(mockResultSet)
+
+        then:
+        actual.timeReceived() == null
     }
 }
