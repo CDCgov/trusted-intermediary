@@ -10,10 +10,11 @@ import java.util.UUID;
  * set of message IDs to link.
  */
 public final class MessageLink {
-    private UUID linkId;
-    private Set<String> messageIds;
+    private final UUID linkId;
+    private final Set<String> messageIds;
 
     public MessageLink() {
+        linkId = null;
         this.messageIds = new HashSet<>();
     }
 
@@ -27,16 +28,8 @@ public final class MessageLink {
         this.messageIds = new HashSet<>(messageIds);
     }
 
-    public void setLinkId(UUID linkId) {
-        this.linkId = linkId;
-    }
-
     public UUID getLinkId() {
         return linkId;
-    }
-
-    public void setMessageIds(Set<String> messageIds) {
-        this.messageIds = messageIds;
     }
 
     public Set<String> getMessageIds() {
