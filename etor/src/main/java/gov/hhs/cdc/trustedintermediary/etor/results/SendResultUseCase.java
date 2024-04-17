@@ -46,7 +46,7 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
                 EtorMetadataStep.ETOR_PROCESSING_TAG_ADDED_TO_MESSAGE_HEADER);
 
         String sentSubmissionId = sender.send(convertedResult).orElse(null);
-        logger.logInfo("Sent result submissionId: {}", sentSubmissionId);
+        logger.logInfo("Sent result reportId: {}", sentSubmissionId);
 
         sendMessageHelper.linkMessage(receivedSubmissionId);
 

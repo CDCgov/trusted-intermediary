@@ -6,7 +6,6 @@ import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageExceptio
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
-import gov.hhs.cdc.trustedintermediary.external.localfile.MockRSEndpointClient
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
@@ -112,7 +111,7 @@ class ReportStreamSenderHelperTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def submissionId = ReportStreamSenderHelper.getInstance().getSubmissionId(mockResponseBody)
+        def submissionId = ReportStreamSenderHelper.getInstance().getReportId(mockResponseBody)
 
         then:
         submissionId.get() == mockSubmissionId
@@ -133,7 +132,7 @@ class ReportStreamSenderHelperTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        ReportStreamSenderHelper.getInstance().getSubmissionId(mockResponseBody)
+        ReportStreamSenderHelper.getInstance().getReportId(mockResponseBody)
 
         then:
         1 * mockLogger.logError(_ as String, exception)
