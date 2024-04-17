@@ -18,7 +18,7 @@ class ConsolidatedSummaryTest extends Specification {
         def inboundSubmissionId = UUID.randomUUID().toString()
 
         def orderClient = new EndpointClient("/v1/etor/orders")
-        def labOrderJsonFileString = Files.readString(Path.of("../examples/Test/Orders/002_ORM_O01.fhir"))
+        def labOrderJsonFileString = Files.readString(Path.of("../examples/Test/e2e/orders/002_ORM_O01.fhir"))
         def senderName = "PLACE_HOLDER"  //TODO: when story #990 is implemented, update this to be the sender from the 002_ORM_O01.fhir message
 
         when:
