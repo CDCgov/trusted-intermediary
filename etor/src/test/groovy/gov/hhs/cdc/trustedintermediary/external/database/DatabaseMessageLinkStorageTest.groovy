@@ -3,17 +3,15 @@ package gov.hhs.cdc.trustedintermediary.external.database
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkException
-import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool
-
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
+import java.util.function.Function
 import spock.lang.Specification
 
 class DatabaseMessageLinkStorageTest extends Specification {
 
-    private ConnectionPool mockConnPool
     private DbDao mockDao
 
     def mockMessageLinkData = new MessageLink(UUID.randomUUID(), "TestMessageId")
@@ -23,60 +21,34 @@ class DatabaseMessageLinkStorageTest extends Specification {
         TestApplicationContext.init()
 
         mockDao = Mock(DbDao)
-        mockConnPool = Mock(ConnectionPool)
 
         TestApplicationContext.register(DbDao, mockDao)
-        TestApplicationContext.register(ConnectionPool, mockConnPool)
         TestApplicationContext.register(DatabaseMessageLinkStorage, DatabaseMessageLinkStorage.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
     }
 
-
-    def "getMessageLink returns message link when rows exist"() {
+    def "getMessageLink returns message link"() {
         given:
         def linkId = UUID.randomUUID()
         def getMessageId = "getMessageId"
         def additionalMessageId = "additionalMessageId"
         def messageLink = new MessageLink(linkId, Set.of(getMessageId, additionalMessageId))
-        def expected = Optional.of(messageLink)
 
-        def mockConn = Mock(Connection)
-        def mockPreparedStatement = Mock(PreparedStatement)
-        def mockResultSet = Mock(ResultSet)
-
-        mockConnPool.getConnection() >> mockConn
-        mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
-        mockResultSet.next() >> true >> true >> false
-
-        mockPreparedStatement.executeQuery() >> mockResultSet
-
-        TestApplicationContext.register(ConnectionPool, mockConnPool)
-        TestApplicationContext.injectRegisteredImplementations()
+        mockDao.fetchManyData(_ as Function<Connection, PreparedStatement>, _ as Function<ResultSet, Map<UUID, String>>, _) >> [
+            [(linkId): getMessageId],
+            [(linkId): additionalMessageId]
+        ].toSet()
 
         when:
         def actual = DatabaseMessageLinkStorage.getInstance().getMessageLink(getMessageId)
 
         then:
-        1 * mockResultSet.getString("link_id") >> linkId
-        1 * mockResultSet.getString("message_id") >> getMessageId
-        1 * mockResultSet.getString("message_id") >> additionalMessageId
-        actual.get().getLinkId() == expected.get().getLinkId()
+        actual.get() == messageLink
     }
 
-
-    def "getMessageLink returns empty optional when rows do not exist"() {
+    def "getMessageLink returns empty optional when not exist"() {
         given:
-        def mockConn = Mock(Connection)
-        def mockPreparedStatement = Mock(PreparedStatement)
-        def mockResultSet = Mock(ResultSet)
-
-        mockConnPool.getConnection() >> mockConn
-        mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
-        mockResultSet.next() >> false
-        mockPreparedStatement.executeQuery() >> mockResultSet
-
-        TestApplicationContext.register(ConnectionPool, mockConnPool)
-        TestApplicationContext.injectRegisteredImplementations()
+        mockDao.fetchManyData(_ as Function<Connection, PreparedStatement>, _ as Function<ResultSet, Map<UUID, String>>, _) >> [].toSet()
 
         when:
         def actual = DatabaseMessageLinkStorage.getInstance().getMessageLink("mock_lookup")
@@ -85,39 +57,29 @@ class DatabaseMessageLinkStorageTest extends Specification {
         actual == Optional.empty()
     }
 
-    def "getMessageLink throws SQLException if something goes wrong"() {
+    def "getMessageLink throws MessageLinkException if something goes wrong"() {
         given:
-        def mockConn
-        def mockPreparedStatement
-        TestApplicationContext.register(ConnectionPool, mockConnPool)
-        TestApplicationContext.injectRegisteredImplementations()
+        mockDao.fetchManyData(_ as Function<Connection, PreparedStatement>, _ as Function<ResultSet, Map<UUID, String>>, _) >> { throw new SQLException("Something went wrong!") }
 
         when:
-        mockConn = Mock(Connection)
-        mockPreparedStatement = Mock(PreparedStatement)
-        mockConnPool.getConnection() >> mockConn
-        mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
-        mockPreparedStatement.executeQuery() >> { throw new SQLException("Something went wrong!") }
         DatabaseMessageLinkStorage.getInstance().getMessageLink("TestSubmissionId")
 
         then:
-        thrown(Exception)
+        thrown(MessageLinkException)
+    }
+
+    def "partialMessageLinkFromResultSet throws exception if something goes wrong"() {
+        given:
+        def resultSet = Mock(ResultSet)
+        def originalException = new SQLException("DB goes boom")
+        resultSet.getString(_ as String) >> { throw originalException }
 
         when:
-        mockConn = Mock(Connection)
-        mockConnPool.getConnection() >> mockConn
-        mockConn.prepareStatement(_ as String) >> { throw new SQLException("Something went wrong!") }
-        DatabaseMessageLinkStorage.getInstance().getMessageLink("TestSubmissionId")
+        DatabaseMessageLinkStorage.getInstance().partialMessageLinkFromResultSet(resultSet)
 
         then:
-        thrown(Exception)
-
-        when:
-        mockConnPool.getConnection() >> { throw new SQLException("Something went wrong!") }
-        DatabaseMessageLinkStorage.getInstance().getMessageLink("TestSubmissionId")
-
-        then:
-        thrown(Exception)
+        def thrownException = thrown(RuntimeException)
+        thrownException.getCause() == originalException
     }
 
     def "saveLinkedMessages happy path works"() {
