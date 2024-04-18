@@ -26,7 +26,7 @@ class ReportStreamSenderHelperTest extends Specification {
         given:
         def requestBody = "testBody"
         def bearerToken = "fake-token"
-        def responseBody = """{"submissionId": "fake-id"}"""
+        def responseBody = """{"reportId": "fake-id"}"""
         def messageType = PartnerMetadataMessageType.ORDER
 
         def mockFormatter = Mock(Formatter)
@@ -43,7 +43,7 @@ class ReportStreamSenderHelperTest extends Specification {
         then:
         1 * mockRsClient.getRsToken() >> "fake-token"
         1 * mockRsClient.requestWatersEndpoint(requestBody, bearerToken) >> responseBody
-        1 * mockFormatter.convertJsonToObject(responseBody, _ as TypeReference) >> [submissionId: "fake-id"]
+        1 * mockFormatter.convertJsonToObject(responseBody, _ as TypeReference) >> [reportId: "fake-id"]
         1 * ReportStreamSenderHelper.getInstance().metadata.put(_, EtorMetadataStep.SENT_TO_REPORT_STREAM)
     }
 
@@ -98,10 +98,10 @@ class ReportStreamSenderHelperTest extends Specification {
         thrown(UnableToSendMessageException)
     }
 
-    def "getSubmissionId logs submissionId if convertJsonToObject is successful"() {
+    def "getReportId logs reportId if convertJsonToObject is successful"() {
         given:
-        def mockSubmissionId = "fake-id"
-        def mockResponseBody = """{"submissionId": "${mockSubmissionId}", "key": "value"}"""
+        def mockReportId = "fake-id"
+        def mockResponseBody = """{"reportId": "${mockReportId}", "key": "value"}"""
 
         TestApplicationContext.register(Formatter, Jackson.getInstance())
 
@@ -111,15 +111,15 @@ class ReportStreamSenderHelperTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def submissionId = ReportStreamSenderHelper.getInstance().getReportId(mockResponseBody)
+        def reportId = ReportStreamSenderHelper.getInstance().getReportId(mockResponseBody)
 
         then:
-        submissionId.get() == mockSubmissionId
+        reportId.get() == mockReportId
     }
 
-    def "getSubmissionId logs error if convertJsonToObject fails"() {
+    def "getReportId logs error if convertJsonToObject fails"() {
         given:
-        def mockResponseBody = '{"submissionId": "fake-id", "key": "value"}'
+        def mockResponseBody = '{"reportId": "fake-id", "key": "value"}'
         def exception = new FormatterProcessingException("couldn't convert json", new Exception())
 
         def mockFormatter = Mock(Formatter)
