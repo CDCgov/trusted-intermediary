@@ -126,16 +126,24 @@ class MetadataTest extends Specification {
     def "linked id for the corresponding message is included when retrieving linked metadata"() {
         given:
         def submissionId = UUID.randomUUID().toString()
-        def orderJsonString = Files.readString(Path.of("../examples/Test/e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir"))
 
-        def orderParsedJson = JsonParser.parse(orderJsonString)
-        def orderPlacerOrderNumber = orderParsedJson.entry.find {it.resource.resourceType == 'ServiceRequest' }.resource.identifier.value[0]
+        def placerOrderNumberFhirPath = "Bundle.entry.resource.ofType(ServiceRequest).identifier.where(type.coding.code = 'PLAC').value"
+        def sendingFacilityIdFhirPath = "Bundle.entry.resource.ofType(MessageHeader).sender.resolve().identifier.where(extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and extension.value = 'HD.2,HD.3').value"
+        def receivingFacilityIdFhirPath = "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and extension.value = 'HD.2,HD.3').value"
 
-        def resultParsedJson = JsonParser.parse(Files.readString(Path.of("../examples/Test/e2e/results/002_2_ORU_R01_short_linked_to_003_ORM_O01_short.fhir")))
-        def resultPlacerOrderNumber = resultParsedJson.entry.find {it.resource.resourceType == 'ServiceRequest' }.resource.identifier.value[0]
+        def orderFhirString = Files.readString(Path.of("../examples/Test/e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir"))
+        def orderResolvedFhir = HapiParser.parse(orderFhirString)
+        def orderPlacerOrderNumber = HapiParser.getStringFromFhirPath(orderResolvedFhir, placerOrderNumberFhirPath)
+        def orderSendingFacilityId = HapiParser.getStringFromFhirPath(orderResolvedFhir, sendingFacilityIdFhirPath)
+
+        def resultFhirString = Files.readString(Path.of("../examples/Test/e2e/results/002_2_ORU_R01_short_linked_to_003_ORM_O01_short.fhir"))
+        def resultResolvedFhir = HapiParser.parse(resultFhirString)
+        def resultPlacerOrderNumber = HapiParser.getStringFromFhirPath(resultResolvedFhir, placerOrderNumberFhirPath)
+        def resultReceivingFacilityId = HapiParser.getStringFromFhirPath(resultResolvedFhir, receivingFacilityIdFhirPath)
 
         expect:
         orderPlacerOrderNumber == resultPlacerOrderNumber
+        orderSendingFacilityId == resultReceivingFacilityId
 
         //        when:
         //        def orderResponse = orderClient.submit(orderJsonString, submissionId, true)

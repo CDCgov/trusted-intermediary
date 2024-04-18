@@ -21,6 +21,9 @@ dependencies {
     //fhir
     implementation 'ca.uhn.hapi.fhir:hapi-fhir-base:7.0.2'
     implementation 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:7.0.2'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-caching-caffeine:7.0.2'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:7.0.2'
+    implementation 'org.fhir:ucum:1.0.8'
 
     testImplementation 'org.apache.groovy:groovy:4.0.21'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
