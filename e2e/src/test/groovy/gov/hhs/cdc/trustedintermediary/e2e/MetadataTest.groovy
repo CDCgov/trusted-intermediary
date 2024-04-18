@@ -125,7 +125,8 @@ class MetadataTest extends Specification {
 
     def "linked id for the corresponding message is included when retrieving linked metadata"() {
         given:
-        def submissionId = UUID.randomUUID().toString()
+        def orderSubmissionId = UUID.randomUUID().toString()
+        def resultSubmissionId = UUID.randomUUID().toString()
 
         def placerOrderNumberFhirPath = "Bundle.entry.resource.ofType(ServiceRequest).identifier.where(type.coding.code = 'PLAC').value"
         def sendingFacilityIdFhirPath = "Bundle.entry.resource.ofType(MessageHeader).sender.resolve().identifier.where(extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and extension.value = 'HD.2,HD.3').value"
@@ -145,10 +146,15 @@ class MetadataTest extends Specification {
         orderPlacerOrderNumber == resultPlacerOrderNumber
         orderSendingFacilityId == resultReceivingFacilityId
 
-        //        when:
-        //        def orderResponse = orderClient.submit(orderJsonString, submissionId, true)
+        when:
+        def orderResponse = orderClient.submit(orderFhirString, orderSubmissionId, true)
+        def resultResponse = orderClient.submit(resultFhirString, resultSubmissionId, true)
 
-        //        then:
-        //        orderResponse == false // junk line for debug
+        def metadataResponse = metadataClient.get(orderSubmissionId, true)
+        def metadataParsedJson = JsonParser.parseContent(metadataResponse)
+        def linkedIds = metadataParsedJson.issue.find { it.details.text == 'linked messages' }.diagnostics
+
+        then:
+        linkedIds.contains(resultSubmissionId)
     }
 }
