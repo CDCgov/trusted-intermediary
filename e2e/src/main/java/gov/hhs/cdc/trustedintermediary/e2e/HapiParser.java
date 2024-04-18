@@ -9,6 +9,6 @@ public class HapiParser {
 
     public HapiParser() {
         engine = CONTEXT.newFhirPath();
-        //        engine.setEvaluationContext(new HapiFhirCustomEvaluationContext());
+        engine.setEvaluationContext(new HapiParserContext());
     }
 }

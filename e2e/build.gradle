@@ -20,6 +20,7 @@ dependencies {
 
     //fhir
     implementation 'ca.uhn.hapi.fhir:hapi-fhir-base:7.0.2'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:7.0.2'
 
     testImplementation 'org.apache.groovy:groovy:4.0.21'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'

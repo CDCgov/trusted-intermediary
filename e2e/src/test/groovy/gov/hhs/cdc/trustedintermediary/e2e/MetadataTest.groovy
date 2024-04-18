@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.e2e
 
-
 import spock.lang.Specification
 
 import java.nio.file.Files
