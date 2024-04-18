@@ -9,6 +9,8 @@ import java.nio.file.Path
 class MetadataTest extends Specification {
 
     def metadataClient = new MetadataClient()
+    def orderClient = new EndpointClient("/v1/etor/orders")
+    def resultClient = new EndpointClient("/v1/etor/results")
 
     def setup() {
         SentPayloadReader.delete()
@@ -16,12 +18,12 @@ class MetadataTest extends Specification {
 
     def "a metadata response is returned from the ETOR metadata endpoint"() {
         given:
+        def orderFhirString = Files.readString(Path.of("../examples/Test/e2e/orders/002_ORM_O01.fhir"))
         def expectedStatusCode = 200
         def inboundSubmissionId = UUID.randomUUID().toString()
-        def labOrderJsonFileString = Files.readString(Path.of("../examples/Test/e2e/orders/002_ORM_O01.fhir"))
 
         when:
-        def orderResponse = orderClient.submit(labOrderJsonFileString, inboundSubmissionId, true)
+        def orderResponse = orderClient.submit(orderFhirString, inboundSubmissionId, true)
 
         then:
         orderResponse.getCode() == expectedStatusCode
@@ -60,13 +62,12 @@ class MetadataTest extends Specification {
 
     def "a metadata response is returned from the ETOR metadata endpoint for results"() {
         given:
+        def resultFhirString = Files.readString(Path.of("../examples/Test/e2e/results/001_ORU_R01.fhir"))
         def expectedStatusCode = 200
         def inboundSubmissionId = UUID.randomUUID().toString()
-        def resultClient = new EndpointClient("/v1/etor/results")
-        def labResult = Files.readString(Path.of("../examples/Test/Results/001_ORU_R01.fhir"))
 
         when:
-        def resultResponse = resultClient.submit(labResult, inboundSubmissionId, true)
+        def resultResponse = resultClient.submit(resultFhirString, inboundSubmissionId, true)
 
         then:
         resultResponse.getCode() == expectedStatusCode
@@ -121,5 +122,23 @@ class MetadataTest extends Specification {
         then:
         metadataResponse.getCode() == 401
         !(parsedJsonBody.error as String).isEmpty()
+    }
+
+    def "linked id for the corresponding message is included when retrieving linked metadata"() {
+        given:
+        def submissionId = UUID.randomUUID().toString()
+        def orderParsedJson = JsonParser.parse(Files.readString(Path.of("../examples/Test/e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir")))
+        def orderPlacerOrderNumber = orderParsedJson.entry.find {it.resource.resourceType == 'ServiceRequest' }.resource.identifier.value[0]
+
+        def resultParsedJson = JsonParser.parse(Files.readString(Path.of("../examples/Test/e2e/results/002_2_ORU_R01_short_linked_to_003_ORM_O01_short.fhir")))
+        def resultPlacerOrderNumber = resultParsedJson.entry.find {it.resource.resourceType == 'ServiceRequest' }.resource.identifier.value[0]
+
+        expect:
+        orderPlacerOrderNumber == resultPlacerOrderNumber
+
+        //        when:
+        //        def orderResponse = orderClient.submit(orderJsonString, submissionId, true)
+        //
+        //        then:
     }
 }
