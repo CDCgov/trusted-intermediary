@@ -126,7 +126,9 @@ class MetadataTest extends Specification {
     def "linked id for the corresponding message is included when retrieving linked metadata"() {
         given:
         def submissionId = UUID.randomUUID().toString()
-        def orderParsedJson = JsonParser.parse(Files.readString(Path.of("../examples/Test/e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir")))
+        def orderJsonString = Files.readString(Path.of("../examples/Test/e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir"))
+
+        def orderParsedJson = JsonParser.parse(orderJsonString)
         def orderPlacerOrderNumber = orderParsedJson.entry.find {it.resource.resourceType == 'ServiceRequest' }.resource.identifier.value[0]
 
         def resultParsedJson = JsonParser.parse(Files.readString(Path.of("../examples/Test/e2e/results/002_2_ORU_R01_short_linked_to_003_ORM_O01_short.fhir")))
@@ -137,7 +139,8 @@ class MetadataTest extends Specification {
 
         //        when:
         //        def orderResponse = orderClient.submit(orderJsonString, submissionId, true)
-        //
+
         //        then:
+        //        orderResponse == false // junk line for debug
     }
 }
