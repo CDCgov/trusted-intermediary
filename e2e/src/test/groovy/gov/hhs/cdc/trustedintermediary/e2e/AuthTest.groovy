@@ -15,7 +15,7 @@ class AuthTest extends Specification {
 
         then:
         response.getCode() == 200
-        def responseBody = JsonParsing.parseContent(response)
+        def responseBody = JsonParser.parseContent(response)
         responseBody.scope == "report-stream"
         responseBody.token_type == "bearer"
         responseBody.access_token != null
@@ -27,7 +27,7 @@ class AuthTest extends Specification {
 
         when:
         def response = AuthClient.authenticate(invalidRequest, "asdf")
-        def parsedJsonBody = JsonParsing.parseContent(response)
+        def parsedJsonBody = JsonParser.parseContent(response)
 
         then:
         response.getCode() == 400
@@ -40,7 +40,7 @@ class AuthTest extends Specification {
 
         when:
         def response = AuthClient.authenticate(existingClientId, invalidToken)
-        def parsedJsonBody = JsonParsing.parseContent(response)
+        def parsedJsonBody = JsonParser.parseContent(response)
 
         then:
         response.getCode() == 401
@@ -53,7 +53,7 @@ class AuthTest extends Specification {
 
         when:
         def response = AuthClient.authenticate(invalidClientId, validToken)
-        def parsedJsonBody = JsonParsing.parseContent(response)
+        def parsedJsonBody = JsonParser.parseContent(response)
 
         then:
         response.getCode() == 401

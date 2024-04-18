@@ -22,7 +22,7 @@ class OrderTest extends Specification {
 
         when:
         def response = orderClient.submit(labOrderJsonFileString, submissionId, true)
-        def parsedJsonBody = JsonParsing.parseContent(response)
+        def parsedJsonBody = JsonParser.parseContent(response)
 
         then:
         response.getCode() == 200
@@ -34,7 +34,7 @@ class OrderTest extends Specification {
         when:
         orderClient.submit(labOrderJsonFileString, submissionId, true)
         def sentPayload = SentPayloadReader.read()
-        def parsedSentPayload = JsonParsing.parse(sentPayload)
+        def parsedSentPayload = JsonParser.parse(sentPayload)
 
         then:
         parsedSentPayload.entry[24].resource.contact.name.text.contains("SADIE S SMITH")
@@ -50,7 +50,7 @@ class OrderTest extends Specification {
         when:
         orderClient.submit(labOrderJsonFileString, submissionId, loginFirst)
         def sentPayload = SentPayloadReader.read()
-        def parsedSentPayLoad = JsonParsing.parse(sentPayload)
+        def parsedSentPayLoad = JsonParser.parse(sentPayload)
         def actualSystem = parsedSentPayLoad.entry[0].resource.meta.tag[1].system
         def actualCode = parsedSentPayLoad.entry[0].resource.meta.tag[1].code
         def actualDisplay = parsedSentPayLoad.entry[0].resource.meta.tag[1].display
@@ -65,8 +65,8 @@ class OrderTest extends Specification {
         when:
         orderClient.submit(labOrderJsonFileString, submissionId, true)
         def sentPayload = SentPayloadReader.read()
-        def parsedSentPayload = JsonParsing.parse(sentPayload)
-        def parsedLabOrderJsonFile = JsonParsing.parse(labOrderJsonFileString)
+        def parsedSentPayload = JsonParser.parse(sentPayload)
+        def parsedLabOrderJsonFile = JsonParser.parse(labOrderJsonFileString)
 
         then:
         //test that everything else is the same except the MessageHeader's event, Patient contact, and etor processing tag
@@ -82,7 +82,7 @@ class OrderTest extends Specification {
         when:
         orderClient.submit(labOrderJsonFileString, submissionId, true)
         def sentPayload = SentPayloadReader.read()
-        def parsedSentPayload = JsonParsing.parse(sentPayload)
+        def parsedSentPayload = JsonParser.parse(sentPayload)
 
 
         then:
@@ -98,7 +98,7 @@ class OrderTest extends Specification {
 
         when:
         def response = orderClient.submit(invalidJsonRequest, submissionId, true)
-        def parsedJsonBody = JsonParsing.parseContent(response)
+        def parsedJsonBody = JsonParser.parseContent(response)
 
         then:
         response.getCode() == 400
@@ -108,7 +108,7 @@ class OrderTest extends Specification {
     def "return a 401 response when making an unauthenticated request"() {
         when:
         def response = orderClient.submit(labOrderJsonFileString, submissionId, false)
-        def parsedJsonBody = JsonParsing.parseContent(response)
+        def parsedJsonBody = JsonParser.parseContent(response)
 
         then:
         response.getCode() == 401

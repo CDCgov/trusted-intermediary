@@ -28,10 +28,10 @@ class MetadataTest extends Specification {
 
         when:
         def inboundMetadataResponse = metadataClient.get(inboundSubmissionId, true)
-        def inboundParsedJsonBody = JsonParsing.parseContent(inboundMetadataResponse)
+        def inboundParsedJsonBody = JsonParser.parseContent(inboundMetadataResponse)
         def outboundSubmissionId = inboundParsedJsonBody.issue.find {it.details.text == 'outbound submission id' }.diagnostics
         def outboundMetadataResponse = metadataClient.get(outboundSubmissionId, true)
-        def outboundParsedJsonBody = JsonParsing.parseContent(outboundMetadataResponse)
+        def outboundParsedJsonBody = JsonParser.parseContent(outboundMetadataResponse)
 
         then:
         inboundMetadataResponse.getCode() == expectedStatusCode
@@ -73,10 +73,10 @@ class MetadataTest extends Specification {
 
         when:
         def inboundMetadataResponse = metadataClient.get(inboundSubmissionId, true)
-        def inboundParsedJsonBody = JsonParsing.parseContent(inboundMetadataResponse)
+        def inboundParsedJsonBody = JsonParser.parseContent(inboundMetadataResponse)
         def outboundSubmissionId = inboundParsedJsonBody.issue.find {it.details.text == 'outbound submission id' }.diagnostics
         def outboundMetadataResponse = metadataClient.get(outboundSubmissionId, true)
-        def outboundParsedJsonBody = JsonParsing.parseContent(outboundMetadataResponse)
+        def outboundParsedJsonBody = JsonParser.parseContent(outboundMetadataResponse)
 
         then:
         inboundMetadataResponse.getCode() == expectedStatusCode
@@ -106,7 +106,7 @@ class MetadataTest extends Specification {
     def "a 404 is returned when there is no metadata for a given ID"() {
         when:
         def metadataResponse = metadataClient.get(UUID.randomUUID().toString(), true)
-        def parsedJsonBody = JsonParsing.parseContent(metadataResponse)
+        def parsedJsonBody = JsonParser.parseContent(metadataResponse)
 
         then:
         metadataResponse.getCode() == 404
@@ -116,7 +116,7 @@ class MetadataTest extends Specification {
     def "metadata endpoint fails when called un an unauthenticated manner"() {
         when:
         def metadataResponse = metadataClient.get("DogCow", false)
-        def parsedJsonBody = JsonParsing.parseContent(metadataResponse)
+        def parsedJsonBody = JsonParser.parseContent(metadataResponse)
 
         then:
         metadataResponse.getCode() == 401
