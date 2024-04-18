@@ -116,7 +116,7 @@
               ]
             },
             "system": "urn:ietf:rfc:3986",
-            "value": "2.16.840.1.114222.4.1.000001"
+            "value": "wrong-oid"
           }
         ]
       }
@@ -158,7 +158,7 @@
               ]
             },
             "system": "urn:ietf:rfc:3986",
-            "value": "2.16.840.1.114222.4.1.181960"
+            "value": "simulated-lab-id"
           }
         ]
       }
@@ -345,7 +345,7 @@
                       ]
                     }
                   ],
-                  "value": "4560411583"
+                  "value": "WrongValue"
                 }
               },
               {
@@ -382,7 +382,7 @@
                 }
               ]
             },
-            "value": "4560411583"
+            "value": "WrongValue"
           }
         ],
         "status": "unknown",
