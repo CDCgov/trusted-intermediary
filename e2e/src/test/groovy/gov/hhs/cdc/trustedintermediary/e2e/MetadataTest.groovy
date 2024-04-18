@@ -11,6 +11,10 @@ class MetadataTest extends Specification {
     def orderClient = new EndpointClient("/v1/etor/orders")
     def resultClient = new EndpointClient("/v1/etor/results")
 
+    def placerOrderNumberFhirPath = "Bundle.entry.resource.ofType(ServiceRequest).identifier.where(type.coding.code = 'PLAC').value"
+    def sendingFacilityIdFhirPath = "Bundle.entry.resource.ofType(MessageHeader).sender.resolve().identifier.where(extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and extension.value = 'HD.2,HD.3').value"
+    def receivingFacilityIdFhirPath = "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and extension.value = 'HD.2,HD.3').value"
+
     def setup() {
         SentPayloadReader.delete()
     }
@@ -126,78 +130,70 @@ class MetadataTest extends Specification {
     def "linked id for the corresponding message is included when retrieving linked metadata"() {
         given:
         def orderSubmissionId = UUID.randomUUID().toString()
-        def resultSubmissionId = UUID.randomUUID().toString()
-        def expectedStatusCode = 200
-
-        def placerOrderNumberFhirPath = "Bundle.entry.resource.ofType(ServiceRequest).identifier.where(type.coding.code = 'PLAC').value"
-        def sendingFacilityIdFhirPath = "Bundle.entry.resource.ofType(MessageHeader).sender.resolve().identifier.where(extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and extension.value = 'HD.2,HD.3').value"
-        def receivingFacilityIdFhirPath = "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and extension.value = 'HD.2,HD.3').value"
-
         def orderFhirString = Files.readString(Path.of("../examples/Test/e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir"))
         def orderResolvedFhir = HapiParser.parse(orderFhirString)
         def orderPlacerOrderNumber = HapiParser.getStringFromFhirPath(orderResolvedFhir, placerOrderNumberFhirPath)
         def orderSendingFacilityId = HapiParser.getStringFromFhirPath(orderResolvedFhir, sendingFacilityIdFhirPath)
+        def orderResponse = orderClient.submit(orderFhirString, orderSubmissionId, true)
 
+        def resultSubmissionId = UUID.randomUUID().toString()
         def resultFhirString = Files.readString(Path.of("../examples/Test/e2e/results/002_2_ORU_R01_short_linked_to_003_ORM_O01_short.fhir"))
         def resultResolvedFhir = HapiParser.parse(resultFhirString)
         def resultPlacerOrderNumber = HapiParser.getStringFromFhirPath(resultResolvedFhir, placerOrderNumberFhirPath)
         def resultReceivingFacilityId = HapiParser.getStringFromFhirPath(resultResolvedFhir, receivingFacilityIdFhirPath)
+        def resultResponse = orderClient.submit(resultFhirString, resultSubmissionId, true)
 
         expect:
         orderPlacerOrderNumber == resultPlacerOrderNumber
         orderSendingFacilityId == resultReceivingFacilityId
+        orderResponse.getCode() == 200
+        resultResponse.getCode() == 200
 
         when:
-        def orderResponse = orderClient.submit(orderFhirString, orderSubmissionId, true)
-        def resultResponse = orderClient.submit(resultFhirString, resultSubmissionId, true)
-
-        def metadataResponse = metadataClient.get(orderSubmissionId, true)
-        def metadataParsedJson = JsonParser.parseContent(metadataResponse)
-        def linkedIds = metadataParsedJson.issue.find { it.details.text == 'linked messages' }.diagnostics
+        def metadataForOrderResponse = metadataClient.get(orderSubmissionId, true)
+        def metadataForOrderParsedJson = JsonParser.parseContent(metadataForOrderResponse)
+        def linkedIdsForOrder = metadataForOrderParsedJson.issue.find { it.details.text == 'linked messages' }.diagnostics
 
         then:
-        orderResponse.getCode() == expectedStatusCode
-        resultResponse.getCode() == expectedStatusCode
+        linkedIdsForOrder.contains(resultSubmissionId)
 
-        linkedIds.contains(resultSubmissionId)
+        when:
+        def metadataForResultResponse = metadataClient.get(resultSubmissionId, true)
+        def metadataForResultParsedJson = JsonParser.parseContent(metadataForResultResponse)
+        def linkedIdsForResult = metadataForResultParsedJson.issue.find { it.details.text == 'linked messages' }.diagnostics
+
+        then:
+        linkedIdsForResult.contains(orderSubmissionId)
     }
 
     def "a metadata order is not linked when the corresponding linking fields do not match"() {
         given:
         def orderSubmissionId = UUID.randomUUID().toString()
-        def resultSubmissionId = UUID.randomUUID().toString()
-        def expectedStatusCode = 200
-
-        def placerOrderNumberFhirPath = "Bundle.entry.resource.ofType(ServiceRequest).identifier.where(type.coding.code = 'PLAC').value"
-        def sendingFacilityIdFhirPath = "Bundle.entry.resource.ofType(MessageHeader).sender.resolve().identifier.where(extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and extension.value = 'HD.2,HD.3').value"
-        def receivingFacilityIdFhirPath = "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field' and extension.value = 'HD.2,HD.3').value"
-
         def orderFhirString = Files.readString(Path.of("../examples/Test/e2e/orders/003_2_ORM_O01_short_not_linked_to_002_ORU_R01_short.fhir"))
         def orderResolvedFhir = HapiParser.parse(orderFhirString)
         def orderPlacerOrderNumber = HapiParser.getStringFromFhirPath(orderResolvedFhir, placerOrderNumberFhirPath)
         def orderSendingFacilityId = HapiParser.getStringFromFhirPath(orderResolvedFhir, sendingFacilityIdFhirPath)
+        def orderResponse = orderClient.submit(orderFhirString, orderSubmissionId, true)
 
+        def resultSubmissionId = UUID.randomUUID().toString()
         def resultFhirString = Files.readString(Path.of("../examples/Test/e2e/results/002_2_ORU_R01_short_linked_to_003_ORM_O01_short.fhir"))
         def resultResolvedFhir = HapiParser.parse(resultFhirString)
         def resultPlacerOrderNumber = HapiParser.getStringFromFhirPath(resultResolvedFhir, placerOrderNumberFhirPath)
         def resultReceivingFacilityId = HapiParser.getStringFromFhirPath(resultResolvedFhir, receivingFacilityIdFhirPath)
+        def resultResponse = resultClient.submit(resultFhirString, resultSubmissionId, true)
 
         expect:
         orderPlacerOrderNumber != resultPlacerOrderNumber
         orderSendingFacilityId != resultReceivingFacilityId
+        orderResponse.getCode() == 200
+        resultResponse.getCode() == 200
 
         when:
-        def orderResponse = orderClient.submit(orderFhirString, orderSubmissionId, true)
-        def resultResponse = resultClient.submit(resultFhirString, resultSubmissionId, true)
-
         def metadataResponse = metadataClient.get(orderSubmissionId, true)
         def metadataParsedJson = JsonParser.parseContent(metadataResponse)
         def linkedIds = metadataParsedJson.issue.find { it.details.text == 'linked messages' }.diagnostics
 
         then:
-        orderResponse.getCode() == expectedStatusCode
-        resultResponse.getCode() == expectedStatusCode
-
         !linkedIds.contains(resultSubmissionId)
     }
 }
