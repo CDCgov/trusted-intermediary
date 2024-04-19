@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageHelper
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator
@@ -35,12 +36,21 @@ class SendOrderUseCaseTest extends Specification {
         given:
         def receivedSubmissionId = "receivedId"
         def sentSubmissionId = "sentId"
-        def messageType = PartnerMetadataMessageType.ORDER
         def messagesIdsToLink = Set.of("messageId1", "messageId2")
 
         def sendOrder = SendOrderUseCase.getInstance()
         def mockOrder = new OrderMock(null, null, null, null, null, null, null, null)
         def mockOmlOrder = Mock(Order)
+
+        def partnerMetadata = new PartnerMetadata(receivedSubmissionId,
+                _ as String,
+                PartnerMetadataMessageType.ORDER,
+                mockOrder.getSendingApplicationDetails(),
+                mockOrder.getSendingFacilityDetails(),
+                mockOrder.getReceivingApplicationDetails(),
+                mockOrder.getReceivingFacilityDetails(),
+                mockOrder.getPlacerOrderNumber()
+                )
 
         TestApplicationContext.injectRegisteredImplementations()
 
@@ -55,15 +65,7 @@ class SendOrderUseCaseTest extends Specification {
         1 * sendOrder.metadata.put(_, EtorMetadataStep.ORDER_CONVERTED_TO_OML)
         1 * sendOrder.metadata.put(_, EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT)
         1 * sendOrder.metadata.put(_, EtorMetadataStep.ETOR_PROCESSING_TAG_ADDED_TO_MESSAGE_HEADER)
-        1 * mockOrchestrator.updateMetadataForReceivedMessage(
-                receivedSubmissionId,
-                _ as String,
-                messageType,
-                mockOmlOrder.getSendingApplicationDetails(),
-                mockOmlOrder.getSendingFacilityDetails(),
-                mockOmlOrder.getReceivingApplicationDetails(),
-                mockOmlOrder.getReceivingFacilityDetails(),
-                mockOmlOrder.getPlacerOrderNumber())
+        1 * mockOrchestrator.updateMetadataForReceivedMessage(_ as PartnerMetadata)
         1 * mockOrchestrator.updateMetadataForSentMessage(receivedSubmissionId, sentSubmissionId)
         1 * mockOrchestrator.findMessagesIdsToLink(receivedSubmissionId) >> messagesIdsToLink
         1 * mockOrchestrator.linkMessages(messagesIdsToLink)
@@ -99,13 +101,8 @@ class SendOrderUseCaseTest extends Specification {
         def order = Mock(Order)
         def omlOrder = Mock(Order)
         def receivedSubmissionId = "receivedId"
-        def messageType = PartnerMetadataMessageType.ORDER
-        mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String, messageType,
-                order.getSendingApplicationDetails(),
-                order.getSendingFacilityDetails(),
-                order.getReceivingApplicationDetails(),
-                order.getReceivingFacilityDetails(),
-                order.getPlacerOrderNumber()) >> { throw new PartnerMetadataException("Error") }
+
+        mockOrchestrator.updateMetadataForReceivedMessage(_ as PartnerMetadata) >> { throw new PartnerMetadataException("Error") }
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
