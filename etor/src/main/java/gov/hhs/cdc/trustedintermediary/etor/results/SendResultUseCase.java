@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageHelper;
 import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
@@ -30,15 +31,19 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
     @Override
     public void convertAndSend(Result<?> result, String receivedSubmissionId)
             throws UnableToSendMessageException {
-        sendMessageHelper.savePartnerMetadataForReceivedMessage(
-                receivedSubmissionId,
-                result.hashCode(),
-                PartnerMetadataMessageType.RESULT,
-                result.getSendingApplicationDetails(),
-                result.getSendingFacilityDetails(),
-                result.getReceivingApplicationDetails(),
-                result.getReceivingFacilityDetails(),
-                result.getPlacerOrderNumber());
+
+        PartnerMetadata partnerMetadata =
+                new PartnerMetadata(
+                        receivedSubmissionId,
+                        String.valueOf(result.hashCode()),
+                        PartnerMetadataMessageType.ORDER,
+                        result.getSendingApplicationDetails(),
+                        result.getSendingFacilityDetails(),
+                        result.getReceivingApplicationDetails(),
+                        result.getReceivingFacilityDetails(),
+                        result.getPlacerOrderNumber());
+
+        sendMessageHelper.savePartnerMetadataForReceivedMessage(partnerMetadata);
 
         var convertedResult = converter.addEtorProcessingTag(result);
         metadata.put(

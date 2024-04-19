@@ -4,7 +4,6 @@ import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink;
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkException;
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkStorage;
-import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
@@ -42,26 +41,19 @@ public class PartnerMetadataOrchestrator {
 
     private PartnerMetadataOrchestrator() {}
 
-    public void updateMetadataForReceivedMessage(
-            String receivedSubmissionId,
-            String messageHash,
-            PartnerMetadataMessageType messageType,
-            MessageHdDataType sendingApplicationDetails,
-            MessageHdDataType sendingFacilityDetails,
-            MessageHdDataType receivingApplicationDetails,
-            MessageHdDataType receivingFacilityDetails,
-            String placerOrderNumber)
+    public void updateMetadataForReceivedMessage(PartnerMetadata partnerMetadata)
             throws PartnerMetadataException {
 
         logger.logInfo(
                 "Looking up sender name and timeReceived from RS delivery API for receivedSubmissionId: {}",
-                receivedSubmissionId);
+                partnerMetadata.receivedSubmissionId());
 
         Instant timeReceived;
         try {
             String bearerToken = rsclient.getRsToken();
             String responseBody =
-                    rsclient.requestDeliveryEndpoint(receivedSubmissionId, bearerToken);
+                    rsclient.requestDeliveryEndpoint(
+                            partnerMetadata.receivedSubmissionId(), bearerToken);
             Map<String, Object> responseObject =
                     formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
 
@@ -89,17 +81,7 @@ public class PartnerMetadataOrchestrator {
             // some data is missing
             logger.logWarning(
                     "Unable to retrieve metadata from RS delivery API, but writing basic metadata entry anyway for received submission ID {}",
-                    receivedSubmissionId);
-            PartnerMetadata partnerMetadata =
-                    new PartnerMetadata(
-                            receivedSubmissionId,
-                            messageHash,
-                            messageType,
-                            sendingApplicationDetails,
-                            sendingFacilityDetails,
-                            receivingApplicationDetails,
-                            receivingFacilityDetails,
-                            placerOrderNumber);
+                    partnerMetadata.receivedSubmissionId());
             partnerMetadataStorage.saveMetadata(partnerMetadata);
 
             throw new PartnerMetadataException(
@@ -111,21 +93,21 @@ public class PartnerMetadataOrchestrator {
                 "Updating metadata with sender: {}, timeReceived: {} and hash",
                 sender,
                 timeReceived);
-        PartnerMetadata partnerMetadata =
+        PartnerMetadata updatedPartnerMetadata =
                 new PartnerMetadata(
-                        receivedSubmissionId,
+                        partnerMetadata.receivedSubmissionId(),
                         sender,
                         timeReceived,
                         null,
-                        messageHash,
+                        partnerMetadata.hash(),
                         PartnerMetadataStatus.PENDING,
-                        messageType,
-                        sendingApplicationDetails,
-                        sendingFacilityDetails,
-                        receivingApplicationDetails,
-                        receivingFacilityDetails,
-                        placerOrderNumber);
-        partnerMetadataStorage.saveMetadata(partnerMetadata);
+                        partnerMetadata.messageType(),
+                        partnerMetadata.sendingApplicationDetails(),
+                        partnerMetadata.sendingFacilityDetails(),
+                        partnerMetadata.receivingApplicationDetails(),
+                        partnerMetadata.receivingFacilityDetails(),
+                        partnerMetadata.placerOrderNumber());
+        partnerMetadataStorage.saveMetadata(updatedPartnerMetadata);
     }
 
     public void updateMetadataForSentMessage(String receivedSubmissionId, String sentSubmissionId)
