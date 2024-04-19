@@ -41,6 +41,7 @@ public class HikariConnectionPool implements ConnectionPool {
         String serverName = ApplicationContext.getProperty("DB_URL", "");
         String dbName = ApplicationContext.getProperty("DB_NAME", "");
         String dbPort = ApplicationContext.getProperty("DB_PORT", "");
+        String connectionLifetime = ApplicationContext.getProperty("DB_MAX_LIFETIME", "");
 
         HikariConfig config = new HikariDataSource();
 
@@ -50,6 +51,7 @@ public class HikariConnectionPool implements ConnectionPool {
         config.addDataSourceProperty("serverName", serverName);
         config.addDataSourceProperty("databaseName", dbName);
         config.addDataSourceProperty("portNumber", dbPort);
+        config.addDataSourceProperty("maxLifetime", connectionLifetime);
 
         return config;
     }
