@@ -14,8 +14,7 @@ DB_PORT=5432      # for gradlew: DB_PORT=5433
 DB_NAME=intermediary
 DB_USER=intermediary
 DB_PASS=changeIT!
-DB_SSL=require
-DB_MAX_LIFETIME=86220000"
+DB_SSL=require"
 
 # Get directory of script file
 script_dir="$(dirname "$0")"
