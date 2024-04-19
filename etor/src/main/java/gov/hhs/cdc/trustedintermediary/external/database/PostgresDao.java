@@ -7,7 +7,6 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStat
 import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -157,26 +156,18 @@ public class PostgresDao implements DbDao {
         }
 
         return new PartnerMetadata(
-                resultSet.getString("received_message_id"),
-                resultSet.getString("sent_message_id"),
+                resultSet.getString("received_message_id1"),
+                resultSet.getString("sent_message_id1"),
                 timeReceived,
                 timeDelivered,
-                resultSet.getString("hash_of_message"),
-                PartnerMetadataStatus.valueOf(resultSet.getString("delivery_status")),
-                resultSet.getString("failure_reason"),
-                PartnerMetadataMessageType.valueOf(resultSet.getString("message_type")),
-                formatter.convertJsonToObject(
-                        resultSet.getString("sending_application_details"),
-                        new TypeReference<MessageHdDataType>() {}),
-                formatter.convertJsonToObject(
-                        resultSet.getString("sending_facility_details"),
-                        new TypeReference<MessageHdDataType>() {}),
-                formatter.convertJsonToObject(
-                        resultSet.getString("receiving_application_details"),
-                        new TypeReference<MessageHdDataType>() {}),
-                formatter.convertJsonToObject(
-                        resultSet.getString("receiving_facility_details"),
-                        new TypeReference<MessageHdDataType>() {}),
+                resultSet.getString("hash_of_message1"),
+                PartnerMetadataStatus.valueOf(resultSet.getString("delivery_status1")),
+                resultSet.getString("failure_reason1"),
+                PartnerMetadataMessageType.valueOf(resultSet.getString("message_type1")),
+                resultSet.getObject("sending_application_details", MessageHdDataType.class),
+                resultSet.getObject("sending_facility_details", MessageHdDataType.class),
+                resultSet.getObject("receiving_application_details", MessageHdDataType.class),
+                resultSet.getObject("receiving_facility_details", MessageHdDataType.class),
                 resultSet.getString("placer_order_number"));
     }
 }

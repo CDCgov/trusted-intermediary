@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.database
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
@@ -202,12 +203,13 @@ class PostgresDaoTest extends Specification {
         def status = PartnerMetadataStatus.PENDING
         def reason = "It done Goofed"
         def messageType = PartnerMetadataMessageType.RESULT
-        def sendingApp = "sending_app"
-        def sendingFacility = "sending_facility"
-        def receivingApp = "receiving_app"
-        def receivingFacility = "receiving_facility"
+        def sendingApp = new MessageHdDataType("sending_app", "sending_app_id", "sending_app_type")
+        def sendingFacility = new MessageHdDataType("sending_facility", "sending_facility_id", "sending_facility_type")
+        def receivingApp = new MessageHdDataType("receiving_app", "receiving_app_id", "receiving_app_type")
+        def receivingFacility = new MessageHdDataType("receiving_facility", "receiving_facility_id", "receiving_facility_type")
+
         def placerOrderNumber = "placer_order_number"
-        def expected = new PartnerMetadata(receivedMessageId, sentMessageId, sender, receiver, timeReceived, timeDelivered, hash, status, reason, messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
+        def expected = new PartnerMetadata(receivedMessageId, sentMessageId, timeReceived, timeDelivered, hash, status, reason, messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
 
         mockConnPool.getConnection() >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
@@ -263,8 +265,13 @@ class PostgresDaoTest extends Specification {
         given:
         def sender = "DogCow"
         def messageType = PartnerMetadataMessageType.RESULT
-        def expected1 = new PartnerMetadata("12345", "7890", sender, "You'll get your just reward", Instant.parse("2024-01-03T15:45:33.30Z"),Instant.parse("2024-01-03T15:45:33.30Z"),  sender.hashCode().toString(), PartnerMetadataStatus.PENDING, "It done Goofed", messageType, "sending_app", "sending_facility", "receiving_app", "receiving_facility", "placer_order_number")
-        def expected2 = new PartnerMetadata("doreyme", "fasole", sender, "receiver", Instant.now(), Instant.now(), "gobeltygoook", PartnerMetadataStatus.DELIVERED, "cause I said so", messageType, "sending_app", "sending_facility", "receiving_app", "receiving_facility", "placer_order_number")
+        def sendingApp = new MessageHdDataType("sending_app", "sending_app_id", "sending_app_type")
+        def sendingFacility = new MessageHdDataType("sending_facility", "sending_facility_id", "sending_facility_type")
+        def receivingApp = new MessageHdDataType("receiving_app", "receiving_app_id", "receiving_app_type")
+        def receivingFacility = new MessageHdDataType("receiving_facility", "receiving_facility_id", "receiving_facility_type")
+
+        def expected1 = new PartnerMetadata("12345", "7890", Instant.parse("2024-01-03T15:45:33.30Z"),Instant.parse("2024-01-03T15:45:33.30Z"),  sender.hashCode().toString(), PartnerMetadataStatus.PENDING, "It done Goofed", messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
+        def expected2 = new PartnerMetadata("doreyme", "fasole", Instant.now(), Instant.now(), "gobeltygoook", PartnerMetadataStatus.DELIVERED, "cause I said so", messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
 
         mockConnPool.getConnection() >> mockConn
         mockConn.prepareStatement(_ as String) >>  mockPreparedStatement
@@ -276,14 +283,6 @@ class PostgresDaoTest extends Specification {
         mockResultSet.getString("sent_message_id") >>> [
             expected1.sentSubmissionId(),
             expected2.sentSubmissionId()
-        ]
-        mockResultSet.getString("sender") >>> [
-            expected1.sender(),
-            expected2.sender()
-        ]
-        mockResultSet.getString("receiver") >>> [
-            expected1.receiver(),
-            expected2.receiver()
         ]
         mockResultSet.getTimestamp("time_received") >>> [
             Timestamp.from(expected1.timeReceived()),
@@ -309,19 +308,19 @@ class PostgresDaoTest extends Specification {
             expected1.messageType().toString(),
             expected2.messageType().toString()
         ]
-        mockResultSet.getString("sending_application_id") >>> [
+        mockResultSet.getString("sending_application_details") >>> [
             expected1.sendingApplicationDetails(),
             expected2.sendingApplicationDetails()
         ]
-        mockResultSet.getString("sending_facility_id") >>> [
+        mockResultSet.getString("sending_facility_details") >>> [
             expected1.sendingFacilityDetails(),
             expected2.sendingFacilityDetails()
         ]
-        mockResultSet.getString("receiving_application_id") >>> [
+        mockResultSet.getString("receiving_application_details") >>> [
             expected1.receivingApplicationDetails(),
             expected2.receivingApplicationDetails()
         ]
-        mockResultSet.getString("receiving_facility_id") >>> [
+        mockResultSet.getString("receiving_facility_details") >>> [
             expected1.receivingFacilityDetails(),
             expected2.receivingFacilityDetails()
         ]
@@ -339,7 +338,7 @@ class PostgresDaoTest extends Specification {
         def actual = PostgresDao.getInstance().fetchMetadataForSender("sender")
 
         then:
-        actual.containsAll(Set.of(expected1, expected2))
+        actual.containsAll(Set.of(expected2, expected1))
     }
 
     // def "throws exception for FormatterProcessingException"() {}

@@ -33,7 +33,7 @@ class PartnerMetadataTest extends Specification {
         def receivingFacilityDetails = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
 
         when:
-        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, timeDelivered, hash, PartnerMetadataStatus.DELIVERED, failureReason, messageType, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
+        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, timeReceived, timeDelivered, hash, PartnerMetadataStatus.DELIVERED, failureReason, messageType, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
 
         then:
         metadata.receivedSubmissionId() == receivedSubmissionId
@@ -112,7 +112,7 @@ class PartnerMetadataTest extends Specification {
         def sendingFacilityDetails = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
         def receivingAppDetails = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
         def receivingFacilityDetails = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
-        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, timeDelivered, hash, PartnerMetadataStatus.PENDING, failureReason, messageType, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
+        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, timeReceived, timeDelivered, hash, PartnerMetadataStatus.PENDING, failureReason, messageType, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
 
         when:
         def newStatus = PartnerMetadataStatus.DELIVERED
@@ -149,7 +149,7 @@ class PartnerMetadataTest extends Specification {
         def sendingFacilityDetails = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
         def receivingAppDetails = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
         def receivingFacilityDetails = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
-        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, sender, receiver, timeReceived, null, hash, PartnerMetadataStatus.PENDING, failureReason, messageType, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
+        def metadata = new PartnerMetadata(receivedSubmissionId, sentSubmissionId, timeReceived, null, hash, PartnerMetadataStatus.PENDING, failureReason, messageType, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
 
         when:
         def updatedMetadata = metadata.withTimeDelivered(timeDelivered)
