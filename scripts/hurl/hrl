@@ -36,6 +36,12 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
+# Check if first argument is -h
+if [ "$1" = "-h" ]; then
+    show_help
+    exit 0
+fi
+
 hurl_file="$1" # Assign the first argument to hurl_file
 shift          # Remove the first argument from the list of arguments
 
@@ -94,7 +100,7 @@ elif [ "$env" = "staging" ]; then
     url=https://$host:443
     # uncomment lines below after setting the path to the staging private key
     # if [ -z "$secret" ] && [ "$client_id" = "flexion" ]; then
-    #     secret="$CDCTI_HOME/path/to/flexion/staging/private/key"
+    #     secret="/path/to/flexion/staging/private/key"
     # fi
 else
     echo "Error: Invalid environment $env"
