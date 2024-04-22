@@ -7,6 +7,7 @@ import org.hl7.fhir.instance.model.api.IBase;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.Reference;
 
+/** Custom evaluation context for FHIRPath engine. */
 public class HapiParserContext implements IFhirPathEvaluationContext {
 
     /**
