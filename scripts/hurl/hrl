@@ -121,7 +121,6 @@ hurl \
     --variable client-id=$client_id \
     --variable client-sender=$client_sender \
     --variable jwt=$(jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 -k $client_id.$client_sender -i $client_id.$client_sender -s $client_id.$client_sender -a $host --no-iat -S @$secret) \
-    --include \
     $verbose \
     $submission_id \
     $hurl_file \

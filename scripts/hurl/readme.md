@@ -40,7 +40,12 @@ Sending an order to staging
 ./hrl waters.hurl -f Orders/003_AL_ORM_O01_NBS_Fully_Populated_0_initial_message.hl7 -e staging -x /path/to/staging/private/key
 ```
 
-Checking the history for a submision id
+Checking the history in local environment for a submision id
 ```
 ./hrl history.hurl -i 100
+```
+
+Checking the history in staging for a submision id
+```
+./hrl history.hurl -i 100 -e staging -x /path/to/staging/private/key
 ```
