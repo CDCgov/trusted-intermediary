@@ -10,6 +10,7 @@ import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
+
 import java.nio.file.Files
 import java.time.Instant
 import spock.lang.Specification
@@ -58,7 +59,28 @@ class FilePartnerMetadataStorageTest extends Specification {
         FilePartnerMetadataStorage.getInstance().saveMetadata(metadata)
 
         then:
-        thrown(PartnerMetadataException)
+        def exception = thrown(PartnerMetadataException)
+        exception.getMessage().startsWith("Error saving metadata for")
+    }
+
+    def "saveMetadata overwrites a file if it had been saved before"() {
+        given:
+        def expectedReceivedSubmissionId = "receivedSubmissionId"
+        def expectedSentSubmissionId = "sentSubmissionId"
+        PartnerMetadata metadata1 = new PartnerMetadata(expectedReceivedSubmissionId, expectedSentSubmissionId, "sender", "receiver", Instant.parse("2023-12-04T18:51:48.941875Z"),Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd", PartnerMetadataStatus.DELIVERED, null, PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
+        PartnerMetadata metadata2 = new PartnerMetadata(expectedReceivedSubmissionId, PartnerMetadataStatus.DELIVERED)
+
+
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        FilePartnerMetadataStorage.getInstance().saveMetadata(metadata1)
+        FilePartnerMetadataStorage.getInstance().saveMetadata(metadata2)
+        def actualMetadata = FilePartnerMetadataStorage.getInstance().readMetadata(expectedReceivedSubmissionId)
+
+        then:
+        actualMetadata.get() == metadata2
     }
 
     def "readMetadata throws PartnerMetadataException when unable to parse file"() {
