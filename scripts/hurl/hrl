@@ -98,17 +98,12 @@ if [ "$env" = "local" ]; then
 elif [ "$env" = "staging" ]; then
     host=staging.prime.cdc.gov
     url=https://$host:443
-    # uncomment lines below after setting the path to the staging private key
-    # if [ -z "$secret" ] && [ "$client_id" = "flexion" ]; then
-    #     secret="/path/to/flexion/staging/private/key"
-    # fi
 else
     echo "Error: Invalid environment $env"
     show_help
     exit 1
 fi
 
-# if $secret is not set, exit and prompt the user to provide the private key
 if [ -z "$secret" ]; then
     echo "Error: Please provide the private key for $client_id"
     exit 1
