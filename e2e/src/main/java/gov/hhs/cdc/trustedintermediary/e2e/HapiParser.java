@@ -7,6 +7,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Base;
 import org.hl7.fhir.r4.model.Bundle;
 
+/** Responsible for parsing FHIR resources and extracting data from them. */
 public class HapiParser {
     private static final FhirContext CONTEXT = FhirContext.forR4();
     private static final IFhirPath PATH_ENGINE;
