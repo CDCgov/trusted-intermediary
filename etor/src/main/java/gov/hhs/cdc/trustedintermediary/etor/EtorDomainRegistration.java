@@ -233,14 +233,16 @@ public class EtorDomainRegistration implements DomainConnector {
 
             Set<String> messageIdsToLink =
                     partnerMetadataOrchestrator.findMessagesIdsToLink(receivedSubmissionId);
-            Set<String> relevantMessageIds =
+            Set<String> relevantMessageIdsToLinkInMetadata =
                     messageIdsToLink.stream()
                             .filter(s -> !s.equals(receivedSubmissionId))
                             .collect(Collectors.toSet());
 
             FhirMetadata<?> responseObject =
                     partnerMetadataConverter.extractPublicMetadataToOperationOutcome(
-                            metadata.get(), receivedSubmissionId, relevantMessageIds);
+                            metadata.get(),
+                            receivedSubmissionId,
+                            relevantMessageIdsToLinkInMetadata);
 
             return domainResponseHelper.constructOkResponseFromString(
                     fhir.encodeResourceToJson(responseObject.getUnderlyingOutcome()));
