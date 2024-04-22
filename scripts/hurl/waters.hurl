@@ -15,10 +15,10 @@ POST {{url}}/api/waters
 Content-Type: application/hl7-v2
 Client: {{client-id}}.{{client-sender}}
 Authorization: Bearer {{token}}
-file,Orders/003_AL_ORM_O01_NBS_Fully_Populated_0_initial_message.hl7;
+file,{{fpath}};
 
 # POST {{url}}/api/waters
 # Content-Type: application/fhir+ndjson
 # Client: {{client-id}}.{{client-sender}}
 # Authorization: Bearer {{token}}
-# file,Orders/003_AL_ORM_O01_NBS_Fully_Populated_1_hl7_translation.fhir;
+# file,{{fpath}};

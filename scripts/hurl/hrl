@@ -8,27 +8,45 @@ fi
 
 # default values
 env=local
-path=$CDCTI_HOME/examples/Test/
+root=$CDCTI_HOME/examples/Test/
 client_id=flexion
 client_sender=simulated-lab
-verbose=0
+verbose=""
+submission_id=""
 
 show_help() {
-    echo "Usage: $(basename $0) [-e arg] [-c arg] [-s arg] [-v] [-h]"
+    echo "Usage: $(basename $0) <HURL_FILE> [OPTIONS]"
     echo
+    echo "Options:"
+    echo "    -f <REL_PATH>         The path to the hl7/fhir file to submit, relative the root path (Required for waters API)"
+    echo "    -r <ROOT_PATH>        The root path to the hl7/fhir files (Default: $root)"
     echo "    -e [local | staging]  The environment to run the test in (Default: $env)"
-    echo "    -c <arg>              The client id to use (Default: $client_id)"
-    echo "    -s <arg>              The client sender to use (Default: $client_sender)"
-    echo "    -x <arg>              The client private key for the environment"
+    echo "    -c <CLIENT_ID>        The client id to use (Default: $client_id)"
+    echo "    -s <CLIENT_SENDER>    The client sender to use (Default: $client_sender)"
+    echo "    -x <KEY_PATH>         The path to the client private key for the environment"
+    echo "    -i <SUBMISSION_ID>    The submissionId to call the history API with (Required for history API)"
     echo "    -v                    Verbose mode"
     echo "    -h                    Display this help and exit"
 }
 
-# Display help if no arguments were provided
-[ "$#" -eq 0 ] && show_help && exit 0
+# Check if required HURL_FILE is provided
+if [ $# -eq 0 ]; then
+    echo "Error: Missing required argument <HURL_FILE>"
+    show_help
+    exit 1
+fi
 
-while getopts ':e:c:s:vh' opt; do
+hurl_file="$1" # Assign the first argument to hurl_file
+shift          # Remove the first argument from the list of arguments
+
+while getopts ':f:r:e:c:s:x:i:vh' opt; do
     case "$opt" in
+    f)
+        fpath="$OPTARG"
+        ;;
+    r)
+        root="$OPTARG"
+        ;;
     e)
         env="$OPTARG"
         ;;
@@ -41,8 +59,11 @@ while getopts ':e:c:s:vh' opt; do
     x)
         secret="$OPTARG"
         ;;
+    i)
+        submission_id="--variable submissionid=$OPTARG"
+        ;;
     v)
-        verbose=1
+        verbose="--verbose"
         ;;
     h)
         show_help
@@ -76,22 +97,26 @@ elif [ "$env" = "staging" ]; then
     #     secret="$CDCTI_HOME/path/to/flexion/staging/private/key"
     # fi
 else
-    echo "Invalid environment: $env"
+    echo "Error: Invalid environment $env"
     show_help
     exit 1
 fi
 
 # if $secret is not set, exit and prompt the user to provide the private key
 if [ -z "$secret" ]; then
-    echo "Please provide the private key for $client_id"
+    echo "Error: Please provide the private key for $client_id"
     exit 1
 fi
 
 hurl \
+    --variable fpath=$fpath \
+    --file-root $root \
     --variable url=$url \
     --variable client-id=$client_id \
     --variable client-sender=$client_sender \
     --variable jwt=$(jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 -k $client_id.$client_sender -i $client_id.$client_sender -s $client_id.$client_sender -a $host --no-iat -S @$secret) \
-    --file-root $path \
     --include \
+    $verbose \
+    $submission_id \
+    $hurl_file \
     $@
