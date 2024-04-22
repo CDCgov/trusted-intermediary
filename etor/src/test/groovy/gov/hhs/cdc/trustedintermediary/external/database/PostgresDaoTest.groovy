@@ -338,7 +338,7 @@ class PostgresDaoTest extends Specification {
         def actual = PostgresDao.getInstance().fetchMetadataForSender("sender")
 
         then:
-        actual.containsAll(Set.of(expected2, expected1))
+        actual.containsAll(Set.of(expected1, expected2))
     }
 
     // def "throws exception for FormatterProcessingException"() {}

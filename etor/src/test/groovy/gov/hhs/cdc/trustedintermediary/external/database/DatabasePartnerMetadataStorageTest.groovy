@@ -16,7 +16,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
     private def mockDao
 
-    def mockMetadata = new PartnerMetadata("receivedSubmissionId", "sentSubmissionId","sender", "receiver", Instant.now(), Instant.now(), "hash", PartnerMetadataStatus.DELIVERED, "failure reason", PartnerMetadataMessageType.ORDER, "sending_app", "sending_facility", "receiving_app", "receiving_facility", "placer_order_number")
+    def mockMetadata = new PartnerMetadata("receivedSubmissionId", "sentSubmissionId", Instant.now(), Instant.now(), "hash", PartnerMetadataStatus.DELIVERED, "failure reason", PartnerMetadataMessageType.ORDER, "sending_app", "sending_facility", "receiving_app", "receiving_facility", "placer_order_number")
 
     def setup() {
         TestApplicationContext.reset()

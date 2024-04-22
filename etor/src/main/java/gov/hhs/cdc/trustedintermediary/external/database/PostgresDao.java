@@ -156,14 +156,14 @@ public class PostgresDao implements DbDao {
         }
 
         return new PartnerMetadata(
-                resultSet.getString("received_message_id1"),
-                resultSet.getString("sent_message_id1"),
+                resultSet.getString("received_message_id"),
+                resultSet.getString("sent_message_id"),
                 timeReceived,
                 timeDelivered,
-                resultSet.getString("hash_of_message1"),
-                PartnerMetadataStatus.valueOf(resultSet.getString("delivery_status1")),
-                resultSet.getString("failure_reason1"),
-                PartnerMetadataMessageType.valueOf(resultSet.getString("message_type1")),
+                resultSet.getString("hash_of_message"),
+                PartnerMetadataStatus.valueOf(resultSet.getString("delivery_status")),
+                resultSet.getString("failure_reason"),
+                PartnerMetadataMessageType.valueOf(resultSet.getString("message_type")),
                 resultSet.getObject("sending_application_details", MessageHdDataType.class),
                 resultSet.getObject("sending_facility_details", MessageHdDataType.class),
                 resultSet.getObject("receiving_application_details", MessageHdDataType.class),
