@@ -32,6 +32,7 @@ public class ReportStreamEndpointClient implements RSEndpointClient {
     private static final String RS_AUTH_API_URL = RS_URL_PREFIX + "/api/token";
     private static final String RS_HISTORY_API_URL =
             RS_URL_PREFIX + "/api/waters/report/{id}/history";
+    private static final String RS_DELIVERY_API_URL = RS_WATERS_API_URL + "/report/{id}/delivery";
 
     private static final String OUR_PRIVATE_KEY_ID =
             "trusted-intermediary-private-key-" + ApplicationContext.getEnvironment();
@@ -120,6 +121,22 @@ public class ReportStreamEndpointClient implements RSEndpointClient {
         } catch (HttpClientException e) {
             throw new ReportStreamEndpointClientException(
                     "Error GETting the history from ReportStream", e);
+        }
+    }
+
+    @Override
+    public String requestDeliveryEndpoint(String reportId, String bearerToken)
+            throws ReportStreamEndpointClientException {
+        logger.logInfo("Requesting delivery API from ReportStream");
+
+        Map<String, String> headers = Map.of("Authorization", "Bearer " + bearerToken);
+
+        try {
+            String url = RS_DELIVERY_API_URL.replace("{id}", reportId);
+            return client.get(url, headers);
+        } catch (HttpClientException e) {
+            throw new ReportStreamEndpointClientException(
+                    "Error GETting deliveries from ReportStream", e);
         }
     }
 

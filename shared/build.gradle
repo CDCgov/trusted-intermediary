@@ -17,8 +17,8 @@ dependencies {
     implementation 'javax.annotation:javax.annotation-api:1.3.2'
 
     //logging
-    implementation 'org.slf4j:slf4j-api:2.0.12'
-    implementation 'ch.qos.logback:logback-classic:1.5.4'
+    implementation 'org.slf4j:slf4j-api:2.0.13'
+    implementation 'ch.qos.logback:logback-classic:1.5.6'
     implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
 
     //jackson
@@ -45,7 +45,7 @@ dependencies {
 
     // azure sdk
     implementation 'com.azure:azure-security-keyvault-secrets:4.8.1'
-    implementation 'com.azure:azure-identity:1.11.4'
+    implementation 'com.azure:azure-identity:1.12.0'
 
     testImplementation 'org.apache.groovy:groovy:4.0.21'
     testFixturesImplementation 'org.apache.groovy:groovy:4.0.21'

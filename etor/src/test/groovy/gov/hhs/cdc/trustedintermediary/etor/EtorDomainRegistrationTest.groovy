@@ -8,10 +8,12 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
+import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecificationException
 import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemographicsUsecase
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController
 import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse
+import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageRequestHandler
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
@@ -22,7 +24,6 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrch
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
 import gov.hhs.cdc.trustedintermediary.etor.operationoutcomes.FhirMetadata
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultController
@@ -31,10 +32,16 @@ import gov.hhs.cdc.trustedintermediary.etor.results.SendResultUseCase
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
+
 import java.time.Instant
 import spock.lang.Specification
 
 class EtorDomainRegistrationTest extends Specification {
+
+    private sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
+    private sendingFacility = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
+    private receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
+    private receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
 
     def setup() {
         TestApplicationContext.reset()
@@ -48,11 +55,27 @@ class EtorDomainRegistrationTest extends Specification {
         def demographicsEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.DEMOGRAPHICS_API_ENDPOINT, true)
         def ordersEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.ORDERS_API_ENDPOINT, true)
         def metadataEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.METADATA_API_ENDPOINT, true)
-
         def consolidatedOrdersEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.CONSOLIDATED_SUMMARY_API_ENDPOINT, true)
 
-        def resultsEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.RESULTS_API_ENDPOINT, true)
+        when:
+        def endpoints = domainRegistration.domainRegistration()
 
+        then:
+        !endpoints.isEmpty()
+        endpoints.get(demographicsEndpoint) != null
+        endpoints.get(ordersEndpoint) != null
+        endpoints.get(metadataEndpoint) != null
+        endpoints.get(consolidatedOrdersEndpoint) != null
+    }
+
+    def "domain registration has endpoints when DB_URL is not found"() {
+        given:
+        def domainRegistration = new EtorDomainRegistration()
+        def demographicsEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.DEMOGRAPHICS_API_ENDPOINT, true)
+        def ordersEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.ORDERS_API_ENDPOINT, true)
+        def metadataEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.METADATA_API_ENDPOINT, true)
+        def consolidatedOrdersEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.CONSOLIDATED_SUMMARY_API_ENDPOINT, true)
+        TestApplicationContext.addEnvironmentVariable("DB_URL", "")
 
         when:
         def endpoints = domainRegistration.domainRegistration()
@@ -76,6 +99,30 @@ class EtorDomainRegistrationTest extends Specification {
         noExceptionThrown()
         !openApiSpecification.isEmpty()
         openApiSpecification.contains("paths:")
+    }
+
+    def "correctly handles errors when loading OpenAPI"() {
+        given:
+        def domainRegistration = Spy(EtorDomainRegistration)
+        domainRegistration.openApiStream(_ as String) >> { throw new IOException()}
+
+        when:
+        domainRegistration.openApiSpecification()
+
+        then:
+        thrown(UnableToReadOpenApiSpecificationException)
+    }
+
+    def "openApiStream assertion behaves correctly with bad filenames"() {
+        given:
+        def domainRegistration = Spy(EtorDomainRegistration)
+        domainRegistration.openApiStream(_ as String) >> { throw new IOException()}
+
+        when:
+        domainRegistration.openApiStream("badFile")
+
+        then:
+        thrown(IOException)
     }
 
     def "stitches the demographics parsing to the response construction"() {
@@ -234,7 +281,10 @@ class EtorDomainRegistrationTest extends Specification {
         request.setPathParams(["id": "metadataId"])
 
         def mockPartnerMetadataOrchestrator = Mock(PartnerMetadataOrchestrator)
-        mockPartnerMetadataOrchestrator.getMetadata(_ as String) >> Optional.ofNullable(new PartnerMetadata("receivedSubmissionId", "sender", Instant.now(), null, "hash", PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER))
+        mockPartnerMetadataOrchestrator.getMetadata(_ as String) >> Optional.ofNullable(
+                new PartnerMetadata("receivedSubmissionId", "sender", Instant.now(), null,
+                "hash", PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER,
+                sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number"))
         TestApplicationContext.register(PartnerMetadataOrchestrator, mockPartnerMetadataOrchestrator)
 
         def mockResponseHelper = Mock(DomainResponseHelper)

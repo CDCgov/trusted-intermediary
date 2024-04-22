@@ -24,11 +24,19 @@ public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
         return INSTANCE;
     }
 
+    @Override
     public void convertAndSend(final Order<?> order, String receivedSubmissionId)
             throws UnableToSendMessageException {
 
         sendMessageHelper.savePartnerMetadataForReceivedMessage(
-                receivedSubmissionId, order.hashCode(), PartnerMetadataMessageType.ORDER);
+                receivedSubmissionId,
+                order.hashCode(),
+                PartnerMetadataMessageType.ORDER,
+                order.getSendingApplicationDetails(),
+                order.getSendingFacilityDetails(),
+                order.getReceivingApplicationDetails(),
+                order.getReceivingFacilityDetails(),
+                order.getPlacerOrderNumber());
 
         var omlOrder = converter.convertToOmlOrder(order);
         metadata.put(order.getFhirResourceId(), EtorMetadataStep.ORDER_CONVERTED_TO_OML);
@@ -42,6 +50,9 @@ public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
                 EtorMetadataStep.ETOR_PROCESSING_TAG_ADDED_TO_MESSAGE_HEADER);
 
         String sentSubmissionId = sender.send(omlOrder).orElse(null);
+        logger.logInfo("Sent order submissionId: {}", sentSubmissionId);
+
+        sendMessageHelper.linkMessage(receivedSubmissionId);
 
         sendMessageHelper.saveSentMessageSubmissionId(receivedSubmissionId, sentSubmissionId);
     }

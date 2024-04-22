@@ -68,4 +68,17 @@ class MockRSEndpointClientTest extends Specification {
         cleanup:
         readonlyLocalFile.toFile().delete()
     }
+
+    def "requestDeliveryEndpoint happy path"() {
+        when:
+        def token = MockRSEndpointClient.getInstance().getRsToken()
+        def response = MockRSEndpointClient.getInstance().requestDeliveryEndpoint("delivery", token)
+        def responseObject =
+                Jackson.getInstance().convertJsonToObject(response, new TypeReference<Map<String, Object>>() {})
+
+        then:
+        responseObject.originalIngestion != null
+        responseObject.originalIngestion[0] != null
+        responseObject.originalIngestion[0].ingestionTime != null
+    }
 }
