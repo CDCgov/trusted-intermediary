@@ -1,5 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 
+# Check if $CDCTI_HOME is set
+if [ -z "$CDCTI_HOME" ]; then
+    echo "Error: CDCTI_HOME is not set. Please set this environment variable before running the script."
+    exit 1
+fi
+
+# default values
 env=local
 path=$CDCTI_HOME/examples/Test/
 client_id=flexion
@@ -7,14 +14,18 @@ client_sender=simulated-lab
 verbose=0
 
 show_help() {
-    echo "Usage: $(basename $0) [-e arg] [-c arg] [-s arg]"
+    echo "Usage: $(basename $0) [-e arg] [-c arg] [-s arg] [-v] [-h]"
     echo
-    echo "    -e [local staging]  The environment to run the test in (Default: $env)"
-    echo "    -c <arg>  The client id to use"
-    echo "    -s <arg>  The client sender to use"
-    echo "    -v        Verbose mode"
-    echo "    -h        Display this help and exit"
+    echo "    -e [local | staging]  The environment to run the test in (Default: $env)"
+    echo "    -c <arg>              The client id to use (Default: $client_id)"
+    echo "    -s <arg>              The client sender to use (Default: $client_sender)"
+    echo "    -x <arg>              The client private key for the environment"
+    echo "    -v                    Verbose mode"
+    echo "    -h                    Display this help and exit"
 }
+
+# Display help if no arguments were provided
+[ "$#" -eq 0 ] && show_help && exit 0
 
 while getopts ':e:c:s:vh' opt; do
     case "$opt" in
@@ -27,8 +38,8 @@ while getopts ':e:c:s:vh' opt; do
     s)
         client_sender="$OPTARG"
         ;;
-    p)
-        client_sender="$OPTARG"
+    x)
+        secret="$OPTARG"
         ;;
     v)
         verbose=1
@@ -51,24 +62,22 @@ while getopts ':e:c:s:vh' opt; do
 done
 shift "$(($OPTIND - 1))"
 
-# Shift command will shift the positional parameters to the left, discarding the first argument
-shift
-
 if [ "$env" = "local" ]; then
     host=localhost
     url=http://$host:7071
-    if [ "$client_id" = "flexion" ]; then
+    if [ -z "$secret" ] && [ "$client_id" = "flexion" ]; then
         secret="$CDCTI_HOME/mock_credentials/organization-trusted-intermediary-private-key-local.pem"
     fi
 elif [ "$env" = "staging" ]; then
     host=staging.prime.cdc.gov
     url=https://$host:443
     # uncomment lines below after setting the path to the staging private key
-    # if [ "$client_id" = "flexion" ]; then
+    # if [ -z "$secret" ] && [ "$client_id" = "flexion" ]; then
     #     secret="$CDCTI_HOME/path/to/flexion/staging/private/key"
     # fi
 else
-    echo "Usage: $0 <local|staging> <command>"
+    echo "Invalid environment: $env"
+    show_help
     exit 1
 fi
 
@@ -83,6 +92,6 @@ hurl \
     --variable client-id=$client_id \
     --variable client-sender=$client_sender \
     --variable jwt=$(jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 -k $client_id.$client_sender -i $client_id.$client_sender -s $client_id.$client_sender -a $host --no-iat -S @$secret) \
-    --file-root $CDCTI_HOME/examples/Test/ \
+    --file-root $path \
     --include \
     $@
