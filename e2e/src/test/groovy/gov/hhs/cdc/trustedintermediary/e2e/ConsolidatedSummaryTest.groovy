@@ -18,7 +18,7 @@ class ConsolidatedSummaryTest extends Specification {
         def inboundSubmissionId = UUID.randomUUID().toString()
 
         def orderClient = new EndpointClient("/v1/etor/orders")
-        def labOrderJsonFileString = Files.readString(Path.of("../examples/Test/Orders/002_ORM_O01.fhir"))
+        def labOrderJsonFileString = Files.readString(Path.of("../examples/Test/e2e/orders/002_ORM_O01.fhir"))
         def senderName = "PLACE_HOLDER"  //TODO: when story #990 is implemented, update this to be the sender from the 002_ORM_O01.fhir message
 
         when:
@@ -29,7 +29,7 @@ class ConsolidatedSummaryTest extends Specification {
 
         when:
         def senderNameResponse = ConsolidatedSummaryClient.get(senderName, true)
-        def jsonBody = JsonParsing.parseContent(senderNameResponse)
+        def jsonBody = JsonParser.parseContent(senderNameResponse)
 
         then:
         jsonBody.get((jsonBody.keySet().toArray())[0]).stale != null
@@ -40,7 +40,7 @@ class ConsolidatedSummaryTest extends Specification {
     def "consolidated endpoint fails when called while not authenticated"() {
         when:
         def consolidatedResponse = ConsolidatedSummaryClient.get("test", false)
-        def parsedJsonBody = JsonParsing.parseContent(consolidatedResponse)
+        def parsedJsonBody = JsonParser.parseContent(consolidatedResponse)
 
         then:
         consolidatedResponse.getCode() == 401

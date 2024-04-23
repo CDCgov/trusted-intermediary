@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.messages
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkException
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator
@@ -16,6 +17,7 @@ class SendMessageHelperTest extends Specification {
     private receivingApp = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
     private receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
     private placerOrderNumber = "placer_order_number"
+    private partnerMetadata
 
     def setup() {
         TestApplicationContext.reset()
@@ -24,18 +26,36 @@ class SendMessageHelperTest extends Specification {
         TestApplicationContext.register(PartnerMetadataOrchestrator, mockOrchestrator)
         TestApplicationContext.register(Logger, mockLogger)
         TestApplicationContext.injectRegisteredImplementations()
+        partnerMetadata = new PartnerMetadata(
+                "receivedId",
+                new Random().nextInt().toString(),
+                PartnerMetadataMessageType.RESULT,
+                sendingApp,
+                sendingFacility,
+                receivingApp,
+                receivingFacility,
+                placerOrderNumber)
     }
     def "savePartnerMetadataForReceivedMessage works"() {
         when:
-        SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage("receivedId", new Random().nextInt(), PartnerMetadataMessageType.RESULT,sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
+        SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage(partnerMetadata)
 
         then:
-        1 * mockOrchestrator.updateMetadataForReceivedMessage(_, _, _, _, _, _, _, _)
+        1 * mockOrchestrator.updateMetadataForReceivedMessage(_)
     }
 
     def "savePartnerMetadataForReceivedMessage should log warnings for null receivedSubmissionId"() {
         when:
-        SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage(null, new Random().nextInt(), PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
+        PartnerMetadata warningPartnerMetadata = new PartnerMetadata(
+                null,
+                new Random().nextInt().toString(),
+                PartnerMetadataMessageType.RESULT,
+                sendingApp,
+                sendingFacility,
+                receivingApp,
+                receivingFacility,
+                placerOrderNumber)
+        SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage(warningPartnerMetadata)
 
         then:
         1 * mockLogger.logWarning(_)
@@ -45,11 +65,10 @@ class SendMessageHelperTest extends Specification {
         given:
         def hashCode = new Random().nextInt()
         def messageType = PartnerMetadataMessageType.RESULT
-        def receivedSubmissionId = "receivedId"
-        mockOrchestrator.updateMetadataForReceivedMessage(receivedSubmissionId, _ as String, messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber) >> { throw new PartnerMetadataException("Error") }
+        mockOrchestrator.updateMetadataForReceivedMessage(partnerMetadata) >> { throw new PartnerMetadataException("Error") }
 
         when:
-        SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage(receivedSubmissionId, hashCode, messageType, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
+        SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage(partnerMetadata)
 
         then:
         1 * mockLogger.logError(_, _)

@@ -10,6 +10,7 @@ import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
+
 import java.nio.file.Files
 import java.time.Instant
 import spock.lang.Specification
@@ -58,7 +59,28 @@ class FilePartnerMetadataStorageTest extends Specification {
         FilePartnerMetadataStorage.getInstance().saveMetadata(metadata)
 
         then:
-        thrown(PartnerMetadataException)
+        def exception = thrown(PartnerMetadataException)
+        exception.getMessage().startsWith("Error saving metadata for")
+    }
+
+    def "saveMetadata overwrites a file if it had been saved before"() {
+        given:
+        def expectedReceivedSubmissionId = "receivedSubmissionId"
+        def expectedSentSubmissionId = "sentSubmissionId"
+        PartnerMetadata metadata1 = new PartnerMetadata(expectedReceivedSubmissionId, expectedSentSubmissionId, "sender", "receiver", Instant.parse("2023-12-04T18:51:48.941875Z"),Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd", PartnerMetadataStatus.DELIVERED, null, PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
+        PartnerMetadata metadata2 = new PartnerMetadata(expectedReceivedSubmissionId, PartnerMetadataStatus.DELIVERED)
+
+
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        FilePartnerMetadataStorage.getInstance().saveMetadata(metadata1)
+        FilePartnerMetadataStorage.getInstance().saveMetadata(metadata2)
+        def actualMetadata = FilePartnerMetadataStorage.getInstance().readMetadata(expectedReceivedSubmissionId)
+
+        then:
+        actualMetadata.get() == metadata2
     }
 
     def "readMetadata throws PartnerMetadataException when unable to parse file"() {
@@ -109,23 +131,34 @@ class FilePartnerMetadataStorageTest extends Specification {
 
     def "readMetadataForMessageLinking returns a set of PartnerMetadata"() {
         given:
-        def receivedSubmissionId = "receivedSubmissionId"
-        def placerOrderNumber = "placerOrderNumber"
-        def sendingAppDetails = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacilityDetails = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        PartnerMetadata metadata1 = new PartnerMetadata(receivedSubmissionId, null, null, null, null, null, null, null, null, null, sendingAppDetails, sendingFacilityDetails, null, null, placerOrderNumber)
-        PartnerMetadata metadata2 = new PartnerMetadata("2", null, null, null, null, null, null, null, null, null, sendingAppDetails, sendingFacilityDetails, null, null, placerOrderNumber)
-
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        FilePartnerMetadataStorage.getInstance().saveMetadata(metadata1)
-        FilePartnerMetadataStorage.getInstance().saveMetadata(metadata2)
-        def metadataSet = FilePartnerMetadataStorage.getInstance().readMetadataForMessageLinking(receivedSubmissionId)
+        def receivedSubmissionId1 = "receivedSubmissionId1"
+        def matchingPlacerOrderNumber1 = "placerOrderNumber1"
+        def matchingSendingFacilityDetails1 = new MessageHdDataType("sending_facility_name1", "sending_facility_id1", "sending_facility_type1")
+        def matchingSendingFacilityDetailsMetadata1 = new PartnerMetadata(receivedSubmissionId1, null, null, null, null, null, null, null, null, null, null, matchingSendingFacilityDetails1, null, new MessageHdDataType(null, null, null), matchingPlacerOrderNumber1)
+        def otherMatchingSendingFacilityDetailsMetadata1 = new PartnerMetadata("1", null, null, null, null, null, null, null, null, null, null, matchingSendingFacilityDetails1, null, new MessageHdDataType(null, null, null), matchingPlacerOrderNumber1)
+        FilePartnerMetadataStorage.getInstance().saveMetadata(matchingSendingFacilityDetailsMetadata1)
+        FilePartnerMetadataStorage.getInstance().saveMetadata(otherMatchingSendingFacilityDetailsMetadata1)
+        def metadataSetWithMatchingSendingFacilityDetails = FilePartnerMetadataStorage.getInstance().readMetadataForMessageLinking(receivedSubmissionId1)
 
         then:
-        metadataSet.containsAll(Set.of(metadata1, metadata2))
+        metadataSetWithMatchingSendingFacilityDetails.containsAll(Set.of(matchingSendingFacilityDetailsMetadata1, otherMatchingSendingFacilityDetailsMetadata1))
+
+        when:
+        def receivedSubmissionId2 = "receivedSubmissionId2"
+        def matchingPlacerOrderNumber2 = "placerOrderNumber2"
+        def matchingSendingFacilityDetails2 = new MessageHdDataType("sending_facility_name2", "sending_facility_id2", "sending_facility_type2")
+        def matchingSendingFacilityDetailsMetadata2 = new PartnerMetadata(receivedSubmissionId2, null, null, null, null, null, null, null, null, null, null, matchingSendingFacilityDetails2, null, new MessageHdDataType(null, null, null), matchingPlacerOrderNumber2)
+        def matchingReceivingFacilityDetailsMetadata2 = new PartnerMetadata("2", null, null, null, null, null, null, null, null, null, null, new MessageHdDataType(null, null, null), null, matchingSendingFacilityDetails2, matchingPlacerOrderNumber2)
+        FilePartnerMetadataStorage.getInstance().saveMetadata(matchingSendingFacilityDetailsMetadata2)
+        FilePartnerMetadataStorage.getInstance().saveMetadata(matchingReceivingFacilityDetailsMetadata2)
+        def metadataSetWithMatchingSendingAndReceivingFacilityDetails = FilePartnerMetadataStorage.getInstance().readMetadataForMessageLinking(receivedSubmissionId2)
+
+        then:
+        metadataSetWithMatchingSendingAndReceivingFacilityDetails.containsAll(Set.of(matchingSendingFacilityDetailsMetadata2, matchingReceivingFacilityDetailsMetadata2))
     }
 
     def "readMetadataForMessageLinking returns an empty set when no metadata is found"() {

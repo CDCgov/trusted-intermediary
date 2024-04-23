@@ -18,11 +18,11 @@ class ResultTest extends Specification {
 
     def "a result response is returned from the ETOR order endpoint"() {
         given:
-        def expectedJsonBody = JsonParsing.parse(labResultJsonFileString)
+        def expectedJsonBody = JsonParser.parse(labResultJsonFileString)
 
         when:
         def response = resultClient.submit(labResultJsonFileString, submissionId, true)
-        def parsedJsonBody = JsonParsing.parseContent(response)
+        def parsedJsonBody = JsonParser.parseContent(response)
 
         then:
         response.getCode() == 200
@@ -33,8 +33,8 @@ class ResultTest extends Specification {
         when:
         resultClient.submit(labResultJsonFileString, submissionId, true)
         def sentPayload = SentPayloadReader.read()
-        def parsedSentPayload = JsonParsing.parse(sentPayload)
-        def parsedLabResultJsonFile = JsonParsing.parse(labResultJsonFileString)
+        def parsedSentPayload = JsonParser.parse(sentPayload)
+        def parsedLabResultJsonFile = JsonParser.parse(labResultJsonFileString)
 
         then:
         parsedSentPayload.entry[0].resource.meta.tag.remove(1) // Remove ETOR meta tagging from tests
@@ -45,7 +45,7 @@ class ResultTest extends Specification {
         when:
         resultClient.submit(labResultJsonFileString, submissionId, true)
         def sentPayload = SentPayloadReader.read()
-        def parsedSentPayload = JsonParsing.parse(sentPayload)
+        def parsedSentPayload = JsonParser.parse(sentPayload)
 
         then:
         //test that the MessageHeader's event is now an ORU_R01
@@ -64,7 +64,7 @@ class ResultTest extends Specification {
 
         when:
         def response = resultClient.submit(invalidJsonRequest, submissionId, true)
-        def parsedJsonBody = JsonParsing.parseContent(response)
+        def parsedJsonBody = JsonParser.parseContent(response)
 
         then:
         response.getCode() == 400
@@ -74,7 +74,7 @@ class ResultTest extends Specification {
     def "return a 401 response when making an unauthenticated request"() {
         when:
         def response = resultClient.submit(labResultJsonFileString, submissionId, false)
-        def parsedJsonBody = JsonParsing.parseContent(response)
+        def parsedJsonBody = JsonParser.parseContent(response)
 
         then:
         response.getCode() == 401
