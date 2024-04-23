@@ -233,7 +233,8 @@ public class EtorDomainRegistration implements DomainConnector {
             Set<String> messageIdsToLink =
                     partnerMetadataOrchestrator.findMessagesIdsToLink(metadataId);
 
-            // Remove the metadataId from the set of messageIdsToLink
+            // Remove the metadataId from the set of messageIdsToLink to avoid showing it in the
+            // partner metadata's linked ids
             messageIdsToLink.remove(metadataId);
 
             FhirMetadata<?> responseObject =
