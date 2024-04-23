@@ -202,8 +202,7 @@ public class EtorDomainRegistration implements DomainConnector {
                     sendOrderUseCase.convertAndSend(orders, receivedSubmissionId);
                     return domainResponseHelper.constructOkResponse(new OrderResponse(orders));
                 },
-                "order",
-                true);
+                "order");
     }
 
     DomainResponse handleResults(DomainRequest request) {
@@ -214,8 +213,7 @@ public class EtorDomainRegistration implements DomainConnector {
                     sendResultUseCase.convertAndSend(results, receivedSubmissionId);
                     return domainResponseHelper.constructOkResponse(new ResultResponse(results));
                 },
-                "results",
-                false);
+                "results");
     }
 
     DomainResponse handleMetadata(DomainRequest request) {
@@ -262,8 +260,7 @@ public class EtorDomainRegistration implements DomainConnector {
     protected DomainResponse handleMessageRequest(
             DomainRequest request,
             MessageRequestHandler<DomainResponse> requestHandler,
-            String messageType,
-            boolean doUpdatePartnerMetadata) {
+            String messageType) {
         String receivedSubmissionId = getReceivedSubmissionId(request);
         boolean markMetadataAsFailed = false;
         String errorMessage = "";
@@ -281,7 +278,7 @@ public class EtorDomainRegistration implements DomainConnector {
             markMetadataAsFailed = true;
             return domainResponseHelper.constructErrorResponse(400, e);
         } finally {
-            if (doUpdatePartnerMetadata && markMetadataAsFailed) {
+            if (markMetadataAsFailed) {
                 try {
                     partnerMetadataOrchestrator.setMetadataStatusToFailed(
                             receivedSubmissionId, errorMessage);
