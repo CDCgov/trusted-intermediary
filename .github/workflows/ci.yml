@@ -119,7 +119,10 @@ jobs:
         uses: liquibase-github-actions/update@v4.27.0
         with:
           changelogFile: ./etor/databaseMigrations/root.yml
-          url: "jdbc:postgresql://localhost:5432/testdb"
+          url: "jdbc:postgresql://postgres:5432/testdb"
           username: testuser
           password: dogcow #pragma: allowlist secret
           labelFilter: '!azure'
+
+          # manually install LB and call command line directly, reuseable.ym,
+          # add something to service section to use the same network as github action network
