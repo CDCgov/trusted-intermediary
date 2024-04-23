@@ -36,7 +36,7 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
                 new PartnerMetadata(
                         receivedSubmissionId,
                         String.valueOf(result.hashCode()),
-                        PartnerMetadataMessageType.ORDER,
+                        PartnerMetadataMessageType.RESULT,
                         result.getSendingApplicationDetails(),
                         result.getSendingFacilityDetails(),
                         result.getReceivingApplicationDetails(),
