@@ -94,19 +94,11 @@ public class PartnerMetadataOrchestrator {
                 sender,
                 timeReceived);
         PartnerMetadata updatedPartnerMetadata =
-                new PartnerMetadata(
-                        partnerMetadata.receivedSubmissionId(),
-                        sender,
-                        timeReceived,
-                        null,
-                        partnerMetadata.hash(),
-                        PartnerMetadataStatus.PENDING,
-                        partnerMetadata.messageType(),
-                        partnerMetadata.sendingApplicationDetails(),
-                        partnerMetadata.sendingFacilityDetails(),
-                        partnerMetadata.receivingApplicationDetails(),
-                        partnerMetadata.receivingFacilityDetails(),
-                        partnerMetadata.placerOrderNumber());
+                partnerMetadata
+                        .withDeliveryStatus(PartnerMetadataStatus.PENDING)
+                        .withSender(sender)
+                        .withTimeReceived(timeReceived)
+                        .withTimeDelivered(null);
         partnerMetadataStorage.saveMetadata(updatedPartnerMetadata);
     }
 
