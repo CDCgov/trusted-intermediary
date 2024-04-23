@@ -61,7 +61,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 /**
@@ -233,16 +232,13 @@ public class EtorDomainRegistration implements DomainConnector {
 
             Set<String> messageIdsToLink =
                     partnerMetadataOrchestrator.findMessagesIdsToLink(receivedSubmissionId);
-            Set<String> relevantMessageIdsToLinkInMetadata =
-                    messageIdsToLink.stream()
-                            .filter(s -> !s.equals(receivedSubmissionId))
-                            .collect(Collectors.toSet());
+
+            // Remove the receivedSubmissionId from the set of messageIdsToLink
+            messageIdsToLink.remove(receivedSubmissionId);
 
             FhirMetadata<?> responseObject =
                     partnerMetadataConverter.extractPublicMetadataToOperationOutcome(
-                            metadata.get(),
-                            receivedSubmissionId,
-                            relevantMessageIdsToLinkInMetadata);
+                            metadata.get(), receivedSubmissionId, messageIdsToLink);
 
             return domainResponseHelper.constructOkResponseFromString(
                     fhir.encodeResourceToJson(responseObject.getUnderlyingOutcome()));

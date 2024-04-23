@@ -279,7 +279,7 @@ class EtorDomainRegistrationTest extends Specification {
         def metadata = new PartnerMetadata("receivedSubmissionId", "sender", Instant.now(), null,
                 "hash", PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER,
                 sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
-        def linkedMessageIds = Set.of(receivedSubmissionId, "Test1", "Test2")
+        def linkedMessageIds = new HashSet<>(Set.of(receivedSubmissionId, "Test1", "Test2"))
         def relevantMessageIds = linkedMessageIds.findAll { it != receivedSubmissionId }
 
         def connector = new EtorDomainRegistration()
