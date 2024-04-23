@@ -109,8 +109,6 @@ public record PartnerMetadata(
         return new PartnerMetadata(
                 this.receivedSubmissionId,
                 sentSubmissionId,
-                this.sender,
-                this.receiver,
                 this.timeReceived,
                 this.timeDelivered,
                 this.hash,
@@ -128,8 +126,6 @@ public record PartnerMetadata(
         return new PartnerMetadata(
                 this.receivedSubmissionId,
                 this.sentSubmissionId,
-                this.sender,
-                this.receiver,
                 timeReceived,
                 this.timeDelivered,
                 this.hash,
