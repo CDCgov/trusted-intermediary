@@ -14,6 +14,7 @@ class HikariConnectionPoolTest extends Specification {
         TestApplicationContext.addEnvironmentVariable("DB_NAME", "test_name")
         TestApplicationContext.addEnvironmentVariable("DB_PORT", "1234")
         TestApplicationContext.addEnvironmentVariable("DB_PASS", "test_pass")
+        TestApplicationContext.addEnvironmentVariable("DB_MAX_LIFETIME", "9001")
 
         credProviders.getPassword() >> "test_pass"
         TestApplicationContext.register(DatabaseCredentialsProvider, credProviders)
@@ -30,5 +31,6 @@ class HikariConnectionPoolTest extends Specification {
         result.getDataSourceProperties().get("serverName") == "test_url"
         result.getDataSourceProperties().get("databaseName") == "test_name"
         result.getDataSourceProperties().get("portNumber") == "1234"
+        result.getMaxLifetime() == 9001L
     }
 }
