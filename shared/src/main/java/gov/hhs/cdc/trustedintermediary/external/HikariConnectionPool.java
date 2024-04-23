@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool;
 import gov.hhs.cdc.trustedintermediary.wrappers.database.DatabaseCredentialsProvider;
 import java.sql.Connection;
@@ -19,6 +20,8 @@ public class HikariConnectionPool implements ConnectionPool {
     private static HikariConnectionPool INSTANCE;
 
     public final HikariDataSource ds;
+
+    private static final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
 
     private HikariConnectionPool() {
         HikariConfig config = constructHikariConfig();
@@ -41,15 +44,17 @@ public class HikariConnectionPool implements ConnectionPool {
         String serverName = ApplicationContext.getProperty("DB_URL", "");
         String dbName = ApplicationContext.getProperty("DB_NAME", "");
         String dbPort = ApplicationContext.getProperty("DB_PORT", "");
-        long connectionLifetime;
-        try {
-            connectionLifetime =
-                    Long.parseLong(ApplicationContext.getProperty("DB_MAX_LIFETIME", "1800000"));
-        } catch (NumberFormatException e) {
-            connectionLifetime = 1800000L;
-        }
 
         HikariConfig config = new HikariDataSource();
+
+        try {
+            String maxLife = ApplicationContext.getProperty("DB_MAX_LIFETIME");
+            if (!maxLife.isEmpty()) {
+                config.setMaxLifetime(Long.parseLong(maxLife));
+            }
+        } catch (NumberFormatException e) {
+            LOGGER.logInfo("Using Hikari default DB Max Lifetime");
+        }
 
         config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
         config.addDataSourceProperty("user", user);
@@ -57,7 +62,6 @@ public class HikariConnectionPool implements ConnectionPool {
         config.addDataSourceProperty("serverName", serverName);
         config.addDataSourceProperty("databaseName", dbName);
         config.addDataSourceProperty("portNumber", dbPort);
-        config.setMaxLifetime(connectionLifetime);
 
         return config;
     }
