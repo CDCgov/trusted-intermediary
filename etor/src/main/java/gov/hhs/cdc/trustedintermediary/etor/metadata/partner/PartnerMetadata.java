@@ -109,7 +109,28 @@ public record PartnerMetadata(
         return new PartnerMetadata(
                 this.receivedSubmissionId,
                 sentSubmissionId,
+                this.sender,
+                this.receiver,
                 this.timeReceived,
+                this.timeDelivered,
+                this.hash,
+                this.deliveryStatus,
+                this.failureReason,
+                this.messageType,
+                this.sendingApplicationDetails,
+                this.sendingFacilityDetails,
+                this.receivingApplicationDetails,
+                this.receivingFacilityDetails,
+                this.placerOrderNumber);
+    }
+
+    public PartnerMetadata withTimeReceived(Instant timeReceived) {
+        return new PartnerMetadata(
+                this.receivedSubmissionId,
+                this.sentSubmissionId,
+                this.sender,
+                this.receiver,
+                timeReceived,
                 this.timeDelivered,
                 this.hash,
                 this.deliveryStatus,

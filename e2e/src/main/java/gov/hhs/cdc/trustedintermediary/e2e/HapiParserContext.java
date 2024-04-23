@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.external.hapi;
+package gov.hhs.cdc.trustedintermediary.e2e;
 
 import ca.uhn.fhir.fhirpath.IFhirPathEvaluationContext;
 import jakarta.annotation.Nonnull;
@@ -8,7 +8,7 @@ import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.Reference;
 
 /** Custom evaluation context for FHIRPath engine. */
-public class HapiFhirCustomEvaluationContext implements IFhirPathEvaluationContext {
+public class HapiParserContext implements IFhirPathEvaluationContext {
 
     /**
      * When a FHIR path includes the "resolve()" method, this function is called to parse that into

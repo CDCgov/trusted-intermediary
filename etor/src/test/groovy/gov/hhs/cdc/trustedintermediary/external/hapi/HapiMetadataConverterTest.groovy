@@ -34,23 +34,25 @@ class HapiMetadataConverterTest extends Specification {
         def hash = "hash"
         def failureReason = "timed_out"
         def messageType =  PartnerMetadataMessageType.ORDER
+        def messageIds = Set.of("TestId")
         PartnerMetadata metadata = new PartnerMetadata(
                 "receivedSubmissionId", "sentSubmissionId", time, time, hash, PartnerMetadataStatus.DELIVERED, failureReason, messageType, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
 
         when:
-        def result = HapiPartnerMetadataConverter.getInstance().extractPublicMetadataToOperationOutcome(metadata, "receivedSubmissionId").getUnderlyingOutcome() as OperationOutcome
+        def result = HapiPartnerMetadataConverter.getInstance().extractPublicMetadataToOperationOutcome(metadata, "receivedSubmissionId", messageIds).getUnderlyingOutcome() as OperationOutcome
 
         then:
         result.getId() == "receivedSubmissionId"
-        result.getIssue().get(0).diagnostics == sender
-        result.getIssue().get(1).diagnostics == receiver
-        result.getIssue().get(2).diagnostics == time.toString()
-        result.getIssue().get(3).diagnostics == hash
-        result.getIssue().get(4).diagnostics == time.toString()
-        result.getIssue().get(5).diagnostics == PartnerMetadataStatus.DELIVERED.toString()
-        result.getIssue().get(6).diagnostics == failureReason
-        result.getIssue().get(7).diagnostics == messageType.toString()
-        result.getIssue().get(8).diagnostics == "sentSubmissionId"
-        result.getIssue().get(9).diagnostics == "receivedSubmissionId"
+        result.getIssue().get(0).diagnostics == messageIds.toString()
+        result.getIssue().get(1).diagnostics == sender
+        result.getIssue().get(2).diagnostics == receiver
+        result.getIssue().get(3).diagnostics == time.toString()
+        result.getIssue().get(4).diagnostics == hash
+        result.getIssue().get(5).diagnostics == time.toString()
+        result.getIssue().get(6).diagnostics == PartnerMetadataStatus.DELIVERED.toString()
+        result.getIssue().get(7).diagnostics == failureReason
+        result.getIssue().get(8).diagnostics == messageType.toString()
+        result.getIssue().get(9).diagnostics == "sentSubmissionId"
+        result.getIssue().get(10).diagnostics == "receivedSubmissionId"
     }
 }

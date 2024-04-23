@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataConverter;
 import gov.hhs.cdc.trustedintermediary.etor.operationoutcomes.FhirMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.operationoutcomes.HapiFhirMetadata;
+import java.util.Set;
 import org.hl7.fhir.r4.model.OperationOutcome;
 
 public class HapiPartnerMetadataConverter implements PartnerMetadataConverter {
@@ -18,10 +19,15 @@ public class HapiPartnerMetadataConverter implements PartnerMetadataConverter {
 
     @Override
     public FhirMetadata<?> extractPublicMetadataToOperationOutcome(
-            PartnerMetadata metadata, String requestedId) {
+            PartnerMetadata metadata, String requestedId, Set<String> messageIdsToLink) {
         var operation = new OperationOutcome();
 
         operation.setId(requestedId);
+        operation
+                .getIssue()
+                .add(
+                        createInformationIssueComponent(
+                                "linked messages", messageIdsToLink.toString()));
         operation
                 .getIssue()
                 .add(

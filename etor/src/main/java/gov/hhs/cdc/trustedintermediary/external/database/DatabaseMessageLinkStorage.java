@@ -73,7 +73,7 @@ public class DatabaseMessageLinkStorage implements MessageLinkStorage {
             for (String messageId : messageLink.getMessageIds()) {
                 columns =
                         List.of(
-                                new DbColumn("link_id", linkId, false, Types.VARCHAR),
+                                new DbColumn("link_id", linkId, false, Types.OTHER),
                                 new DbColumn("message_id", messageId, false, Types.VARCHAR));
                 dao.upsertData(
                         "message_link",
