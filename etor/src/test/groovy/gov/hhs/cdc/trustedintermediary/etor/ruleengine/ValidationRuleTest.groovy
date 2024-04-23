@@ -50,7 +50,7 @@ class ValidationRuleTest extends Specification {
         ], null)
 
         expect:
-        rule.appliesTo(new FhirResourceMock("resource")) == applies
+        rule.shouldRun(new FhirResourceMock("resource")) == applies
 
         where:
         conditionResult | applies
@@ -67,7 +67,7 @@ class ValidationRuleTest extends Specification {
         def rule = new ValidationRule(null, null, null, ["condition"], null)
 
         when:
-        def applies = rule.appliesTo(Mock(FhirResource))
+        def applies = rule.shouldRun(Mock(FhirResource))
 
         then:
         1 * mockLogger.logError(_ as String, _ as Exception)

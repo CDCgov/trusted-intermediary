@@ -41,7 +41,7 @@ class RuleEngineIntegrationTest extends Specification {
         def bundle = new Bundle()
 
         when:
-        engine.validate(new HapiFhirResource(bundle))
+        engine.runRules(new HapiFhirResource(bundle))
 
         then:
         (1.._) * mockLogger.logWarning(_ as String)
@@ -53,7 +53,7 @@ class RuleEngineIntegrationTest extends Specification {
 
         when:
         exampleFhirResources.each { resource ->
-            engine.validate(resource)
+            engine.runRules(resource)
         }
 
         then:

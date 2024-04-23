@@ -49,7 +49,6 @@ public class ValidationRule implements Rule {
         return description;
     }
 
-    @Override
     public String getViolationMessage() {
         return violationMessage;
     }
@@ -59,34 +58,12 @@ public class ValidationRule implements Rule {
         return conditions;
     }
 
-    @Override
     public List<String> getValidations() {
         return validations;
     }
 
     @Override
-    public boolean isValid(FhirResource<?> resource) {
-        return validations.stream()
-                .allMatch(
-                        validation -> {
-                            try {
-                                return fhirEngine.evaluateCondition(
-                                        resource.getUnderlyingResource(), validation);
-                            } catch (Exception e) {
-                                logger.logError(
-                                        "Rule ["
-                                                + name
-                                                + "]: "
-                                                + "An error occurred while evaluating the validation: "
-                                                + validation,
-                                        e);
-                                return false;
-                            }
-                        });
-    }
-
-    @Override
-    public boolean appliesTo(FhirResource<?> resource) {
+    public boolean shouldRun(FhirResource<?> resource) {
         return conditions.stream()
                 .allMatch(
                         condition -> {
@@ -104,5 +81,26 @@ public class ValidationRule implements Rule {
                                 return false;
                             }
                         });
+    }
+
+    @Override
+    public void runRule(FhirResource<?> resource) {
+        for (String validation : validations) {
+            try {
+                boolean isValid =
+                        fhirEngine.evaluateCondition(resource.getUnderlyingResource(), validation);
+                if (!isValid) {
+                    logger.logWarning("Rule violation: " + violationMessage);
+                }
+            } catch (Exception e) {
+                logger.logError(
+                        "Rule ["
+                                + name
+                                + "]: "
+                                + "An error occurred while evaluating the validation: "
+                                + validation,
+                        e);
+            }
+        }
     }
 }

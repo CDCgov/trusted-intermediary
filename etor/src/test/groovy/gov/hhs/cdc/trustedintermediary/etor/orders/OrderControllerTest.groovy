@@ -38,7 +38,7 @@ class OrderControllerTest extends Specification {
 
         then:
         actualBundle == expectedBundle
-        (1.._) * ruleEngine.validate(_)
+        (1.._) * ruleEngine.runRules(_)
     }
 
     def "parseOrders registers a metadata step"() {

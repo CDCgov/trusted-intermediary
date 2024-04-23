@@ -66,13 +66,13 @@ class RuleEngineTest extends Specification {
         mockRuleLoader.loadRules(_ as String) >> { throw exception }
 
         when:
-        ruleEngine.validate(Mock(FhirResource))
+        ruleEngine.runRules(Mock(FhirResource))
 
         then:
         1 * mockLogger.logError(_ as String, exception)
     }
 
-    def "validate handles logging warning correctly"() {
+    def 'runRules handles logging warning correctly'() {
         given:
         def ruleViolationMessage = "Rule violation message"
         def fullRuleViolationMessage = "Rule violation: " + ruleViolationMessage
@@ -82,25 +82,25 @@ class RuleEngineTest extends Specification {
         mockRuleLoader.loadRules(_ as String) >> [invalidRule]
 
         when:
-        invalidRule.appliesTo(fhirBundle) >> true
+        invalidRule.shouldRun(fhirBundle) >> true
         invalidRule.isValid(fhirBundle) >> false
-        ruleEngine.validate(fhirBundle)
+        ruleEngine.runRules(fhirBundle)
 
         then:
         1 * mockLogger.logWarning(fullRuleViolationMessage)
 
         when:
-        invalidRule.appliesTo(fhirBundle) >> true
+        invalidRule.shouldRun(fhirBundle) >> true
         invalidRule.isValid(fhirBundle) >> true
-        ruleEngine.validate(fhirBundle)
+        ruleEngine.runRules(fhirBundle)
 
         then:
         0 * mockLogger.logWarning(fullRuleViolationMessage)
 
         when:
-        invalidRule.appliesTo(fhirBundle) >> false
+        invalidRule.shouldRun(fhirBundle) >> false
         invalidRule.isValid(fhirBundle) >> false
-        ruleEngine.validate(fhirBundle)
+        ruleEngine.runRules(fhirBundle)
 
         then:
         0 * mockLogger.logWarning(fullRuleViolationMessage)

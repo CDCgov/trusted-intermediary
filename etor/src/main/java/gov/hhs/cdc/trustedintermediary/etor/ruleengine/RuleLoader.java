@@ -1,8 +1,12 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine;
 
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.FormatterProcessingException;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +16,7 @@ import javax.inject.Inject;
 public class RuleLoader {
     private static final RuleLoader INSTANCE = new RuleLoader();
     @Inject Formatter formatter;
+    @Inject Logger logger;
 
     private RuleLoader() {}
 
@@ -19,14 +24,18 @@ public class RuleLoader {
         return INSTANCE;
     }
 
-    public List<ValidationRule> loadRules(String ruleStream) throws RuleLoaderException {
-        try {
-            Map<String, List<ValidationRule>> jsonObj =
-                    formatter.convertJsonToObject(ruleStream, new TypeReference<>() {});
+    public List<Rule> loadRules(String fileName) {
+        try (InputStream ruleDefinitionStream =
+                getClass().getClassLoader().getResourceAsStream(fileName)) {
+            assert ruleDefinitionStream != null;
+            var rulesString =
+                    new String(ruleDefinitionStream.readAllBytes(), StandardCharsets.UTF_8);
+            Map<String, List<Rule>> jsonObj =
+                    formatter.convertJsonToObject(rulesString, new TypeReference<>() {});
             return jsonObj.getOrDefault("rules", Collections.emptyList());
-        } catch (FormatterProcessingException e) {
-            throw new RuleLoaderException(
-                    "Failed to load rules definitions for provided stream", e);
+        } catch (IOException | FormatterProcessingException e) {
+            logger.logError("Failed to load rules definitions from: " + fileName, e);
+            return Collections.emptyList();
         }
     }
 }

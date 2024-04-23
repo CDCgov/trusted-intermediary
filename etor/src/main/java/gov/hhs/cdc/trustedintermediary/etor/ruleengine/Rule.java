@@ -12,17 +12,9 @@ public interface Rule {
 
     String getDescription();
 
-    /**
-     * Descriptive message when there's a rule violation Note: When implementing this method, make
-     * sure that no PII or PHI is included in the message!
-     */
-    String getViolationMessage();
-
     List<String> getConditions();
 
-    List<String> getValidations();
+    boolean shouldRun(FhirResource<?> resource);
 
-    boolean isValid(FhirResource<?> resource);
-
-    boolean appliesTo(FhirResource<?> resource);
+    void runRule(FhirResource<?> resource);
 }
