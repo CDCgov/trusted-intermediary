@@ -1,5 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external;
 
+import static java.lang.Long.parseLong;
+
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
@@ -41,7 +43,8 @@ public class HikariConnectionPool implements ConnectionPool {
         String serverName = ApplicationContext.getProperty("DB_URL", "");
         String dbName = ApplicationContext.getProperty("DB_NAME", "");
         String dbPort = ApplicationContext.getProperty("DB_PORT", "");
-        String connectionLifetime = ApplicationContext.getProperty("DB_MAX_LIFETIME", "1800000");
+        long connectionLifetime =
+                parseLong(ApplicationContext.getProperty("DB_MAX_LIFETIME", "1800000"));
 
         HikariConfig config = new HikariDataSource();
 
@@ -51,7 +54,7 @@ public class HikariConnectionPool implements ConnectionPool {
         config.addDataSourceProperty("serverName", serverName);
         config.addDataSourceProperty("databaseName", dbName);
         config.addDataSourceProperty("portNumber", dbPort);
-        config.addDataSourceProperty("maxLifetime", connectionLifetime);
+        config.setMaxLifetime(connectionLifetime);
 
         return config;
     }
