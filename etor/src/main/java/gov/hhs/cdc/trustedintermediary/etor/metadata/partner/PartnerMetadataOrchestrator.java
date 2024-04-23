@@ -91,10 +91,7 @@ public class PartnerMetadataOrchestrator {
         String sender = "PLACE_HOLDER";
         logger.logInfo("Updating metadata with sender: {}, timeReceived: {}", sender, timeReceived);
         PartnerMetadata updatedPartnerMetadata =
-                partnerMetadata
-                        .withDeliveryStatus(PartnerMetadataStatus.PENDING)
-                        .withSender(sender)
-                        .withTimeReceived(timeReceived);
+                partnerMetadata.withSender(sender).withTimeReceived(timeReceived);
         partnerMetadataStorage.saveMetadata(updatedPartnerMetadata);
     }
 
