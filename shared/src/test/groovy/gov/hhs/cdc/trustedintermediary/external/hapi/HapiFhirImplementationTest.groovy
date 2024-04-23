@@ -138,7 +138,7 @@ class HapiFhirImplementationTest extends Specification {
 
     def "parseResource can convert a valid string to Bundle"() {
         given:
-        def fhirBody = Files.readString(Path.of("../examples/Test/Orders/001_OML_O21_short.fhir"))
+        def fhirBody = Files.readString(Path.of("../examples/Test/e2e/orders/001_OML_O21_short.fhir"))
 
         when:
         def parsedBundle = fhir.parseResource(fhirBody, Bundle.class)

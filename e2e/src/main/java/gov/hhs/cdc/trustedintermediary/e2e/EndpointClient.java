@@ -52,7 +52,7 @@ public class EndpointClient {
 
     public static Object getResponseBodyValue(ClassicHttpResponse response, String key)
             throws IOException {
-        var responseBody = JsonParsing.parseContent(response);
+        var responseBody = JsonParser.parseContent(response);
         return responseBody.get(key);
     }
 }

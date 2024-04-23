@@ -36,6 +36,8 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import java.time.Instant
 import spock.lang.Specification
 
+import java.util.stream.Collectors
+
 class EtorDomainRegistrationTest extends Specification {
 
     private sendingApp = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
@@ -273,31 +275,32 @@ class EtorDomainRegistrationTest extends Specification {
     def "metadata endpoint happy path"() {
         given:
         def expectedStatusCode = 200
+        def receivedSubmissionId = "receivedSubmissionId"
+        def metadata = new PartnerMetadata("receivedSubmissionId", "sender", Instant.now(), null,
+                "hash", PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER,
+                sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
+        def linkedMessageIds = new HashSet<>(Set.of(receivedSubmissionId, "Test1", "Test2"))
+        def relevantMessageIds = linkedMessageIds.findAll { it != receivedSubmissionId }
 
         def connector = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, connector)
 
         def request = new DomainRequest()
-        request.setPathParams(["id": "metadataId"])
+        request.setPathParams(["id": receivedSubmissionId])
 
         def mockPartnerMetadataOrchestrator = Mock(PartnerMetadataOrchestrator)
-        mockPartnerMetadataOrchestrator.getMetadata(_ as String) >> Optional.ofNullable(
-                new PartnerMetadata("receivedSubmissionId", "sender", Instant.now(), null,
-                "hash", PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER,
-                sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number"))
         TestApplicationContext.register(PartnerMetadataOrchestrator, mockPartnerMetadataOrchestrator)
 
         def mockResponseHelper = Mock(DomainResponseHelper)
-        mockResponseHelper.constructOkResponseFromString(_ as String) >> new DomainResponse(expectedStatusCode)
         TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
 
         def mockPartnerMetadataConverter = Mock(PartnerMetadataConverter)
-        mockPartnerMetadataConverter.extractPublicMetadataToOperationOutcome(_ as PartnerMetadata, _ as String) >> Mock(FhirMetadata)
         TestApplicationContext.register(PartnerMetadataConverter, mockPartnerMetadataConverter)
 
         def mockFhir = Mock(HapiFhir)
         mockFhir.encodeResourceToJson(_) >> ""
         TestApplicationContext.register(HapiFhir, mockFhir)
+
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -306,6 +309,10 @@ class EtorDomainRegistrationTest extends Specification {
 
         then:
         actualStatusCode == expectedStatusCode
+        1 * mockPartnerMetadataOrchestrator.getMetadata(receivedSubmissionId) >> Optional.ofNullable(metadata)
+        1 * mockPartnerMetadataOrchestrator.findMessagesIdsToLink(receivedSubmissionId) >> linkedMessageIds
+        1 * mockPartnerMetadataConverter.extractPublicMetadataToOperationOutcome(_ as PartnerMetadata, _ as String, relevantMessageIds) >> Mock(FhirMetadata)
+        1 * mockResponseHelper.constructOkResponseFromString(_ as String) >> new DomainResponse(expectedStatusCode)
     }
 
     def "metadata endpoint returns a 404 response when metadata id is not found"() {

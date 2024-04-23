@@ -17,9 +17,9 @@
 
 ## Previously renamed files
 
-- `fhir/MN NBS FHIR Order Message.json` => `Test/Orders/002_ORM_O01.fhir`
-- `fhir/lab_order.json` => `Test/Orders/001_OML_O21_short.fhir`
-- `fhir/newborn_patient.json` => `Test/Demographics/001_Patient_NBS.fhir`
+- `fhir/MN NBS FHIR Order Message.json` => `Test/e2e/orders/002_ORM_O01.fhir`
+- `fhir/lab_order.json` => `Test/e2e/orders/001_OML_O21_short.fhir`
+- `fhir/newborn_patient.json` => `Test/e2e/demographics/001_Patient_NBS.fhir`
 - `fhir/oml_message.json` => `Other/004_OML_O21.fhir`
 - `hl7/AL/Baptist ORM 1.txt` => `Oracle/001_Oracle_ORM_O01.hl7`
 - `hl7/AL/Baptist ORM 2.txt` => `Oracle/002_Oracle_ORM_O01.hl7`

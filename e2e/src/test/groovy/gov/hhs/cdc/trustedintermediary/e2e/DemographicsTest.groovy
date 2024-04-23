@@ -8,7 +8,7 @@ import java.nio.file.Path
 class DemographicsTest extends Specification {
 
     def demographicsClient = new EndpointClient("/v1/etor/demographics")
-    def newbornPatientJsonFileString = Files.readString(Path.of("../examples/Test/Demographics/001_Patient_NBS.fhir"))
+    def newbornPatientJsonFileString = Files.readString(Path.of("../examples/Test/e2e/demographics/001_Patient_NBS.fhir"))
 
     def setup() {
         SentPayloadReader.delete()
@@ -21,7 +21,7 @@ class DemographicsTest extends Specification {
 
         when:
         def response = demographicsClient.submit(newbornPatientJsonFileString, true)
-        def parsedJsonBody = JsonParsing.parseContent(response)
+        def parsedJsonBody = JsonParser.parseContent(response)
 
         then:
         response.getCode() == 200
@@ -32,9 +32,9 @@ class DemographicsTest extends Specification {
     def "payload file check"() {
         when:
         def response = demographicsClient.submit(newbornPatientJsonFileString, true)
-        def parsedResponseBody = JsonParsing.parseContent(response)
+        def parsedResponseBody = JsonParser.parseContent(response)
         def sentPayload = SentPayloadReader.read()
-        def parsedSentPayload = JsonParsing.parse(sentPayload)
+        def parsedSentPayload = JsonParser.parse(sentPayload)
 
         then:
         response.getCode() == 200
@@ -54,7 +54,7 @@ class DemographicsTest extends Specification {
 
         when:
         def response = demographicsClient.submit(invalidJsonRequest, true)
-        def parsedJsonBody = JsonParsing.parseContent(response)
+        def parsedJsonBody = JsonParser.parseContent(response)
 
         then:
         response.getCode() == 400
@@ -64,7 +64,7 @@ class DemographicsTest extends Specification {
     def "return a 401 response when making an unauthenticated request"() {
         when:
         def response = demographicsClient.submit(newbornPatientJsonFileString, false)
-        def parsedJsonBody = JsonParsing.parseContent(response)
+        def parsedJsonBody = JsonParser.parseContent(response)
 
         then:
         response.getCode() == 401

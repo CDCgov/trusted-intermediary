@@ -62,7 +62,7 @@ class RuleEngineIntegrationTest extends Specification {
 
     def "validation rule with resolve() works as expected"() {
         given:
-        def fhirResource = getExampleFhirResource("Orders/001_OML_O21_short.fhir")
+        def fhirResource = getExampleFhirResource("e2e/orders/001_OML_O21_short.fhir")
         def validation = "Bundle.entry.resource.ofType(MessageHeader).focus.resolve().category.exists()"
         def rule = createValidationRule([], [validation])
 
@@ -83,7 +83,7 @@ class RuleEngineIntegrationTest extends Specification {
 
         where:
         testFile | validation
-        "Orders/001_OML_O21_short.fhir"                                    | "Bundle.entry.resource.ofType(MessageHeader).focus.resolve().category.exists()"
+        "e2e/orders/001_OML_O21_short.fhir"                                       | "Bundle.entry.resource.ofType(MessageHeader).focus.resolve().category.exists()"
         "Orders/003_AL_ORM_O01_NBS_Fully_Populated_1_hl7_translation.fhir" | "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(system = 'urn:ietf:rfc:3986').value.exists()"
         // Once we fix the mapping for ORM from story #900 and update the FHIR files in /examples/Test/Orders, we can uncomment the below line
         // "Orders/003_AL_ORM_O01_NBS_Fully_Populated_1_hl7_translation.fhir" | "Bundle.entry.resource.ofType(Observation).where(code.coding.code = '57723-9').value.coding.code.exists()"
@@ -99,8 +99,8 @@ class RuleEngineIntegrationTest extends Specification {
 
         where:
         testFile | validation
-        "Orders/001_OML_O21_short.fhir" | "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(system = 'urn:ietf:rfc:3986').value.exists()"
-        "Orders/001_OML_O21_short.fhir" | "Bundle.entry.resource.ofType(Observation).where(code.coding.code = '57723-9').value.coding.code.exists()"
+        "e2e/orders/001_OML_O21_short.fhir" | "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(system = 'urn:ietf:rfc:3986').value.exists()"
+        "e2e/orders/001_OML_O21_short.fhir" | "Bundle.entry.resource.ofType(Observation).where(code.coding.code = '57723-9').value.coding.code.exists()"
     }
 
     def "validation passes: Message has required receiver id"() {
