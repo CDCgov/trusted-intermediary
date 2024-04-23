@@ -38,8 +38,6 @@ class PartnerMetadataTest extends Specification {
         then:
         metadata.receivedSubmissionId() == receivedSubmissionId
         metadata.sentSubmissionId() == sentSubmissionId
-        metadata.sender() == sender
-        metadata.receiver() == receiver
         metadata.timeDelivered() == timeDelivered
         metadata.timeReceived() == timeReceived
         metadata.hash() == hash
@@ -121,8 +119,6 @@ class PartnerMetadataTest extends Specification {
         then:
         updatedMetadata.receivedSubmissionId() == receivedSubmissionId
         updatedMetadata.sentSubmissionId() == sentSubmissionId
-        updatedMetadata.sender() == sender
-        updatedMetadata.receiver() == receiver
         updatedMetadata.timeReceived() == timeReceived
         updatedMetadata.timeDelivered() == null
         updatedMetadata.hash() == hash
@@ -157,8 +153,6 @@ class PartnerMetadataTest extends Specification {
         then:
         updatedMetadata.receivedSubmissionId() == receivedSubmissionId
         updatedMetadata.sentSubmissionId() == sentSubmissionId
-        updatedMetadata.sender() == sender
-        updatedMetadata.receiver() == receiver
         updatedMetadata.timeReceived() == timeReceived
         updatedMetadata.timeDelivered() == timeDelivered
         updatedMetadata.hash() == hash

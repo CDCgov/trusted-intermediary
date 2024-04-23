@@ -99,39 +99,75 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
     @Override
     public Set<PartnerMetadata> readMetadataForSender(String sender)
             throws PartnerMetadataException {
-
-        Set<PartnerMetadata> partnerMetadata = null;
-
-        try (Stream<Path> fileList = Files.list(METADATA_DIRECTORY)) {
-            partnerMetadata =
-                    fileList.map(
-                                    fileName -> {
-                                        try {
-                                            return Files.readString(fileName);
-                                        } catch (IOException e) {
-                                            throw new RuntimeException(e);
-                                        }
-                                    })
-                            .map(
-                                    metadataContent -> {
-                                        try {
-                                            return formatter.convertJsonToObject(
-                                                    metadataContent,
-                                                    new TypeReference<PartnerMetadata>() {});
-                                        } catch (FormatterProcessingException e) {
-                                            throw new RuntimeException(e);
-                                        }
-                                    })
-                            .filter(
-                                    metadata ->
-                                            metadata.sendingFacilityDetails()
-                                                    .namespace()
-                                                    .equals(sender))
-                            .collect(Collectors.toSet());
+        try {
+            return getPartnerMetadata().stream()
+                    .filter(
+                            metadata ->
+                                    metadata.sendingFacilityDetails().namespace().equals(sender))
+                    .collect(Collectors.toSet());
         } catch (Exception e) {
             throw new PartnerMetadataException("Failed reading metadata for sender: " + sender, e);
         }
-        return partnerMetadata;
+    }
+
+    @Override
+    public Set<PartnerMetadata> readMetadataForMessageLinking(String receivedSubmissionId)
+            throws PartnerMetadataException {
+        try {
+            Set<PartnerMetadata> existingMetadata = getPartnerMetadata();
+            PartnerMetadata match =
+                    existingMetadata.stream()
+                            .filter(
+                                    metadata ->
+                                            metadata.receivedSubmissionId()
+                                                    .equals(receivedSubmissionId))
+                            .findFirst()
+                            .orElse(null);
+
+            if (match == null) {
+                logger.logWarning(
+                        "Matching metadata not found for receivedSubmissionId: {}",
+                        receivedSubmissionId);
+                return Set.of();
+            }
+
+            return existingMetadata.stream()
+                    .filter(
+                            metadata ->
+                                    metadata.placerOrderNumber().equals(match.placerOrderNumber())
+                                            && metadata.sendingApplicationDetails()
+                                                    .equals(match.sendingApplicationDetails())
+                                            && metadata.sendingFacilityDetails()
+                                                    .equals(match.sendingFacilityDetails()))
+                    .collect(Collectors.toSet());
+        } catch (Exception e) {
+            throw new PartnerMetadataException(
+                    "Failed reading metadata for submissionId: " + receivedSubmissionId, e);
+        }
+    }
+
+    private Set<PartnerMetadata> getPartnerMetadata() throws IOException {
+        try (Stream<Path> fileList = Files.list(METADATA_DIRECTORY)) {
+            return fileList.map(
+                            fileName -> {
+                                try {
+                                    return Files.readString(fileName);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            })
+                    .map(
+                            metadataContent -> {
+                                try {
+                                    return formatter.convertJsonToObject(
+                                            metadataContent,
+                                            new TypeReference<PartnerMetadata>() {});
+                                } catch (FormatterProcessingException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            })
+                    .collect(Collectors.toSet());
+        }
     }
 
     private Path getFilePath(String metadataId) {
