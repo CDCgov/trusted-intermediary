@@ -18,7 +18,7 @@ dependencies {
 
     //logging
     implementation 'org.slf4j:slf4j-api:2.0.13'
-    implementation 'ch.qos.logback:logback-classic:1.5.5'
+    implementation 'ch.qos.logback:logback-classic:1.5.6'
     implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
 
     //jackson
@@ -44,7 +44,7 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
 
     // azure sdk
-    implementation 'com.azure:azure-security-keyvault-secrets:4.8.1'
+    implementation 'com.azure:azure-security-keyvault-secrets:4.8.2'
     implementation 'com.azure:azure-identity:1.12.0'
 
     testImplementation 'org.apache.groovy:groovy:4.0.21'

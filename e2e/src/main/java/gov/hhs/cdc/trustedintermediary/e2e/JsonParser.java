@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.util.Map;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 
-public class JsonParsing {
+public class JsonParser {
 
     private static final ObjectMapper JSON_OBJECT_MAPPER = new ObjectMapper();
 

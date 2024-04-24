@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageHelper;
 import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
@@ -28,15 +29,18 @@ public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
     public void convertAndSend(final Order<?> order, String receivedSubmissionId)
             throws UnableToSendMessageException {
 
-        sendMessageHelper.savePartnerMetadataForReceivedMessage(
-                receivedSubmissionId,
-                order.hashCode(),
-                PartnerMetadataMessageType.ORDER,
-                order.getSendingApplicationDetails(),
-                order.getSendingFacilityDetails(),
-                order.getReceivingApplicationDetails(),
-                order.getReceivingFacilityDetails(),
-                order.getPlacerOrderNumber());
+        PartnerMetadata partnerMetadata =
+                new PartnerMetadata(
+                        receivedSubmissionId,
+                        String.valueOf(order.hashCode()),
+                        PartnerMetadataMessageType.ORDER,
+                        order.getSendingApplicationDetails(),
+                        order.getSendingFacilityDetails(),
+                        order.getReceivingApplicationDetails(),
+                        order.getReceivingFacilityDetails(),
+                        order.getPlacerOrderNumber());
+
+        sendMessageHelper.savePartnerMetadataForReceivedMessage(partnerMetadata);
 
         var omlOrder = converter.convertToOmlOrder(order);
         metadata.put(order.getFhirResourceId(), EtorMetadataStep.ORDER_CONVERTED_TO_OML);

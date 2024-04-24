@@ -59,6 +59,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import javax.inject.Inject;
 
@@ -202,8 +203,7 @@ public class EtorDomainRegistration implements DomainConnector {
                     sendOrderUseCase.convertAndSend(orders, receivedSubmissionId);
                     return domainResponseHelper.constructOkResponse(new OrderResponse(orders));
                 },
-                "order",
-                true);
+                "order");
     }
 
     DomainResponse handleResults(DomainRequest request) {
@@ -214,8 +214,7 @@ public class EtorDomainRegistration implements DomainConnector {
                     sendResultUseCase.convertAndSend(results, receivedSubmissionId);
                     return domainResponseHelper.constructOkResponse(new ResultResponse(results));
                 },
-                "results",
-                false);
+                "results");
     }
 
     DomainResponse handleMetadata(DomainRequest request) {
@@ -229,9 +228,16 @@ public class EtorDomainRegistration implements DomainConnector {
                         404, "Metadata not found for ID: " + metadataId);
             }
 
+            Set<String> messageIdsToLink =
+                    partnerMetadataOrchestrator.findMessagesIdsToLink(metadataId);
+
+            // Remove the metadataId from the set of messageIdsToLink to avoid showing it in the
+            // partner metadata's linked ids
+            messageIdsToLink.remove(metadataId);
+
             FhirMetadata<?> responseObject =
                     partnerMetadataConverter.extractPublicMetadataToOperationOutcome(
-                            metadata.get(), metadataId);
+                            metadata.get(), metadataId, messageIdsToLink);
 
             return domainResponseHelper.constructOkResponseFromString(
                     fhir.encodeResourceToJson(responseObject.getUnderlyingOutcome()));
@@ -262,8 +268,7 @@ public class EtorDomainRegistration implements DomainConnector {
     protected DomainResponse handleMessageRequest(
             DomainRequest request,
             MessageRequestHandler<DomainResponse> requestHandler,
-            String messageType,
-            boolean doUpdatePartnerMetadata) {
+            String messageType) {
         String receivedSubmissionId = getReceivedSubmissionId(request);
         boolean markMetadataAsFailed = false;
         String errorMessage = "";
@@ -281,7 +286,7 @@ public class EtorDomainRegistration implements DomainConnector {
             markMetadataAsFailed = true;
             return domainResponseHelper.constructErrorResponse(400, e);
         } finally {
-            if (doUpdatePartnerMetadata && markMetadataAsFailed) {
+            if (markMetadataAsFailed) {
                 try {
                     partnerMetadataOrchestrator.setMetadataStatusToFailed(
                             receivedSubmissionId, errorMessage);
