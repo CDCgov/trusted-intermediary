@@ -96,6 +96,7 @@ jobs:
 
 
   migration-test:
+    name: Database Migration Test
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -123,6 +124,3 @@ jobs:
           username: testuser
           password: dogcow #pragma: allowlist secret
           labelFilter: '!azure'
-
-          # manually install LB and call command line directly, reuseable.ym,
-          # add something to service section to use the same network as github action network
