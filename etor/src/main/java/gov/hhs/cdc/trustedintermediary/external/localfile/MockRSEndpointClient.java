@@ -38,7 +38,7 @@ public class MockRSEndpointClient implements RSEndpointClient {
         } catch (IOException e) {
             throw new ReportStreamEndpointClientException("Error writing the lab order", e);
         }
-        return "{ \"submissionId\": \"" + UUID.randomUUID() + "\" }";
+        return "{ \"reportId\": \"" + UUID.randomUUID() + "\" }";
     }
 
     @Override
