@@ -55,23 +55,23 @@ public class ReportStreamSenderHelper {
         logger.logInfo("{} successfully sent to ReportStream", messageType);
         metadata.put(fhirResourceId, EtorMetadataStep.SENT_TO_REPORT_STREAM);
 
-        Optional<String> sentSubmissionId = getSubmissionId(rsResponseBody);
-        if (sentSubmissionId.isEmpty()) {
-            logger.logError("Unable to retrieve sentSubmissionId from ReportStream response");
+        Optional<String> outboundReportId = getReportId(rsResponseBody);
+        if (outboundReportId.isEmpty()) {
+            logger.logError("Unable to retrieve ReportId from ReportStream response");
         } else {
-            logger.logInfo("ReportStream response's sentSubmissionId={}", sentSubmissionId);
+            logger.logInfo("ReportStream response's ReportId={}", outboundReportId);
         }
 
-        return sentSubmissionId;
+        return outboundReportId;
     }
 
-    protected Optional<String> getSubmissionId(String rsResponseBody) {
+    protected Optional<String> getReportId(String rsResponseBody) {
         try {
             Map<String, Object> rsResponse =
                     formatter.convertJsonToObject(rsResponseBody, new TypeReference<>() {});
-            return Optional.ofNullable(rsResponse.get("submissionId").toString());
+            return Optional.ofNullable(rsResponse.get("reportId").toString());
         } catch (FormatterProcessingException e) {
-            logger.logError("Unable to get the submissionId", e);
+            logger.logError("Unable to get the reportId", e);
         }
 
         return Optional.empty();
