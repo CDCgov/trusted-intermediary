@@ -159,7 +159,7 @@ databaseChangeLog:
       id: 7
       author: Jorge.Lopez
       labels: update-metadata-table
-      context::: metadata
+      context: metadata
       comment: delete sender and receiver columns from metadata table
       changes:
         - dropColumn:
