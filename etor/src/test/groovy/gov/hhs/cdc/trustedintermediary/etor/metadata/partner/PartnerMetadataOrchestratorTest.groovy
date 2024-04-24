@@ -26,7 +26,6 @@ class PartnerMetadataOrchestratorTest extends Specification {
     def hashCode = "hash"
     def bearerToken = "token"
     def sender = "sender"
-    def receiver = "org.service"
     def placerOrderNumber = "placer_order_number"
     def timeReceived = Instant.now()
     def timeDelivered = null
@@ -573,11 +572,9 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
     def "getDataFromReportStream returns correct status, receiver name, error messages from valid JSON response"() {
         given:
-        def organization = "org_id"
-        def sender = "service_name"
         def status = "Error"
         def errorMessage = "Bad message"
-        def validJson = """{"overallStatus": "${status}", "destinations": [{"organization_id": "${organization}", "service": "${sender}"}], "errors": [{"message": "${errorMessage}" }]}"""
+        def validJson = """{"overallStatus": "${status}", "errors": [{"message": "${errorMessage}" }]}"""
 
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
@@ -586,16 +583,14 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def parsedResponse = PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(validJson)
 
         then:
-        parsedResponse[0] == "${organization}.${sender}"
-        parsedResponse[1] == status
-        parsedResponse[2].contains(errorMessage)
+        parsedResponse[0] == status
+        parsedResponse[1].contains(errorMessage)
     }
 
     def "getDataFromReportStream throws FormatterProcessingException or returns null for unexpected format response"() {
         given:
         def exception
         def objectMapperMessage = "objectMapper failed to convert"
-        def noReceiverMessage = "Unable to extract receiver name"
         def noStatusMessage = "Unable to extract overallStatus"
         def noReasonMessage = "Unable to extract failure reason"
         def noTimeMessage = "Unable to extract timeDelivered"
@@ -617,7 +612,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
         then:
         exception = thrown(FormatterProcessingException)
-        exception.getMessage().indexOf(noReceiverMessage) >= 0
+        exception.getMessage().indexOf(noReasonMessage) >= 0
 
         when:
         def jsonWithoutDestinations = "{\"someotherkey\": \"value\"}"
@@ -625,37 +620,14 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
         then:
         exception = thrown(FormatterProcessingException)
-        exception.getMessage().indexOf(noReceiverMessage) >= 0
-
-        when:
-        def jsonWithEmptyDestinations = """{"destinations": [], "errors": []}"""
-        def parsedData = PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithEmptyDestinations)
-
-        then:
-        parsedData[0] == null
+        exception.getMessage().indexOf(noReasonMessage) >= 0
 
         when:
         def jsonWithNoStatus = """{"destinations": [], "errors": []}"""
-        parsedData = PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithNoStatus)
+        def parsedData = PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithNoStatus)
 
         then:
-        parsedData[1] == null
-
-        when:
-        def jsonWithoutOrgId = "{\"destinations\":[{\"service\":\"service\"}]}"
-        PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithoutOrgId)
-
-        then:
-        exception = thrown(FormatterProcessingException)
-        exception.getMessage().indexOf(noReceiverMessage) >= 0
-
-        when:
-        def jsonWithoutService = "{\"destinations\":[{\"organization_id\":\"org_id\"}]}"
-        PartnerMetadataOrchestrator.getInstance().getDataFromReportStream(jsonWithoutService)
-
-        then:
-        exception = thrown(FormatterProcessingException)
-        exception.getMessage().indexOf(noReceiverMessage) >= 0
+        parsedData[0] == null
 
         when:
         def jsonWithoutErrorMessageSubString = "{\"destinations\":[{\"organization_id\":\"org_id\", \"service\":\"service\"}], \"overallStatus\": \"Error\"}"
