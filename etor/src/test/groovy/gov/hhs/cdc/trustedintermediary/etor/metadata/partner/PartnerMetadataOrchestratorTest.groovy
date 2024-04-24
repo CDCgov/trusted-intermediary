@@ -730,10 +730,10 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def mockMetadata = [
             new PartnerMetadata("123456789", null, Instant.now(), null, null, status, failure, PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
         ]
-        mockPartnerMetadataStorage.readMetadataForSender(sender) >> mockMetadata
+        mockPartnerMetadataStorage.readMetadataForSender(sendingFacility.namespace()) >> mockMetadata
 
         when:
-        def result = PartnerMetadataOrchestrator.getInstance().getConsolidatedMetadata(sender)
+        def result = PartnerMetadataOrchestrator.getInstance().getConsolidatedMetadata(sendingFacility.namespace())
 
         then:
         !result.isEmpty()

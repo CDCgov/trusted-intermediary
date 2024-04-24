@@ -276,7 +276,7 @@ class EtorDomainRegistrationTest extends Specification {
         given:
         def expectedStatusCode = 200
         def receivedSubmissionId = "receivedSubmissionId"
-        def metadata = new PartnerMetadata("receivedSubmissionId", "sender", Instant.now(), null,
+        def metadata = new PartnerMetadata("receivedSubmissionId", Instant.now(), null,
                 "hash", PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER,
                 sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
         def linkedMessageIds = new HashSet<>(Set.of(receivedSubmissionId, "Test1", "Test2"))

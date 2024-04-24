@@ -157,6 +157,7 @@ public class PartnerMetadataOrchestrator {
             var ourStatus = ourStatusFromReportStreamStatus(rsStatus);
 
             logger.logInfo("Updating metadata with receiver {} and status {}", receiver, ourStatus);
+            partnerMetadata = partnerMetadata.withDeliveryStatus(ourStatus);
 
             if (ourStatus == PartnerMetadataStatus.FAILED) {
                 partnerMetadata = partnerMetadata.withFailureMessage(rsMessage);
