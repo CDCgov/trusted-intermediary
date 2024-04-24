@@ -28,15 +28,15 @@ class HapiMetadataConverterTest extends Specification {
     def "ExtractPublicMetadata to OperationOutcome returns FHIR metadata"() {
         given:
 
-        def sender = "sender"
-        def receiver = "receiver"
+        def sendingFacilytId = "sending_facility_id"
+        def receivingFacilityId = "receiving_facility_id"
         def time = Instant.now()
         def hash = "hash"
         def failureReason = "timed_out"
         def messageType =  PartnerMetadataMessageType.ORDER
         def messageIds = Set.of("TestId")
         PartnerMetadata metadata = new PartnerMetadata(
-                "receivedSubmissionId", "sentSubmissionId", sender, receiver, time, time, hash, PartnerMetadataStatus.DELIVERED, failureReason, messageType, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
+                "receivedSubmissionId", "sentSubmissionId", time, time, hash, PartnerMetadataStatus.DELIVERED, failureReason, messageType, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
 
         when:
         def result = HapiPartnerMetadataConverter.getInstance().extractPublicMetadataToOperationOutcome(metadata, "receivedSubmissionId", messageIds).getUnderlyingOutcome() as OperationOutcome
@@ -44,8 +44,8 @@ class HapiMetadataConverterTest extends Specification {
         then:
         result.getId() == "receivedSubmissionId"
         result.getIssue().get(0).diagnostics == messageIds.toString()
-        result.getIssue().get(1).diagnostics == sender
-        result.getIssue().get(2).diagnostics == receiver
+        result.getIssue().get(1).diagnostics == sendingFacilytId
+        result.getIssue().get(2).diagnostics == receivingFacilityId
         result.getIssue().get(3).diagnostics == time.toString()
         result.getIssue().get(4).diagnostics == hash
         result.getIssue().get(5).diagnostics == time.toString()

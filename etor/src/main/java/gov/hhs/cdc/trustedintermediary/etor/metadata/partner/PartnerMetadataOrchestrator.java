@@ -88,10 +88,8 @@ public class PartnerMetadataOrchestrator {
                     "Unable to retrieve metadata from RS delivery API", e);
         }
 
-        String sender = "PLACE_HOLDER";
-        logger.logInfo("Updating metadata with sender: {}, timeReceived: {}", sender, timeReceived);
-        PartnerMetadata updatedPartnerMetadata =
-                partnerMetadata.withSender(sender).withTimeReceived(timeReceived);
+        logger.logInfo("Updating metadata with timeReceived: {}", timeReceived);
+        PartnerMetadata updatedPartnerMetadata = partnerMetadata.withTimeReceived(timeReceived);
         partnerMetadataStorage.saveMetadata(updatedPartnerMetadata);
     }
 
@@ -158,7 +156,7 @@ public class PartnerMetadataOrchestrator {
             var ourStatus = ourStatusFromReportStreamStatus(rsStatus);
 
             logger.logInfo("Updating metadata with receiver {} and status {}", receiver, ourStatus);
-            partnerMetadata = partnerMetadata.withReceiver(receiver).withDeliveryStatus(ourStatus);
+            partnerMetadata = partnerMetadata.withDeliveryStatus(ourStatus);
 
             if (ourStatus == PartnerMetadataStatus.FAILED) {
                 partnerMetadata = partnerMetadata.withFailureMessage(rsMessage);
@@ -342,7 +340,7 @@ public class PartnerMetadataOrchestrator {
     }
 
     private boolean metadataIsStale(PartnerMetadata partnerMetadata) {
-        return partnerMetadata.receiver() == null
+        return partnerMetadata.receivingFacilityDetails().universalId() == null
                 || partnerMetadata.deliveryStatus() == PartnerMetadataStatus.PENDING;
     }
 }

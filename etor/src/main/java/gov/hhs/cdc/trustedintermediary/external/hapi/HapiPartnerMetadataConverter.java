@@ -30,10 +30,18 @@ public class HapiPartnerMetadataConverter implements PartnerMetadataConverter {
                         createInformationIssueComponent(
                                 "linked messages", messageIdsToLink.toString()));
 
-        operation.getIssue().add(createInformationIssueComponent("sender name", metadata.sender()));
         operation
                 .getIssue()
-                .add(createInformationIssueComponent("receiver name", metadata.receiver()));
+                .add(
+                        createInformationIssueComponent(
+                                "sender universal id",
+                                metadata.sendingFacilityDetails().universalId()));
+        operation
+                .getIssue()
+                .add(
+                        createInformationIssueComponent(
+                                "receiver universal id",
+                                metadata.receivingFacilityDetails().universalId()));
 
         String ingestion = null;
         String delivered = null;
