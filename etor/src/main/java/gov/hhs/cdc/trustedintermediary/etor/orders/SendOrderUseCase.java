@@ -53,11 +53,11 @@ public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
                 order.getFhirResourceId(),
                 EtorMetadataStep.ETOR_PROCESSING_TAG_ADDED_TO_MESSAGE_HEADER);
 
-        String sentSubmissionId = sender.send(omlOrder).orElse(null);
-        logger.logInfo("Sent order reportId: {}", sentSubmissionId);
+        String outboundReportId = sender.send(omlOrder).orElse(null);
+        logger.logInfo("Sent order reportId: {}", outboundReportId);
 
         sendMessageHelper.linkMessage(receivedSubmissionId);
 
-        sendMessageHelper.saveSentMessageSubmissionId(receivedSubmissionId, sentSubmissionId);
+        sendMessageHelper.saveSentMessageSubmissionId(receivedSubmissionId, outboundReportId);
     }
 }
