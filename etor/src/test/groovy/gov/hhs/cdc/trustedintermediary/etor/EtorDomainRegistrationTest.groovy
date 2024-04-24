@@ -279,8 +279,7 @@ class EtorDomainRegistrationTest extends Specification {
         def metadata = new PartnerMetadata("receivedSubmissionId", "sender", Instant.now(), null,
                 "hash", PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER,
                 sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
-        def linkedMessageIds = new HashSet<>(Set.of(receivedSubmissionId, "Test1", "Test2"))
-        def relevantMessageIds = linkedMessageIds.findAll { it != receivedSubmissionId }
+        def linkedMessageIds = Set.of(receivedSubmissionId, "Test1", "Test2")
 
         def connector = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, connector)
@@ -311,7 +310,7 @@ class EtorDomainRegistrationTest extends Specification {
         actualStatusCode == expectedStatusCode
         1 * mockPartnerMetadataOrchestrator.getMetadata(receivedSubmissionId) >> Optional.ofNullable(metadata)
         1 * mockPartnerMetadataOrchestrator.findMessagesIdsToLink(receivedSubmissionId) >> linkedMessageIds
-        1 * mockPartnerMetadataConverter.extractPublicMetadataToOperationOutcome(_ as PartnerMetadata, _ as String, relevantMessageIds) >> Mock(FhirMetadata)
+        1 * mockPartnerMetadataConverter.extractPublicMetadataToOperationOutcome(_ as PartnerMetadata, _ as String, linkedMessageIds) >> Mock(FhirMetadata)
         1 * mockResponseHelper.constructOkResponseFromString(_ as String) >> new DomainResponse(expectedStatusCode)
     }
 
