@@ -44,8 +44,8 @@ class HapiMetadataConverterTest extends Specification {
         then:
         result.getId() == "receivedSubmissionId"
         result.getIssue().get(0).diagnostics == messageIds.toString()
-        result.getIssue().get(1).diagnostics == sender
-        result.getIssue().get(2).diagnostics == receiver
+        result.getIssue().get(1).diagnostics == sendingFacilityDetails.namespace()
+        result.getIssue().get(2).diagnostics == receivingFacilityDetails.namespace()
         result.getIssue().get(3).diagnostics == time.toString()
         result.getIssue().get(4).diagnostics == hash
         result.getIssue().get(5).diagnostics == time.toString()
