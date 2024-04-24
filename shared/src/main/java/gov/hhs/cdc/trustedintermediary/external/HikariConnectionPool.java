@@ -49,7 +49,7 @@ public class HikariConnectionPool implements ConnectionPool {
 
         try {
             String maxLife = ApplicationContext.getProperty("DB_MAX_LIFETIME");
-            if (!maxLife.isEmpty()) {
+            if (maxLife != null && !maxLife.isEmpty()) {
                 config.setMaxLifetime(Long.parseLong(maxLife));
             }
         } catch (NumberFormatException e) {
