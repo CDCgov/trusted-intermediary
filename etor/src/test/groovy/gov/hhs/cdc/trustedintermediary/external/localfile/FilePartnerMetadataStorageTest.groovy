@@ -113,7 +113,6 @@ class FilePartnerMetadataStorageTest extends Specification {
 
     def "readMetadataForSender returns a set of PartnerMetadata"() {
         given:
-        def sender = "same_sender"
         PartnerMetadata metadata2 = new PartnerMetadata("abcdefghi", null, null, null, null, null, null, null, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
         PartnerMetadata metadata1 = new PartnerMetadata("123456789", null, null, null, null, null, null, null, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
 
@@ -123,7 +122,7 @@ class FilePartnerMetadataStorageTest extends Specification {
         when:
         FilePartnerMetadataStorage.getInstance().saveMetadata(metadata1)
         FilePartnerMetadataStorage.getInstance().saveMetadata(metadata2)
-        def metadataSet = FilePartnerMetadataStorage.getInstance().readMetadataForSender(sender)
+        def metadataSet = FilePartnerMetadataStorage.getInstance().readMetadataForSender(sendingFacilityDetails.universalId())
 
         then:
         metadataSet.containsAll(Set.of(metadata1, metadata2))
