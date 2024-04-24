@@ -19,7 +19,7 @@ class ConsolidatedSummaryTest extends Specification {
 
         def orderClient = new EndpointClient("/v1/etor/orders")
         def labOrderJsonFileString = Files.readString(Path.of("../examples/Test/e2e/orders/002_ORM_O01.fhir"))
-        def senderName = "urn:dns:centracare.com"  //TODO: when story #990 is implemented, update this to be the sender from the 002_ORM_O01.fhir message
+        def senderName = "centracare.com"
 
         when:
         def orderResponse = orderClient.submit(labOrderJsonFileString, inboundSubmissionId, true)

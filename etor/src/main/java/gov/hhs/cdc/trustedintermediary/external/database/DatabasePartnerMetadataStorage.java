@@ -195,16 +195,6 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                         false,
                         Types.VARCHAR),
                 new DbColumn("sent_message_id", metadata.sentSubmissionId(), true, Types.VARCHAR),
-                new DbColumn(
-                        "sender",
-                        metadata.sendingFacilityDetails().universalId(),
-                        false,
-                        Types.VARCHAR),
-                new DbColumn(
-                        "receiver",
-                        metadata.receivingFacilityDetails().universalId(),
-                        true,
-                        Types.VARCHAR),
                 new DbColumn("hash_of_message", metadata.hash(), false, Types.VARCHAR),
                 new DbColumn(
                         "time_received",
