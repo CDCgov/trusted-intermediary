@@ -128,6 +128,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                                         ON m1.placer_order_number = m2.placer_order_number
                                             AND (m1.sending_facility_details = m2.sending_facility_details
                                                 OR m1.sending_facility_details = m2.receiving_facility_details)
+                                            AND m1.received_message_id <> m2.received_message_id
                                     WHERE m1.received_message_id = ?;
                                     """);
                                     statement.setString(1, submissionId);
