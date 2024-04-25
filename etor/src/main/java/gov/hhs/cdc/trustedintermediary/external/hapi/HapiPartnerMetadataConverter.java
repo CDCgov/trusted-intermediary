@@ -32,12 +32,13 @@ public class HapiPartnerMetadataConverter implements PartnerMetadataConverter {
                 .getIssue()
                 .add(
                         createInformationIssueComponent(
-                                "sender name", metadata.sendingFacilityDetails().namespace()));
+                                "sender name", metadata.sendingFacilityDetails().universalId()));
         operation
                 .getIssue()
                 .add(
                         createInformationIssueComponent(
-                                "receiver name", metadata.receivingFacilityDetails().namespace()));
+                                "receiver name",
+                                metadata.receivingFacilityDetails().universalId()));
 
         String ingestion = null;
         String delivered = null;

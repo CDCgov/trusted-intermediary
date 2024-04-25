@@ -341,7 +341,7 @@ public class PartnerMetadataOrchestrator {
     }
 
     private boolean metadataIsStale(PartnerMetadata partnerMetadata) {
-        return partnerMetadata.receivingFacilityDetails().namespace() == null
+        return partnerMetadata.receivingFacilityDetails().universalId() == null
                 || partnerMetadata.deliveryStatus() == PartnerMetadataStatus.PENDING;
     }
 }

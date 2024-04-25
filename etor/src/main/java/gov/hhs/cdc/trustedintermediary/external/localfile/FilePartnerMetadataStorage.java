@@ -103,7 +103,7 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
             return getPartnerMetadata().stream()
                     .filter(
                             metadata ->
-                                    metadata.sendingFacilityDetails().namespace().equals(sender))
+                                    metadata.sendingFacilityDetails().universalId().equals(sender))
                     .collect(Collectors.toSet());
         } catch (Exception e) {
             throw new PartnerMetadataException("Failed reading metadata for sender: " + sender, e);
