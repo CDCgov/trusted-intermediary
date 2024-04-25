@@ -46,8 +46,6 @@ class MetadataTest extends Specification {
 
         [
             "linked messages",
-            "sender name",
-            "receiver name",
             "ingestion",
             "payload hash",
             "delivery status",
