@@ -70,6 +70,10 @@ public class SendMessageHelper {
             if (messageIdsToLink == null || messageIdsToLink.isEmpty()) {
                 return;
             }
+
+            // Add receivedSubmissionId to complete the list of messageIds to link
+            messageIdsToLink.add(receivedSubmissionId);
+
             logger.logInfo(
                     "Found messages to link for receivedSubmissionId {}: {}",
                     receivedSubmissionId,
