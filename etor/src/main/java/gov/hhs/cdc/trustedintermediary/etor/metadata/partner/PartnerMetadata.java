@@ -37,34 +37,6 @@ public record PartnerMetadata(
 
     public PartnerMetadata(
             String receivedSubmissionId,
-            Instant timeReceived,
-            Instant timeDelivered,
-            String hash,
-            PartnerMetadataStatus deliveryStatus,
-            PartnerMetadataMessageType messageType,
-            MessageHdDataType sendingApplicationDetails,
-            MessageHdDataType sendingFacilityDetails,
-            MessageHdDataType receivingApplicationDetails,
-            MessageHdDataType receivingFacilityDetails,
-            String placerOrderNumber) {
-        this(
-                receivedSubmissionId,
-                null,
-                timeReceived,
-                timeDelivered,
-                hash,
-                deliveryStatus,
-                null,
-                messageType,
-                sendingApplicationDetails,
-                sendingFacilityDetails,
-                receivingApplicationDetails,
-                receivingFacilityDetails,
-                placerOrderNumber);
-    }
-
-    public PartnerMetadata(
-            String receivedSubmissionId,
             String hash,
             PartnerMetadataMessageType messageType,
             MessageHdDataType sendingApplicationDetails,

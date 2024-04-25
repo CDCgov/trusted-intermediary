@@ -47,34 +47,6 @@ class PartnerMetadataTest extends Specification {
         metadata.receivingFacilityDetails() == receivingFacilityDetails
     }
 
-    def "test overloaded constructor"() {
-        given:
-        def receivedSubmissionId = "receivedSubmissionId"
-        def timeReceived = Instant.now()
-        def timeDelivered = Instant.now()
-        def hash = "abcd"
-        def status = PartnerMetadataStatus.DELIVERED
-        def sendingAppDetails = new MessageHdDataType("sending_app_name", "sending_app_id", "sending_app_type")
-        def sendingFacilityDetails = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
-        def receivingAppDetails = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
-        def receivingFacilityDetails = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
-
-        when:
-        def metadata = new PartnerMetadata(receivedSubmissionId, timeReceived, timeDelivered, hash, PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
-
-        then:
-        metadata.receivedSubmissionId() == receivedSubmissionId
-        metadata.sentSubmissionId() == null
-        metadata.timeReceived() == timeReceived
-        metadata.timeDelivered() == timeDelivered
-        metadata.hash() == hash
-        metadata.deliveryStatus() == status
-        metadata.sendingApplicationDetails() == sendingAppDetails
-        metadata.sendingFacilityDetails() == sendingFacilityDetails
-        metadata.receivingApplicationDetails() == receivingAppDetails
-        metadata.receivingFacilityDetails() == receivingFacilityDetails
-    }
-
     def "test constructor with only received submission ID and status"() {
         given:
         def receivedSubmissionId = "receivedSubmissionId"
