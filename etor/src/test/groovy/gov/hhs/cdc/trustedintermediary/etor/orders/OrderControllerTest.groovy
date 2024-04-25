@@ -3,7 +3,7 @@ package gov.hhs.cdc.trustedintermediary.etor.orders
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleEngine
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.ValidationRuleEngine
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiMessageHelper
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
@@ -12,14 +12,14 @@ import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
 
 class OrderControllerTest extends Specification {
-    def ruleEngine = Mock(RuleEngine)
+    def ruleEngine = Mock(ValidationRuleEngine)
 
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(OrderController, OrderController.getInstance())
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
-        TestApplicationContext.register(RuleEngine, ruleEngine)
+        TestApplicationContext.register(ValidationRuleEngine, ruleEngine)
         TestApplicationContext.register(HapiMessageHelper, HapiMessageHelper.getInstance())
     }
 

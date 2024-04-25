@@ -17,10 +17,10 @@ import spock.lang.Specification
 import java.nio.file.Files
 import java.nio.file.Path
 
-class RuleEngineIntegrationTest extends Specification {
+class ValidationRuleEngineIntegrationTest extends Specification {
     def testExampleFilesPath = "../examples/Test"
     def fhir = HapiFhirImplementation.getInstance()
-    def engine = RuleEngine.getInstance()
+    def engine = ValidationRuleEngine.getInstance()
     def mockLogger = Mock(Logger)
 
     def setup() {
@@ -29,7 +29,7 @@ class RuleEngineIntegrationTest extends Specification {
 
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.register(HapiFhir, fhir)
-        TestApplicationContext.register(RuleEngine, engine)
+        TestApplicationContext.register(ValidationRuleEngine, engine)
         TestApplicationContext.register(RuleLoader, RuleLoader.getInstance())
         TestApplicationContext.register(Logger, mockLogger)
 
