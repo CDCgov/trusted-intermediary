@@ -97,14 +97,19 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
     }
 
     @Override
-    public Set<PartnerMetadata> readMetadataForSender(String sender)
+    public Set<PartnerMetadata> readMetadataForSender(String senderUniversalId)
             throws PartnerMetadataException {
         try {
             return getPartnerMetadata().stream()
-                    .filter(metadata -> metadata.sender().equals(sender))
+                    .filter(
+                            metadata ->
+                                    metadata.sendingFacilityDetails()
+                                            .universalId()
+                                            .equals(senderUniversalId))
                     .collect(Collectors.toSet());
         } catch (Exception e) {
-            throw new PartnerMetadataException("Failed reading metadata for sender: " + sender, e);
+            throw new PartnerMetadataException(
+                    "Failed reading metadata for sender: " + senderUniversalId, e);
         }
     }
 

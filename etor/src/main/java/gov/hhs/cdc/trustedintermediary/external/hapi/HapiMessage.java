@@ -71,11 +71,7 @@ public class HapiMessage implements Message<Bundle> {
                 .flatMap(patient -> patient.getIdentifier().stream())
                 .filter(
                         identifier ->
-                                identifier
-                                        .getType()
-                                        .hasCoding(
-                                                "http://terminology.hl7.org/CodeSystem/v2-0203",
-                                                "MR"))
+                                "MR".equals(identifier.getType().getCodingFirstRep().getCode()))
                 .map(Identifier::getValue)
                 .findFirst()
                 .orElse("");

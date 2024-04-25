@@ -8,8 +8,6 @@ import java.time.Instant;
  *
  * @param receivedSubmissionId The received submission ID.
  * @param sentSubmissionId The sent submission ID.
- * @param sender The name of the sender of the message.
- * @param receiver The name of the receiver of the message.
  * @param timeReceived The time the message was received.
  * @param timeDelivered The time the message was delivered.
  * @param hash The hash of the message.
@@ -18,8 +16,6 @@ import java.time.Instant;
 public record PartnerMetadata(
         String receivedSubmissionId,
         String sentSubmissionId,
-        String sender,
-        String receiver,
         Instant timeReceived,
         Instant timeDelivered,
         String hash,
@@ -41,37 +37,6 @@ public record PartnerMetadata(
 
     public PartnerMetadata(
             String receivedSubmissionId,
-            String sender,
-            Instant timeReceived,
-            Instant timeDelivered,
-            String hash,
-            PartnerMetadataStatus deliveryStatus,
-            PartnerMetadataMessageType messageType,
-            MessageHdDataType sendingApplicationDetails,
-            MessageHdDataType sendingFacilityDetails,
-            MessageHdDataType receivingApplicationDetails,
-            MessageHdDataType receivingFacilityDetails,
-            String placerOrderNumber) {
-        this(
-                receivedSubmissionId,
-                null,
-                sender,
-                null,
-                timeReceived,
-                timeDelivered,
-                hash,
-                deliveryStatus,
-                null,
-                messageType,
-                sendingApplicationDetails,
-                sendingFacilityDetails,
-                receivingApplicationDetails,
-                receivingFacilityDetails,
-                placerOrderNumber);
-    }
-
-    public PartnerMetadata(
-            String receivedSubmissionId,
             String hash,
             PartnerMetadataMessageType messageType,
             MessageHdDataType sendingApplicationDetails,
@@ -81,8 +46,6 @@ public record PartnerMetadata(
             String placerOrderNumber) {
         this(
                 receivedSubmissionId,
-                null,
-                null,
                 null,
                 null,
                 null,
@@ -104,8 +67,6 @@ public record PartnerMetadata(
                 null,
                 null,
                 null,
-                null,
-                null,
                 deliveryStatus,
                 null,
                 null,
@@ -120,46 +81,6 @@ public record PartnerMetadata(
         return new PartnerMetadata(
                 this.receivedSubmissionId,
                 sentSubmissionId,
-                this.sender,
-                this.receiver,
-                this.timeReceived,
-                this.timeDelivered,
-                this.hash,
-                this.deliveryStatus,
-                this.failureReason,
-                this.messageType,
-                this.sendingApplicationDetails,
-                this.sendingFacilityDetails,
-                this.receivingApplicationDetails,
-                this.receivingFacilityDetails,
-                this.placerOrderNumber);
-    }
-
-    public PartnerMetadata withSender(String sender) {
-        return new PartnerMetadata(
-                this.receivedSubmissionId,
-                this.sentSubmissionId,
-                sender,
-                this.receiver,
-                this.timeReceived,
-                this.timeDelivered,
-                this.hash,
-                this.deliveryStatus,
-                this.failureReason,
-                this.messageType,
-                this.sendingApplicationDetails,
-                this.sendingFacilityDetails,
-                this.receivingApplicationDetails,
-                this.receivingFacilityDetails,
-                this.placerOrderNumber);
-    }
-
-    public PartnerMetadata withReceiver(String receiver) {
-        return new PartnerMetadata(
-                this.receivedSubmissionId,
-                this.sentSubmissionId,
-                this.sender,
-                receiver,
                 this.timeReceived,
                 this.timeDelivered,
                 this.hash,
@@ -177,8 +98,6 @@ public record PartnerMetadata(
         return new PartnerMetadata(
                 this.receivedSubmissionId,
                 this.sentSubmissionId,
-                this.sender,
-                this.receiver,
                 timeReceived,
                 this.timeDelivered,
                 this.hash,
@@ -196,8 +115,6 @@ public record PartnerMetadata(
         return new PartnerMetadata(
                 this.receivedSubmissionId,
                 this.sentSubmissionId,
-                this.sender,
-                this.receiver,
                 this.timeReceived,
                 timeDelivered,
                 this.hash,
@@ -215,8 +132,6 @@ public record PartnerMetadata(
         return new PartnerMetadata(
                 this.receivedSubmissionId,
                 this.sentSubmissionId,
-                this.sender,
-                this.receiver,
                 this.timeReceived,
                 this.timeDelivered,
                 this.hash,
@@ -234,8 +149,6 @@ public record PartnerMetadata(
         return new PartnerMetadata(
                 this.receivedSubmissionId,
                 this.sentSubmissionId,
-                this.sender,
-                this.receiver,
                 this.timeReceived,
                 this.timeDelivered,
                 this.hash,

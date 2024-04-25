@@ -154,3 +154,17 @@ databaseChangeLog:
             columnName: receiving_facility_details
             newDataType: jsonb
             tableName: metadata
+
+  - changeSet:
+      id: 7
+      author: Jorge.Lopez
+      labels: update-metadata-table
+      context: metadata
+      comment: delete sender and receiver columns from metadata table
+      changes:
+        - dropColumn:
+            tableName: metadata
+            columnName: sender
+        - dropColumn:
+            tableName: metadata
+            columnName: receiver
