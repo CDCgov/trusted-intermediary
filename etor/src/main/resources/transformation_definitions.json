@@ -1,9 +1,9 @@
 {
-  "rules": [ {
+  "definitions": [ {
       "name": "",
       "description": "",
       "conditions": [ ],
-      "transformations": [ ]
+      "rules": [ ]
     }
   ]
 }

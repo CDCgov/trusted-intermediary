@@ -78,7 +78,7 @@ class RuleEngineTest extends Specification {
         def fullRuleViolationMessage = "Rule violation: " + ruleViolationMessage
         def fhirBundle = Mock(FhirResource)
         def invalidRule = Mock(Rule)
-        invalidRule.getViolationMessage() >> ruleViolationMessage
+        invalidRule.getMessage() >> ruleViolationMessage
         mockRuleLoader.loadRules(_ as String) >> [invalidRule]
 
         when:

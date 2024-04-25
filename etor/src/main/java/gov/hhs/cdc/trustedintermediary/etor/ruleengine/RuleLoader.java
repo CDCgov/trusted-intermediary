@@ -32,7 +32,7 @@ public class RuleLoader {
                     new String(ruleDefinitionStream.readAllBytes(), StandardCharsets.UTF_8);
             Map<String, List<Rule>> jsonObj =
                     formatter.convertJsonToObject(rulesString, new TypeReference<>() {});
-            return jsonObj.getOrDefault("rules", Collections.emptyList());
+            return jsonObj.getOrDefault("definitions", Collections.emptyList());
         } catch (IOException | FormatterProcessingException e) {
             logger.logError("Failed to load rules definitions from: " + fileName, e);
             return Collections.emptyList();

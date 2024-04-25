@@ -14,7 +14,17 @@ public class TransformationRule implements Rule {
     }
 
     @Override
+    public String getMessage() {
+        return "";
+    }
+
+    @Override
     public List<String> getConditions() {
+        return List.of();
+    }
+
+    @Override
+    public List<String> getRules() {
         return List.of();
     }
 

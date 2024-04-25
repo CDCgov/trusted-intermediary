@@ -6,10 +6,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import spock.lang.Specification
 
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
-
 class RuleLoaderTest extends Specification {
 
     String fileContents
@@ -47,7 +43,7 @@ class RuleLoaderTest extends Specification {
         ValidationRule rule = rules.get(0) as ValidationRule
         rule.getName() == "patientName"
         rule.getConditions() == ["Patient.name.exists()"]
-        rule.getValidations() == [
+        rule.getRules() == [
             "Patient.name.where(use='usual').given.exists()"
         ]
     }

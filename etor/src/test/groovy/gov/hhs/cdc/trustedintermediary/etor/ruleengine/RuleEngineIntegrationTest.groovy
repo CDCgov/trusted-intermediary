@@ -175,9 +175,9 @@ class RuleEngineIntegrationTest extends Specification {
         return new ValidationRule(
                 name: "Rule name",
                 description: "Rule description",
-                violationMessage: "Rule warning message",
+                message: "Rule warning message",
                 conditions: ruleConditions,
-                validations: ruleValidations,
+                rules: ruleValidations,
                 )
     }
 

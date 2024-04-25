@@ -33,9 +33,9 @@ class ValidationRuleTest extends Specification {
         then:
         rule.getName() == ruleName
         rule.getDescription() == ruleDescription
-        rule.getViolationMessage() == ruleWarningMessage
+        rule.getMessage() == ruleWarningMessage
         rule.getConditions() == conditions
-        rule.getValidations() == validations
+        rule.getRules() == validations
     }
 
     def "appliesTo returns expected boolean depending on conditions"() {

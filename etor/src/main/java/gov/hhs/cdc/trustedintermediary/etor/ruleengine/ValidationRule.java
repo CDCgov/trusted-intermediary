@@ -16,9 +16,9 @@ public class ValidationRule implements Rule {
     private final HapiFhir fhirEngine = ApplicationContext.getImplementation(HapiFhir.class);
     private String name;
     private String description;
-    private String violationMessage;
+    private String message;
     private List<String> conditions;
-    private List<String> validations;
+    private List<String> rules;
 
     /**
      * Do not delete this constructor! It is used for JSON deserialization when loading rules from a
@@ -34,9 +34,9 @@ public class ValidationRule implements Rule {
             List<String> ruleValidations) {
         name = ruleName;
         description = ruleDescription;
-        violationMessage = ruleWarningMessage;
+        message = ruleWarningMessage;
         conditions = ruleConditions;
-        validations = ruleValidations;
+        rules = ruleValidations;
     }
 
     @Override
@@ -49,8 +49,8 @@ public class ValidationRule implements Rule {
         return description;
     }
 
-    public String getViolationMessage() {
-        return violationMessage;
+    public String getMessage() {
+        return message;
     }
 
     @Override
@@ -58,8 +58,8 @@ public class ValidationRule implements Rule {
         return conditions;
     }
 
-    public List<String> getValidations() {
-        return validations;
+    public List<String> getRules() {
+        return rules;
     }
 
     @Override
@@ -85,12 +85,12 @@ public class ValidationRule implements Rule {
 
     @Override
     public void runRule(FhirResource<?> resource) {
-        for (String validation : validations) {
+        for (String validation : rules) {
             try {
                 boolean isValid =
                         fhirEngine.evaluateCondition(resource.getUnderlyingResource(), validation);
                 if (!isValid) {
-                    logger.logWarning("Rule violation: " + violationMessage);
+                    logger.logWarning("Rule violation: " + message);
                 }
             } catch (Exception e) {
                 logger.logError(

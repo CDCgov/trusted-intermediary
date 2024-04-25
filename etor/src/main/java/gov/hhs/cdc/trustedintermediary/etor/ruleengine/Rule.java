@@ -12,7 +12,11 @@ public interface Rule {
 
     String getDescription();
 
+    String getMessage();
+
     List<String> getConditions();
+
+    List<String> getRules();
 
     boolean shouldRun(FhirResource<?> resource);
 
