@@ -717,10 +717,10 @@ class PartnerMetadataOrchestratorTest extends Specification {
             placerOrderNumber
             )
         ]
-        mockPartnerMetadataStorage.readMetadataForSender(sender) >> mockMetadata
+        mockPartnerMetadataStorage.readMetadataForSender(_ as String) >> mockMetadata
 
         when:
-        def result = PartnerMetadataOrchestrator.getInstance().getConsolidatedMetadata(sender)
+        def result = PartnerMetadataOrchestrator.getInstance().getConsolidatedMetadata("sender")
 
         then:
         !result.isEmpty()
