@@ -29,14 +29,14 @@ public class ValidationRule implements Rule {
     public ValidationRule(
             String ruleName,
             String ruleDescription,
-            String ruleWarningMessage,
+            String ruleMessage,
             List<String> ruleConditions,
-            List<String> ruleValidations) {
+            List<String> ruleActions) {
         name = ruleName;
         description = ruleDescription;
-        message = ruleWarningMessage;
+        message = ruleMessage;
         conditions = ruleConditions;
-        rules = ruleValidations;
+        rules = ruleActions;
     }
 
     @Override
