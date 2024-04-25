@@ -51,8 +51,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         receivingFacility = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
 
         testMetadata = new PartnerMetadata(receivedSubmissionId,
-                sentSubmissionId
-                ,
+                sentSubmissionId,
                 timeReceived,
                 timeDelivered,
                 hashCode,
@@ -114,9 +113,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
         def expectedMetadata = new PartnerMetadata(
                 receivedSubmissionId,
-                sentSubmissionId
-
-                ,
+                sentSubmissionId,
                 Instant.parse(timestamp),
                 timeDelivered,
                 hashCode,
@@ -702,8 +699,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def mockMetadata = [
             new PartnerMetadata(
             "123456789",
-            null
-            ,
+            null,
             Instant.now(),
             null,
             null,
