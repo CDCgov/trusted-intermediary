@@ -89,6 +89,38 @@ jobs:
         working-directory: operations
         run: terraform fmt -recursive -check
 
+
   securityScanAnalyze:
     name: CodeQL Security Scan
     uses: ./.github/workflows/codeql_reusable.yml
+
+
+  migration-test:
+    name: Database Migration Test
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: testdb
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: dogcow #pragma: allowlist secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Db migration
+        uses: liquibase-github-actions/update@v4.27.0
+        with:
+          changelogFile: ./etor/databaseMigrations/root.yml
+          url: "jdbc:postgresql://postgres:5432/testdb"
+          username: testuser
+          password: dogcow #pragma: allowlist secret
+          labelFilter: '!azure'
