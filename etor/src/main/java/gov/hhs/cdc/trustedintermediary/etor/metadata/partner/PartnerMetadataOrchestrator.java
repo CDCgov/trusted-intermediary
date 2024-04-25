@@ -88,10 +88,8 @@ public class PartnerMetadataOrchestrator {
                     "Unable to retrieve metadata from RS delivery API", e);
         }
 
-        String sender = "PLACE_HOLDER";
-        logger.logInfo("Updating metadata with sender: {}, timeReceived: {}", sender, timeReceived);
-        PartnerMetadata updatedPartnerMetadata =
-                partnerMetadata.withSender(sender).withTimeReceived(timeReceived);
+        logger.logInfo("Updating metadata with timeReceived: {}", timeReceived);
+        PartnerMetadata updatedPartnerMetadata = partnerMetadata.withTimeReceived(timeReceived);
         partnerMetadataStorage.saveMetadata(updatedPartnerMetadata);
     }
 
@@ -137,7 +135,6 @@ public class PartnerMetadataOrchestrator {
                     "Receiver name not found in metadata or delivery status still pending, looking up {} from RS history API",
                     sentSubmissionId);
 
-            String receiver;
             String rsStatus;
             String rsMessage = "";
             String timeDelivered;
@@ -146,10 +143,9 @@ public class PartnerMetadataOrchestrator {
                 String responseBody =
                         rsclient.requestHistoryEndpoint(sentSubmissionId, bearerToken);
                 var parsedResponseBody = getDataFromReportStream(responseBody);
-                receiver = parsedResponseBody[0];
-                rsStatus = parsedResponseBody[1];
-                rsMessage = parsedResponseBody[2];
-                timeDelivered = parsedResponseBody[3];
+                rsStatus = parsedResponseBody[0];
+                rsMessage = parsedResponseBody[1];
+                timeDelivered = parsedResponseBody[2];
             } catch (ReportStreamEndpointClientException | FormatterProcessingException e) {
                 throw new PartnerMetadataException(
                         "Unable to retrieve metadata from RS history API", e);
@@ -157,8 +153,8 @@ public class PartnerMetadataOrchestrator {
 
             var ourStatus = ourStatusFromReportStreamStatus(rsStatus);
 
-            logger.logInfo("Updating metadata with receiver {} and status {}", receiver, ourStatus);
-            partnerMetadata = partnerMetadata.withReceiver(receiver).withDeliveryStatus(ourStatus);
+            logger.logInfo("Updating metadata with status {}", ourStatus);
+            partnerMetadata = partnerMetadata.withDeliveryStatus(ourStatus);
 
             if (ourStatus == PartnerMetadataStatus.FAILED) {
                 partnerMetadata = partnerMetadata.withFailureMessage(rsMessage);
@@ -280,21 +276,6 @@ public class PartnerMetadataOrchestrator {
         Map<String, Object> responseObject =
                 formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
 
-        String receiver;
-        try {
-            ArrayList<?> destinations = (ArrayList<?>) responseObject.get("destinations");
-            Map<?, ?> destination = (Map<?, ?>) destinations.get(0);
-            String organizationId = destination.get("organization_id").toString();
-            String service = destination.get("service").toString();
-            receiver = organizationId + "." + service;
-        } catch (IndexOutOfBoundsException e) {
-            // the destinations have not been determined yet by RS
-            receiver = null;
-        } catch (Exception e) {
-            throw new FormatterProcessingException(
-                    "Unable to extract receiver name from response due to unexpected format", e);
-        }
-
         String overallStatus;
         try {
             overallStatus = (String) responseObject.get("overallStatus");
@@ -324,7 +305,7 @@ public class PartnerMetadataOrchestrator {
                     "Unable to extract timeDelivered due to unexpected format", e);
         }
 
-        return new String[] {receiver, overallStatus, errorMessages.toString(), timeDelivered};
+        return new String[] {overallStatus, errorMessages.toString(), timeDelivered};
     }
 
     PartnerMetadataStatus ourStatusFromReportStreamStatus(String rsStatus) {
@@ -342,7 +323,7 @@ public class PartnerMetadataOrchestrator {
     }
 
     private boolean metadataIsStale(PartnerMetadata partnerMetadata) {
-        return partnerMetadata.receiver() == null
+        return partnerMetadata.receivingFacilityDetails().universalId() == null
                 || partnerMetadata.deliveryStatus() == PartnerMetadataStatus.PENDING;
     }
 }

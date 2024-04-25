@@ -128,6 +128,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                                         ON m1.placer_order_number = m2.placer_order_number
                                             AND (m1.sending_facility_details = m2.sending_facility_details
                                                 OR m1.sending_facility_details = m2.receiving_facility_details)
+                                            AND m1.received_message_id <> m2.received_message_id
                                     WHERE m1.received_message_id = ?;
                                     """);
                                     statement.setString(1, submissionId);
@@ -162,8 +163,6 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
             return new PartnerMetadata(
                     resultSet.getString(METADATA_TABLE_RECEIVED_MESSAGE_ID),
                     resultSet.getString("sent_message_id"),
-                    resultSet.getString("sender"),
-                    resultSet.getString("receiver"),
                     timeReceived,
                     timeDelivered,
                     resultSet.getString("hash_of_message"),
@@ -197,8 +196,6 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                         false,
                         Types.VARCHAR),
                 new DbColumn("sent_message_id", metadata.sentSubmissionId(), true, Types.VARCHAR),
-                new DbColumn("sender", metadata.sender(), false, Types.VARCHAR),
-                new DbColumn("receiver", metadata.receiver(), true, Types.VARCHAR),
                 new DbColumn("hash_of_message", metadata.hash(), false, Types.VARCHAR),
                 new DbColumn(
                         "time_received",

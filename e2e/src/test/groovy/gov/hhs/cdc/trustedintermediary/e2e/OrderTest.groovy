@@ -17,7 +17,7 @@ class OrderTest extends Specification {
 
     def "an order response is returned from the ETOR order endpoint"() {
         given:
-        def expectedFhirResourceId  = "Bundle/1696524903034430000.eb38702e-23df-4650-9e4c-c7d4b3b6b92b"
+        def expectedFhirResourceId  = "Bundle/1713991685806650392.f865cc8e-d438-4d5f-9147-05930f25a997"
         def expectedPatientId  = "11102779"
 
         when:
@@ -37,7 +37,7 @@ class OrderTest extends Specification {
         def parsedSentPayload = JsonParser.parse(sentPayload)
 
         then:
-        parsedSentPayload.entry[24].resource.contact.name.text.contains("SADIE S SMITH")
+        parsedSentPayload.entry[3].resource.contact[0].name.family.contains("SMITH")
     }
 
     def "check that ETOR processing code is added to the order before sending to report stream"() {
@@ -72,7 +72,7 @@ class OrderTest extends Specification {
         //test that everything else is the same except the MessageHeader's event, Patient contact, and etor processing tag
         parsedSentPayload.entry[0].resource.remove("eventCoding")
         parsedLabOrderJsonFile.entry[0].resource.remove("eventCoding")
-        parsedSentPayload.entry[24].resource.remove("contact")
+        parsedSentPayload.entry[3].resource.remove("contact")
         parsedSentPayload.entry[0].resource.meta.tag.remove(1)
 
         parsedSentPayload == parsedLabOrderJsonFile

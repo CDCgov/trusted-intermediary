@@ -21,7 +21,6 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataConv
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStatus
 import gov.hhs.cdc.trustedintermediary.etor.operationoutcomes.FhirMetadata
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse
@@ -32,11 +31,7 @@ import gov.hhs.cdc.trustedintermediary.etor.results.SendResultUseCase
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
-
-import java.time.Instant
 import spock.lang.Specification
-
-import java.util.stream.Collectors
 
 class EtorDomainRegistrationTest extends Specification {
 
@@ -276,11 +271,8 @@ class EtorDomainRegistrationTest extends Specification {
         given:
         def expectedStatusCode = 200
         def receivedSubmissionId = "receivedSubmissionId"
-        def metadata = new PartnerMetadata("receivedSubmissionId", "sender", Instant.now(), null,
-                "hash", PartnerMetadataStatus.DELIVERED, PartnerMetadataMessageType.ORDER,
-                sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
-        def linkedMessageIds = new HashSet<>(Set.of(receivedSubmissionId, "Test1", "Test2"))
-        def relevantMessageIds = linkedMessageIds.findAll { it != receivedSubmissionId }
+        def metadata = new PartnerMetadata("receivedSubmissionId", "hash", PartnerMetadataMessageType.ORDER, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
+        def linkedMessageIds = Set.of(receivedSubmissionId, "Test1", "Test2")
 
         def connector = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, connector)
@@ -311,7 +303,7 @@ class EtorDomainRegistrationTest extends Specification {
         actualStatusCode == expectedStatusCode
         1 * mockPartnerMetadataOrchestrator.getMetadata(receivedSubmissionId) >> Optional.ofNullable(metadata)
         1 * mockPartnerMetadataOrchestrator.findMessagesIdsToLink(receivedSubmissionId) >> linkedMessageIds
-        1 * mockPartnerMetadataConverter.extractPublicMetadataToOperationOutcome(_ as PartnerMetadata, _ as String, relevantMessageIds) >> Mock(FhirMetadata)
+        1 * mockPartnerMetadataConverter.extractPublicMetadataToOperationOutcome(_ as PartnerMetadata, _ as String, linkedMessageIds) >> Mock(FhirMetadata)
         1 * mockResponseHelper.constructOkResponseFromString(_ as String) >> new DomainResponse(expectedStatusCode)
     }
 
