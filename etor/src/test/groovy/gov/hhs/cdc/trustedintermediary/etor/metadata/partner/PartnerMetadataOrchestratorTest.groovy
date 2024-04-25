@@ -25,7 +25,6 @@ class PartnerMetadataOrchestratorTest extends Specification {
     def sentSubmissionId = "sentSubmissionId"
     def hashCode = "hash"
     def bearerToken = "token"
-    def sender = "sender"
     def placerOrderNumber = "placer_order_number"
     def timeReceived = Instant.now()
     def timeDelivered = null
