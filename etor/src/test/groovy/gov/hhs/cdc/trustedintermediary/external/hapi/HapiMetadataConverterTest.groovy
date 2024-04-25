@@ -28,7 +28,7 @@ class HapiMetadataConverterTest extends Specification {
     def "ExtractPublicMetadata to OperationOutcome returns FHIR metadata"() {
         given:
 
-        def sendingFacilytId = "sending_facility_id"
+        def sendingFacilityId = "sending_facility_id"
         def receivingFacilityId = "receiving_facility_id"
         def time = Instant.now()
         def hash = "hash"
@@ -44,7 +44,7 @@ class HapiMetadataConverterTest extends Specification {
         then:
         result.getId() == "receivedSubmissionId"
         result.getIssue().get(0).diagnostics == messageIds.toString()
-        result.getIssue().get(1).diagnostics == sendingFacilytId
+        result.getIssue().get(1).diagnostics == sendingFacilityId
         result.getIssue().get(2).diagnostics == receivingFacilityId
         result.getIssue().get(3).diagnostics == time.toString()
         result.getIssue().get(4).diagnostics == hash
