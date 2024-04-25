@@ -1,35 +1,13 @@
 {
   "definitions": [ {
-      "name": "flattenOBR",
-      "description": "Flatten OBRs",
-    "message": "ORM doesn't have required Card Number",
-      "conditions": [
-        "Bundle.entry.resource.ofType(MessageHeader).destination.sender = 'CA'"
-      ],
+      "name": "Rule name",
+      "description": "Rule description",
+      "message": "Log message",
+      "conditions": [ ],
       "rules": [
         {
-          "name": "FlattenOBRTransformation",
-          "args": {}
-        },
-        {
-          "name": "updateFhirPathValue",
-          "args": {
-            "fhirPathName": "receivingFacilityName",
-            "value": "CDPH"
-          }
-        },
-        {
-          "name": "updateFhirPathValue",
-          "args": {
-            "fhirPathName": "Bundle/MSH5",
-            "value": "EPIC"
-          }
-        },
-        {
-          "name": "removeFhirPathValue",
-          "args": {
-            "fhirPathName": "Bundle/PID-3.4"
-          }
+          "name": "Transformation method name",
+          "args": { }
         }
       ]
     }

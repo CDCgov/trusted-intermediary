@@ -24,13 +24,13 @@ public class RuleLoader {
         return INSTANCE;
     }
 
-    public List<Rule> loadRules(String fileName) {
+    public <T extends Rule> List<T> loadRules(String fileName, Class<T> ruleClass) {
         try (InputStream ruleDefinitionStream =
                 getClass().getClassLoader().getResourceAsStream(fileName)) {
             assert ruleDefinitionStream != null;
             var rulesString =
                     new String(ruleDefinitionStream.readAllBytes(), StandardCharsets.UTF_8);
-            Map<String, List<Rule>> jsonObj =
+            Map<String, List<T>> jsonObj =
                     formatter.convertJsonToObject(rulesString, new TypeReference<>() {});
             return jsonObj.getOrDefault("definitions", Collections.emptyList());
         } catch (IOException | FormatterProcessingException e) {

@@ -1,11 +1,13 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import spock.lang.Specification
 
 class RuleEngineTest extends Specification {
-    def ruleEngine = RuleEngine.getInstance()
+    def ruleEngine = ValidationRuleEngine.getInstance()
     def mockRuleLoader = Mock(RuleLoader)
     def mockLogger = Mock(Logger)
 
@@ -16,7 +18,8 @@ class RuleEngineTest extends Specification {
         TestApplicationContext.init()
         TestApplicationContext.register(RuleLoader, mockRuleLoader)
         TestApplicationContext.register(Logger, mockLogger)
-        TestApplicationContext.register(RuleEngine, ruleEngine)
+        TestApplicationContext.register(ValidationRuleEngine, ruleEngine)
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
 
         TestApplicationContext.injectRegisteredImplementations()
     }
