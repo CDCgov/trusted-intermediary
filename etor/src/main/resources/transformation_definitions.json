@@ -1,7 +1,7 @@
 {
   "definitions": [ {
-      "name": "flattenOBR",
-      "description": "Flatten OBRs",
+    "name": "flattenOBR",
+    "description": "Flatten OBRs",
     "message": "ORM doesn't have required Card Number",
       "conditions": [
         "Bundle.entry.resource.ofType(MessageHeader).destination.sender = 'CA'"

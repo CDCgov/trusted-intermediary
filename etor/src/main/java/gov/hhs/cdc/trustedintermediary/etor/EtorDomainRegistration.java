@@ -33,8 +33,8 @@ import gov.hhs.cdc.trustedintermediary.etor.results.ResultConverter;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultResponse;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultSender;
 import gov.hhs.cdc.trustedintermediary.etor.results.SendResultUseCase;
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleEngine;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader;
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.ValidationRuleEngine;
 import gov.hhs.cdc.trustedintermediary.external.database.DatabaseMessageLinkStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.DatabasePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.DbDao;
@@ -131,9 +131,12 @@ public class EtorDomainRegistration implements DomainConnector {
                 PartnerMetadataOrchestrator.class, PartnerMetadataOrchestrator.getInstance());
         ApplicationContext.register(
                 PartnerMetadataConverter.class, HapiPartnerMetadataConverter.getInstance());
-        // Validation rules
+
+        // Validation/Transformation rules
         ApplicationContext.register(RuleLoader.class, RuleLoader.getInstance());
-        ApplicationContext.register(ValidationRuleEngine.class, ValidationRuleEngine.getInstance());
+        RuleLoader.getInstance().loadDefinitions("validation_definitions.json");
+        RuleLoader.getInstance().loadDefinitions("transformation_definitions.json");
+        ApplicationContext.register(RuleEngine.class, RuleEngine.getInstance());
 
         ApplicationContext.register(SendMessageHelper.class, SendMessageHelper.getInstance());
 

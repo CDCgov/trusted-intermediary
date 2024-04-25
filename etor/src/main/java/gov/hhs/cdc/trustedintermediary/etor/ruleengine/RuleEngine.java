@@ -7,12 +7,13 @@ import java.util.List;
 public class RuleEngine {
     final List<Rule> rules = new ArrayList<>();
     RuleLoader ruleLoader;
-    String ruleDefinitionsFileName;
+    private static final RuleEngine INSTANCE = new RuleEngine();
 
-    RuleEngine(RuleLoader ruleLoader, String ruleDefinitionsFileName) {
-        this.ruleLoader = ruleLoader;
-        this.ruleDefinitionsFileName = ruleDefinitionsFileName;
+    public static RuleEngine getInstance() {
+        return INSTANCE;
     }
+
+    private RuleEngine() {}
 
     public void unloadRules() {
         rules.clear();
@@ -22,7 +23,7 @@ public class RuleEngine {
         if (rules.isEmpty()) {
             synchronized (this) {
                 if (rules.isEmpty()) {
-                    var parsedRules = ruleLoader.loadRules(ruleDefinitionsFileName);
+                    var parsedRules = ruleLoader.loadRules();
                     loadRules(parsedRules);
                 }
             }

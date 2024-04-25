@@ -2,7 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.orders;
 
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.ValidationRuleEngine;
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleEngine;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrder;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
@@ -20,7 +20,7 @@ public class OrderController {
     @Inject HapiFhir fhir;
     @Inject Logger logger;
     @Inject MetricMetadata metadata;
-    @Inject ValidationRuleEngine validationEngine;
+    @Inject RuleEngine validationEngine;
 
     private OrderController() {}
 
