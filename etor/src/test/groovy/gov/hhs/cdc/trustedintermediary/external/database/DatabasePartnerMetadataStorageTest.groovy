@@ -201,9 +201,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         def testMapper = new ObjectMapper()
         def mockMetadata = new PartnerMetadata(
                 "receivedSubmissionId",
-                "sentSubmissionId"
-
-                ,
+                "sentSubmissionId",
                 null,
                 null,
                 "hash",
