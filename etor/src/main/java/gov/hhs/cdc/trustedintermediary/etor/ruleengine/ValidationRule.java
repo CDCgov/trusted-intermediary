@@ -49,6 +49,7 @@ public class ValidationRule implements Rule {
         return description;
     }
 
+    @Override
     public String getMessage() {
         return message;
     }
@@ -58,6 +59,7 @@ public class ValidationRule implements Rule {
         return conditions;
     }
 
+    @Override
     public List<String> getRules() {
         return rules;
     }
