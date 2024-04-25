@@ -138,7 +138,9 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
                                                     || metadata.sendingFacilityDetails()
                                                             .equals(
                                                                     match
-                                                                            .receivingFacilityDetails())))
+                                                                            .receivingFacilityDetails()))
+                                            && !metadata.receivedSubmissionId()
+                                                    .equals(receivedSubmissionId))
                     .collect(Collectors.toSet());
         } catch (Exception e) {
             throw new PartnerMetadataException(
