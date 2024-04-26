@@ -7,7 +7,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import spock.lang.Specification
 
 class RuleEngineTest extends Specification {
-    def ruleEngine = ValidationRuleEngine.getInstance()
+    def ruleEngine = RuleEngine.getInstance("validation_definitions.json", ValidationRule.class)
     def mockRuleLoader = Mock(RuleLoader)
     def mockLogger = Mock(Logger)
 
@@ -18,18 +18,22 @@ class RuleEngineTest extends Specification {
         TestApplicationContext.init()
         TestApplicationContext.register(RuleLoader, mockRuleLoader)
         TestApplicationContext.register(Logger, mockLogger)
-        TestApplicationContext.register(ValidationRuleEngine, ruleEngine)
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.register(RuleEngine, ruleEngine)
 
         TestApplicationContext.injectRegisteredImplementations()
     }
 
     def "ensureRulesLoaded happy path"() {
+        given:
+        def mockRuleLoader = Mock(RuleLoader)
+        TestApplicationContext.register(RuleLoader, mockRuleLoader)
+        TestApplicationContext.injectRegisteredImplementations()
+
         when:
         ruleEngine.ensureRulesLoaded()
 
         then:
-        1 * mockRuleLoader.loadRules(_ as String) >> [Mock(Rule)]
+        1 * mockRuleLoader.loadRules(_ as String, ValidationRule.class) >> [Mock(Rule)]
         ruleEngine.rules.size() == 1
     }
 
@@ -39,7 +43,7 @@ class RuleEngineTest extends Specification {
         ruleEngine.ensureRulesLoaded() // Call twice to test if rules are loaded only once
 
         then:
-        1 * mockRuleLoader.loadRules(_ as String) >> [Mock(Rule)]
+        1 * mockRuleLoader.loadRules(_ as String, ValidationRule.class) >> [Mock(Rule)]
     }
 
     def "ensureRulesLoaded loads rules only once on multiple threads"() {
@@ -60,13 +64,13 @@ class RuleEngineTest extends Specification {
         threads*.join()
 
         then:
-        1 * mockRuleLoader.loadRules(_ as String) >> [Mock(Rule)]
+        1 * mockRuleLoader.loadRules(_ as String, ValidationRule.class) >> [Mock(Rule)]
     }
 
     def "ensureRulesLoaded logs an error if there is an exception loading the rules"() {
         given:
         def exception = new RuleLoaderException("Error loading rules", new Exception())
-        mockRuleLoader.loadRules(_ as String) >> { throw exception }
+        mockRuleLoader.loadRules(_ as String, ValidationRule.class) >> { throw exception }
 
         when:
         ruleEngine.runRules(Mock(FhirResource))
@@ -82,7 +86,7 @@ class RuleEngineTest extends Specification {
         def fhirBundle = Mock(FhirResource)
         def invalidRule = Mock(Rule)
         invalidRule.getMessage() >> ruleViolationMessage
-        mockRuleLoader.loadRules(_ as String) >> [invalidRule]
+        mockRuleLoader.loadRules(_ as String, ValidationRule.class) >> [invalidRule]
 
         when:
         invalidRule.shouldRun(fhirBundle) >> true

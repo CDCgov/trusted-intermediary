@@ -2,42 +2,46 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
 
 /** Manages the application of rules loaded from a definitions file using the RuleLoader. */
-public class RuleEngine<T extends Rule> {
-    final List<T> rules = new ArrayList<>();
-    private final RuleLoader ruleLoader;
-    private final String ruleDefinitionsFileName;
-    private final Class<T> ruleClass;
+public class RuleEngine implements IRuleEngine {
+    private Class<?> ruleClass;
+    private String ruleDefinitionsFileName;
+    final List<Rule> rules = new ArrayList<>();
 
-    RuleEngine(RuleLoader ruleLoader, String ruleDefinitionsFileName, Class<T> ruleClass) {
-        this.ruleLoader = ruleLoader;
-        this.ruleDefinitionsFileName = ruleDefinitionsFileName;
-        this.ruleClass = ruleClass;
+    private static final RuleEngine INSTANCE = new RuleEngine();
+
+    @Inject RuleLoader ruleLoader;
+
+    public static RuleEngine getInstance(String ruleDefinitionsFileName, Class<?> ruleClass) {
+        INSTANCE.ruleDefinitionsFileName = ruleDefinitionsFileName;
+        INSTANCE.ruleClass = ruleClass;
+        return INSTANCE;
     }
+
+    private RuleEngine() {}
 
     public void unloadRules() {
         rules.clear();
     }
 
     public void ensureRulesLoaded() {
-        if (rules.isEmpty()) {
-            synchronized (this) {
-                if (rules.isEmpty()) {
-                    List<T> parsedRules = ruleLoader.loadRules(ruleDefinitionsFileName, ruleClass);
-                    loadRules(parsedRules);
-                }
+        synchronized (this) {
+            if (rules.isEmpty()) {
+                List<Rule> parsedRules = ruleLoader.loadRules(ruleDefinitionsFileName, ruleClass);
+                loadRules(parsedRules);
             }
         }
     }
 
-    private synchronized void loadRules(List<T> rules) {
+    private synchronized void loadRules(List<Rule> rules) {
         this.rules.addAll(rules);
     }
 
     public void runRules(FhirResource<?> resource) {
         ensureRulesLoaded();
-        for (T rule : rules) {
+        for (Rule rule : rules) {
             if (rule.shouldRun(resource)) {
                 rule.runRule(resource);
             }
