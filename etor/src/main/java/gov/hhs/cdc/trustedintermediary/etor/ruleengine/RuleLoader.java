@@ -24,7 +24,7 @@ public class RuleLoader {
         return INSTANCE;
     }
 
-    public <T extends Rule> List<T> loadRules(String fileName, Class<?> ruleClass) {
+    public <T> List<T> loadRules(String fileName, Class<T> clazz) {
         try (InputStream ruleDefinitionStream =
                 getClass().getClassLoader().getResourceAsStream(fileName)) {
             assert ruleDefinitionStream != null;

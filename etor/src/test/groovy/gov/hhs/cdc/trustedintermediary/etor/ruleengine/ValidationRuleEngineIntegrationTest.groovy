@@ -20,7 +20,7 @@ import java.nio.file.Path
 class ValidationRuleEngineIntegrationTest extends Specification {
     def testExampleFilesPath = "../examples/Test"
     def fhir = HapiFhirImplementation.getInstance()
-    def engine = ValidationRuleEngine.getInstance()
+    def engine = ValidationRuleEngine.getInstance("validation_definitions.json")
     def mockLogger = Mock(Logger)
 
     def setup() {
