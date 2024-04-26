@@ -64,22 +64,25 @@ class ValidationRuleEngineIntegrationTest extends Specification {
         given:
         def fhirResource = getExampleFhirResource("e2e/orders/001_OML_O21_short.fhir")
         def validation = "Bundle.entry.resource.ofType(MessageHeader).focus.resolve().category.exists()"
-        def rule = createValidationRule([], [validation])
+        Rule rule = createValidationRule([], [validation])
 
         when:
-        def applies = rule.isValid(fhirResource)
+        rule.runRule(fhirResource)
 
         then:
-        applies
+        0 * mockLogger.logWarning(_ as String)
+        0 * mockLogger.logError(_ as String, _ as Throwable)
     }
 
     def "validation rules pass for test files"() {
         given:
         def fhirResource = getExampleFhirResource(testFile)
         def rule = createValidationRule([], [validation])
+        0 * mockLogger.logWarning(_ as String)
+        0 * mockLogger.logError(_ as String, _ as Throwable)
 
         expect:
-        rule.isValid(fhirResource)
+        rule.runRule(fhirResource)
 
         where:
         testFile | validation
@@ -93,9 +96,11 @@ class ValidationRuleEngineIntegrationTest extends Specification {
         given:
         def fhirResource = getExampleFhirResource(testFile)
         def rule = createValidationRule([], [validation])
+        1 * mockLogger.logWarning(_ as String)
+        0 * mockLogger.logError(_ as String, _ as Throwable)
 
         expect:
-        !rule.isValid(fhirResource)
+        rule.runRule(fhirResource)
 
         where:
         testFile | validation
@@ -118,9 +123,11 @@ class ValidationRuleEngineIntegrationTest extends Specification {
         def bundle = createMessageBundle(receiverOrganization: receiverOrganization)
         // for some reason, we need to encode and decode the bundle for resolve() to work
         def fhirResource = new HapiFhirResource(fhir.parseResource(fhir.encodeResourceToJson(bundle), Bundle))
+        rule.runRule(fhirResource)
 
         then:
-        rule.isValid(fhirResource)
+        0 * mockLogger.logWarning(_ as String)
+        0 * mockLogger.logError(_ as String, _ as Throwable)
 
         when:
         receiverOrganization = new Organization()
@@ -131,9 +138,11 @@ class ValidationRuleEngineIntegrationTest extends Specification {
                 .setValue("simulated-hospital-id")
         bundle = createMessageBundle(receiverOrganization: receiverOrganization)
         fhirResource = new HapiFhirResource(fhir.parseResource(fhir.encodeResourceToJson(bundle), Bundle))
+        rule.runRule(fhirResource)
 
         then:
-        !rule.isValid(fhirResource)
+        1 * mockLogger.logWarning(_ as String)
+        0 * mockLogger.logError(_ as String, _ as Throwable)
 
         when:
         receiverOrganization = new Organization()
@@ -143,9 +152,11 @@ class ValidationRuleEngineIntegrationTest extends Specification {
                 .setValue("simulated-hospital-id")
         bundle = createMessageBundle(receiverOrganization: receiverOrganization)
         fhirResource = new HapiFhirResource(fhir.parseResource(fhir.encodeResourceToJson(bundle), Bundle))
+        rule.runRule(fhirResource)
 
         then:
-        !rule.isValid(fhirResource)
+        1 * mockLogger.logWarning(_ as String)
+        0 * mockLogger.logError(_ as String, _ as Throwable)
     }
 
     Bundle createMessageBundle(Map params) {
