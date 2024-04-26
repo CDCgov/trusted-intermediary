@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine;
 
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
@@ -27,7 +28,7 @@ public class ValidationRuleEngine implements RuleEngine {
         synchronized (this) {
             if (rules.isEmpty()) {
                 List<ValidationRule> parsedRules =
-                        ruleLoader.loadRules(ruleDefinitionsFileName, ValidationRule.class);
+                        ruleLoader.loadRules(ruleDefinitionsFileName, new TypeReference<>() {});
                 loadRules(parsedRules);
             }
         }

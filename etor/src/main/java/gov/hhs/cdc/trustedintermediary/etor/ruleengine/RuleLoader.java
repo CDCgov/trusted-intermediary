@@ -24,14 +24,15 @@ public class RuleLoader {
         return INSTANCE;
     }
 
-    public <T> List<T> loadRules(String fileName, Class<T> clazz) {
+    public <T> List<T> loadRules(
+            String fileName, TypeReference<Map<String, List<T>>> typeReference) {
         try (InputStream ruleDefinitionStream =
                 getClass().getClassLoader().getResourceAsStream(fileName)) {
             assert ruleDefinitionStream != null;
             var rulesString =
                     new String(ruleDefinitionStream.readAllBytes(), StandardCharsets.UTF_8);
             Map<String, List<T>> jsonObj =
-                    formatter.convertJsonToObject(rulesString, new TypeReference<>() {});
+                    formatter.convertJsonToObject(rulesString, typeReference);
             return jsonObj.getOrDefault("definitions", Collections.emptyList());
         } catch (IOException | FormatterProcessingException e) {
             logger.logError("Failed to load rules definitions from: " + fileName, e);
