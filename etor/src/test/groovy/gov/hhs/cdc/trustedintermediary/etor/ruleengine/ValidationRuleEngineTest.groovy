@@ -1,13 +1,12 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
+import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
 import spock.lang.Specification
 
-class RuleEngineTest extends Specification {
-    def ruleEngine = RuleEngine.getInstance("validation_definitions.json", ValidationRule.class)
+class ValidationRuleEngineTest extends Specification {
+    def ruleEngine = ValidationRuleEngine.getInstance("validation_definitions.json")
     def mockRuleLoader = Mock(RuleLoader)
     def mockLogger = Mock(Logger)
 
@@ -70,7 +69,7 @@ class RuleEngineTest extends Specification {
     def "ensureRulesLoaded logs an error if there is an exception loading the rules"() {
         given:
         def exception = new RuleLoaderException("Error loading rules", new Exception())
-        mockRuleLoader.loadRules(_ as String, ValidationRule.class) >> { throw exception }
+        mockRuleLoader.loadRules(_ as String, _ as TypeReference) >> { throw exception }
 
         when:
         ruleEngine.runRules(Mock(FhirResource))
@@ -79,14 +78,14 @@ class RuleEngineTest extends Specification {
         1 * mockLogger.logError(_ as String, exception)
     }
 
-    def 'runRules handles logging warning correctly'() {
+    def "runRules handles logging warning correctly"() {
         given:
         def ruleViolationMessage = "Rule violation message"
         def fullRuleViolationMessage = "Rule violation: " + ruleViolationMessage
         def fhirBundle = Mock(FhirResource)
         def invalidRule = Mock(Rule)
         invalidRule.getMessage() >> ruleViolationMessage
-        mockRuleLoader.loadRules(_ as String, ValidationRule.class) >> [invalidRule]
+        mockRuleLoader.loadRules(_ as String, _ as TypeReference) >> [invalidRule]
 
         when:
         invalidRule.shouldRun(fhirBundle) >> true

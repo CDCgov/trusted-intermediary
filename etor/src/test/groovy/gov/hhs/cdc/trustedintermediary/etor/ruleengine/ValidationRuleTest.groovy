@@ -77,7 +77,6 @@ class ValidationRuleTest extends Specification {
     def "isValid returns expected boolean depending on validations"() {
         given:
         def mockFhir = Mock(HapiFhir)
-        mockFhir.evaluateCondition(_ as Object, _ as String) >> true >> validationResult
         TestApplicationContext.register(HapiFhir, mockFhir)
 
         def rule = new ValidationRule(null, null, null, null, [
@@ -85,13 +84,21 @@ class ValidationRuleTest extends Specification {
             "secondValidation"
         ])
 
-        expect:
-        rule.isValid(new FhirResourceMock("resource")) == valid
+        when:
+        mockFhir.evaluateCondition(_ as Object, _ as String) >> true >> true
+        rule.runRule(new FhirResourceMock("resource"))
 
-        where:
-        validationResult | valid
-        true             | true
-        false            | false
+        then:
+        0 * mockLogger.logWarning(_ as String)
+        0 * mockLogger.logError(_ as String, _ as Exception)
+
+        when:
+        mockFhir.evaluateCondition(_ as Object, _ as String) >> true >> false
+        rule.runRule(new FhirResourceMock("resource"))
+
+        then:
+        1 * mockLogger.logWarning(_ as String)
+        0 * mockLogger.logError(_ as String, _ as Exception)
     }
 
     def "isValid logs an error and returns false if an exception happens when evaluating a validation"() {
@@ -103,10 +110,10 @@ class ValidationRuleTest extends Specification {
         def rule = new ValidationRule(null, null, null, null, ["validation"])
 
         when:
-        def valid = rule.isValid(Mock(FhirResource))
+        rule.runRule(Mock(FhirResource))
 
         then:
+        0 * mockLogger.logWarning(_ as String)
         1 * mockLogger.logError(_ as String, _ as Exception)
-        !valid
     }
 }

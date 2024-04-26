@@ -71,7 +71,7 @@ class ValidationRuleEngineIntegrationTest extends Specification {
 
         then:
         0 * mockLogger.logWarning(_ as String)
-        0 * mockLogger.logError(_ as String, _ as Throwable)
+        0 * mockLogger.logError(_ as String, _ as Exception)
     }
 
     def "validation rules pass for test files"() {
@@ -79,7 +79,7 @@ class ValidationRuleEngineIntegrationTest extends Specification {
         def fhirResource = getExampleFhirResource(testFile)
         def rule = createValidationRule([], [validation])
         0 * mockLogger.logWarning(_ as String)
-        0 * mockLogger.logError(_ as String, _ as Throwable)
+        0 * mockLogger.logError(_ as String, _ as Exception)
 
         expect:
         rule.runRule(fhirResource)
@@ -97,7 +97,7 @@ class ValidationRuleEngineIntegrationTest extends Specification {
         def fhirResource = getExampleFhirResource(testFile)
         def rule = createValidationRule([], [validation])
         1 * mockLogger.logWarning(_ as String)
-        0 * mockLogger.logError(_ as String, _ as Throwable)
+        0 * mockLogger.logError(_ as String, _ as Exception)
 
         expect:
         rule.runRule(fhirResource)
@@ -127,7 +127,7 @@ class ValidationRuleEngineIntegrationTest extends Specification {
 
         then:
         0 * mockLogger.logWarning(_ as String)
-        0 * mockLogger.logError(_ as String, _ as Throwable)
+        0 * mockLogger.logError(_ as String, _ as Exception)
 
         when:
         receiverOrganization = new Organization()
@@ -142,7 +142,7 @@ class ValidationRuleEngineIntegrationTest extends Specification {
 
         then:
         1 * mockLogger.logWarning(_ as String)
-        0 * mockLogger.logError(_ as String, _ as Throwable)
+        0 * mockLogger.logError(_ as String, _ as Exception)
 
         when:
         receiverOrganization = new Organization()
@@ -156,7 +156,7 @@ class ValidationRuleEngineIntegrationTest extends Specification {
 
         then:
         1 * mockLogger.logWarning(_ as String)
-        0 * mockLogger.logError(_ as String, _ as Throwable)
+        0 * mockLogger.logError(_ as String, _ as Exception)
     }
 
     Bundle createMessageBundle(Map params) {
