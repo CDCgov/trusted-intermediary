@@ -125,7 +125,7 @@ class FilePartnerMetadataStorageTest extends Specification {
         when:
         FilePartnerMetadataStorage.getInstance().saveMetadata(metadata1)
         FilePartnerMetadataStorage.getInstance().saveMetadata(metadata2)
-        def metadataSet = FilePartnerMetadataStorage.getInstance().readMetadataForSender(sendingFacilityDetails.namespace())
+        def metadataSet = FilePartnerMetadataStorage.getInstance().readMetadataForSender(sendingFacilityDetails.universalId())
 
         then:
         metadataSet.containsAll(Set.of(metadata1, metadata2))

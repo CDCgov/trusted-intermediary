@@ -105,8 +105,6 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 List.of(
                 new DbColumn("received_message_id", mockMetadata.receivedSubmissionId(), false, Types.VARCHAR),
                 new DbColumn("sent_message_id", mockMetadata.sentSubmissionId(), true, Types.VARCHAR),
-                new DbColumn("sender", mockMetadata.sendingFacilityDetails().namespace(), false, Types.VARCHAR),
-                new DbColumn("receiver", mockMetadata.receivingFacilityDetails().namespace(), true, Types.VARCHAR),
                 new DbColumn("hash_of_message", mockMetadata.hash(), false, Types.VARCHAR),
                 new DbColumn("time_received", Timestamp.from(mockMetadata.timeReceived()),false, Types.TIMESTAMP),
                 new DbColumn("time_delivered", Timestamp.from(mockMetadata.timeDelivered()),true, Types.TIMESTAMP),
@@ -221,8 +219,6 @@ class DatabasePartnerMetadataStorageTest extends Specification {
                 List.of(
                 new DbColumn("received_message_id", mockMetadata.receivedSubmissionId(), false, Types.VARCHAR),
                 new DbColumn("sent_message_id", mockMetadata.sentSubmissionId(), true, Types.VARCHAR),
-                new DbColumn("sender", mockMetadata.sendingFacilityDetails().namespace(), false, Types.VARCHAR),
-                new DbColumn("receiver", mockMetadata.receivingFacilityDetails().namespace(), true, Types.VARCHAR),
                 new DbColumn("hash_of_message", mockMetadata.hash(), false, Types.VARCHAR),
                 new DbColumn("time_received", null, false, Types.TIMESTAMP),
                 new DbColumn("time_delivered", null,true, Types.TIMESTAMP),
