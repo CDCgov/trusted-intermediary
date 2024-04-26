@@ -20,10 +20,12 @@ public class ValidationRuleEngine implements RuleEngine {
 
     private ValidationRuleEngine() {}
 
+    @Override
     public void unloadRules() {
         rules.clear();
     }
 
+    @Override
     public void ensureRulesLoaded() {
         synchronized (this) {
             if (rules.isEmpty()) {
@@ -34,10 +36,7 @@ public class ValidationRuleEngine implements RuleEngine {
         }
     }
 
-    private synchronized void loadRules(List<ValidationRule> rules) {
-        this.rules.addAll(rules);
-    }
-
+    @Override
     public void runRules(FhirResource<?> resource) {
         ensureRulesLoaded();
         for (ValidationRule rule : rules) {
@@ -45,5 +44,9 @@ public class ValidationRuleEngine implements RuleEngine {
                 rule.runRule(resource);
             }
         }
+    }
+
+    private synchronized void loadRules(List<ValidationRule> rules) {
+        this.rules.addAll(rules);
     }
 }
