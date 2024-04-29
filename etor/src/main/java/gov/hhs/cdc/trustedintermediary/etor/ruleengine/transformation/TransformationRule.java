@@ -27,7 +27,11 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
         for (TransformationRuleMethod transformation : this.getRules()) {
             String methodName = transformation.name();
             Map<String, String> methodArgs = transformation.args();
-            // evaluate methodName(methodArgs) and apply transformation to resource
+            // evaluate methodName(resource, methodArgs)
+            // i.e. addEtorProcessingTag(resource, methodArgs) where methodArgs is empty
+            // first, need to get methodName from ruleengine/transformation/custom/ using the class
+            // name or file name
+            // then, need to call the method with the resource and methodArgs
         }
     }
 }
