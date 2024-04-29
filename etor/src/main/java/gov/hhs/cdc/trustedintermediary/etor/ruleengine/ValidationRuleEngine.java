@@ -27,11 +27,13 @@ public class ValidationRuleEngine implements RuleEngine {
 
     @Override
     public void ensureRulesLoaded() {
-        synchronized (this) {
-            if (rules.isEmpty()) {
-                List<ValidationRule> parsedRules =
-                        ruleLoader.loadRules(ruleDefinitionsFileName, new TypeReference<>() {});
-                loadRules(parsedRules);
+        if (rules.isEmpty()) {
+            synchronized (this) {
+                if (rules.isEmpty()) {
+                    List<ValidationRule> parsedRules =
+                            ruleLoader.loadRules(ruleDefinitionsFileName, new TypeReference<>() {});
+                    loadRules(parsedRules);
+                }
             }
         }
     }
