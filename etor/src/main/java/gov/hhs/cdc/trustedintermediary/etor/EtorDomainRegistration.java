@@ -34,7 +34,7 @@ import gov.hhs.cdc.trustedintermediary.etor.results.ResultResponse;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultSender;
 import gov.hhs.cdc.trustedintermediary.etor.results.SendResultUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader;
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.ValidationRuleEngine;
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation.ValidationRuleEngine;
 import gov.hhs.cdc.trustedintermediary.external.database.DatabaseMessageLinkStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.DatabasePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.DbDao;

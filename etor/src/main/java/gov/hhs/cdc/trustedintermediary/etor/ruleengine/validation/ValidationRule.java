@@ -1,6 +1,8 @@
-package gov.hhs.cdc.trustedintermediary.etor.ruleengine;
+package gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.Rule;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.List;
