@@ -48,7 +48,7 @@ public class ValidationRuleEngine implements RuleEngine {
 
                     List<ValidationRule> parsedRules =
                             ruleLoader.loadRules(path, new TypeReference<>() {});
-                    loadRules(parsedRules);
+                    this.rules.addAll(parsedRules);
                 }
             }
         }
@@ -67,9 +67,5 @@ public class ValidationRuleEngine implements RuleEngine {
                 rule.runRule(resource);
             }
         }
-    }
-
-    private synchronized void loadRules(List<ValidationRule> rules) {
-        this.rules.addAll(rules);
     }
 }
