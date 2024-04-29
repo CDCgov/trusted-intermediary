@@ -6,6 +6,7 @@ import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Patient;
 
 /**
  * Helper class with a variety of utilities to use on a FHIR bundle message. It adds the 'ETOR' tag
@@ -58,5 +59,15 @@ public class HapiMessageConverterHelper {
             bundle.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader));
         }
         return messageHeader;
+    }
+
+    /**
+     * Finds the first patient in bundle resource or returns null
+     *
+     * @param bundle
+     * @return Patient if found
+     */
+    public static Patient findPatientOrNull(Bundle bundle) {
+        return HapiHelper.resourcesInBundle(bundle, Patient.class).findFirst().orElse(null);
     }
 }
