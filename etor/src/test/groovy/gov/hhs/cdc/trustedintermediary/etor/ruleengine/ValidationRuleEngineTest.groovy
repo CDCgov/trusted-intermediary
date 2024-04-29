@@ -121,4 +121,17 @@ class ValidationRuleEngineTest extends Specification {
         then:
         0 * mockLogger.logWarning(fullFailedValidationMessage)
     }
+
+
+    def "runRules logs an error and doesn't run any rules when there's a RuleLoaderException"() {
+        given:
+        def exception = new RuleLoaderException("Error loading rules", new Exception())
+        mockRuleLoader.loadRules(_ as Path, _ as TypeReference) >> { throw exception }
+
+        when:
+        ruleEngine.runRules(Mock(FhirResource))
+
+        then:
+        1 * mockLogger.logError(_ as String, exception)
+    }
 }
