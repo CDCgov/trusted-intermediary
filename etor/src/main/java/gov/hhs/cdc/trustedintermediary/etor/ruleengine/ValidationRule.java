@@ -92,7 +92,7 @@ public class ValidationRule implements Rule {
                 boolean isValid =
                         fhirEngine.evaluateCondition(resource.getUnderlyingResource(), validation);
                 if (!isValid) {
-                    logger.logWarning("Rule violation: " + message);
+                    logger.logWarning("Validation failed: " + message);
                 }
             } catch (Exception e) {
                 logger.logError(
