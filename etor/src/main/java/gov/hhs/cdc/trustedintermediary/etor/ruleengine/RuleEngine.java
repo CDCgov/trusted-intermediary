@@ -4,7 +4,7 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine;
 public interface RuleEngine {
     void unloadRules();
 
-    void ensureRulesLoaded();
+    void ensureRulesLoaded() throws RuleLoaderException;
 
     void runRules(FhirResource<?> resource);
 }

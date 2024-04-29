@@ -26,17 +26,17 @@ public class RuleLoader {
         return INSTANCE;
     }
 
-    public <T> List<T> loadRules(Path path, TypeReference<Map<String, List<T>>> typeReference) {
+    public <T> List<T> loadRules(Path path, TypeReference<Map<String, List<T>>> typeReference)
+            throws RuleLoaderException {
         try (InputStream ruleDefinitionStream = Files.newInputStream(path)) {
-            assert ruleDefinitionStream != null;
             var rulesString =
                     new String(ruleDefinitionStream.readAllBytes(), StandardCharsets.UTF_8);
             Map<String, List<T>> jsonObj =
                     formatter.convertJsonToObject(rulesString, typeReference);
             return jsonObj.getOrDefault("definitions", Collections.emptyList());
         } catch (IOException | FormatterProcessingException e) {
-            logger.logError("Failed to load rules definitions from: " + path.getFileName(), e);
-            return Collections.emptyList();
+            throw new RuleLoaderException(
+                    "Failed to load rules definitions for provided path: " + path, e);
         }
     }
 }

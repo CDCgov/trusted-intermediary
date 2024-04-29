@@ -19,9 +19,19 @@ class RuleLoaderTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(RuleLoader, RuleLoader.getInstance())
+        TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.register(HapiFhir, Mock(HapiFhir))
         TestApplicationContext.injectRegisteredImplementations()
 
         tempFile = Files.createTempFile("test_validation_definition", ".json")
+    }
+
+    def cleanup(){
+        Files.deleteIfExists(tempFile)
+    }
+
+    def "load rules from file"() {
+        given:
         fileContents = """
         {
             "definitions": [
@@ -36,17 +46,6 @@ class RuleLoaderTest extends Specification {
         }
         """
         Files.writeString(tempFile, fileContents)
-    }
-
-    def cleanup(){
-        Files.deleteIfExists(tempFile)
-    }
-
-    def "load rules from file"() {
-        given:
-        TestApplicationContext.register(HapiFhir, Mock(HapiFhir))
-        TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         List<ValidationRule> rules = RuleLoader.getInstance().loadRules(tempFile, new TypeReference<Map<String, List<ValidationRule>>>() {})
@@ -64,8 +63,11 @@ class RuleLoaderTest extends Specification {
     }
 
     def "handle FormatterProcessingException when loading rules from a non existent file"() {
+        given:
+        Files.writeString(tempFile, "!K@WJ#8uhy")
+
         when:
-        RuleLoader.getInstance().loadRules("!K@WJ#8uhy")
+        RuleLoader.getInstance().loadRules(tempFile, new TypeReference<Map<String, List<ValidationRule>>>() {})
 
         then:
         thrown(RuleLoaderException)
