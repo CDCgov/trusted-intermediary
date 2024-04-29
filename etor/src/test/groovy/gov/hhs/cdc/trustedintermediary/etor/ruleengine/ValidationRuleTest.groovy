@@ -38,7 +38,7 @@ class ValidationRuleTest extends Specification {
         rule.getRules() == validations
     }
 
-    def "appliesTo returns expected boolean depending on conditions"() {
+    def "shouldRun returns expected boolean depending on conditions"() {
         given:
         def mockFhir = Mock(HapiFhir)
         mockFhir.evaluateCondition(_ as Object, _ as String) >> true >> conditionResult
@@ -58,7 +58,7 @@ class ValidationRuleTest extends Specification {
         false           | false
     }
 
-    def "appliesTo logs an error and returns false if an exception happens when evaluating a condition"() {
+    def "shouldRun logs an error and returns false if an exception happens when evaluating a condition"() {
         given:
         def mockFhir = Mock(HapiFhirImplementation)
         mockFhir.evaluateCondition(_ as Object, "condition") >> { throw new Exception() }
@@ -74,7 +74,7 @@ class ValidationRuleTest extends Specification {
         !applies
     }
 
-    def "isValid returns expected boolean depending on validations"() {
+    def "runRule returns expected boolean depending on validations"() {
         given:
         def mockFhir = Mock(HapiFhir)
         TestApplicationContext.register(HapiFhir, mockFhir)
@@ -101,7 +101,7 @@ class ValidationRuleTest extends Specification {
         0 * mockLogger.logError(_ as String, _ as Exception)
     }
 
-    def "isValid logs an error and returns false if an exception happens when evaluating a validation"() {
+    def "runRule logs an error and returns false if an exception happens when evaluating a validation"() {
         given:
         def mockFhir = Mock(HapiFhirImplementation)
         mockFhir.evaluateCondition(_ as Object, "condition") >> { throw new Exception() }

@@ -1,16 +1,21 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine;
 
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 
+/** Implements the RuleEngine interface. It represents a rule engine for validations. */
 public class ValidationRuleEngine implements RuleEngine {
     private String ruleDefinitionsFileName;
     final List<ValidationRule> rules = new ArrayList<>();
 
     private static final ValidationRuleEngine INSTANCE = new ValidationRuleEngine();
 
+    @Inject Logger logger;
     @Inject RuleLoader ruleLoader;
 
     public static ValidationRuleEngine getInstance(String ruleDefinitionsFileName) {
@@ -26,19 +31,33 @@ public class ValidationRuleEngine implements RuleEngine {
     }
 
     @Override
-    public void ensureRulesLoaded() {
-        synchronized (this) {
-            if (rules.isEmpty()) {
-                List<ValidationRule> parsedRules =
-                        ruleLoader.loadRules(ruleDefinitionsFileName, new TypeReference<>() {});
-                loadRules(parsedRules);
+    public void ensureRulesLoaded() throws RuleLoaderException {
+        if (rules.isEmpty()) {
+            synchronized (this) {
+                if (rules.isEmpty()) {
+                    Path path =
+                            Paths.get(
+                                    getClass()
+                                            .getClassLoader()
+                                            .getResource(ruleDefinitionsFileName)
+                                            .getPath());
+
+                    List<ValidationRule> parsedRules =
+                            ruleLoader.loadRules(path, new TypeReference<>() {});
+                    loadRules(parsedRules);
+                }
             }
         }
     }
 
     @Override
     public void runRules(FhirResource<?> resource) {
-        ensureRulesLoaded();
+        try {
+            ensureRulesLoaded();
+        } catch (RuleLoaderException e) {
+            logger.logError("Failed to load rules definitions", e);
+            return;
+        }
         for (ValidationRule rule : rules) {
             if (rule.shouldRun(resource)) {
                 rule.runRule(resource);
