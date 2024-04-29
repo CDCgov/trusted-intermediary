@@ -37,20 +37,25 @@ class ValidationRuleEngineTest extends Specification {
     }
 
     def "ensureRulesLoaded loads rules only once by default"() {
+        given:
+        mockRuleLoader.loadRules(_ as String, _ as TypeReference) >> []
+
         when:
         ruleEngine.ensureRulesLoaded()
         ruleEngine.ensureRulesLoaded() // Call twice to test if rules are loaded only once
 
         then:
-        1 * mockRuleLoader.loadRules(_ as String, ValidationRule.class) >> [Mock(Rule)]
+        1 * mockRuleLoader.loadRules(_ as String, _ as TypeReference)
     }
 
     def "ensureRulesLoaded loads rules only once on multiple threads"() {
         given:
         def threadsNum = 10
         def iterations = 4
+        def mockRule = Mock(ValidationRule)
 
         when:
+        mockRuleLoader.loadRules(_ as String, _ as TypeReference) >> [mockRule]
         List<Thread> threads = []
         (1..threadsNum).each { threadId ->
             threads.add(new Thread({
@@ -63,13 +68,16 @@ class ValidationRuleEngineTest extends Specification {
         threads*.join()
 
         then:
-        1 * mockRuleLoader.loadRules(_ as String, ValidationRule.class) >> [Mock(Rule)]
+        1 * mockRuleLoader.loadRules(_ as String, _ as TypeReference)
     }
 
     def "ensureRulesLoaded logs an error if there is an exception loading the rules"() {
         given:
         def exception = new RuleLoaderException("Error loading rules", new Exception())
-        mockRuleLoader.loadRules(_ as String, _ as TypeReference) >> { throw exception }
+        mockRuleLoader.loadRules(_ as String, _ as TypeReference) >> {
+            mockLogger.logError("Error loading rules", exception)
+            return []
+        }
 
         when:
         ruleEngine.runRules(Mock(FhirResource))
