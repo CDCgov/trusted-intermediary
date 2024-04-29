@@ -66,7 +66,7 @@ class ValidationRuleEngineIntegrationTest extends Specification {
         given:
         def fhirResource = getExampleFhirResource("e2e/orders/001_OML_O21_short.fhir")
         def validation = "Bundle.entry.resource.ofType(MessageHeader).focus.resolve().category.exists()"
-        Rule rule = createValidationRule([], [validation])
+        def rule = createValidationRule([], [validation])
 
         when:
         rule.runRule(fhirResource)
@@ -184,13 +184,13 @@ class ValidationRuleEngineIntegrationTest extends Specification {
         return bundle
     }
 
-    Rule createValidationRule(List<String> ruleConditions, List<String> ruleValidations) {
+    ValidationRule createValidationRule(List<String> ruleConditions, List<String> ruleValidations) {
         return new ValidationRule(
-                name: "Rule name",
-                description: "Rule description",
-                message: "Rule warning message",
-                conditions: ruleConditions,
-                rules: ruleValidations,
+                "Rule name",
+                "Rule description",
+                "Rule warning message",
+                ruleConditions,
+                ruleValidations,
                 )
     }
 
