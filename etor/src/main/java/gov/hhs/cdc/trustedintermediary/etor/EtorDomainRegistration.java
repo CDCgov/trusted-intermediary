@@ -34,6 +34,7 @@ import gov.hhs.cdc.trustedintermediary.etor.results.ResultResponse;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultSender;
 import gov.hhs.cdc.trustedintermediary.etor.results.SendResultUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader;
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.TransformationRuleEngine;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation.ValidationRuleEngine;
 import gov.hhs.cdc.trustedintermediary.external.database.DatabaseMessageLinkStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.DatabasePartnerMetadataStorage;
@@ -136,6 +137,9 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(
                 ValidationRuleEngine.class,
                 ValidationRuleEngine.getInstance("validation_definitions.json"));
+        ApplicationContext.register(
+                TransformationRuleEngine.class,
+                TransformationRuleEngine.getInstance("transformation_definitions.json"));
 
         ApplicationContext.register(SendMessageHelper.class, SendMessageHelper.getInstance());
 
