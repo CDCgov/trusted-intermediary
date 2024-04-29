@@ -27,6 +27,7 @@ public class ValidationRule extends Rule {
         super(ruleName, ruleDescription, ruleMessage, ruleConditions, ruleActions);
     }
 
+    @Override
     public void runRule(FhirResource<?> resource) {
         for (String validation : this.getRules()) {
             try {
