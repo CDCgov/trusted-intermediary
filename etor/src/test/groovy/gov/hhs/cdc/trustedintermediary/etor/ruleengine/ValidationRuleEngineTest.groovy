@@ -9,6 +9,7 @@ class ValidationRuleEngineTest extends Specification {
     def ruleEngine = ValidationRuleEngine.getInstance("validation_definitions.json")
     def mockRuleLoader = Mock(RuleLoader)
     def mockLogger = Mock(Logger)
+    def mockRule = Mock(ValidationRule)
 
     def setup() {
         ruleEngine.unloadRules()
@@ -24,35 +25,33 @@ class ValidationRuleEngineTest extends Specification {
 
     def "ensureRulesLoaded happy path"() {
         given:
-        def mockRuleLoader = Mock(RuleLoader)
-        TestApplicationContext.register(RuleLoader, mockRuleLoader)
-        TestApplicationContext.injectRegisteredImplementations()
+        mockRuleLoader.loadRules(_ as String, _ as TypeReference) >> [mockRule]
 
         when:
         ruleEngine.ensureRulesLoaded()
 
         then:
-        1 * mockRuleLoader.loadRules(_ as String, ValidationRule.class) >> [Mock(Rule)]
+        1 * mockRuleLoader.loadRules(_ as String, _ as TypeReference) >> [mockRule]
         ruleEngine.rules.size() == 1
     }
 
     def "ensureRulesLoaded loads rules only once by default"() {
         given:
-        mockRuleLoader.loadRules(_ as String, _ as TypeReference) >> []
+        mockRuleLoader.loadRules(_ as String, _ as TypeReference) >> [mockRule]
 
         when:
         ruleEngine.ensureRulesLoaded()
         ruleEngine.ensureRulesLoaded() // Call twice to test if rules are loaded only once
 
         then:
-        1 * mockRuleLoader.loadRules(_ as String, _ as TypeReference)
+        1 * mockRuleLoader.loadRules(_ as String, _ as TypeReference) >> [mockRule]
+        ruleEngine.rules.size() == 1
     }
 
     def "ensureRulesLoaded loads rules only once on multiple threads"() {
         given:
         def threadsNum = 10
         def iterations = 4
-        def mockRule = Mock(ValidationRule)
 
         when:
         mockRuleLoader.loadRules(_ as String, _ as TypeReference) >> [mockRule]
