@@ -1,5 +1,7 @@
-package gov.hhs.cdc.trustedintermediary.etor.ruleengine;
+package gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation;
 
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.Rule;
 import java.util.List;
 
 public class TransformationRule implements Rule {
