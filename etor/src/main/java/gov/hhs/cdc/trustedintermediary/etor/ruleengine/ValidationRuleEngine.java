@@ -1,6 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
@@ -29,8 +31,15 @@ public class ValidationRuleEngine implements RuleEngine {
     public void ensureRulesLoaded() {
         synchronized (this) {
             if (rules.isEmpty()) {
+                Path path =
+                        Paths.get(
+                                getClass()
+                                        .getClassLoader()
+                                        .getResource(ruleDefinitionsFileName)
+                                        .getPath());
+
                 List<ValidationRule> parsedRules =
-                        ruleLoader.loadRules(ruleDefinitionsFileName, new TypeReference<>() {});
+                        ruleLoader.loadRules(path, new TypeReference<>() {});
                 loadRules(parsedRules);
             }
         }
