@@ -29,18 +29,20 @@ public class ValidationRuleEngine implements RuleEngine {
 
     @Override
     public void ensureRulesLoaded() {
-        synchronized (this) {
-            if (rules.isEmpty()) {
-                Path path =
-                        Paths.get(
-                                getClass()
-                                        .getClassLoader()
-                                        .getResource(ruleDefinitionsFileName)
-                                        .getPath());
+        if (rules.isEmpty()) {
+            synchronized (this) {
+                if (rules.isEmpty()) {
+                    Path path =
+                            Paths.get(
+                                    getClass()
+                                            .getClassLoader()
+                                            .getResource(ruleDefinitionsFileName)
+                                            .getPath());
 
-                List<ValidationRule> parsedRules =
-                        ruleLoader.loadRules(path, new TypeReference<>() {});
-                loadRules(parsedRules);
+                    List<ValidationRule> parsedRules =
+                            ruleLoader.loadRules(path, new TypeReference<>() {});
+                    loadRules(parsedRules);
+                }
             }
         }
     }
