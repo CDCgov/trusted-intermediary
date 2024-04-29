@@ -1,12 +1,40 @@
 {
   "definitions": [ {
-      "name": "Rule name",
-      "description": "Rule description",
-      "message": "Log message",
+      "name": "addEtorProcessingTag",
+      "description": "Add ETOR Processing Tag",
+      "message": "",
       "conditions": [ ],
       "rules": [
         {
-          "name": "Transformation method name",
+          "name": "addEtorTagToBundle",
+          "args": { }
+        }
+      ]
+    },
+    {
+      "name": "convertToOmlOrder",
+      "description": "Convert to OML Order",
+      "message": "",
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'O01'"
+      ],
+      "rules": [
+        {
+          "name": "convertToOmlOrder",
+          "args": { }
+        }
+      ]
+    },
+    {
+      "name": "addContactSectionToPatientResource",
+      "description": "Add Contact Section to Patient Resource",
+      "message": "",
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'O01'"
+      ],
+      "rules": [
+        {
+          "name": "addContactSectionToPatientResource",
           "args": { }
         }
       ]
