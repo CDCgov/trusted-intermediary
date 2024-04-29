@@ -50,7 +50,7 @@ public class HapiMessageConverterHelper {
      * @param bundle the in coming message in a FHIR bundle
      * @return returns existing MessageHeader resource or a newly created one
      */
-    public MessageHeader findOrInitializeMessageHeader(Bundle bundle) {
+    public static MessageHeader findOrInitializeMessageHeader(Bundle bundle) {
         var messageHeader =
                 HapiHelper.resourcesInBundle(bundle, MessageHeader.class).findFirst().orElse(null);
         if (messageHeader == null) {
