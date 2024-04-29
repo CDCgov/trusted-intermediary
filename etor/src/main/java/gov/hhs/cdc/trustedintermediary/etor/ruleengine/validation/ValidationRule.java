@@ -1,26 +1,16 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation;
 
-import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.Rule;
-import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
-import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.List;
 
 /**
- * Implements the Rule interface. It represents a rule with a name, description, warning message,
- * conditions, and validations. It uses the HapiFhir engine to evaluate the conditions and
- * validations.
+ * The ValidationRule class extends the {@link gov.hhs.cdc.trustedintermediary.etor.ruleengine.Rule
+ * Rule} class and represents a validation rule. It implements the {@link
+ * gov.hhs.cdc.trustedintermediary.etor.ruleengine.Rule#runRule(FhirResource) runRule} method to
+ * evaluate the validation and log a warning if the validation fails.
  */
-public class ValidationRule implements Rule {
-
-    private final Logger logger = ApplicationContext.getImplementation(Logger.class);
-    private final HapiFhir fhirEngine = ApplicationContext.getImplementation(HapiFhir.class);
-    private String name;
-    private String description;
-    private String message;
-    private List<String> conditions;
-    private List<String> rules;
+public class ValidationRule extends Rule {
 
     /**
      * Do not delete this constructor! It is used for JSON deserialization when loading rules from a
@@ -34,72 +24,22 @@ public class ValidationRule implements Rule {
             String ruleMessage,
             List<String> ruleConditions,
             List<String> ruleActions) {
-        name = ruleName;
-        description = ruleDescription;
-        message = ruleMessage;
-        conditions = ruleConditions;
-        rules = ruleActions;
+        super(ruleName, ruleDescription, ruleMessage, ruleConditions, ruleActions);
     }
 
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public String getMessage() {
-        return message;
-    }
-
-    @Override
-    public List<String> getConditions() {
-        return conditions;
-    }
-
-    @Override
-    public List<String> getRules() {
-        return rules;
-    }
-
-    @Override
-    public boolean shouldRun(FhirResource<?> resource) {
-        return conditions.stream()
-                .allMatch(
-                        condition -> {
-                            try {
-                                return fhirEngine.evaluateCondition(
-                                        resource.getUnderlyingResource(), condition);
-                            } catch (Exception e) {
-                                logger.logError(
-                                        "Rule ["
-                                                + name
-                                                + "]: "
-                                                + "An error occurred while evaluating the condition: "
-                                                + condition,
-                                        e);
-                                return false;
-                            }
-                        });
-    }
-
-    @Override
     public void runRule(FhirResource<?> resource) {
-        for (String validation : rules) {
+        for (String validation : this.getRules()) {
             try {
                 boolean isValid =
-                        fhirEngine.evaluateCondition(resource.getUnderlyingResource(), validation);
+                        this.fhirEngine.evaluateCondition(
+                                resource.getUnderlyingResource(), validation);
                 if (!isValid) {
-                    logger.logWarning("Validation failed: " + message);
+                    this.logger.logWarning("Validation failed: " + this.getMessage());
                 }
             } catch (Exception e) {
-                logger.logError(
+                this.logger.logError(
                         "Rule ["
-                                + name
+                                + this.getName()
                                 + "]: "
                                 + "An error occurred while evaluating the validation: "
                                 + validation,
