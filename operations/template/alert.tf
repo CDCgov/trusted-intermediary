@@ -1,5 +1,5 @@
 resource "azurerm_storage_account" "alerts" {
-  name                     = "cdcti${var.environment}alerts"
+  name                     = "cdcti${var.environment}-alerts"
   resource_group_name      = data.azurerm_resource_group.group.name
   location                 = azurerm_resource_group.group.location
   account_tier             = "Standard"
@@ -12,29 +12,24 @@ resource "azurerm_monitor_action_group" "monitor" {
   short_name          = "cdcti-alerts"
 
   webhook_receiver {
-    name        = "notsureyet"
+    name        = "flexion-slack-webhook-receiver"
     service_uri = "http://our-slack-webhook.com/channel"
   }
 }
 
-resource "azurerm_monitor_metric_alert" "example" {
+resource "azurerm_monitor_metric_alert" "alert" {
   name                = "db-connection-metric-alert"
   resource_group_name = data.azurerm_resource_group.group.name
   scopes              = [azurerm_storage_account.alerts.id]
-  description         = "Action will be triggered when Transactions count is greater than 50."
+  description         = "Action will be triggered when database connection failure count is greater than 5 in the past week."
 
   criteria {
-    metric_namespace = "Microsoft.Storage/storageAccounts"
-    metric_name      = "Transactions"
+    metric_namespace = "Microsoft.cdcti-${var.environment}-database/flexibleServers"
+    metric_name      = "connections_failed"
     aggregation      = "Total"
     operator         = "GreaterThan"
-    threshold        = 50
-
-    dimension {
-      name     = "ApiName"
-      operator = "Include"
-      values   = ["*"]
-    }
+    threshold        = 2
+    frequency        = "PT30M"
   }
 
   action {
