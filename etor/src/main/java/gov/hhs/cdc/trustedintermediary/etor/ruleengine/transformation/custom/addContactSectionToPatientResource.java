@@ -1,14 +1,21 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom;
 
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
+import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhirTransformation;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
+import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import java.util.List;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
 
 public class addContactSectionToPatientResource implements CustomFhirTransformation {
+
+    private final MetricMetadata metadata =
+            ApplicationContext.getImplementation(MetricMetadata.class);
+
     private final List<Coding> CODING_LIST =
             List.of(
                     new Coding(
@@ -35,5 +42,7 @@ public class addContactSectionToPatientResource implements CustomFhirTransformat
                     myContact.setTelecom(p.getTelecom());
                     myContact.setAddress(p.getAddressFirstRep());
                 });
+
+        metadata.put(bundle.getId(), EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT);
     }
 }
