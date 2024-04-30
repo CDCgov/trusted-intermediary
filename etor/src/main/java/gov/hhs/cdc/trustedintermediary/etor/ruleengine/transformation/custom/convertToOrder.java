@@ -2,7 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom;
 
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhirTransformation;
-import gov.hhs.cdc.trustedintermediary.external.hapi.HapiMessageConverterHelper;
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
@@ -33,12 +33,11 @@ public class convertToOrder implements CustomFhirTransformation {
         bundle.setType(
                 Bundle.BundleType.MESSAGE); // it always needs to be a message, so no if statement
 
-        var patient = HapiMessageConverterHelper.findPatientOrNull(bundle);
+        var patient = HapiOrderConverter.findPatientOrNull(bundle);
 
-        var serviceRequest =
-                HapiMessageConverterHelper.createServiceRequest(patient, orderDateTime);
-        var messageHeader = HapiMessageConverterHelper.createOmlMessageHeader();
-        var provenance = HapiMessageConverterHelper.createProvenanceResource(orderDateTime);
+        var serviceRequest = HapiOrderConverter.createServiceRequest(patient, orderDateTime);
+        var messageHeader = HapiOrderConverter.createOmlMessageHeader();
+        var provenance = HapiOrderConverter.createProvenanceResource(orderDateTime);
 
         bundle.getEntry().add(0, new Bundle.BundleEntryComponent().setResource(messageHeader));
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(serviceRequest));

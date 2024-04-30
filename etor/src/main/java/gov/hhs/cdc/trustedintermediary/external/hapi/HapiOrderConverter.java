@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CodeableConcept;
@@ -79,7 +80,7 @@ public class HapiOrderConverter implements OrderConverter {
                         .orElse(null);
 
         var serviceRequest = createServiceRequest(patient, orderDateTime);
-        var messageHeader = createMessageHeader();
+        var messageHeader = createOmlMessageHeader();
         var provenance = createProvenanceResource(orderDateTime);
 
         demographicsBundle
@@ -132,9 +133,7 @@ public class HapiOrderConverter implements OrderConverter {
         return new HapiOrder(orderBundle);
     }
 
-    private MessageHeader createMessageHeader() {
-        logger.logInfo("Creating new MessageHeader");
-
+    public static MessageHeader createOmlMessageHeader() {
         var messageHeader = new MessageHeader();
 
         messageHeader.setId(UUID.randomUUID().toString());
@@ -166,9 +165,8 @@ public class HapiOrderConverter implements OrderConverter {
         return new HapiOrder(messageBundle);
     }
 
-    private ServiceRequest createServiceRequest(final Patient patient, final Date orderDateTime) {
-        logger.logInfo("Creating new ServiceRequest");
-
+    public static ServiceRequest createServiceRequest(
+            final Patient patient, final Date orderDateTime) {
         var serviceRequest = new ServiceRequest();
 
         serviceRequest.setId(UUID.randomUUID().toString());
@@ -192,8 +190,7 @@ public class HapiOrderConverter implements OrderConverter {
         return serviceRequest;
     }
 
-    private Provenance createProvenanceResource(Date orderDate) {
-        logger.logInfo("Creating new Provenance");
+    public static Provenance createProvenanceResource(Date orderDate) {
         var provenance = new Provenance();
 
         provenance.setId(UUID.randomUUID().toString());
@@ -201,5 +198,13 @@ public class HapiOrderConverter implements OrderConverter {
         provenance.setActivity(new CodeableConcept(OML_CODING));
 
         return provenance;
+    }
+
+    public static Patient findPatientOrNull(Bundle bundle) {
+        return HapiHelper.resourcesInBundle(bundle, Patient.class).findFirst().orElse(null);
+    }
+
+    public static Stream<Patient> findAllPatients(Bundle bundle) {
+        return HapiHelper.resourcesInBundle(bundle, Patient.class);
     }
 }
