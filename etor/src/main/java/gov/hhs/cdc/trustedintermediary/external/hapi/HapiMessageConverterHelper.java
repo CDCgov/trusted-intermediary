@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
@@ -69,5 +70,15 @@ public class HapiMessageConverterHelper {
      */
     public static Patient findPatientOrNull(Bundle bundle) {
         return HapiHelper.resourcesInBundle(bundle, Patient.class).findFirst().orElse(null);
+    }
+
+    /**
+     * Finds all patient resources inside a given bundle
+     *
+     * @param bundle Bundle to check
+     * @return Stream list of patients.
+     */
+    public static Stream<Patient> findAllPatients(Bundle bundle) {
+        return HapiHelper.resourcesInBundle(bundle, Patient.class);
     }
 }
