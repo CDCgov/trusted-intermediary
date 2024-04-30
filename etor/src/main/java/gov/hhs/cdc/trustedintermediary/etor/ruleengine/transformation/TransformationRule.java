@@ -6,6 +6,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -34,44 +35,44 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
     }
 
     public void runRule(FhirResource<?> resource) {
-        Path customTransformatiosPath =
-                Path.of(
-                        "etor/src/main/java/gov/hhs/cdc/trustedintermediary/etor/ruleengine/transformation/custom/");
-        File[] customTransformationFiles = customTransformatiosPath.toFile().listFiles();
-
-        if (customTransformationFiles == null) {
-            logger.logInfo("No custom transformation files found.");
-            return;
-        }
 
         for (TransformationRuleMethod transformation : this.getRules()) {
-            String methodName = transformation.name();
-            Map<String, String> methodArgs = transformation.args();
+            String name = transformation.name();
+            Map<String, String> args = transformation.args();
 
-            for (File file : customTransformationFiles) {
-                if (file.isFile() && (file.getName().endsWith(".class"))) {
-                    String className = file.getName().replace(".class", "");
-                    if (className.equalsIgnoreCase(methodName)) {
-                        try {
-                            Class<?> clazz = Class.forName(className);
-                            Method method =
-                                    clazz.getDeclaredMethod(
-                                            "transform", FhirResource.class, Map.class);
-                            method.invoke(
-                                    clazz.getDeclaredConstructor().newInstance(),
-                                    resource,
-                                    methodArgs);
-                            return;
-                        } catch (ClassNotFoundException
-                                | NoSuchMethodException
-                                | IllegalAccessException
-                                | InvocationTargetException
-                                | InstantiationException e) {
-                            logger.logError("Error invoking method: " + e.getMessage());
-                        }
-                    }
-                }
+            try {
+                Class<?> clazz = loadCustomTransformationClassFromFile(name);
+                Method method = clazz.getDeclaredMethod("transform", FhirResource.class, Map.class);
+                method.invoke(clazz.getDeclaredConstructor().newInstance(), resource, args);
+            } catch (ClassNotFoundException
+                    | NoSuchMethodException
+                    | IllegalAccessException
+                    | InvocationTargetException
+                    | InstantiationException e) {
+                logger.logError("Error invoking method: " + e.getMessage());
             }
         }
+    }
+
+    private static Class<?> loadCustomTransformationClassFromFile(String className)
+            throws ClassNotFoundException {
+        String customPackageName =
+                "gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom";
+        Path customTransformationPath =
+                Paths.get(
+                        "src/main/java/gov/hhs/cdc/trustedintermediary/etor/ruleengine/transformation/custom/");
+        File[] customTransformationFiles = customTransformationPath.toFile().listFiles();
+        assert customTransformationFiles != null;
+
+        for (File file : customTransformationFiles) {
+            String fileName = file.getName().replace(".java", "");
+            if (file.isFile()
+                    && (file.getName().endsWith(".java"))
+                    && (fileName.equalsIgnoreCase(className))) {
+                return Class.forName(customPackageName + "." + className);
+            }
+        }
+
+        throw new ClassNotFoundException("No custom transformation file found for " + className);
     }
 }

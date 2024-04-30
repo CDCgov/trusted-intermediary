@@ -6,7 +6,7 @@
       "conditions": [ ],
       "rules": [
         {
-          "name": "addEtorTagToBundle",
+          "name": "addEtorProcessingTag",
           "args": { }
         }
       ]
