@@ -15,7 +15,7 @@ public class addContactSectionToPatientResource implements CustomFhirTransformat
                             "http://terminology.hl7.org/CodeSystem/v3-RoleCode", "MTH", "mother"));
 
     @Override
-    public FhirResource<?> transform(FhirResource<?> resource, Map<String, String> args) {
+    public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
 
         var patients = HapiMessageConverterHelper.findAllPatients(bundle);
@@ -35,7 +35,5 @@ public class addContactSectionToPatientResource implements CustomFhirTransformat
                     myContact.setTelecom(p.getTelecom());
                     myContact.setAddress(p.getAddressFirstRep());
                 });
-
-        return resource;
     }
 }

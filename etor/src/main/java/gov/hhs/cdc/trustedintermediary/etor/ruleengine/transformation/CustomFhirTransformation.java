@@ -4,5 +4,5 @@ import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import java.util.Map;
 
 public interface CustomFhirTransformation {
-    FhirResource<?> transform(FhirResource<?> resource, Map<String, String> args);
+    void transform(FhirResource<?> resource, Map<String, String> args);
 }

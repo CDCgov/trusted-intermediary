@@ -16,12 +16,10 @@ public class convertToOmlOrder implements CustomFhirTransformation {
                     "OML - Laboratory order");
 
     @Override
-    public FhirResource<?> transform(FhirResource<?> resource, Map<String, String> args) {
+    public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
 
         var messageHeader = findOrInitializeMessageHeader(bundle);
         messageHeader.setEvent(OML_CODING);
-
-        return resource;
     }
 }
