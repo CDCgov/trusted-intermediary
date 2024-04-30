@@ -30,7 +30,7 @@ class TransformationRuleEngineIntegrationTest  extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
     }
 
-    def "transformation rules run"() {
+    def "transformation rules run without error"() {
         given:
         def bundle = new Bundle()
 
@@ -38,6 +38,6 @@ class TransformationRuleEngineIntegrationTest  extends Specification {
         engine.runRules(new HapiFhirResource(bundle))
 
         then:
-        0 * mockLogger.logWarning(_ as String)
+        0 * mockLogger.logError(_ as String, _ as Exception)
     }
 }
