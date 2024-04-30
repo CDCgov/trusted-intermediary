@@ -49,7 +49,7 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
                     | IllegalAccessException
                     | InvocationTargetException
                     | InstantiationException e) {
-                logger.logError("Error invoking method: " + e.getMessage());
+                logger.logError("Error invoking method: " + name, e);
             }
         }
     }
