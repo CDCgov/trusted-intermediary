@@ -6,7 +6,7 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
 
-public class convertToOrder implements CustomFhirTransformation {
+public class convertDemographicsToOrder implements CustomFhirTransformation {
 
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {

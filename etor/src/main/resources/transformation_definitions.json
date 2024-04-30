@@ -12,7 +12,7 @@
       ]
     },
     {
-      "name": "convertToOrder",
+      "name": "convertDemographicsToOrder",
       "description": "Convert Demographics to Order",
       "message": "",
       "conditions": [
