@@ -23,7 +23,7 @@ class TransformationRuleEngineIntegrationTest  extends Specification {
 
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.register(HapiFhir, fhir)
-        TestApplicationContext.register(ValidationRuleEngine, engine)
+        TestApplicationContext.register(TransformationRuleEngine, engine)
         TestApplicationContext.register(RuleLoader, RuleLoader.getInstance())
         TestApplicationContext.register(Logger, mockLogger)
 

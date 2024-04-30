@@ -18,6 +18,12 @@ import java.util.Map;
  */
 public class TransformationRule extends Rule<TransformationRuleMethod> {
 
+    /**
+     * Do not delete this constructor! It is used for JSON deserialization when loading rules from a
+     * file.
+     */
+    public TransformationRule() {}
+
     public TransformationRule(
             String ruleName,
             String ruleDescription,
