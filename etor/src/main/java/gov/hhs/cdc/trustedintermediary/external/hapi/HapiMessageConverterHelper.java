@@ -24,12 +24,7 @@ public class HapiMessageConverterHelper {
 
     private HapiMessageConverterHelper() {}
 
-    /**
-     * Adds the `ETOR` code to any message provided
-     *
-     * @param messageBundle the in coming message in a FHIR bundle
-     */
-    public void addEtorTagToBundle(Bundle messageBundle) {
+    public static void addEtorTagToBundle(Bundle messageBundle) {
         var messageHeader = findOrInitializeMessageHeader(messageBundle);
         var meta = messageHeader.hasMeta() ? messageHeader.getMeta() : new Meta();
 
@@ -44,12 +39,6 @@ public class HapiMessageConverterHelper {
         messageHeader.setMeta(meta);
     }
 
-    /**
-     * Checks if the FHIR bundle has a messageHeader, and it creates one if it is missing
-     *
-     * @param bundle the in coming message in a FHIR bundle
-     * @return returns existing MessageHeader resource or a newly created one
-     */
     public static MessageHeader findOrInitializeMessageHeader(Bundle bundle) {
         var messageHeader =
                 HapiHelper.resourcesInBundle(bundle, MessageHeader.class).findFirst().orElse(null);
