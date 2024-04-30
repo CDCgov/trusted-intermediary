@@ -12,8 +12,22 @@
       ]
     },
     {
+      "name": "convertToOrder",
+      "description": "Convert Demographics to Order",
+      "message": "",
+      "conditions": [
+        "Condition to filter demographics messages"
+      ],
+      "rules": [
+        {
+          "name": "convertToOrder",
+          "args": { }
+        }
+      ]
+    },
+    {
       "name": "convertToOmlOrder",
-      "description": "Convert to OML Order",
+      "description": "Convert ORM to OML Order",
       "message": "",
       "conditions": [
         "Bundle.entry.resource.ofType(MessageHeader).event.code = 'O01'"
@@ -27,10 +41,10 @@
     },
     {
       "name": "addContactSectionToPatientResource",
-      "description": "Add Contact Section to Patient Resource",
+      "description": "Add Contact Section to Patient Resource in OML Order",
       "message": "",
       "conditions": [
-        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'O01'"
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'O21'"
       ],
       "rules": [
         {
