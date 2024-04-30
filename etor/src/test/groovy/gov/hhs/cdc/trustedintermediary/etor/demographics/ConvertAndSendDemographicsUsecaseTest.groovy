@@ -3,7 +3,7 @@ package gov.hhs.cdc.trustedintermediary.etor.demographics
 import gov.hhs.cdc.trustedintermediary.DemographicsMock
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
+
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender
 
 import spock.lang.Specification

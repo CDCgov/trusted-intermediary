@@ -3,7 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 import gov.hhs.cdc.trustedintermediary.DemographicsMock
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
+
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.Extension

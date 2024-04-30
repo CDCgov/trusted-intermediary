@@ -2,14 +2,11 @@ package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter;
-import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
-import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
@@ -27,8 +24,7 @@ import org.hl7.fhir.r4.model.UrlType;
  * Order <Bundle>}). Also converts an order to identify as an HL7v2 OML in the {@link
  * MessageHeader}.
  */
-public class HapiOrderConverter implements OrderConverter {
-    private static final HapiOrderConverter INSTANCE = new HapiOrderConverter();
+public class HapiOrderConverter {
     private static final Coding OML_CODING =
             new Coding(
                     "http://terminology.hl7.org/CodeSystem/v2-0003",
@@ -40,20 +36,7 @@ public class HapiOrderConverter implements OrderConverter {
                     new Coding(
                             "http://terminology.hl7.org/CodeSystem/v3-RoleCode", "MTH", "mother"));
 
-    @Inject Logger logger;
-
-    @Inject HapiMessageConverterHelper hapiMessageConverterHelper;
-
-    public static HapiOrderConverter getInstance() {
-        return INSTANCE;
-    }
-
-    private HapiOrderConverter() {}
-
-    @Override
-    public HapiOrder convertToOrder(final Demographics<?> demographics) {
-        logger.logInfo("Converting demographics to order");
-
+    public static HapiOrder convertToOrder(final Demographics<?> demographics) {
         var hapiDemographics = (Demographics<Bundle>) demographics;
         var demographicsBundle = hapiDemographics.getUnderlyingResource();
 
@@ -92,23 +75,17 @@ public class HapiOrderConverter implements OrderConverter {
         return new HapiOrder(demographicsBundle);
     }
 
-    @Override
-    public Order<?> convertToOmlOrder(Order<?> order) {
-        logger.logInfo("Converting order to have OML metadata");
-
+    public static Order<?> convertToOmlOrder(Order<?> order) {
         var hapiOrder = (Order<Bundle>) order;
         var orderBundle = hapiOrder.getUnderlyingResource();
-        var messageHeader = hapiMessageConverterHelper.findOrInitializeMessageHeader(orderBundle);
+        var messageHeader = HapiMessageConverterHelper.findOrInitializeMessageHeader(orderBundle);
 
         messageHeader.setEvent(OML_CODING);
 
         return new HapiOrder(orderBundle);
     }
 
-    @Override
-    public Order<?> addContactSectionToPatientResource(Order<?> order) {
-        logger.logInfo("Adding contact section in Patient resource");
-
+    public static Order<?> addContactSectionToPatientResource(Order<?> order) {
         var hapiOrder = (Order<Bundle>) order;
         var orderBundle = hapiOrder.getUnderlyingResource();
 
@@ -153,16 +130,6 @@ public class HapiOrderConverter implements OrderConverter {
                         .setName("CDC Trusted Intermediary"));
 
         return messageHeader;
-    }
-
-    @Override
-    public Order<?> addEtorProcessingTag(Order<?> message) {
-        var hapiOrder = (Order<Bundle>) message;
-        var messageBundle = hapiOrder.getUnderlyingResource();
-
-        hapiMessageConverterHelper.addEtorTagToBundle(messageBundle);
-
-        return new HapiOrder(messageBundle);
     }
 
     public static ServiceRequest createServiceRequest(

@@ -4,7 +4,7 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 import gov.hhs.cdc.trustedintermediary.ResultMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.results.Result
-import gov.hhs.cdc.trustedintermediary.etor.results.ResultConverter
+
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Patient

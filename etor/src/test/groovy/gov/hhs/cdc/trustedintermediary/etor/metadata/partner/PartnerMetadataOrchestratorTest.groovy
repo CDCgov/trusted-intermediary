@@ -5,7 +5,7 @@ import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkStorage
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
+
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException
