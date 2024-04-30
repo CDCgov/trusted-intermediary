@@ -36,60 +36,45 @@ public class HapiOrderConverter {
                     new Coding(
                             "http://terminology.hl7.org/CodeSystem/v3-RoleCode", "MTH", "mother"));
 
-    public static HapiOrder convertToOrder(final Demographics<?> demographics) {
-        var hapiDemographics = (Demographics<Bundle>) demographics;
-        var demographicsBundle = hapiDemographics.getUnderlyingResource();
-
+    public static void convertDemographicsToOrder(Bundle demographics) {
         var overallId = UUID.randomUUID().toString();
-        if (!demographicsBundle.hasId()) {
-            demographicsBundle.setId(overallId);
+        if (!demographics.hasId()) {
+            demographics.setId(overallId);
         }
 
-        if (!demographicsBundle.hasIdentifier()) {
-            demographicsBundle.setIdentifier(new Identifier().setValue(overallId));
+        if (!demographics.hasIdentifier()) {
+            demographics.setIdentifier(new Identifier().setValue(overallId));
         }
 
         var orderDateTime = Date.from(Instant.now());
-        if (!demographicsBundle.hasTimestamp()) {
-            demographicsBundle.setTimestamp(orderDateTime);
+        if (!demographics.hasTimestamp()) {
+            demographics.setTimestamp(orderDateTime);
         }
 
-        demographicsBundle.setType(
+        demographics.setType(
                 Bundle.BundleType.MESSAGE); // it always needs to be a message, so no if statement
 
         var patient =
-                HapiHelper.resourcesInBundle(demographicsBundle, Patient.class)
-                        .findFirst()
-                        .orElse(null);
+                HapiHelper.resourcesInBundle(demographics, Patient.class).findFirst().orElse(null);
 
         var serviceRequest = createServiceRequest(patient, orderDateTime);
         var messageHeader = createOmlMessageHeader();
         var provenance = createProvenanceResource(orderDateTime);
 
-        demographicsBundle
+        demographics
                 .getEntry()
                 .add(0, new Bundle.BundleEntryComponent().setResource(messageHeader));
-        demographicsBundle.addEntry(new Bundle.BundleEntryComponent().setResource(serviceRequest));
-        demographicsBundle.addEntry(new Bundle.BundleEntryComponent().setResource(provenance));
-
-        return new HapiOrder(demographicsBundle);
+        demographics.addEntry(new Bundle.BundleEntryComponent().setResource(serviceRequest));
+        demographics.addEntry(new Bundle.BundleEntryComponent().setResource(provenance));
     }
 
-    public static Order<?> convertToOmlOrder(Order<?> order) {
-        var hapiOrder = (Order<Bundle>) order;
-        var orderBundle = hapiOrder.getUnderlyingResource();
-        var messageHeader = HapiMessageConverterHelper.findOrInitializeMessageHeader(orderBundle);
-
+    public static void convertToOmlOrder(Bundle order) {
+        var messageHeader = HapiMessageConverterHelper.findOrInitializeMessageHeader(order);
         messageHeader.setEvent(OML_CODING);
-
-        return new HapiOrder(orderBundle);
     }
 
-    public static Order<?> addContactSectionToPatientResource(Order<?> order) {
-        var hapiOrder = (Order<Bundle>) order;
-        var orderBundle = hapiOrder.getUnderlyingResource();
-
-        HapiHelper.resourcesInBundle(orderBundle, Patient.class)
+    public static void addContactSectionToPatientResource(Bundle order) {
+        HapiHelper.resourcesInBundle(order, Patient.class)
                 .forEach(
                         p -> {
                             var myContact = p.addContact();
@@ -106,8 +91,6 @@ public class HapiOrderConverter {
                             myContact.setTelecom(p.getTelecom());
                             myContact.setAddress(p.getAddressFirstRep());
                         });
-
-        return new HapiOrder(orderBundle);
     }
 
     public static MessageHeader createOmlMessageHeader() {
