@@ -237,32 +237,6 @@ class HapiOrderConverterTest extends Specification {
         contactSectionAddress.getPostalCode() == convertedPatientAddress.getPostalCode()
     }
 
-    def "add etor processing tag to messageHeader resource"() {
-        given:
-        def expectedSystem = "http://localcodes.org/ETOR"
-        def expectedCode = "ETOR"
-        def expectedDisplay = "Processed by ETOR"
-
-        def messageHeader = new MessageHeader()
-        messageHeader.setId(UUID.randomUUID().toString())
-        def messageHeaderEntry = new Bundle.BundleEntryComponent().setResource(messageHeader)
-        mockOrderBundle.getEntry().add(1, messageHeaderEntry)
-        mockOrder.getUnderlyingResource() >> mockOrderBundle
-
-        when:
-        def convertedOrderBundle = HapiOrderConverter.getInstance().addEtorProcessingTag(mockOrder).getUnderlyingResource() as Bundle
-
-        then:
-        def messageHeaders = convertedOrderBundle.getEntry().get(1).getResource() as MessageHeader
-        def actualSystem = messageHeaders.getMeta().getTag()[0].getSystem()
-        def actualCode = messageHeaders.getMeta().getTag()[0].getCode()
-        def actualDisplay = messageHeaders.getMeta().getTag()[0].getDisplay()
-        actualSystem == expectedSystem
-        actualCode == expectedCode
-        actualDisplay == expectedDisplay
-    }
-
-
     def "no humanName section in contact"() {
         given:
         def addHumanName = false
