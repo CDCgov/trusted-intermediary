@@ -12,20 +12,6 @@
       ]
     },
     {
-      "name": "convertDemographicsToOrder",
-      "description": "Convert Demographics to Order",
-      "message": "",
-      "conditions": [
-        "Condition to filter demographics messages"
-      ],
-      "rules": [
-        {
-          "name": "convertToOrder",
-          "args": { }
-        }
-      ]
-    },
-    {
       "name": "convertToOmlOrder",
       "description": "Convert ORM to OML Order",
       "message": "",
