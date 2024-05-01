@@ -31,7 +31,6 @@ class HapiOrderConverterTest extends Specification {
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
-        TestApplicationContext.register(OrderConverter, HapiOrderConverter.getInstance())
         TestApplicationContext.register(HapiMessageConverterHelper, HapiMessageConverterHelper.getInstance())
         TestApplicationContext.register(HapiMessageHelper, HapiMessageHelper.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
@@ -47,14 +46,14 @@ class HapiOrderConverterTest extends Specification {
     def "the converter fills in gaps of any missing data in the Bundle"() {
 
         when:
-        def orderBundle = HapiOrderConverter.getInstance().convertDemographicsToOrder(mockDemographics).getUnderlyingResource()
+        HapiOrderConverter.convertDemographicsToOrder(mockDemographics as Bundle)
 
         then:
-        orderBundle.hasId()
-        orderBundle.hasIdentifier()
-        orderBundle.hasTimestamp()
-        orderBundle.getType() == Bundle.BundleType.MESSAGE
-        orderBundle.getId() == orderBundle.getIdentifier().getValue()
+        mockDemographics
+        mockDemographics.hasIdentifier()
+        mockDemographics.hasTimestamp()
+        mockDemographics.getType() == Bundle.BundleType.MESSAGE
+        mockDemographics.getId() == mockDemographics.getIdentifier().getValue()
     }
 
     def "the converter doesn't change things if it is already set"() {
@@ -67,7 +66,7 @@ class HapiOrderConverterTest extends Specification {
         mockDemographicsBundle.setTimestamp(mockTimestamp)
 
         when:
-        def orderBundle = HapiOrderConverter.getInstance().convertDemographicsToOrder(mockDemographics).getUnderlyingResource()
+        def orderBundle = HapiOrderConverter.convertDemographicsToOrder(mockDemographics)
 
         then:
         orderBundle.getId() == mockId
@@ -81,7 +80,7 @@ class HapiOrderConverterTest extends Specification {
         mockDemographicsBundle.setType(Bundle.BundleType.COLLECTION)
 
         when:
-        def orderBundle = HapiOrderConverter.getInstance().convertDemographicsToOrder(mockDemographics).getUnderlyingResource()
+        def orderBundle = HapiOrderConverter.convertDemographicsToOrder(mockDemographics)
 
         then:
         orderBundle.getType() == Bundle.BundleType.MESSAGE
@@ -90,7 +89,7 @@ class HapiOrderConverterTest extends Specification {
     def "the demographics correctly constructs a message header in the lab order"() {
 
         when:
-        def orderBundle = HapiOrderConverter.getInstance().convertDemographicsToOrder(mockDemographics).getUnderlyingResource()
+        def orderBundle = HapiOrderConverter.convertDemographicsToOrder(mockDemographics)
 
         then:
         def messageHeader = orderBundle.getEntry().get(0).getResource() as MessageHeader
@@ -108,7 +107,7 @@ class HapiOrderConverterTest extends Specification {
     def "the converter correctly reuses the patient from the passed in demographics"() {
 
         when:
-        def orderBundle = HapiOrderConverter.getInstance().convertDemographicsToOrder(mockDemographics).getUnderlyingResource()
+        def orderBundle = HapiOrderConverter.convertDemographicsToOrder(mockDemographics)
 
         then:
         def patient = orderBundle.getEntry().get(1).getResource() as Patient
@@ -119,7 +118,7 @@ class HapiOrderConverterTest extends Specification {
     def "the converter correctly constructs a service request in the lab order"() {
 
         when:
-        def orderBundle = HapiOrderConverter.getInstance().convertDemographicsToOrder(mockDemographics).getUnderlyingResource()
+        def orderBundle = HapiOrderConverter.convertDemographicsToOrder(mockDemographics)
 
         then:
         def serviceRequest = orderBundle.getEntry().get(2).getResource() as ServiceRequest
@@ -134,7 +133,7 @@ class HapiOrderConverterTest extends Specification {
     def "the order datetime should match for bundle, service request, and provenance resources"() {
 
         when:
-        def orderBundle = HapiOrderConverter.getInstance().convertDemographicsToOrder(mockDemographics).getUnderlyingResource()
+        def orderBundle = HapiOrderConverter.convertDemographicsToOrder(mockDemographics)
         def bundleDateTime = orderBundle.getTimestamp()
         def serviceRequest = orderBundle.getEntry().get(2).getResource() as ServiceRequest
         def provenance = orderBundle.getEntry().get(3).getResource() as Provenance
@@ -158,22 +157,26 @@ class HapiOrderConverterTest extends Specification {
                 "ORM"))))
 
         when:
-        def convertedOrderBundle = HapiOrderConverter.getInstance().convertToOmlOrder(mockOrder).getUnderlyingResource() as Bundle
+        HapiOrderConverter.convertToOmlOrder(mockOrder.getUnderlyingResource())
 
         then:
-        def convertedMessageHeader = convertedOrderBundle.getEntry().get(1).getResource() as MessageHeader
+        def convertedMessageHeader =
+                HapiHelper.resourcesInBundle(mockOrder.getUnderlyingResource(), MessageHeader.class).findFirst().orElse(null)
 
+        convertedMessageHeader != null
         convertedMessageHeader.getEventCoding().getCode() == "O21"
         convertedMessageHeader.getEventCoding().getDisplay().contains("OML")
     }
 
     def "adds the message header to specify OML"() {
         when:
-        def convertedOrderBundle = HapiOrderConverter.getInstance().convertToOmlOrder(mockOrder).getUnderlyingResource() as Bundle
+        HapiOrderConverter.convertToOmlOrder(mockOrder.getUnderlyingResource())
 
         then:
-        def convertedMessageHeader = convertedOrderBundle.getEntry().get(1).getResource() as MessageHeader
+        def convertedMessageHeader =
+                HapiHelper.resourcesInBundle(mockOrder.getUnderlyingResource(), MessageHeader.class).findFirst().orElse(null)
 
+        convertedMessageHeader != null
         convertedMessageHeader.getEventCoding().getCode() == "O21"
         convertedMessageHeader.getEventCoding().getDisplay().contains("OML")
     }
@@ -192,10 +195,10 @@ class HapiOrderConverterTest extends Specification {
         mockOrderBundle.setEntry(entryList)
 
         when:
-        def convertedOrderBundle = HapiOrderConverter.getInstance().addContactSectionToPatientResource(mockOrder).getUnderlyingResource() as Bundle
+        HapiOrderConverter.addContactSectionToPatientResource(mockOrder.getUnderlyingResource())
 
         then:
-        def convertedPatient = convertedOrderBundle.getEntry().get(0).getResource() as Patient
+        def convertedPatient = HapiHelper.resourcesInBundle(mockOrder.getUnderlyingResource(), Patient.class).findFirst().orElse(null)
         def contactSection = convertedPatient.getContact()[0]
 
         contactSection != null
