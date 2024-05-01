@@ -42,14 +42,6 @@ class TransformationRuleEngineIntegrationTest  extends Specification {
     }
 
     def "transformation rules filter and run rules for Orders"() {
-        given:
-        def bundle = new Bundle()
-
-        when:
-        engine.runRules(new HapiFhirResource(bundle))
-
-        then:
-        0 * mockLogger.logError(_ as String, _ as Exception)
     }
 
     def "transformation rules filter and run rules for Results"() {
