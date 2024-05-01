@@ -5,7 +5,7 @@ import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkStorage
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
-
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.TransformationRuleEngine
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException
@@ -67,7 +67,6 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
         TestApplicationContext.register(PartnerMetadataOrchestrator, PartnerMetadataOrchestrator.getInstance())
         TestApplicationContext.register(MessageLinkStorage, mockMessageLinkStorage)
-        TestApplicationContext.register(OrderConverter, HapiOrderConverter.getInstance())
         TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
 
         TestApplicationContext.register(RSEndpointClient, mockClient)
