@@ -8,6 +8,7 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
+import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
@@ -26,6 +27,7 @@ class TransformationRuleEngineIntegrationTest  extends Specification {
         TestApplicationContext.register(TransformationRuleEngine, engine)
         TestApplicationContext.register(RuleLoader, RuleLoader.getInstance())
         TestApplicationContext.register(Logger, mockLogger)
+        TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
 
         TestApplicationContext.injectRegisteredImplementations()
     }
