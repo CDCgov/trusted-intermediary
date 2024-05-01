@@ -19,10 +19,10 @@ class ConvertAndSendDemographicsUsecaseTest extends Specification {
 
     def "ConvertAndSend"() {
         given:
-        def engine = Mock(TransformationRuleEngine)
+        def mockEngine = Mock(TransformationRuleEngine)
         def mockSender = Mock(OrderSender)
 
-        TestApplicationContext.register(TransformationRuleEngine, engine)
+        TestApplicationContext.register(TransformationRuleEngine, mockEngine)
         TestApplicationContext.register(OrderSender, mockSender)
         TestApplicationContext.injectRegisteredImplementations()
 
@@ -32,7 +32,7 @@ class ConvertAndSendDemographicsUsecaseTest extends Specification {
         ConvertAndSendDemographicsUsecase.getInstance().convertAndSend(demographics)
 
         then:
-        1 * engine.runRules(_ as Demographics)
+        1 * mockEngine.runRules(_ as Demographics)
         1 * mockSender.send(_ as Order)
     }
 }

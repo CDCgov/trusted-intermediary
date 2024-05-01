@@ -4,10 +4,8 @@ import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageHelper
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException
-import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.TransformationRuleEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
@@ -17,7 +15,7 @@ import spock.lang.Specification
 class SendOrderUseCaseTest extends Specification {
 
     def mockOrchestrator = Mock(PartnerMetadataOrchestrator)
-    def engine = Mock(TransformationRuleEngine)
+    def mockEngine = Mock(TransformationRuleEngine)
     def mockSender = Mock(OrderSender)
     def mockLogger = Mock(Logger)
 
@@ -28,7 +26,7 @@ class SendOrderUseCaseTest extends Specification {
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
         TestApplicationContext.register(PartnerMetadataOrchestrator, mockOrchestrator)
         TestApplicationContext.register(SendMessageHelper, SendMessageHelper.getInstance())
-        TestApplicationContext.register(TransformationRuleEngine, engine)
+        TestApplicationContext.register(TransformationRuleEngine, mockEngine)
         TestApplicationContext.register(OrderSender, mockSender)
         TestApplicationContext.register(Logger, mockLogger)
     }
@@ -46,7 +44,7 @@ class SendOrderUseCaseTest extends Specification {
         SendOrderUseCase.getInstance().convertAndSend(mockOrder, receivedSubmissionId)
 
         then:
-        1 * engine.runRules(mockOrder)
+        1 * mockEngine.runRules(mockOrder)
         1 * mockSender.send(mockOrder) >> Optional.of(sentSubmissionId)
         1 * mockOrchestrator.updateMetadataForReceivedMessage(_ as PartnerMetadata)
         1 * mockOrchestrator.updateMetadataForSentMessage(receivedSubmissionId, sentSubmissionId)
@@ -92,7 +90,7 @@ class SendOrderUseCaseTest extends Specification {
 
         then:
         1 * mockLogger.logError(_, _)
-        1 * engine.runRules(order)
+        1 * mockEngine.runRules(order)
         1 * mockOrchestrator.findMessagesIdsToLink(receivedSubmissionId) >> Set.of()
         1 * mockSender.send(order) >> Optional.of("sentId")
     }
@@ -108,7 +106,7 @@ class SendOrderUseCaseTest extends Specification {
         SendOrderUseCase.getInstance().convertAndSend(order, "receivedId")
 
         then:
-        1 * engine.runRules(order)
+        1 * mockEngine.runRules(order)
         1 * mockOrchestrator.findMessagesIdsToLink(_ as String) >> Set.of()
         1 * mockSender.send(order) >> Optional.of("sentId")
         1 * mockLogger.logError(_, partnerMetadataException)
