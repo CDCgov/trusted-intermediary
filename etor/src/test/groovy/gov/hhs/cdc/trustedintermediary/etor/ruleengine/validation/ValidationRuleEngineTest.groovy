@@ -1,13 +1,13 @@
-package gov.hhs.cdc.trustedintermediary.etor.ruleengine
+package gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation.ValidationRule
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation.ValidationRuleEngine
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleEngine
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoaderException
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
 import spock.lang.Specification
-
-import java.nio.file.Path
 
 class ValidationRuleEngineTest extends Specification {
     def ruleEngine = ValidationRuleEngine.getInstance("validation_definitions.json")
