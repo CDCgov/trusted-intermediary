@@ -12,6 +12,20 @@
       ]
     },
     {
+      "name": "convertDemographicsToOrder",
+      "description": "Convert Demographics to Order",
+      "message": "",
+      "conditions": [
+        "Bundle.entry.resource.is(FHIR.Patient)"
+      ],
+      "rules": [
+        {
+          "name": "convertToOrder",
+          "args": { }
+        }
+      ]
+    },
+    {
       "name": "convertToOmlOrder",
       "description": "Convert ORM to OML Order",
       "message": "",
