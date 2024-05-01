@@ -12,9 +12,9 @@ import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
 
-class TransformationRuleEngineIntegrationTest  extends Specification {
-    def fhir = HapiFhirImplementation.getInstance()
+class TransformationRuleEngineIntegrationTest extends Specification {
     def engine = TransformationRuleEngine.getInstance("transformation_definitions.json")
+    def fhir = HapiFhirImplementation.getInstance()
     def mockLogger = Mock(Logger)
 
     def setup() {
@@ -42,10 +42,13 @@ class TransformationRuleEngineIntegrationTest  extends Specification {
         0 * mockLogger.logError(_ as String, _ as Exception)
     }
 
-    def "transformation rules filter and run rules for Orders"() {
+    def "transformation rules filter and run rules for ORM messages"() {
     }
 
-    def "transformation rules filter and run rules for Results"() {
+    def "transformation rules filter and run rules for OML messages"() {
+    }
+
+    def "transformation rules filter and run rules for ORU messages"() {
     }
 
     def "transformation rules filter and run rules for Demographics"() {
