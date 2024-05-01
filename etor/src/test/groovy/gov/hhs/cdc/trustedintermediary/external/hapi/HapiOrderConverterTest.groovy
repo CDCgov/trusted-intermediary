@@ -44,20 +44,23 @@ class HapiOrderConverterTest extends Specification {
     }
 
     def "the converter fills in gaps of any missing data in the Bundle"() {
+        given:
+        def mockDemographicsResource = mockDemographics.getUnderlyingResource()
 
         when:
-        HapiOrderConverter.convertDemographicsToOrder(mockDemographics as Bundle)
+        HapiOrderConverter.convertDemographicsToOrder(mockDemographicsResource)
 
         then:
-        mockDemographics
-        mockDemographics.hasIdentifier()
-        mockDemographics.hasTimestamp()
-        mockDemographics.getType() == Bundle.BundleType.MESSAGE
-        mockDemographics.getId() == mockDemographics.getIdentifier().getValue()
+        mockDemographicsResource
+        mockDemographicsResource.hasIdentifier()
+        mockDemographicsResource.hasTimestamp()
+        mockDemographicsResource.getType() == Bundle.BundleType.MESSAGE
+        mockDemographicsResource.getId() == mockDemographicsResource.getIdentifier().getValue()
     }
 
     def "the converter doesn't change things if it is already set"() {
         given:
+        def mockDemographicsResource = mockDemographics.getUnderlyingResource()
         def mockId = "an id"
         mockDemographicsBundle.setId(mockId)
         def mockIdentifier = "an identifier"
@@ -66,34 +69,36 @@ class HapiOrderConverterTest extends Specification {
         mockDemographicsBundle.setTimestamp(mockTimestamp)
 
         when:
-        def orderBundle = HapiOrderConverter.convertDemographicsToOrder(mockDemographics)
+        HapiOrderConverter.convertDemographicsToOrder(mockDemographicsResource)
 
         then:
-        orderBundle.getId() == mockId
-        orderBundle.getIdentifier().getValue() == mockIdentifier
-        orderBundle.getTimestamp() == mockTimestamp
-        orderBundle.getId() != orderBundle.getIdentifier().getValue()
+        mockDemographicsResource.getId() == mockId
+        mockDemographicsResource.getIdentifier().getValue() == mockIdentifier
+        mockDemographicsResource.getTimestamp() == mockTimestamp
+        mockDemographicsResource.getId() != mockDemographicsResource.getIdentifier().getValue()
     }
 
     def "the converter always changes the bundle type to message"() {
         given:
+        def mockDemographicsResource = mockDemographics.getUnderlyingResource()
         mockDemographicsBundle.setType(Bundle.BundleType.COLLECTION)
 
         when:
-        def orderBundle = HapiOrderConverter.convertDemographicsToOrder(mockDemographics)
+        HapiOrderConverter.convertDemographicsToOrder(mockDemographicsResource)
 
         then:
-        orderBundle.getType() == Bundle.BundleType.MESSAGE
+        mockDemographicsResource.getType() == Bundle.BundleType.MESSAGE
     }
 
     def "the demographics correctly constructs a message header in the lab order"() {
+        given:
+        def mockDemographicsResource = mockDemographics.getUnderlyingResource()
 
         when:
-        def orderBundle = HapiOrderConverter.convertDemographicsToOrder(mockDemographics)
+        HapiOrderConverter.convertDemographicsToOrder(mockDemographicsResource)
+        def messageHeader = HapiHelper.resourcesInBundle(mockDemographicsResource, MessageHeader.class).findFirst().orElse(null)
 
         then:
-        def messageHeader = orderBundle.getEntry().get(0).getResource() as MessageHeader
-
         messageHeader.hasId()
         messageHeader.getMeta().getTag().system[0] == "http://terminology.hl7.org/CodeSystem/v2-0103"
         messageHeader.getMeta().getTag().code[0] == "P"
@@ -105,43 +110,46 @@ class HapiOrderConverterTest extends Specification {
     }
 
     def "the converter correctly reuses the patient from the passed in demographics"() {
+        given:
+        def mockDemographicsResource = mockDemographics.getUnderlyingResource()
 
         when:
-        def orderBundle = HapiOrderConverter.convertDemographicsToOrder(mockDemographics)
+        HapiOrderConverter.convertDemographicsToOrder(mockDemographicsResource)
+        def patient = HapiHelper.resourcesInBundle(mockDemographicsResource, Patient.class).findFirst().orElse(null)
 
         then:
-        def patient = orderBundle.getEntry().get(1).getResource() as Patient
-
         patient == mockPatient
     }
 
     def "the converter correctly constructs a service request in the lab order"() {
+        given:
+        def mockDemographicsResource = mockDemographics.getUnderlyingResource()
 
         when:
-        def orderBundle = HapiOrderConverter.convertDemographicsToOrder(mockDemographics)
+        HapiOrderConverter.convertDemographicsToOrder(mockDemographicsResource)
+        def serviceRequest = HapiHelper.resourcesInBundle(mockDemographicsResource, ServiceRequest.class).findFirst().orElse(null)
 
         then:
-        def serviceRequest = orderBundle.getEntry().get(2).getResource() as ServiceRequest
-
         serviceRequest.hasId()
         serviceRequest.getCode().getCodingFirstRep().getCode() == "54089-8"
         serviceRequest.getCategoryFirstRep().getCodingFirstRep().getCode() == "108252007"
-        serviceRequest.getSubject().getResource() == orderBundle.getEntry().get(1).getResource()
+        serviceRequest.getSubject().getResource() == mockDemographicsResource.getEntry().get(1).getResource()
         serviceRequest.hasAuthoredOn()
     }
 
     def "the order datetime should match for bundle, service request, and provenance resources"() {
+        given:
+        def mockDemographicsResource = mockDemographics.getUnderlyingResource()
 
         when:
-        def orderBundle = HapiOrderConverter.convertDemographicsToOrder(mockDemographics)
-        def bundleDateTime = orderBundle.getTimestamp()
-        def serviceRequest = orderBundle.getEntry().get(2).getResource() as ServiceRequest
-        def provenance = orderBundle.getEntry().get(3).getResource() as Provenance
-
-        then:
+        HapiOrderConverter.convertDemographicsToOrder(mockDemographicsResource)
+        def bundleDateTime = mockDemographicsResource.getTimestamp()
+        def serviceRequest = HapiHelper.resourcesInBundle(mockDemographicsResource, ServiceRequest.class).findFirst().orElse(null)
+        def provenance = HapiHelper.resourcesInBundle(mockDemographicsResource, Provenance.class).findFirst().orElse(null)
         def serviceRequestDateTime = serviceRequest.getAuthoredOn()
         def provenanceDateTime = provenance.getRecorded()
 
+        then:
         bundleDateTime == serviceRequestDateTime
         bundleDateTime == provenanceDateTime
         serviceRequestDateTime == provenanceDateTime
