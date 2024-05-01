@@ -1,11 +1,11 @@
 package gov.hhs.cdc.trustedintermediary.etor.demographics
 
 import gov.hhs.cdc.trustedintermediary.DemographicsMock
-import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-
+import gov.hhs.cdc.trustedintermediary.etor.orders.Order
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender
-
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.TransformationRuleEngine
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiMessageHelper
 import spock.lang.Specification
 
 class ConvertAndSendDemographicsUsecaseTest extends Specification {
@@ -13,16 +13,16 @@ class ConvertAndSendDemographicsUsecaseTest extends Specification {
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
+        TestApplicationContext.register(HapiMessageHelper, HapiMessageHelper.getInstance())
         TestApplicationContext.register(ConvertAndSendDemographicsUsecase, ConvertAndSendDemographicsUsecase.getInstance())
     }
 
     def "ConvertAndSend"() {
         given:
-        def mockOrder = new OrderMock(null, null, null, null, null, null, null, null)
-        def mockConverter = Mock(OrderConverter)
+        def engine = Mock(TransformationRuleEngine)
         def mockSender = Mock(OrderSender)
 
-        TestApplicationContext.register(OrderConverter, mockConverter)
+        TestApplicationContext.register(TransformationRuleEngine, engine)
         TestApplicationContext.register(OrderSender, mockSender)
         TestApplicationContext.injectRegisteredImplementations()
 
@@ -32,7 +32,7 @@ class ConvertAndSendDemographicsUsecaseTest extends Specification {
         ConvertAndSendDemographicsUsecase.getInstance().convertAndSend(demographics)
 
         then:
-        1 * mockConverter.convertToOrder(_ as Demographics) >> mockOrder
-        1 * mockSender.send(mockOrder)
+        1 * engine.runRules(_ as Demographics)
+        1 * mockSender.send(_ as Order)
     }
 }
