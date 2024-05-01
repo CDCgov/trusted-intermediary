@@ -60,7 +60,8 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
                 "gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom";
         Path customTransformationPath =
                 Paths.get(
-                        "src/main/java/gov/hhs/cdc/trustedintermediary/etor/ruleengine/transformation/custom/");
+                        System.getProperty("user.dir"),
+                        "../etor/src/main/java/gov/hhs/cdc/trustedintermediary/etor/ruleengine/transformation/custom/");
         File[] customTransformationFiles = customTransformationPath.toFile().listFiles();
         assert customTransformationFiles != null;
 
