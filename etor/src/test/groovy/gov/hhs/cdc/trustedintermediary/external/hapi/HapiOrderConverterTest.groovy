@@ -272,11 +272,11 @@ class HapiOrderConverterTest extends Specification {
         entryList.add(patientEntry)
         mockOrderBundle.setEntry(entryList)
         when:
-        def convertedOrderBundle = HapiOrderConverter.getInstance().addContactSectionToPatientResource(mockOrder).getUnderlyingResource() as Bundle
+        HapiOrderConverter.addContactSectionToPatientResource(mockOrderBundle)
 
         then:
-        def convertedPatient = convertedOrderBundle.getEntry().get(0).getResource() as Patient
-        def contactSection = convertedPatient.getContact()[0]
+        def convertedPatient = HapiHelper.resourcesInBundle(mockOrderBundle, Patient.class).findFirst().orElse(null)
+        def contactSection = convertedPatient.getContact().first()
 
         !contactSection.hasName()
     }
