@@ -1,5 +1,19 @@
 {
   "definitions": [ {
+      "name": "convertDemographicsToOrder",
+      "description": "Convert Demographics to Order",
+      "message": "",
+      "conditions": [
+        "Bundle.entry.resource.all($this is Patient)"
+      ],
+      "rules": [
+        {
+          "name": "convertDemographicsToOrder",
+          "args": { }
+        }
+      ]
+    },
+    {
       "name": "addEtorProcessingTag",
       "description": "Add ETOR Processing Tag",
       "message": "",
@@ -7,20 +21,6 @@
       "rules": [
         {
           "name": "addEtorProcessingTag",
-          "args": { }
-        }
-      ]
-    },
-    {
-      "name": "convertDemographicsToOrder",
-      "description": "Convert Demographics to Order",
-      "message": "",
-      "conditions": [
-        "Bundle.entry.resource.is(Patient)"
-      ],
-      "rules": [
-        {
-          "name": "convertDemographicsToOrder",
           "args": { }
         }
       ]
