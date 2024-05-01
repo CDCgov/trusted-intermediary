@@ -7,7 +7,6 @@ import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageUseCase
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.TransformationRuleEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
