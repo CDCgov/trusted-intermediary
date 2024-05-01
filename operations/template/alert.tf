@@ -21,7 +21,7 @@ resource "azurerm_monitor_metric_alert" "alert" {
   name                = "db-connection-metric-alert"
   resource_group_name = data.azurerm_resource_group.group.name
   scopes              = [azurerm_storage_account.alerts.id]
-  description         = "Action will be triggered when database connection failure count is greater than 1 in the last 30 minutes"
+  description         = "Action will be triggered when database connection failure count is greater than 1"
 
   criteria {
     metric_namespace = "Microsoft.cdcti-${var.environment}-database/flexibleServers"
@@ -29,7 +29,7 @@ resource "azurerm_monitor_metric_alert" "alert" {
     aggregation      = "Total"
     operator         = "GreaterThan"
     threshold        = 1
-    frequency        = "PT30M"
+    frequency        = "PT1M"
   }
 
   action {
