@@ -16,11 +16,11 @@
       "description": "Convert Demographics to Order",
       "message": "",
       "conditions": [
-        "Bundle.entry.resource.is(FHIR.Patient)"
+        "Bundle.entry.resource.is(Patient)"
       ],
       "rules": [
         {
-          "name": "convertToOrder",
+          "name": "convertDemographicsToOrder",
           "args": { }
         }
       ]
