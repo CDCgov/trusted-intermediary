@@ -110,10 +110,10 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
     }
 
     @Override
-    public Set<PartnerMetadata> readMetadataForMessageLinking(String submissionId)
+    public Set<String> readMetadataForMessageLinking(String submissionId)
             throws PartnerMetadataException {
 
-        Set<PartnerMetadata> metadataSet;
+        Set<String> metadataSet;
         try {
             metadataSet =
                     dao.fetchManyData(
@@ -122,14 +122,15 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                                     PreparedStatement statement =
                                             connection.prepareStatement(
                                                     """
-                                    SELECT m2.*
+                                    SELECT m2.received_message_id
                                     FROM metadata m1
                                     JOIN metadata m2
                                         ON m1.placer_order_number = m2.placer_order_number
                                             AND (m1.sending_facility_details = m2.sending_facility_details
                                                 OR m1.sending_facility_details = m2.receiving_facility_details)
                                             AND m1.received_message_id <> m2.received_message_id
-                                    WHERE m1.received_message_id = ?;
+                                    WHERE m1.received_message_id = ?
+                                    LIMIT 5;
                                     """);
                                     statement.setString(1, submissionId);
                                     return statement;
@@ -137,7 +138,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                                     throw new RuntimeException(e);
                                 }
                             },
-                            this::partnerMetadataFromResultSet,
+                            this::idsFromResult,
                             Collectors.toSet());
 
             return metadataSet;
@@ -183,6 +184,15 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                             new TypeReference<>() {}),
                     resultSet.getString("placer_order_number"));
         } catch (SQLException | FormatterProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    String idsFromResult(ResultSet resultSet) {
+
+        try {
+            return resultSet.getString(METADATA_TABLE_RECEIVED_MESSAGE_ID);
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
