@@ -72,4 +72,12 @@ public class TransformationRuleEngine implements RuleEngine {
                     }
                 });
     }
+
+    @Override
+    public TransformationRule getRuleByName(String ruleName) {
+        return rules.stream()
+                .filter(rule -> rule.getName().equals(ruleName))
+                .findFirst()
+                .orElse(null);
+    }
 }

@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation
 
 import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
+import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation
@@ -57,6 +58,22 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         }
     }
 
+    def "transformation rules run for specific test files and all rules have corresponding test files"() {
+        def fhirResource = ExamplesHelper.getExampleFhirResource(testFile)
+        0 * mockLogger.logError(_ as String, _ as Exception)
+        1 * mockLogger.logInfo(_ as String, _ as String)
+
+        expect:
+        engine.getRuleByName(ruleName).runRule(fhirResource)
+
+        where:
+        ruleName                             | testFile
+        "addEtorProcessingTag"               | "e2e/orders/001_OML_O21_short.fhir"
+        "convertDemographicsToOrder"         | "e2e/demographics/001_Patient_NBS.fhir"
+        "convertToOmlOrder"                  | "e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir"
+        "addContactSectionToPatientResource" | "e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir"
+    }
+
     def "Testing accuracy of rule: convertDemographicsToOrder"() {
         given:
         def untouchedBundle = new Bundle()
@@ -91,7 +108,7 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
         then:
         untouchedBundle.entry.isEmpty()
-        bundle.entry[0].getResource().meta.tag[0].code == "ETOR"
+        bundle.entry[0].getResource().meta.tag.last().code == "ETOR"
     }
 
     def "Testing accuracy of rule: convertToOmlOrder"() {
