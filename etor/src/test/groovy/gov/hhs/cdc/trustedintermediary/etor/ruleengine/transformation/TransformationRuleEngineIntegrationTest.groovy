@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation
 
-
+import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation
@@ -11,6 +11,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.Patient
 import spock.lang.Specification
 
 class TransformationRuleEngineIntegrationTest extends Specification {
@@ -59,7 +60,7 @@ class TransformationRuleEngineIntegrationTest extends Specification {
     def "Testing accuracy of rule: convertDemographicsToOrder"() {
         given:
         def untouchedBundle = new Bundle()
-        def bundle = new Bundle()
+        def bundle = untouchedBundle.copy()
         engine.ensureRulesLoaded()
         engine.rules.removeAll(engine.rules.findAll {
             it.name != "convertDemographicsToOrder"
@@ -79,7 +80,7 @@ class TransformationRuleEngineIntegrationTest extends Specification {
     def "Testing accuracy of rule: addEtorProcessingTag"() {
         given:
         def untouchedBundle = new Bundle()
-        def bundle = new Bundle()
+        def bundle = untouchedBundle.copy()
         engine.ensureRulesLoaded()
         engine.rules.removeAll(engine.rules.findAll {
             it.name != "addEtorProcessingTag"
@@ -91,6 +92,43 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         then:
         untouchedBundle.entry.isEmpty()
         bundle.entry[0].getResource().meta.tag[0].code == "ETOR"
+    }
+
+    def "Testing accuracy of rule: convertToOmlOrder"() {
+        given:
+        def untouchedBundle = FhirBundleHelper.createMessageBundle(messageTypeCode: "ORM_O01")
+        def bundle = untouchedBundle.copy()
+        engine.ensureRulesLoaded()
+        engine.rules.removeAll(engine.rules.findAll {
+            it.name != "convertToOmlOrder"
+        })
+
+        when:
+        engine.runRules(new HapiFhirResource(bundle))
+
+        then:
+        untouchedBundle.entry[0].getResource().event.code == "O01"
+        bundle.entry[0].getResource().event.code == "O21"
+    }
+
+    def "Testing accuracy of rule: addContactSectionToPatientResource"() {
+        given:
+        def untouchedBundle = FhirBundleHelper.createMessageBundle(messageTypeCode: "OML_O21")
+        untouchedBundle.addEntry(new Bundle.BundleEntryComponent().setResource(new Patient()))
+        def bundle = untouchedBundle.copy()
+        engine.ensureRulesLoaded()
+        engine.rules.removeAll(engine.rules.findAll {
+            it.name != "addContactSectionToPatientResource"
+        })
+
+        when:
+        engine.runRules(new HapiFhirResource(bundle))
+
+        then:
+        def untouchedPatient = untouchedBundle.entry[2].getResource() as Patient
+        untouchedPatient.contact.isEmpty()
+        def patient = bundle.entry[2].getResource() as Patient
+        patient.contact.size() > 0
     }
 
     //    def "transformation rules filter and run rules for ORM messages"() {
