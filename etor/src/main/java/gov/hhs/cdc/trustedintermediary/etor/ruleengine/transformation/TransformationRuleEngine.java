@@ -64,6 +64,19 @@ public class TransformationRuleEngine implements RuleEngine {
             logger.logError("Failed to load rules definitions", e);
             return;
         }
+
+        rules.forEach(
+                rule -> {
+                    try {
+                        if (rule.shouldRun(resource)) {
+                            rule.runRule((resource));
+                        }
+                    } catch (Exception e) { // Do we need a custom exception for rules?
+                        logger.logError(
+                                "Error executing rule: " + rule.getClass().getSimpleName(), e);
+                    }
+                });
+
         for (TransformationRule rule : rules) {
             if (rule.shouldRun(resource)) {
                 rule.runRule(resource);
