@@ -1,9 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation
 
-import gov.hhs.cdc.trustedintermediary.ExamplesHelper
+
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation.ValidationRule
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
@@ -53,7 +52,7 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
         then:
         transformationMethodNames.each { transformationMethodName ->
-            assert TransformationRule.loadCustomTransformationClassFromFile(transformationMethodName) != null
+            assert TransformationRule.loadClassFromCache(transformationMethodName) != null
         }
     }
 
