@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation.ValidationRule
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
@@ -41,22 +42,34 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
+        (1.._) * mockLogger.logInfo(_ as String, _ as String)
     }
 
-    def "transformation rules filter and run rules for ORM messages"() {
-        given:
-        def fhirResource = ExamplesHelper.getExampleFhirResource(testFile)
-        def rule = createValidationRule([], [validation])
-        0 * mockLogger.logWarning(_ as String)
-        0 * mockLogger.logError(_ as String, _ as Exception)
-
-        expect:
-        rule.runRule(fhirResource)
-
-        where:
-        testFile | validation
-        "e2e/orders/001_OML_O21_short.fhir" | "Bundle.entry.resource.ofType(MessageHeader).focus.resolve().category.exists()"
-    }
+    //    def "transformation rules filter and run rules for ORM messages"() {
+    //        given:
+    //        def fhirResource = ExamplesHelper.getExampleFhirResource(testFile)
+    //        def rule = createTransformationRuleFromName(transformationMethodName)
+    //        0 * mockLogger.logError(_ as String, _ as Exception)
+    //
+    //        when:
+    //        def testFile = "e2e/orders/001_OML_O21_short.fhir"
+    //        def transformationMethodName = "addContactSectionToPatientResource"
+    //        def fhirResource = ExamplesHelper.getExampleFhirResource(testFile)
+    //        def transformedFhirResource = addContactSectionToPatientResource(fhirResource)
+    //
+    //        then:
+    //        def rule = createTransformationRuleFromName(transformationMethodName)
+    //        rule.runRule(fhirResource)
+    //
+    //        then:
+    //
+    ////        expect:
+    ////        rule.runRule(fhirResource)
+    ////
+    ////        where:
+    ////        testFile                            | transformationMethodName
+    ////        "e2e/orders/001_OML_O21_short.fhir" | "addContactSectionToPatientResource"
+    //    }
 
     def "transformation rules filter and run rules for OML messages"() {
     }
@@ -65,5 +78,27 @@ class TransformationRuleEngineIntegrationTest extends Specification {
     }
 
     def "transformation rules filter and run rules for Demographics"() {
+    }
+
+    TransformationRule createTransformationRule(List<String> conditions, List<TransformationRuleMethod> transformations) {
+        return new TransformationRule(
+                "Rule name",
+                "Rule description",
+                "Rule message",
+                conditions,
+                transformations,
+                )
+    }
+
+    TransformationRule createTransformationRuleFromName(String transformationName) {
+        return new TransformationRule(
+                "Rule name",
+                "Rule description",
+                "Rule message",
+                [],
+                [
+                    new TransformationRuleMethod(transformationName, new HashMap<String, String>())
+                ]
+                )
     }
 }
