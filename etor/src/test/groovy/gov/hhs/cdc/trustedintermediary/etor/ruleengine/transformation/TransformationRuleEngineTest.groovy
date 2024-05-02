@@ -123,7 +123,6 @@ class TransformationRuleEngineTest extends Specification {
         0 * mockLogger.logInfo(applyingTransformationMessage)
     }
 
-
     def "runRules logs an error and doesn't run any rules when there's a RuleLoaderException"() {
         given:
         def exception = new RuleLoaderException("Error loading rules", new Exception())
@@ -134,5 +133,20 @@ class TransformationRuleEngineTest extends Specification {
 
         then:
         1 * mockLogger.logError(_ as String, exception)
+    }
+
+    def "getRuleByName returns the rule with the given name"() {
+        given:
+        def ruleName = "Rule name"
+        def testRule = Mock(TransformationRule)
+        testRule.getName() >> ruleName
+        mockRuleLoader.loadRules(_ as InputStream, _ as TypeReference) >> [testRule]
+
+        when:
+        ruleEngine.ensureRulesLoaded()
+        def rule = ruleEngine.getRuleByName(ruleName)
+
+        then:
+        rule == testRule
     }
 }
