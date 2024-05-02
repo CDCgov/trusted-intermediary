@@ -91,37 +91,36 @@ class TransformationRuleEngineTest extends Specification {
 
     def "runRules handles logging warning correctly"() {
         given:
-        def failedTransformationMessage = "Failed transformation message"
-        def fullFailedTransformationMessage = "Transformation failed: " + failedTransformationMessage
+        def applyingTransformationMessage = "Applying transformation"
         def fhirBundle = Mock(FhirResource)
-        def invalidRule = Mock(TransformationRule)
-        invalidRule.getMessage() >> failedTransformationMessage
-        invalidRule.shouldRun(fhirBundle) >> true
-        mockRuleLoader.loadRules(_ as InputStream, _ as TypeReference) >> [invalidRule]
+        def testRule = Mock(TransformationRule)
+        testRule.getMessage() >> applyingTransformationMessage
+        testRule.shouldRun(fhirBundle) >> true
+        mockRuleLoader.loadRules(_ as InputStream, _ as TypeReference) >> [testRule]
 
         when:
-        invalidRule.runRule(fhirBundle) >> {
-            mockLogger.logWarning(fullFailedTransformationMessage)
+        testRule.runRule(fhirBundle) >> {
+            mockLogger.logInfo(applyingTransformationMessage)
         }
         ruleEngine.runRules(fhirBundle)
 
         then:
-        1 * mockLogger.logWarning(fullFailedTransformationMessage)
+        1 * mockLogger.logInfo(applyingTransformationMessage)
 
         when:
-        invalidRule.runRule(fhirBundle) >> null
-        invalidRule.shouldRun(fhirBundle) >> true
+        testRule.runRule(fhirBundle) >> null
+        testRule.shouldRun(fhirBundle) >> true
         ruleEngine.runRules(fhirBundle)
 
         then:
-        0 * mockLogger.logWarning(fullFailedTransformationMessage)
+        0 * mockLogger.logInfo(applyingTransformationMessage)
 
         when:
-        invalidRule.shouldRun(fhirBundle) >> false
+        testRule.shouldRun(fhirBundle) >> false
         ruleEngine.runRules(fhirBundle)
 
         then:
-        0 * mockLogger.logWarning(fullFailedTransformationMessage)
+        0 * mockLogger.logInfo(applyingTransformationMessage)
     }
 
 
