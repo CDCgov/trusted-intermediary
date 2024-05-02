@@ -92,7 +92,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                                 try {
                                     PreparedStatement statement =
                                             connection.prepareStatement(
-                                                    "SELECT * FROM metadata WHERE sender = ?");
+                                                    "SELECT * FROM metadata WHERE sending_facility_details->> 'universalId' = ?");
                                     statement.setString(1, sender);
                                     return statement;
                                 } catch (SQLException e) {
