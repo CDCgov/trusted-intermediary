@@ -1,12 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation;
 
-import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.Rule;
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +16,8 @@ import java.util.Map;
  * apply a transformation to the FHIR resource.
  */
 public class TransformationRule extends Rule<TransformationRuleMethod> {
+
+    private static final Map<String, Class<?>> classCache = new HashMap<>();
 
     /**
      * Do not delete this constructor! It is used for JSON deserialization when loading rules from a
@@ -60,24 +60,18 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
 
     private static Class<?> loadCustomTransformationClassFromFile(String className)
             throws ClassNotFoundException {
-        String customPackageName =
-                "gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom";
-        Path rootPath = ApplicationContext.getRootPath();
-        Path customTransformationPath =
-                rootPath.resolve(
-                        "etor/src/main/java/gov/hhs/cdc/trustedintermediary/etor/ruleengine/transformation/custom/");
-        File[] customTransformationFiles = customTransformationPath.toFile().listFiles();
-        assert customTransformationFiles != null;
-
-        for (File file : customTransformationFiles) {
-            String fileName = file.getName().replace(".java", "");
-            if (file.isFile()
-                    && (file.getName().endsWith(".java"))
-                    && (fileName.equalsIgnoreCase(className))) {
-                return Class.forName(customPackageName + "." + className);
-            }
+        if (classCache.containsKey(className)) {
+            return classCache.get(className);
         }
 
-        throw new ClassNotFoundException("No custom transformation file found for " + className);
+        Class<?> clazz = Class.forName(getFullClassName(className));
+        classCache.put(className, clazz);
+        return clazz;
+    }
+
+    private static String getFullClassName(String className) throws ClassNotFoundException {
+        String packageName =
+                "gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom";
+        return packageName + "." + className;
     }
 }
