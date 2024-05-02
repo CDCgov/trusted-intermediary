@@ -46,8 +46,7 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
 
         try {
             Class<?> clazz = loadCustomTransformationClassFromFile(name);
-            Method method = clazz.getDeclaredMethod("transform", FhirResource.class, Map.class);
-            method.invoke(clazz.getDeclaredConstructor().newInstance(), resource, args);
+            executeCustomTransformationMethod(clazz, resource, args);
         } catch (NoSuchMethodException
                 | IllegalAccessException
                 | InvocationTargetException
@@ -58,18 +57,26 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
         }
     }
 
-    private static Class<?> loadCustomTransformationClassFromFile(String className)
+    static Class<?> loadCustomTransformationClassFromFile(String className)
             throws ClassNotFoundException {
         if (classCache.containsKey(className)) {
             return classCache.get(className);
         }
 
-        Class<?> clazz = Class.forName(getFullClassName(className));
+        Class<?> clazz = Class.forName(getCustomTransformationFullClassName(className));
         classCache.put(className, clazz);
         return clazz;
     }
 
-    private static String getFullClassName(String className) throws ClassNotFoundException {
+    static void executeCustomTransformationMethod(
+            Class<?> clazz, FhirResource<?> resource, Map<String, String> args)
+            throws NoSuchMethodException, InvocationTargetException, InstantiationException,
+                    IllegalAccessException {
+        Method method = clazz.getDeclaredMethod("transform", FhirResource.class, Map.class);
+        method.invoke(clazz.getDeclaredConstructor().newInstance(), resource, args);
+    }
+
+    private static String getCustomTransformationFullClassName(String className) {
         String packageName =
                 "gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom";
         return packageName + "." + className;

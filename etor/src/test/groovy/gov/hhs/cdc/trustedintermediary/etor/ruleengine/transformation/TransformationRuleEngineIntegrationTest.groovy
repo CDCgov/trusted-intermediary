@@ -31,6 +31,8 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
 
         TestApplicationContext.injectRegisteredImplementations()
+
+        engine.ensureRulesLoaded()
     }
 
     def "transformation rules run without error"() {
@@ -43,6 +45,16 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
         (1.._) * mockLogger.logInfo(_ as String, _ as String)
+    }
+
+    def "all transformations in the definitions file have existing custom methods"() {
+        when:
+        def transformationMethodNames = engine.rules.collect { rule -> rule.name }
+
+        then:
+        transformationMethodNames.each { transformationMethodName ->
+            assert TransformationRule.loadCustomTransformationClassFromFile(transformationMethodName) != null
+        }
     }
 
     //    def "transformation rules filter and run rules for ORM messages"() {
