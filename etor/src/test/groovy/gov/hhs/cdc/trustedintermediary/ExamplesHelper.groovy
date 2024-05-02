@@ -6,7 +6,6 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import org.hl7.fhir.r4.model.Bundle
 
 import java.nio.file.Files
-import java.nio.file.Path
 
 class ExamplesHelper {
 

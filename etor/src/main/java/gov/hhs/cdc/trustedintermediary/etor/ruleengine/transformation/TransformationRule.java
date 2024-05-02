@@ -43,6 +43,7 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
             TransformationRuleMethod transformation, FhirResource<?> resource) {
         String name = transformation.name();
         Map<String, String> args = transformation.args();
+        logger.logInfo("Applying transformation: ", name);
 
         try {
             Class<?> clazz = loadCustomTransformationClassFromFile(name);
