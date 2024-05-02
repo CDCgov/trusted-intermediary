@@ -32,8 +32,6 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
 
         TestApplicationContext.injectRegisteredImplementations()
-
-        engine.ensureRulesLoaded()
     }
 
     def "transformation rules run without error"() {
@@ -60,12 +58,16 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
     def "transformation rules run for specific test files and all rules have corresponding test files"() {
         given:
+        engine.ensureRulesLoaded()
         def fhirResource = ExamplesHelper.getExampleFhirResource(testFile)
+        def fhirBundle = (Bundle) fhirResource.getUnderlyingResource()
+        def fhirBundleCopy = fhirBundle.copy()
+        def rule = engine.getRuleByName(ruleName)
         0 * mockLogger.logError(_ as String, _ as Exception)
-        1 * mockLogger.logInfo(_ as String, _ as String)
 
         expect:
-        engine.getRuleByName(ruleName).runRule(fhirResource)
+        rule.runRule(fhirResource)
+        !fhirBundle.equalsDeep(fhirBundleCopy)
 
         where:
         ruleName                             | testFile
