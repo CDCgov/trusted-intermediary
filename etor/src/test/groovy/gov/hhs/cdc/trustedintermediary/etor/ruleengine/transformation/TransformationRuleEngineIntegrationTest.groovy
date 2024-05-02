@@ -56,20 +56,25 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         }
     }
 
-    //    def "Testing accuracy of rule: convertDemographicsToOrder"() {
-    //        given:
-    //        def bundle = new Bundle()
-    //        engine.ensureRulesLoaded()
-    //        engine.rules.removeAll(engine.rules.findAll {
-    //            it.name != "convertDemographicsToOrder"
-    //        })
-    //
-    //        when:
-    //        engine.runRules(new HapiFhirResource(bundle))
-    //
-    //        then:
-    //        bundle != null
-    //    }
+    def "Testing accuracy of rule: convertDemographicsToOrder"() {
+        given:
+        def untouchedBundle = new Bundle()
+        def bundle = new Bundle()
+        engine.ensureRulesLoaded()
+        engine.rules.removeAll(engine.rules.findAll {
+            it.name != "convertDemographicsToOrder"
+        })
+
+        when:
+        engine.runRules(new HapiFhirResource(bundle))
+
+        then:
+        untouchedBundle.entry.isEmpty()
+        bundle.entry.size() == 3
+        bundle.entry[0].getResource().fhirType() == "MessageHeader"
+        bundle.entry[1].getResource().fhirType() == "ServiceRequest"
+        bundle.entry[2].getResource().fhirType() == "Provenance"
+    }
 
     def "Testing accuracy of rule: addEtorProcessingTag"() {
         given:
@@ -85,7 +90,7 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
         then:
         untouchedBundle.entry.isEmpty()
-        bundle.entry.first().getResource().meta.tag.first().code == "ETOR"
+        bundle.entry[0].getResource().meta.tag[0].code == "ETOR"
     }
 
     //    def "transformation rules filter and run rules for ORM messages"() {
