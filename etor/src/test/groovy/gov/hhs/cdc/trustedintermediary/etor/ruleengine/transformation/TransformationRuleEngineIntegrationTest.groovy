@@ -57,6 +57,38 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         }
     }
 
+    //    def "Testing accuracy of rule: convertDemographicsToOrder"() {
+    //        given:
+    //        def bundle = new Bundle()
+    //        engine.ensureRulesLoaded()
+    //        engine.rules.removeAll(engine.rules.findAll {
+    //            it.name != "convertDemographicsToOrder"
+    //        })
+    //
+    //        when:
+    //        engine.runRules(new HapiFhirResource(bundle))
+    //
+    //        then:
+    //        bundle != null
+    //    }
+
+    def "Testing accuracy of rule: addEtorProcessingTag"() {
+        given:
+        def untouchedBundle = new Bundle()
+        def bundle = new Bundle()
+        engine.ensureRulesLoaded()
+        engine.rules.removeAll(engine.rules.findAll {
+            it.name != "addEtorProcessingTag"
+        })
+
+        when:
+        engine.runRules(new HapiFhirResource(bundle))
+
+        then:
+        untouchedBundle.entry.isEmpty()
+        bundle.entry.first().getResource().meta.tag.first().code == "ETOR"
+    }
+
     //    def "transformation rules filter and run rules for ORM messages"() {
     //        given:
     //        def fhirResource = ExamplesHelper.getExampleFhirResource(testFile)
