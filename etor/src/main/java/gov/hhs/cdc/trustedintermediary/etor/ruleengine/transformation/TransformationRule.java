@@ -45,7 +45,7 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
         logger.logInfo("Applying transformation: ", name);
 
         try {
-            Class<?> clazz = loadCustomTransformationClassFromFile(name);
+            Class<?> clazz = loadClassFromCache(name);
             executeCustomTransformationMethod(clazz, resource, args);
         } catch (NoSuchMethodException
                 | IllegalAccessException
@@ -57,15 +57,23 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
         }
     }
 
-    static Class<?> loadCustomTransformationClassFromFile(String className)
-            throws ClassNotFoundException {
-        if (classCache.containsKey(className)) {
-            return classCache.get(className);
-        }
+    private static Class<?> loadClassFromCache(String className) throws ClassNotFoundException {
+        return classCache.computeIfAbsent(className, TransformationRule::loadClassByName);
+    }
 
-        Class<?> clazz = Class.forName(getCustomTransformationFullClassName(className));
-        classCache.put(className, clazz);
-        return clazz;
+    private static Class<?> loadClassByName(String className) {
+        String fullClassName = getFullClassName(className);
+        try {
+            return Class.forName(fullClassName);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static String getFullClassName(String className) {
+        String packageName =
+                "gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom";
+        return packageName + "." + className;
     }
 
     static void executeCustomTransformationMethod(
@@ -74,11 +82,5 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
                     IllegalAccessException {
         Method method = clazz.getDeclaredMethod("transform", FhirResource.class, Map.class);
         method.invoke(clazz.getDeclaredConstructor().newInstance(), resource, args);
-    }
-
-    private static String getCustomTransformationFullClassName(String className) {
-        String packageName =
-                "gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom";
-        return packageName + "." + className;
     }
 }
