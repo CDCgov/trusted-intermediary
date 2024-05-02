@@ -38,18 +38,6 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
         this.getRules().forEach((transformation -> applyTransformation(transformation, resource)));
     }
 
-    static Class<?> loadClassFromCache(String className) throws ClassNotFoundException {
-        return classCache.computeIfAbsent(className, TransformationRule::loadClassByName);
-    }
-
-    static void executeCustomTransformationMethod(
-            Class<?> clazz, FhirResource<?> resource, Map<String, String> args)
-            throws NoSuchMethodException, InvocationTargetException, InstantiationException,
-                    IllegalAccessException {
-        Method method = clazz.getDeclaredMethod("transform", FhirResource.class, Map.class);
-        method.invoke(clazz.getDeclaredConstructor().newInstance(), resource, args);
-    }
-
     private void applyTransformation(
             TransformationRuleMethod transformation, FhirResource<?> resource) {
         String name = transformation.name();
@@ -69,6 +57,10 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
         }
     }
 
+    private static Class<?> loadClassFromCache(String className) throws ClassNotFoundException {
+        return classCache.computeIfAbsent(className, TransformationRule::loadClassByName);
+    }
+
     private static Class<?> loadClassByName(String className) {
         String fullClassName = getFullClassName(className);
         try {
@@ -82,5 +74,13 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
         String packageName =
                 "gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom";
         return packageName + "." + className;
+    }
+
+    static void executeCustomTransformationMethod(
+            Class<?> clazz, FhirResource<?> resource, Map<String, String> args)
+            throws NoSuchMethodException, InvocationTargetException, InstantiationException,
+                    IllegalAccessException {
+        Method method = clazz.getDeclaredMethod("transform", FhirResource.class, Map.class);
+        method.invoke(clazz.getDeclaredConstructor().newInstance(), resource, args);
     }
 }
