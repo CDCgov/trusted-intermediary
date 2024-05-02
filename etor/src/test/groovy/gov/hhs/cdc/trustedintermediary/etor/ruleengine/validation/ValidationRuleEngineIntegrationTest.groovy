@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
+import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation
@@ -10,10 +11,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Organization
-import org.hl7.fhir.r4.model.Reference
 import spock.lang.Specification
 
 class ValidationRuleEngineIntegrationTest extends Specification {
@@ -118,7 +116,7 @@ class ValidationRuleEngineIntegrationTest extends Specification {
                 .addIdentifier()
                 .setSystem("urn:ietf:rfc:3986")
                 .setValue("simulated-hospital-id")
-        def bundle = createMessageBundle(receiverOrganization: receiverOrganization)
+        def bundle = FhirBundleHelper.createMessageBundle(receiverOrganization: receiverOrganization)
         // for some reason, we need to encode and decode the bundle for resolve() to work
         def fhirResource = new HapiFhirResource(fhir.parseResource(fhir.encodeResourceToJson(bundle), Bundle))
         rule.runRule(fhirResource)
@@ -134,7 +132,7 @@ class ValidationRuleEngineIntegrationTest extends Specification {
                 .addIdentifier()
                 .setSystem("another-system")
                 .setValue("simulated-hospital-id")
-        bundle = createMessageBundle(receiverOrganization: receiverOrganization)
+        bundle = FhirBundleHelper.createMessageBundle(receiverOrganization: receiverOrganization)
         fhirResource = new HapiFhirResource(fhir.parseResource(fhir.encodeResourceToJson(bundle), Bundle))
         rule.runRule(fhirResource)
 
@@ -148,36 +146,13 @@ class ValidationRuleEngineIntegrationTest extends Specification {
         receiverOrganization
                 .addIdentifier()
                 .setValue("simulated-hospital-id")
-        bundle = createMessageBundle(receiverOrganization: receiverOrganization)
+        bundle = FhirBundleHelper.createMessageBundle(receiverOrganization: receiverOrganization)
         fhirResource = new HapiFhirResource(fhir.parseResource(fhir.encodeResourceToJson(bundle), Bundle))
         rule.runRule(fhirResource)
 
         then:
         1 * mockLogger.logWarning(_ as String)
         0 * mockLogger.logError(_ as String, _ as Exception)
-    }
-
-    Bundle createMessageBundle(Map params) {
-        String messageTypeCode = params.messageTypeCode as String ?: "ORM_O01"
-        Organization receiverOrganization = params.receiverOrganization as Organization ?: new Organization()
-        MessageHeader messageHeader = params.messageType as MessageHeader ?: new MessageHeader()
-
-        MessageHeader.MessageDestinationComponent destination = messageHeader.addDestination()
-        String receiverOrganizationFullUrl = "Organization/" + receiverOrganization.getId()
-        destination.setReceiver(new Reference(receiverOrganizationFullUrl))
-
-        Coding eventCoding = new Coding()
-        eventCoding.setSystem("http://terminology.hl7.org/CodeSystem/v2-0003")
-        String[] parts = messageTypeCode.split("_")
-        eventCoding.setCode(parts[1])
-        eventCoding.setDisplay(String.format("%s^%s^%s", parts[0], parts[1], messageTypeCode))
-        messageHeader.setEvent(eventCoding)
-
-        Bundle bundle = new Bundle()
-        bundle.setType(Bundle.BundleType.MESSAGE)
-        bundle.addEntry().setResource(messageHeader)
-        bundle.addEntry().setFullUrl(receiverOrganizationFullUrl).setResource(receiverOrganization)
-        return bundle
     }
 
     ValidationRule createValidationRule(List<String> ruleConditions, List<String> ruleValidations) {
