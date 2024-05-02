@@ -36,21 +36,24 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
 
     public void runRule(FhirResource<?> resource) {
 
-        for (TransformationRuleMethod transformation : this.getRules()) {
-            String name = transformation.name();
-            Map<String, String> args = transformation.args();
+        this.getRules().forEach((transformation -> applyTransformation(transformation, resource)));
+    }
 
-            try {
-                Class<?> clazz = loadCustomTransformationClassFromFile(name);
-                Method method = clazz.getDeclaredMethod("transform", FhirResource.class, Map.class);
-                method.invoke(clazz.getDeclaredConstructor().newInstance(), resource, args);
-            } catch (ClassNotFoundException
-                    | NoSuchMethodException
-                    | IllegalAccessException
-                    | InvocationTargetException
-                    | InstantiationException e) {
-                logger.logError("Error invoking method: " + name, e);
-            }
+    private void applyTransformation(
+            TransformationRuleMethod transformation, FhirResource<?> resource) {
+        String name = transformation.name();
+        Map<String, String> args = transformation.args();
+
+        try {
+            Class<?> clazz = loadCustomTransformationClassFromFile(name);
+            Method method = clazz.getDeclaredMethod("transform", FhirResource.class, Map.class);
+            method.invoke(clazz.getDeclaredConstructor().newInstance(), resource, args);
+        } catch (ClassNotFoundException
+                | NoSuchMethodException
+                | IllegalAccessException
+                | InvocationTargetException
+                | InstantiationException e) {
+            logger.logError("Error invoking method: " + name, e);
         }
     }
 
