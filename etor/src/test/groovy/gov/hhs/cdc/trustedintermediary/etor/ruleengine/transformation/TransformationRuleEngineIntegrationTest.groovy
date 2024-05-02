@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation
 
+import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation
@@ -43,6 +44,18 @@ class TransformationRuleEngineIntegrationTest extends Specification {
     }
 
     def "transformation rules filter and run rules for ORM messages"() {
+        given:
+        def fhirResource = ExamplesHelper.getExampleFhirResource(testFile)
+        def rule = createValidationRule([], [validation])
+        0 * mockLogger.logWarning(_ as String)
+        0 * mockLogger.logError(_ as String, _ as Exception)
+
+        expect:
+        rule.runRule(fhirResource)
+
+        where:
+        testFile | validation
+        "e2e/orders/001_OML_O21_short.fhir" | "Bundle.entry.resource.ofType(MessageHeader).focus.resolve().category.exists()"
     }
 
     def "transformation rules filter and run rules for OML messages"() {

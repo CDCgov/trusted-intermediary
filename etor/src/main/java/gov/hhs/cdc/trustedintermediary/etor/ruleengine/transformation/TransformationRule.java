@@ -1,12 +1,12 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation;
 
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.Rule;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -61,10 +61,10 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
             throws ClassNotFoundException {
         String customPackageName =
                 "gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom";
+        Path rootPath = ApplicationContext.getRootPath();
         Path customTransformationPath =
-                Paths.get(
-                        System.getProperty("user.dir"),
-                        "../etor/src/main/java/gov/hhs/cdc/trustedintermediary/etor/ruleengine/transformation/custom/");
+                rootPath.resolve(
+                        "etor/src/main/java/gov/hhs/cdc/trustedintermediary/etor/ruleengine/transformation/custom/");
         File[] customTransformationFiles = customTransformationPath.toFile().listFiles();
         assert customTransformationFiles != null;
 
