@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation
 
+import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation
@@ -15,11 +16,7 @@ import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Reference
 import spock.lang.Specification
 
-import java.nio.file.Files
-import java.nio.file.Path
-
 class ValidationRuleEngineIntegrationTest extends Specification {
-    def testExampleFilesPath = "../examples/Test"
     def fhir = HapiFhirImplementation.getInstance()
     def engine = ValidationRuleEngine.getInstance("validation_definitions.json")
     def mockLogger = Mock(Logger)
@@ -50,7 +47,7 @@ class ValidationRuleEngineIntegrationTest extends Specification {
 
     def "validation doesn't break for any of the sample test messages"() {
         given:
-        def exampleFhirResources = getExampleFhirResources("Orders")
+        def exampleFhirResources = ExamplesHelper.getExampleFhirResources("Orders")
 
         when:
         exampleFhirResources.each { resource ->
@@ -63,7 +60,7 @@ class ValidationRuleEngineIntegrationTest extends Specification {
 
     def "validation rule with resolve() works as expected"() {
         given:
-        def fhirResource = getExampleFhirResource("e2e/orders/001_OML_O21_short.fhir")
+        def fhirResource = ExamplesHelper.getExampleFhirResource("e2e/orders/001_OML_O21_short.fhir")
         def validation = "Bundle.entry.resource.ofType(MessageHeader).focus.resolve().category.exists()"
         def rule = createValidationRule([], [validation])
 
@@ -77,7 +74,7 @@ class ValidationRuleEngineIntegrationTest extends Specification {
 
     def "validation rules pass for test files"() {
         given:
-        def fhirResource = getExampleFhirResource(testFile)
+        def fhirResource = ExamplesHelper.getExampleFhirResource(testFile)
         def rule = createValidationRule([], [validation])
         0 * mockLogger.logWarning(_ as String)
         0 * mockLogger.logError(_ as String, _ as Exception)
@@ -87,7 +84,7 @@ class ValidationRuleEngineIntegrationTest extends Specification {
 
         where:
         testFile | validation
-        "e2e/orders/001_OML_O21_short.fhir"                                       | "Bundle.entry.resource.ofType(MessageHeader).focus.resolve().category.exists()"
+        "e2e/orders/001_OML_O21_short.fhir"                                | "Bundle.entry.resource.ofType(MessageHeader).focus.resolve().category.exists()"
         "Orders/003_AL_ORM_O01_NBS_Fully_Populated_1_hl7_translation.fhir" | "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(system = 'urn:ietf:rfc:3986').value.exists()"
         // Once we fix the mapping for ORM from story #900 and update the FHIR files in /examples/Test/Orders, we can uncomment the below line
         // "Orders/003_AL_ORM_O01_NBS_Fully_Populated_1_hl7_translation.fhir" | "Bundle.entry.resource.ofType(Observation).where(code.coding.code = '57723-9').value.coding.code.exists()"
@@ -95,7 +92,7 @@ class ValidationRuleEngineIntegrationTest extends Specification {
 
     def "validation rules fail for test files"() {
         given:
-        def fhirResource = getExampleFhirResource(testFile)
+        def fhirResource = ExamplesHelper.getExampleFhirResource(testFile)
         def rule = createValidationRule([], [validation])
         1 * mockLogger.logWarning(_ as String)
         0 * mockLogger.logError(_ as String, _ as Exception)
@@ -191,16 +188,5 @@ class ValidationRuleEngineIntegrationTest extends Specification {
                 ruleConditions,
                 ruleValidations,
                 )
-    }
-
-    List<HapiFhirResource> getExampleFhirResources(String messageType = "") {
-        return Files.walk(Path.of(testExampleFilesPath, messageType))
-                .filter { it.toString().endsWith(".fhir") }
-                .map { new HapiFhirResource(fhir.parseResource(Files.readString(it), Bundle))  }
-                .collect()
-    }
-
-    HapiFhirResource getExampleFhirResource(String relativeFilePath) {
-        return new HapiFhirResource(fhir.parseResource(Files.readString(Path.of(testExampleFilesPath, relativeFilePath)), Bundle))
     }
 }
