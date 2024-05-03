@@ -5,6 +5,7 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.Resource
 
 class FhirBundleHelper {
 
@@ -29,5 +30,12 @@ class FhirBundleHelper {
         bundle.addEntry().setResource(messageHeader)
         bundle.addEntry().setFullUrl(receiverOrganizationFullUrl).setResource(receiverOrganization)
         return bundle
+    }
+
+    static resourceInBundle(Bundle bundle, Class resourceType) {
+        return bundle.entry.stream()
+                .map { it.getResource() }
+                .filter { it.class == resourceType }
+                .findFirst().orElse(null)
     }
 }
