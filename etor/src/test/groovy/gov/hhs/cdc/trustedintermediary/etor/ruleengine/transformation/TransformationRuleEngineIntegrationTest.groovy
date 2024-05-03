@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation
 
+import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader
@@ -130,6 +131,33 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
         transformationLookup[ruleName](bundle)
+    }
+
+    def "consecutively applied transformations don't interfere with each other: 003_2_ORM_O01_short_linked_to_002_ORU_R01_short"() {
+        given:
+        def testFile = "e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir"
+        def transformationsToApply = [
+            "convertToOmlOrder",
+            "addContactSectionToPatientResource"
+        ]
+        def fhirResource = ExamplesHelper.getExampleFhirResource(testFile)
+        def bundle = (Bundle) fhirResource.getUnderlyingResource()
+
+        expect:
+        FhirBundleHelper.resourceInBundle(bundle, MessageHeader).event.code == "O01"
+        FhirBundleHelper.resourceInBundle(bundle, Patient).contact.isEmpty()
+
+        when:
+        engine.ensureRulesLoaded()
+        transformationsToApply.each { ruleName ->
+            engine.getRuleByName(ruleName).runRule(fhirResource)
+        }
+
+        then:
+        0 * mockLogger.logError(_ as String, _ as Exception)
+        transformationsToApply.each { ruleName ->
+            transformationLookup[ruleName](bundle)
+        }
     }
 
     //    todo: ignoring while figuring out how to filter the demographics example
