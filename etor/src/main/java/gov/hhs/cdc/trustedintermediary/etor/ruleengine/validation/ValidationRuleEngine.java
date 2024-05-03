@@ -35,6 +35,7 @@ public class ValidationRuleEngine implements RuleEngine {
 
     @Override
     public void ensureRulesLoaded() throws RuleLoaderException {
+        // Double-checked locking - needed to protect from excessive sync locks
         if (rules.isEmpty()) {
             synchronized (this) {
                 if (rules.isEmpty()) {

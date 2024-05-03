@@ -299,6 +299,8 @@ with this option enabled.
 2. Copy the scripts found at [/scripts/rs](/scripts/rs) to `prime-reportstream/prime-router`
    - **Note**: follow the instructions in [/scripts/rs/readme.md](/scripts/rs/readme.md) to set up the environment variable
 3. CD to `prime-reportstream/prime-router`
+
+   If attempting to access the metadata endpoint in ReportStream add the variable `ETOR_TI_baseurl="http://host.docker.internal:8080"` to `.prime-router/.vault/env/.env.local` file before building the container
 4. Run the `./cleanslate` script. For more information you can refer to the [ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/docs-deprecated/getting-started/getting-started.md#building-the-baseline)
 5. Run RS with `docker compose up --build -d`
 6. Edit `/settings/staging/0166-flexion-staging-results-handling.yml` to comment the lines related to staging settings, and uncomment the ones for local settings:
