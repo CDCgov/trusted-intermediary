@@ -1,7 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation;
 
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleEngine;
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleEngineImplementation;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoaderException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -12,8 +12,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 /** Implements the RuleEngine interface. It represents a rule engine for transformations. */
-public class TransformationRuleEngine implements RuleEngine {
-    private String ruleDefinitionsFileName;
+public class TransformationRuleEngine extends RuleEngineImplementation implements RuleEngine {
     final List<TransformationRule> rules = new ArrayList<>();
 
     private static final TransformationRuleEngine INSTANCE = new TransformationRuleEngine();
@@ -52,28 +51,13 @@ public class TransformationRuleEngine implements RuleEngine {
         }
     }
 
-    @Override
-    public void runRules(FhirResource<?> resource) {
-        try {
-            ensureRulesLoaded();
-        } catch (RuleLoaderException e) {
-            logger.logError("Failed to load rules definitions", e);
-            return;
-        }
-
-        rules.forEach(
-                rule -> {
-                    if (rule.shouldRun(resource)) {
-                        rule.runRule((resource));
-                    }
-                });
+    protected List<TransformationRule> parseRules() {
+        List<TransformationRule> parsedRules =
+                ruleLoader.loadRules(resourceStream, new TypeReference<>() {});
     }
 
     @Override
     public TransformationRule getRuleByName(String ruleName) {
-        return rules.stream()
-                .filter(rule -> rule.getName().equals(ruleName))
-                .findFirst()
-                .orElse(null);
+        return (TransformationRule) super.getRuleByName(ruleName);
     }
 }

@@ -16,7 +16,7 @@ class TransformationRuleEngineTest extends Specification {
     def mockRule = Mock(TransformationRule)
 
     def setup() {
-        ruleEngine.unloadRules()
+        //        ruleEngine.unloadRules()
 
         TestApplicationContext.reset()
         TestApplicationContext.init()
@@ -25,6 +25,10 @@ class TransformationRuleEngineTest extends Specification {
         TestApplicationContext.register(RuleEngine, ruleEngine)
 
         TestApplicationContext.injectRegisteredImplementations()
+    }
+
+    def cleanup() {
+        ruleEngine.unloadRules()
     }
 
     def "ensureRulesLoaded happy path"() {
