@@ -36,19 +36,22 @@ public class TransformationRuleEngine implements RuleEngine {
 
     @Override
     public void ensureRulesLoaded() throws RuleLoaderException {
-        synchronized (this) {
-            if (rules.isEmpty()) {
-                String path = ruleDefinitionsFileName;
-                try (InputStream resourceStream =
-                        getClass().getClassLoader().getResourceAsStream(path)) {
-                    if (resourceStream == null) {
-                        throw new RuleLoaderException("No resource found at " + path);
+        // Double-checked locking - needed to protect from excessive sync locks
+        if (rules.isEmpty()) {
+            synchronized (this) {
+                if (rules.isEmpty()) {
+                    String path = ruleDefinitionsFileName;
+                    try (InputStream resourceStream =
+                            getClass().getClassLoader().getResourceAsStream(path)) {
+                        if (resourceStream == null) {
+                            throw new RuleLoaderException("No resource found at " + path);
+                        }
+                        List<TransformationRule> parsedRules =
+                                ruleLoader.loadRules(resourceStream, new TypeReference<>() {});
+                        this.rules.addAll(parsedRules);
+                    } catch (IOException e) {
+                        throw new RuleLoaderException("Failed to load rules from " + path, e);
                     }
-                    List<TransformationRule> parsedRules =
-                            ruleLoader.loadRules(resourceStream, new TypeReference<>() {});
-                    this.rules.addAll(parsedRules);
-                } catch (IOException e) {
-                    throw new RuleLoaderException("Failed to load rules from " + path, e);
                 }
             }
         }
