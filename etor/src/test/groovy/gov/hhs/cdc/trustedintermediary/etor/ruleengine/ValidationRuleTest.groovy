@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine
 
 import gov.hhs.cdc.trustedintermediary.FhirResourceMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation.ValidationRule
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
@@ -33,12 +34,12 @@ class ValidationRuleTest extends Specification {
         then:
         rule.getName() == ruleName
         rule.getDescription() == ruleDescription
-        rule.getViolationMessage() == ruleWarningMessage
+        rule.getMessage() == ruleWarningMessage
         rule.getConditions() == conditions
-        rule.getValidations() == validations
+        rule.getRules() == validations
     }
 
-    def "appliesTo returns expected boolean depending on conditions"() {
+    def "shouldRun returns expected boolean depending on conditions"() {
         given:
         def mockFhir = Mock(HapiFhir)
         mockFhir.evaluateCondition(_ as Object, _ as String) >> true >> conditionResult
@@ -50,7 +51,7 @@ class ValidationRuleTest extends Specification {
         ], null)
 
         expect:
-        rule.appliesTo(new FhirResourceMock("resource")) == applies
+        rule.shouldRun(new FhirResourceMock("resource")) == applies
 
         where:
         conditionResult | applies
@@ -58,7 +59,7 @@ class ValidationRuleTest extends Specification {
         false           | false
     }
 
-    def "appliesTo logs an error and returns false if an exception happens when evaluating a condition"() {
+    def "shouldRun logs an error and returns false if an exception happens when evaluating a condition"() {
         given:
         def mockFhir = Mock(HapiFhirImplementation)
         mockFhir.evaluateCondition(_ as Object, "condition") >> { throw new Exception() }
@@ -67,17 +68,16 @@ class ValidationRuleTest extends Specification {
         def rule = new ValidationRule(null, null, null, ["condition"], null)
 
         when:
-        def applies = rule.appliesTo(Mock(FhirResource))
+        def applies = rule.shouldRun(Mock(FhirResource))
 
         then:
         1 * mockLogger.logError(_ as String, _ as Exception)
         !applies
     }
 
-    def "isValid returns expected boolean depending on validations"() {
+    def "runRule returns expected boolean depending on validations"() {
         given:
         def mockFhir = Mock(HapiFhir)
-        mockFhir.evaluateCondition(_ as Object, _ as String) >> true >> validationResult
         TestApplicationContext.register(HapiFhir, mockFhir)
 
         def rule = new ValidationRule(null, null, null, null, [
@@ -85,16 +85,24 @@ class ValidationRuleTest extends Specification {
             "secondValidation"
         ])
 
-        expect:
-        rule.isValid(new FhirResourceMock("resource")) == valid
+        when:
+        mockFhir.evaluateCondition(_ as Object, _ as String) >> true >> true
+        rule.runRule(new FhirResourceMock("resource"))
 
-        where:
-        validationResult | valid
-        true             | true
-        false            | false
+        then:
+        0 * mockLogger.logWarning(_ as String)
+        0 * mockLogger.logError(_ as String, _ as Exception)
+
+        when:
+        mockFhir.evaluateCondition(_ as Object, _ as String) >> true >> false
+        rule.runRule(new FhirResourceMock("resource"))
+
+        then:
+        1 * mockLogger.logWarning(_ as String)
+        0 * mockLogger.logError(_ as String, _ as Exception)
     }
 
-    def "isValid logs an error and returns false if an exception happens when evaluating a validation"() {
+    def "runRule logs an error and returns false if an exception happens when evaluating a validation"() {
         given:
         def mockFhir = Mock(HapiFhirImplementation)
         mockFhir.evaluateCondition(_ as Object, "condition") >> { throw new Exception() }
@@ -103,10 +111,10 @@ class ValidationRuleTest extends Specification {
         def rule = new ValidationRule(null, null, null, null, ["validation"])
 
         when:
-        def valid = rule.isValid(Mock(FhirResource))
+        rule.runRule(Mock(FhirResource))
 
         then:
+        0 * mockLogger.logWarning(_ as String)
         1 * mockLogger.logError(_ as String, _ as Exception)
-        !valid
     }
 }

@@ -1,28 +1,85 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine;
 
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
+import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.List;
 
 /**
- * The Rule interface defines the structure for a rule in the rule engine. Each rule has a name,
- * description, warning message, conditions, validations, and methods to check if a resource is
- * valid and if the rule applies to a resource.
+ * Represents a rule that can be run on a FHIR resource. Each rule has a name, description, logging
+ * message, conditions to determine if the rule should run, and actions to run in case the condition
+ * is met.
  */
-public interface Rule {
-    String getName();
+public class Rule {
 
-    String getDescription();
+    protected final Logger logger = ApplicationContext.getImplementation(Logger.class);
+    protected final HapiFhir fhirEngine = ApplicationContext.getImplementation(HapiFhir.class);
+    private String name;
+    private String description;
+    private String message;
+    private List<String> conditions;
+    private List<String> rules;
 
     /**
-     * Descriptive message when there's a rule violation Note: When implementing this method, make
-     * sure that no PII or PHI is included in the message!
+     * Do not delete this constructor! It is used for JSON deserialization when loading rules from a
+     * file.
      */
-    String getViolationMessage();
+    public Rule() {}
 
-    List<String> getConditions();
+    public Rule(
+            String ruleName,
+            String ruleDescription,
+            String ruleMessage,
+            List<String> ruleConditions,
+            List<String> ruleActions) {
+        name = ruleName;
+        description = ruleDescription;
+        message = ruleMessage;
+        conditions = ruleConditions;
+        rules = ruleActions;
+    }
 
-    List<String> getValidations();
+    public String getName() {
+        return name;
+    }
 
-    boolean isValid(FhirResource<?> resource);
+    public String getDescription() {
+        return description;
+    }
 
-    boolean appliesTo(FhirResource<?> resource);
+    public String getMessage() {
+        return message;
+    }
+
+    public List<String> getConditions() {
+        return conditions;
+    }
+
+    public List<String> getRules() {
+        return rules;
+    }
+
+    public boolean shouldRun(FhirResource<?> resource) {
+        return conditions.stream()
+                .allMatch(
+                        condition -> {
+                            try {
+                                return fhirEngine.evaluateCondition(
+                                        resource.getUnderlyingResource(), condition);
+                            } catch (Exception e) {
+                                logger.logError(
+                                        "Rule ["
+                                                + name
+                                                + "]: "
+                                                + "An error occurred while evaluating the condition: "
+                                                + condition,
+                                        e);
+                                return false;
+                            }
+                        });
+    }
+
+    public void runRule(FhirResource<?> resource) {
+        throw new UnsupportedOperationException("This method must be implemented by subclasses.");
+    }
 }
