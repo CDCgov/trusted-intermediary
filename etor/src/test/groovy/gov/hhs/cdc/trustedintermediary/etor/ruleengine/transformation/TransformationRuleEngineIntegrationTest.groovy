@@ -19,6 +19,7 @@ class TransformationRuleEngineIntegrationTest extends Specification {
     def engine = TransformationRuleEngine.getInstance("transformation_definitions.json")
     def fhir = HapiFhirImplementation.getInstance()
     def mockLogger = Mock(Logger)
+    def transformationLookup
 
     def setup() {
         TestApplicationContext.reset()
@@ -32,6 +33,21 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
 
         TestApplicationContext.injectRegisteredImplementations()
+
+        transformationLookup = [
+            "addEtorProcessingTag": { Bundle bundle ->
+                def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
+                messageHeader.meta.tag.last().code == "ETOR"
+            },
+            "convertToOmlOrder": { Bundle bundle ->
+                def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
+                messageHeader.event.code == "O21"
+            },
+            "addContactSectionToPatientResource": { Bundle bundle ->
+                def patient = FhirBundleHelper.resourceInBundle(bundle, Patient)
+                patient.contact.size() > 0
+            }
+        ]
     }
 
     def "transformation rules run without error"() {
@@ -72,7 +88,7 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
-        transformMethodAppliesExpectedChanges(ruleName, bundle)
+        transformationLookup[ruleName](bundle)
     }
 
     def "test rule transformation accuracy: convertToOmlOrder"() {
@@ -92,7 +108,7 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
-        transformMethodAppliesExpectedChanges(ruleName, bundle)
+        transformationLookup[ruleName](bundle)
     }
 
     def "test rule transformation accuracy: addContactSectionToPatientResource"() {
@@ -113,7 +129,7 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
-        transformMethodAppliesExpectedChanges(ruleName, bundle)
+        transformationLookup[ruleName](bundle)
     }
 
     //    todo: ignoring while figuring out how to filter the demographics example
@@ -142,24 +158,4 @@ class TransformationRuleEngineIntegrationTest extends Specification {
     //        serviceRequest != null
     //        provenance != null
     //    }
-
-    boolean transformMethodAppliesExpectedChanges(String method, Bundle bundle) {
-        def expected = false
-        switch (method) {
-            case "addEtorProcessingTag":
-                def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
-                expected = messageHeader.meta.tag.last().code == "ETOR"
-                return expected
-            case "convertToOmlOrder":
-                def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
-                expected = messageHeader.event.code == "O21"
-                return expected
-            case "addContactSectionToPatientResource":
-                def patient = FhirBundleHelper.resourceInBundle(bundle, Patient.class)
-                expected = patient.contact.size() > 0
-                return expected
-            default:
-                return false
-        }
-    }
 }
