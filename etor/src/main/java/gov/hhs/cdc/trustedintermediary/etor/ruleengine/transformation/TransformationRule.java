@@ -38,7 +38,7 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
         this.getRules().forEach((transformation -> applyTransformation(transformation, resource)));
     }
 
-    static Class<?> loadClassFromCache(String className) throws ClassNotFoundException {
+    static Class<?> loadClassFromCache(String className) throws RuntimeException {
         return classCache.computeIfAbsent(className, TransformationRule::loadClassByName);
     }
 
@@ -64,8 +64,6 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
                 | InvocationTargetException
                 | InstantiationException e) {
             logger.logError("Error invoking method: " + name + ", due to: " + e.getMessage(), e);
-        } catch (ClassNotFoundException e) {
-            logger.logError("Transformation class not found: " + name, e);
         }
     }
 
