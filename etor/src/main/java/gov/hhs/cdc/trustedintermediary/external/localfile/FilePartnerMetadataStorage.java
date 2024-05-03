@@ -134,7 +134,7 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
                 return Set.of();
             }
 
-            return Set.of();
+            return Set.of(match.receivedSubmissionId());
         } catch (Exception e) {
             throw new PartnerMetadataException(
                     "Failed reading metadata for submissionId: " + receivedSubmissionId, e);
