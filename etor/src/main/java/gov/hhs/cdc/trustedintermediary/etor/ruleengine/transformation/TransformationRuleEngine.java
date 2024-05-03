@@ -6,7 +6,6 @@ import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoaderException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,19 +39,14 @@ public class TransformationRuleEngine implements RuleEngine {
         if (rules.isEmpty()) {
             synchronized (this) {
                 if (rules.isEmpty()) {
-                    String path = ruleDefinitionsFileName;
-                    try (InputStream resourceStream =
-                            getClass().getClassLoader().getResourceAsStream(path)) {
-                        if (resourceStream == null) {
-                            throw new RuleLoaderException(
-                                    "No resource found at " + path, new IOException());
-                        }
-                        List<TransformationRule> parsedRules =
-                                ruleLoader.loadRules(resourceStream, new TypeReference<>() {});
-                        this.rules.addAll(parsedRules);
-                    } catch (IOException e) {
-                        throw new RuleLoaderException("Failed to load rules from " + path, e);
-                    }
+                    InputStream resourceStream =
+                            getClass()
+                                    .getClassLoader()
+                                    .getResourceAsStream(ruleDefinitionsFileName);
+                    assert resourceStream != null;
+                    List<TransformationRule> parsedRules =
+                            ruleLoader.loadRules(resourceStream, new TypeReference<>() {});
+                    this.rules.addAll(parsedRules);
                 }
             }
         }
