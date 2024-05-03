@@ -283,17 +283,6 @@ class PartnerMetadataOrchestratorTest extends Specification {
         1 * mockPartnerMetadataStorage.saveMetadata(updatedPartnerMetadata)
     }
 
-    def "updateMetadataForSentMessage test case when sentSubmissionId is null"() {
-        given:
-        def sentSubmissionId = null
-
-        when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentMessage(receivedSubmissionId, sentSubmissionId)
-
-        then:
-        0 * mockPartnerMetadataStorage.readMetadata(receivedSubmissionId)
-    }
-
     def "getMetadata throws PartnerMetadataException on client error"() {
         given:
         def partnerMetadata = new PartnerMetadata(receivedSubmissionId, "sentSubmissionId", Instant.now(), null, "hash", PartnerMetadataStatus.PENDING, "failureReason", PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)

@@ -96,7 +96,8 @@ class HapiOrderConverterTest extends Specification {
 
         when:
         HapiOrderConverter.convertDemographicsToOrder(mockDemographicsResource)
-        def messageHeader = HapiHelper.resourcesInBundle(mockDemographicsResource, MessageHeader.class).findFirst().orElse(null)
+        def messageHeader = HapiHelper.
+                resourcesInBundle(mockDemographicsResource, MessageHeader.class).findFirst().orElse(null)
 
         then:
         messageHeader.hasId()

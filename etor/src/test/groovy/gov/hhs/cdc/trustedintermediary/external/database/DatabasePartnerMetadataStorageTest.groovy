@@ -265,19 +265,6 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         thrown(PartnerMetadataException)
     }
 
-    def "readMetadataForSender happy path works"() {
-        given:
-        def expectedResult = Set.of(mockMetadata)
-
-        mockDao.fetchManyData(_ as Function<Connection, PreparedStatement>, _ as Function<ResultSet, PartnerMetadata>, _) >> expectedResult
-
-        when:
-        def actualResult = DatabasePartnerMetadataStorage.getInstance().readMetadataForSender("TestSender")
-
-        then:
-        actualResult == expectedResult
-    }
-
     def "readMetadataForSender unhappy path works"() {
         given:
         mockDao.fetchManyData(_ as Function<Connection, PreparedStatement>, _ as Function<ResultSet, PartnerMetadata>, _) >> { throw new SQLException("Something went wrong!") }

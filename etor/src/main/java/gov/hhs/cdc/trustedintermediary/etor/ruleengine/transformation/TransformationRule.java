@@ -38,19 +38,6 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
         this.getRules().forEach((transformation -> applyTransformation(transformation, resource)));
     }
 
-    static Class<?> loadClassFromCache(String className) throws ClassNotFoundException {
-        return classCache.computeIfAbsent(className, TransformationRule::loadClassByName);
-    }
-
-    static void executeCustomTransformationMethod(
-            Class<?> clazz, FhirResource<?> resource, Map<String, String> args)
-            throws NoSuchMethodException, InvocationTargetException, InstantiationException,
-                    IllegalAccessException {
-        CustomFhirTransformation transformation =
-                (CustomFhirTransformation) clazz.getDeclaredConstructor().newInstance();
-        transformation.transform(resource, args);
-    }
-
     private void applyTransformation(
             TransformationRuleMethod transformation, FhirResource<?> resource) {
         String name = transformation.name();
@@ -65,9 +52,11 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
                 | InvocationTargetException
                 | InstantiationException e) {
             logger.logError("Error invoking method: " + name + ", due to: " + e.getMessage(), e);
-        } catch (ClassNotFoundException e) {
-            logger.logError("Transformation class not found: " + name, e);
         }
+    }
+
+    static Class<?> loadClassFromCache(String className) throws RuntimeException {
+        return classCache.computeIfAbsent(className, TransformationRule::loadClassByName);
     }
 
     private static Class<?> loadClassByName(String className) {
@@ -83,5 +72,14 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
         String packageName =
                 "gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom";
         return packageName + "." + className;
+    }
+
+    static void executeCustomTransformationMethod(
+            Class<?> clazz, FhirResource<?> resource, Map<String, String> args)
+            throws NoSuchMethodException, InvocationTargetException, InstantiationException,
+                    IllegalAccessException {
+        CustomFhirTransformation transformation =
+                (CustomFhirTransformation) clazz.getDeclaredConstructor().newInstance();
+        transformation.transform(resource, args);
     }
 }
