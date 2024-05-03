@@ -71,7 +71,7 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
         when:
         rule.runRule(new HapiFhirResource(bundle))
-        def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader.class)
+        def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
@@ -91,8 +91,8 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
         when:
         rule.runRule(new HapiFhirResource(bundle))
-        def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader.class)
-        def untouchedMessageHeader = FhirBundleHelper.resourceInBundle(untouchedBundle, MessageHeader.class)
+        def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
+        def untouchedMessageHeader = FhirBundleHelper.resourceInBundle(untouchedBundle, MessageHeader)
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
@@ -116,7 +116,7 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         when:
         rule.runRule(new HapiFhirResource(bundle))
         def patient = FhirBundleHelper.resourceInBundle(bundle, Patient.class)
-        def untouchedPatient = FhirBundleHelper.resourceInBundle(untouchedBundle, Patient.class)
+        def untouchedPatient = FhirBundleHelper.resourceInBundle(untouchedBundle, Patient)
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
@@ -139,9 +139,9 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
         when:
         rule.runRule(fhirResource)
-        def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader.class)
-        def serviceRequest = FhirBundleHelper.resourceInBundle(bundle, ServiceRequest.class)
-        def provenance = FhirBundleHelper.resourceInBundle(bundle, Provenance.class)
+        def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
+        def serviceRequest = FhirBundleHelper.resourceInBundle(bundle, ServiceRequest)
+        def provenance = FhirBundleHelper.resourceInBundle(bundle, Provenance)
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)

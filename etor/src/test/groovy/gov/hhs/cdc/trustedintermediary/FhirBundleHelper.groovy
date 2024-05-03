@@ -34,7 +34,7 @@ class FhirBundleHelper {
 
     static resourceInBundle(Bundle bundle, Class resourceType) {
         return bundle.entry.stream()
-                .map { it.resource }
+                .map { it.getResource() }
                 .filter { it.class == resourceType }
                 .findFirst().orElse(null)
     }
