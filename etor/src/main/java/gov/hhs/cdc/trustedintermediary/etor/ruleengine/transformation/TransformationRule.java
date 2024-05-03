@@ -33,6 +33,7 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
         super(ruleName, ruleDescription, ruleMessage, ruleConditions, ruleActions);
     }
 
+    @Override
     public void runRule(FhirResource<?> resource) {
         this.getRules().forEach((transformation -> applyTransformation(transformation, resource)));
     }
