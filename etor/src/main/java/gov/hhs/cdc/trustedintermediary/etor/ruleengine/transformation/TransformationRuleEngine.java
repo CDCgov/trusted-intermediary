@@ -65,12 +65,8 @@ public class TransformationRuleEngine implements RuleEngine {
 
         rules.forEach(
                 rule -> {
-                    try {
-                        if (rule.shouldRun(resource)) {
-                            rule.runRule((resource));
-                        }
-                    } catch (Exception e) {
-                        logger.logError("Error executing rule: " + rule.getName(), e);
+                    if (rule.shouldRun(resource)) {
+                        rule.runRule((resource));
                     }
                 });
     }
