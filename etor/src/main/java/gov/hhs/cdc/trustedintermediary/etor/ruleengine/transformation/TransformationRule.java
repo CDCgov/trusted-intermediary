@@ -4,9 +4,9 @@ import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.Rule;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The TransformationRule class extends the {@link
@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public class TransformationRule extends Rule<TransformationRuleMethod> {
 
-    private static final Map<String, Class<?>> classCache = new HashMap<>();
+    private static final Map<String, Class<?>> classCache = new ConcurrentHashMap<>();
 
     /**
      * Do not delete this constructor! It is used for JSON deserialization when loading rules from a
