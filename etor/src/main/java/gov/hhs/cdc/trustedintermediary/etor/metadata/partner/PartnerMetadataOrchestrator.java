@@ -224,7 +224,10 @@ public class PartnerMetadataOrchestrator {
     public Set<String> findMessagesIdsToLink(String receivedSubmissionId)
             throws PartnerMetadataException {
 
-        return partnerMetadataStorage.readMetadataForMessageLinking(receivedSubmissionId);
+        Set<String> messageIds =
+                partnerMetadataStorage.readMetadataForMessageLinking(receivedSubmissionId);
+        messageIds.add(receivedSubmissionId);
+        return messageIds;
     }
 
     public void linkMessages(Set<String> messageIds) throws MessageLinkException {
