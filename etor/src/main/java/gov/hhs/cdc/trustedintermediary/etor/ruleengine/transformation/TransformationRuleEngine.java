@@ -44,7 +44,8 @@ public class TransformationRuleEngine implements RuleEngine {
                     try (InputStream resourceStream =
                             getClass().getClassLoader().getResourceAsStream(path)) {
                         if (resourceStream == null) {
-                            throw new RuleLoaderException("No resource found at " + path);
+                            throw new RuleLoaderException(
+                                    "No resource found at " + path, new IOException());
                         }
                         List<TransformationRule> parsedRules =
                                 ruleLoader.loadRules(resourceStream, new TypeReference<>() {});
