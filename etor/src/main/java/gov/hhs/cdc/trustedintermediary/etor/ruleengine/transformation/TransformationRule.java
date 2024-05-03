@@ -3,7 +3,6 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.Rule;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,8 +45,9 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
             Class<?> clazz, FhirResource<?> resource, Map<String, String> args)
             throws NoSuchMethodException, InvocationTargetException, InstantiationException,
                     IllegalAccessException {
-        Method method = clazz.getDeclaredMethod("transform", FhirResource.class, Map.class);
-        method.invoke(clazz.getDeclaredConstructor().newInstance(), resource, args);
+        CustomFhirTransformation transformation =
+                (CustomFhirTransformation) clazz.getDeclaredConstructor().newInstance();
+        transformation.transform(resource, args);
     }
 
     private void applyTransformation(
