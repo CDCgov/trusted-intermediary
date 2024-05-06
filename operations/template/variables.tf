@@ -13,3 +13,9 @@ variable "vpn_root_certificate" {
   nullable = true
   default  = null
 }
+
+variable "alert_slack_webhook" {
+  type = string
+  nullable = false
+  sensitive = true
+}

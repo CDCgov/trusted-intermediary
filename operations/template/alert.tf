@@ -1,7 +1,7 @@
 resource "azurerm_storage_account" "alerts" {
   name                     = "cdcti${var.environment}-alerts"
   resource_group_name      = data.azurerm_resource_group.group.name
-  location                 = azurerm_resource_group.group.location
+  location                 = data.azurerm_resource_group.group.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
 }
@@ -13,7 +13,7 @@ resource "azurerm_monitor_action_group" "monitor" {
 
   webhook_receiver {
     name        = "cdcti-flexion-slack-webhook-receiver"
-    service_uri = "http://our-slack-webhook.com/channel"
+    service_uri = var.alert_slack_webhook
   }
 }
 
