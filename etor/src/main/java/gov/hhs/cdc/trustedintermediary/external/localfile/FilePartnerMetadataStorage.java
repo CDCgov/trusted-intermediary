@@ -134,7 +134,20 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
                 return Set.of();
             }
 
-            return Set.of(match.receivedSubmissionId());
+            return existingMetadata.stream()
+                    .filter(
+                            metadata ->
+                                    metadata.placerOrderNumber().equals(match.placerOrderNumber())
+                                            && (metadata.sendingFacilityDetails()
+                                                            .equals(match.sendingFacilityDetails())
+                                                    || metadata.sendingFacilityDetails()
+                                                            .equals(
+                                                                    match
+                                                                            .receivingFacilityDetails()))
+                                            && !metadata.receivedSubmissionId()
+                                                    .equals(receivedSubmissionId))
+                    .map(PartnerMetadata::receivedSubmissionId)
+                    .collect(Collectors.toSet());
         } catch (Exception e) {
             throw new PartnerMetadataException(
                     "Failed reading metadata for submissionId: " + receivedSubmissionId, e);
