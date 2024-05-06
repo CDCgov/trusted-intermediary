@@ -133,6 +133,11 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         transformationLookup[ruleName](bundle)
     }
 
+    //    def "test rule transformation accuracy: addSendingFacilityToMessageHeader"() {
+    //        given:
+    //        def ruleName = "addSendingFacilityToMessageHeader"
+    //    }
+
     def "consecutively applied transformations don't interfere with each other: 003_2_ORM_O01_short_linked_to_002_ORU_R01_short"() {
         given:
         def testFile = "e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir"
