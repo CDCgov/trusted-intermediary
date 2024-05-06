@@ -32,6 +32,8 @@ on:
         required: false
       VPN_GITHUB_SECRET_KEY:
         required: false
+      SLACK_WEBHOOK_ALERT:
+        required: true
     outputs:
       REGISTRY:
         description: The container registry
