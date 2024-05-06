@@ -14,7 +14,8 @@ jobs:
     with:
       ENVIRONMENT: dev
       TERRAFORM_DIRECTORY: operations/environments/dev
-      TERRAFORM_APPLY_PARAMETERS: -var="alert_slack_webhook=${{ secret.ALERT_SLACK_WEBHOOK }}"
+      SLACK_WEBHOOK_ALERT: ${{ secrets.ALERT_SLACK_WEBHOOK }}
+      TERRAFORM_APPLY_PARAMETERS: -var="alert_slack_webhook=$SLACK_WEBHOOK_ALERT"
     secrets:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CDC_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_CDC_TENANT_ID }}
