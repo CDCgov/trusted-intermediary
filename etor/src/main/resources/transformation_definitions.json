@@ -38,6 +38,20 @@
           "args": { }
         }
       ]
+    },
+    {
+      "name": "addSendingFacilityToMessageHeader",
+      "description": "Add Contact Section to Patient Resource in OML Order",
+      "message": "",
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'O21'"
+      ],
+      "rules": [
+        {
+          "name": "addSendingFacilityToMessageHeader",
+          "args": { }
+        }
+      ]
     }
   ]
 }
