@@ -9,6 +9,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
 
+/** Custom transformation to convert an ORM order to OML. */
 public class convertToOmlOrder implements CustomFhirTransformation {
 
     private final MetricMetadata metadata =
