@@ -13,6 +13,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.MessageHeader
+import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Patient
 import spock.lang.Specification
 
@@ -36,17 +37,21 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         transformationLookup = [
-            "addEtorProcessingTag": { Bundle bundle ->
+            "addEtorProcessingTag"              : { Bundle bundle ->
                 def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
                 messageHeader.meta.tag.last().code == "ETOR"
             },
-            "convertToOmlOrder": { Bundle bundle ->
+            "convertToOmlOrder"                 : { Bundle bundle ->
                 def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
                 messageHeader.event.code == "O21"
             },
             "addContactSectionToPatientResource": { Bundle bundle ->
                 def patient = FhirBundleHelper.resourceInBundle(bundle, Patient)
                 patient.contact.size() > 0
+            },
+            "addSendingFacilityToMessageHeader": { Bundle bundle ->
+                def org = FhirBundleHelper.resourceInBundle(bundle, Organization)
+                org.name == "testName"
             }
         ]
     }
@@ -133,10 +138,27 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         transformationLookup[ruleName](bundle)
     }
 
-    //    def "test rule transformation accuracy: addSendingFacilityToMessageHeader"() {
-    //        given:
-    //        def ruleName = "addSendingFacilityToMessageHeader"
-    //    }
+    def "test rule transformation accuracy: addSendingFacilityToMessageHeader"() {
+        given:
+        def ruleName = "addSendingFacilityToMessageHeader"
+        // we could also use this file for testing the rule: e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir
+        def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: "OML_O21")
+        //        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(new Patient()))
+
+        engine.ensureRulesLoaded()
+        def rule = engine.getRuleByName(ruleName)
+
+        expect:
+        FhirBundleHelper.resourceInBundle(bundle, Organization).isEmpty()
+        //        org.name == "testName"
+
+        when:
+        rule.runRule(new HapiFhirResource(bundle))
+
+        then:
+        0 * mockLogger.logError(_ as String, _ as Exception)
+        transformationLookup[ruleName](bundle)
+    }
 
     def "consecutively applied transformations don't interfere with each other: 003_2_ORM_O01_short_linked_to_002_ORU_R01_short"() {
         given:
