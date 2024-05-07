@@ -6,6 +6,7 @@ resource "azurerm_monitor_action_group" "monitor" {
   webhook_receiver {
     name        = "cdcti-flexion-slack-webhook-receiver"
     service_uri = var.alert_slack_webhook
+    use_common_alert_schema = false
   }
 }
 
@@ -27,5 +28,6 @@ resource "azurerm_monitor_metric_alert" "alert" {
 
   action {
     action_group_id = azurerm_monitor_action_group.monitor.id
+    custom_webhook_payload = "{ \"text\" : \"Warning: ${azurerm_postgresql_flexible_server.database.id} connection has failed once in the last minute!\"}"
   }
 }
