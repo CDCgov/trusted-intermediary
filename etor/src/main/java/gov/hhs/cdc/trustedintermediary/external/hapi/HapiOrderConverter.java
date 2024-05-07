@@ -157,4 +157,15 @@ public class HapiOrderConverter {
     public static Stream<Patient> findAllPatients(Bundle bundle) {
         return HapiHelper.resourcesInBundle(bundle, Patient.class);
     }
+
+    public static void addSendingFacilityToMessageHeader(Bundle bundle, String name) {
+        var header = HapiHelper.resourcesInBundle(bundle, MessageHeader.class).findFirst();
+        if (header.isEmpty()) {
+            return;
+        }
+
+        var org = new Organization();
+        org.setName(name);
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(org));
+    }
 }

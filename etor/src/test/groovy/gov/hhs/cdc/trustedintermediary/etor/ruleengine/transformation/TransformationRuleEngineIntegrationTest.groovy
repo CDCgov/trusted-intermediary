@@ -122,6 +122,29 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         patient.contact.size() > 0
     }
 
+    def "test rule transformation accuracy: addSendingFacilityToMessageHeader"() {
+        given:
+        def ruleName = 'addSendingFacilityToMessageHeader'
+        // we could also use this file for testing the rule: e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir
+        def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: 'OML_O21')
+        //        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(new Patient()))
+
+        engine.ensureRulesLoaded()
+        def rule = engine.getRuleByName(ruleName)
+
+        expect:
+        FhirBundleHelper.resourceInBundle(bundle, Organization).isEmpty()
+        //        org.name == "testName"
+
+        when:
+        rule.runRule(new HapiFhirResource(bundle))
+        def org = FhirBundleHelper.resourceInBundle(bundle, Organization)
+
+        then:
+        0 * mockLogger.logError(_ as String, _ as Exception)
+        org.name == 'testName'
+    }
+
     def "consecutively applied transformations don't interfere with each other: 003_2_ORM_O01_short_linked_to_002_ORU_R01_short"() {
         given:
         def testFile = 'e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir'
