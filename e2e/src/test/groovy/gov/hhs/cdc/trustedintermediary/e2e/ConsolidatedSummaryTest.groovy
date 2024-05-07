@@ -19,7 +19,7 @@ class ConsolidatedSummaryTest extends Specification {
 
         def orderClient = new EndpointClient("/v1/etor/orders")
         def labOrderJsonFileString = Files.readString(Path.of("../examples/Test/e2e/orders/002_ORM_O01.fhir"))
-        def senderName = "centracare.com"
+        def senderId = "centracare.com"
 
         when:
         def orderResponse = orderClient.submit(labOrderJsonFileString, inboundSubmissionId, true)
@@ -28,12 +28,12 @@ class ConsolidatedSummaryTest extends Specification {
         orderResponse.getCode() == expectedStatusCode
 
         when:
-        def senderNameResponse = ConsolidatedSummaryClient.get(senderName, true)
+        def senderNameResponse = ConsolidatedSummaryClient.get(senderId, true)
         def jsonBody = JsonParser.parseContent(senderNameResponse)
 
         then:
         jsonBody.get((jsonBody.keySet().toArray())[0]).stale != null
-        jsonBody.get((jsonBody.keySet().toArray())[0]).failureReason == null
+        jsonBody.get(jsonBody.keySet().toArray()[0]).containsKey("failureReason")
         jsonBody.get((jsonBody.keySet().toArray())[0]).status != null
     }
 

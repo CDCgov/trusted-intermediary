@@ -724,7 +724,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         def receivingFacilityDetails = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
         def partnerMetadata1 = new PartnerMetadata(receivedSubmissionId1, "hash1", PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, placerOrderNumber)
         def partnerMetadata2 = new PartnerMetadata(receivedSubmissionId2, "hash2", PartnerMetadataMessageType.RESULT, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, placerOrderNumber)
-        def metadataSetForMessageLinking = Set.of(partnerMetadata1, partnerMetadata2)
+        def metadataSetForMessageLinking = Set.of(receivedSubmissionId1, receivedSubmissionId2)
         mockPartnerMetadataStorage.readMetadataForMessageLinking(receivedSubmissionId) >> metadataSetForMessageLinking
 
         when:

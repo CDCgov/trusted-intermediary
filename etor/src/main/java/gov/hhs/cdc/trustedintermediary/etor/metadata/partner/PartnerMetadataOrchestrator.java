@@ -223,11 +223,8 @@ public class PartnerMetadataOrchestrator {
 
     public Set<String> findMessagesIdsToLink(String receivedSubmissionId)
             throws PartnerMetadataException {
-        var metadataSet =
-                partnerMetadataStorage.readMetadataForMessageLinking(receivedSubmissionId);
-        return metadataSet.stream()
-                .map(PartnerMetadata::receivedSubmissionId)
-                .collect(Collectors.toSet());
+
+        return partnerMetadataStorage.readMetadataForMessageLinking(receivedSubmissionId);
     }
 
     public void linkMessages(Set<String> messageIds) throws MessageLinkException {
