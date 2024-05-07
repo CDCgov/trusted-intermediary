@@ -1,11 +1,3 @@
-resource "azurerm_storage_account" "alerts" {
-  name                     = "cdcti${var.environment}-alerts"
-  resource_group_name      = data.azurerm_resource_group.group.name
-  location                 = data.azurerm_resource_group.group.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-}
-
 resource "azurerm_monitor_action_group" "monitor" {
   name                = "cdcti${var.environment}-actiongroup"
   resource_group_name = data.azurerm_resource_group.group.name
@@ -26,7 +18,7 @@ resource "azurerm_monitor_metric_alert" "alert" {
   window_size      = "PT1M"
 
   criteria {
-    metric_namespace = "Microsoft.cdcti-${var.environment}-database/flexibleServers"
+    metric_namespace = "Microsoft.DBforPostgreSQL/flexibleServers"
     metric_name      = "connections_failed"
     aggregation      = "Total"
     operator         = "GreaterThan"
