@@ -21,7 +21,6 @@ class TransformationRuleEngineIntegrationTest extends Specification {
     def engine = TransformationRuleEngine.getInstance("transformation_definitions.json")
     def fhir = HapiFhirImplementation.getInstance()
     def mockLogger = Mock(Logger)
-    def transformationLookup
 
     def setup() {
         TestApplicationContext.reset()
@@ -35,25 +34,6 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
 
         TestApplicationContext.injectRegisteredImplementations()
-
-        transformationLookup = [
-            "addEtorProcessingTag"              : { Bundle bundle ->
-                def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
-                messageHeader.meta.tag.last().code == "ETOR"
-            },
-            "convertToOmlOrder"                 : { Bundle bundle ->
-                def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
-                messageHeader.event.code == "O21"
-            },
-            "addContactSectionToPatientResource": { Bundle bundle ->
-                def patient = FhirBundleHelper.resourceInBundle(bundle, Patient)
-                patient.contact.size() > 0
-            },
-            "addSendingFacilityToMessageHeader": { Bundle bundle ->
-                def org = FhirBundleHelper.resourceInBundle(bundle, Organization)
-                org.name == "testName"
-            }
-        ]
     }
 
     def "transformation rules run without error"() {
@@ -91,10 +71,11 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
         when:
         rule.runRule(new HapiFhirResource(bundle))
+        def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
-        transformationLookup[ruleName](bundle)
+        messageHeader.meta.tag.last().code == "ETOR"
     }
 
     def "test rule transformation accuracy: convertToOmlOrder"() {
@@ -111,10 +92,11 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
         when:
         rule.runRule(new HapiFhirResource(bundle))
+        def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
-        transformationLookup[ruleName](bundle)
+        messageHeader.event.code == "O21"
     }
 
     def "test rule transformation accuracy: addContactSectionToPatientResource"() {
@@ -132,10 +114,11 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
         when:
         rule.runRule(new HapiFhirResource(bundle))
+        def patient = FhirBundleHelper.resourceInBundle(bundle, Patient)
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
-        transformationLookup[ruleName](bundle)
+        patient.contact.size() > 0
     }
 
     def "test rule transformation accuracy: addSendingFacilityToMessageHeader"() {
@@ -154,10 +137,11 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
         when:
         rule.runRule(new HapiFhirResource(bundle))
+        def org = FhirBundleHelper.resourceInBundle(bundle, Organization)
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
-        transformationLookup[ruleName](bundle)
+        org.name == "testName"
     }
 
     def "consecutively applied transformations don't interfere with each other: 003_2_ORM_O01_short_linked_to_002_ORU_R01_short"() {
@@ -179,38 +163,12 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         transformationsToApply.each { ruleName ->
             engine.getRuleByName(ruleName).runRule(fhirResource)
         }
+        def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
+        def patient = FhirBundleHelper.resourceInBundle(bundle, Patient)
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
-        transformationsToApply.each { ruleName ->
-            transformationLookup[ruleName](bundle)
-        }
+        messageHeader.event.code == "O21"
+        patient.contact.size() > 0
     }
-
-    //    todo: ignoring while figuring out how to filter the demographics example
-    //    def "test rule transformation accuracy: convertDemographicsToOrder"() {
-    //        given:
-    //        def ruleName = "convertDemographicsToOrder"
-    //        def testFile = "e2e/demographics/001_Patient_NBS.fhir"
-    //
-    //        def fhirResource = ExamplesHelper.getExampleFhirResource(testFile)
-    //        def bundle = (Bundle) fhirResource.getUnderlyingResource()
-    //        def untouchedBundle = bundle.copy()
-    //
-    //        engine.ensureRulesLoaded()
-    //        def rule = engine.getRuleByName(ruleName)
-    //
-    //        when:
-    //        rule.runRule(fhirResource)
-    //        def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
-    //        def serviceRequest = FhirBundleHelper.resourceInBundle(bundle, ServiceRequest)
-    //        def provenance = FhirBundleHelper.resourceInBundle(bundle, Provenance)
-    //
-    //        then:
-    //        0 * mockLogger.logError(_ as String, _ as Exception)
-    //        !bundle.equalsDeep(untouchedBundle)
-    //        messageHeader != null
-    //        serviceRequest != null
-    //        provenance != null
-    //    }
 }
