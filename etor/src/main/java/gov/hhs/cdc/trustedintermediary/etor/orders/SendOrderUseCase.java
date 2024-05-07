@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleException;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.TransformationRuleEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
@@ -42,7 +43,11 @@ public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
 
         sendMessageHelper.savePartnerMetadataForReceivedMessage(partnerMetadata);
 
-        transformationEngine.runRules(order);
+        try {
+            transformationEngine.runRules(order);
+        } catch (RuleException e) {
+            throw new UnableToSendMessageException("Error running transformation rules", e);
+        }
 
         String outboundReportId = sender.send(order).orElse(null);
         logger.logInfo("Sent order reportId: {}", outboundReportId);

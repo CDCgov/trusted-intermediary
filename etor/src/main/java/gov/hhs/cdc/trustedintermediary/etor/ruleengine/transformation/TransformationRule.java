@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation;
 
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.Rule;
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
@@ -34,12 +35,15 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
     }
 
     @Override
-    public void runRule(FhirResource<?> resource) {
-        this.getRules().forEach((transformation -> applyTransformation(transformation, resource)));
+    public void runRule(FhirResource<?> resource) throws RuleException {
+        for (TransformationRuleMethod transformation : this.getRules()) {
+            applyTransformation(transformation, resource);
+        }
     }
 
     private void applyTransformation(
-            TransformationRuleMethod transformation, FhirResource<?> resource) {
+            TransformationRuleMethod transformation, FhirResource<?> resource)
+            throws RuleException {
         String name = transformation.name();
         Map<String, String> args = transformation.args();
         logger.logInfo("Applying transformation: ", name);
@@ -51,7 +55,7 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
                 | IllegalAccessException
                 | InvocationTargetException
                 | InstantiationException e) {
-            logger.logError("Error invoking method: " + name + ", due to: " + e.getMessage(), e);
+            throw new RuleException("Error invoking method: " + name, e);
         }
     }
 
