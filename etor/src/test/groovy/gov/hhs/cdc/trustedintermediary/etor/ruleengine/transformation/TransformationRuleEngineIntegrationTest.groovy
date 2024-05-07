@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation
 
+import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader
@@ -12,6 +13,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.MessageHeader
+import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Patient
 import spock.lang.Specification
 
@@ -69,10 +71,11 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
         when:
         rule.runRule(new HapiFhirResource(bundle))
+        def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
-        transformMethodAppliesExpectedChanges(ruleName, bundle)
+        messageHeader.meta.tag.last().code == "ETOR"
     }
 
     def "test rule transformation accuracy: convertToOmlOrder"() {
@@ -89,10 +92,11 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
         when:
         rule.runRule(new HapiFhirResource(bundle))
+        def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
-        transformMethodAppliesExpectedChanges(ruleName, bundle)
+        messageHeader.event.code == "O21"
     }
 
     def "test rule transformation accuracy: addContactSectionToPatientResource"() {
@@ -110,56 +114,61 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
         when:
         rule.runRule(new HapiFhirResource(bundle))
+        def patient = FhirBundleHelper.resourceInBundle(bundle, Patient)
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
-        transformMethodAppliesExpectedChanges(ruleName, bundle)
+        patient.contact.size() > 0
     }
 
-    //    todo: ignoring while figuring out how to filter the demographics example
-    //    def "test rule transformation accuracy: convertDemographicsToOrder"() {
-    //        given:
-    //        def ruleName = "convertDemographicsToOrder"
-    //        def testFile = "e2e/demographics/001_Patient_NBS.fhir"
-    //
-    //        def fhirResource = ExamplesHelper.getExampleFhirResource(testFile)
-    //        def bundle = (Bundle) fhirResource.getUnderlyingResource()
-    //        def untouchedBundle = bundle.copy()
-    //
-    //        engine.ensureRulesLoaded()
-    //        def rule = engine.getRuleByName(ruleName)
-    //
-    //        when:
-    //        rule.runRule(fhirResource)
-    //        def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
-    //        def serviceRequest = FhirBundleHelper.resourceInBundle(bundle, ServiceRequest)
-    //        def provenance = FhirBundleHelper.resourceInBundle(bundle, Provenance)
-    //
-    //        then:
-    //        0 * mockLogger.logError(_ as String, _ as Exception)
-    //        !bundle.equalsDeep(untouchedBundle)
-    //        messageHeader != null
-    //        serviceRequest != null
-    //        provenance != null
-    //    }
+    def "test rule transformation accuracy: addSendingFacilityToMessageHeader"() {
+        given:
+        def ruleName = "addSendingFacilityToMessageHeader"
+        // we could also use this file for testing the rule: e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir
+        def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: "OML_O21")
+        //        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(new Patient()))
 
-    boolean transformMethodAppliesExpectedChanges(String method, Bundle bundle) {
-        def expected = false
-        switch (method) {
-            case "addEtorProcessingTag":
-                def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
-                expected = messageHeader.meta.tag.last().code == "ETOR"
-                return expected
-            case "convertToOmlOrder":
-                def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
-                expected = messageHeader.event.code == "O21"
-                return expected
-            case "addContactSectionToPatientResource":
-                def patient = FhirBundleHelper.resourceInBundle(bundle, Patient.class)
-                expected = patient.contact.size() > 0
-                return expected
-            default:
-                return false
+        engine.ensureRulesLoaded()
+        def rule = engine.getRuleByName(ruleName)
+
+        expect:
+        FhirBundleHelper.resourceInBundle(bundle, Organization).isEmpty()
+        //        org.name == "testName"
+
+        when:
+        rule.runRule(new HapiFhirResource(bundle))
+        def org = FhirBundleHelper.resourceInBundle(bundle, Organization)
+
+        then:
+        0 * mockLogger.logError(_ as String, _ as Exception)
+        org.name == "testName"
+    }
+
+    def "consecutively applied transformations don't interfere with each other: 003_2_ORM_O01_short_linked_to_002_ORU_R01_short"() {
+        given:
+        def testFile = "e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir"
+        def transformationsToApply = [
+            "convertToOmlOrder",
+            "addContactSectionToPatientResource"
+        ]
+        def fhirResource = ExamplesHelper.getExampleFhirResource(testFile)
+        def bundle = (Bundle) fhirResource.getUnderlyingResource()
+
+        expect:
+        FhirBundleHelper.resourceInBundle(bundle, MessageHeader).event.code == "O01"
+        FhirBundleHelper.resourceInBundle(bundle, Patient).contact.isEmpty()
+
+        when:
+        engine.ensureRulesLoaded()
+        transformationsToApply.each { ruleName ->
+            engine.getRuleByName(ruleName).runRule(fhirResource)
         }
+        def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
+        def patient = FhirBundleHelper.resourceInBundle(bundle, Patient)
+
+        then:
+        0 * mockLogger.logError(_ as String, _ as Exception)
+        messageHeader.event.code == "O21"
+        patient.contact.size() > 0
     }
 }
