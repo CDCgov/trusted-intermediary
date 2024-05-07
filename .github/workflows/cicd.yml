@@ -29,6 +29,7 @@ jobs:
       VPN_CA_CERTIFICATE: ${{ secrets.VPN_CA_CERTIFICATE }}
       VPN_GITHUB_CERTIFICATE: ${{ secrets.VPN_GITHUB_CERTIFICATE}}
       VPN_GITHUB_SECRET_KEY: ${{ secrets.VPN_GITHUB_SECRET_KEY }}
+      TERRAFORM_APPLY_PARAMETERS: -var="alert_slack_webhook=${{ secrets.ALERT_SLACK_WEBHOOK }}"
 
   staging-deploy:
     name: Staging Application Deploy

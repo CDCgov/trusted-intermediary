@@ -36,11 +36,11 @@ jobs:
       ENVIRONMENT: pr
       TERRAFORM_DIRECTORY: operations/environments/pr
       TERRAFORM_INIT_PARAMETERS: -backend-config="key=pr_${{ github.event.number }}.tfstate"
-      TERRAFORM_APPLY_PARAMETERS: -var="pr_number=${{ github.event.number }}"
     secrets:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      TERRAFORM_APPLY_PARAMETERS: -var="pr_number=${{ github.event.number }}" -var="alert_slack_webhook=${{ secrets.ALERT_SLACK_WEBHOOK }}"
 
 
   terraform-deploy-skip:  # runs when the PR doesn't have any changes that require the PR deploy; this ensures we get the appropriate required PR checks

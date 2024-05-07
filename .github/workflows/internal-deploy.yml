@@ -18,6 +18,7 @@ jobs:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      TERRAFORM_APPLY_PARAMETERS: -var="alert_slack_webhook=${{ secrets.ALERT_SLACK_WEBHOOK }}"
 
   internal-deploy:
     name: Internal Application Deploy
