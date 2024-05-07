@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation
 
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException
 import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
 import gov.hhs.cdc.trustedintermediary.FhirResourceMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
@@ -87,7 +86,7 @@ class TransformationRuleTest extends Specification {
         thrown(RuntimeException)
     }
 
-    def "runRule() throws RuleExecutionException when given a class without transform"() {
+    def "runRule() throws RuntimeException when given a class without transform"() {
         given:
         def ruleName = "Rule name"
         def ruleDescription = "Rule Description"
@@ -105,10 +104,10 @@ class TransformationRuleTest extends Specification {
         rule.runRule(fhirResource)
 
         then:
-        thrown(RuleExecutionException)
+        thrown(RuntimeException)
     }
 
-    def "runRule() throws RuleExecutionException when given abstract class input"() {
+    def "runRule() throws RuntimeException when given abstract class input"() {
         given:
         def ruleName = "Rule name"
         def ruleDescription = "Rule Description"
@@ -126,10 +125,10 @@ class TransformationRuleTest extends Specification {
         rule.runRule(fhirResource)
 
         then:
-        thrown(RuleExecutionException)
+        thrown(RuntimeException)
     }
 
-    def "runRule() throws RuleExecutionException when given a private constructor class input"() {
+    def "runRule() throws RuntimeException when given a private constructor class input"() {
         given:
         def ruleName = "Rule name"
         def ruleDescription = "Rule Description"
@@ -147,6 +146,6 @@ class TransformationRuleTest extends Specification {
         rule.runRule(fhirResource)
 
         then:
-        thrown(RuleExecutionException)
+        thrown(RuntimeException)
     }
 }
