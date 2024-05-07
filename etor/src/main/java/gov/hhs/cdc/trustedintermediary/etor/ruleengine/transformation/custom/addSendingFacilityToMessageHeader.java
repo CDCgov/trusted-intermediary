@@ -18,7 +18,7 @@ public class addSendingFacilityToMessageHeader implements CustomFhirTransformati
     public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
         HapiOrderConverter.addSendingFacilityToMessageHeader(
-                bundle, "CDPH"); // @todo use args to pass org name
+                bundle, args.get("name")); // @todo use args to pass org name
         metadata.put(bundle.getId(), EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT);
     }
 }
