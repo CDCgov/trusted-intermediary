@@ -5,8 +5,8 @@ import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.TransformationRuleEngine;
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.TransformationRuleException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import javax.inject.Inject;
 
@@ -46,7 +46,7 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
 
         try {
             transformationEngine.runRules(result);
-        } catch (TransformationRuleException e) {
+        } catch (RuleExecutionException e) {
             throw new UnableToSendMessageException("Error running transformation rules", e);
         }
 

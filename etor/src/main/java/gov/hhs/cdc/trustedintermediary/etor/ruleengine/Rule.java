@@ -79,7 +79,7 @@ public class Rule<T> {
                         });
     }
 
-    public void runRule(FhirResource<?> resource) {
+    public void runRule(FhirResource<?> resource) throws RuleExecutionException {
         throw new UnsupportedOperationException("This method must be implemented by subclasses.");
     }
 }
