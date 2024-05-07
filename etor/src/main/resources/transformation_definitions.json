@@ -38,20 +38,6 @@
           "args": { }
         }
       ]
-    },
-    {
-      "name": "addSendingFacilityToMessageHeader",
-      "description": "Add standard sending facility information",
-      "message": "",
-      "conditions": [ ],
-      "rules": [
-        {
-          "name": "addSendingFacilityToMessageHeader",
-          "args": {
-            "name": "CDPH"
-          }
-        }
-      ]
     }
   ]
 }

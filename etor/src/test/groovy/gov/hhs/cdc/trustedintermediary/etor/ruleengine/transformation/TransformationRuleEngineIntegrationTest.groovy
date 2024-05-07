@@ -18,7 +18,8 @@ import org.hl7.fhir.r4.model.Patient
 import spock.lang.Specification
 
 class TransformationRuleEngineIntegrationTest extends Specification {
-    def engine = TransformationRuleEngine.getInstance("transformation_definitions.json")
+
+    def engine = TransformationRuleEngine.getInstance('transformation_definitions.json')
     def fhir = HapiFhirImplementation.getInstance()
     def mockLogger = Mock(Logger)
 
@@ -60,7 +61,7 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
     def "test rule transformation accuracy: addEtorProcessingTag"() {
         given:
-        def ruleName = "addEtorProcessingTag"
+        def ruleName = 'addEtorProcessingTag'
         // we could also use this file for testing the rule: e2e/orders/001_OML_O21_short.fhir
         def bundle = new Bundle()
         engine.ensureRulesLoaded()
@@ -75,20 +76,20 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
-        messageHeader.meta.tag.last().code == "ETOR"
+        messageHeader.meta.tag.last().code == 'ETOR'
     }
 
     def "test rule transformation accuracy: convertToOmlOrder"() {
         given:
-        def ruleName = "convertToOmlOrder"
+        def ruleName = 'convertToOmlOrder'
         // we could also use this file for testing the rule: e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir
-        def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: "ORM_O01")
+        def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: 'ORM_O01')
 
         engine.ensureRulesLoaded()
         def rule = engine.getRuleByName(ruleName)
 
         expect:
-        FhirBundleHelper.resourceInBundle(bundle, MessageHeader).event.code == "O01"
+        FhirBundleHelper.resourceInBundle(bundle, MessageHeader).event.code == 'O01'
 
         when:
         rule.runRule(new HapiFhirResource(bundle))
@@ -96,14 +97,14 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
-        messageHeader.event.code == "O21"
+        messageHeader.event.code == 'O21'
     }
 
     def "test rule transformation accuracy: addContactSectionToPatientResource"() {
         given:
-        def ruleName = "addContactSectionToPatientResource"
+        def ruleName = 'addContactSectionToPatientResource'
         // we could also use this file for testing the rule: e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir
-        def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: "OML_O21")
+        def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: 'OML_O21')
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(new Patient()))
 
         engine.ensureRulesLoaded()
@@ -121,41 +122,18 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         patient.contact.size() > 0
     }
 
-    def "test rule transformation accuracy: addSendingFacilityToMessageHeader"() {
-        given:
-        def ruleName = "addSendingFacilityToMessageHeader"
-        // we could also use this file for testing the rule: e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir
-        def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: "OML_O21")
-        //        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(new Patient()))
-
-        engine.ensureRulesLoaded()
-        def rule = engine.getRuleByName(ruleName)
-
-        expect:
-        FhirBundleHelper.resourceInBundle(bundle, Organization).isEmpty()
-        //        org.name == "testName"
-
-        when:
-        rule.runRule(new HapiFhirResource(bundle))
-        def org = FhirBundleHelper.resourceInBundle(bundle, Organization)
-
-        then:
-        0 * mockLogger.logError(_ as String, _ as Exception)
-        org.name == "testName"
-    }
-
     def "consecutively applied transformations don't interfere with each other: 003_2_ORM_O01_short_linked_to_002_ORU_R01_short"() {
         given:
-        def testFile = "e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir"
+        def testFile = 'e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir'
         def transformationsToApply = [
-            "convertToOmlOrder",
-            "addContactSectionToPatientResource"
+            'convertToOmlOrder',
+            'addContactSectionToPatientResource'
         ]
         def fhirResource = ExamplesHelper.getExampleFhirResource(testFile)
         def bundle = (Bundle) fhirResource.getUnderlyingResource()
 
         expect:
-        FhirBundleHelper.resourceInBundle(bundle, MessageHeader).event.code == "O01"
+        FhirBundleHelper.resourceInBundle(bundle, MessageHeader).event.code == 'O01'
         FhirBundleHelper.resourceInBundle(bundle, Patient).contact.isEmpty()
 
         when:
@@ -168,7 +146,7 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
-        messageHeader.event.code == "O21"
+        messageHeader.event.code == 'O21'
         patient.contact.size() > 0
     }
 }
