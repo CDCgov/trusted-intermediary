@@ -5,7 +5,6 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Reference
-import org.hl7.fhir.r4.model.Resource
 
 class FhirBundleHelper {
 

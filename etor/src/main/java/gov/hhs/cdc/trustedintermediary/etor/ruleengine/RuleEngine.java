@@ -10,6 +10,4 @@ public interface RuleEngine {
     void ensureRulesLoaded() throws RuleLoaderException;
 
     void runRules(FhirResource<?> resource);
-
-    Rule<?> getRuleByName(String ruleName);
 }
