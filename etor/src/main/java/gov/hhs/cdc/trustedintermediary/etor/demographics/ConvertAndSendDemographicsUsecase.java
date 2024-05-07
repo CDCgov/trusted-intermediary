@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.demographics;
 
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.TransformationRuleEngine;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrder;
 import javax.inject.Inject;
@@ -27,7 +28,11 @@ public class ConvertAndSendDemographicsUsecase {
     private ConvertAndSendDemographicsUsecase() {}
 
     public void convertAndSend(Demographics<?> demographics) throws UnableToSendMessageException {
-        transformationEngine.runRules(demographics);
+        try {
+            transformationEngine.runRules(demographics);
+        } catch (RuleExecutionException e) {
+            throw new UnableToSendMessageException("Error running transformation rules", e);
+        }
         var order = new HapiOrder((Bundle) demographics.getUnderlyingResource());
         sender.send(order);
     }

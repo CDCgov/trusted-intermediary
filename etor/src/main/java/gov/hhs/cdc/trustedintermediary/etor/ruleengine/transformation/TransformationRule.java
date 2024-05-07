@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation;
 
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.Rule;
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class TransformationRule extends Rule<TransformationRuleMethod> {
 
-    private static final Map<String, Class<?>> classCache = new ConcurrentHashMap<>();
+    //    private static final Map<String, Class<?>> classCache = new ConcurrentHashMap<>();
+    private static final Map<String, CustomFhirTransformation> transformationInstanceCache =
+            new ConcurrentHashMap<>();
 
     /**
      * Do not delete this constructor! It is used for JSON deserialization when loading rules from a
@@ -34,37 +37,41 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
     }
 
     @Override
-    public void runRule(FhirResource<?> resource) {
-        this.getRules().forEach((transformation -> applyTransformation(transformation, resource)));
+    public void runRule(FhirResource<?> resource) throws RuleExecutionException {
+        for (TransformationRuleMethod transformation : this.getRules()) {
+            applyTransformation(transformation, resource);
+        }
     }
 
     private void applyTransformation(
-            TransformationRuleMethod transformation, FhirResource<?> resource) {
+            TransformationRuleMethod transformation, FhirResource<?> resource)
+            throws RuleExecutionException {
         String name = transformation.name();
         Map<String, String> args = transformation.args();
         logger.logInfo("Applying transformation: ", name);
 
+        CustomFhirTransformation transformationInstance = getTransformationInstance(name);
+        transformationInstance.transform(resource, args);
+    }
+
+    static CustomFhirTransformation getTransformationInstance(String name) throws RuntimeException {
+        return transformationInstanceCache.computeIfAbsent(
+                name, TransformationRule::createTransformationInstance);
+    }
+
+    private static CustomFhirTransformation createTransformationInstance(
+            String transformationName) {
+        String fullClassName = getFullClassName(transformationName);
         try {
-            Class<?> clazz = loadClassFromCache(name);
-            executeCustomTransformationMethod(clazz, resource, args);
-        } catch (NoSuchMethodException
+            Class<?> clazz = Class.forName(fullClassName);
+            return (CustomFhirTransformation) clazz.getDeclaredConstructor().newInstance();
+        } catch (ClassNotFoundException
+                | InstantiationException
                 | IllegalAccessException
-                | InvocationTargetException
-                | InstantiationException e) {
-            logger.logError("Error invoking method: " + name + ", due to: " + e.getMessage(), e);
-        }
-    }
-
-    static Class<?> loadClassFromCache(String className) throws RuntimeException {
-        return classCache.computeIfAbsent(className, TransformationRule::loadClassByName);
-    }
-
-    private static Class<?> loadClassByName(String className) {
-        String fullClassName = getFullClassName(className);
-        try {
-            return Class.forName(fullClassName);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+                | NoSuchMethodException
+                | InvocationTargetException e) {
+            throw new RuntimeException(
+                    "Error creating transformation instance for: " + transformationName, e);
         }
     }
 
@@ -72,14 +79,5 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
         String packageName =
                 "gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom";
         return packageName + "." + className;
-    }
-
-    static void executeCustomTransformationMethod(
-            Class<?> clazz, FhirResource<?> resource, Map<String, String> args)
-            throws NoSuchMethodException, InvocationTargetException, InstantiationException,
-                    IllegalAccessException {
-        CustomFhirTransformation transformation =
-                (CustomFhirTransformation) clazz.getDeclaredConstructor().newInstance();
-        transformation.transform(resource, args);
     }
 }

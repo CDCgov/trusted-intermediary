@@ -66,12 +66,4 @@ public class ValidationRuleEngine implements RuleEngine {
             }
         }
     }
-
-    @Override
-    public ValidationRule getRuleByName(String ruleName) {
-        return rules.stream()
-                .filter(rule -> rule.getName().equals(ruleName))
-                .findFirst()
-                .orElse(null);
-    }
 }

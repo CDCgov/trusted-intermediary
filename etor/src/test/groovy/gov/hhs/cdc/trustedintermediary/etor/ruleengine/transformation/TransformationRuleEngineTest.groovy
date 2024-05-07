@@ -134,19 +134,4 @@ class TransformationRuleEngineTest extends Specification {
         then:
         1 * mockLogger.logError(_ as String, exception)
     }
-
-    def "getRuleByName returns the rule with the given name"() {
-        given:
-        def ruleName = "Rule name"
-        def testRule = Mock(TransformationRule)
-        testRule.getName() >> ruleName
-        mockRuleLoader.loadRules(_ as InputStream, _ as TypeReference) >> [testRule]
-
-        when:
-        ruleEngine.ensureRulesLoaded()
-        def rule = ruleEngine.getRuleByName(ruleName)
-
-        then:
-        rule == testRule
-    }
 }

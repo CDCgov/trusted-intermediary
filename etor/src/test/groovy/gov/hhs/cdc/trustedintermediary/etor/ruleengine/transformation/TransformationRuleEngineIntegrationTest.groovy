@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation
 
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleEngineHelper
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
@@ -13,7 +14,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.MessageHeader
-import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Patient
 import spock.lang.Specification
 
@@ -35,6 +35,8 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
 
         TestApplicationContext.injectRegisteredImplementations()
+
+        engine.ensureRulesLoaded()
     }
 
     def "transformation rules run without error"() {
@@ -55,7 +57,7 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
         then:
         transformationMethodNames.each { transformationMethodName ->
-            assert TransformationRule.loadClassFromCache(transformationMethodName) != null
+            assert TransformationRule.getTransformationInstance(transformationMethodName) != null
         }
     }
 
@@ -64,8 +66,7 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         def ruleName = 'addEtorProcessingTag'
         // we could also use this file for testing the rule: e2e/orders/001_OML_O21_short.fhir
         def bundle = new Bundle()
-        engine.ensureRulesLoaded()
-        def rule = engine.getRuleByName(ruleName)
+        def rule = RuleEngineHelper.getRuleByName(engine.rules, ruleName)
 
         expect:
         FhirBundleHelper.resourceInBundle(bundle, MessageHeader) == null
@@ -84,9 +85,7 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         def ruleName = 'convertToOmlOrder'
         // we could also use this file for testing the rule: e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir
         def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: 'ORM_O01')
-
-        engine.ensureRulesLoaded()
-        def rule = engine.getRuleByName(ruleName)
+        def rule = RuleEngineHelper.getRuleByName(engine.rules, ruleName)
 
         expect:
         FhirBundleHelper.resourceInBundle(bundle, MessageHeader).event.code == 'O01'
@@ -106,9 +105,7 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         // we could also use this file for testing the rule: e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir
         def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: 'OML_O21')
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(new Patient()))
-
-        engine.ensureRulesLoaded()
-        def rule = engine.getRuleByName(ruleName)
+        def rule = RuleEngineHelper.getRuleByName(engine.rules, ruleName)
 
         expect:
         FhirBundleHelper.resourceInBundle(bundle, Patient).contact.isEmpty()
@@ -160,9 +157,9 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         FhirBundleHelper.resourceInBundle(bundle, Patient).contact.isEmpty()
 
         when:
-        engine.ensureRulesLoaded()
         transformationsToApply.each { ruleName ->
-            engine.getRuleByName(ruleName).runRule(fhirResource)
+            def rule = RuleEngineHelper.getRuleByName(engine.rules, ruleName)
+            rule.runRule(fhirResource)
         }
         def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
         def patient = FhirBundleHelper.resourceInBundle(bundle, Patient)

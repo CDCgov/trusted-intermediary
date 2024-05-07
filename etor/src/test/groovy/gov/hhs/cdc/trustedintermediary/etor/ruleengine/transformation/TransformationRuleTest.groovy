@@ -86,7 +86,7 @@ class TransformationRuleTest extends Specification {
         thrown(RuntimeException)
     }
 
-    def "runRule() throws NoSuchMethodException when given a class without transform"() {
+    def "runRule() throws RuntimeException when given a class without transform"() {
         given:
         def ruleName = "Rule name"
         def ruleDescription = "Rule Description"
@@ -104,10 +104,10 @@ class TransformationRuleTest extends Specification {
         rule.runRule(fhirResource)
 
         then:
-        1 * mockLogger.logError(_, _)
+        thrown(RuntimeException)
     }
 
-    def "runRule() throws InstantiationException when given abstract class input"() {
+    def "runRule() throws RuntimeException when given abstract class input"() {
         given:
         def ruleName = "Rule name"
         def ruleDescription = "Rule Description"
@@ -125,10 +125,10 @@ class TransformationRuleTest extends Specification {
         rule.runRule(fhirResource)
 
         then:
-        1 * mockLogger.logError(_, _)
+        thrown(RuntimeException)
     }
 
-    def "runRule() throws IllegalAccessException when given a private constructor class input"() {
+    def "runRule() throws RuntimeException when given a private constructor class input"() {
         given:
         def ruleName = "Rule name"
         def ruleDescription = "Rule Description"
@@ -146,6 +146,6 @@ class TransformationRuleTest extends Specification {
         rule.runRule(fhirResource)
 
         then:
-        1 * mockLogger.logError(_, _)
+        thrown(RuntimeException)
     }
 }

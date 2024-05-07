@@ -9,6 +9,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
 
+/** Custom transformation to add a contact section to a patient resource. */
 public class addContactSectionToPatientResource implements CustomFhirTransformation {
 
     private final MetricMetadata metadata =
