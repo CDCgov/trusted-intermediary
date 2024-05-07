@@ -2,7 +2,6 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation;
 
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleEngine;
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleException;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoaderException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -54,7 +53,7 @@ public class TransformationRuleEngine implements RuleEngine {
     }
 
     @Override
-    public void runRules(FhirResource<?> resource) throws RuleException {
+    public void runRules(FhirResource<?> resource) throws TransformationRuleException {
         try {
             ensureRulesLoaded();
         } catch (RuleLoaderException e) {

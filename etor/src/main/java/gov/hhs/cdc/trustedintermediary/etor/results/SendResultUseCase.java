@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageExceptio
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.TransformationRuleEngine;
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.TransformationRuleException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import javax.inject.Inject;
 
@@ -43,7 +44,11 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
 
         sendMessageHelper.savePartnerMetadataForReceivedMessage(partnerMetadata);
 
-        transformationEngine.runRules(result);
+        try {
+            transformationEngine.runRules(result);
+        } catch (TransformationRuleException e) {
+            throw new UnableToSendMessageException("Error running transformation rules", e);
+        }
 
         String outboundReportId = sender.send(result).orElse(null);
         logger.logInfo("Sent result reportId: {}", outboundReportId);
