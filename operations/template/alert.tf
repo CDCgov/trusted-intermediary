@@ -22,6 +22,8 @@ resource "azurerm_monitor_metric_alert" "alert" {
   resource_group_name = data.azurerm_resource_group.group.name
   scopes              = [azurerm_postgresql_flexible_server.database.id]
   description         = "Action will be triggered when database connection failure count is 1 or more each minute for the passed minute"
+  frequency        = "PT1M"
+  window_size      = "PT1M"
 
   criteria {
     metric_namespace = "Microsoft.cdcti-${var.environment}-database/flexibleServers"
@@ -29,8 +31,6 @@ resource "azurerm_monitor_metric_alert" "alert" {
     aggregation      = "Total"
     operator         = "GreaterThan"
     threshold        = 0
-    frequency        = "PT1M"
-    window_size      = "PT1M"
   }
 
   action {
