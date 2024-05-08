@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.etor
 
-import gov.hhs.cdc.trustedintermediary.DemographicsMock
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.ResultMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
@@ -9,13 +8,8 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
 import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecificationException
-import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemographicsUsecase
-import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics
-import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController
-import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageRequestHandler
-import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataConverter
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
@@ -49,7 +43,6 @@ class EtorDomainRegistrationTest extends Specification {
     def "domain registration has endpoints"() {
         given:
         def domainRegistration = new EtorDomainRegistration()
-        def demographicsEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.DEMOGRAPHICS_API_ENDPOINT, true)
         def ordersEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.ORDERS_API_ENDPOINT, true)
         def metadataEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.METADATA_API_ENDPOINT, true)
         def consolidatedOrdersEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.CONSOLIDATED_SUMMARY_API_ENDPOINT, true)
@@ -59,7 +52,6 @@ class EtorDomainRegistrationTest extends Specification {
 
         then:
         !endpoints.isEmpty()
-        endpoints.get(demographicsEndpoint) != null
         endpoints.get(ordersEndpoint) != null
         endpoints.get(metadataEndpoint) != null
         endpoints.get(consolidatedOrdersEndpoint) != null
@@ -68,7 +60,6 @@ class EtorDomainRegistrationTest extends Specification {
     def "domain registration has endpoints when DB_URL is not found"() {
         given:
         def domainRegistration = new EtorDomainRegistration()
-        def demographicsEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.DEMOGRAPHICS_API_ENDPOINT, true)
         def ordersEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.ORDERS_API_ENDPOINT, true)
         def metadataEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.METADATA_API_ENDPOINT, true)
         def consolidatedOrdersEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.CONSOLIDATED_SUMMARY_API_ENDPOINT, true)
@@ -79,7 +70,6 @@ class EtorDomainRegistrationTest extends Specification {
 
         then:
         !endpoints.isEmpty()
-        endpoints.get(demographicsEndpoint) != null
         endpoints.get(ordersEndpoint) != null
         endpoints.get(metadataEndpoint) != null
         endpoints.get(consolidatedOrdersEndpoint) != null
@@ -120,95 +110,6 @@ class EtorDomainRegistrationTest extends Specification {
 
         then:
         thrown(IOException)
-    }
-
-    def "stitches the demographics parsing to the response construction"() {
-        given:
-        def domainRegistration = new EtorDomainRegistration()
-
-        def mockDemographicsController = Mock(PatientDemographicsController)
-        def mockResponseHelper = Mock(DomainResponseHelper)
-
-        def mockRequestId = "asdf-12341-jkl-7890"
-
-        mockDemographicsController.parseDemographics(_ as DomainRequest) >> new DemographicsMock(mockRequestId, "a patient ID", "demographics")
-        mockResponseHelper.constructOkResponse(_ as PatientDemographicsResponse) >> new DomainResponse(418)
-
-        def mockUseCase = Mock(ConvertAndSendDemographicsUsecase)
-
-        TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
-        TestApplicationContext.register(PatientDemographicsController, mockDemographicsController)
-        TestApplicationContext.register(ConvertAndSendDemographicsUsecase, mockUseCase)
-        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        def domainRequest = new DomainRequest()
-
-        when:
-        domainRegistration.handleDemographics(domainRequest)
-
-        then:
-        1 * mockResponseHelper.constructOkResponse(_ as PatientDemographicsResponse) >> { PatientDemographicsResponse demographicsResponse ->
-            assert demographicsResponse.fhirResourceId == mockRequestId
-        }
-        1 * mockUseCase.convertAndSend(_ as Demographics)
-    }
-
-    def "handleDemographics generates an error response when the usecase throws an exception"() {
-        given:
-        def expectedStatusCode = 400
-
-        def domainRegistration = new EtorDomainRegistration()
-        TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
-
-        def mockController = Mock(PatientDemographicsController)
-        mockController.parseDemographics(_ as DomainRequest) >> new DemographicsMock<?>(null, null, null)
-        TestApplicationContext.register(PatientDemographicsController, mockController)
-
-        def mockUseCase = Mock(ConvertAndSendDemographicsUsecase)
-        mockUseCase.convertAndSend(_ as Demographics<?>) >> {
-            throw new UnableToSendMessageException("error", new NullPointerException())
-        }
-        TestApplicationContext.register(ConvertAndSendDemographicsUsecase, mockUseCase)
-
-        def mockResponseHelper = Mock(DomainResponseHelper)
-        mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as Exception) >> new DomainResponse(expectedStatusCode)
-        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
-
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        def res = domainRegistration.handleDemographics(new DomainRequest())
-        def actualStatusCode = res.statusCode
-
-        then:
-        actualStatusCode == expectedStatusCode
-    }
-
-    def "handlesDemographics throws 400 error when a FhirParseException is triggered"() {
-
-        given:
-        def expectedStatusCode = 400
-        def domainRegistration = new EtorDomainRegistration()
-        TestApplicationContext.register(EtorDomainRegistration, domainRegistration)
-        def mockRequest = new DomainRequest()
-        def message = "Something blew up!"
-        def cause = new IllegalArgumentException()
-        def fhirParseException = new FhirParseException(message, cause)
-        def mockPatientDemographicsController = Mock(PatientDemographicsController)
-        mockPatientDemographicsController.parseDemographics(mockRequest) >> { throw fhirParseException }
-        TestApplicationContext.register(PatientDemographicsController, mockPatientDemographicsController)
-        def mockHelper = Mock(DomainResponseHelper)
-        mockHelper.constructErrorResponse(expectedStatusCode, fhirParseException) >> { new DomainResponse(expectedStatusCode)}
-        TestApplicationContext.register(DomainResponseHelper, mockHelper)
-        TestApplicationContext.injectRegisteredImplementations()
-
-        when:
-        def res = domainRegistration.handleDemographics(mockRequest)
-        def actualStatusCode = res.getStatusCode()
-
-        then:
-        actualStatusCode == expectedStatusCode
     }
 
     def "handleOrders happy path"() {
