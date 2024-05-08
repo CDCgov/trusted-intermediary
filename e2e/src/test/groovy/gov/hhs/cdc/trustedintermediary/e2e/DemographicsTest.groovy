@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.e2e
 
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import java.nio.file.Files
@@ -29,25 +30,26 @@ class DemographicsTest extends Specification {
         parsedJsonBody.patientId == expectedPatientId
     }
 
-    //    todo: ignoring while figuring out how to filter the demographics example
-    //    def "payload file check"() {
-    //        when:
-    //        def response = demographicsClient.submit(newbornPatientJsonFileString, true)
-    //        def parsedResponseBody = JsonParser.parseContent(response)
-    //        def sentPayload = SentPayloadReader.read()
-    //        def parsedSentPayload = JsonParser.parse(sentPayload)
-    //
-    //        then:
-    //        response.getCode() == 200
-    //        parsedSentPayload.entry[0].resource.resourceType == "MessageHeader"
-    //        parsedSentPayload.entry[2].resource.resourceType == "ServiceRequest"
-    //
-    //        parsedSentPayload.entry[1].resource.resourceType == "Patient"
-    //        parsedSentPayload.entry[1].resource.id == "infant-twin-1"
-    //
-    //        parsedSentPayload.entry[1].resource.identifier[1].value == parsedResponseBody.patientId  //the second (index 1) identifier so happens to be the MRN
-    //        parsedSentPayload.resourceType + "/" + parsedSentPayload.id == parsedResponseBody.fhirResourceId
-    //    }
+    // flagging to delete if and when we remove demographics endpoint
+    @Ignore
+    def "payload file check"() {
+        when:
+        def response = demographicsClient.submit(newbornPatientJsonFileString, true)
+        def parsedResponseBody = JsonParser.parseContent(response)
+        def sentPayload = SentPayloadReader.read()
+        def parsedSentPayload = JsonParser.parse(sentPayload)
+
+        then:
+        response.getCode() == 200
+        parsedSentPayload.entry[0].resource.resourceType == "MessageHeader"
+        parsedSentPayload.entry[2].resource.resourceType == "ServiceRequest"
+
+        parsedSentPayload.entry[1].resource.resourceType == "Patient"
+        parsedSentPayload.entry[1].resource.id == "infant-twin-1"
+
+        parsedSentPayload.entry[1].resource.identifier[1].value == parsedResponseBody.patientId  //the second (index 1) identifier so happens to be the MRN
+        parsedSentPayload.resourceType + "/" + parsedSentPayload.id == parsedResponseBody.fhirResourceId
+    }
 
     def "return a 400 response when request has unexpected format"() {
         given:
