@@ -1,9 +1,12 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
+import java.util.Collections;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.Reference;
 
 /** Helper class with transformation methods that take a FHIR Bundle and modifies it */
 public class HapiMessageConverterHelper {
@@ -33,5 +36,28 @@ public class HapiMessageConverterHelper {
             bundle.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader));
         }
         return messageHeader;
+    }
+
+    public static void addSendingFacilityToMessageHeader(Bundle bundle, String name) {
+        var header =
+                HapiHelper.resourcesInBundle(bundle, MessageHeader.class)
+                        .findFirst()
+                        .orElse(new MessageHeader());
+        var org = new Organization().setName(name);
+        header.setSender(new Reference(org));
+    }
+
+    public static void addReceivingFacilityToMessageHeader(Bundle bundle, String name) {
+        var header =
+                HapiHelper.resourcesInBundle(bundle, MessageHeader.class)
+                        .findFirst()
+                        .orElse(new MessageHeader());
+        var org = new Organization();
+        var destination = new MessageHeader.MessageDestinationComponent();
+
+        org.setName(name);
+        destination.setReceiver(new Reference(org));
+        header.setDestination(Collections.singletonList(destination));
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(org));
     }
 }
