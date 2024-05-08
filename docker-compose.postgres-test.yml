@@ -1,0 +1,23 @@
+# Run the following to migrate...
+# liquibase update --changelog-file ./etor/databaseMigrations/root.yml --url jdbc:postgresql://localhost:5433/intermediary --username intermediary --password 'changeIT!' --label-filter '!azure'
+
+# Run the following to rollback...
+# liquibase rollback-count --changelog-file ./etor/databaseMigrations/root.yml --url jdbc:postgresql://localhost:5433/intermediary --username intermediary --password 'changeIT!' --count 2
+
+version: "3.7"
+
+services:
+  postgresql:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: "intermediary-test"
+      POSTGRES_PASSWORD: "changeIT!" # pragma: allowlist secret
+      POSTGRES_USER: "intermediary"
+    ports:
+      - 5433:5432
+    volumes:
+      - ti_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  ti_postgres_data:

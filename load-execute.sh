@@ -5,7 +5,7 @@ start_api() {
     echo 'Starting API'
     export DB_URL=localhost
     export DB_PORT=5433
-    export DB_NAME=intermediary
+    export DB_NAME=intermediary-test
     export DB_USER=intermediary
     export DB_PASS=changeIT!
     export DB_SSL=require
@@ -16,14 +16,14 @@ start_api() {
 
 start_database() {
     echo 'Starting database'
-    docker compose -f docker-compose.postgres.yml up -d
+    docker compose -f docker-compose.postgres-test.yml up -d
     sleep 2
     echo "Database started"
 }
 
 migrate_database() {
     echo 'Migrating database'
-    liquibase update --changelog-file ./etor/databaseMigrations/root.yml --url jdbc:postgresql://localhost:5433/intermediary --username intermediary --password 'changeIT!' --label-filter '!azure'
+    liquibase update --changelog-file ./etor/databaseMigrations/root.yml --url jdbc:postgresql://localhost:5433/intermediary-test --username intermediary --password 'changeIT!' --label-filter '!azure'
     echo "Database migrated"
 }
 
