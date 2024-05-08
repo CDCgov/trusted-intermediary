@@ -3,10 +3,9 @@ resource "azurerm_monitor_action_group" "monitor" {
   resource_group_name = data.azurerm_resource_group.group.name
   short_name          = "cdcti-alerts"
 
-  webhook_receiver {
-    name        = "cdcti-flexion-slack-webhook-receiver"
-    service_uri = var.alert_slack_webhook
-    use_common_alert_schema = false
+  email_receiver {
+    name          = "cdcti-flexion-slack-email-receiver"
+    email_address = var.alert_slack_webhook
   }
 }
 
@@ -28,6 +27,5 @@ resource "azurerm_monitor_metric_alert" "alert" {
 
   action {
     action_group_id = azurerm_monitor_action_group.monitor.id
-    custom_webhook_payload = "{ \"text\" : \"Warning: ${azurerm_postgresql_flexible_server.database.id} connection has failed once in the last minute!\"}"
   }
 }
