@@ -144,8 +144,8 @@ class FilePartnerMetadataStorageTest extends Specification {
         def metadataSetWithMatchingSendingFacilityDetails = FilePartnerMetadataStorage.getInstance().readMetadataForMessageLinking(receivedSubmissionId1)
 
         then:
-        metadataSetWithMatchingSendingFacilityDetails.contains(otherMatchingSendingFacilityDetailsMetadata1)
-        !metadataSetWithMatchingSendingFacilityDetails.contains(matchingSendingFacilityDetailsMetadata1)
+        metadataSetWithMatchingSendingFacilityDetails.contains(otherMatchingSendingFacilityDetailsMetadata1.receivedSubmissionId())
+        !metadataSetWithMatchingSendingFacilityDetails.contains(matchingSendingFacilityDetailsMetadata1.receivedSubmissionId())
 
         when:
         def receivedSubmissionId2 = "receivedSubmissionId2"
@@ -158,8 +158,8 @@ class FilePartnerMetadataStorageTest extends Specification {
         def metadataSetWithMatchingSendingAndReceivingFacilityDetails = FilePartnerMetadataStorage.getInstance().readMetadataForMessageLinking(receivedSubmissionId2)
 
         then:
-        metadataSetWithMatchingSendingAndReceivingFacilityDetails.contains(matchingReceivingFacilityDetailsMetadata2)
-        !metadataSetWithMatchingSendingAndReceivingFacilityDetails.contains(matchingSendingFacilityDetailsMetadata2)
+        metadataSetWithMatchingSendingAndReceivingFacilityDetails.contains(matchingReceivingFacilityDetailsMetadata2.receivedSubmissionId())
+        !metadataSetWithMatchingSendingAndReceivingFacilityDetails.contains(matchingSendingFacilityDetailsMetadata2.receivedSubmissionId())
     }
 
     def "readMetadataForMessageLinking returns an empty set when no metadata is found"() {
