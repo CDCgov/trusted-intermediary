@@ -15,7 +15,7 @@ import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Patient
 import spock.lang.Specification
 
-class HapiOrderConverterTest extends Specification {
+class HapiOrderConverterHelperTest extends Specification {
 
     Patient mockPatient
     Bundle mockOrderBundle
@@ -24,7 +24,6 @@ class HapiOrderConverterTest extends Specification {
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
-        TestApplicationContext.register(HapiMessageConverterHelper, HapiMessageConverterHelper.getInstance())
         TestApplicationContext.register(HapiMessageHelper, HapiMessageHelper.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
@@ -43,7 +42,7 @@ class HapiOrderConverterTest extends Specification {
                 "ORM"))))
 
         when:
-        HapiOrderConverter.convertToOmlOrder(mockOrder.getUnderlyingResource())
+        HapiOrderConverterHelper.convertToOmlOrder(mockOrder.getUnderlyingResource())
 
         then:
         def convertedMessageHeader =
@@ -56,7 +55,7 @@ class HapiOrderConverterTest extends Specification {
 
     def "adds the message header to specify OML"() {
         when:
-        HapiOrderConverter.convertToOmlOrder(mockOrder.getUnderlyingResource())
+        HapiOrderConverterHelper.convertToOmlOrder(mockOrder.getUnderlyingResource())
 
         then:
         def convertedMessageHeader =
@@ -81,7 +80,7 @@ class HapiOrderConverterTest extends Specification {
         mockOrderBundle.setEntry(entryList)
 
         when:
-        HapiOrderConverter.addContactSectionToPatientResource(mockOrder.getUnderlyingResource())
+        HapiOrderConverterHelper.addContactSectionToPatientResource(mockOrder.getUnderlyingResource())
 
         then:
         def convertedPatient = HapiHelper.resourcesInBundle(mockOrder.getUnderlyingResource(), Patient.class).findFirst().orElse(null)
@@ -125,7 +124,7 @@ class HapiOrderConverterTest extends Specification {
         mockOrderBundle.setEntry(entryList)
 
         when:
-        HapiOrderConverter.addContactSectionToPatientResource(mockOrderBundle)
+        HapiOrderConverterHelper.addContactSectionToPatientResource(mockOrderBundle)
 
         then:
         def convertedPatient = HapiHelper.resourcesInBundle(mockOrderBundle, Patient.class).findFirst().orElse(null)

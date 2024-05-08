@@ -1,26 +1,12 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
-import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
 
-/**
- * Helper class with a variety of utilities to use on a FHIR bundle message. It adds the 'ETOR' tag
- * to a FHIR bundle of type: OML, ORU It also creates the messageHeader resource in a FHIR bundle
- * message.
- */
+/** Helper class with transformation methods that take a FHIR Bundle and modifies it */
 public class HapiMessageConverterHelper {
-
-    private static final HapiMessageConverterHelper INSTANCE = new HapiMessageConverterHelper();
-
-    public static HapiMessageConverterHelper getInstance() {
-        return INSTANCE;
-    }
-
-    @Inject Logger logger;
 
     private HapiMessageConverterHelper() {}
 

@@ -3,14 +3,10 @@ package gov.hhs.cdc.trustedintermediary.external.hapi;
 import java.util.List;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Patient;
 
-/**
- * Converts an order to identify as an HL7v2 OML in the {@link MessageHeader}. Also helps in moving
- * around data in the order.
- */
-public class HapiOrderConverter {
+/** Helper class with transformation methods that take an order Bundle and modifies it */
+public class HapiOrderConverterHelper {
 
     private static final Coding OML_CODING =
             new Coding(
