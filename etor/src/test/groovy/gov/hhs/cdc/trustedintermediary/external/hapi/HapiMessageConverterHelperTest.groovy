@@ -2,7 +2,11 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import org.hl7.fhir.r4.model.*
+import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.MessageHeader
+import org.hl7.fhir.r4.model.Meta
+import org.hl7.fhir.r4.model.Patient
 import spock.lang.Specification
 
 class HapiMessageConverterHelperTest extends Specification {
@@ -17,7 +21,6 @@ class HapiMessageConverterHelperTest extends Specification {
         mockBundle = null
         TestApplicationContext.reset()
         TestApplicationContext.init()
-        TestApplicationContext.register(HapiMessageConverterHelper, HapiMessageConverterHelper.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         mockPatient = new Patient()
@@ -32,7 +35,7 @@ class HapiMessageConverterHelperTest extends Specification {
         mockBundle.getEntry().add(messageHeaderEntry)
 
         when:
-        HapiMessageConverterHelper.getInstance().addEtorTagToBundle(mockBundle) as Bundle
+        HapiMessageConverterHelper.addEtorTagToBundle(mockBundle)
 
         then:
         def messageHeaders = mockBundle.getEntry().get(1).getResource() as MessageHeader
@@ -45,7 +48,7 @@ class HapiMessageConverterHelperTest extends Specification {
 
     def "addEtorTag adds the ETOR message header tag to any Bundle when message header is missing"() {
         when:
-        HapiMessageConverterHelper.getInstance().addEtorTagToBundle(mockBundle) as Bundle
+        HapiMessageConverterHelper.addEtorTagToBundle(mockBundle)
 
         then:
         def messageHeaders = mockBundle.getEntry().get(1).getResource() as MessageHeader
@@ -71,7 +74,7 @@ class HapiMessageConverterHelperTest extends Specification {
         mockBundle.getEntry().add(messageHeaderEntry)
 
         when:
-        HapiMessageConverterHelper.getInstance().addEtorTagToBundle(mockBundle) as Bundle
+        HapiMessageConverterHelper.addEtorTagToBundle(mockBundle)
 
         then:
         def messageHeaders = mockBundle.getEntry().get(1).getResource() as MessageHeader
@@ -97,12 +100,10 @@ class HapiMessageConverterHelperTest extends Specification {
         def messageHeaderEntry = new Bundle.BundleEntryComponent().setResource(messageHeader)
         mockBundle.getEntry().add(messageHeaderEntry)
 
-        def converter = HapiMessageConverterHelper.getInstance()
-
         when:
-        converter.addEtorTagToBundle(mockBundle)
+        HapiMessageConverterHelper.addEtorTagToBundle(mockBundle)
         messageHeader.getMeta().getTag().findAll {it.system == etorTag.system}.size() == 1
-        converter.addEtorTagToBundle(mockBundle)
+        HapiMessageConverterHelper.addEtorTagToBundle(mockBundle)
 
         then:
         messageHeader.getMeta().getTag().findAll {it.system == etorTag.system}.size() == 1

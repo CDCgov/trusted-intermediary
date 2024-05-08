@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine
 
-import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException
 import spock.lang.Specification
 

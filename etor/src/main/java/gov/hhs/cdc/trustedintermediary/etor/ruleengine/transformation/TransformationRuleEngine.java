@@ -7,6 +7,7 @@ import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoaderException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +45,11 @@ public class TransformationRuleEngine implements RuleEngine {
                             getClass()
                                     .getClassLoader()
                                     .getResourceAsStream(ruleDefinitionsFileName);
-                    assert resourceStream != null;
+                    if (resourceStream == null) {
+                        throw new RuleLoaderException(
+                                "File not found: " + ruleDefinitionsFileName,
+                                new FileNotFoundException());
+                    }
                     List<TransformationRule> parsedRules =
                             ruleLoader.loadRules(resourceStream, new TypeReference<>() {});
                     this.rules.addAll(parsedRules);

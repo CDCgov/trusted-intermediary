@@ -18,7 +18,7 @@ We typically isolate libraries by creating an Interface at the library boundary.
 
 Our business logic can then use the wrapper Interface without needing to know the actual underlying implementation, and that implementation can be changed without changing the Interface that the business logic relies on.
 
-You can see an example of this in [Demographics.java](../app/src/main/java/gov/hhs/cdc/trustedintermediary/etor/demographics/Demographics.java) (the interface) and [HapiDemographics.java](../app/src/main/java/gov/hhs/cdc/trustedintermediary/external/hapi/HapiDemographics.java) (the implementation).
+You can see an example of this in [Order.java](../etor/src/main/java/gov/hhs/cdc/trustedintermediary/etor/orders/Order.java) (the interface) and [HapiOrder.java](../etor/src/main/java/gov/hhs/cdc/trustedintermediary/external/hapi/HapiOrder.java) (the implementation).
 
 ### Related Issues
 

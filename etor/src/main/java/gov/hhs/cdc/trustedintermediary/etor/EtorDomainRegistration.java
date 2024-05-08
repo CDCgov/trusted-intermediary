@@ -7,10 +7,6 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper;
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint;
 import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecificationException;
-import gov.hhs.cdc.trustedintermediary.etor.demographics.ConvertAndSendDemographicsUsecase;
-import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
-import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsController;
-import gov.hhs.cdc.trustedintermediary.etor.demographics.PatientDemographicsResponse;
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkStorage;
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageRequestHandler;
 import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageHelper;
@@ -38,7 +34,6 @@ import gov.hhs.cdc.trustedintermediary.external.database.DatabaseMessageLinkStor
 import gov.hhs.cdc.trustedintermediary.external.database.DatabasePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.DbDao;
 import gov.hhs.cdc.trustedintermediary.external.database.PostgresDao;
-import gov.hhs.cdc.trustedintermediary.external.hapi.HapiMessageConverterHelper;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiMessageHelper;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiPartnerMetadataConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.FileMessageLinkStorage;
@@ -62,20 +57,17 @@ import javax.inject.Inject;
 
 /**
  * The domain connector for the ETOR domain. It connects it with the larger trusted intermediary. It
- * houses the request processing logic for the demographics and orders endpoints.
+ * houses the request processing logic for the orders, results, and metadata endpoints.
  */
 public class EtorDomainRegistration implements DomainConnector {
 
-    static final String DEMOGRAPHICS_API_ENDPOINT = "/v1/etor/demographics";
     static final String ORDERS_API_ENDPOINT = "/v1/etor/orders";
     static final String METADATA_API_ENDPOINT = "/v1/etor/metadata/{id}";
     static final String RESULTS_API_ENDPOINT = "/v1/etor/results";
 
     static final String CONSOLIDATED_SUMMARY_API_ENDPOINT = "/v1/etor/metadata/summary/{sender}";
 
-    @Inject PatientDemographicsController patientDemographicsController;
     @Inject OrderController orderController;
-    @Inject ConvertAndSendDemographicsUsecase convertAndSendDemographicsUsecase;
     @Inject SendOrderUseCase sendOrderUseCase;
 
     @Inject ResultController resultController;
@@ -91,8 +83,6 @@ public class EtorDomainRegistration implements DomainConnector {
 
     private final Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> endpoints =
             Map.of(
-                    new HttpEndpoint("POST", DEMOGRAPHICS_API_ENDPOINT, true),
-                            this::handleDemographics,
                     new HttpEndpoint("POST", ORDERS_API_ENDPOINT, true), this::handleOrders,
                     new HttpEndpoint("GET", METADATA_API_ENDPOINT, true), this::handleMetadata,
                     new HttpEndpoint("POST", RESULTS_API_ENDPOINT, true), this::handleResults,
@@ -101,12 +91,6 @@ public class EtorDomainRegistration implements DomainConnector {
 
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
-        // Demographics
-        ApplicationContext.register(
-                PatientDemographicsController.class, PatientDemographicsController.getInstance());
-        ApplicationContext.register(
-                ConvertAndSendDemographicsUsecase.class,
-                ConvertAndSendDemographicsUsecase.getInstance());
         // Orders
         ApplicationContext.register(OrderController.class, OrderController.getInstance());
         ApplicationContext.register(SendOrderUseCase.class, SendOrderUseCase.getInstance());
@@ -116,8 +100,6 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(SendResultUseCase.class, SendResultUseCase.getInstance());
         ApplicationContext.register(ResultSender.class, ReportStreamResultSender.getInstance());
         // Message
-        ApplicationContext.register(
-                HapiMessageConverterHelper.class, HapiMessageConverterHelper.getInstance());
         ApplicationContext.register(
                 ReportStreamSenderHelper.class, ReportStreamSenderHelper.getInstance());
         ApplicationContext.register(HapiMessageHelper.class, HapiMessageHelper.getInstance());
@@ -173,26 +155,6 @@ public class EtorDomainRegistration implements DomainConnector {
     public String openApiStream(String fileName) throws IOException {
         InputStream openApiStream = getClass().getClassLoader().getResourceAsStream(fileName);
         return new String(openApiStream.readAllBytes(), StandardCharsets.UTF_8);
-    }
-
-    DomainResponse handleDemographics(DomainRequest request) {
-        Demographics<?> demographics;
-
-        try {
-            demographics = patientDemographicsController.parseDemographics(request);
-            convertAndSendDemographicsUsecase.convertAndSend(demographics);
-        } catch (FhirParseException e) {
-            logger.logError("Unable to parse demographics request", e);
-            return domainResponseHelper.constructErrorResponse(400, e);
-        } catch (UnableToSendMessageException e) {
-            logger.logError("Unable to send demographics", e);
-            return domainResponseHelper.constructErrorResponse(400, e);
-        }
-
-        PatientDemographicsResponse patientDemographicsResponse =
-                new PatientDemographicsResponse(demographics);
-
-        return domainResponseHelper.constructOkResponse(patientDemographicsResponse);
     }
 
     DomainResponse handleOrders(DomainRequest request) {
