@@ -2,16 +2,17 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
+
 import org.hl7.fhir.r4.model.Address
-import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.StringType
+
+import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.StringType
 import spock.lang.Specification
 
 class HapiOrderConverterTest extends Specification {
@@ -23,13 +24,11 @@ class HapiOrderConverterTest extends Specification {
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
-        TestApplicationContext.register(OrderConverter, HapiOrderConverter.getInstance())
         TestApplicationContext.register(HapiMessageConverterHelper, HapiMessageConverterHelper.getInstance())
         TestApplicationContext.register(HapiMessageHelper, HapiMessageHelper.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         mockPatient = new Patient()
-
         mockOrderBundle = new Bundle().addEntry(new Bundle.BundleEntryComponent().setResource(mockPatient))
         mockOrder = new OrderMock("fhirResourceId", "patientId", mockOrderBundle, null, null, null, null, null)
     }
@@ -44,22 +43,26 @@ class HapiOrderConverterTest extends Specification {
                 "ORM"))))
 
         when:
-        def convertedOrderBundle = HapiOrderConverter.getInstance().convertToOmlOrder(mockOrder).getUnderlyingResource() as Bundle
+        HapiOrderConverter.convertToOmlOrder(mockOrder.getUnderlyingResource())
 
         then:
-        def convertedMessageHeader = convertedOrderBundle.getEntry().get(1).getResource() as MessageHeader
+        def convertedMessageHeader =
+                HapiHelper.resourcesInBundle(mockOrder.getUnderlyingResource(), MessageHeader.class).findFirst().orElse(null)
 
+        convertedMessageHeader != null
         convertedMessageHeader.getEventCoding().getCode() == "O21"
         convertedMessageHeader.getEventCoding().getDisplay().contains("OML")
     }
 
     def "adds the message header to specify OML"() {
         when:
-        def convertedOrderBundle = HapiOrderConverter.getInstance().convertToOmlOrder(mockOrder).getUnderlyingResource() as Bundle
+        HapiOrderConverter.convertToOmlOrder(mockOrder.getUnderlyingResource())
 
         then:
-        def convertedMessageHeader = convertedOrderBundle.getEntry().get(1).getResource() as MessageHeader
+        def convertedMessageHeader =
+                HapiHelper.resourcesInBundle(mockOrder.getUnderlyingResource(), MessageHeader.class).findFirst().orElse(null)
 
+        convertedMessageHeader != null
         convertedMessageHeader.getEventCoding().getCode() == "O21"
         convertedMessageHeader.getEventCoding().getDisplay().contains("OML")
     }
@@ -78,10 +81,10 @@ class HapiOrderConverterTest extends Specification {
         mockOrderBundle.setEntry(entryList)
 
         when:
-        def convertedOrderBundle = HapiOrderConverter.getInstance().addContactSectionToPatientResource(mockOrder).getUnderlyingResource() as Bundle
+        HapiOrderConverter.addContactSectionToPatientResource(mockOrder.getUnderlyingResource())
 
         then:
-        def convertedPatient = convertedOrderBundle.getEntry().get(0).getResource() as Patient
+        def convertedPatient = HapiHelper.resourcesInBundle(mockOrder.getUnderlyingResource(), Patient.class).findFirst().orElse(null)
         def contactSection = convertedPatient.getContact()[0]
 
         contactSection != null
@@ -112,32 +115,6 @@ class HapiOrderConverterTest extends Specification {
         contactSectionAddress.getPostalCode() == convertedPatientAddress.getPostalCode()
     }
 
-    def "add etor processing tag to messageHeader resource"() {
-        given:
-        def expectedSystem = "http://localcodes.org/ETOR"
-        def expectedCode = "ETOR"
-        def expectedDisplay = "Processed by ETOR"
-
-        def messageHeader = new MessageHeader()
-        messageHeader.setId(UUID.randomUUID().toString())
-        def messageHeaderEntry = new Bundle.BundleEntryComponent().setResource(messageHeader)
-        mockOrderBundle.getEntry().add(1, messageHeaderEntry)
-        mockOrder.getUnderlyingResource() >> mockOrderBundle
-
-        when:
-        def convertedOrderBundle = HapiOrderConverter.getInstance().addEtorProcessingTag(mockOrder).getUnderlyingResource() as Bundle
-
-        then:
-        def messageHeaders = convertedOrderBundle.getEntry().get(1).getResource() as MessageHeader
-        def actualSystem = messageHeaders.getMeta().getTag()[0].getSystem()
-        def actualCode = messageHeaders.getMeta().getTag()[0].getCode()
-        def actualDisplay = messageHeaders.getMeta().getTag()[0].getDisplay()
-        actualSystem == expectedSystem
-        actualCode == expectedCode
-        actualDisplay == expectedDisplay
-    }
-
-
     def "no humanName section in contact"() {
         given:
         def addHumanName = false
@@ -146,12 +123,13 @@ class HapiOrderConverterTest extends Specification {
         def entryList = new ArrayList<Bundle.BundleEntryComponent>()
         entryList.add(patientEntry)
         mockOrderBundle.setEntry(entryList)
+
         when:
-        def convertedOrderBundle = HapiOrderConverter.getInstance().addContactSectionToPatientResource(mockOrder).getUnderlyingResource() as Bundle
+        HapiOrderConverter.addContactSectionToPatientResource(mockOrderBundle)
 
         then:
-        def convertedPatient = convertedOrderBundle.getEntry().get(0).getResource() as Patient
-        def contactSection = convertedPatient.getContact()[0]
+        def convertedPatient = HapiHelper.resourcesInBundle(mockOrderBundle, Patient.class).findFirst().orElse(null)
+        def contactSection = convertedPatient.getContact().first()
 
         !contactSection.hasName()
     }

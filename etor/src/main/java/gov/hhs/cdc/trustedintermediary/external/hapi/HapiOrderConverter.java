@@ -1,10 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
-import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter;
-import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.List;
-import javax.inject.Inject;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.MessageHeader;
@@ -14,8 +10,8 @@ import org.hl7.fhir.r4.model.Patient;
  * Converts an order to identify as an HL7v2 OML in the {@link MessageHeader}. Also helps in moving
  * around data in the order.
  */
-public class HapiOrderConverter implements OrderConverter {
-    private static final HapiOrderConverter INSTANCE = new HapiOrderConverter();
+public class HapiOrderConverter {
+
     private static final Coding OML_CODING =
             new Coding(
                     "http://terminology.hl7.org/CodeSystem/v2-0003",
@@ -27,37 +23,13 @@ public class HapiOrderConverter implements OrderConverter {
                     new Coding(
                             "http://terminology.hl7.org/CodeSystem/v3-RoleCode", "MTH", "mother"));
 
-    @Inject Logger logger;
-
-    @Inject HapiMessageConverterHelper hapiMessageConverterHelper;
-
-    public static HapiOrderConverter getInstance() {
-        return INSTANCE;
-    }
-
-    private HapiOrderConverter() {}
-
-    @Override
-    public Order<?> convertToOmlOrder(Order<?> order) {
-        logger.logInfo("Converting order to have OML metadata");
-
-        var hapiOrder = (Order<Bundle>) order;
-        var orderBundle = hapiOrder.getUnderlyingResource();
-        var messageHeader = hapiMessageConverterHelper.findOrInitializeMessageHeader(orderBundle);
-
+    public static void convertToOmlOrder(Bundle order) {
+        var messageHeader = HapiMessageConverterHelper.findOrInitializeMessageHeader(order);
         messageHeader.setEvent(OML_CODING);
-
-        return new HapiOrder(orderBundle);
     }
 
-    @Override
-    public Order<?> addContactSectionToPatientResource(Order<?> order) {
-        logger.logInfo("Adding contact section in Patient resource");
-
-        var hapiOrder = (Order<Bundle>) order;
-        var orderBundle = hapiOrder.getUnderlyingResource();
-
-        HapiHelper.resourcesInBundle(orderBundle, Patient.class)
+    public static void addContactSectionToPatientResource(Bundle order) {
+        HapiHelper.resourcesInBundle(order, Patient.class)
                 .forEach(
                         p -> {
                             var myContact = p.addContact();
@@ -74,17 +46,5 @@ public class HapiOrderConverter implements OrderConverter {
                             myContact.setTelecom(p.getTelecom());
                             myContact.setAddress(p.getAddressFirstRep());
                         });
-
-        return new HapiOrder(orderBundle);
-    }
-
-    @Override
-    public Order<?> addEtorProcessingTag(Order<?> message) {
-        var hapiOrder = (Order<Bundle>) message;
-        var messageBundle = hapiOrder.getUnderlyingResource();
-
-        hapiMessageConverterHelper.addEtorTagToBundle(messageBundle);
-
-        return new HapiOrder(messageBundle);
     }
 }
