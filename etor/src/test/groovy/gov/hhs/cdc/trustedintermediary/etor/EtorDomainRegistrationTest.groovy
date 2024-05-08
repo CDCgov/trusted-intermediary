@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.etor
 
-
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.ResultMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
