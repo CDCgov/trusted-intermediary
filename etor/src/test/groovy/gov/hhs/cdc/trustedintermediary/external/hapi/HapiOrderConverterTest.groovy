@@ -246,6 +246,7 @@ class HapiOrderConverterTest extends Specification {
         def entryList = new ArrayList<Bundle.BundleEntryComponent>()
         entryList.add(patientEntry)
         mockOrderBundle.setEntry(entryList)
+
         when:
         HapiOrderConverter.addContactSectionToPatientResource(mockOrderBundle)
 
@@ -254,6 +255,51 @@ class HapiOrderConverterTest extends Specification {
         def contactSection = convertedPatient.getContact().first()
 
         !contactSection.hasName()
+    }
+
+    def "findPatientOrNull returns expected result"() {
+        given:
+        def patientResource = fakePatientResource(true)
+        def patientEntry = new Bundle.BundleEntryComponent().setResource(patientResource)
+        def entryList = new ArrayList<Bundle.BundleEntryComponent>()
+        entryList.add(patientEntry)
+        mockOrderBundle.setEntry(entryList)
+
+        when:
+        def patient = HapiOrderConverter.findPatientOrNull(mockOrderBundle)
+
+        then:
+        patient != null
+
+        when:
+        def patientNotFound = HapiOrderConverter.findPatientOrNull(new Bundle())
+
+        then:
+        patientNotFound == null
+    }
+
+    def "findAllPatients returns expected result"() {
+        given:
+        def patientResource = fakePatientResource(true)
+        def patientEntry = new Bundle.BundleEntryComponent().setResource(patientResource)
+        def entryList = new ArrayList<Bundle.BundleEntryComponent>()
+        entryList.add(patientEntry)
+        mockOrderBundle.setEntry(entryList)
+
+        when:
+        def patients = HapiOrderConverter.findAllPatients(mockOrderBundle)
+        List<Patient> patientList = patients.collect { it as Patient }
+
+        then:
+        patientList.size() == 1
+        patientList.get(0) == patientResource
+
+        when:
+        def patientsNotFound = HapiOrderConverter.findAllPatients(new Bundle())
+        List<Patient> patientsNotFoundList = patientsNotFound.collect { it as Patient }
+
+        then:
+        patientsNotFoundList.size() == 0
     }
 
     Patient fakePatientResource(boolean addHumanName) {
