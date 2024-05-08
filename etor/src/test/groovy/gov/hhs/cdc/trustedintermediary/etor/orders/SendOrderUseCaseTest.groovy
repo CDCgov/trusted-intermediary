@@ -1,12 +1,15 @@
 package gov.hhs.cdc.trustedintermediary.etor.orders
 
+import gov.hhs.cdc.trustedintermediary.DemographicsMock
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics
 import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageHelper
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.TransformationRuleEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
@@ -126,5 +129,18 @@ class SendOrderUseCaseTest extends Specification {
         1 * mockLogger.logWarning(_)
         1 * mockOrchestrator.findMessagesIdsToLink(_ as String) >> Set.of()
         0 * mockOrchestrator.updateMetadataForSentMessage(_ as String, _ as String)
+    }
+
+    def "convertAndSend throws an UnableToSendMessageException when there's an error running the transformation rules"() {
+        given:
+        def order = Mock(Order)
+        mockEngine.runRules(order) >> { throw new RuleExecutionException("Error running transformation rules", new Exception()) }
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        SendOrderUseCase.getInstance().convertAndSend(order, "receivedId")
+
+        then:
+        thrown(UnableToSendMessageException)
     }
 }
