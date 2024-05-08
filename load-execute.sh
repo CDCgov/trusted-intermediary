@@ -4,7 +4,7 @@ set -e
 start_api() {
     echo 'Starting API'
     export DB_URL=localhost
-    export DB_PORT=5433
+    export DB_PORT=5434
     export DB_NAME=intermediary-test
     export DB_USER=intermediary
     export DB_PASS=changeIT!
@@ -23,7 +23,7 @@ start_database() {
 
 migrate_database() {
     echo 'Migrating database'
-    liquibase update --changelog-file ./etor/databaseMigrations/root.yml --url jdbc:postgresql://localhost:5433/intermediary-test --username intermediary --password 'changeIT!' --label-filter '!azure'
+    liquibase update --changelog-file ./etor/databaseMigrations/root.yml --url jdbc:postgresql://localhost:5434/intermediary-test --username intermediary --password 'changeIT!' --label-filter '!azure'
     echo "Database migrated"
 }
 
@@ -54,9 +54,9 @@ cleanup() {
     kill "${API_PID}"
     echo "PID ${API_PID} killed"
     echo "Stopping and deleting database"
-    docker stop trusted-intermediary-postgresql-1
-    docker rm -f trusted-intermediary-postgresql-1
-    docker volume rm trusted-intermediary_ti_postgres_data
+    docker stop trusted-intermediary-postgresql-test-1
+    docker rm -f trusted-intermediary-postgresql-test-1
+    docker volume rm trusted-intermediary_ti_postgres_test_data
     echo "Database stopped and deleted"
 }
 
