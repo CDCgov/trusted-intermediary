@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.hapi;
 import gov.hhs.cdc.trustedintermediary.etor.demographics.Demographics;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -13,6 +14,7 @@ import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Provenance;
 import org.hl7.fhir.r4.model.Reference;
@@ -159,13 +161,25 @@ public class HapiOrderConverter {
     }
 
     public static void addSendingFacilityToMessageHeader(Bundle bundle, String name) {
-        var header = HapiHelper.resourcesInBundle(bundle, MessageHeader.class).findFirst();
-        if (header.isEmpty()) {
-            return;
-        }
+        var header =
+                HapiHelper.resourcesInBundle(bundle, MessageHeader.class)
+                        .findFirst()
+                        .orElse(new MessageHeader());
+        var org = new Organization().setName(name);
+        header.setSender(new Reference(org));
+    }
 
+    public static void addReceivingFacilityToMessageHeader(Bundle bundle, String name) {
+        var header =
+                HapiHelper.resourcesInBundle(bundle, MessageHeader.class)
+                        .findFirst()
+                        .orElse(new MessageHeader());
         var org = new Organization();
+        var destination = new MessageHeader.MessageDestinationComponent();
+
         org.setName(name);
+        destination.setReceiver(new Reference(org));
+        header.setDestination(Collections.singletonList(destination));
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(org));
     }
 }

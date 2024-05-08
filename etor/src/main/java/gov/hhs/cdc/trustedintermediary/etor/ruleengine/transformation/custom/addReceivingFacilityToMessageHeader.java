@@ -9,7 +9,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
 
-public class addSendingFacilityToMessageHeader implements CustomFhirTransformation {
+public class addReceivingFacilityToMessageHeader implements CustomFhirTransformation {
 
     private final MetricMetadata metadata =
             ApplicationContext.getImplementation(MetricMetadata.class);
@@ -17,7 +17,7 @@ public class addSendingFacilityToMessageHeader implements CustomFhirTransformati
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
-        HapiOrderConverter.addSendingFacilityToMessageHeader(bundle, args.get("name"));
+        HapiOrderConverter.addReceivingFacilityToMessageHeader(bundle, args.get("name"));
         metadata.put(bundle.getId(), EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT);
     }
 }

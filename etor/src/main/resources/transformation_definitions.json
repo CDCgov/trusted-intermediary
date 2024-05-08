@@ -52,6 +52,20 @@
           }
         }
       ]
+    },
+    {
+      "name": "addReceivingFacilityToMessageHeader",
+      "description": "Add standard receiving facility information",
+      "message": "",
+      "conditions": [ ],
+      "rules": [
+        {
+          "name": "addReceivingFacilityToMessageHeader",
+          "args": {
+            "name": "EPIC"
+          }
+        }
+      ]
     }
   ]
 }

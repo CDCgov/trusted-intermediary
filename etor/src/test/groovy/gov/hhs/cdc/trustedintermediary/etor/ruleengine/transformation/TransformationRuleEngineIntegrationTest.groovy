@@ -14,6 +14,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.MessageHeader
+import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Patient
 import spock.lang.Specification
 
@@ -122,24 +123,43 @@ class TransformationRuleEngineIntegrationTest extends Specification {
     def "test rule transformation accuracy: addSendingFacilityToMessageHeader"() {
         given:
         def ruleName = 'addSendingFacilityToMessageHeader'
-        // we could also use this file for testing the rule: e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir
         def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: 'OML_O21')
-        //        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(new Patient()))
 
         engine.ensureRulesLoaded()
-        def rule = engine.getRuleByName(ruleName)
+        def rule = RuleEngineHelper.getRuleByName(engine.rules, ruleName)
 
         expect:
         FhirBundleHelper.resourceInBundle(bundle, Organization).isEmpty()
-        //        org.name == "testName"
 
         when:
         rule.runRule(new HapiFhirResource(bundle))
-        def org = FhirBundleHelper.resourceInBundle(bundle, Organization)
+        def header = FhirBundleHelper.resourceInBundle(bundle, MessageHeader) as MessageHeader
+        var org = header.sender.getResource() as Organization
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
-        org.name == 'testName'
+        org.name == "CDPH"
+    }
+
+    def "test rule transformation accuracy: addReceivingFacilityToMessageHeader"() {
+        given:
+        def ruleName = 'addReceivingFacilityToMessageHeader'
+        def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: 'OML_O21')
+
+        engine.ensureRulesLoaded()
+        def rule = RuleEngineHelper.getRuleByName(engine.rules, ruleName)
+
+        expect:
+        FhirBundleHelper.resourceInBundle(bundle, Organization).isEmpty()
+
+        when:
+        rule.runRule(new HapiFhirResource(bundle))
+        def header = FhirBundleHelper.resourceInBundle(bundle, MessageHeader) as MessageHeader
+        var org = header.destination.first().getReceiver().getResource() as Organization
+
+        then:
+        0 * mockLogger.logError(_ as String, _ as Exception)
+        org.name == "EPIC"
     }
 
     def "consecutively applied transformations don't interfere with each other: 003_2_ORM_O01_short_linked_to_002_ORU_R01_short"() {
