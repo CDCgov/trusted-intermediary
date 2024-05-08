@@ -74,6 +74,17 @@ class TransformationRuleEngineTest extends Specification {
         1 * mockRuleLoader.loadRules(_ as InputStream, _ as TypeReference)
     }
 
+    def "ensureRulesLoaded throws a RuleLoaderException if the file doesn't exist"() {
+        given:
+        def ruleEngine = TransformationRuleEngine.getInstance("nonexistent_file")
+
+        when:
+        ruleEngine.ensureRulesLoaded()
+
+        then:
+        thrown(RuleLoaderException)
+    }
+
     def "ensureRulesLoaded logs an error if there is an exception loading the rules"() {
         given:
         def exception = new RuleLoaderException("Error loading rules", new Exception())
