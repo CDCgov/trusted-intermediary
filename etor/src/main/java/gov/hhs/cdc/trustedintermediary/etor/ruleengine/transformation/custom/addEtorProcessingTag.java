@@ -4,7 +4,7 @@ import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhirTransformation;
-import gov.hhs.cdc.trustedintermediary.external.hapi.HapiMessageConverterHelper;
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
@@ -23,7 +23,7 @@ public class addEtorProcessingTag implements CustomFhirTransformation {
         var code = "ETOR";
         var display = "Processed by ETOR";
 
-        HapiMessageConverterHelper.addMetaTag(bundle, system, code, display);
+        HapiHelper.addMetaTag(bundle, system, code, display);
 
         metadata.put(bundle.getId(), EtorMetadataStep.ETOR_PROCESSING_TAG_ADDED_TO_MESSAGE_HEADER);
     }

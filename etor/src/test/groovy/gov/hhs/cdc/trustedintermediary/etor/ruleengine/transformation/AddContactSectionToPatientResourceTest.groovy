@@ -53,7 +53,7 @@ class AddContactSectionToPatientResourceTest extends Specification {
         transformClass.transform(new HapiFhirResource(mockOrder.getUnderlyingResource()), null)
 
         then:
-        def convertedPatient = HapiHelper.resourcesInBundle(mockOrder.getUnderlyingResource(), Patient.class).findFirst().orElse(null)
+        def convertedPatient = HapiHelper.resourceInBundle(mockOrder.getUnderlyingResource(), Patient.class) as Patient
         def contactSection = convertedPatient.getContact()[0]
 
         contactSection != null
@@ -97,7 +97,7 @@ class AddContactSectionToPatientResourceTest extends Specification {
         transformClass.transform(new HapiFhirResource(mockOrder.getUnderlyingResource()), null)
 
         then:
-        def convertedPatient = HapiHelper.resourcesInBundle(mockOrderBundle, Patient.class).findFirst().orElse(null)
+        def convertedPatient = HapiHelper.resourceInBundle(mockOrderBundle, Patient.class) as Patient
         def contactSection = convertedPatient.getContact().first()
 
         !contactSection.hasName()

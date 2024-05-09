@@ -3,7 +3,7 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation
 import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
 import gov.hhs.cdc.trustedintermediary.FhirResourceMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.external.hapi.HapiTestHelper
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import org.hl7.fhir.r4.model.Bundle
@@ -53,17 +53,18 @@ class TransformationRuleTest extends Specification {
         def ruleActions = [
             new TransformationRuleMethod("HappyPathMockClass", null)
         ]
+
+        def rule = new TransformationRule(ruleName, ruleDescription, ruleMessage, ruleConditions, ruleActions)
+        def fhirResource = new FhirResourceMock(FhirBundleHelper.createMessageBundle(new HashMap()))
+
         TestApplicationContext.register(HapiFhir, Mock(HapiFhir))
 
         when:
-        def rule = new TransformationRule(ruleName, ruleDescription, ruleMessage, ruleConditions, ruleActions)
-        def fhirResource = new FhirResourceMock(FhirBundleHelper.createMessageBundle(new HashMap()))
         rule.runRule(fhirResource)
 
         then:
-        def messageHeaderStream = HapiTestHelper.resourceInBundle(fhirResource.getUnderlyingResource() as Bundle, MessageHeader.class)
-        def actualMessageHeader = messageHeaderStream.filter{resource -> resource.getEventCoding().getCode().equals("mock_code")}.findFirst().orElse(null)
-        actualMessageHeader.getEventCoding().getCode() == "mock_code"
+        def messageHeader = HapiHelper.resourceInBundle(fhirResource.getUnderlyingResource() as Bundle, MessageHeader.class) as MessageHeader
+        messageHeader.getEventCoding().getCode() == "mock_code"
     }
 
     def "runRule() throws RuntimeException when an invalid class is given as input"() {

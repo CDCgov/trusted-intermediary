@@ -4,7 +4,7 @@ import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhirTransformation;
-import gov.hhs.cdc.trustedintermediary.external.hapi.HapiMessageConverterHelper;
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
 import gov.hhs.cdc.trustedintermediary.hl7fhir.FhirValuesHelper;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import java.util.Map;
@@ -19,7 +19,7 @@ public class convertToOmlOrder implements CustomFhirTransformation {
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
-        HapiMessageConverterHelper.setMessageTypeCoding(bundle, FhirValuesHelper.OML_CODING);
+        HapiHelper.setMessageTypeCoding(bundle, FhirValuesHelper.OML_CODING);
         metadata.put(bundle.getId(), EtorMetadataStep.ORDER_CONVERTED_TO_OML);
     }
 }
