@@ -18,7 +18,13 @@ public class addEtorProcessingTag implements CustomFhirTransformation {
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
-        HapiMessageConverterHelper.addEtorTagToBundle(bundle);
+
+        var system = "http://localcodes.org/ETOR";
+        var code = "ETOR";
+        var display = "Processed by ETOR";
+
+        HapiMessageConverterHelper.addMetaTag(bundle, system, code, display);
+
         metadata.put(bundle.getId(), EtorMetadataStep.ETOR_PROCESSING_TAG_ADDED_TO_MESSAGE_HEADER);
     }
 }

@@ -10,19 +10,21 @@ public class HapiMessageConverterHelper {
 
     private HapiMessageConverterHelper() {}
 
-    public static void addEtorTagToBundle(Bundle messageBundle) {
+    public static void addMetaTag(
+            Bundle messageBundle, String system, String code, String display) {
         var messageHeader = findOrInitializeMessageHeader(messageBundle);
         var meta = messageHeader.hasMeta() ? messageHeader.getMeta() : new Meta();
 
-        var systemValue = "http://localcodes.org/ETOR";
-        var codeValue = "ETOR";
-        var displayValue = "Processed by ETOR";
-
-        if (meta.getTag(systemValue, codeValue) == null) {
-            meta.addTag(new Coding(systemValue, codeValue, displayValue));
+        if (meta.getTag(system, code) == null) {
+            meta.addTag(new Coding(system, code, display));
         }
 
         messageHeader.setMeta(meta);
+    }
+
+    public static void setMessageTypeCoding(Bundle order, Coding coding) {
+        var messageHeader = HapiMessageConverterHelper.findOrInitializeMessageHeader(order);
+        messageHeader.setEvent(coding);
     }
 
     public static MessageHeader findOrInitializeMessageHeader(Bundle bundle) {
