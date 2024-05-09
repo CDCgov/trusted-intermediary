@@ -53,11 +53,10 @@ class TransformationRuleTest extends Specification {
         def ruleActions = [
             new TransformationRuleMethod("HappyPathMockClass", null)
         ]
+        TestApplicationContext.register(HapiFhir, Mock(HapiFhir))
 
         def rule = new TransformationRule(ruleName, ruleDescription, ruleMessage, ruleConditions, ruleActions)
         def fhirResource = new FhirResourceMock(FhirBundleHelper.createMessageBundle(new HashMap()))
-
-        TestApplicationContext.register(HapiFhir, Mock(HapiFhir))
 
         when:
         rule.runRule(fhirResource)
