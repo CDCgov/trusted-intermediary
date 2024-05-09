@@ -10,7 +10,7 @@ import java.util.List;
  * message, conditions to determine if the rule should run, and actions to run in case the condition
  * is met.
  */
-public class Rule {
+public class Rule<T> {
 
     protected final Logger logger = ApplicationContext.getImplementation(Logger.class);
     protected final HapiFhir fhirEngine = ApplicationContext.getImplementation(HapiFhir.class);
@@ -18,7 +18,7 @@ public class Rule {
     private String description;
     private String message;
     private List<String> conditions;
-    private List<String> rules;
+    private List<T> rules;
 
     /**
      * Do not delete this constructor! It is used for JSON deserialization when loading rules from a
@@ -31,7 +31,7 @@ public class Rule {
             String ruleDescription,
             String ruleMessage,
             List<String> ruleConditions,
-            List<String> ruleActions) {
+            List<T> ruleActions) {
         name = ruleName;
         description = ruleDescription;
         message = ruleMessage;
@@ -55,7 +55,7 @@ public class Rule {
         return conditions;
     }
 
-    public List<String> getRules() {
+    public List<T> getRules() {
         return rules;
     }
 
@@ -79,7 +79,7 @@ public class Rule {
                         });
     }
 
-    public void runRule(FhirResource<?> resource) {
+    public void runRule(FhirResource<?> resource) throws RuleExecutionException {
         throw new UnsupportedOperationException("This method must be implemented by subclasses.");
     }
 }

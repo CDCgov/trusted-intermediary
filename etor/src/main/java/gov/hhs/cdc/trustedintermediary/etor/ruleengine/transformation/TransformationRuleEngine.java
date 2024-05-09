@@ -1,7 +1,8 @@
-package gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation;
+package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation;
 
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleEngine;
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoaderException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -12,22 +13,22 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 
-/** Implements the RuleEngine interface. It represents a rule engine for validations. */
-public class ValidationRuleEngine implements RuleEngine {
+/** Implements the RuleEngine interface. It represents a rule engine for transformations. */
+public class TransformationRuleEngine implements RuleEngine {
     private String ruleDefinitionsFileName;
-    final List<ValidationRule> rules = new ArrayList<>();
+    final List<TransformationRule> rules = new ArrayList<>();
 
-    private static final ValidationRuleEngine INSTANCE = new ValidationRuleEngine();
+    private static final TransformationRuleEngine INSTANCE = new TransformationRuleEngine();
 
     @Inject Logger logger;
     @Inject RuleLoader ruleLoader;
 
-    public static ValidationRuleEngine getInstance(String ruleDefinitionsFileName) {
+    public static TransformationRuleEngine getInstance(String ruleDefinitionsFileName) {
         INSTANCE.ruleDefinitionsFileName = ruleDefinitionsFileName;
         return INSTANCE;
     }
 
-    private ValidationRuleEngine() {}
+    private TransformationRuleEngine() {}
 
     @Override
     public void unloadRules() {
@@ -49,7 +50,7 @@ public class ValidationRuleEngine implements RuleEngine {
                                 "File not found: " + ruleDefinitionsFileName,
                                 new FileNotFoundException());
                     }
-                    List<ValidationRule> parsedRules =
+                    List<TransformationRule> parsedRules =
                             ruleLoader.loadRules(resourceStream, new TypeReference<>() {});
                     this.rules.addAll(parsedRules);
                 }
@@ -58,16 +59,17 @@ public class ValidationRuleEngine implements RuleEngine {
     }
 
     @Override
-    public void runRules(FhirResource<?> resource) {
+    public void runRules(FhirResource<?> resource) throws RuleExecutionException {
         try {
             ensureRulesLoaded();
         } catch (RuleLoaderException e) {
             logger.logError("Failed to load rules definitions", e);
             return;
         }
-        for (ValidationRule rule : rules) {
+
+        for (TransformationRule rule : rules) {
             if (rule.shouldRun(resource)) {
-                rule.runRule(resource);
+                rule.runRule((resource));
             }
         }
     }

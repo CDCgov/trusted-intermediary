@@ -3,9 +3,10 @@ package gov.hhs.cdc.trustedintermediary.etor.orders;
 import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageHelper;
 import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
-import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException;
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.TransformationRuleEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import javax.inject.Inject;
@@ -13,7 +14,7 @@ import javax.inject.Inject;
 /** The overall logic to receive, convert to OML, and subsequently send a lab order. */
 public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
     private static final SendOrderUseCase INSTANCE = new SendOrderUseCase();
-    @Inject OrderConverter converter;
+    @Inject TransformationRuleEngine transformationEngine;
     @Inject OrderSender sender;
     @Inject MetricMetadata metadata;
     @Inject SendMessageHelper sendMessageHelper;
@@ -42,18 +43,13 @@ public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
 
         sendMessageHelper.savePartnerMetadataForReceivedMessage(partnerMetadata);
 
-        var omlOrder = converter.convertToOmlOrder(order);
-        metadata.put(order.getFhirResourceId(), EtorMetadataStep.ORDER_CONVERTED_TO_OML);
+        try {
+            transformationEngine.runRules(order);
+        } catch (RuleExecutionException e) {
+            throw new UnableToSendMessageException("Error running transformation rules", e);
+        }
 
-        omlOrder = converter.addContactSectionToPatientResource(omlOrder);
-        metadata.put(order.getFhirResourceId(), EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT);
-
-        omlOrder = converter.addEtorProcessingTag(omlOrder);
-        metadata.put(
-                order.getFhirResourceId(),
-                EtorMetadataStep.ETOR_PROCESSING_TAG_ADDED_TO_MESSAGE_HEADER);
-
-        String outboundReportId = sender.send(omlOrder).orElse(null);
+        String outboundReportId = sender.send(order).orElse(null);
         logger.logInfo("Sent order reportId: {}", outboundReportId);
 
         sendMessageHelper.linkMessage(receivedSubmissionId);

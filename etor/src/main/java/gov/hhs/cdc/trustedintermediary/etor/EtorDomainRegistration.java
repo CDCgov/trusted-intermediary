@@ -19,27 +19,23 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStor
 import gov.hhs.cdc.trustedintermediary.etor.operationoutcomes.FhirMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderController;
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderResponse;
 import gov.hhs.cdc.trustedintermediary.etor.orders.OrderSender;
 import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.results.Result;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultController;
-import gov.hhs.cdc.trustedintermediary.etor.results.ResultConverter;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultResponse;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultSender;
 import gov.hhs.cdc.trustedintermediary.etor.results.SendResultUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader;
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.TransformationRuleEngine;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation.ValidationRuleEngine;
 import gov.hhs.cdc.trustedintermediary.external.database.DatabaseMessageLinkStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.DatabasePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.DbDao;
 import gov.hhs.cdc.trustedintermediary.external.database.PostgresDao;
-import gov.hhs.cdc.trustedintermediary.external.hapi.HapiMessageConverterHelper;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiMessageHelper;
-import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiPartnerMetadataConverter;
-import gov.hhs.cdc.trustedintermediary.external.hapi.HapiResultConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.FileMessageLinkStorage;
 import gov.hhs.cdc.trustedintermediary.external.localfile.FilePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.localfile.MockRSEndpointClient;
@@ -96,18 +92,14 @@ public class EtorDomainRegistration implements DomainConnector {
     @Override
     public Map<HttpEndpoint, Function<DomainRequest, DomainResponse>> domainRegistration() {
         // Orders
-        ApplicationContext.register(OrderConverter.class, HapiOrderConverter.getInstance());
         ApplicationContext.register(OrderController.class, OrderController.getInstance());
         ApplicationContext.register(SendOrderUseCase.class, SendOrderUseCase.getInstance());
         ApplicationContext.register(OrderSender.class, ReportStreamOrderSender.getInstance());
         // Results
-        ApplicationContext.register(ResultConverter.class, HapiResultConverter.getInstance());
         ApplicationContext.register(ResultController.class, ResultController.getInstance());
         ApplicationContext.register(SendResultUseCase.class, SendResultUseCase.getInstance());
         ApplicationContext.register(ResultSender.class, ReportStreamResultSender.getInstance());
         // Message
-        ApplicationContext.register(
-                HapiMessageConverterHelper.class, HapiMessageConverterHelper.getInstance());
         ApplicationContext.register(
                 ReportStreamSenderHelper.class, ReportStreamSenderHelper.getInstance());
         ApplicationContext.register(HapiMessageHelper.class, HapiMessageHelper.getInstance());
@@ -121,6 +113,9 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(
                 ValidationRuleEngine.class,
                 ValidationRuleEngine.getInstance("validation_definitions.json"));
+        ApplicationContext.register(
+                TransformationRuleEngine.class,
+                TransformationRuleEngine.getInstance("transformation_definitions.json"));
 
         ApplicationContext.register(SendMessageHelper.class, SendMessageHelper.getInstance());
 

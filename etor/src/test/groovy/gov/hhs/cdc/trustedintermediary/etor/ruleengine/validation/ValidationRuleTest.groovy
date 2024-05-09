@@ -1,8 +1,8 @@
-package gov.hhs.cdc.trustedintermediary.etor.ruleengine
+package gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation
 
 import gov.hhs.cdc.trustedintermediary.FhirResourceMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation.ValidationRule
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
