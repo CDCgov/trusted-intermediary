@@ -12,6 +12,12 @@ public class HapiHelper {
 
     private HapiHelper() {}
 
+    public static final Coding OML_CODING =
+            new Coding(
+                    "http://terminology.hl7.org/CodeSystem/v2-0003",
+                    "O21",
+                    "OML - Laboratory order");
+
     /**
      * Returns a {@link Stream} of FHIR resources inside the provided {@link Bundle} that match the
      * given resource type.
