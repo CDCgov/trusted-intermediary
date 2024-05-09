@@ -1,7 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi
 
-
+import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.hl7fhir.FhirValuesHelper
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.MessageHeader
@@ -12,7 +13,10 @@ import spock.lang.Specification
 class HapiMessageConverterHelperTest extends Specification {
 
     Bundle mockBundle
+    Bundle mockOrderBundle
     Patient mockPatient
+    OrderMock<Bundle> mockOrder
+
     def expectedSystem = "http://localcodes.org/ETOR"
     def expectedCode = "ETOR"
     def expectedDisplay = "Processed by ETOR"
@@ -24,7 +28,9 @@ class HapiMessageConverterHelperTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         mockPatient = new Patient()
+        mockOrderBundle = new Bundle().addEntry(new Bundle.BundleEntryComponent().setResource(mockPatient))
         mockBundle = new Bundle().addEntry(new Bundle.BundleEntryComponent().setResource(mockPatient))
+        mockOrder = new OrderMock("fhirResourceId", "patientId", mockOrderBundle, null, null, null, null, null)
     }
 
     def "addEtorTag adds the ETOR message header tag to any Bundle"() {
@@ -35,7 +41,7 @@ class HapiMessageConverterHelperTest extends Specification {
         mockBundle.getEntry().add(messageHeaderEntry)
 
         when:
-        HapiMessageConverterHelper.addEtorTagToBundle(mockBundle)
+        HapiMessageConverterHelper.addMetaTag(mockBundle, expectedSystem, expectedCode, expectedDisplay)
 
         then:
         def messageHeaders = mockBundle.getEntry().get(1).getResource() as MessageHeader
@@ -48,7 +54,7 @@ class HapiMessageConverterHelperTest extends Specification {
 
     def "addEtorTag adds the ETOR message header tag to any Bundle when message header is missing"() {
         when:
-        HapiMessageConverterHelper.addEtorTagToBundle(mockBundle)
+        HapiMessageConverterHelper.addMetaTag(mockBundle, expectedSystem, expectedCode, expectedDisplay)
 
         then:
         def messageHeaders = mockBundle.getEntry().get(1).getResource() as MessageHeader
@@ -74,7 +80,7 @@ class HapiMessageConverterHelperTest extends Specification {
         mockBundle.getEntry().add(messageHeaderEntry)
 
         when:
-        HapiMessageConverterHelper.addEtorTagToBundle(mockBundle)
+        HapiMessageConverterHelper.addMetaTag(mockBundle, expectedSystem, expectedCode, expectedDisplay)
 
         then:
         def messageHeaders = mockBundle.getEntry().get(1).getResource() as MessageHeader
@@ -90,7 +96,6 @@ class HapiMessageConverterHelperTest extends Specification {
         secondActualMessageTag.getDisplay() == expectedDisplay
     }
 
-
     def "addEtorTag adds the ETOR header tag only once"() {
         given:
         def etorTag = new Coding(expectedSystem, expectedCode, expectedDisplay)
@@ -101,11 +106,45 @@ class HapiMessageConverterHelperTest extends Specification {
         mockBundle.getEntry().add(messageHeaderEntry)
 
         when:
-        HapiMessageConverterHelper.addEtorTagToBundle(mockBundle)
+        HapiMessageConverterHelper.addMetaTag(mockBundle, expectedSystem, expectedCode, expectedDisplay)
         messageHeader.getMeta().getTag().findAll {it.system == etorTag.system}.size() == 1
-        HapiMessageConverterHelper.addEtorTagToBundle(mockBundle)
+        HapiMessageConverterHelper.addMetaTag(mockBundle, expectedSystem, expectedCode, expectedDisplay)
 
         then:
         messageHeader.getMeta().getTag().findAll {it.system == etorTag.system}.size() == 1
+    }
+
+    def "convert the pre-existing message header to specify OML"() {
+        given:
+        mockOrderBundle.addEntry(
+                new Bundle.BundleEntryComponent().setResource(
+                new MessageHeader().setEvent(new Coding(
+                "http://terminology.hl7.org/CodeSystem/v2-0003",
+                "O01",
+                "ORM"))))
+
+        when:
+        HapiMessageConverterHelper.setMessageTypeCoding(mockOrder.getUnderlyingResource(), FhirValuesHelper.OML_CODING)
+
+        then:
+        def convertedMessageHeader =
+                HapiHelper.resourcesInBundle(mockOrder.getUnderlyingResource(), MessageHeader.class).findFirst().orElse(null)
+
+        convertedMessageHeader != null
+        convertedMessageHeader.getEventCoding().getCode() == "O21"
+        convertedMessageHeader.getEventCoding().getDisplay().contains("OML")
+    }
+
+    def "adds the message header to specify OML"() {
+        when:
+        HapiMessageConverterHelper.setMessageTypeCoding(mockOrder.getUnderlyingResource(), FhirValuesHelper.OML_CODING)
+
+        then:
+        def convertedMessageHeader =
+                HapiHelper.resourcesInBundle(mockOrder.getUnderlyingResource(), MessageHeader.class).findFirst().orElse(null)
+
+        convertedMessageHeader != null
+        convertedMessageHeader.getEventCoding().getCode() == "O21"
+        convertedMessageHeader.getEventCoding().getDisplay().contains("OML")
     }
 }

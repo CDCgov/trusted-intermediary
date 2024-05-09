@@ -5,10 +5,7 @@ import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Resource;
 
 /** Helper class that works on HapiFHIR constructs. */
-public
-class HapiHelper { // not a public class so it is package-private (meaning only other classes in
-    // this package can access it
-    private HapiHelper() {}
+public class HapiHelper {
 
     /**
      * Returns a {@link Stream} of FHIR resources inside the provided {@link Bundle} that match the
