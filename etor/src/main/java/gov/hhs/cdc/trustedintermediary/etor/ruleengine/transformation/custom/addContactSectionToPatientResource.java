@@ -4,10 +4,13 @@ import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhirTransformation;
-import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverterHelper;
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
+import java.util.List;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Patient;
 
 /** Custom transformation to add a contact section to a patient resource. */
 public class addContactSectionToPatientResource implements CustomFhirTransformation {
@@ -18,7 +21,30 @@ public class addContactSectionToPatientResource implements CustomFhirTransformat
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
-        HapiOrderConverterHelper.addContactSectionToPatientResource(bundle);
+
+        HapiHelper.resourcesInBundle(bundle, Patient.class)
+                .forEach(
+                        p -> {
+                            var myContact = p.addContact();
+                            var motherRelationship = myContact.addRelationship();
+                            motherRelationship.setCoding(
+                                    List.of(
+                                            new Coding(
+                                                    "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+                                                    "MTH",
+                                                    "mother")));
+
+                            var mothersMaidenNameExtension =
+                                    p.getExtensionByUrl(
+                                            "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName");
+                            if (mothersMaidenNameExtension != null) {
+                                myContact.setName(
+                                        p.castToHumanName(mothersMaidenNameExtension.getValue()));
+                            }
+                            myContact.setTelecom(p.getTelecom());
+                            myContact.setAddress(p.getAddressFirstRep());
+                        });
+
         metadata.put(bundle.getId(), EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT);
     }
 }
