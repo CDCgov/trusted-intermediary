@@ -39,7 +39,8 @@ public class HapiMessageHelper {
 
     public String extractSendingApplicationUniversalIdType(Bundle messageBundle) {
         return fhirEngine.getStringFromFhirPath(
-                messageBundle, Hl7FhirMappingPath.SENDING_APPLICATION_UNIVERSAL_ID_TYPE.getFhirPath());
+                messageBundle,
+                Hl7FhirMappingPath.SENDING_APPLICATION_UNIVERSAL_ID_TYPE.getFhirPath());
     }
 
     public String extractSendingFacilityNamespace(Bundle messageBundle) {
@@ -69,7 +70,8 @@ public class HapiMessageHelper {
 
     public String extractReceivingApplicationUniversalIdType(Bundle messageBundle) {
         return fhirEngine.getStringFromFhirPath(
-                messageBundle, Hl7FhirMappingPath.RECEIVING_APPLICATION_UNIVERSAL_ID_TYPE.getFhirPath());
+                messageBundle,
+                Hl7FhirMappingPath.RECEIVING_APPLICATION_UNIVERSAL_ID_TYPE.getFhirPath());
     }
 
     public String extractReceivingFacilityNamespace(Bundle messageBundle) {
@@ -84,6 +86,7 @@ public class HapiMessageHelper {
 
     public String extractReceivingFacilityUniversalIdType(Bundle messageBundle) {
         return fhirEngine.getStringFromFhirPath(
-                messageBundle, Hl7FhirMappingPath.RECEIVING_FACILITY_UNIVERSAL_ID_TYPE.getFhirPath());
+                messageBundle,
+                Hl7FhirMappingPath.RECEIVING_FACILITY_UNIVERSAL_ID_TYPE.getFhirPath());
     }
 }
