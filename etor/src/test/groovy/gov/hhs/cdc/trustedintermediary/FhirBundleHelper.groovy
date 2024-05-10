@@ -30,11 +30,4 @@ class FhirBundleHelper {
         bundle.addEntry().setFullUrl(receiverOrganizationFullUrl).setResource(receiverOrganization)
         return bundle
     }
-
-    static resourceInBundle(Bundle bundle, Class resourceType) {
-        return bundle.entry.stream()
-                .map { it.getResource() }
-                .filter { it.class == resourceType }
-                .findFirst().orElse(null)
-    }
 }
