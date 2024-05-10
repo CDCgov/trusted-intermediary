@@ -66,6 +66,20 @@
           }
         }
       ]
+    },
+    {
+      "name": "removeMessageTypeStructure",
+      "description": "Remove message type structure",
+      "message": "",
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
+      ],
+      "rules": [
+        {
+          "name": "removeMessageTypeStructure",
+          "args": { }
+        }
+      ]
     }
   ]
 }
