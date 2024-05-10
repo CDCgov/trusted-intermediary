@@ -130,11 +130,11 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         def rule = RuleEngineHelper.getRuleByName(engine.rules, ruleName)
 
         expect:
-        FhirBundleHelper.resourceInBundle(bundle, Organization).isEmpty()
+        HapiHelper.resourceInBundle(bundle, Organization).isEmpty()
 
         when:
         rule.runRule(new HapiFhirResource(bundle))
-        def header = FhirBundleHelper.resourceInBundle(bundle, MessageHeader) as MessageHeader
+        def header = HapiHelper.resourceInBundle(bundle, MessageHeader) as MessageHeader
         var org = header.sender.getResource() as Organization
 
         then:
@@ -151,11 +151,11 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         def rule = RuleEngineHelper.getRuleByName(engine.rules, ruleName)
 
         expect:
-        FhirBundleHelper.resourceInBundle(bundle, Organization).isEmpty()
+        HapiHelper.resourceInBundle(bundle, Organization).isEmpty()
 
         when:
         rule.runRule(new HapiFhirResource(bundle))
-        def header = FhirBundleHelper.resourceInBundle(bundle, MessageHeader) as MessageHeader
+        def header = HapiHelper.resourceInBundle(bundle, MessageHeader) as MessageHeader
         var org = header.destination.first().getReceiver().getResource() as Organization
 
         then:
