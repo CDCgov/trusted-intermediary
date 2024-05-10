@@ -85,11 +85,27 @@
       "name": "switchPlacerOrderAndGroupNumbers",
       "description": "Switch placer order and placer group numbers",
       "message": "",
-      "conditions": [],
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
+      ],
       "rules": [
         {
           "name": "switchPlacerOrderAndGroupNumbers",
-          "args": {}
+          "args": { }
+        }
+      ]
+    },
+    {
+      "name": "scrubPatientIdentifiers",
+      "description": "Remove PID-3.4 and PID-3.5",
+      "message": "",
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
+      ],
+      "rules": [
+        {
+          "name": "scrubPatientIdentifiers",
+          "args": { }
         }
       ]
     }
