@@ -87,7 +87,7 @@ public class HapiHelper {
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(org));
     }
 
-    public static void swapOBRsRenameThis(Bundle bundle) {
+    public static void switchPlacerOrderAndGroupNumbers(Bundle bundle) {
         //        Update ORC-2 with content from ORC-4 in the ORU result message.
         //                Replace ORC-2.1 with content of ORC-4.1.
         //                Replace ORC-2.2 with content of ORC-4.2

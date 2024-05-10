@@ -66,6 +66,18 @@
           }
         }
       ]
+    },
+    {
+      "name": "switchPlacerOrderAndGroupNumbers",
+      "description": "Switch placer order and placer group numbers",
+      "message": "",
+      "conditions": [ ],
+      "rules": [
+        {
+          "name": "switchPlacerOrderAndGroupNumbers",
+          "args": { }
+        }
+      ]
     }
   ]
 }
