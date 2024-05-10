@@ -45,7 +45,7 @@ public class HapiHelper {
 
     public static void addMetaTag(
             Bundle messageBundle, String system, String code, String display) {
-        var messageHeader = findOrInitializeMessageHeader(messageBundle);
+        var messageHeader = findOrCreateMessageHeader(messageBundle);
         var meta = messageHeader.hasMeta() ? messageHeader.getMeta() : new Meta();
 
         if (meta.getTag(system, code) == null) {
@@ -56,11 +56,11 @@ public class HapiHelper {
     }
 
     public static void setMessageTypeCoding(Bundle order, Coding coding) {
-        var messageHeader = findOrInitializeMessageHeader(order);
+        var messageHeader = findOrCreateMessageHeader(order);
         messageHeader.setEvent(coding);
     }
 
-    public static MessageHeader findOrInitializeMessageHeader(Bundle bundle) {
+    public static MessageHeader findOrCreateMessageHeader(Bundle bundle) {
         var messageHeader = resourceInBundle(bundle, MessageHeader.class);
         if (messageHeader == null) {
             messageHeader = new MessageHeader();
@@ -70,23 +70,17 @@ public class HapiHelper {
     }
 
     public static void addSendingFacilityToMessageHeader(Bundle bundle, String name) {
-        var header =
-                HapiHelper.resourcesInBundle(bundle, MessageHeader.class)
-                        .findFirst()
-                        .orElse(new MessageHeader());
-        var org = new Organization().setName(name);
+        var header = findOrCreateMessageHeader(bundle);
+        var org = new Organization();
+        org.setName(name);
         header.setSender(new Reference(org));
     }
 
     public static void addReceivingFacilityToMessageHeader(Bundle bundle, String name) {
-        var header =
-                HapiHelper.resourcesInBundle(bundle, MessageHeader.class)
-                        .findFirst()
-                        .orElse(new MessageHeader());
+        var header = findOrCreateMessageHeader(bundle);
         var org = new Organization();
-        var destination = new MessageHeader.MessageDestinationComponent();
-
         org.setName(name);
+        var destination = new MessageHeader.MessageDestinationComponent();
         destination.setReceiver(new Reference(org));
         header.setDestination(Collections.singletonList(destination));
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(org));
