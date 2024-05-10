@@ -7,6 +7,7 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
@@ -69,11 +70,11 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         def rule = RuleEngineHelper.getRuleByName(engine.rules, ruleName)
 
         expect:
-        FhirBundleHelper.resourceInBundle(bundle, MessageHeader) == null
+        HapiHelper.resourceInBundle(bundle, MessageHeader) == null
 
         when:
         rule.runRule(new HapiFhirResource(bundle))
-        def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
+        def messageHeader = HapiHelper.resourceInBundle(bundle, MessageHeader)
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
@@ -88,11 +89,11 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         def rule = RuleEngineHelper.getRuleByName(engine.rules, ruleName)
 
         expect:
-        FhirBundleHelper.resourceInBundle(bundle, MessageHeader).event.code == 'O01'
+        HapiHelper.resourceInBundle(bundle, MessageHeader).event.code == 'O01'
 
         when:
         rule.runRule(new HapiFhirResource(bundle))
-        def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
+        def messageHeader = HapiHelper.resourceInBundle(bundle, MessageHeader) as MessageHeader
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
@@ -108,11 +109,11 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         def rule = RuleEngineHelper.getRuleByName(engine.rules, ruleName)
 
         expect:
-        FhirBundleHelper.resourceInBundle(bundle, Patient).contact.isEmpty()
+        HapiHelper.resourceInBundle(bundle, Patient).contact.isEmpty()
 
         when:
         rule.runRule(new HapiFhirResource(bundle))
-        def patient = FhirBundleHelper.resourceInBundle(bundle, Patient)
+        def patient = HapiHelper.resourceInBundle(bundle, Patient)
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
@@ -130,16 +131,16 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         def bundle = (Bundle) fhirResource.getUnderlyingResource()
 
         expect:
-        FhirBundleHelper.resourceInBundle(bundle, MessageHeader).event.code == 'O01'
-        FhirBundleHelper.resourceInBundle(bundle, Patient).contact.isEmpty()
+        HapiHelper.resourceInBundle(bundle, MessageHeader).event.code == 'O01'
+        HapiHelper.resourceInBundle(bundle, Patient).contact.isEmpty()
 
         when:
         transformationsToApply.each { ruleName ->
             def rule = RuleEngineHelper.getRuleByName(engine.rules, ruleName)
             rule.runRule(fhirResource)
         }
-        def messageHeader = FhirBundleHelper.resourceInBundle(bundle, MessageHeader)
-        def patient = FhirBundleHelper.resourceInBundle(bundle, Patient)
+        def messageHeader = HapiHelper.resourceInBundle(bundle, MessageHeader) as MessageHeader
+        def patient = HapiHelper.resourceInBundle(bundle, Patient) as Patient
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
