@@ -54,13 +54,13 @@
       ]
     },
     {
-      "name": "addReceivingFacilityToMessageHeader",
-      "description": "Add standard receiving facility information",
+      "name": "addReceivingApplicationToMessageHeader",
+      "description": "Add standard receiving application information",
       "message": "",
       "conditions": [ ],
       "rules": [
         {
-          "name": "addReceivingFacilityToMessageHeader",
+          "name": "addReceivingApplicationToMessageHeader",
           "args": {
             "name": "EPIC"
           }
