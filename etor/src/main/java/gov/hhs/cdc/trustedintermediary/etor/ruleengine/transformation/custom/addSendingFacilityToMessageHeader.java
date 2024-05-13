@@ -6,10 +6,11 @@ import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhirTransformation;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
+import java.util.Collections;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Organization;
-import org.hl7.fhir.r4.model.Reference;
 
 public class addSendingFacilityToMessageHeader implements CustomFhirTransformation {
 
@@ -19,10 +20,10 @@ public class addSendingFacilityToMessageHeader implements CustomFhirTransformati
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
-        var header = HapiHelper.findOrCreateMessageHeader(bundle);
-        var organization = new Organization();
-        organization.setName(args.get("name"));
-        header.setSender(new Reference(organization));
+        Organization sendingFacility = HapiHelper.getSendingFacility(bundle);
+        Identifier facilityIdentifier = HapiHelper.createHDNamespaceIdentifier();
+        facilityIdentifier.setValue(args.get("name"));
+        sendingFacility.setIdentifier(Collections.singletonList(facilityIdentifier));
         metadata.put(bundle.getId(), EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT);
     }
 }

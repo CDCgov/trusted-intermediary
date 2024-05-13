@@ -3,9 +3,13 @@ package gov.hhs.cdc.trustedintermediary.external.hapi;
 import java.util.stream.Stream;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.StringType;
 
 /** Helper class that works on HapiFHIR constructs. */
 public class HapiHelper {
@@ -64,5 +68,35 @@ public class HapiHelper {
             bundle.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader));
         }
         return (MessageHeader) messageHeader;
+    }
+
+    public static MessageHeader.MessageSourceComponent getSendingApplication(Bundle bundle) {
+        MessageHeader messageHeader = HapiHelper.findOrCreateMessageHeader(bundle);
+        return messageHeader.getSource();
+    }
+
+    public static Organization getSendingFacility(Bundle bundle) {
+        MessageHeader messageHeader = HapiHelper.findOrCreateMessageHeader(bundle);
+        return (Organization) messageHeader.getSender().getResource();
+    }
+
+    public static MessageHeader.MessageDestinationComponent getReceivingApplication(Bundle bundle) {
+        MessageHeader messageHeader = HapiHelper.findOrCreateMessageHeader(bundle);
+        return messageHeader.getDestinationFirstRep();
+    }
+
+    public static Organization getReceivingFacility(Bundle bundle) {
+        MessageHeader messageHeader = HapiHelper.findOrCreateMessageHeader(bundle);
+        return (Organization) messageHeader.getDestinationFirstRep().getReceiver().getResource();
+    }
+
+    public static Identifier createHDNamespaceIdentifier() {
+        Identifier identifier = new Identifier();
+        Extension extension =
+                new Extension(
+                        "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                        new StringType("HD.1"));
+        identifier.addExtension(extension);
+        return identifier;
     }
 }
