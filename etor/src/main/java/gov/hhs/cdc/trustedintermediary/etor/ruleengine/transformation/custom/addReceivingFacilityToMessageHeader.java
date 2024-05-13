@@ -21,7 +21,7 @@ public class addReceivingFacilityToMessageHeader implements CustomFhirTransforma
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
-        var header = HapiHelper.findOrCreateMessageHeader(bundle);
+        var header = HapiHelper.getMessageHeader(bundle);
         var organization = new Organization();
         organization.setName(args.get("name"));
         var destination = new MessageHeader.MessageDestinationComponent();
