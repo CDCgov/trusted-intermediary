@@ -142,9 +142,9 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         org.name == "CDPH"
     }
 
-    def "test rule transformation accuracy: addReceivingFacilityToMessageHeader"() {
+    def "test rule transformation accuracy: addReceivingApplicationToMessageHeader"() {
         given:
-        def ruleName = 'addReceivingFacilityToMessageHeader'
+        def ruleName = 'addReceivingApplicationToMessageHeader'
         def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: 'OML_O21')
 
         engine.ensureRulesLoaded()

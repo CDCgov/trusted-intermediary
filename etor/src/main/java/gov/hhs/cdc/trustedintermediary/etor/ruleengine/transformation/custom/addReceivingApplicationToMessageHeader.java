@@ -13,7 +13,7 @@ import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Reference;
 
-public class addReceivingFacilityToMessageHeader implements CustomFhirTransformation {
+public class addReceivingApplicationToMessageHeader implements CustomFhirTransformation {
 
     private final MetricMetadata metadata =
             ApplicationContext.getImplementation(MetricMetadata.class);
