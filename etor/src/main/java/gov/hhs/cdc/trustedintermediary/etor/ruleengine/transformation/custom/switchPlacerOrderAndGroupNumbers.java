@@ -30,23 +30,24 @@ public class switchPlacerOrderAndGroupNumbers implements CustomFhirTransformatio
 
         serviceRequests.forEach(
                 serviceRequest -> {
-                    var twoPointOne = serviceRequest.getIdentifier().get(0);
-                    var twoPointTwo =
+                    var serviceIdentifier = serviceRequest.getIdentifier().get(0);
+                    var serviceNamespaceExtension =
                             serviceRequest
                                     .getIdentifier()
                                     .get(0)
                                     .getExtensionByUrl(
                                             "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id");
-                    var fourPointOne = serviceRequest.getCode().getCoding().get(0);
-                    var fourPointTwo = serviceRequest.getCode().getCoding().get(0);
+                    var serviceCoding = serviceRequest.getCode().getCoding().get(0);
 
-                    var valueHolder = twoPointOne.getValue();
-                    twoPointOne.setValue(fourPointOne.getCode());
-                    fourPointOne.setCode(valueHolder);
+                    // Switch values on OBR 2.1 and 4.1
+                    var valueHolder = serviceIdentifier.getValue();
+                    serviceIdentifier.setValue(serviceCoding.getCode());
+                    serviceCoding.setCode(valueHolder);
 
-                    valueHolder = twoPointTwo.getValue().primitiveValue();
-                    twoPointTwo.setValue(fourPointTwo.getDisplayElement());
-                    fourPointTwo.setCode(valueHolder);
+                    // Switch values on OBR 2.2 and 4.2
+                    valueHolder = serviceNamespaceExtension.getValue().primitiveValue();
+                    serviceNamespaceExtension.setValue(serviceCoding.getDisplayElement());
+                    serviceCoding.setCode(valueHolder);
                 });
         metadata.put(bundle.getId(), EtorMetadataStep.SWITCH_PLACER_ORDER_AND_GROUP_NUMBERS);
     }
