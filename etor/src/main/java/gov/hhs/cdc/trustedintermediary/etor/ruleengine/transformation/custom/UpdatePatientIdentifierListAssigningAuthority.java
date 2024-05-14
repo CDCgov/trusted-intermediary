@@ -7,7 +7,7 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
 
-public class UpdatePatientIdentifierList implements CustomFhirTransformation {
+public class UpdatePatientIdentifierListAssigningAuthority implements CustomFhirTransformation {
 
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args)
@@ -19,14 +19,14 @@ public class UpdatePatientIdentifierList implements CustomFhirTransformation {
 
         try {
             Bundle bundle = (Bundle) resource.getUnderlyingResource();
-            String field = args.get("field");
+            String field = args.getOrDefault("field", "PID 3.4");
             String newValue = args.get("newValue");
 
             if (field == null || newValue == null) {
                 throw new IllegalArgumentException("Missing 'field' or 'newValue' argument");
             }
 
-            HapiHelper.updatePatientIdentifier(bundle, field, newValue);
+            HapiHelper.updatePatientIdentifierType(bundle, field, newValue);
 
         } catch (Exception e) {
 

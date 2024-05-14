@@ -69,12 +69,24 @@ public class HapiHelper {
         return (MessageHeader) messageHeader;
     }
 
-    public static void updatePatientIdentifier(Bundle bundle, String field, String newvalue) {
+    /**
+     * Updates the code of an identifier's type within a Patient's identifier list in a FHIR Bundle
+     * based on a specified type code. This method is intended to work specifically with identifier
+     * types that correspond to HL7 PID segments PID 3.4 and PID 3.5.
+     *
+     * @param bundle the FHIR Bundle containing Patient resources whose identifiers need to be
+     *     updated.
+     * @param field the identifier type code to match on (corresponds to parts of PID 3.4 and PID
+     *     3.5).
+     * @param newValue the new value to which the identifier type code should be set.
+     * @throws IllegalArgumentException if the provided bundle is null, or if any other argument
+     *     does not meet the method's requirements.
+     */
+    public static void updatePatientIdentifierType(Bundle bundle, String field, String newValue) {
         bundle.getEntry()
                 .forEach(
                         entry -> {
-                            if (entry.getResource() instanceof Patient) {
-                                Patient patient = (Patient) entry.getResource();
+                            if (entry.getResource() instanceof Patient patient) {
                                 List<Identifier> identifiers = patient.getIdentifier();
                                 identifiers.stream()
                                         .filter(
@@ -94,7 +106,7 @@ public class HapiHelper {
                                                         identifier
                                                                 .getType()
                                                                 .getCodingFirstRep()
-                                                                .setCode(newvalue));
+                                                                .setCode(newValue));
                             }
                         });
     }
