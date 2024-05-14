@@ -1,7 +1,7 @@
 {
   "definitions": [ {
       "name": "addEtorProcessingTag",
-      "description": "Add ETOR Processing Tag",
+      "description": "Adds ETOR processing tag to all messages",
       "message": "",
       "conditions": [ ],
       "rules": [
@@ -13,7 +13,7 @@
     },
     {
       "name": "convertToOmlOrder",
-      "description": "Convert ORM to OML Order",
+      "description": "Converts an ORM order to OML",
       "message": "",
       "conditions": [
         "Bundle.entry.resource.ofType(MessageHeader).event.code = 'O01'"
@@ -27,7 +27,7 @@
     },
     {
       "name": "addContactSectionToPatientResource",
-      "description": "Add Contact Section to Patient Resource in OML Order",
+      "description": "Adds mother's contact section to patient in OML Order",
       "message": "",
       "conditions": [
         "Bundle.entry.resource.ofType(MessageHeader).event.code = 'O21'"
@@ -40,10 +40,12 @@
       ]
     },
     {
-      "name": "updateSendingFacilityNamespace",
-      "description": "Add standard sending facility information",
+      "name": "ucsdOruUpdateSendingFacilityNamespace",
+      "description": "Updates UCSD ORU Sending Facility's Namespace Id (MSH-4) to 'CDPH'. It also removes Universal Id (MSH-4.2) and Universal Id Type (MSH-4.3).",
       "message": "",
-      "conditions": [ ],
+      "conditions":  [
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
+      ],
       "rules": [
         {
           "name": "updateSendingFacilityNamespace",
@@ -54,13 +56,15 @@
       ]
     },
     {
-      "name": "addReceivingApplicationToMessageHeader",
-      "description": "Add standard receiving application information",
+      "name": "ucsdOruUpdateReceivingApplicationNamespace",
+      "description": "Updates UCSD ORU Receiving Application's Namespace Id (MSH-5.1) to 'EPIC'. It also removes Universal Id (MSH-5.2) and Universal Id Type (MSH-5.3)",
       "message": "",
-      "conditions": [ ],
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
+      ],
       "rules": [
         {
-          "name": "addReceivingApplicationToMessageHeader",
+          "name": "updateReceivingApplicationNamespace",
           "args": {
             "name": "EPIC"
           }
@@ -68,8 +72,8 @@
       ]
     },
     {
-      "name": "removeMessageTypeStructure",
-      "description": "Remove message type structure",
+      "name": "ucsdOruRemoveMessageTypeStructure",
+      "description": "Removes UCSD ORU's Message Structure (MSH-9.3) from the Message Type (MSH-9)",
       "message": "",
       "conditions": [
         "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
@@ -82,8 +86,8 @@
       ]
     },
     {
-      "name": "switchPlacerOrderAndGroupNumbers",
-      "description": "Switch placer order and placer group numbers",
+      "name": "ucsdOruSwitchPlacerOrderAndGroupNumbers",
+      "description": "Swaps UCSD ORU's Placer Order Number (ORC-2) and Placer Group Number (ORC-4)",
       "message": "",
       "conditions": [
         "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
@@ -96,8 +100,8 @@
       ]
     },
     {
-      "name": "removePatientIdentifiers",
-      "description": "Remove PID-3.4 and PID-3.5",
+      "name": "ucsdOruRemovePatientIdentifiers",
+      "description": "Removes UCSD ORU's Assigning Authority (PID-3.4) and Identifier Type Code (PID-3.5) from Patient Identifier List (PID-3)",
       "message": "",
       "conditions": [
         "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
