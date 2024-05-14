@@ -1,10 +1,13 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
+import java.util.List;
 import java.util.stream.Stream;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Resource;
 
 /** Helper class that works on HapiFHIR constructs. */
@@ -64,5 +67,35 @@ public class HapiHelper {
             bundle.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader));
         }
         return (MessageHeader) messageHeader;
+    }
+
+    public static void updatePatientIdentifier(Bundle bundle, String field, String newvalue) {
+        bundle.getEntry()
+                .forEach(
+                        entry -> {
+                            if (entry.getResource() instanceof Patient) {
+                                Patient patient = (Patient) entry.getResource();
+                                List<Identifier> identifiers = patient.getIdentifier();
+                                identifiers.stream()
+                                        .filter(
+                                                identifier ->
+                                                        identifier.getType() != null
+                                                                && identifier
+                                                                                .getType()
+                                                                                .getCodingFirstRep()
+                                                                        != null
+                                                                && field.equals(
+                                                                        identifier
+                                                                                .getType()
+                                                                                .getCodingFirstRep()
+                                                                                .getCode()))
+                                        .forEach(
+                                                identifier ->
+                                                        identifier
+                                                                .getType()
+                                                                .getCodingFirstRep()
+                                                                .setCode(newvalue));
+                            }
+                        });
     }
 }
