@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
-import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom.updateCaliforniaReceivingFacility
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
@@ -26,7 +25,7 @@ class UpdateCaliforniaReceivingFacilityTest extends Specification {
         def fhirResource = ExamplesHelper.getExampleFhirResource("../MN/004_MN_ORU_R01_NBS_1_hl7_translation.fhir")
         def bundle = fhirResource.getUnderlyingResource() as Bundle
 
-        def messageHeader = HapiHelper.findOrCreateMessageHeader(bundle)
+        def messageHeader = HapiHelper.getOrCreateMessageHeader(bundle)
         def destination = messageHeader.getDestinationFirstRep()
         def organization = destination.getReceiver().getResource() as Organization
         def ident = organization.getIdentifier().findAll {

@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.MessageHeader;
 
 public class removeMessageTypeStructure implements CustomFhirTransformation {
 
@@ -17,8 +16,7 @@ public class removeMessageTypeStructure implements CustomFhirTransformation {
     public void transform(FhirResource<?> resource, Map<String, String> args)
             throws RuleExecutionException {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
-        MessageHeader messageHeader = HapiHelper.findOrCreateMessageHeader(bundle);
-        Coding coding = messageHeader.getEventCoding();
+        Coding coding = HapiHelper.getMessageTypeCoding(bundle);
         String display = coding.getDisplay();
         String delimiter = "^";
         String[] displayArray = display.split("\\" + delimiter);

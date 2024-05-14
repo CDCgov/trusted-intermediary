@@ -5,7 +5,6 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom.removeMessageTypeStructure
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
-import org.hl7.fhir.r4.model.MessageHeader
 import spock.lang.Specification
 
 class RemoveMessageTypeStructureTest  extends Specification {
@@ -23,7 +22,7 @@ class RemoveMessageTypeStructureTest  extends Specification {
     def "remove message type structure"() {
         given:
         def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: 'ORM_O01')
-        def messageHeader = HapiHelper.findOrCreateMessageHeader(bundle)
+        def messageHeader = HapiHelper.getOrCreateMessageHeader(bundle)
         def displayArray = messageHeader.getEventCoding().getDisplay().split("\\^")
 
         expect:
@@ -32,7 +31,7 @@ class RemoveMessageTypeStructureTest  extends Specification {
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
-        def convertedMessageHeader = HapiHelper.findOrCreateMessageHeader(bundle)
+        def convertedMessageHeader = HapiHelper.getOrCreateMessageHeader(bundle)
         def convertedDisplay = convertedMessageHeader.getEventCoding().getDisplay()
         def convertedDisplayArray = convertedDisplay.split("\\^")
 

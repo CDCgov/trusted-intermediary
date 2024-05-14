@@ -49,7 +49,7 @@ class HapiHelperTest extends Specification {
         def expectedDisplay = "expectedDisplay"
 
         def mockBundle = new Bundle()
-        HapiHelper.findOrCreateMessageHeader(mockBundle)
+        HapiHelper.getOrCreateMessageHeader(mockBundle)
 
         when:
         HapiHelper.addMetaTag(mockBundle, expectedSystem, expectedCode, expectedDisplay)
