@@ -1,14 +1,12 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom;
 
-import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
-import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhirTransformation;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
-import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.ServiceRequest;
+import org.hl7.fhir.r4.model.StringType;
 
 /**
  * Updates Placer Order Number (ORC-2) with content from Placer Group Number (ORC-4). It also
@@ -18,8 +16,8 @@ import org.hl7.fhir.r4.model.ServiceRequest;
  */
 public class switchPlacerOrderAndGroupNumbers implements CustomFhirTransformation {
 
-    private final MetricMetadata metadata =
-            ApplicationContext.getImplementation(MetricMetadata.class);
+    //    private final MetricMetadata metadata =
+    //            ApplicationContext.getImplementation(MetricMetadata.class);
 
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {
@@ -38,19 +36,24 @@ public class switchPlacerOrderAndGroupNumbers implements CustomFhirTransformatio
                                     .getIdentifier()
                                     .get(0)
                                     .getExtensionByUrl(
+                                            "https://reportstream.cdc.gov/fhir/StructureDefinition/assigning-authority")
+                                    .getExtensionByUrl(
                                             "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id");
                     var serviceCoding = serviceRequest.getCode().getCoding().get(0);
+                    var obr2_1 = serviceIdentifier.getValue();
+                    var obr2_2 = serviceNamespaceExtension.getValue().primitiveValue();
+                    var obr4_1 = serviceCoding.getCode();
+                    var obr4_2 = serviceCoding.getDisplay();
 
-                    // Switch values on OBR 2.1 and 4.1
-                    var valueHolder = serviceIdentifier.getValue();
-                    serviceIdentifier.setValue(serviceCoding.getCode());
-                    serviceCoding.setCode(valueHolder);
+                    // Switch values between OBR 2.1 and 4.1
+                    serviceIdentifier.setValue(obr4_1);
+                    serviceCoding.setCode(obr2_1);
 
-                    // Switch values on OBR 2.2 and 4.2
-                    valueHolder = serviceNamespaceExtension.getValue().primitiveValue();
-                    serviceNamespaceExtension.setValue(serviceCoding.getDisplayElement());
-                    serviceCoding.setCode(valueHolder);
+                    // Switch values between OBR 2.2 and 4.2
+                    serviceNamespaceExtension.setValue(new StringType(obr4_2));
+                    serviceCoding.setDisplay(obr2_2);
                 });
-        metadata.put(bundle.getId(), EtorMetadataStep.SWITCH_PLACER_ORDER_AND_GROUP_NUMBERS);
+        //        metadata.put(bundle.getId(),
+        // EtorMetadataStep.SWITCH_PLACER_ORDER_AND_GROUP_NUMBERS);
     }
 }
