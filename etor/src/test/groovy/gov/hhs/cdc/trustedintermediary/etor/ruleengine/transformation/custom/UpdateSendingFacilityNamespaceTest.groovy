@@ -1,16 +1,12 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
-import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
-import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderTest
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Organization
-import org.hl7.fhir.r4.model.Reference
 import spock.lang.Specification
 
 class UpdateSendingFacilityNamespaceTest extends Specification {
