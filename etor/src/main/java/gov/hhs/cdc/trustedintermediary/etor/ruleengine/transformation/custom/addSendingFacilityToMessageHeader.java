@@ -12,6 +12,10 @@ import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Organization;
 
+/**
+ * Updates Sending Facility's Namespace Id (MSH-4) to given value and removes Universal Id (MSH-4.2)
+ * and Universal Id Type (MSH-4.3).
+ */
 public class addSendingFacilityToMessageHeader implements CustomFhirTransformation {
 
     private final MetricMetadata metadata =

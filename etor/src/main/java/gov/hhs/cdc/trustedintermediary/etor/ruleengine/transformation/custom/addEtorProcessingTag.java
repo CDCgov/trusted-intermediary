@@ -9,7 +9,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
 
-/** Custom transformation to add an ETOR tag to the message header of a FHIR bundle. */
+/** Adds the ETOR tag to a message header meta tag for RS processing. */
 public class addEtorProcessingTag implements CustomFhirTransformation {
 
     private final MetricMetadata metadata =

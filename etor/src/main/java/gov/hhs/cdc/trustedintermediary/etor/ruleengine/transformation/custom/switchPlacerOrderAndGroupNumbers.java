@@ -10,6 +10,12 @@ import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.ServiceRequest;
 
+/**
+ * Updates Placer Order Number (ORC-2) with content from Placer Group Number (ORC-4). It also
+ * replaces Placer Order Number's Entity Identifier (ORC-2.1) and Namespace Id (ORC-2.2) with Placer
+ * Group Number's Entity Identifier (ORC-4.1) and Namespace Id (ORC-4.2) respectively. Effectively,
+ * we're swapping ORC-2 for ORC-4 and vice versa.
+ */
 public class switchPlacerOrderAndGroupNumbers implements CustomFhirTransformation {
 
     private final MetricMetadata metadata =
@@ -17,14 +23,10 @@ public class switchPlacerOrderAndGroupNumbers implements CustomFhirTransformatio
 
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {
-        //        Update ORC-2 with content from ORC-4 in the ORU result message.
-        //                Replace ORC-2.1 with content of ORC-4.1.
-        //                Replace ORC-2.2 with content of ORC-4.2
-        //        Effectively, we're swapping ORC-2 for ORC-4 and vice versa
-        //        OBR 2.1: identifier[0]. value
-        //        OBR 2.2: identifier.extension[1].extension[0].valueString
-        //        OBR 4.1: code.coding[0].code
-        //        OBR 4.2: code.coding[0].display
+        // OBR 2.1: identifier[0]. value
+        // OBR 2.2: identifier.extension[1].extension[0].valueString
+        // OBR 4.1: code.coding[0].code
+        // OBR 4.2: code.coding[0].display
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
         var serviceRequests = HapiHelper.resourcesInBundle(bundle, ServiceRequest.class);
 
