@@ -2,7 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom.updateCaliforniaReceivingFacility
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom.updateReceivingFacilityWithOrderingFacilityIdentifier
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import org.hl7.fhir.r4.model.Bundle
@@ -17,7 +17,7 @@ class UpdateCaliforniaReceivingFacilityTest extends Specification {
         TestApplicationContext.init()
         TestApplicationContext.injectRegisteredImplementations()
 
-        transformClass = new updateCaliforniaReceivingFacility()
+        transformClass = new updateReceivingFacilityWithOrderingFacilityIdentifier()
     }
 
     def "update california receiving facility"() {

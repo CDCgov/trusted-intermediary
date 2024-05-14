@@ -12,9 +12,10 @@ import org.hl7.fhir.r4.model.Organization;
 
 /**
  * Updates the receiving facility (MSH-6) to value in Ordering Facility Name's Organization
- * Identifier (ORC-21.10). This transformation is specific to California.
+ * Identifier (ORC-21.10).
  */
-public class updateCaliforniaReceivingFacility implements CustomFhirTransformation {
+public class updateReceivingFacilityWithOrderingFacilityIdentifier
+        implements CustomFhirTransformation {
 
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args)
