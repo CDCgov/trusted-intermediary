@@ -9,7 +9,7 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Organization
 import spock.lang.Specification
 
-class UpdateCaliforniaReceivingFacilityTest extends Specification {
+class UpdateReceivingFacilityWithOrderingFacilityIdentifierTest extends Specification {
     def transformClass
 
     def setup() {

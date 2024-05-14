@@ -22,9 +22,9 @@ public class updateReceivingFacilityWithOrderingFacilityIdentifier
             throws RuleExecutionException {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
         Organization receivingFacility = HapiHelper.getReceivingFacility(bundle);
-        Identifier facilityIdentifier = HapiHelper.createHDNamespaceIdentifier();
+        Identifier namespaceIdentifier = HapiHelper.createHDNamespaceIdentifier();
         String orderingFacilityNameOrganizationIdentifier = "R797"; // Get it from ORC-21.10
-        facilityIdentifier.setValue(orderingFacilityNameOrganizationIdentifier);
-        receivingFacility.setIdentifier(Collections.singletonList(facilityIdentifier));
+        namespaceIdentifier.setValue(orderingFacilityNameOrganizationIdentifier);
+        receivingFacility.setIdentifier(Collections.singletonList(namespaceIdentifier));
     }
 }

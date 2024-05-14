@@ -16,7 +16,7 @@ import org.hl7.fhir.r4.model.Organization;
  * Updates Sending Facility's Namespace Id (MSH-4) to given value and removes Universal Id (MSH-4.2)
  * and Universal Id Type (MSH-4.3).
  */
-public class addSendingFacilityToMessageHeader implements CustomFhirTransformation {
+public class updateSendingFacilityNamespace implements CustomFhirTransformation {
 
     private final MetricMetadata metadata =
             ApplicationContext.getImplementation(MetricMetadata.class);
@@ -25,9 +25,9 @@ public class addSendingFacilityToMessageHeader implements CustomFhirTransformati
     public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
         Organization sendingFacility = HapiHelper.getSendingFacility(bundle);
-        Identifier facilityIdentifier = HapiHelper.createHDNamespaceIdentifier();
-        facilityIdentifier.setValue(args.get("name"));
-        sendingFacility.setIdentifier(Collections.singletonList(facilityIdentifier));
+        Identifier namespaceIdentifier = HapiHelper.createHDNamespaceIdentifier();
+        namespaceIdentifier.setValue(args.get("name"));
+        sendingFacility.setIdentifier(Collections.singletonList(namespaceIdentifier));
         metadata.put(bundle.getId(), EtorMetadataStep.CONTACT_SECTION_ADDED_TO_PATIENT);
     }
 }

@@ -2,14 +2,14 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom.scrubPatientIdentifiers
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom.removePatientIdentifiers
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Patient
 import spock.lang.Specification
 
-class scrubPatientIdentifierTest extends Specification {
+class RemovePatientIdentifierTest extends Specification {
     def transformClass
 
     def setup() {
@@ -17,7 +17,7 @@ class scrubPatientIdentifierTest extends Specification {
         TestApplicationContext.init()
         TestApplicationContext.injectRegisteredImplementations()
 
-        transformClass = new scrubPatientIdentifiers()
+        transformClass = new removePatientIdentifiers()
     }
 
     def "remove PID.3-4 and PID.3-5 from Bundle"() {

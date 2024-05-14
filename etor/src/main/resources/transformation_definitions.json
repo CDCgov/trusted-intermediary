@@ -40,13 +40,13 @@
       ]
     },
     {
-      "name": "addSendingFacilityToMessageHeader",
+      "name": "updateSendingFacilityNamespace",
       "description": "Add standard sending facility information",
       "message": "",
       "conditions": [ ],
       "rules": [
         {
-          "name": "addSendingFacilityToMessageHeader",
+          "name": "updateSendingFacilityNamespace",
           "args": {
             "name": "CDPH"
           }
@@ -96,7 +96,7 @@
       ]
     },
     {
-      "name": "scrubPatientIdentifiers",
+      "name": "removePatientIdentifiers",
       "description": "Remove PID-3.4 and PID-3.5",
       "message": "",
       "conditions": [
@@ -104,7 +104,7 @@
       ],
       "rules": [
         {
-          "name": "scrubPatientIdentifiers",
+          "name": "removePatientIdentifiers",
           "args": { }
         }
       ]
