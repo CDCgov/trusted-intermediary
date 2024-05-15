@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
@@ -48,7 +49,7 @@ public class HapiHelper {
 
     public static void addMetaTag(
             Bundle messageBundle, String system, String code, String display) {
-        MessageHeader messageHeader = getOrCreateMessageHeader(messageBundle);
+        MessageHeader messageHeader = getMessageHeader(messageBundle);
         var meta = messageHeader.hasMeta() ? messageHeader.getMeta() : new Meta();
 
         if (meta.getTag(system, code) == null) {
@@ -59,12 +60,16 @@ public class HapiHelper {
     }
 
     // MSH - Message Header
-    public static MessageHeader getMessageHeader(Bundle bundle) {
-        return (MessageHeader) resourceInBundle(bundle, MessageHeader.class);
+    public static MessageHeader getMessageHeader(Bundle bundle) throws NoSuchElementException {
+        MessageHeader messageHeader = (MessageHeader) resourceInBundle(bundle, MessageHeader.class);
+        if (messageHeader == null) {
+            throw new NoSuchElementException("MessageHeader not found in the bundle");
+        }
+        return messageHeader;
     }
 
     public static MessageHeader getOrCreateMessageHeader(Bundle bundle) {
-        MessageHeader messageHeader = getMessageHeader(bundle);
+        MessageHeader messageHeader = (MessageHeader) resourceInBundle(bundle, MessageHeader.class);
         if (messageHeader == null) {
             messageHeader = new MessageHeader();
             bundle.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader));
