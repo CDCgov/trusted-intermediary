@@ -22,7 +22,7 @@ class UpdateSendingFacilityNamespaceTest extends Specification {
         transformClass = new updateSendingFacilityNamespace()
     }
 
-    def "update sending facility namespace to given name"() {
+    def "update sending facility namespace to given name and remove other identifiers"() {
         given:
         def name = "CDPH"
         def fhirResource = ExamplesHelper.getExampleFhirResource("../MN/004_MN_ORU_R01_NBS_1_hl7_translation.fhir")
@@ -30,7 +30,7 @@ class UpdateSendingFacilityNamespaceTest extends Specification {
 
         expect:
         def existingOrg = HapiHelper.getMessageHeader(bundle).getSender().getResource() as Organization
-        existingOrg.name != name
+        existingOrg.getIdentifierFirstRep().getValue() != name
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), Map.of("name", name))
@@ -38,6 +38,7 @@ class UpdateSendingFacilityNamespaceTest extends Specification {
         def org = header.getSender().getResource() as Organization
 
         then:
-        org.name == name
+        org.getIdentifier().size() == 1
+        org.getIdentifierFirstRep().getValue() == name
     }
 }
