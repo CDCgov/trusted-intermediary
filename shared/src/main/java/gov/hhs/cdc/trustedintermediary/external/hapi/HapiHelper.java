@@ -116,6 +116,9 @@ public class HapiHelper {
     // PID.3 - Patient Identifier List
     public static List<Identifier> getPatientIdentifierList(Bundle bundle) {
         Patient patient = (Patient) resourceInBundle(bundle, Patient.class);
+        if (patient == null) {
+            throw new NoSuchElementException("Patient not found in the bundle");
+        }
         return patient.getIdentifier();
     }
 
