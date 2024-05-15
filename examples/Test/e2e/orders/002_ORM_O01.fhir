@@ -105,6 +105,7 @@
                                 "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
                                 "valueString": "MSH.5"
                             }
+
                         ],
                         "name": "NATUS",
                         "receiver": {

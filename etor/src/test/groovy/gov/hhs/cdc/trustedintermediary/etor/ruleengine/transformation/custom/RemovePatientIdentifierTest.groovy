@@ -16,7 +16,7 @@ class RemovePatientIdentifierTest extends Specification {
         TestApplicationContext.init()
         TestApplicationContext.injectRegisteredImplementations()
 
-        transformClass = new removePatientIdentifiers()
+        transformClass = new RemovePatientIdentifiers()
     }
 
     def "remove PID.3-4 and PID.3-5 from Bundle"() {

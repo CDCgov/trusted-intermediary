@@ -14,7 +14,7 @@ import org.hl7.fhir.r4.model.StringType;
  * Group Number's Entity Identifier (ORC-4.1) and Namespace Id (ORC-4.2) respectively. Effectively,
  * we're swapping ORC-2 for ORC-4 and vice versa.
  */
-public class switchPlacerOrderAndGroupNumbers implements CustomFhirTransformation {
+public class SwitchPlacerOrderAndGroupNumbers implements CustomFhirTransformation {
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
