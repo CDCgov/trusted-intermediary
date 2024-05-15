@@ -19,17 +19,11 @@ public class UpdatePatientIdentifierListAssigningAuthority implements CustomFhir
 
         try {
             Bundle bundle = (Bundle) resource.getUnderlyingResource();
-            String field = args.getOrDefault("field", "PID 3.4");
             String newValue = args.get("newValue");
 
-            if (field == null || newValue == null) {
-                throw new IllegalArgumentException("Missing 'field' or 'newValue' argument");
-            }
-
-            HapiHelper.updatePatientIdentifierType(bundle, field, newValue);
+            HapiHelper.updateOrganizationIdentifierValue(bundle, newValue);
 
         } catch (Exception e) {
-
             throw new RuleExecutionException("Unexpected error during transformation", e);
         }
     }

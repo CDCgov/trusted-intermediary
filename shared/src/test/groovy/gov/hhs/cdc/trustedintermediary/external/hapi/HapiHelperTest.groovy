@@ -207,7 +207,7 @@ class HapiHelperTest extends Specification {
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(patientWithoutMatchingIdentifier))
 
         when:
-        HapiHelper.updatePatientIdentifierType(bundle, field, "testit")
+        HapiHelper.updateOrganizationIdentifierValue(bundle, field, "testit")
 
         then:
         patientWithMatchingIdentifier.identifier.any {

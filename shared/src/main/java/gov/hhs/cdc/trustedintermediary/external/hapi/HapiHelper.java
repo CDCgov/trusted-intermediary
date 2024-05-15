@@ -1,6 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
-import java.util.List;
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import java.util.AbstractMap;
 import java.util.stream.Stream;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
@@ -16,6 +18,8 @@ import org.hl7.fhir.r4.model.Resource;
 public class HapiHelper {
 
     private HapiHelper() {}
+
+    private static final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
 
     public static final Coding OML_CODING =
             new Coding(
@@ -72,65 +76,75 @@ public class HapiHelper {
     }
 
     /**
-     * Updates the code of an identifier's type within a Patient's identifier list in a FHIR Bundle
-     * based on a specified type code. This method is intended to work specifically with identifier
-     * types that correspond to HL7 PID segments PID 3.4 and PID 3.5.
+     * Updates the value of an identifier for an Organization within a FHIR Bundle based on specific
+     * criteria. This method processes each Patient resource within the bundle, identifies linked
+     * Organizations via the assigner field of Patient identifiers, and checks each Organization's
+     * identifier for specific extension criteria. If the criteria are met (specifically an
+     * extension URL and a valueString that match predefined values), the identifier's value is
+     * updated to a new specified value.
+     *
+     * <p>The following HL7 segment is changed: PID 3.4 - Assigning Authority
      *
      * @param bundle the FHIR Bundle containing Patient resources whose identifiers need to be
      *     updated.
-     * @param field the identifier type code to match on (corresponds to parts of PID 3.4 and PID
-     *     3.5).
      * @param newValue the new value to which the identifier type code should be set.
-     * @throws IllegalArgumentException if the provided bundle is null, or if any other argument
-     *     does not meet the method's requirements.
      */
-    public static void updatePatientIdentifierType(Bundle bundle, String field, String newValue) {
-        bundle.getEntry()
-                .forEach(
-                        entry -> {
-                            if (entry.getResource() instanceof Patient patient) {
-                                List<Identifier> identifiers = patient.getIdentifier();
-                                identifiers.stream()
+    public static void updateOrganizationIdentifierValue(Bundle bundle, String newValue) {
+        bundle.getEntry().stream()
+                .map(Bundle.BundleEntryComponent::getResource)
+                .filter(resource -> resource instanceof Patient)
+                .map(resource -> (Patient) resource)
+                .flatMap(patient -> patient.getIdentifier().stream())
+                .map(
+                        identifier ->
+                                new AbstractMap.SimpleEntry<>(
+                                        identifier,
+                                        getOrganizationFromAssigner(
+                                                bundle, identifier.getAssigner())))
+                .filter(entry -> entry.getValue() != null)
+                .flatMap(
+                        entry ->
+                                entry.getValue().getIdentifier().stream()
                                         .filter(
-                                                identifier ->
-                                                        identifier.getType() != null
-                                                                && identifier
-                                                                                .getType()
-                                                                                .getCodingFirstRep()
-                                                                        != null
-                                                                && field.equals(
-                                                                        identifier
-                                                                                .getType()
-                                                                                .getCodingFirstRep()
-                                                                                .getCode()))
-                                        .forEach(
-                                                identifier ->
-                                                        identifier
-                                                                .getType()
-                                                                .getCodingFirstRep()
-                                                                .setCode(newValue));
-                            }
+                                                orgIdentifier ->
+                                                        hasRequiredExtension(
+                                                                orgIdentifier,
+                                                                "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                                                "HD.1"))
+                                        .peek(
+                                                orgIdentifier -> {
+                                                    LOGGER.logInfo(
+                                                            "Updating Organization identifier from: "
+                                                                    + orgIdentifier.getValue());
+                                                })
+                                        .map(orgIdentifier -> orgIdentifier.setValue(newValue)))
+                .forEach(
+                        orgIdentifier -> {
+                            LOGGER.logInfo(
+                                    "Updated Organization identifier to: "
+                                            + orgIdentifier.getValue());
                         });
     }
 
+    /**
+     * Fetches the Organization referenced by a Patient identifier assigner.
+     *
+     * @param bundle The FHIR Bundle to search.
+     * @param assigner The assigner reference.
+     * @return Optional containing the Organization if found, otherwise empty.
+     */
     private static Organization getOrganizationFromAssigner(Bundle bundle, Reference assigner) {
         if (assigner == null || assigner.getResource() == null) {
             return null;
         }
 
-        Organization organization =
-                bundle.getEntry().stream()
-                        .map(Bundle.BundleEntryComponent::getResource)
-                        .filter(resource -> resource instanceof Organization)
-                        .map(resource -> (Organization) resource)
-                        .filter(
-                                org ->
-                                        ("Organization/" + org.getId())
-                                                .equals(assigner.getReference()))
-                        .findFirst()
-                        .orElse(null);
-
-        return organization;
+        return bundle.getEntry().stream()
+                .map(Bundle.BundleEntryComponent::getResource)
+                .filter(resource -> resource instanceof Organization)
+                .map(resource -> (Organization) resource)
+                .filter(org -> ("Organization/" + org.getId()).equals(assigner.getReference()))
+                .findFirst()
+                .orElse(null);
     }
 
     /**
@@ -141,7 +155,7 @@ public class HapiHelper {
      * @param valueString The extension valueString to match.
      * @return true if the extension exists and matches, false otherwise.
      */
-    private static boolean hasRequiedExtension(
+    private static boolean hasRequiredExtension(
             Identifier identifier, String url, String valueString) {
         return identifier.getExtension().stream()
                 .anyMatch(
