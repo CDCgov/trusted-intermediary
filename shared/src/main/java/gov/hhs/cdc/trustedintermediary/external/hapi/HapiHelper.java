@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.hapi;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.AbstractMap;
+import java.util.Optional;
 import java.util.stream.Stream;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
@@ -101,10 +102,10 @@ public class HapiHelper {
                                         identifier,
                                         getOrganizationFromAssigner(
                                                 bundle, identifier.getAssigner())))
-                .filter(entry -> entry.getValue() != null)
+                .filter(entry -> entry.getValue().isPresent())
                 .flatMap(
                         entry ->
-                                entry.getValue().getIdentifier().stream()
+                                entry.getValue().get().getIdentifier().stream()
                                         .filter(
                                                 orgIdentifier ->
                                                         hasRequiredExtension(
@@ -112,18 +113,16 @@ public class HapiHelper {
                                                                 "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
                                                                 "HD.1"))
                                         .peek(
-                                                orgIdentifier -> {
-                                                    LOGGER.logInfo(
-                                                            "Updating Organization identifier from: "
-                                                                    + orgIdentifier.getValue());
-                                                })
-                                        .map(orgIdentifier -> orgIdentifier.setValue(newValue)))
+                                                orgIdentifier ->
+                                                        LOGGER.logInfo(
+                                                                "Updating Organization identifier from: "
+                                                                        + orgIdentifier.getValue()))
+                                        .peek(orgIdentifier -> orgIdentifier.setValue(newValue)))
                 .forEach(
-                        orgIdentifier -> {
-                            LOGGER.logInfo(
-                                    "Updated Organization identifier to: "
-                                            + orgIdentifier.getValue());
-                        });
+                        orgIdentifier ->
+                                LOGGER.logInfo(
+                                        "Updated Organization identifier to: "
+                                                + orgIdentifier.getValue()));
     }
 
     /**
@@ -131,20 +130,28 @@ public class HapiHelper {
      *
      * @param bundle The FHIR Bundle to search.
      * @param assigner The assigner reference.
-     * @return Optional containing the Organization if found, otherwise empty.
+     * @return Organization if found, otherwise empty.
      */
-    private static Organization getOrganizationFromAssigner(Bundle bundle, Reference assigner) {
-        if (assigner == null || assigner.getResource() == null) {
-            return null;
+    private static Optional<Organization> getOrganizationFromAssigner(
+            Bundle bundle, Reference assigner) {
+        if (assigner == null || assigner.getReference() == null) {
+            return Optional.empty();
         }
 
         return bundle.getEntry().stream()
                 .map(Bundle.BundleEntryComponent::getResource)
                 .filter(resource -> resource instanceof Organization)
                 .map(resource -> (Organization) resource)
+                .peek(
+                        org ->
+                                LOGGER.logInfo(
+                                        "Checking organization with ID: "
+                                                + org.getId()
+                                                + " against reference: "
+                                                + assigner.getReference()))
                 .filter(org -> ("Organization/" + org.getId()).equals(assigner.getReference()))
-                .findFirst()
-                .orElse(null);
+                .peek(org -> LOGGER.logInfo("Found matching Organization: " + org.getId()))
+                .findFirst();
     }
 
     /**

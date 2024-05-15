@@ -1,18 +1,28 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi
 
+import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Identifier
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Provenance
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.ServiceRequest
+import org.hl7.fhir.r4.model.StringType
 import spock.lang.Specification
 
 class HapiHelperTest extends Specification {
+
+    def setup() {
+        TestApplicationContext.reset()
+        TestApplicationContext.init()
+        TestApplicationContext.injectRegisteredImplementations()
+    }
 
     def "resourcesInBundle return a stream of a specific type of resources in a FHIR Bundle"() {
         given:
@@ -184,37 +194,30 @@ class HapiHelperTest extends Specification {
         convertedMessageHeader.getEventCoding().getDisplay() == expectedDisplay
     }
 
-    def "updatePatientIdentifierType updates the correct identifier"() {
+    def "updateOrganizationIdentifierValue updates the correct identifier value"() {
         given:
-        def matchingTypeConcept = new CodeableConcept()
-        def differentTypeConcept = new CodeableConcept()
-        def field = "PID 3.4"
-        def initialValue = "initial Assigning Authority"
-        def newValue = "Updated Assigning Authority"
-        matchingTypeConcept.addCoding().setCode(field)
-        differentTypeConcept.addCoding(new Coding().setCode("differntCode"))
-        def patientWithMatchingIdentifier = new Patient()
-        patientWithMatchingIdentifier.addIdentifier(
-                new Identifier().setType(matchingTypeConcept)
-                )
-        def patientWithoutMatchingIdentifier = new Patient()
-        patientWithoutMatchingIdentifier.addIdentifier(
-                new Identifier().setType(differentTypeConcept)
-                )
+        String presentValue = "initial Assigning Authority"
+        String newValue = "Updated Assigning Authority"
+        def identifierExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field", new StringType("HD.1"))
+
+        def organization = new Organization()
+        organization.addIdentifier(new Identifier().setValue(presentValue).addExtension(identifierExtension) as Identifier)
+
+        def patient = new Patient()
+        patient.addIdentifier(new Identifier().setAssigner(new Reference("Organization/1") as Reference))
 
         def bundle = new Bundle()
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(patientWithMatchingIdentifier))
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(patientWithoutMatchingIdentifier))
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(patient))
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(organization).setFullUrl("Organization/1"))
 
         when:
-        HapiHelper.updateOrganizationIdentifierValue(bundle, field, "testit")
+        HapiHelper.updateOrganizationIdentifierValue(bundle, newValue)
 
         then:
-        patientWithMatchingIdentifier.identifier.any {
-            it.type.coding.any { it.code == newValue }
-        }
-        patientWithoutMatchingIdentifier.identifier.every {
-            it.type.coding.every { it.code != newValue }
+        organization.getIdentifier().any {
+            it.hasExtension("https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field") &&
+                    it.getExtensionByUrl("https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field").getValue().toString() == "HD.1" &&
+                    it.getValue() == newValue
         }
     }
 }
