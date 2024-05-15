@@ -48,7 +48,7 @@ public class HapiHelper {
 
     public static void addMetaTag(
             Bundle messageBundle, String system, String code, String display) {
-        var messageHeader = getMessageHeader(messageBundle);
+        MessageHeader messageHeader = getOrCreateMessageHeader(messageBundle);
         var meta = messageHeader.hasMeta() ? messageHeader.getMeta() : new Meta();
 
         if (meta.getTag(system, code) == null) {
@@ -80,7 +80,7 @@ public class HapiHelper {
 
     // MSH.9 - Message Type
     public static void setMessageTypeCoding(Bundle order, Coding coding) {
-        var messageHeader = getMessageHeader(order);
+        var messageHeader = getOrCreateMessageHeader(order);
         messageHeader.setEvent(coding);
     }
 
