@@ -237,17 +237,19 @@ class HapiHelperTest extends Specification {
     def "sending application's get, send and create work as expected"() {
         given:
         def bundle = new Bundle()
-        def sendingApplication = HapiHelper.createSendingApplication()
+        def expectedSendingApplication = HapiHelper.createSendingApplication()
         HapiHelper.getOrCreateMessageHeader(bundle)
 
         expect:
-        HapiHelper.getSendingApplication(bundle) != sendingApplication
+        def existingSendingApplication = HapiHelper.getSendingApplication(bundle)
+        !existingSendingApplication.equalsDeep(expectedSendingApplication)
 
         when:
-        HapiHelper.setSendingApplication(bundle, sendingApplication)
+        HapiHelper.setSendingApplication(bundle, expectedSendingApplication)
+        def actualSendingApplication = HapiHelper.getSendingApplication(bundle)
 
         then:
-        HapiHelper.getSendingApplication(bundle) == sendingApplication
+        actualSendingApplication.equalsDeep(expectedSendingApplication)
     }
 
     def "sending facility's get, send and create work as expected"() {
@@ -263,6 +265,40 @@ class HapiHelperTest extends Specification {
         HapiHelper.setSendingFacility(bundle, sendingFacility)
 
         then:
-        HapiHelper.getSendingFacility(bundle) == sendingFacility
+        HapiHelper.getSendingFacility(bundle).equalsDeep(sendingFacility)
+    }
+
+    def "receiving application's get, send and create work as expected"() {
+        given:
+        def bundle = new Bundle()
+        def expectedReceivingApplication = HapiHelper.createReceivingApplication()
+        HapiHelper.getOrCreateMessageHeader(bundle)
+
+        expect:
+        def existingReceivingApplication = HapiHelper.getReceivingApplication(bundle)
+        !existingReceivingApplication.equalsDeep(expectedReceivingApplication)
+
+        when:
+        HapiHelper.setReceivingApplication(bundle, expectedReceivingApplication)
+        def actualReceivingApplication = HapiHelper.getReceivingApplication(bundle)
+
+        then:
+        actualReceivingApplication.equalsDeep(expectedReceivingApplication)
+    }
+
+    def "receiving facility's get, send and create work as expected"() {
+        given:
+        def bundle = new Bundle()
+        HapiHelper.getOrCreateMessageHeader(bundle)
+
+        expect:
+        HapiHelper.getSendingFacility(bundle) == null
+
+        when:
+        def sendingFacility = HapiHelper.createSendingFacility()
+        HapiHelper.setSendingFacility(bundle, sendingFacility)
+
+        then:
+        HapiHelper.getSendingFacility(bundle).equalsDeep(sendingFacility)
     }
 }

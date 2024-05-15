@@ -103,7 +103,9 @@ public class HapiHelper {
     }
 
     public static MessageHeader.MessageSourceComponent createSendingApplication() {
-        return new MessageHeader.MessageSourceComponent();
+        MessageHeader.MessageSourceComponent source = new MessageHeader.MessageSourceComponent();
+        source.setId(UUID.randomUUID().toString());
+        return source;
     }
 
     // MSH.4 - Sending Facility
@@ -115,8 +117,9 @@ public class HapiHelper {
     public static void setSendingFacility(Bundle bundle, Organization sendingFacility) {
         MessageHeader messageHeader = getMessageHeader(bundle);
         String organizationId = sendingFacility.getId();
-        String organizationReference = "Organization/" + organizationId;
-        messageHeader.setSender(new Reference(organizationReference));
+        Reference organizationReference = new Reference("Organization/" + organizationId);
+        organizationReference.setResource(sendingFacility);
+        messageHeader.setSender(organizationReference);
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(sendingFacility));
     }
 
@@ -133,10 +136,41 @@ public class HapiHelper {
         return messageHeader.getDestinationFirstRep();
     }
 
+    public static void setReceivingApplication(
+            Bundle bundle, MessageHeader.MessageDestinationComponent receivingApplication) {
+        MessageHeader messageHeader = getMessageHeader(bundle);
+        messageHeader.setDestination(List.of(receivingApplication));
+    }
+
+    public static MessageHeader.MessageDestinationComponent createReceivingApplication() {
+        MessageHeader.MessageDestinationComponent destination =
+                new MessageHeader.MessageDestinationComponent();
+        destination.setId(UUID.randomUUID().toString());
+        return destination;
+    }
+
     // MSH.6 - Receiving Facility
     public static Organization getReceivingFacility(Bundle bundle) {
         MessageHeader messageHeader = getMessageHeader(bundle);
         return (Organization) messageHeader.getDestinationFirstRep().getReceiver().getResource();
+    }
+
+    public static void setReceivingFacility(Bundle bundle, Organization receivingFacility) {
+        MessageHeader messageHeader = getMessageHeader(bundle);
+        String organizationId = receivingFacility.getId();
+        String organizationReference = "Organization/" + organizationId;
+        MessageHeader.MessageDestinationComponent destination =
+                new MessageHeader.MessageDestinationComponent();
+        destination.setReceiver(new Reference(organizationReference));
+        messageHeader.setDestination(List.of(destination));
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(receivingFacility));
+    }
+
+    public static Organization createReceivingFacility() {
+        Organization organization = new Organization();
+        String organizationId = UUID.randomUUID().toString();
+        organization.setId(organizationId);
+        return organization;
     }
 
     // PID.3 - Patient Identifier List
