@@ -123,7 +123,7 @@ public class HapiHelper {
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(sendingFacility));
     }
 
-    public static Organization createSendingFacility() {
+    public static Organization createFacilityOrganization() {
         Organization organization = new Organization();
         String organizationId = UUID.randomUUID().toString();
         organization.setId(organizationId);
@@ -158,19 +158,13 @@ public class HapiHelper {
     public static void setReceivingFacility(Bundle bundle, Organization receivingFacility) {
         MessageHeader messageHeader = getMessageHeader(bundle);
         String organizationId = receivingFacility.getId();
-        String organizationReference = "Organization/" + organizationId;
+        Reference organizationReference = new Reference("Organization/" + organizationId);
+        organizationReference.setResource(receivingFacility);
         MessageHeader.MessageDestinationComponent destination =
                 new MessageHeader.MessageDestinationComponent();
-        destination.setReceiver(new Reference(organizationReference));
+        destination.setReceiver(organizationReference);
         messageHeader.setDestination(List.of(destination));
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(receivingFacility));
-    }
-
-    public static Organization createReceivingFacility() {
-        Organization organization = new Organization();
-        String organizationId = UUID.randomUUID().toString();
-        organization.setId(organizationId);
-        return organization;
     }
 
     // PID.3 - Patient Identifier List

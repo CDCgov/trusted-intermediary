@@ -261,7 +261,7 @@ class HapiHelperTest extends Specification {
         HapiHelper.getSendingFacility(bundle) == null
 
         when:
-        def sendingFacility = HapiHelper.createSendingFacility()
+        def sendingFacility = HapiHelper.createFacilityOrganization()
         HapiHelper.setSendingFacility(bundle, sendingFacility)
 
         then:
@@ -292,13 +292,13 @@ class HapiHelperTest extends Specification {
         HapiHelper.getOrCreateMessageHeader(bundle)
 
         expect:
-        HapiHelper.getSendingFacility(bundle) == null
+        HapiHelper.getReceivingFacility(bundle) == null
 
         when:
-        def sendingFacility = HapiHelper.createSendingFacility()
-        HapiHelper.setSendingFacility(bundle, sendingFacility)
+        def receivingFacility = HapiHelper.createFacilityOrganization()
+        HapiHelper.setReceivingFacility(bundle, receivingFacility)
 
         then:
-        HapiHelper.getSendingFacility(bundle).equalsDeep(sendingFacility)
+        HapiHelper.getReceivingFacility(bundle).equalsDeep(receivingFacility)
     }
 }
