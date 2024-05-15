@@ -250,4 +250,19 @@ class HapiHelperTest extends Specification {
         then:
         noExceptionThrown()
     }
+
+    def "should handle patients without assigners"() {
+        given:
+        def patient = new Patient()
+        patient.addIdentifier(new Identifier())
+
+        def bundle = new Bundle()
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(patient))
+
+        when:
+        HapiHelper.updateOrganizationIdentifierValue(bundle, "newValue")
+
+        then:
+        noExceptionThrown()
+    }
 }
