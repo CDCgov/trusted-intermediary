@@ -112,6 +112,8 @@ running...
 ```
 
 This will run the API for you, so no need to run it manually.
+**If you are already running the API, stop it before running the load tests or the cleanup steps won't work.**
+The load tests will also spin up (and clean up) a local test DB on port 5434 that should not interfere with the local dev DB.
 
 The `locustfile.py` that specifies the load test is located at
 [`./operations/locustfile.py`](./operations/locustfile.py).
