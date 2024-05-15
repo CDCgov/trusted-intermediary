@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 import java.util.stream.Stream;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
@@ -11,6 +12,7 @@ import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.StringType;
 
@@ -83,9 +85,8 @@ public class HapiHelper {
         return messageHeader.getEventCoding();
     }
 
-    // MSH.9 - Message Type
-    public static void setMessageTypeCoding(Bundle order, Coding coding) {
-        var messageHeader = getOrCreateMessageHeader(order);
+    public static void setMessageTypeCoding(Bundle bundle, Coding coding) {
+        var messageHeader = getOrCreateMessageHeader(bundle);
         messageHeader.setEvent(coding);
     }
 
@@ -95,10 +96,35 @@ public class HapiHelper {
         return messageHeader.getSource();
     }
 
+    public static void setSendingApplication(
+            Bundle bundle, MessageHeader.MessageSourceComponent sendingApplication) {
+        MessageHeader messageHeader = getMessageHeader(bundle);
+        messageHeader.setSource(sendingApplication);
+    }
+
+    public static MessageHeader.MessageSourceComponent createSendingApplication() {
+        return new MessageHeader.MessageSourceComponent();
+    }
+
     // MSH.4 - Sending Facility
     public static Organization getSendingFacility(Bundle bundle) {
         MessageHeader messageHeader = getMessageHeader(bundle);
         return (Organization) messageHeader.getSender().getResource();
+    }
+
+    public static void setSendingFacility(Bundle bundle, Organization sendingFacility) {
+        MessageHeader messageHeader = getMessageHeader(bundle);
+        String organizationId = sendingFacility.getId();
+        String organizationReference = "Organization/" + organizationId;
+        messageHeader.setSender(new Reference(organizationReference));
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(sendingFacility));
+    }
+
+    public static Organization createSendingFacility() {
+        Organization organization = new Organization();
+        String organizationId = UUID.randomUUID().toString();
+        organization.setId(organizationId);
+        return organization;
     }
 
     // MSH.5 - Receiving Application

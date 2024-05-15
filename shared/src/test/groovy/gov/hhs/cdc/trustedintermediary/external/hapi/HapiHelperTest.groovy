@@ -233,4 +233,36 @@ class HapiHelperTest extends Specification {
         convertedMessageHeader.getEventCoding().getCode() == expectedCode
         convertedMessageHeader.getEventCoding().getDisplay() == expectedDisplay
     }
+
+    def "sending application's get, send and create work as expected"() {
+        given:
+        def bundle = new Bundle()
+        def sendingApplication = HapiHelper.createSendingApplication()
+        HapiHelper.getOrCreateMessageHeader(bundle)
+
+        expect:
+        HapiHelper.getSendingApplication(bundle) != sendingApplication
+
+        when:
+        HapiHelper.setSendingApplication(bundle, sendingApplication)
+
+        then:
+        HapiHelper.getSendingApplication(bundle) == sendingApplication
+    }
+
+    def "sending facility's get, send and create work as expected"() {
+        given:
+        def bundle = new Bundle()
+        HapiHelper.getOrCreateMessageHeader(bundle)
+
+        expect:
+        HapiHelper.getSendingFacility(bundle) == null
+
+        when:
+        def sendingFacility = HapiHelper.createSendingFacility()
+        HapiHelper.setSendingFacility(bundle, sendingFacility)
+
+        then:
+        HapiHelper.getSendingFacility(bundle) == sendingFacility
+    }
 }
