@@ -135,23 +135,46 @@ public class HapiHelper {
     private static Optional<Organization> getOrganizationFromAssigner(
             Bundle bundle, Reference assigner) {
         if (assigner == null || assigner.getReference() == null) {
+            LOGGER.logInfo("Assigner or assigner reference is null.");
             return Optional.empty();
         }
 
-        return bundle.getEntry().stream()
-                .map(Bundle.BundleEntryComponent::getResource)
-                .filter(resource -> resource instanceof Organization)
-                .map(resource -> (Organization) resource)
-                .peek(
-                        org ->
-                                LOGGER.logInfo(
-                                        "Checking organization with ID: "
-                                                + org.getId()
-                                                + " against reference: "
-                                                + assigner.getReference()))
-                .filter(org -> ("Organization/" + org.getId()).equals(assigner.getReference()))
-                .peek(org -> LOGGER.logInfo("Found matching Organization: " + org.getId()))
-                .findFirst();
+        LOGGER.logInfo(
+                "Starting search for Organization with reference: " + assigner.getReference());
+
+        // Stream through the Bundle entries
+        Optional<Organization> result =
+                bundle.getEntry().stream()
+                        .map(Bundle.BundleEntryComponent::getResource)
+                        .filter(resource -> resource instanceof Organization)
+                        .map(resource -> (Organization) resource)
+                        .peek(
+                                org ->
+                                        LOGGER.logInfo(
+                                                "Checking organization with ID: " + org.getId()))
+                        .filter(
+                                org -> {
+                                    boolean matches =
+                                            ("Organization/" + org.getId())
+                                                    .equals(assigner.getReference());
+                                    LOGGER.logInfo(
+                                            "Organization ID: "
+                                                    + org.getId()
+                                                    + " matches assigner reference: "
+                                                    + matches);
+                                    return matches;
+                                })
+                        .findFirst();
+
+        // Log whether a matching organization was found
+        if (result.isPresent()) {
+            LOGGER.logInfo("Found matching Organization: " + result.get().getId());
+        } else {
+            LOGGER.logInfo(
+                    "No matching Organization found for reference: " + assigner.getReference());
+        }
+
+        return result;
     }
 
     /**

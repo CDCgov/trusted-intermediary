@@ -196,15 +196,17 @@ class HapiHelperTest extends Specification {
 
     def "updateOrganizationIdentifierValue updates the correct identifier value"() {
         given:
-        String presentValue = "initial Assigning Authority"
-        String newValue = "Updated Assigning Authority"
+        def id = "1"
+        def presentValue = "initial Assigning Authority"
+        def newValue = "Updated Assigning Authority"
         def identifierExtension = new Extension("https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field", new StringType("HD.1"))
 
         def organization = new Organization()
+        organization.setId(id)
         organization.addIdentifier(new Identifier().setValue(presentValue).addExtension(identifierExtension) as Identifier)
 
         def patient = new Patient()
-        patient.addIdentifier(new Identifier().setAssigner(new Reference("Organization/1") as Reference))
+        patient.addIdentifier(new Identifier().setAssigner(new Reference("Organization/" + id) as Reference))
 
         def bundle = new Bundle()
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(patient))
