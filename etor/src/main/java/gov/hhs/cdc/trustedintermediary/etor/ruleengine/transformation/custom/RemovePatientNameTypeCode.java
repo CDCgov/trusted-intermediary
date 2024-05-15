@@ -10,7 +10,8 @@ import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Patient;
 
-public class RemoveNameTypeCode implements CustomFhirTransformation {
+/** Removes Name Type Code (PID-5.7) from Patient Name (PID-5). */
+public class RemovePatientNameTypeCode implements CustomFhirTransformation {
 
     @Override
     public void transform(final FhirResource<?> resource, final Map<String, String> args)
