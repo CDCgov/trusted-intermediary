@@ -21,6 +21,11 @@ public class HapiHelper {
 
     private HapiHelper() {}
 
+    public static final String UNIVERSAL_ID_URL =
+            "https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id";
+    public static final String UNIVERSAL_ID_TYPE_URL =
+            "https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type";
+
     public static final Coding OML_CODING =
             new Coding(
                     "http://terminology.hl7.org/CodeSystem/v2-0003",

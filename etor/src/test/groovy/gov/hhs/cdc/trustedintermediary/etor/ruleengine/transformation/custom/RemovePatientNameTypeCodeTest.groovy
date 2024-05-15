@@ -23,7 +23,6 @@ class RemovePatientNameTypeCodeTest extends Specification {
         def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/002_CA_ORU_R01_initial_translation.fhir")
         def bundle = fhirResource.getUnderlyingResource() as Bundle
         def patient = HapiHelper.resourceInBundle(bundle, Patient) as Patient
-        def patientName = patient.getName()
         def pid5_7 = getPid5_7(bundle)
 
         expect:
@@ -41,9 +40,8 @@ class RemovePatientNameTypeCodeTest extends Specification {
         def patient = HapiHelper.resourceInBundle(bundle, Patient) as Patient
         def patientName = patient.getName()
         def extension = patientName.get(0).getExtensionByUrl("https://reportstream.cdc.gov/fhir/StructureDefinition/xpn-human-name")
-        if (extension.hasExtension("XPN.7"))
-            return patientName.get(0).getExtensionByUrl("https://reportstream.cdc.gov/fhir/StructureDefinition/xpn-human-name").getExtensionByUrl("XPN.7").getValue()
-        else
+        if (!extension.hasExtension("XPN.7"))
             return null
+        return patientName.get(0).getExtensionByUrl("https://reportstream.cdc.gov/fhir/StructureDefinition/xpn-human-name").getExtensionByUrl("XPN.7").getValue()
     }
 }
