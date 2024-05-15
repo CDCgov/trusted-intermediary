@@ -7,7 +7,9 @@ import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 
 /** Helper class that works on HapiFHIR constructs. */
@@ -109,6 +111,26 @@ public class HapiHelper {
                                                                 .setCode(newValue));
                             }
                         });
+    }
+
+    private static Organization getOrganizationFromAssigner(Bundle bundle, Reference assigner) {
+        if (assigner == null || assigner.getResource() == null) {
+            return null;
+        }
+
+        Organization organization =
+                bundle.getEntry().stream()
+                        .map(Bundle.BundleEntryComponent::getResource)
+                        .filter(resource -> resource instanceof Organization)
+                        .map(resource -> (Organization) resource)
+                        .filter(
+                                org ->
+                                        ("Organization/" + org.getId())
+                                                .equals(assigner.getReference()))
+                        .findFirst()
+                        .orElse(null);
+
+        return organization;
     }
 
     /**
