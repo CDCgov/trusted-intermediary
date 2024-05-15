@@ -42,6 +42,57 @@ class HapiHelperTest extends Specification {
         patientStream.allMatch {patients.contains(it) && it.getResourceType() == ResourceType.Patient }
     }
 
+    def "getMessageHeader returns the message header from the bundle if it exists"() {
+        given:
+        def bundle = new Bundle()
+        def messageHeader = new MessageHeader()
+        def messageHeaderEntry = new Bundle.BundleEntryComponent().setResource(messageHeader)
+        bundle.getEntry().add(messageHeaderEntry)
+
+        when:
+        def actualMessageHeader = HapiHelper.getMessageHeader(bundle)
+
+        then:
+        actualMessageHeader == messageHeader
+    }
+
+    def "getMessageHeader throws a NoSuchElementException if the message header does not exist"() {
+        given:
+        def bundle = new Bundle()
+
+        when:
+        HapiHelper.getMessageHeader(bundle)
+
+        then:
+        thrown(NoSuchElementException)
+    }
+
+    def "getOrCreateMessageHeader returns the existing message header if it exists"() {
+        given:
+        def bundle = new Bundle()
+        def messageHeader = new MessageHeader()
+        def messageHeaderEntry = new Bundle.BundleEntryComponent().setResource(messageHeader)
+        bundle.getEntry().add(messageHeaderEntry)
+
+        when:
+        def actualMessageHeader = HapiHelper.getOrCreateMessageHeader(bundle)
+
+        then:
+        actualMessageHeader == messageHeader
+    }
+
+    def "getOrCreateMessageHeader creates a new message header if it does not exist"() {
+        given:
+        def bundle = new Bundle()
+
+        when:
+        def actualMessageHeader = HapiHelper.getOrCreateMessageHeader(bundle)
+
+        then:
+        actualMessageHeader != null
+        actualMessageHeader.getResourceType() == ResourceType.MessageHeader
+    }
+
     def "addMetaTag adds message header tag to any Bundle"() {
         given:
         def expectedSystem = "expectedSystem"
@@ -69,6 +120,7 @@ class HapiHelperTest extends Specification {
         def expectedCode = "expectedCode"
         def expectedDisplay = "expectedDisplay"
         def mockBundle = new Bundle()
+        HapiHelper.getOrCreateMessageHeader(mockBundle)
 
         when:
         HapiHelper.addMetaTag(mockBundle, expectedSystem, expectedCode, expectedDisplay)

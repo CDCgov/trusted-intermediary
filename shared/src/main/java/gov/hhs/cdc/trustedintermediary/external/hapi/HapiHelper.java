@@ -47,18 +47,6 @@ public class HapiHelper {
         return resourcesInBundle(bundle, resourceType).findFirst().orElse(null);
     }
 
-    public static void addMetaTag(
-            Bundle messageBundle, String system, String code, String display) {
-        MessageHeader messageHeader = getMessageHeader(messageBundle);
-        var meta = messageHeader.hasMeta() ? messageHeader.getMeta() : new Meta();
-
-        if (meta.getTag(system, code) == null) {
-            meta.addTag(new Coding(system, code, display));
-        }
-
-        messageHeader.setMeta(meta);
-    }
-
     // MSH - Message Header
     public static MessageHeader getMessageHeader(Bundle bundle) throws NoSuchElementException {
         MessageHeader messageHeader = (MessageHeader) resourceInBundle(bundle, MessageHeader.class);
@@ -75,6 +63,18 @@ public class HapiHelper {
             bundle.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader));
         }
         return messageHeader;
+    }
+
+    public static void addMetaTag(
+            Bundle messageBundle, String system, String code, String display) {
+        MessageHeader messageHeader = getMessageHeader(messageBundle);
+        var meta = messageHeader.hasMeta() ? messageHeader.getMeta() : new Meta();
+
+        if (meta.getTag(system, code) == null) {
+            meta.addTag(new Coding(system, code, display));
+        }
+
+        messageHeader.setMeta(meta);
     }
 
     // MSH.9 - Message Type
