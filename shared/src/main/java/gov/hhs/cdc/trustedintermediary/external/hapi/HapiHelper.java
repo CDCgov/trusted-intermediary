@@ -93,8 +93,8 @@ public class HapiHelper {
     public static void updateOrganizationIdentifierValue(Bundle bundle, String newValue) {
         bundle.getEntry().stream()
                 .map(Bundle.BundleEntryComponent::getResource)
-                .filter(resource -> resource instanceof Patient)
-                .map(resource -> (Patient) resource)
+                .filter(Patient.class::isInstance)
+                .map(Patient.class::cast)
                 .flatMap(patient -> patient.getIdentifier().stream())
                 .map(
                         identifier ->
@@ -117,7 +117,7 @@ public class HapiHelper {
                                                         LOGGER.logInfo(
                                                                 "Updating Organization identifier from: "
                                                                         + orgIdentifier.getValue()))
-                                        .peek(orgIdentifier -> orgIdentifier.setValue(newValue)))
+                                        .map(orgIdentifier -> orgIdentifier.setValue(newValue)))
                 .forEach(
                         orgIdentifier ->
                                 LOGGER.logInfo(
@@ -144,8 +144,8 @@ public class HapiHelper {
 
         return bundle.getEntry().stream()
                 .map(Bundle.BundleEntryComponent::getResource)
-                .filter(resource -> resource instanceof Organization)
-                .map(resource -> (Organization) resource)
+                .filter(Organization.class::isInstance)
+                .map(Organization.class::cast)
                 .peek(org -> LOGGER.logInfo("Checking organization with ID: " + org.getId()))
                 .filter(
                         org -> {
