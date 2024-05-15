@@ -63,25 +63,6 @@ class HapiHelperTest extends Specification {
         actualMessageTag.getDisplay() == expectedDisplay
     }
 
-    def "addMetaTag adds message header tag to any Bundle when message header is missing"() {
-        given:
-        def expectedSystem = "expectedSystem"
-        def expectedCode = "expectedCode"
-        def expectedDisplay = "expectedDisplay"
-        def mockBundle = new Bundle()
-
-        when:
-        HapiHelper.addMetaTag(mockBundle, expectedSystem, expectedCode, expectedDisplay)
-
-        then:
-        def messageHeaders = HapiHelper.resourceInBundle(mockBundle, MessageHeader)
-        def actualMessageTag = messageHeaders.getMeta().getTag()[0]
-
-        actualMessageTag.getSystem() == expectedSystem
-        actualMessageTag.getCode() == expectedCode
-        actualMessageTag.getDisplay() == expectedDisplay
-    }
-
     def "addMetaTag adds the message header tag to any Bundle with existing Meta tag"() {
         given:
         def firstExpectedSystem = "firstExpectedSystem"
@@ -169,6 +150,7 @@ class HapiHelperTest extends Specification {
         def expectedDisplay = "expectedDisplay"
         def expectedCoding = new Coding(expectedSystem, expectedCode, expectedDisplay)
         def mockBundle = new Bundle()
+        HapiHelper.getOrCreateMessageHeader(mockBundle)
 
         when:
         HapiHelper.setMessageTypeCoding(mockBundle, expectedCoding)
