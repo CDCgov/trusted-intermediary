@@ -142,39 +142,23 @@ public class HapiHelper {
         LOGGER.logInfo(
                 "Starting search for Organization with reference: " + assigner.getReference());
 
-        // Stream through the Bundle entries
-        Optional<Organization> result =
-                bundle.getEntry().stream()
-                        .map(Bundle.BundleEntryComponent::getResource)
-                        .filter(resource -> resource instanceof Organization)
-                        .map(resource -> (Organization) resource)
-                        .peek(
-                                org ->
-                                        LOGGER.logInfo(
-                                                "Checking organization with ID: " + org.getId()))
-                        .filter(
-                                org -> {
-                                    boolean matches =
-                                            ("Organization/" + org.getId())
-                                                    .equals(assigner.getReference());
-                                    LOGGER.logInfo(
-                                            "Organization ID: "
-                                                    + org.getId()
-                                                    + " matches assigner reference: "
-                                                    + matches);
-                                    return matches;
-                                })
-                        .findFirst();
-
-        // Log whether a matching organization was found
-        if (result.isPresent()) {
-            LOGGER.logInfo("Found matching Organization: " + result.get().getId());
-        } else {
-            LOGGER.logInfo(
-                    "No matching Organization found for reference: " + assigner.getReference());
-        }
-
-        return result;
+        return bundle.getEntry().stream()
+                .map(Bundle.BundleEntryComponent::getResource)
+                .filter(resource -> resource instanceof Organization)
+                .map(resource -> (Organization) resource)
+                .peek(org -> LOGGER.logInfo("Checking organization with ID: " + org.getId()))
+                .filter(
+                        org -> {
+                            boolean matches =
+                                    ("Organization/" + org.getId()).equals(assigner.getReference());
+                            LOGGER.logInfo(
+                                    "Checking organization with ID: "
+                                            + org.getId()
+                                            + " for match: "
+                                            + matches);
+                            return matches;
+                        })
+                .findFirst();
     }
 
     /**
