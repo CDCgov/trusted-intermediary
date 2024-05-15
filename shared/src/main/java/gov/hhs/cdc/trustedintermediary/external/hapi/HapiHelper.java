@@ -6,7 +6,6 @@ import java.util.UUID;
 import java.util.stream.Stream;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
@@ -21,6 +20,8 @@ public class HapiHelper {
 
     private HapiHelper() {}
 
+    public static final String HL7_FIELD_URL =
+            "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field";
     public static final String UNIVERSAL_ID_URL =
             "https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id";
     public static final String UNIVERSAL_ID_TYPE_URL =
@@ -135,6 +136,12 @@ public class HapiHelper {
         return organization;
     }
 
+    public static Identifier getSendingFacilityNamespace(Bundle bundle) {
+        Organization sendingFacility = getSendingFacility(bundle);
+        List<Identifier> identifiers = sendingFacility.getIdentifier();
+        return getHDNamespace(identifiers);
+    }
+
     // MSH.5 - Receiving Application
     public static MessageHeader.MessageDestinationComponent getReceivingApplication(Bundle bundle) {
         MessageHeader messageHeader = getMessageHeader(bundle);
@@ -182,13 +189,16 @@ public class HapiHelper {
     }
 
     // HD.1 - Namespace Id
-    public static Identifier createHDNamespaceIdentifier() {
-        Identifier identifier = new Identifier();
-        Extension extension =
-                new Extension(
-                        "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
-                        new StringType("HD.1"));
-        identifier.addExtension(extension);
-        return identifier;
+    public static Identifier getHDNamespace(List<Identifier> identifiers) {
+        for (Identifier identifier : identifiers) {
+            if (identifier.hasExtension(HL7_FIELD_URL)
+                    && identifier
+                            .getExtensionByUrl(HL7_FIELD_URL)
+                            .getValue()
+                            .equalsDeep(new StringType("HD.1"))) {
+                return identifier;
+            }
+        }
+        throw new NoSuchElementException("Namespace not found");
     }
 }

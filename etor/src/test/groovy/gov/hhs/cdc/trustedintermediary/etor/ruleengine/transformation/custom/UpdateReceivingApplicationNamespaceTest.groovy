@@ -1,14 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
-import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
-import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.StringType
-import org.hl7.fhir.r4.model.Type
 import spock.lang.Specification
 
 class UpdateReceivingApplicationNamespaceTest extends Specification {
@@ -34,10 +30,10 @@ class UpdateReceivingApplicationNamespaceTest extends Specification {
         HapiHelper.setReceivingApplication(bundle, receivingApplication)
 
         expect:
-        def beforeReceivingApplication = HapiHelper.getReceivingApplication(bundle)
-        beforeReceivingApplication.name != name
-        beforeReceivingApplication.getExtensionByUrl(HapiHelper.UNIVERSAL_ID_URL) != null
-        beforeReceivingApplication.getExtensionByUrl(HapiHelper.UNIVERSAL_ID_TYPE_URL) != null
+        def existingReceivingApplication = HapiHelper.getReceivingApplication(bundle)
+        existingReceivingApplication.name != name
+        existingReceivingApplication.getExtensionByUrl(HapiHelper.UNIVERSAL_ID_URL) != null
+        existingReceivingApplication.getExtensionByUrl(HapiHelper.UNIVERSAL_ID_TYPE_URL) != null
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), Map.of("name", name))

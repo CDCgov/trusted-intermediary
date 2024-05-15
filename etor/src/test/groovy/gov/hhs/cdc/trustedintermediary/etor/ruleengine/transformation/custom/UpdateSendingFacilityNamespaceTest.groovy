@@ -4,9 +4,7 @@ import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
-import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.Organization
 import spock.lang.Specification
 
 class UpdateSendingFacilityNamespaceTest extends Specification {
@@ -16,7 +14,6 @@ class UpdateSendingFacilityNamespaceTest extends Specification {
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
-        TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
         TestApplicationContext.injectRegisteredImplementations()
 
         transformClass = new UpdateSendingFacilityNamespace()
@@ -29,16 +26,14 @@ class UpdateSendingFacilityNamespaceTest extends Specification {
         def bundle = fhirResource.getUnderlyingResource() as Bundle
 
         expect:
-        def existingOrg = HapiHelper.getMessageHeader(bundle).getSender().getResource() as Organization
-        existingOrg.getIdentifierFirstRep().getValue() != name
+        HapiHelper.getSendingFacility(bundle).getIdentifier().size() > 1
+        HapiHelper.getSendingFacilityNamespace(bundle).getValue() != name
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), Map.of("name", name))
-        def header = HapiHelper.getMessageHeader(bundle)
-        def org = header.getSender().getResource() as Organization
 
         then:
-        org.getIdentifier().size() == 1
-        org.getIdentifierFirstRep().getValue() == name
+        HapiHelper.getSendingFacility(bundle).getIdentifier().size() == 1
+        HapiHelper.getSendingFacilityNamespace(bundle).getValue() == name
     }
 }
