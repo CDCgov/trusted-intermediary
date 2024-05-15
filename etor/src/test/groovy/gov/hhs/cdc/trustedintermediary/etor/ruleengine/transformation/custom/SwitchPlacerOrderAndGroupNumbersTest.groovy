@@ -18,40 +18,40 @@ class SwitchPlacerOrderAndGroupNumbersTest extends Specification {
         transformClass = new switchPlacerOrderAndGroupNumbers()
     }
 
-    def "switch OBR.2 and OBR.4 in Bundle"() {
+    def "switch OCR.2 and OCR.4 in Bundle"() {
         given:
         def fhirResource = ExamplesHelper.getExampleFhirResource("../MN/004_MN_ORU_R01_NBS_1_hl7_translation.fhir")
         def bundle = fhirResource.getUnderlyingResource() as Bundle
-        def result = getOBRSections(bundle)
-        def obr2_1 = result[0]
-        def obr2_2 = result[1]
-        def obr4_1 = result[2]
-        def obr4_2 = result[3]
+        def result = getORCSections(bundle)
+        def orc2_1 = result[0]
+        def orc2_2 = result[1]
+        def orc4_1 = result[2]
+        def orc4_2 = result[3]
 
         expect:
-        obr2_1 == "423787478"
-        obr2_2 == "EPIC"
-        obr4_1 == "57128-1"
-        obr4_2 == "Newborn Screening Report summary panel"
+        orc2_1 == "423787478"
+        orc2_2 == "EPIC"
+        orc4_1 == "57128-1"
+        orc4_2 == "Newborn Screening Report summary panel"
 
         when:
         transformClass.transform(fhirResource, null)
-        def switchedResult = getOBRSections(bundle)
+        def switchedResult = getORCSections(bundle)
         def switchedObr2_1 = switchedResult[0]
         def switchedObr2_2 = switchedResult[1]
         def switchedObr4_1 = switchedResult[2]
         def switchedObr4_2 = switchedResult[3]
 
         then:
-        switchedObr2_1 == obr4_1
-        switchedObr2_2 == obr4_2
-        switchedObr4_1 == obr2_1
-        switchedObr4_2 == obr2_2
+        switchedObr2_1 == orc4_1
+        switchedObr2_2 == orc4_2
+        switchedObr4_1 == orc2_1
+        switchedObr4_2 == orc2_2
     }
 
-    // Returns a list of values for the OBR sections that need checking in the following order:
+    // Returns a list of values for the OCR sections that need checking in the following order:
     // [2.1, 2.2, 4.1, 4.2]
-    def getOBRSections(Bundle bundle) {
+    def getORCSections(Bundle bundle) {
         def serviceRequest = HapiHelper.resourceInBundle(bundle, ServiceRequest)
         def serviceIdentifier = serviceRequest.getIdentifier()[0]
         var serviceNamespaceExtension =
