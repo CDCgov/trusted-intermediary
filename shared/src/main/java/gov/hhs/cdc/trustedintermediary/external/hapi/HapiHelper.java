@@ -130,7 +130,7 @@ public class HapiHelper {
      *
      * @param bundle The FHIR Bundle to search.
      * @param assigner The assigner reference.
-     * @return Organization if found, otherwise empty.
+     * @return Optional<Organization> if found, otherwise Optionale.empty().
      */
     private static Optional<Organization> getOrganizationFromAssigner(
             Bundle bundle, Reference assigner) {

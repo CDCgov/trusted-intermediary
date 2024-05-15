@@ -222,4 +222,15 @@ class HapiHelperTest extends Specification {
                     it.getValue() == newValue
         }
     }
+
+    def "handle empty bundle gracefully"() {
+        given:
+        Bundle emptyBundle = new Bundle()
+
+        when:
+        HapiHelper.updateOrganizationIdentifierValue(emptyBundle, "newValue")
+
+        then:
+        noExceptionThrown()
+    }
 }
