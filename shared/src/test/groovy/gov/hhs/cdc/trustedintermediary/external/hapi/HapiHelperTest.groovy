@@ -1,7 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi
 
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
@@ -180,5 +182,39 @@ class HapiHelperTest extends Specification {
         convertedMessageHeader.getEventCoding().getSystem() == expectedSystem
         convertedMessageHeader.getEventCoding().getCode() == expectedCode
         convertedMessageHeader.getEventCoding().getDisplay() == expectedDisplay
+    }
+
+    def "updatePatientIdentifierType updates the correct identifier"() {
+        given:
+        def matchingTypeConcept = new CodeableConcept()
+        def differentTypeConcept = new CodeableConcept()
+        def field = "PID 3.4"
+        def initialValue = "initial Assigning Authority"
+        def newValue = "Updated Assigning Authority"
+        matchingTypeConcept.addCoding().setCode(field)
+        differentTypeConcept.addCoding(new Coding().setCode("differntCode"))
+        def patientWithMatchingIdentifier = new Patient()
+        patientWithMatchingIdentifier.addIdentifier(
+                new Identifier().setType(matchingTypeConcept)
+                )
+        def patientWithoutMatchingIdentifier = new Patient()
+        patientWithoutMatchingIdentifier.addIdentifier(
+                new Identifier().setType(differentTypeConcept)
+                )
+
+        def bundle = new Bundle()
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(patientWithMatchingIdentifier))
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(patientWithoutMatchingIdentifier))
+
+        when:
+        HapiHelper.updatePatientIdentifierType(bundle, field, "testit")
+
+        then:
+        patientWithMatchingIdentifier.identifier.any {
+            it.type.coding.any { it.code == newValue }
+        }
+        patientWithoutMatchingIdentifier.identifier.every {
+            it.type.coding.every { it.code != newValue }
+        }
     }
 }

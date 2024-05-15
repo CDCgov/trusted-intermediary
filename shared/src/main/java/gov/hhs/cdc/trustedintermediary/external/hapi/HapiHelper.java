@@ -110,4 +110,21 @@ public class HapiHelper {
                             }
                         });
     }
+
+    /**
+     * Checks if an identifier has the required extension with specific url and valueString.
+     *
+     * @param identifier The identifier to check.
+     * @param url The extension url to match.
+     * @param valueString The extension valueString to match.
+     * @return true if the extension exists and matches, false otherwise.
+     */
+    private static boolean hasRequiedExtension(
+            Identifier identifier, String url, String valueString) {
+        return identifier.getExtension().stream()
+                .anyMatch(
+                        extension ->
+                                url.equals(extension.getUrl())
+                                        && valueString.equals(extension.getValue().toString()));
+    }
 }
