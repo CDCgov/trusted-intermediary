@@ -18,7 +18,7 @@ class UpdateReceivingApplicationNamespaceTest extends Specification {
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
         TestApplicationContext.injectRegisteredImplementations()
 
-        transformClass = new updateReceivingApplicationNamespace()
+        transformClass = new UpdateReceivingApplicationNamespace()
     }
 
     def "update receiving application namespace to given name"() {

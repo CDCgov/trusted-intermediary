@@ -2,7 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom.removeNameTypeCode
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom.RemoveNameTypeCode
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Patient
@@ -16,7 +16,7 @@ class RemoveNameTypeCodeTest extends Specification {
         TestApplicationContext.init()
         TestApplicationContext.injectRegisteredImplementations()
 
-        transformClass = new removeNameTypeCode()
+        transformClass = new RemoveNameTypeCode()
     }
 
     def "remove PID.5-7 from Bundle"() {

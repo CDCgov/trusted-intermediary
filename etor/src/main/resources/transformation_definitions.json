@@ -6,7 +6,7 @@
       "conditions": [ ],
       "rules": [
         {
-          "name": "addEtorProcessingTag",
+          "name": "AddEtorProcessingTag",
           "args": { }
         }
       ]
@@ -20,7 +20,7 @@
       ],
       "rules": [
         {
-          "name": "convertToOmlOrder",
+          "name": "ConvertToOmlOrder",
           "args": { }
         }
       ]
@@ -34,7 +34,7 @@
       ],
       "rules": [
         {
-          "name": "addContactSectionToPatientResource",
+          "name": "AddContactSectionToPatientResource",
           "args": { }
         }
       ]
@@ -48,7 +48,7 @@
       ],
       "rules": [
         {
-          "name": "updateSendingFacilityNamespace",
+          "name": "UpdateSendingFacilityNamespace",
           "args": {
             "name": "CDPH"
           }
@@ -64,7 +64,7 @@
       ],
       "rules": [
         {
-          "name": "updateReceivingApplicationNamespace",
+          "name": "UpdateReceivingApplicationNamespace",
           "args": {
             "name": "EPIC"
           }
@@ -80,7 +80,7 @@
       ],
       "rules": [
         {
-          "name": "removeMessageTypeStructure",
+          "name": "RemoveMessageTypeStructure",
           "args": { }
         }
       ]
@@ -94,7 +94,7 @@
       ],
       "rules": [
         {
-          "name": "switchPlacerOrderAndGroupNumbers",
+          "name": "SwitchPlacerOrderAndGroupNumbers",
           "args": { }
         }
       ]
@@ -108,7 +108,7 @@
       ],
       "rules": [
         {
-          "name": "removePatientIdentifiers",
+          "name": "RemovePatientIdentifiers",
           "args": { }
         }
       ]

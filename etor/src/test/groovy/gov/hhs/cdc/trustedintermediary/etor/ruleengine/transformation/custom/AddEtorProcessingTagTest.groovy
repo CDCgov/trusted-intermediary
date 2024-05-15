@@ -17,7 +17,7 @@ class AddEtorProcessingTagTest extends Specification {
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
         TestApplicationContext.injectRegisteredImplementations()
 
-        transformClass = new addEtorProcessingTag()
+        transformClass = new AddEtorProcessingTag()
     }
 
     def "add ETOR meta tag to message header"() {

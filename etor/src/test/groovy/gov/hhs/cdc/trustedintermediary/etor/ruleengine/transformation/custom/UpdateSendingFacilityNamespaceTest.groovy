@@ -19,7 +19,7 @@ class UpdateSendingFacilityNamespaceTest extends Specification {
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
         TestApplicationContext.injectRegisteredImplementations()
 
-        transformClass = new updateSendingFacilityNamespace()
+        transformClass = new UpdateSendingFacilityNamespace()
     }
 
     def "update sending facility namespace to given name and remove other identifiers"() {

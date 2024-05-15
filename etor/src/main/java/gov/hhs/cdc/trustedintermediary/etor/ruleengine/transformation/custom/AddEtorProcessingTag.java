@@ -9,8 +9,8 @@ import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
 
-/** Converts an ORM order to OML. */
-public class convertToOmlOrder implements CustomFhirTransformation {
+/** Adds the ETOR tag to a message header meta tag for RS processing. */
+public class AddEtorProcessingTag implements CustomFhirTransformation {
 
     private final MetricMetadata metadata =
             ApplicationContext.getImplementation(MetricMetadata.class);
@@ -18,7 +18,13 @@ public class convertToOmlOrder implements CustomFhirTransformation {
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
-        HapiHelper.setMessageTypeCoding(bundle, HapiHelper.OML_CODING);
-        metadata.put(bundle.getId(), EtorMetadataStep.ORDER_CONVERTED_TO_OML);
+
+        var system = "http://localcodes.org/ETOR";
+        var code = "ETOR";
+        var display = "Processed by ETOR";
+
+        HapiHelper.addMetaTag(bundle, system, code, display);
+
+        metadata.put(bundle.getId(), EtorMetadataStep.ETOR_PROCESSING_TAG_ADDED_TO_MESSAGE_HEADER);
     }
 }

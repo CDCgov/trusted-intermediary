@@ -33,7 +33,7 @@ class AddContactSectionToPatientResourceTest extends Specification {
         mockOrder = new OrderMock("fhirResourceId", "patientId", mockOrderBundle, null, null, null, null, null)
 
 
-        transformClass = new addContactSectionToPatientResource()
+        transformClass = new AddContactSectionToPatientResource()
     }
 
     def "add patient contact section when there's none"() {

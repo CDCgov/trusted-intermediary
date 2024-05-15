@@ -11,7 +11,7 @@ import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
 
 /** Removes the Message Structure (MSH-9.3) from the Message Type (MSH-9). */
-public class removeMessageTypeStructure implements CustomFhirTransformation {
+public class RemoveMessageTypeStructure implements CustomFhirTransformation {
 
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args)

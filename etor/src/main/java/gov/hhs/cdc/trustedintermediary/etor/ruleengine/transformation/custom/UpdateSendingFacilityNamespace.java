@@ -16,7 +16,7 @@ import org.hl7.fhir.r4.model.Organization;
  * Updates Sending Facility's Namespace Id (MSH-4) to given value and removes Universal Id (MSH-4.2)
  * and Universal Id Type (MSH-4.3).
  */
-public class updateSendingFacilityNamespace implements CustomFhirTransformation {
+public class UpdateSendingFacilityNamespace implements CustomFhirTransformation {
 
     private final MetricMetadata metadata =
             ApplicationContext.getImplementation(MetricMetadata.class);

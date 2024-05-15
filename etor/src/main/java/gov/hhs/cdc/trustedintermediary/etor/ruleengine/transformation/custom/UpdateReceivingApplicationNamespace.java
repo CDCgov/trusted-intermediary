@@ -17,7 +17,7 @@ import org.hl7.fhir.r4.model.Reference;
  * Updates Receiving Application's Namespace Id (MSH-5.1) to given value, and removes Universal Id
  * (MSH-5.2) and Universal Id Type (MSH-5.3).
  */
-public class updateReceivingApplicationNamespace implements CustomFhirTransformation {
+public class UpdateReceivingApplicationNamespace implements CustomFhirTransformation {
 
     private final MetricMetadata metadata =
             ApplicationContext.getImplementation(MetricMetadata.class);
