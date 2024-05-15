@@ -12,7 +12,7 @@ import org.hl7.fhir.r4.model.Organization;
  * Removes Assigning Authority (PID-3.4) and Identifier Type Code (PID-3.5) from Patient Identifier
  * List (PID-3).
  */
-public class RemovePatientIdentifiers implements CustomFhirTransformation {
+public class removePatientIdentifiers implements CustomFhirTransformation {
 
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {

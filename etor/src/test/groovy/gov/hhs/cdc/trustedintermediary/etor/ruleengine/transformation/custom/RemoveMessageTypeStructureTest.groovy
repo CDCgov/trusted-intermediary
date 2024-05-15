@@ -17,7 +17,7 @@ class RemoveMessageTypeStructureTest  extends Specification {
         TestApplicationContext.init()
         TestApplicationContext.injectRegisteredImplementations()
 
-        transformClass = new RemoveMessageTypeStructure()
+        transformClass = new removeMessageTypeStructure()
     }
 
     def "remove message type structure"() {

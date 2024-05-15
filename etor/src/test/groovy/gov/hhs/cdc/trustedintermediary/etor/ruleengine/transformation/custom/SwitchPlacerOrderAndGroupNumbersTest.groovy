@@ -15,7 +15,7 @@ class SwitchPlacerOrderAndGroupNumbersTest extends Specification {
         TestApplicationContext.init()
         TestApplicationContext.injectRegisteredImplementations()
 
-        transformClass = new SwitchPlacerOrderAndGroupNumbers()
+        transformClass = new switchPlacerOrderAndGroupNumbers()
     }
 
     def "switch OCR.2 and OCR.4 in Bundle"() {
