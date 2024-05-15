@@ -233,4 +233,21 @@ class HapiHelperTest extends Specification {
         then:
         noExceptionThrown()
     }
+
+    def "should not perform updates if no organizations are present in the bundle"() {
+        given:
+        def id = "1"
+        def patient = new Patient()
+        patient.addIdentifier(new Identifier().setAssigner(new Reference("Organization/" + id) as Reference))
+
+        def bundle = new Bundle()
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(patient))
+        Bundle bundleWithNoOrganizations = bundle
+
+        when:
+        HapiHelper.updateOrganizationIdentifierValue(bundleWithNoOrganizations, "newValue")
+
+        then:
+        noExceptionThrown()
+    }
 }
