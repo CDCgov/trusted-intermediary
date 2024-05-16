@@ -2,6 +2,8 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Organization
@@ -16,7 +18,7 @@ class RemovePatientIdentifierTest extends Specification {
         TestApplicationContext.init()
         TestApplicationContext.injectRegisteredImplementations()
 
-        transformClass = new removePatientIdentifiers()
+        transformClass = new RemovePatientIdentifiers()
     }
 
     def "remove PID.3-4 and PID.3-5 from Bundle"() {
@@ -40,6 +42,18 @@ class RemovePatientIdentifierTest extends Specification {
         then:
         strippedPid3_4 == null
         strippedPid3_5 == null
+    }
+
+    def "throw RuleExecutionException if patient resource not present"() {
+        given:
+        def bundle = new Bundle()
+        HapiHelper.createMessageHeader(bundle)
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), null)
+
+        then:
+        thrown(RuleExecutionException)
     }
 
     def getPid3_4AndPid3_5(Bundle bundle) {

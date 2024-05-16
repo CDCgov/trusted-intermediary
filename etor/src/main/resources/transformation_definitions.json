@@ -6,7 +6,7 @@
       "conditions": [ ],
       "rules": [
         {
-          "name": "addEtorProcessingTag",
+          "name": "AddEtorProcessingTag",
           "args": { }
         }
       ]
@@ -20,7 +20,7 @@
       ],
       "rules": [
         {
-          "name": "convertToOmlOrder",
+          "name": "ConvertToOmlOrder",
           "args": { }
         }
       ]
@@ -34,7 +34,7 @@
       ],
       "rules": [
         {
-          "name": "addContactSectionToPatientResource",
+          "name": "AddContactSectionToPatientResource",
           "args": { }
         }
       ]
@@ -43,12 +43,13 @@
       "name": "ucsdOruUpdateSendingFacilityNamespace",
       "description": "Updates UCSD ORU Sending Facility's Namespace Id (MSH-4) to 'CDPH'. It also removes Universal Id (MSH-4.2) and Universal Id Type (MSH-4.3).",
       "message": "",
-      "conditions":  [
-        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'"
       ],
       "rules": [
         {
-          "name": "updateSendingFacilityNamespace",
+          "name": "UpdateSendingFacilityNamespace",
           "args": {
             "name": "CDPH"
           }
@@ -60,11 +61,12 @@
       "description": "Updates UCSD ORU Receiving Application's Namespace Id (MSH-5.1) to 'EPIC'. It also removes Universal Id (MSH-5.2) and Universal Id Type (MSH-5.3)",
       "message": "",
       "conditions": [
-        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'"
       ],
       "rules": [
         {
-          "name": "updateReceivingApplicationNamespace",
+          "name": "UpdateReceivingApplicationNamespace",
           "args": {
             "name": "EPIC"
           }
@@ -76,11 +78,12 @@
       "description": "Removes UCSD ORU's Message Structure (MSH-9.3) from the Message Type (MSH-9)",
       "message": "",
       "conditions": [
-        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'"
       ],
       "rules": [
         {
-          "name": "removeMessageTypeStructure",
+          "name": "RemoveMessageTypeStructure",
           "args": { }
         }
       ]
@@ -90,11 +93,12 @@
       "description": "Swaps UCSD ORU's Placer Order Number (ORC-2) and Placer Group Number (ORC-4)",
       "message": "",
       "conditions": [
-        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'"
       ],
       "rules": [
         {
-          "name": "switchPlacerOrderAndGroupNumbers",
+          "name": "SwitchPlacerOrderAndGroupNumbers",
           "args": { }
         }
       ]
@@ -104,11 +108,27 @@
       "description": "Removes UCSD ORU's Assigning Authority (PID-3.4) and Identifier Type Code (PID-3.5) from Patient Identifier List (PID-3)",
       "message": "",
       "conditions": [
-        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'"
       ],
       "rules": [
         {
-          "name": "removePatientIdentifiers",
+          "name": "RemovePatientIdentifiers",
+          "args": { }
+        }
+      ]
+    },
+    {
+      "name": "ucsdOruRemovePatientNameTypeCode",
+      "description": "Removes UCSD ORU's Name Type Code (PID-5.7) from Patient Name (PID-5)",
+      "message": "",
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'"
+      ],
+      "rules": [
+        {
+          "name": "RemovePatientNameTypeCode",
           "args": { }
         }
       ]

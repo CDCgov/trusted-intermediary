@@ -18,7 +18,7 @@ class ConvertToOmlOrderTest extends Specification {
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
         TestApplicationContext.injectRegisteredImplementations()
 
-        transformClass = new convertToOmlOrder()
+        transformClass = new ConvertToOmlOrder()
     }
 
     def "convert ORM order to OML"() {

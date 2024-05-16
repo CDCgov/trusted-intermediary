@@ -5,7 +5,6 @@ import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhir
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.MessageHeader
 
 class HappyPathMockClass implements CustomFhirTransformation {
 
