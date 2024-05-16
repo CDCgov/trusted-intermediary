@@ -20,11 +20,18 @@ public class updateReceivingFacilityWithOrderingFacilityIdentifier
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args)
             throws RuleExecutionException {
-        Bundle bundle = (Bundle) resource.getUnderlyingResource();
-        Organization receivingFacility = HapiHelper.getReceivingFacility(bundle);
-        Identifier namespaceIdentifier = HapiHelper.createHDNamespaceIdentifier();
-        String orderingFacilityNameOrganizationIdentifier = "R797"; // Get it from ORC-21.10
-        namespaceIdentifier.setValue(orderingFacilityNameOrganizationIdentifier);
-        receivingFacility.setIdentifier(Collections.singletonList(namespaceIdentifier));
+        try {
+            Bundle bundle = (Bundle) resource.getUnderlyingResource();
+            Organization receivingFacility = HapiHelper.getReceivingFacility(bundle);
+            Identifier namespaceIdentifier =
+                    HapiHelper.getHDNamespaceIdentifier(receivingFacility.getIdentifier());
+            String orderingFacilityNameOrganizationIdentifier = "R797"; // Get it from ORC-21.10
+            namespaceIdentifier.setValue(orderingFacilityNameOrganizationIdentifier);
+            receivingFacility.setIdentifier(Collections.singletonList(namespaceIdentifier));
+        } catch (Exception e) {
+            throw new RuleExecutionException(
+                    "Failed to update the receiving facility with the ordering facility identifier",
+                    e);
+        }
     }
 }
