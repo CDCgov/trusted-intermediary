@@ -3,20 +3,19 @@ package gov.hhs.cdc.trustedintermediary.etor.results;
 import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageHelper;
 import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageUseCase;
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
-import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException;
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.TransformationRuleEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import javax.inject.Inject;
 
 /** Use case for converting and sending a lab result message. */
 public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
     private static final SendResultUseCase INSTANCE = new SendResultUseCase();
 
-    @Inject ResultConverter converter;
+    @Inject TransformationRuleEngine transformationEngine;
     @Inject ResultSender sender;
-    @Inject MetricMetadata metadata;
 
     @Inject SendMessageHelper sendMessageHelper;
 
@@ -45,12 +44,13 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
 
         sendMessageHelper.savePartnerMetadataForReceivedMessage(partnerMetadata);
 
-        var convertedResult = converter.addEtorProcessingTag(result);
-        metadata.put(
-                result.getFhirResourceId(),
-                EtorMetadataStep.ETOR_PROCESSING_TAG_ADDED_TO_MESSAGE_HEADER);
+        try {
+            transformationEngine.runRules(result);
+        } catch (RuleExecutionException e) {
+            throw new UnableToSendMessageException("Error running transformation rules", e);
+        }
 
-        String outboundReportId = sender.send(convertedResult).orElse(null);
+        String outboundReportId = sender.send(result).orElse(null);
         logger.logInfo("Sent result reportId: {}", outboundReportId);
 
         sendMessageHelper.linkMessage(receivedSubmissionId);

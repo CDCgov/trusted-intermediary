@@ -15,8 +15,8 @@ dependencies {
     implementation 'org.apache.httpcomponents.client5:httpclient5-fluent:5.3.1'
 
     //jackson
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.17.0'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.17.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.1'
 
     //fhir
     implementation 'ca.uhn.hapi.fhir:hapi-fhir-base:7.0.2'

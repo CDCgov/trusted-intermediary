@@ -15,6 +15,8 @@ class MockRSEndpointClientTest extends Specification {
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
+        TestApplicationContext.register(MockRSEndpointClient, MockRSEndpointClient.getInstance())
+        TestApplicationContext.injectRegisteredImplementations()
     }
 
     def cleanup() {

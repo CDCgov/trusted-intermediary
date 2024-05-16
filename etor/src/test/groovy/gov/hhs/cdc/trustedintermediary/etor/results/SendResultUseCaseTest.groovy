@@ -7,8 +7,11 @@ import gov.hhs.cdc.trustedintermediary.etor.messages.SendMessageUseCase
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
-import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator
+import gov.hhs.cdc.trustedintermediary.etor.orders.Order
+import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.TransformationRuleEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import spock.lang.Specification
@@ -16,7 +19,7 @@ import spock.lang.Specification
 class SendResultUseCaseTest extends Specification {
 
     def mockSender = Mock(ResultSender)
-    def mockConverter = Mock(ResultConverter)
+    def mockEngine = Mock(TransformationRuleEngine)
     def mockOrchestrator = Mock(PartnerMetadataOrchestrator)
     def mockLogger = Mock(Logger)
 
@@ -27,7 +30,7 @@ class SendResultUseCaseTest extends Specification {
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
         TestApplicationContext.register(PartnerMetadataOrchestrator, mockOrchestrator)
         TestApplicationContext.register(SendMessageHelper, SendMessageHelper.getInstance())
-        TestApplicationContext.register(ResultConverter, mockConverter)
+        TestApplicationContext.register(TransformationRuleEngine, mockEngine)
         TestApplicationContext.register(ResultSender, mockSender)
         TestApplicationContext.register(Logger, mockLogger)
         TestApplicationContext.injectRegisteredImplementations()
@@ -42,7 +45,7 @@ class SendResultUseCaseTest extends Specification {
         SendResultUseCase.getInstance().convertAndSend(mockResult, receivedSubmissionId)
 
         then:
-        1 * mockConverter.addEtorProcessingTag(mockResult) >> mockResult
+        1 * mockEngine.runRules(mockResult)
         1 * mockSender.send(mockResult) >> Optional.of("sentSubmissionId")
     }
 
@@ -70,7 +73,7 @@ class SendResultUseCaseTest extends Specification {
 
         then:
         1 * mockLogger.logError(_, _)
-        1 * mockConverter.addEtorProcessingTag(result) >> result
+        1 * mockEngine.runRules(result)
         1 * mockSender.send(result) >> Optional.of("sentId")
     }
 
@@ -85,8 +88,21 @@ class SendResultUseCaseTest extends Specification {
         SendResultUseCase.getInstance().convertAndSend(result, receivedSubmissionId)
 
         then:
-        1 * mockConverter.addEtorProcessingTag(result) >> result
+        1 * mockEngine.runRules(result)
         1 * mockSender.send(result) >> Optional.of("sentId")
         1 * mockLogger.logError(_, _)
+    }
+
+    def "convertAndSend throws an UnableToSendMessageException when there's an error running the transformation rules"() {
+        given:
+        def result = Mock(Result)
+        mockEngine.runRules(result) >> { throw new RuleExecutionException("Error running transformation rules", new Exception()) }
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        SendResultUseCase.getInstance().convertAndSend(result, "receivedId")
+
+        then:
+        thrown(UnableToSendMessageException)
     }
 }

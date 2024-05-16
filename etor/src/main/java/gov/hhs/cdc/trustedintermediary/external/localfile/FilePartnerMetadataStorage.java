@@ -114,7 +114,7 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
     }
 
     @Override
-    public Set<PartnerMetadata> readMetadataForMessageLinking(String receivedSubmissionId)
+    public Set<String> readMetadataForMessageLinking(String receivedSubmissionId)
             throws PartnerMetadataException {
         try {
             Set<PartnerMetadata> existingMetadata = getPartnerMetadata();
@@ -146,6 +146,7 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
                                                                             .receivingFacilityDetails()))
                                             && !metadata.receivedSubmissionId()
                                                     .equals(receivedSubmissionId))
+                    .map(PartnerMetadata::receivedSubmissionId)
                     .collect(Collectors.toSet());
         } catch (Exception e) {
             throw new PartnerMetadataException(

@@ -10,11 +10,13 @@ To run the application directly, execute...
 ./gradlew clean run
 ```
 
-This will run the web API on port 8080.  You can view the API documentation at `/openapi`.
+This runs the web API on port 8080. The app reads/writes data to a local file (unless you have a DB configured)
+
+You can view the API documentation at `/openapi`.
 
 ### Generating and using a token
 1. Run `brew install mike-engel/jwt-cli/jwt-cli`
-2. Run `jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256  --no-iat -S @/PATH_TO_FILE_ON_YOUR_MACHINE/trusted-intermediary/mock_credentials/organization-trusted-intermediary-private-key-local.pem`
+2. Replace `PATH_TO_FILE_ON_YOUR_MACHINE` in this command with the actual path, then run it: `jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256  --no-iat -S @/PATH_TO_FILE_ON_YOUR_MACHINE/trusted-intermediary/mock_credentials/organization-trusted-intermediary-private-key-local.pem`
 3. Copy token from terminal and paste into your postman body with the key `client_assertion`
 4. Add a key to the body with the key `scope` and value of `trusted-intermediary`
 5. Body type should be `x-wwww-form-urlencoded`
@@ -32,18 +34,30 @@ The additional requirements needed to contribute towards development are...
 - [Python](https://docs.python-guide.org/starting/installation/)
 - [Terraform](https://www.terraform.io)
 - [Liquibase](https://www.liquibase.com/download)
+- [Docker](https://www.docker.com/)
 
 ### Generating .env File
 
-To set up the necessary environment variables, you can use the `generate_env.sh` script. This script will create a `.env` file in the resource folder with the required configuration. Follow these steps:
+To set up the necessary environment variables, run the `generate_env.sh` script. This script
+creates a `.env` file in the resource folder with the required configuration
 
 1. Navigate to the project directory.
-
 2. Run the `generate_env.sh` script:
 
    ```bash
    ./generate_env.sh
    ```
+3. If you run TI using Docker rather than Gradle, update the DB and port values in the `.env` file (the alternate values are in comments)
+
+### Using a local database
+Use [docker-compose.postgres.yml](docker-compose.postgres.yml) to run your local DB. In IntelliJ, you can click the play arrow to start it
+
+![docker-postgres.png](images/docker-postgres.png)
+
+Apply all outstanding migrations:
+```bash
+liquibase update --changelog-file ./etor/databaseMigrations/root.yml --url jdbc:postgresql://localhost:5433/intermediary --username intermediary --password 'changeIT!' --label-filter '!azure'
+```
 
 ### Compiling
 
@@ -68,6 +82,8 @@ To run the unit tests, execute...
 #### End-to-end Tests
 
 End-to-end tests are meant to interact and assert the overall flow of the API is operating correctly. They require that the API to be running already.
+The end-to-end tests use whatever database configuration is already in place - if you're using the local filesystem,
+so will the e2e tests (this is how they work on github), and if you're using a DB, so will the tests
 
 To run them, execute...
 
@@ -299,6 +315,8 @@ with this option enabled.
 2. Copy the scripts found at [/scripts/rs](/scripts/rs) to `prime-reportstream/prime-router`
    - **Note**: follow the instructions in [/scripts/rs/readme.md](/scripts/rs/readme.md) to set up the environment variable
 3. CD to `prime-reportstream/prime-router`
+
+   If attempting to access the metadata endpoint in ReportStream add the variable `ETOR_TI_baseurl="http://host.docker.internal:8080"` to `.prime-router/.vault/env/.env.local` file before building the container
 4. Run the `./cleanslate` script. For more information you can refer to the [ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/docs-deprecated/getting-started/getting-started.md#building-the-baseline)
 5. Run RS with `docker compose up --build -d`
 6. Edit `/settings/staging/0166-flexion-staging-results-handling.yml` to comment the lines related to staging settings, and uncomment the ones for local settings:
