@@ -64,11 +64,7 @@ public class HapiHelper {
 
     // MSH - Message Header
     public static MessageHeader getMessageHeader(Bundle bundle) throws NoSuchElementException {
-        MessageHeader messageHeader = resourceInBundle(bundle, MessageHeader.class);
-        if (messageHeader == null) {
-            throw new NoSuchElementException("MessageHeader not found in the bundle");
-        }
-        return messageHeader;
+        return resourceInBundle(bundle, MessageHeader.class);
     }
 
     public static MessageHeader createMessageHeader(Bundle bundle) {
@@ -187,7 +183,7 @@ public class HapiHelper {
     public static List<Identifier> getPatientIdentifierList(Bundle bundle) {
         Patient patient = resourceInBundle(bundle, Patient.class);
         if (patient == null) {
-            throw new NoSuchElementException("Patient not found in the bundle");
+            return null;
         }
         return patient.getIdentifier();
     }
@@ -203,6 +199,6 @@ public class HapiHelper {
                 return identifier;
             }
         }
-        throw new NoSuchElementException("Namespace not found");
+        return null;
     }
 }
