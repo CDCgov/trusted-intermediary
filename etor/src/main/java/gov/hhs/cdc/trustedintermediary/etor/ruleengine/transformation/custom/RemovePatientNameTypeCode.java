@@ -18,7 +18,7 @@ public class RemovePatientNameTypeCode implements CustomFhirTransformation {
             throws RuleExecutionException {
         try {
             Bundle bundle = (Bundle) resource.getUnderlyingResource();
-            Patient patient = (Patient) HapiHelper.resourceInBundle(bundle, Patient.class);
+            Patient patient = HapiHelper.resourceInBundle(bundle, Patient.class);
             List<HumanName> names = patient.getName();
             names.stream()
                     .map(name -> name.getExtensionByUrl(HapiHelper.EXTENSION_XPN_HUMAN_NAME))

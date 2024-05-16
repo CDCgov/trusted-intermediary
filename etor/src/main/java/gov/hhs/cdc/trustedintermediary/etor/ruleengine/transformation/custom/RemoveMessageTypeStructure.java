@@ -6,8 +6,8 @@ import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhir
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
 
@@ -22,12 +22,12 @@ public class RemoveMessageTypeStructure implements CustomFhirTransformation {
             Coding coding = HapiHelper.getMessageTypeCoding(bundle);
             String display = coding.getDisplay();
             String delimiter = "^";
-            ArrayList<String> displayList =
-                    Arrays.stream(display.split("\\" + delimiter))
-                            .collect(Collectors.toCollection(ArrayList::new));
+            List<String> displayList =
+                    new ArrayList<>(Arrays.asList(display.split("\\" + delimiter)));
             if (displayList.size() < 3) {
                 return;
             }
+            // Remove the third element from the list
             displayList.remove(2);
             String strippedString = String.join(delimiter, displayList);
             coding.setDisplay(strippedString);
