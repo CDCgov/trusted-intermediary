@@ -19,8 +19,8 @@ public class UpdateReceivingApplicationNamespace implements CustomFhirTransforma
         try {
             Bundle bundle = (Bundle) resource.getUnderlyingResource();
             var receivingApplication = HapiHelper.getReceivingApplication(bundle);
-            receivingApplication.removeExtension(HapiHelper.UNIVERSAL_ID_URL);
-            receivingApplication.removeExtension(HapiHelper.UNIVERSAL_ID_TYPE_URL);
+            receivingApplication.removeExtension(HapiHelper.EXTENSION_UNIVERSAL_ID_URL);
+            receivingApplication.removeExtension(HapiHelper.EXTENSION_UNIVERSAL_ID_TYPE_URL);
             receivingApplication.setName(args.get("name"));
         } catch (Exception e) {
             throw new RuleExecutionException("Failed to update receiving application namespace", e);

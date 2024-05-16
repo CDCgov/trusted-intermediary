@@ -20,12 +20,14 @@ public class HapiHelper {
 
     private HapiHelper() {}
 
-    public static final String HL7_FIELD_URL =
+    public static final String EXTENSION_HL7_FIELD_URL =
             "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field";
-    public static final String UNIVERSAL_ID_URL =
+    public static final String EXTENSION_UNIVERSAL_ID_URL =
             "https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id";
-    public static final String UNIVERSAL_ID_TYPE_URL =
+    public static final String EXTENSION_UNIVERSAL_ID_TYPE_URL =
             "https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type";
+
+    public static final StringType EXTENSION_DATA_TYPE_HD1 = new StringType("HD.1");
 
     public static final Coding OML_CODING =
             new Coding(
@@ -188,11 +190,11 @@ public class HapiHelper {
     // HD.1 - Namespace Id
     public static Identifier getHDNamespace(List<Identifier> identifiers) {
         for (Identifier identifier : identifiers) {
-            if (identifier.hasExtension(HL7_FIELD_URL)
+            if (identifier.hasExtension(EXTENSION_HL7_FIELD_URL)
                     && identifier
-                            .getExtensionByUrl(HL7_FIELD_URL)
+                            .getExtensionByUrl(EXTENSION_HL7_FIELD_URL)
                             .getValue()
-                            .equalsDeep(new StringType("HD.1"))) {
+                            .equalsDeep(EXTENSION_DATA_TYPE_HD1)) {
                 return identifier;
             }
         }

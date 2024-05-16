@@ -2,12 +2,15 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Provenance
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.ServiceRequest
+import org.hl7.fhir.r4.model.StringType
 import spock.lang.Specification
 
 class HapiHelperTest extends Specification {
@@ -286,5 +289,20 @@ class HapiHelperTest extends Specification {
 
         then:
         HapiHelper.getReceivingFacility(bundle).equalsDeep(receivingFacility)
+    }
+
+    def "getHDNamespace returns the correct namespace"() {
+        given:
+        def expectedExtension = new Extension(HapiHelper.EXTENSION_HL7_FIELD_URL, HapiHelper.EXTENSION_DATA_TYPE_HD1)
+        def expectedIdentifier = new Identifier().setExtension(List.of(expectedExtension)) as Identifier
+        def otherExtension = new Extension(HapiHelper.EXTENSION_HL7_FIELD_URL, new StringType("other"))
+        def otherIdentifier = new Identifier().setExtension(List.of(otherExtension)) as Identifier
+        List<Identifier> identifiers = List.of(expectedIdentifier, otherIdentifier)
+
+        when:
+        def actualNamespace = HapiHelper.getHDNamespace(identifiers)
+
+        then:
+        actualNamespace == expectedIdentifier
     }
 }
