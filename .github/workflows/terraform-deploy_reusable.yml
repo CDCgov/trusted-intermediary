@@ -13,10 +13,6 @@ on:
         type: string
         required: false
         default: ""
-#      TERRAFORM_APPLY_PARAMETERS:
-#        type: string
-#        required: false
-#        default: ""
     secrets:
       AZURE_CLIENT_ID:
         required: true
