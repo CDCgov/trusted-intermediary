@@ -25,16 +25,15 @@ public class ObrOverrides implements CustomFhirTransformation {
                         if (Objects.equals(serviceCoding.getCode(), args.get("checkValue"))) {
                             var codingSystem =
                                     serviceCoding.getExtensionByUrl(
-                                            "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding-system");
+                                            HapiHelper.EXTENSION_CODING_SYSTEM);
                             codingSystem.setValue(new StringType(args.get("codingSystem")));
 
                             var altId =
                                     serviceCoding.getExtensionByUrl(
-                                            "https://reportstream.cdc.gov/fhir/StructureDefinition/alternate-value");
+                                            HapiHelper.EXTENSION_ALTERNATE_VALUE);
                             if (altId.isEmpty()) {
                                 altId = new Extension();
-                                altId.setUrl(
-                                        "https://reportstream.cdc.gov/fhir/StructureDefinition/alternate-value");
+                                altId.setUrl(HapiHelper.EXTENSION_ALTERNATE_VALUE);
                                 serviceCoding.addExtension(altId);
                             }
                             altId.setValue(new StringType(args.get("alternateId")));

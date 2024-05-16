@@ -35,6 +35,12 @@ public class HapiHelper {
     public static final StringType EXTENSION_DATA_TYPE_HD1 = new StringType("HD.1");
     public static final String EXTENSION_XPN7 = "XPN.7";
 
+    public static final String EXTENSION_CODING_SYSTEM =
+            "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding-system";
+
+    public static final String EXTENSION_ALTERNATE_VALUE =
+            "https://reportstream.cdc.gov/fhir/StructureDefinition/alternate-value";
+
     public static final Coding OML_CODING =
             new Coding(
                     "http://terminology.hl7.org/CodeSystem/v2-0003",
