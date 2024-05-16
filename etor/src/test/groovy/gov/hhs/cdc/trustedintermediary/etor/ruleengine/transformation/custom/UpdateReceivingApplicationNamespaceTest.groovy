@@ -23,7 +23,7 @@ class UpdateReceivingApplicationNamespaceTest extends Specification {
         given:
         def name = "EPIC"
         def bundle = new Bundle()
-        HapiHelper.getOrCreateMessageHeader(bundle)
+        HapiHelper.createMessageHeader(bundle)
         def receivingApplication = HapiHelper.createReceivingApplication()
         receivingApplication.addExtension(HapiHelper.UNIVERSAL_ID_URL, new StringType("universal-id"))
         receivingApplication.addExtension(HapiHelper.UNIVERSAL_ID_TYPE_URL, new StringType("universal-id-type"))

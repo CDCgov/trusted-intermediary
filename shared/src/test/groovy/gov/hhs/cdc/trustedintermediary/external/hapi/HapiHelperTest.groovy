@@ -67,26 +67,12 @@ class HapiHelperTest extends Specification {
         thrown(NoSuchElementException)
     }
 
-    def "getOrCreateMessageHeader returns the existing message header if it exists"() {
-        given:
-        def bundle = new Bundle()
-        def messageHeader = new MessageHeader()
-        def messageHeaderEntry = new Bundle.BundleEntryComponent().setResource(messageHeader)
-        bundle.getEntry().add(messageHeaderEntry)
-
-        when:
-        def actualMessageHeader = HapiHelper.getOrCreateMessageHeader(bundle)
-
-        then:
-        actualMessageHeader == messageHeader
-    }
-
-    def "getOrCreateMessageHeader creates a new message header if it does not exist"() {
+    def "createMessageHeader creates a new message header if it does not exist"() {
         given:
         def bundle = new Bundle()
 
         when:
-        def actualMessageHeader = HapiHelper.getOrCreateMessageHeader(bundle)
+        def actualMessageHeader = HapiHelper.createMessageHeader(bundle)
 
         then:
         actualMessageHeader != null
@@ -100,7 +86,7 @@ class HapiHelperTest extends Specification {
         def expectedDisplay = "expectedDisplay"
 
         def mockBundle = new Bundle()
-        HapiHelper.getOrCreateMessageHeader(mockBundle)
+        HapiHelper.createMessageHeader(mockBundle)
 
         when:
         HapiHelper.addMetaTag(mockBundle, expectedSystem, expectedCode, expectedDisplay)
@@ -120,7 +106,7 @@ class HapiHelperTest extends Specification {
         def expectedCode = "expectedCode"
         def expectedDisplay = "expectedDisplay"
         def mockBundle = new Bundle()
-        HapiHelper.getOrCreateMessageHeader(mockBundle)
+        HapiHelper.createMessageHeader(mockBundle)
 
         when:
         HapiHelper.addMetaTag(mockBundle, expectedSystem, expectedCode, expectedDisplay)
@@ -221,11 +207,11 @@ class HapiHelperTest extends Specification {
         def expectedDisplay = "expectedDisplay"
         def expectedCoding = new Coding(expectedSystem, expectedCode, expectedDisplay)
         def mockBundle = new Bundle()
+        HapiHelper.createMessageHeader(mockBundle)
 
         when:
         HapiHelper.setMessageTypeCoding(mockBundle, expectedCoding)
-        def convertedMessageHeader =
-                HapiHelper.resourceInBundle(mockBundle, MessageHeader.class) as MessageHeader
+        def convertedMessageHeader = HapiHelper.getMessageHeader(mockBundle)
 
         then:
         convertedMessageHeader != null
@@ -238,7 +224,7 @@ class HapiHelperTest extends Specification {
         given:
         def bundle = new Bundle()
         def expectedSendingApplication = HapiHelper.createSendingApplication()
-        HapiHelper.getOrCreateMessageHeader(bundle)
+        HapiHelper.createMessageHeader(bundle)
 
         expect:
         def existingSendingApplication = HapiHelper.getSendingApplication(bundle)
@@ -255,7 +241,7 @@ class HapiHelperTest extends Specification {
     def "sending facility's get, send and create work as expected"() {
         given:
         def bundle = new Bundle()
-        HapiHelper.getOrCreateMessageHeader(bundle)
+        HapiHelper.createMessageHeader(bundle)
 
         expect:
         HapiHelper.getSendingFacility(bundle) == null
@@ -272,7 +258,7 @@ class HapiHelperTest extends Specification {
         given:
         def bundle = new Bundle()
         def expectedReceivingApplication = HapiHelper.createReceivingApplication()
-        HapiHelper.getOrCreateMessageHeader(bundle)
+        HapiHelper.createMessageHeader(bundle)
 
         expect:
         def existingReceivingApplication = HapiHelper.getReceivingApplication(bundle)
@@ -289,7 +275,7 @@ class HapiHelperTest extends Specification {
     def "receiving facility's get, send and create work as expected"() {
         given:
         def bundle = new Bundle()
-        HapiHelper.getOrCreateMessageHeader(bundle)
+        HapiHelper.createMessageHeader(bundle)
 
         expect:
         HapiHelper.getReceivingFacility(bundle) == null

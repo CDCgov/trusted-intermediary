@@ -64,12 +64,9 @@ public class HapiHelper {
         return messageHeader;
     }
 
-    public static MessageHeader getOrCreateMessageHeader(Bundle bundle) {
-        MessageHeader messageHeader = (MessageHeader) resourceInBundle(bundle, MessageHeader.class);
-        if (messageHeader == null) {
-            messageHeader = new MessageHeader();
-            bundle.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader));
-        }
+    public static MessageHeader createMessageHeader(Bundle bundle) {
+        MessageHeader messageHeader = new MessageHeader();
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader));
         return messageHeader;
     }
 
@@ -92,7 +89,7 @@ public class HapiHelper {
     }
 
     public static void setMessageTypeCoding(Bundle bundle, Coding coding) {
-        var messageHeader = getOrCreateMessageHeader(bundle);
+        var messageHeader = getMessageHeader(bundle);
         messageHeader.setEvent(coding);
     }
 

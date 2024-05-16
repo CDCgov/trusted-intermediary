@@ -44,7 +44,7 @@ class RemoveMessageTypeStructureTest  extends Specification {
         given:
         def messageTypeDisplay = "ORU^R01"
         def bundle = new Bundle()
-        def messageHeader = HapiHelper.getOrCreateMessageHeader(bundle)
+        def messageHeader = HapiHelper.createMessageHeader(bundle)
         messageHeader.setEvent(new Coding().setDisplay(messageTypeDisplay))
 
         when:
