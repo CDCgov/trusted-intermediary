@@ -59,15 +59,15 @@ class HapiHelperTest extends Specification {
         actualMessageHeader == messageHeader
     }
 
-    def "getMessageHeader throws a NoSuchElementException if the message header does not exist"() {
+    def "getMessageHeader returns null if the message header does not exist"() {
         given:
         def bundle = new Bundle()
 
         when:
-        HapiHelper.getMessageHeader(bundle)
+        def messageHeader = HapiHelper.getMessageHeader(bundle)
 
         then:
-        thrown(NoSuchElementException)
+        messageHeader == null
     }
 
     def "createMessageHeader creates a new message header if it does not exist"() {
@@ -306,16 +306,16 @@ class HapiHelperTest extends Specification {
         actualNamespace == expectedIdentifier
     }
 
-    def "getHDNamespaceIdentifier throws a NoSuchElementException if the namespace is not found"() {
+    def "getHDNamespaceIdentifier returns null if the namespace is not found"() {
         given:
         def extension = new Extension(HapiHelper.EXTENSION_HL7_FIELD_URL, new StringType("other"))
         def identifier = new Identifier().setExtension(List.of(extension)) as Identifier
         List<Identifier> identifiers = List.of(identifier)
 
         when:
-        HapiHelper.getHDNamespaceIdentifier(identifiers)
+        def actualIdentifier = HapiHelper.getHDNamespaceIdentifier(identifiers)
 
         then:
-        thrown(NoSuchElementException)
+        actualIdentifier == null
     }
 }
