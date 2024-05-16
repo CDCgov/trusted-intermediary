@@ -30,10 +30,10 @@ public class HapiHelper {
             "https://reportstream.cdc.gov/fhir/StructureDefinition/assigning-authority";
     public static final String EXTENSION_NAMESPACE_ID_URL =
             "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id";
-    public static final String EXTENSION_XPN_HUMAN_NAME =
+    public static final String EXTENSION_XPN_HUMAN_NAME_URL =
             "https://reportstream.cdc.gov/fhir/StructureDefinition/xpn-human-name";
-    public static final StringType EXTENSION_DATA_TYPE_HD1 = new StringType("HD.1");
-    public static final String EXTENSION_XPN7 = "XPN.7";
+    public static final String EXTENSION_XPN7_URL = "XPN.7";
+    public static final StringType EXTENSION_HD1_DATA_TYPE = new StringType("HD.1");
 
     public static final Coding OML_CODING =
             new Coding(
@@ -195,7 +195,7 @@ public class HapiHelper {
                     && identifier
                             .getExtensionByUrl(EXTENSION_HL7_FIELD_URL)
                             .getValue()
-                            .equalsDeep(EXTENSION_DATA_TYPE_HD1)) {
+                            .equalsDeep(EXTENSION_HD1_DATA_TYPE)) {
                 return identifier;
             }
         }
