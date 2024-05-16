@@ -31,9 +31,8 @@ public class SwitchPlacerOrderAndGroupNumbers implements CustomFhirTransformatio
                                         .getIdentifier()
                                         .get(0)
                                         .getExtensionByUrl(
-                                                "https://reportstream.cdc.gov/fhir/StructureDefinition/assigning-authority")
-                                        .getExtensionByUrl(
-                                                "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id");
+                                                HapiHelper.EXTENSION_ASSIGNING_AUTHORITY_URL)
+                                        .getExtensionByUrl(HapiHelper.EXTENSION_NAMESPACE_ID_URL);
                         var serviceCoding = serviceRequest.getCode().getCoding().get(0);
                         var orc2_1 = serviceIdentifier.getValue();
                         var orc2_2 = serviceNamespaceExtension.getValue().primitiveValue();

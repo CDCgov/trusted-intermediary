@@ -21,12 +21,9 @@ public class RemovePatientNameTypeCode implements CustomFhirTransformation {
             Patient patient = (Patient) HapiHelper.resourceInBundle(bundle, Patient.class);
             List<HumanName> names = patient.getName();
             names.stream()
-                    .map(
-                            name ->
-                                    name.getExtensionByUrl(
-                                            "https://reportstream.cdc.gov/fhir/StructureDefinition/xpn-human-name"))
+                    .map(name -> name.getExtensionByUrl(HapiHelper.EXTENSION_XPN_HUMAN_NAME))
                     .findFirst()
-                    .ifPresent(extension -> extension.removeExtension("XPN.7"));
+                    .ifPresent(extension -> extension.removeExtension(HapiHelper.EXTENSION_XPN7));
         } catch (Exception e) {
             throw new RuleExecutionException("Failed to remove patient name type code", e);
         }

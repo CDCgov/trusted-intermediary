@@ -26,8 +26,14 @@ public class HapiHelper {
             "https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id";
     public static final String EXTENSION_UNIVERSAL_ID_TYPE_URL =
             "https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type";
-
+    public static final String EXTENSION_ASSIGNING_AUTHORITY_URL =
+            "https://reportstream.cdc.gov/fhir/StructureDefinition/assigning-authority";
+    public static final String EXTENSION_NAMESPACE_ID_URL =
+            "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id";
+    public static final String EXTENSION_XPN_HUMAN_NAME =
+            "https://reportstream.cdc.gov/fhir/StructureDefinition/xpn-human-name";
     public static final StringType EXTENSION_DATA_TYPE_HD1 = new StringType("HD.1");
+    public static final String EXTENSION_XPN7 = "XPN.7";
 
     public static final Coding OML_CODING =
             new Coding(
