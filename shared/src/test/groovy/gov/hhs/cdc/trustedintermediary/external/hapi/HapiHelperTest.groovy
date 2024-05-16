@@ -305,4 +305,17 @@ class HapiHelperTest extends Specification {
         then:
         actualNamespace == expectedIdentifier
     }
+
+    def "getHDNamespace throws a NoSuchElementException if the namespace is not found"() {
+        given:
+        def extension = new Extension(HapiHelper.EXTENSION_HL7_FIELD_URL, new StringType("other"))
+        def identifier = new Identifier().setExtension(List.of(extension)) as Identifier
+        List<Identifier> identifiers = List.of(identifier)
+
+        when:
+        HapiHelper.getHDNamespace(identifiers)
+
+        then:
+        thrown(NoSuchElementException)
+    }
 }
