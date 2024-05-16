@@ -112,6 +112,24 @@
           "args": { }
         }
       ]
+    },
+    {
+      "name": "ucsdOruObrOverrides",
+      "description": "Manual overwrites on OBR-4 fields for a specific code",
+      "message": "",
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
+        "Bundle.entry.resource.ofType(ServiceRequest).code = '54089-8'"
+      ],
+      "rules": [
+        {
+          "name": "ObrOverrides",
+          "args": {
+            "codingSystem": "LN",
+            "alternateId": "CDPHGSPEAP"
+          }
+        }
+      ]
     }
   ]
 }
