@@ -291,7 +291,7 @@ class HapiHelperTest extends Specification {
         HapiHelper.getReceivingFacility(bundle).equalsDeep(receivingFacility)
     }
 
-    def "getHDNamespace returns the correct namespace"() {
+    def 'getHDNamespaceIdentifier returns the correct namespaceIdentifier'() {
         given:
         def expectedExtension = new Extension(HapiHelper.EXTENSION_HL7_FIELD_URL, HapiHelper.EXTENSION_DATA_TYPE_HD1)
         def expectedIdentifier = new Identifier().setExtension(List.of(expectedExtension)) as Identifier
@@ -300,20 +300,20 @@ class HapiHelperTest extends Specification {
         List<Identifier> identifiers = List.of(expectedIdentifier, otherIdentifier)
 
         when:
-        def actualNamespace = HapiHelper.getHDNamespace(identifiers)
+        def actualNamespace = HapiHelper.getHDNamespaceIdentifier(identifiers)
 
         then:
         actualNamespace == expectedIdentifier
     }
 
-    def "getHDNamespace throws a NoSuchElementException if the namespace is not found"() {
+    def "getHDNamespaceIdentifier throws a NoSuchElementException if the namespace is not found"() {
         given:
         def extension = new Extension(HapiHelper.EXTENSION_HL7_FIELD_URL, new StringType("other"))
         def identifier = new Identifier().setExtension(List.of(extension)) as Identifier
         List<Identifier> identifiers = List.of(identifier)
 
         when:
-        HapiHelper.getHDNamespace(identifiers)
+        HapiHelper.getHDNamespaceIdentifier(identifiers)
 
         then:
         thrown(NoSuchElementException)
