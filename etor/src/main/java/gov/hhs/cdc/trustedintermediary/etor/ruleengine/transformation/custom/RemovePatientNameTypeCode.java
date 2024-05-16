@@ -20,8 +20,10 @@ public class RemovePatientNameTypeCode implements CustomFhirTransformation {
             Bundle bundle = (Bundle) resource.getUnderlyingResource();
             Patient patient = HapiHelper.resourceInBundle(bundle, Patient.class);
             for (HumanName name : patient.getName()) {
-                Extension extension = name.getExtensionByUrl(HapiHelper.EXTENSION_XPN_HUMAN_NAME);
-                if ((extension != null) && (extension.hasExtension(HapiHelper.EXTENSION_XPN7_URL))) {
+                Extension extension =
+                        name.getExtensionByUrl(HapiHelper.EXTENSION_XPN_HUMAN_NAME_URL);
+                if ((extension != null)
+                        && (extension.hasExtension(HapiHelper.EXTENSION_XPN7_URL))) {
                     extension.removeExtension(HapiHelper.EXTENSION_XPN7_URL);
                 }
             }
