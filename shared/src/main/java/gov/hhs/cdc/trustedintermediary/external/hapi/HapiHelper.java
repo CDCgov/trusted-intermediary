@@ -64,7 +64,11 @@ public class HapiHelper {
 
     // MSH - Message Header
     public static MessageHeader getMessageHeader(Bundle bundle) throws NoSuchElementException {
-        return resourceInBundle(bundle, MessageHeader.class);
+        MessageHeader messageHeader = resourceInBundle(bundle, MessageHeader.class);
+        if (messageHeader == null) {
+            throw new NoSuchElementException("MessageHeader not found in the bundle");
+        }
+        return messageHeader;
     }
 
     public static MessageHeader createMessageHeader(Bundle bundle) {

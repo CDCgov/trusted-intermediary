@@ -59,15 +59,15 @@ class HapiHelperTest extends Specification {
         actualMessageHeader == messageHeader
     }
 
-    def "getMessageHeader returns null if the message header does not exist"() {
+    def "getMessageHeader throws a NoSuchElementException if the message header does not exist"() {
         given:
         def bundle = new Bundle()
 
         when:
-        def messageHeader = HapiHelper.getMessageHeader(bundle)
+        HapiHelper.getMessageHeader(bundle)
 
         then:
-        messageHeader == null
+        thrown(NoSuchElementException)
     }
 
     def "createMessageHeader creates a new message header if it does not exist"() {
