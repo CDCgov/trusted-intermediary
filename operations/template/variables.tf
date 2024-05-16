@@ -15,7 +15,7 @@ variable "vpn_root_certificate" {
 }
 
 variable "alert_slack_email" {
-  type = string
-  nullable = false
+  type      = string
+  nullable  = false
   sensitive = true
 }

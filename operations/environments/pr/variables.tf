@@ -4,7 +4,7 @@ variable "pr_number" {
 }
 
 variable "alert_slack_email" {
-  type = string
-  nullable = false
+  type      = string
+  nullable  = false
   sensitive = true
 }
