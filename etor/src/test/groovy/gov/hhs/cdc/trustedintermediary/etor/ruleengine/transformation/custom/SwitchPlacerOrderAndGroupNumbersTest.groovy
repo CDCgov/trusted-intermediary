@@ -2,8 +2,13 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.ServiceRequest
 import spock.lang.Specification
 
@@ -15,7 +20,7 @@ class SwitchPlacerOrderAndGroupNumbersTest extends Specification {
         TestApplicationContext.init()
         TestApplicationContext.injectRegisteredImplementations()
 
-        transformClass = new switchPlacerOrderAndGroupNumbers()
+        transformClass = new SwitchPlacerOrderAndGroupNumbers()
     }
 
     def "switch OCR.2 and OCR.4 in Bundle"() {
@@ -47,6 +52,18 @@ class SwitchPlacerOrderAndGroupNumbersTest extends Specification {
         switchedObr2_2 == orc4_2
         switchedObr4_1 == orc2_1
         switchedObr4_2 == orc2_2
+    }
+
+    def "throw RuleExecutionException if ServiceRequest doesn't have identifiers"() {
+        given:
+        def bundle = new Bundle()
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(new ServiceRequest()))
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), null)
+
+        then:
+        thrown(RuleExecutionException)
     }
 
     // Returns a list of values for the OCR sections that need checking in the following order:

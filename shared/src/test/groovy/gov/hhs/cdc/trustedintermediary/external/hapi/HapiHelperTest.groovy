@@ -2,12 +2,15 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Provenance
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.ServiceRequest
+import org.hl7.fhir.r4.model.StringType
 import spock.lang.Specification
 
 class HapiHelperTest extends Specification {
@@ -42,6 +45,43 @@ class HapiHelperTest extends Specification {
         patientStream.allMatch {patients.contains(it) && it.getResourceType() == ResourceType.Patient }
     }
 
+    def "getMessageHeader returns the message header from the bundle if it exists"() {
+        given:
+        def bundle = new Bundle()
+        def messageHeader = new MessageHeader()
+        def messageHeaderEntry = new Bundle.BundleEntryComponent().setResource(messageHeader)
+        bundle.getEntry().add(messageHeaderEntry)
+
+        when:
+        def actualMessageHeader = HapiHelper.getMessageHeader(bundle)
+
+        then:
+        actualMessageHeader == messageHeader
+    }
+
+    def "getMessageHeader throws a NoSuchElementException if the message header does not exist"() {
+        given:
+        def bundle = new Bundle()
+
+        when:
+        HapiHelper.getMessageHeader(bundle)
+
+        then:
+        thrown(NoSuchElementException)
+    }
+
+    def "createMessageHeader creates a new message header if it does not exist"() {
+        given:
+        def bundle = new Bundle()
+
+        when:
+        def actualMessageHeader = HapiHelper.createMessageHeader(bundle)
+
+        then:
+        actualMessageHeader != null
+        actualMessageHeader.getResourceType() == ResourceType.MessageHeader
+    }
+
     def "addMetaTag adds message header tag to any Bundle"() {
         given:
         def expectedSystem = "expectedSystem"
@@ -49,7 +89,7 @@ class HapiHelperTest extends Specification {
         def expectedDisplay = "expectedDisplay"
 
         def mockBundle = new Bundle()
-        HapiHelper.getOrCreateMessageHeader(mockBundle)
+        HapiHelper.createMessageHeader(mockBundle)
 
         when:
         HapiHelper.addMetaTag(mockBundle, expectedSystem, expectedCode, expectedDisplay)
@@ -69,6 +109,7 @@ class HapiHelperTest extends Specification {
         def expectedCode = "expectedCode"
         def expectedDisplay = "expectedDisplay"
         def mockBundle = new Bundle()
+        HapiHelper.createMessageHeader(mockBundle)
 
         when:
         HapiHelper.addMetaTag(mockBundle, expectedSystem, expectedCode, expectedDisplay)
@@ -169,16 +210,99 @@ class HapiHelperTest extends Specification {
         def expectedDisplay = "expectedDisplay"
         def expectedCoding = new Coding(expectedSystem, expectedCode, expectedDisplay)
         def mockBundle = new Bundle()
+        HapiHelper.createMessageHeader(mockBundle)
 
         when:
         HapiHelper.setMessageTypeCoding(mockBundle, expectedCoding)
-        def convertedMessageHeader =
-                HapiHelper.resourceInBundle(mockBundle, MessageHeader.class) as MessageHeader
+        def convertedMessageHeader = HapiHelper.getMessageHeader(mockBundle)
 
         then:
         convertedMessageHeader != null
         convertedMessageHeader.getEventCoding().getSystem() == expectedSystem
         convertedMessageHeader.getEventCoding().getCode() == expectedCode
         convertedMessageHeader.getEventCoding().getDisplay() == expectedDisplay
+    }
+
+    def "sending application's get, send and create work as expected"() {
+        given:
+        def bundle = new Bundle()
+        def expectedSendingApplication = HapiHelper.createSendingApplication()
+        HapiHelper.createMessageHeader(bundle)
+
+        expect:
+        def existingSendingApplication = HapiHelper.getSendingApplication(bundle)
+        !existingSendingApplication.equalsDeep(expectedSendingApplication)
+
+        when:
+        HapiHelper.setSendingApplication(bundle, expectedSendingApplication)
+        def actualSendingApplication = HapiHelper.getSendingApplication(bundle)
+
+        then:
+        actualSendingApplication.equalsDeep(expectedSendingApplication)
+    }
+
+    def "sending facility's get, send and create work as expected"() {
+        given:
+        def bundle = new Bundle()
+        HapiHelper.createMessageHeader(bundle)
+
+        expect:
+        HapiHelper.getSendingFacility(bundle) == null
+
+        when:
+        def sendingFacility = HapiHelper.createFacilityOrganization()
+        HapiHelper.setSendingFacility(bundle, sendingFacility)
+
+        then:
+        HapiHelper.getSendingFacility(bundle).equalsDeep(sendingFacility)
+    }
+
+    def "receiving application's get, send and create work as expected"() {
+        given:
+        def bundle = new Bundle()
+        def expectedReceivingApplication = HapiHelper.createReceivingApplication()
+        HapiHelper.createMessageHeader(bundle)
+
+        expect:
+        def existingReceivingApplication = HapiHelper.getReceivingApplication(bundle)
+        !existingReceivingApplication.equalsDeep(expectedReceivingApplication)
+
+        when:
+        HapiHelper.setReceivingApplication(bundle, expectedReceivingApplication)
+        def actualReceivingApplication = HapiHelper.getReceivingApplication(bundle)
+
+        then:
+        actualReceivingApplication.equalsDeep(expectedReceivingApplication)
+    }
+
+    def "receiving facility's get, send and create work as expected"() {
+        given:
+        def bundle = new Bundle()
+        HapiHelper.createMessageHeader(bundle)
+
+        expect:
+        HapiHelper.getReceivingFacility(bundle) == null
+
+        when:
+        def receivingFacility = HapiHelper.createFacilityOrganization()
+        HapiHelper.setReceivingFacility(bundle, receivingFacility)
+
+        then:
+        HapiHelper.getReceivingFacility(bundle).equalsDeep(receivingFacility)
+    }
+
+    def "getHDNamespace returns the correct namespace"() {
+        given:
+        def expectedExtension = new Extension(HapiHelper.EXTENSION_HL7_FIELD_URL, HapiHelper.EXTENSION_DATA_TYPE_HD1)
+        def expectedIdentifier = new Identifier().setExtension(List.of(expectedExtension)) as Identifier
+        def otherExtension = new Extension(HapiHelper.EXTENSION_HL7_FIELD_URL, new StringType("other"))
+        def otherIdentifier = new Identifier().setExtension(List.of(otherExtension)) as Identifier
+        List<Identifier> identifiers = List.of(expectedIdentifier, otherIdentifier)
+
+        when:
+        def actualNamespace = HapiHelper.getHDNamespace(identifiers)
+
+        then:
+        actualNamespace == expectedIdentifier
     }
 }

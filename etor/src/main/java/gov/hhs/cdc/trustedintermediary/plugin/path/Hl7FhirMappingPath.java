@@ -88,7 +88,10 @@ public enum Hl7FhirMappingPath {
             "",
             """
  Bundle.entry.resource.ofType(MessageHeader).destination.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type').value
- """);
+ """),
+    PATIENT_IDENTIFIER_NAME_TYPE_CODE(
+            "PID.5-7",
+            " Bundle.entry.resource.ofType(Patient).name.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/xpn-human-name').extension.where(url = 'XPN.7').value");
 
     private final String fhirPath;
     private final String hl7Path;

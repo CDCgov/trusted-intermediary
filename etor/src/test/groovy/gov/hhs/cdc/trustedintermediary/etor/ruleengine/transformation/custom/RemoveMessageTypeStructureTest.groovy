@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
 import spock.lang.Specification
@@ -17,7 +18,7 @@ class RemoveMessageTypeStructureTest  extends Specification {
         TestApplicationContext.init()
         TestApplicationContext.injectRegisteredImplementations()
 
-        transformClass = new removeMessageTypeStructure()
+        transformClass = new RemoveMessageTypeStructure()
     }
 
     def "remove message type structure"() {
@@ -44,7 +45,7 @@ class RemoveMessageTypeStructureTest  extends Specification {
         given:
         def messageTypeDisplay = "ORU^R01"
         def bundle = new Bundle()
-        def messageHeader = HapiHelper.getOrCreateMessageHeader(bundle)
+        def messageHeader = HapiHelper.createMessageHeader(bundle)
         messageHeader.setEvent(new Coding().setDisplay(messageTypeDisplay))
 
         when:
@@ -54,5 +55,17 @@ class RemoveMessageTypeStructureTest  extends Specification {
 
         then:
         convertedDisplay == messageTypeDisplay
+    }
+
+    def "throw RuleExecutionException if message type coding not present"() {
+        given:
+        def bundle = new Bundle()
+        HapiHelper.createMessageHeader(bundle)
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), null)
+
+        then:
+        thrown(RuleExecutionException)
     }
 }

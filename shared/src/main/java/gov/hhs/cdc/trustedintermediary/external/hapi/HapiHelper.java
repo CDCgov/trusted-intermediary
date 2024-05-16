@@ -1,15 +1,17 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 import java.util.stream.Stream;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.StringType;
 
@@ -17,6 +19,21 @@ import org.hl7.fhir.r4.model.StringType;
 public class HapiHelper {
 
     private HapiHelper() {}
+
+    public static final String EXTENSION_HL7_FIELD_URL =
+            "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field";
+    public static final String EXTENSION_UNIVERSAL_ID_URL =
+            "https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id";
+    public static final String EXTENSION_UNIVERSAL_ID_TYPE_URL =
+            "https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type";
+    public static final String EXTENSION_ASSIGNING_AUTHORITY_URL =
+            "https://reportstream.cdc.gov/fhir/StructureDefinition/assigning-authority";
+    public static final String EXTENSION_NAMESPACE_ID_URL =
+            "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id";
+    public static final String EXTENSION_XPN_HUMAN_NAME =
+            "https://reportstream.cdc.gov/fhir/StructureDefinition/xpn-human-name";
+    public static final StringType EXTENSION_DATA_TYPE_HD1 = new StringType("HD.1");
+    public static final String EXTENSION_XPN7 = "XPN.7";
 
     public static final Coding OML_CODING =
             new Coding(
@@ -46,9 +63,24 @@ public class HapiHelper {
         return resourcesInBundle(bundle, resourceType).findFirst().orElse(null);
     }
 
+    // MSH - Message Header
+    public static MessageHeader getMessageHeader(Bundle bundle) throws NoSuchElementException {
+        MessageHeader messageHeader = (MessageHeader) resourceInBundle(bundle, MessageHeader.class);
+        if (messageHeader == null) {
+            throw new NoSuchElementException("MessageHeader not found in the bundle");
+        }
+        return messageHeader;
+    }
+
+    public static MessageHeader createMessageHeader(Bundle bundle) {
+        MessageHeader messageHeader = new MessageHeader();
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader));
+        return messageHeader;
+    }
+
     public static void addMetaTag(
             Bundle messageBundle, String system, String code, String display) {
-        MessageHeader messageHeader = getOrCreateMessageHeader(messageBundle);
+        MessageHeader messageHeader = getMessageHeader(messageBundle);
         var meta = messageHeader.hasMeta() ? messageHeader.getMeta() : new Meta();
 
         if (meta.getTag(system, code) == null) {
@@ -58,29 +90,14 @@ public class HapiHelper {
         messageHeader.setMeta(meta);
     }
 
-    // MSH - Message Header
-    public static MessageHeader getMessageHeader(Bundle bundle) {
-        return (MessageHeader) resourceInBundle(bundle, MessageHeader.class);
-    }
-
-    public static MessageHeader getOrCreateMessageHeader(Bundle bundle) {
-        MessageHeader messageHeader = getMessageHeader(bundle);
-        if (messageHeader == null) {
-            messageHeader = new MessageHeader();
-            bundle.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader));
-        }
-        return messageHeader;
-    }
-
     // MSH.9 - Message Type
     public static Coding getMessageTypeCoding(Bundle bundle) {
         MessageHeader messageHeader = getMessageHeader(bundle);
         return messageHeader.getEventCoding();
     }
 
-    // MSH.9 - Message Type
-    public static void setMessageTypeCoding(Bundle order, Coding coding) {
-        var messageHeader = getOrCreateMessageHeader(order);
+    public static void setMessageTypeCoding(Bundle bundle, Coding coding) {
+        var messageHeader = getMessageHeader(bundle);
         messageHeader.setEvent(coding);
     }
 
@@ -90,10 +107,44 @@ public class HapiHelper {
         return messageHeader.getSource();
     }
 
+    public static void setSendingApplication(
+            Bundle bundle, MessageHeader.MessageSourceComponent sendingApplication) {
+        MessageHeader messageHeader = getMessageHeader(bundle);
+        messageHeader.setSource(sendingApplication);
+    }
+
+    public static MessageHeader.MessageSourceComponent createSendingApplication() {
+        MessageHeader.MessageSourceComponent source = new MessageHeader.MessageSourceComponent();
+        source.setId(UUID.randomUUID().toString());
+        return source;
+    }
+
     // MSH.4 - Sending Facility
     public static Organization getSendingFacility(Bundle bundle) {
         MessageHeader messageHeader = getMessageHeader(bundle);
         return (Organization) messageHeader.getSender().getResource();
+    }
+
+    public static void setSendingFacility(Bundle bundle, Organization sendingFacility) {
+        MessageHeader messageHeader = getMessageHeader(bundle);
+        String organizationId = sendingFacility.getId();
+        Reference organizationReference = new Reference("Organization/" + organizationId);
+        organizationReference.setResource(sendingFacility);
+        messageHeader.setSender(organizationReference);
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(sendingFacility));
+    }
+
+    public static Organization createFacilityOrganization() {
+        Organization organization = new Organization();
+        String organizationId = UUID.randomUUID().toString();
+        organization.setId(organizationId);
+        return organization;
+    }
+
+    public static Identifier getSendingFacilityNamespace(Bundle bundle) {
+        Organization sendingFacility = getSendingFacility(bundle);
+        List<Identifier> identifiers = sendingFacility.getIdentifier();
+        return getHDNamespace(identifiers);
     }
 
     // MSH.5 - Receiving Application
@@ -102,26 +153,57 @@ public class HapiHelper {
         return messageHeader.getDestinationFirstRep();
     }
 
+    public static void setReceivingApplication(
+            Bundle bundle, MessageHeader.MessageDestinationComponent receivingApplication) {
+        MessageHeader messageHeader = getMessageHeader(bundle);
+        messageHeader.setDestination(List.of(receivingApplication));
+    }
+
+    public static MessageHeader.MessageDestinationComponent createReceivingApplication() {
+        MessageHeader.MessageDestinationComponent destination =
+                new MessageHeader.MessageDestinationComponent();
+        destination.setId(UUID.randomUUID().toString());
+        return destination;
+    }
+
     // MSH.6 - Receiving Facility
     public static Organization getReceivingFacility(Bundle bundle) {
         MessageHeader messageHeader = getMessageHeader(bundle);
         return (Organization) messageHeader.getDestinationFirstRep().getReceiver().getResource();
     }
 
+    public static void setReceivingFacility(Bundle bundle, Organization receivingFacility) {
+        MessageHeader messageHeader = getMessageHeader(bundle);
+        String organizationId = receivingFacility.getId();
+        Reference organizationReference = new Reference("Organization/" + organizationId);
+        organizationReference.setResource(receivingFacility);
+        MessageHeader.MessageDestinationComponent destination =
+                new MessageHeader.MessageDestinationComponent();
+        destination.setReceiver(organizationReference);
+        messageHeader.setDestination(List.of(destination));
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(receivingFacility));
+    }
+
     // PID.3 - Patient Identifier List
     public static List<Identifier> getPatientIdentifierList(Bundle bundle) {
         Patient patient = (Patient) resourceInBundle(bundle, Patient.class);
+        if (patient == null) {
+            throw new NoSuchElementException("Patient not found in the bundle");
+        }
         return patient.getIdentifier();
     }
 
     // HD.1 - Namespace Id
-    public static Identifier createHDNamespaceIdentifier() {
-        Identifier identifier = new Identifier();
-        Extension extension =
-                new Extension(
-                        "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
-                        new StringType("HD.1"));
-        identifier.addExtension(extension);
-        return identifier;
+    public static Identifier getHDNamespace(List<Identifier> identifiers) {
+        for (Identifier identifier : identifiers) {
+            if (identifier.hasExtension(EXTENSION_HL7_FIELD_URL)
+                    && identifier
+                            .getExtensionByUrl(EXTENSION_HL7_FIELD_URL)
+                            .getValue()
+                            .equalsDeep(EXTENSION_DATA_TYPE_HD1)) {
+                return identifier;
+            }
+        }
+        throw new NoSuchElementException("Namespace not found");
     }
 }
