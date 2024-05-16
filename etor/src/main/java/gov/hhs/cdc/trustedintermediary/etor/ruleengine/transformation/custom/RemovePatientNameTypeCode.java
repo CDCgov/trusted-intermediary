@@ -23,7 +23,8 @@ public class RemovePatientNameTypeCode implements CustomFhirTransformation {
             names.stream()
                     .map(name -> name.getExtensionByUrl(HapiHelper.EXTENSION_XPN_HUMAN_NAME))
                     .findFirst()
-                    .ifPresent(extension -> extension.removeExtension(HapiHelper.EXTENSION_XPN7));
+                    .ifPresent(
+                            extension -> extension.removeExtension(HapiHelper.EXTENSION_XPN7_URL));
         } catch (Exception e) {
             throw new RuleExecutionException("Failed to remove patient name type code", e);
         }

@@ -293,7 +293,7 @@ class HapiHelperTest extends Specification {
 
     def 'getHDNamespaceIdentifier returns the correct namespaceIdentifier'() {
         given:
-        def expectedExtension = new Extension(HapiHelper.EXTENSION_HL7_FIELD_URL, HapiHelper.EXTENSION_DATA_TYPE_HD1)
+        def expectedExtension = new Extension(HapiHelper.EXTENSION_HL7_FIELD_URL, HapiHelper.EXTENSION_HD1_DATA_TYPE)
         def expectedIdentifier = new Identifier().setExtension(List.of(expectedExtension)) as Identifier
         def otherExtension = new Extension(HapiHelper.EXTENSION_HL7_FIELD_URL, new StringType("other"))
         def otherIdentifier = new Identifier().setExtension(List.of(otherExtension)) as Identifier

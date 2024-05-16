@@ -6,13 +6,17 @@ import java.util.UUID;
 import java.util.stream.Stream;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.DiagnosticReport;
+import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.PractitionerRole;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ServiceRequest;
 import org.hl7.fhir.r4.model.StringType;
 
 /** Helper class that works on HapiFHIR constructs. */
@@ -32,8 +36,11 @@ public class HapiHelper {
             "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id";
     public static final String EXTENSION_XPN_HUMAN_NAME =
             "https://reportstream.cdc.gov/fhir/StructureDefinition/xpn-human-name";
-    public static final StringType EXTENSION_DATA_TYPE_HD1 = new StringType("HD.1");
-    public static final String EXTENSION_XPN7 = "XPN.7";
+    public static final String EXTENSION_XON_ORGANIZATION =
+            "https://reportstream.cdc.gov/fhir/StructureDefinition/xon-organization";
+    public static final String EXTENSION_XON10_URL = "XON.10";
+    public static final String EXTENSION_XPN7_URL = "XPN.7";
+    public static final StringType EXTENSION_HD1_DATA_TYPE = new StringType("HD.1");
 
     public static final Coding OML_CODING =
             new Coding(
@@ -205,5 +212,30 @@ public class HapiHelper {
             }
         }
         throw new NoSuchElementException("Namespace not found");
+    }
+
+    // Diagnostic Report
+    public static DiagnosticReport getDiagnosticReport(Bundle bundle) {
+        return resourceInBundle(bundle, DiagnosticReport.class);
+    }
+
+    public static ServiceRequest getServiceRequestBasedOn(DiagnosticReport diagnosticReport) {
+        return (ServiceRequest) diagnosticReport.getBasedOnFirstRep().getResource();
+    }
+
+    public static PractitionerRole getPractitionerRoleRequester(ServiceRequest serviceRequest) {
+        return (PractitionerRole) serviceRequest.getRequester().getResource();
+    }
+
+    public static Organization getOrganization(PractitionerRole practitionerRole) {
+        return (Organization) practitionerRole.getOrganization().getResource();
+    }
+
+    public static Extension getOrc21Extension(Organization organization) {
+        if (organization.hasExtension(EXTENSION_XON_ORGANIZATION)) {
+            Extension xonOrgExtension = organization.getExtensionByUrl(EXTENSION_XON_ORGANIZATION);
+            return xonOrgExtension.getExtensionByUrl(EXTENSION_XON10_URL);
+        }
+        throw new NoSuchElementException("ORC-21.10 extension not found");
     }
 }

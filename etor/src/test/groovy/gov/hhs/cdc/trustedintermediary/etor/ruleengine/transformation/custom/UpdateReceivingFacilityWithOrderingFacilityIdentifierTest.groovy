@@ -21,34 +21,25 @@ class UpdateReceivingFacilityWithOrderingFacilityIdentifierTest extends Specific
         transformClass = new updateReceivingFacilityWithOrderingFacilityIdentifier()
     }
 
-    def "update california receiving facility"() {
+    def "update california receiving facility with ordering facility identifier"() {
         given:
         def fhirResource = ExamplesHelper.getExampleFhirResource('../MN/004_MN_ORU_R01_NBS_1_hl7_translation.fhir')
         def bundle = fhirResource.getUnderlyingResource() as Bundle
-
-        def messageHeader = HapiHelper.getMessageHeader(bundle)
-        def destination = messageHeader.getDestinationFirstRep()
-        def organization = destination.getReceiver().getResource() as Organization
-        def ident = organization.getIdentifier().findAll {
-            it.getExtension().findAll {
-                it.value as String == 'HD.1'
-            }
-        }.first()
-        //        def displayArray = messageHeader.getEventCoding().getDisplay().split("\\^")
+        def diagnosticReport = HapiHelper.getDiagnosticReport(bundle)
+        def serviceRequest = HapiHelper.getServiceRequestBasedOn(diagnosticReport)
+        def practitionerRole = HapiHelper.getPractitionerRoleRequester(serviceRequest)
+        def organization = HapiHelper.getOrganization(practitionerRole)
+        def orcTwentyOneDotTen = HapiHelper.getOrc21Extension(organization).getValue() as String
 
         expect:
-        //        displayArray.size() == 3
-        //        displayArray[2] != ""
+        HapiHelper.getReceivingFacility(bundle).getIdentifier().size() > 1
+        HapiHelper.getSendingFacilityNamespace(bundle).getValue() != orcTwentyOneDotTen
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
-        //        def convertedMessageHeader = HapiHelper.findOrCreateMessageHeader(bundle)
-        //        def convertedDisplay = convertedMessageHeader.getEventCoding().getDisplay()
-        //        def convertedDisplayArray = convertedDisplay.split("\\^")
 
         then:
-        true
-        //        convertedDisplayArray.size() == 2
+        HapiHelper.getSendingFacilityNamespace(bundle).getValue() == orcTwentyOneDotTen
     }
 
     def "throw RuleExecutionException if receiving facility not in bundle"() {
