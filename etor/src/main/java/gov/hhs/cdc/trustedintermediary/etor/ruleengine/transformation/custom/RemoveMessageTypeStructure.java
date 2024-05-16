@@ -7,6 +7,7 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
 
@@ -21,8 +22,9 @@ public class RemoveMessageTypeStructure implements CustomFhirTransformation {
             Coding coding = HapiHelper.getMessageTypeCoding(bundle);
             String display = coding.getDisplay();
             String delimiter = "^";
-            String[] displayArray = display.split("\\" + delimiter);
-            ArrayList<String> displayList = new ArrayList<>(Arrays.asList(displayArray));
+            ArrayList<String> displayList =
+                    Arrays.stream(display.split("\\" + delimiter))
+                            .collect(Collectors.toCollection(ArrayList::new));
             if (displayList.size() < 3) {
                 return;
             }

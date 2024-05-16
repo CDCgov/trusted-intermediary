@@ -144,7 +144,7 @@ public class HapiHelper {
     public static Identifier getSendingFacilityNamespace(Bundle bundle) {
         Organization sendingFacility = getSendingFacility(bundle);
         List<Identifier> identifiers = sendingFacility.getIdentifier();
-        return getHDNamespace(identifiers);
+        return getHDNamespaceIdentifier(identifiers);
     }
 
     // MSH.5 - Receiving Application
@@ -194,7 +194,7 @@ public class HapiHelper {
     }
 
     // HD.1 - Namespace Id
-    public static Identifier getHDNamespace(List<Identifier> identifiers) {
+    public static Identifier getHDNamespaceIdentifier(List<Identifier> identifiers) {
         for (Identifier identifier : identifiers) {
             if (identifier.hasExtension(EXTENSION_HL7_FIELD_URL)
                     && identifier
