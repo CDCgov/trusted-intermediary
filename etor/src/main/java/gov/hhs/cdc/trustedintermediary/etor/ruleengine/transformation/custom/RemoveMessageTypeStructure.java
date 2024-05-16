@@ -16,17 +16,21 @@ public class RemoveMessageTypeStructure implements CustomFhirTransformation {
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args)
             throws RuleExecutionException {
-        Bundle bundle = (Bundle) resource.getUnderlyingResource();
-        Coding coding = HapiHelper.getMessageTypeCoding(bundle);
-        String display = coding.getDisplay();
-        String delimiter = "^";
-        String[] displayArray = display.split("\\" + delimiter);
-        ArrayList<String> displayList = new ArrayList<>(Arrays.asList(displayArray));
-        if (displayList.size() < 3) {
-            return;
+        try {
+            Bundle bundle = (Bundle) resource.getUnderlyingResource();
+            Coding coding = HapiHelper.getMessageTypeCoding(bundle);
+            String display = coding.getDisplay();
+            String delimiter = "^";
+            String[] displayArray = display.split("\\" + delimiter);
+            ArrayList<String> displayList = new ArrayList<>(Arrays.asList(displayArray));
+            if (displayList.size() < 3) {
+                return;
+            }
+            displayList.remove(2);
+            String strippedString = String.join(delimiter, displayList);
+            coding.setDisplay(strippedString);
+        } catch (Exception e) {
+            throw new RuleExecutionException("Failed to remove message type structure", e);
         }
-        displayList.remove(2);
-        String strippedString = String.join(delimiter, displayList);
-        coding.setDisplay(strippedString);
     }
 }

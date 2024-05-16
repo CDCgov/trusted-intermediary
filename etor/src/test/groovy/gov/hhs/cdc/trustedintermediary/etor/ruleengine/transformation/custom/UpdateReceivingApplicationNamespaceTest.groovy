@@ -1,9 +1,11 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.ServiceRequest
 import org.hl7.fhir.r4.model.StringType
 import spock.lang.Specification
 
@@ -43,5 +45,17 @@ class UpdateReceivingApplicationNamespaceTest extends Specification {
         transformedReceivingApplication.name == name
         transformedReceivingApplication.getExtensionByUrl(HapiHelper.UNIVERSAL_ID_URL) == null
         transformedReceivingApplication.getExtensionByUrl(HapiHelper.UNIVERSAL_ID_TYPE_URL) == null
+    }
+
+    def "throw RuleExecutionException if receiving application not in bundle"() {
+        given:
+        def bundle = new Bundle()
+        HapiHelper.createMessageHeader(bundle)
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), null)
+
+        then:
+        thrown(RuleExecutionException)
     }
 }
