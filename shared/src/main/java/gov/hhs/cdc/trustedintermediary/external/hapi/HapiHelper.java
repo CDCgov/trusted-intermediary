@@ -36,7 +36,7 @@ public class HapiHelper {
             "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id";
     public static final String EXTENSION_XPN_HUMAN_NAME_URL =
             "https://reportstream.cdc.gov/fhir/StructureDefinition/xpn-human-name";
-    public static final String EXTENSION_XON_ORGANIZATION =
+    public static final String EXTENSION_XON_ORGANIZATION_URL =
             "https://reportstream.cdc.gov/fhir/StructureDefinition/xon-organization";
     public static final String EXTENSION_XON10_URL = "XON.10";
     public static final String EXTENSION_XPN7_URL = "XPN.7";
@@ -227,10 +227,11 @@ public class HapiHelper {
     }
 
     public static Extension getOrc21Extension(Organization organization) {
-        if (organization.hasExtension(EXTENSION_XON_ORGANIZATION)) {
-            Extension xonOrgExtension = organization.getExtensionByUrl(EXTENSION_XON_ORGANIZATION);
+        if (organization.hasExtension(EXTENSION_XON_ORGANIZATION_URL)) {
+            Extension xonOrgExtension =
+                    organization.getExtensionByUrl(EXTENSION_XON_ORGANIZATION_URL);
             return xonOrgExtension.getExtensionByUrl(EXTENSION_XON10_URL);
         }
-        throw new NoSuchElementException("ORC-21.10 extension not found");
+        return null;
     }
 }

@@ -14,7 +14,7 @@ import org.hl7.fhir.r4.model.Organization;
  * Updates the receiving facility (MSH-6) to value in Ordering Facility Name's Organization
  * Identifier (ORC-21.10).
  */
-public class updateReceivingFacilityWithOrderingFacilityIdentifier
+public class UpdateReceivingFacilityWithOrderingFacilityIdentifier
         implements CustomFhirTransformation {
 
     @Override
@@ -25,6 +25,9 @@ public class updateReceivingFacilityWithOrderingFacilityIdentifier
             Organization receivingFacility = HapiHelper.getReceivingFacility(bundle);
             Identifier namespaceIdentifier =
                     HapiHelper.getHDNamespaceIdentifier(receivingFacility.getIdentifier());
+            if (namespaceIdentifier == null) {
+                return;
+            }
             String orderingFacilityNameOrganizationIdentifier = "R797"; // Get it from ORC-21.10
             namespaceIdentifier.setValue(orderingFacilityNameOrganizationIdentifier);
             receivingFacility.setIdentifier(Collections.singletonList(namespaceIdentifier));

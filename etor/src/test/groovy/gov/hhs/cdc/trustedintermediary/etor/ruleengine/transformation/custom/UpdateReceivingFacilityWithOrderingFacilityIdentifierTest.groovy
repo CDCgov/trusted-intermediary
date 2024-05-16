@@ -6,7 +6,6 @@ import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.Organization
 import spock.lang.Specification
 
 class UpdateReceivingFacilityWithOrderingFacilityIdentifierTest extends Specification {
@@ -18,10 +17,10 @@ class UpdateReceivingFacilityWithOrderingFacilityIdentifierTest extends Specific
         TestApplicationContext.init()
         TestApplicationContext.injectRegisteredImplementations()
 
-        transformClass = new updateReceivingFacilityWithOrderingFacilityIdentifier()
+        transformClass = new UpdateReceivingFacilityWithOrderingFacilityIdentifier()
     }
 
-    def "update california receiving facility with ordering facility identifier"() {
+    def "update receiving facility with ordering facility identifier"() {
         given:
         def fhirResource = ExamplesHelper.getExampleFhirResource('../MN/004_MN_ORU_R01_NBS_1_hl7_translation.fhir')
         def bundle = fhirResource.getUnderlyingResource() as Bundle
