@@ -2,7 +2,6 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import org.hl7.fhir.r4.model.Bundle
@@ -28,20 +27,20 @@ class UpdateReceivingFacilityWithOrderingFacilityIdentifierTest extends Specific
         def serviceRequest = HapiHelper.getBasedOnServiceRequest(diagnosticReport)
         def practitionerRole = HapiHelper.getPractitionerRoleRequester(serviceRequest)
         def organization = HapiHelper.getOrganization(practitionerRole)
-        def orcTwentyOneDotTen = HapiHelper.getOrc21Extension(organization).getValue() as String
+        def orc21_10 = HapiHelper.getOrc21Extension(organization).getValue() as String
 
         expect:
         HapiHelper.getReceivingFacility(bundle).getIdentifier().size() > 1
-        HapiHelper.getSendingFacilityNamespace(bundle).getValue() != orcTwentyOneDotTen
+        HapiHelper.getMSH4_1Identifier(bundle).getValue() != orc21_10
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
 
         then:
-        HapiHelper.getSendingFacilityNamespace(bundle).getValue() == orcTwentyOneDotTen
+        HapiHelper.getMSH4_1Identifier(bundle).getValue() == orc21_10
     }
 
-    def "throw RuleExecutionException if receiving facility not in bundle"() {
+    def "don't throw exception if receiving facility not in bundle"() {
         given:
         def bundle = new Bundle()
         HapiHelper.createMessageHeader(bundle)
@@ -50,6 +49,6 @@ class UpdateReceivingFacilityWithOrderingFacilityIdentifierTest extends Specific
         transformClass.transform(new HapiFhirResource(bundle), null)
 
         then:
-        thrown(RuleExecutionException)
+        noExceptionThrown()
     }
 }

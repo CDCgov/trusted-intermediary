@@ -27,14 +27,14 @@ class UpdateSendingFacilityNamespaceTest extends Specification {
 
         expect:
         HapiHelper.getSendingFacility(bundle).getIdentifier().size() > 1
-        HapiHelper.getSendingFacilityNamespace(bundle).getValue() != name
+        HapiHelper.getMSH4_1Identifier(bundle).getValue() != name
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), Map.of("name", name))
 
         then:
         HapiHelper.getSendingFacility(bundle).getIdentifier().size() == 1
-        HapiHelper.getSendingFacilityNamespace(bundle).getValue() == name
+        HapiHelper.getMSH4_1Identifier(bundle).getValue() == name
     }
 
     def "don't throw exception if sending facility not in bundle"() {

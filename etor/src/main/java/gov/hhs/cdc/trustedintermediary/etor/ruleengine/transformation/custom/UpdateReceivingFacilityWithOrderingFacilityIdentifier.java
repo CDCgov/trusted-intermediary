@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom;
 
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhirTransformation;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
 import java.util.Collections;
@@ -18,23 +17,16 @@ public class UpdateReceivingFacilityWithOrderingFacilityIdentifier
         implements CustomFhirTransformation {
 
     @Override
-    public void transform(FhirResource<?> resource, Map<String, String> args)
-            throws RuleExecutionException {
-        try {
-            Bundle bundle = (Bundle) resource.getUnderlyingResource();
-            Organization receivingFacility = HapiHelper.getReceivingFacility(bundle);
-            Identifier namespaceIdentifier =
-                    HapiHelper.getHDNamespaceIdentifier(receivingFacility.getIdentifier());
-            if (namespaceIdentifier == null) {
-                return;
-            }
-            String orderingFacilityNameOrganizationIdentifier = "R797"; // Get it from ORC-21.10
-            namespaceIdentifier.setValue(orderingFacilityNameOrganizationIdentifier);
-            receivingFacility.setIdentifier(Collections.singletonList(namespaceIdentifier));
-        } catch (Exception e) {
-            throw new RuleExecutionException(
-                    "Failed to update the receiving facility with the ordering facility identifier",
-                    e);
+    public void transform(FhirResource<?> resource, Map<String, String> args) {
+        Bundle bundle = (Bundle) resource.getUnderlyingResource();
+        Organization receivingFacility = HapiHelper.getReceivingFacility(bundle);
+        Identifier namespaceIdentifier =
+                HapiHelper.getHD1Identifier(receivingFacility.getIdentifier());
+        if (namespaceIdentifier == null) {
+            return;
         }
+        String orderingFacilityNameOrganizationIdentifier = "R797"; // Get it from ORC-21.10
+        namespaceIdentifier.setValue(orderingFacilityNameOrganizationIdentifier);
+        receivingFacility.setIdentifier(Collections.singletonList(namespaceIdentifier));
     }
 }

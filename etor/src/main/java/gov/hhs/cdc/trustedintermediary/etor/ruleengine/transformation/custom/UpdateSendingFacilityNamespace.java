@@ -17,7 +17,7 @@ public class UpdateSendingFacilityNamespace implements CustomFhirTransformation 
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
-        Identifier namespaceIdentifier = HapiHelper.getSendingFacilityNamespace(bundle);
+        Identifier namespaceIdentifier = HapiHelper.getMSH4_1Identifier(bundle);
         if (namespaceIdentifier == null) {
             return;
         }

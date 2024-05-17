@@ -44,7 +44,6 @@ public class HapiHelper {
     public static final String EXTENSION_XPN7_URL = "XPN.7";
     public static final StringType EXTENSION_HD1_DATA_TYPE = new StringType("HD.1");
     public static final StringType EXTENSION_ORC2_DATA_TYPE = new StringType("ORC.2");
-    public static final StringType EXTENSION_ORC4_DATA_TYPE = new StringType("ORC.4");
 
     public static final Coding OML_CODING =
             new Coding(
@@ -130,7 +129,8 @@ public class HapiHelper {
         messageHeader.setSender(organizationReference);
     }
 
-    public static Identifier getSendingFacilityNamespace(Bundle bundle) {
+    // MSH-4.1 - Namespace ID
+    public static Identifier getMSH4_1Identifier(Bundle bundle) {
         Organization sendingFacility = getSendingFacility(bundle);
         if (sendingFacility == null) {
             return null;
@@ -165,6 +165,8 @@ public class HapiHelper {
         destination.setReceiver(organizationReference);
         messageHeader.setDestination(List.of(destination));
     }
+
+    // MSH-6.1 - Namespace ID
 
     // MSH-9 - Message Type
     public static Coding getMessageTypeCoding(Bundle bundle) {
