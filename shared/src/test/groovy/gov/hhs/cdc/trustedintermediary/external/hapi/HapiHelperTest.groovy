@@ -454,6 +454,39 @@ class HapiHelperTest extends Specification {
         HapiHelper.getPID5_7Value(bundle) == null
     }
 
+    // ORC - Common Order
+    def "DiagnosticReport methods work as expected"() {
+        given:
+        def bundle = new Bundle()
+
+        expect:
+        HapiHelper.getDiagnosticReport(bundle) == null
+
+        when:
+        HapiHelper.createDiagnosticReport(bundle)
+
+        then:
+        HapiHelper.getDiagnosticReport(bundle) != null
+    }
+
+    def "BasedOnServiceRequest methods work as expected"() {
+        given:
+        def bundle = new Bundle()
+        def dr = HapiHelper.createDiagnosticReport(bundle)
+
+        expect:
+        HapiHelper.getServiceRequestBasedOn(dr) == null
+        dr.getBasedOnFirstRep().getResource() == null
+
+        when:
+        def sr = HapiHelper.createBasedOnServiceRequest(dr)
+
+        then:
+        sr != null
+        dr.getBasedOn().size() == 1
+        dr.getBasedOnFirstRep().getResource() == sr
+    }
+
     // ORC-4.1 - Entity Identifier
     def "orc-4.1 methods work as expected"() {
         given:

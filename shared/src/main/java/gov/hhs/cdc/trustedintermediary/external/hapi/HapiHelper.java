@@ -364,7 +364,7 @@ public class HapiHelper {
 
     public static ServiceRequest createBasedOnServiceRequest(DiagnosticReport diagnosticReport) {
         ServiceRequest serviceRequest = new ServiceRequest();
-        diagnosticReport.addBasedOn(new Reference(serviceRequest));
+        diagnosticReport.setBasedOn(List.of(new Reference(serviceRequest)));
         return serviceRequest;
     }
 
