@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom;
 
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhirTransformation;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
 import java.util.Map;
@@ -11,13 +10,8 @@ import org.hl7.fhir.r4.model.Bundle;
 public class RemovePatientNameTypeCode implements CustomFhirTransformation {
 
     @Override
-    public void transform(final FhirResource<?> resource, final Map<String, String> args)
-            throws RuleExecutionException {
-        try {
-            Bundle bundle = (Bundle) resource.getUnderlyingResource();
-            HapiHelper.removePID5_7Extension(bundle);
-        } catch (Exception e) {
-            throw new RuleExecutionException("Failed to remove patient name type code", e);
-        }
+    public void transform(final FhirResource<?> resource, final Map<String, String> args) {
+        Bundle bundle = (Bundle) resource.getUnderlyingResource();
+        HapiHelper.removePID5_7Extension(bundle);
     }
 }
