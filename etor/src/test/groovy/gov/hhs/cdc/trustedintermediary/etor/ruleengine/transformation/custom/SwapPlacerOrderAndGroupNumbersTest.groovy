@@ -20,18 +20,16 @@ class SwapPlacerOrderAndGroupNumbersTest extends Specification {
         transformClass = new SwapPlacerOrderAndGroupNumbers()
     }
 
-    def "switch OCR.2 and OCR.4 in Bundle"() {
+    def "swap ORC-2.1 with ORC-4.1 and ORC-2.2 with ORC-4.2"() {
         given:
         def fhirResource = ExamplesHelper.getExampleFhirResource("../MN/004_MN_ORU_R01_NBS_1_hl7_translation.fhir")
         def bundle = fhirResource.getUnderlyingResource() as Bundle
 
         def serviceRequest = HapiHelper.resourceInBundle(bundle, ServiceRequest)
-        def placerOrderNumberIdentifier = HapiHelper.getPlacerOrderNumberIdentifier(serviceRequest)
-        def orc2_1 = HapiHelper.getEI1Value(placerOrderNumberIdentifier)
-        def orc2_2 = HapiHelper.getEI2Value(placerOrderNumberIdentifier)
-        def placerGroupNumberCoding = HapiHelper.getPlacerGroupNumberCoding(serviceRequest)
-        def orc4_1 = placerGroupNumberCoding.getCode()
-        def orc4_2 = placerGroupNumberCoding.getDisplay()
+        def orc2_1 = HapiHelper.getORC2_1Value(serviceRequest)
+        def orc2_2 = HapiHelper.getORC2_2Value(serviceRequest)
+        def orc4_1 = HapiHelper.getORC4_1Value(serviceRequest)
+        def orc4_2 = HapiHelper.getORC4_2Value(serviceRequest)
 
         expect:
         orc2_1 == "423787478"
@@ -41,12 +39,10 @@ class SwapPlacerOrderAndGroupNumbersTest extends Specification {
 
         when:
         transformClass.transform(fhirResource, null)
-        def actualPlacerOrderNumberIdentifier = HapiHelper.getPlacerOrderNumberIdentifier(serviceRequest)
-        def actualOrc2_1 = HapiHelper.getEI1Value(actualPlacerOrderNumberIdentifier)
-        def actualOrc2_2 = HapiHelper.getEI2Value(actualPlacerOrderNumberIdentifier)
-        def actualPlacerGroupNumberCoding = HapiHelper.getPlacerGroupNumberCoding(serviceRequest)
-        def actualOrc4_1 = actualPlacerGroupNumberCoding.getCode()
-        def actualOrc4_2 = actualPlacerGroupNumberCoding.getDisplay()
+        def actualOrc2_1 = HapiHelper.getORC2_1Value(serviceRequest)
+        def actualOrc2_2 = HapiHelper.getORC2_2Value(serviceRequest)
+        def actualOrc4_1 = HapiHelper.getORC4_1Value(serviceRequest)
+        def actualOrc4_2 = HapiHelper.getORC4_2Value(serviceRequest)
 
         then:
         actualOrc2_1 == orc4_1
@@ -65,27 +61,5 @@ class SwapPlacerOrderAndGroupNumbersTest extends Specification {
 
         then:
         thrown(RuleExecutionException)
-    }
-
-    // Returns a list of values for the OCR sections that need checking in the following order:
-    // [2.1, 2.2, 4.1, 4.2]
-    def getORCSections(Bundle bundle) {
-        def serviceRequest = HapiHelper.resourceInBundle(bundle, ServiceRequest)
-        def serviceIdentifier = serviceRequest.getIdentifier()[0]
-        var serviceNamespaceExtension =
-                serviceRequest
-                .getIdentifier()[0]
-                .getExtensionByUrl(
-                "https://reportstream.cdc.gov/fhir/StructureDefinition/assigning-authority")
-                .getExtensionByUrl(
-                "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id")
-        var serviceCoding = serviceRequest.getCode().getCoding().get(0)
-
-        return [
-            serviceIdentifier.getValue(),
-            serviceNamespaceExtension.getValue().primitiveValue(),
-            serviceCoding.getCode(),
-            serviceCoding.getDisplay()
-        ]
     }
 }

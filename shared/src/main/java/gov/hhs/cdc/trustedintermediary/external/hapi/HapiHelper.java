@@ -200,20 +200,88 @@ public class HapiHelper {
         return resourceInBundle(bundle, DiagnosticReport.class);
     }
 
-    // ORC
+    // ORC - Common Order
     public static ServiceRequest getServiceRequestBasedOn(DiagnosticReport diagnosticReport) {
         return (ServiceRequest) diagnosticReport.getBasedOnFirstRep().getResource();
     }
 
     // ORC.2 - Placer Order Number
-    public static Identifier getPlacerOrderNumberIdentifier(ServiceRequest serviceRequest) {
+    public static Identifier getORC2Identifier(ServiceRequest serviceRequest) {
         List<Identifier> identifiers = serviceRequest.getIdentifier();
         return getHl7FieldIdentifier(identifiers, EXTENSION_ORC2_DATA_TYPE);
     }
 
+    // ORC-2.1 - Entity Identifier
+    public static String getORC2_1Value(ServiceRequest serviceRequest) {
+        Identifier identifier = getORC2Identifier(serviceRequest);
+        if (identifier == null) {
+            return null;
+        }
+        return getEI1Value(identifier);
+    }
+
+    public static void setORC2_1Value(ServiceRequest serviceRequest, String value) {
+        Identifier identifier = getORC2Identifier(serviceRequest);
+        if (identifier == null) {
+            return;
+        }
+        setEI1Value(identifier, value);
+    }
+
+    // ORC-2.2 - Namespace ID
+    public static String getORC2_2Value(ServiceRequest serviceRequest) {
+        Identifier identifier = getORC2Identifier(serviceRequest);
+        if (identifier == null) {
+            return null;
+        }
+        return getEI2Value(identifier);
+    }
+
+    public static void setORC2_2Value(ServiceRequest serviceRequest, String value) {
+        Identifier identifier = getORC2Identifier(serviceRequest);
+        if (identifier == null) {
+            return;
+        }
+        setEI2Value(identifier, value);
+    }
+
     // ORC.4 - Placer Group Number
-    public static Coding getPlacerGroupNumberCoding(ServiceRequest serviceRequest) {
+    public static Coding getORC4Coding(ServiceRequest serviceRequest) {
         return serviceRequest.getCode().getCoding().get(0);
+    }
+
+    // ORC-4.1 - Entity Identifier
+    public static String getORC4_1Value(ServiceRequest serviceRequest) {
+        Coding coding = getORC4Coding(serviceRequest);
+        if (coding == null) {
+            return null;
+        }
+        return coding.getCode();
+    }
+
+    public static void setORC4_1Value(ServiceRequest serviceRequest, String value) {
+        Coding coding = getORC4Coding(serviceRequest);
+        if (coding == null) {
+            return;
+        }
+        coding.setCode(value);
+    }
+
+    // ORC-4.2 - Namespace ID
+    public static String getORC4_2Value(ServiceRequest serviceRequest) {
+        Coding coding = getORC4Coding(serviceRequest);
+        if (coding == null) {
+            return null;
+        }
+        return coding.getDisplay();
+    }
+
+    public static void setORC4_2Value(ServiceRequest serviceRequest, String value) {
+        Coding coding = getORC4Coding(serviceRequest);
+        if (coding == null) {
+            return;
+        }
+        coding.setDisplay(value);
     }
 
     // HD - Hierarchic Designator

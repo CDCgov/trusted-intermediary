@@ -6,8 +6,6 @@ import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhir
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.ServiceRequest;
 
 /**
@@ -25,19 +23,15 @@ public class SwapPlacerOrderAndGroupNumbers implements CustomFhirTransformation 
             var serviceRequests = HapiHelper.resourcesInBundle(bundle, ServiceRequest.class);
 
             for (ServiceRequest serviceRequest : serviceRequests.toList()) {
-                Identifier placerOrderNumberIdentifier =
-                        HapiHelper.getPlacerOrderNumberIdentifier(serviceRequest);
-                String orc2_1 = HapiHelper.getEI1Value(placerOrderNumberIdentifier);
-                String orc2_2 = HapiHelper.getEI2Value(placerOrderNumberIdentifier);
-                Coding placerGroupNumberCoding =
-                        HapiHelper.getPlacerGroupNumberCoding(serviceRequest);
-                String orc4_1 = placerGroupNumberCoding.getCode();
-                String orc4_2 = placerGroupNumberCoding.getDisplay();
+                String orc2_1 = HapiHelper.getORC2_1Value(serviceRequest);
+                String orc2_2 = HapiHelper.getORC2_2Value(serviceRequest);
+                String orc4_1 = HapiHelper.getORC4_1Value(serviceRequest);
+                String orc4_2 = HapiHelper.getORC4_2Value(serviceRequest);
 
-                HapiHelper.setEI1Value(placerOrderNumberIdentifier, orc4_1);
-                HapiHelper.setEI2Value(placerOrderNumberIdentifier, orc4_2);
-                placerGroupNumberCoding.setCode(orc2_1);
-                placerGroupNumberCoding.setDisplay(orc2_2);
+                HapiHelper.setORC2_1Value(serviceRequest, orc4_1);
+                HapiHelper.setORC2_2Value(serviceRequest, orc4_2);
+                HapiHelper.setORC4_1Value(serviceRequest, orc2_1);
+                HapiHelper.setORC4_2Value(serviceRequest, orc2_2);
             }
         } catch (Exception e) {
             throw new RuleExecutionException("Failed to switch placer order and group numbers", e);
