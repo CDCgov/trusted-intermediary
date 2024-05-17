@@ -7,6 +7,8 @@ import java.util.stream.Stream;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DiagnosticReport;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
@@ -198,23 +200,27 @@ public class HapiHelper {
         coding.setDisplay(value);
     }
 
+    // PID - Patient
+    public static Patient getPatient(Bundle bundle) {
+        return resourceInBundle(bundle, Patient.class);
+    }
+
     // PID-3 - Patient Identifier List
-    public static List<Identifier> getPatientIdentifierList(Bundle bundle) {
-        Patient patient = resourceInBundle(bundle, Patient.class);
+    public static Identifier getPatientIdentifier(Bundle bundle) {
+        Patient patient = getPatient(bundle);
         if (patient == null) {
             return null;
         }
-        return patient.getIdentifier();
-    }
-
-    public static DiagnosticReport getDiagnosticReport(Bundle bundle) {
-        return resourceInBundle(bundle, DiagnosticReport.class);
+        return patient.getIdentifierFirstRep();
     }
 
     // PID-3.4 - Assigning Authority
     public static Identifier getPID3_4Identifier(Bundle bundle) {
-        List<Identifier> identifiers = getPatientIdentifierList(bundle);
-        Organization organization = (Organization) identifiers.get(0).getAssigner().getResource();
+        Identifier identifier = getPatientIdentifier(bundle);
+        if (identifier == null) {
+            return null;
+        }
+        Organization organization = (Organization) identifier.getAssigner().getResource();
         return organization.getIdentifierFirstRep();
     }
 
@@ -236,11 +242,11 @@ public class HapiHelper {
 
     // PID-3.5 - Identifier Type Code
     public static Coding getPID3_5Coding(Bundle bundle) {
-        List<Identifier> identifiers = getPatientIdentifierList(bundle);
-        if (identifiers == null) {
+        Identifier identifier = getPatientIdentifier(bundle);
+        if (identifier == null) {
             return null;
         }
-        return identifiers.get(0).getType().getCodingFirstRep();
+        return identifier.getType().getCodingFirstRep();
     }
 
     public static String getPID3_5Value(Bundle bundle) {
@@ -257,6 +263,32 @@ public class HapiHelper {
             return;
         }
         coding.setCode(value);
+    }
+
+    // PID-5 - Patient Name
+    public static Extension getPID5Extension(Bundle bundle) {
+        Patient patient = getPatient(bundle);
+        HumanName name = patient.getNameFirstRep();
+        return name.getExtensionByUrl(HapiHelper.EXTENSION_XPN_HUMAN_NAME_URL);
+    }
+
+    // PID-5.7 - Name Type Code
+    public static String getPID5_7Value(Bundle bundle) {
+        Extension extension = getPID5Extension(bundle);
+        if (extension == null || !extension.hasExtension(HapiHelper.EXTENSION_XPN7_URL)) {
+            return null;
+        }
+        return extension
+                .getExtensionByUrl(HapiHelper.EXTENSION_XPN7_URL)
+                .getValue()
+                .primitiveValue();
+    }
+
+    public static void removePID5_7Extension(Bundle bundle) {
+        Extension extension = getPID5Extension(bundle);
+        if (extension != null && extension.hasExtension(HapiHelper.EXTENSION_XPN7_URL)) {
+            extension.removeExtension(HapiHelper.EXTENSION_XPN7_URL);
+        }
     }
 
     // ORC - Common Order
