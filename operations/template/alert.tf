@@ -31,12 +31,13 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "alert" {
       | summarize count()
     QUERY
 
-  severity    = 3
-  frequency   = 10
-  time_window = 30
+  severity                = 3
+  frequency               = 10
+  time_window             = 30
+  auto_mitigation_enabled = true
 
   trigger {
     operator  = "GreaterThan"
-    threshold = 5
+    threshold = 1
   }
 }
