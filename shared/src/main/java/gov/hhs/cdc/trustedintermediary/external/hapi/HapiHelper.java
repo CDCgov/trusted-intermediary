@@ -292,7 +292,7 @@ public class HapiHelper {
         return name.getExtensionByUrl(HapiHelper.EXTENSION_XPN_HUMAN_NAME_URL);
     }
 
-    public static void createPID5Extension(Bundle bundle) {
+    public static void setPID5Extension(Bundle bundle) {
         Patient patient = getPatient(bundle);
         if (patient == null) {
             return;
