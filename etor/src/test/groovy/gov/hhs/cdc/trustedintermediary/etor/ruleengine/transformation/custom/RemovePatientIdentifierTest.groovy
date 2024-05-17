@@ -2,8 +2,6 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException
-import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
@@ -36,17 +34,5 @@ class RemovePatientIdentifierTest extends Specification {
         then:
         HapiHelper.getPID3_4Value(bundle) == null
         HapiHelper.getPID3_5Value(bundle) == null
-    }
-
-    def "throw RuleExecutionException if patient resource not present"() {
-        given:
-        def bundle = new Bundle()
-        HapiHelper.createMessageHeader(bundle)
-
-        when:
-        transformClass.transform(new HapiFhirResource(bundle), null)
-
-        then:
-        thrown(RuleExecutionException)
     }
 }

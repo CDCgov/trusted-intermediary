@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom;
 
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhirTransformation;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
 import java.util.Map;
@@ -14,14 +13,9 @@ import org.hl7.fhir.r4.model.Bundle;
 public class RemovePatientIdentifiers implements CustomFhirTransformation {
 
     @Override
-    public void transform(FhirResource<?> resource, Map<String, String> args)
-            throws RuleExecutionException {
-        try {
-            Bundle bundle = (Bundle) resource.getUnderlyingResource();
-            HapiHelper.setPID3_4Value(bundle, ""); // remove PID.3-4
-            HapiHelper.setPID3_5Value(bundle, ""); // remove PID.3-5
-        } catch (Exception e) {
-            throw new RuleExecutionException("Failed to remove patient identifiers", e);
-        }
+    public void transform(FhirResource<?> resource, Map<String, String> args) {
+        Bundle bundle = (Bundle) resource.getUnderlyingResource();
+        HapiHelper.setPID3_4Value(bundle, ""); // remove PID.3-4
+        HapiHelper.setPID3_5Value(bundle, ""); // remove PID.3-5
     }
 }

@@ -206,22 +206,21 @@ public class HapiHelper {
     }
 
     // PID-3 - Patient Identifier List
-    public static List<Identifier> getPatientIdentifierList(Bundle bundle) {
+    public static Identifier getPatientIdentifier(Bundle bundle) {
         Patient patient = getPatient(bundle);
         if (patient == null) {
             return null;
         }
-        return patient.getIdentifier();
-    }
-
-    public static DiagnosticReport getDiagnosticReport(Bundle bundle) {
-        return resourceInBundle(bundle, DiagnosticReport.class);
+        return patient.getIdentifierFirstRep();
     }
 
     // PID-3.4 - Assigning Authority
     public static Identifier getPID3_4Identifier(Bundle bundle) {
-        List<Identifier> identifiers = getPatientIdentifierList(bundle);
-        Organization organization = (Organization) identifiers.get(0).getAssigner().getResource();
+        Identifier identifier = getPatientIdentifier(bundle);
+        if (identifier == null) {
+            return null;
+        }
+        Organization organization = (Organization) identifier.getAssigner().getResource();
         return organization.getIdentifierFirstRep();
     }
 
@@ -243,11 +242,11 @@ public class HapiHelper {
 
     // PID-3.5 - Identifier Type Code
     public static Coding getPID3_5Coding(Bundle bundle) {
-        List<Identifier> identifiers = getPatientIdentifierList(bundle);
-        if (identifiers == null) {
+        Identifier identifier = getPatientIdentifier(bundle);
+        if (identifier == null) {
             return null;
         }
-        return identifiers.get(0).getType().getCodingFirstRep();
+        return identifier.getType().getCodingFirstRep();
     }
 
     public static String getPID3_5Value(Bundle bundle) {
