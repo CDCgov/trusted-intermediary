@@ -18,7 +18,7 @@ public class ConvertToOmlOrder implements CustomFhirTransformation {
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
-        HapiHelper.setMessageTypeCoding(bundle, HapiHelper.OML_CODING);
+        HapiHelper.setMSH9Coding(bundle, HapiHelper.OML_CODING);
         metadata.put(bundle.getId(), EtorMetadataStep.ORDER_CONVERTED_TO_OML);
     }
 }

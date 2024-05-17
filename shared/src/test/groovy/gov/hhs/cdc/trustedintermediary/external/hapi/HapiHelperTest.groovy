@@ -46,7 +46,7 @@ class HapiHelperTest extends Specification {
     }
 
     // MSH - Message Header
-    def "getMessageHeader returns the message header from the bundle if it exists"() {
+    def "getMSHMessageHeader returns the message header from the bundle if it exists"() {
         given:
         def bundle = new Bundle()
         def messageHeader = new MessageHeader()
@@ -54,29 +54,29 @@ class HapiHelperTest extends Specification {
         bundle.getEntry().add(messageHeaderEntry)
 
         when:
-        def actualMessageHeader = HapiHelper.getMessageHeader(bundle)
+        def actualMessageHeader = HapiHelper.getMSHMessageHeader(bundle)
 
         then:
         actualMessageHeader == messageHeader
     }
 
-    def "getMessageHeader throws a NoSuchElementException if the message header does not exist"() {
+    def "getMSHMessageHeader throws a NoSuchElementException if the message header does not exist"() {
         given:
         def bundle = new Bundle()
 
         when:
-        HapiHelper.getMessageHeader(bundle)
+        HapiHelper.getMSHMessageHeader(bundle)
 
         then:
         thrown(NoSuchElementException)
     }
 
-    def "createMessageHeader creates a new message header if it does not exist"() {
+    def "createMSHMessageHeader creates a new message header if it does not exist"() {
         given:
         def bundle = new Bundle()
 
         when:
-        def actualMessageHeader = HapiHelper.createMessageHeader(bundle)
+        def actualMessageHeader = HapiHelper.createMSHMessageHeader(bundle)
 
         then:
         actualMessageHeader != null
@@ -90,7 +90,7 @@ class HapiHelperTest extends Specification {
         def expectedDisplay = "expectedDisplay"
 
         def mockBundle = new Bundle()
-        HapiHelper.createMessageHeader(mockBundle)
+        HapiHelper.createMSHMessageHeader(mockBundle)
 
         when:
         HapiHelper.addMetaTag(mockBundle, expectedSystem, expectedCode, expectedDisplay)
@@ -110,7 +110,7 @@ class HapiHelperTest extends Specification {
         def expectedCode = "expectedCode"
         def expectedDisplay = "expectedDisplay"
         def mockBundle = new Bundle()
-        HapiHelper.createMessageHeader(mockBundle)
+        HapiHelper.createMSHMessageHeader(mockBundle)
 
         when:
         HapiHelper.addMetaTag(mockBundle, expectedSystem, expectedCode, expectedDisplay)
@@ -185,16 +185,16 @@ class HapiHelperTest extends Specification {
     def "sending application's get, set and create work as expected"() {
         given:
         def bundle = new Bundle()
-        def expectedSendingApplication = HapiHelper.createSendingApplication()
-        HapiHelper.createMessageHeader(bundle)
+        def expectedSendingApplication = HapiHelper.createMSH3MessageSourceComponent()
+        HapiHelper.createMSHMessageHeader(bundle)
 
         expect:
-        def existingSendingApplication = HapiHelper.getSendingApplication(bundle)
+        def existingSendingApplication = HapiHelper.getMSH3MessageSourceComponent(bundle)
         !existingSendingApplication.equalsDeep(expectedSendingApplication)
 
         when:
-        HapiHelper.setSendingApplication(bundle, expectedSendingApplication)
-        def actualSendingApplication = HapiHelper.getSendingApplication(bundle)
+        HapiHelper.setMSH3MessageSourceComponent(bundle, expectedSendingApplication)
+        def actualSendingApplication = HapiHelper.getMSH3MessageSourceComponent(bundle)
 
         then:
         actualSendingApplication.equalsDeep(expectedSendingApplication)
@@ -204,17 +204,17 @@ class HapiHelperTest extends Specification {
     def "sending facility's get, set and create work as expected"() {
         given:
         def bundle = new Bundle()
-        HapiHelper.createMessageHeader(bundle)
+        HapiHelper.createMSHMessageHeader(bundle)
 
         expect:
-        HapiHelper.getSendingFacility(bundle) == null
+        HapiHelper.getMSH4Organization(bundle) == null
 
         when:
         def sendingFacility = HapiHelper.createOrganization()
-        HapiHelper.setSendingFacility(bundle, sendingFacility)
+        HapiHelper.setMSH4Organization(bundle, sendingFacility)
 
         then:
-        HapiHelper.getSendingFacility(bundle).equalsDeep(sendingFacility)
+        HapiHelper.getMSH4Organization(bundle).equalsDeep(sendingFacility)
     }
 
     // MSH-5 - Receiving Application
@@ -222,15 +222,15 @@ class HapiHelperTest extends Specification {
         given:
         def bundle = new Bundle()
         def expectedReceivingApplication = HapiHelper.createMessageDestinationComponent()
-        HapiHelper.createMessageHeader(bundle)
+        HapiHelper.createMSHMessageHeader(bundle)
 
         expect:
-        def existingReceivingApplication = HapiHelper.getReceivingApplication(bundle)
+        def existingReceivingApplication = HapiHelper.getMSH5MessageDestinationComponent(bundle)
         !existingReceivingApplication.equalsDeep(expectedReceivingApplication)
 
         when:
-        HapiHelper.setReceivingApplication(bundle, expectedReceivingApplication)
-        def actualReceivingApplication = HapiHelper.getReceivingApplication(bundle)
+        HapiHelper.setMSH5MessageDestinationComponent(bundle, expectedReceivingApplication)
+        def actualReceivingApplication = HapiHelper.getMSH5MessageDestinationComponent(bundle)
 
         then:
         actualReceivingApplication.equalsDeep(expectedReceivingApplication)
@@ -240,17 +240,17 @@ class HapiHelperTest extends Specification {
     def "receiving facility's get, set and create work as expected"() {
         given:
         def bundle = new Bundle()
-        HapiHelper.createMessageHeader(bundle)
+        HapiHelper.createMSHMessageHeader(bundle)
 
         expect:
-        HapiHelper.getReceivingFacility(bundle) == null
+        HapiHelper.getMSH6Organization(bundle) == null
 
         when:
         def receivingFacility = HapiHelper.createOrganization()
-        HapiHelper.setReceivingFacility(bundle, receivingFacility)
+        HapiHelper.setMSH6Organization(bundle, receivingFacility)
 
         then:
-        HapiHelper.getReceivingFacility(bundle).equalsDeep(receivingFacility)
+        HapiHelper.getMSH6Organization(bundle).equalsDeep(receivingFacility)
     }
 
     // MSH-9 - Message Type
@@ -267,7 +267,7 @@ class HapiHelperTest extends Specification {
                 new MessageHeader().setEvent(coding)))
 
         when:
-        HapiHelper.setMessageTypeCoding(mockBundle, expectedCoding)
+        HapiHelper.setMSH9Coding(mockBundle, expectedCoding)
         def convertedMessageHeader = HapiHelper.resourceInBundle(mockBundle, MessageHeader.class) as MessageHeader
 
         then:
@@ -284,11 +284,11 @@ class HapiHelperTest extends Specification {
         def expectedDisplay = "expectedDisplay"
         def expectedCoding = new Coding(expectedSystem, expectedCode, expectedDisplay)
         def mockBundle = new Bundle()
-        HapiHelper.createMessageHeader(mockBundle)
+        HapiHelper.createMSHMessageHeader(mockBundle)
 
         when:
-        HapiHelper.setMessageTypeCoding(mockBundle, expectedCoding)
-        def convertedMessageHeader = HapiHelper.getMessageHeader(mockBundle)
+        HapiHelper.setMSH9Coding(mockBundle, expectedCoding)
+        def convertedMessageHeader = HapiHelper.getMSHMessageHeader(mockBundle)
 
         then:
         convertedMessageHeader != null
@@ -302,7 +302,7 @@ class HapiHelperTest extends Specification {
         given:
         def bundle = new Bundle()
         def msh9_3 = "msh9_3"
-        HapiHelper.createMessageHeader(bundle)
+        HapiHelper.createMSHMessageHeader(bundle)
 
         when:
         HapiHelper.setMSH9_3Value(bundle, msh9_3)
@@ -317,24 +317,24 @@ class HapiHelperTest extends Specification {
         def bundle = new Bundle()
 
         when:
-        def nullPatientIdentifier = HapiHelper.getPatientIdentifier(bundle)
+        def nullPatientIdentifier = HapiHelper.getPID3Identifier(bundle)
 
         then:
         nullPatientIdentifier == null
 
         when:
-        HapiHelper.setPatientIdentifier(bundle, new Identifier())
+        HapiHelper.setPID3Identifier(bundle, new Identifier())
 
         then:
         noExceptionThrown()
 
         when:
-        HapiHelper.createPatient(bundle)
+        HapiHelper.createPIDPatient(bundle)
         def newPatientIdentifier = new Identifier()
-        HapiHelper.setPatientIdentifier(bundle, newPatientIdentifier)
+        HapiHelper.setPID3Identifier(bundle, newPatientIdentifier)
 
         then:
-        HapiHelper.getPatientIdentifier(bundle) == newPatientIdentifier
+        HapiHelper.getPID3Identifier(bundle) == newPatientIdentifier
     }
 
     // PID-3.4 - Assigning Authority
@@ -356,8 +356,8 @@ class HapiHelperTest extends Specification {
         HapiHelper.getPID3_4Value(bundle) == null
 
         when:
-        HapiHelper.createPatient(bundle)
-        HapiHelper.setPatientIdentifier(bundle, new Identifier())
+        HapiHelper.createPIDPatient(bundle)
+        HapiHelper.setPID3Identifier(bundle, new Identifier())
         HapiHelper.setPID3_4Identifier(bundle, new Identifier())
 
         then:
@@ -389,8 +389,8 @@ class HapiHelperTest extends Specification {
         HapiHelper.getPID3_5Value(bundle) == null
 
         when:
-        HapiHelper.createPatient(bundle)
-        HapiHelper.setPatientIdentifier(bundle, new Identifier())
+        HapiHelper.createPIDPatient(bundle)
+        HapiHelper.setPID3Identifier(bundle, new Identifier())
         HapiHelper.setPID3_5Coding(bundle, new Coding())
 
         then:
@@ -415,7 +415,7 @@ class HapiHelperTest extends Specification {
         HapiHelper.getPID5Extension(bundle) == null
 
         when:
-        HapiHelper.createPatient(bundle)
+        HapiHelper.createPIDPatient(bundle)
         HapiHelper.setPID5Extension(bundle)
 
         then:
@@ -436,7 +436,7 @@ class HapiHelperTest extends Specification {
         HapiHelper.getPID5_7Value(bundle) == null
 
         when:
-        HapiHelper.createPatient(bundle)
+        HapiHelper.createPIDPatient(bundle)
         HapiHelper.setPID5Extension(bundle)
         HapiHelper.removePID5_7Extension(bundle)
 
@@ -483,7 +483,7 @@ class HapiHelperTest extends Specification {
         def dr = HapiHelper.createDiagnosticReport(bundle)
 
         expect:
-        HapiHelper.getServiceRequestBasedOn(dr) == null
+        HapiHelper.getBasedOnServiceRequest(dr) == null
         dr.getBasedOnFirstRep().getResource() == null
 
         when:

@@ -70,7 +70,7 @@ public class HapiHelper {
     }
 
     // MSH - Message Header
-    public static MessageHeader getMessageHeader(Bundle bundle) throws NoSuchElementException {
+    public static MessageHeader getMSHMessageHeader(Bundle bundle) throws NoSuchElementException {
         MessageHeader messageHeader = resourceInBundle(bundle, MessageHeader.class);
         if (messageHeader == null) {
             throw new NoSuchElementException("MessageHeader not found in the bundle");
@@ -78,7 +78,7 @@ public class HapiHelper {
         return messageHeader;
     }
 
-    public static MessageHeader createMessageHeader(Bundle bundle) {
+    public static MessageHeader createMSHMessageHeader(Bundle bundle) {
         MessageHeader messageHeader = new MessageHeader();
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader));
         return messageHeader;
@@ -86,7 +86,7 @@ public class HapiHelper {
 
     public static void addMetaTag(
             Bundle messageBundle, String system, String code, String display) {
-        MessageHeader messageHeader = getMessageHeader(messageBundle);
+        MessageHeader messageHeader = getMSHMessageHeader(messageBundle);
         var meta = messageHeader.hasMeta() ? messageHeader.getMeta() : new Meta();
 
         if (meta.getTag(system, code) == null) {
@@ -97,37 +97,39 @@ public class HapiHelper {
     }
 
     // MSH-3 - Sending Application
-    public static MessageHeader.MessageSourceComponent getSendingApplication(Bundle bundle) {
-        MessageHeader messageHeader = getMessageHeader(bundle);
+    public static MessageHeader.MessageSourceComponent getMSH3MessageSourceComponent(
+            Bundle bundle) {
+        MessageHeader messageHeader = getMSHMessageHeader(bundle);
         return messageHeader.getSource();
     }
 
-    public static void setSendingApplication(
+    public static void setMSH3MessageSourceComponent(
             Bundle bundle, MessageHeader.MessageSourceComponent sendingApplication) {
-        MessageHeader messageHeader = getMessageHeader(bundle);
+        MessageHeader messageHeader = getMSHMessageHeader(bundle);
         messageHeader.setSource(sendingApplication);
     }
 
-    public static MessageHeader.MessageSourceComponent createSendingApplication() {
+    public static MessageHeader.MessageSourceComponent createMSH3MessageSourceComponent() {
         MessageHeader.MessageSourceComponent source = new MessageHeader.MessageSourceComponent();
         source.setId(UUID.randomUUID().toString());
         return source;
     }
 
     // MSH-4 - Sending Facility
-    public static Organization getSendingFacility(Bundle bundle) {
-        MessageHeader messageHeader = getMessageHeader(bundle);
+    public static Organization getMSH4Organization(Bundle bundle) {
+        MessageHeader messageHeader = getMSHMessageHeader(bundle);
         return (Organization) messageHeader.getSender().getResource();
     }
 
-    public static void setSendingFacility(Bundle bundle, Organization sendingFacility) {
-        MessageHeader messageHeader = getMessageHeader(bundle);
+    public static void setMSH4Organization(Bundle bundle, Organization sendingFacility) {
+        MessageHeader messageHeader = getMSHMessageHeader(bundle);
         Reference organizationReference = createOrganizationReference(bundle, sendingFacility);
         messageHeader.setSender(organizationReference);
     }
 
-    public static Identifier getSendingFacilityNamespace(Bundle bundle) {
-        Organization sendingFacility = getSendingFacility(bundle);
+    // MSH-4.1 - Namespace ID
+    public static Identifier getMSH4_1Identifier(Bundle bundle) {
+        Organization sendingFacility = getMSH4Organization(bundle);
         if (sendingFacility == null) {
             return null;
         }
@@ -136,25 +138,26 @@ public class HapiHelper {
     }
 
     // MSH-5 - Receiving Application
-    public static MessageHeader.MessageDestinationComponent getReceivingApplication(Bundle bundle) {
-        MessageHeader messageHeader = getMessageHeader(bundle);
+    public static MessageHeader.MessageDestinationComponent getMSH5MessageDestinationComponent(
+            Bundle bundle) {
+        MessageHeader messageHeader = getMSHMessageHeader(bundle);
         return messageHeader.getDestinationFirstRep();
     }
 
-    public static void setReceivingApplication(
+    public static void setMSH5MessageDestinationComponent(
             Bundle bundle, MessageHeader.MessageDestinationComponent receivingApplication) {
-        MessageHeader messageHeader = getMessageHeader(bundle);
+        MessageHeader messageHeader = getMSHMessageHeader(bundle);
         messageHeader.setDestination(List.of(receivingApplication));
     }
 
     // MSH-6 - Receiving Facility
-    public static Organization getReceivingFacility(Bundle bundle) {
-        MessageHeader messageHeader = getMessageHeader(bundle);
+    public static Organization getMSH6Organization(Bundle bundle) {
+        MessageHeader messageHeader = getMSHMessageHeader(bundle);
         return (Organization) messageHeader.getDestinationFirstRep().getReceiver().getResource();
     }
 
-    public static void setReceivingFacility(Bundle bundle, Organization receivingFacility) {
-        MessageHeader messageHeader = getMessageHeader(bundle);
+    public static void setMSH6Organization(Bundle bundle, Organization receivingFacility) {
+        MessageHeader messageHeader = getMSHMessageHeader(bundle);
         Reference organizationReference = createOrganizationReference(bundle, receivingFacility);
         MessageHeader.MessageDestinationComponent destination =
                 new MessageHeader.MessageDestinationComponent();
@@ -163,49 +166,49 @@ public class HapiHelper {
     }
 
     // MSH-9 - Message Type
-    public static Coding getMessageTypeCoding(Bundle bundle) {
-        MessageHeader messageHeader = getMessageHeader(bundle);
+    public static Coding getMSH9Coding(Bundle bundle) {
+        MessageHeader messageHeader = getMSHMessageHeader(bundle);
         return messageHeader.getEventCoding();
     }
 
-    public static void setMessageTypeCoding(Bundle bundle, Coding coding) {
-        var messageHeader = getMessageHeader(bundle);
+    public static void setMSH9Coding(Bundle bundle, Coding coding) {
+        var messageHeader = getMSHMessageHeader(bundle);
         messageHeader.setEvent(coding);
     }
 
     // MSH-9.3 - Message Structure
     public static String getMSH9_3Value(Bundle bundle) {
-        Coding coding = getMessageTypeCoding(bundle);
+        Coding coding = getMSH9Coding(bundle);
         return coding.getDisplay();
     }
 
     public static void setMSH9_3Value(Bundle bundle, String value) {
-        Coding coding = getMessageTypeCoding(bundle);
+        Coding coding = getMSH9Coding(bundle);
         coding.setDisplay(value);
     }
 
     // PID - Patient
-    public static Patient getPatient(Bundle bundle) {
+    public static Patient getPIDPatient(Bundle bundle) {
         return resourceInBundle(bundle, Patient.class);
     }
 
-    public static Patient createPatient(Bundle bundle) {
+    public static Patient createPIDPatient(Bundle bundle) {
         Patient patient = new Patient();
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(patient));
         return patient;
     }
 
     // PID-3 - Patient Identifier List
-    public static Identifier getPatientIdentifier(Bundle bundle) {
-        Patient patient = getPatient(bundle);
+    public static Identifier getPID3Identifier(Bundle bundle) {
+        Patient patient = getPIDPatient(bundle);
         if (patient == null) {
             return null;
         }
         return patient.getIdentifierFirstRep();
     }
 
-    public static void setPatientIdentifier(Bundle bundle, Identifier identifier) {
-        Patient patient = getPatient(bundle);
+    public static void setPID3Identifier(Bundle bundle, Identifier identifier) {
+        Patient patient = getPIDPatient(bundle);
         if (patient == null) {
             return;
         }
@@ -214,7 +217,7 @@ public class HapiHelper {
 
     // PID-3.4 - Assigning Authority
     public static Identifier getPID3_4Identifier(Bundle bundle) {
-        Identifier identifier = getPatientIdentifier(bundle);
+        Identifier identifier = getPID3Identifier(bundle);
         if (identifier == null) {
             return null;
         }
@@ -223,7 +226,7 @@ public class HapiHelper {
     }
 
     public static void setPID3_4Identifier(Bundle bundle, Identifier identifier) {
-        Identifier patientIdentifier = getPatientIdentifier(bundle);
+        Identifier patientIdentifier = getPID3Identifier(bundle);
         if (patientIdentifier == null) {
             return;
         }
@@ -251,7 +254,7 @@ public class HapiHelper {
 
     // PID-3.5 - Identifier Type Code
     public static Coding getPID3_5Coding(Bundle bundle) {
-        Identifier identifier = getPatientIdentifier(bundle);
+        Identifier identifier = getPID3Identifier(bundle);
         if (identifier == null) {
             return null;
         }
@@ -259,7 +262,7 @@ public class HapiHelper {
     }
 
     public static void setPID3_5Coding(Bundle bundle, Coding coding) {
-        Identifier identifier = getPatientIdentifier(bundle);
+        Identifier identifier = getPID3Identifier(bundle);
         if (identifier == null) {
             return;
         }
@@ -284,7 +287,7 @@ public class HapiHelper {
 
     // PID-5 - Patient Name
     public static Extension getPID5Extension(Bundle bundle) {
-        Patient patient = getPatient(bundle);
+        Patient patient = getPIDPatient(bundle);
         if (patient == null) {
             return null;
         }
@@ -293,7 +296,7 @@ public class HapiHelper {
     }
 
     public static void setPID5Extension(Bundle bundle) {
-        Patient patient = getPatient(bundle);
+        Patient patient = getPIDPatient(bundle);
         if (patient == null) {
             return;
         }
@@ -344,7 +347,7 @@ public class HapiHelper {
         return diagnosticReport;
     }
 
-    public static ServiceRequest getServiceRequestBasedOn(DiagnosticReport diagnosticReport) {
+    public static ServiceRequest getBasedOnServiceRequest(DiagnosticReport diagnosticReport) {
         return (ServiceRequest) diagnosticReport.getBasedOnFirstRep().getResource();
     }
 
@@ -486,7 +489,8 @@ public class HapiHelper {
         return destination;
     }
 
-    private static Reference createOrganizationReference(Bundle bundle, Organization organization) {
+    protected static Reference createOrganizationReference(
+            Bundle bundle, Organization organization) {
         String organizationId = organization.getId();
         Reference organizationReference = new Reference("Organization/" + organizationId);
         organizationReference.setResource(organization);
@@ -494,7 +498,7 @@ public class HapiHelper {
         return organizationReference;
     }
 
-    private static Identifier getHl7FieldIdentifier(
+    protected static Identifier getHl7FieldIdentifier(
             List<Identifier> identifiers, StringType dataType) {
         for (Identifier identifier : identifiers) {
             if (identifier.hasExtension(EXTENSION_HL7_FIELD_URL)

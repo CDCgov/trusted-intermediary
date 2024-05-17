@@ -4,7 +4,6 @@ import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
 import spock.lang.Specification
@@ -44,12 +43,12 @@ class RemoveMessageTypeStructureTest  extends Specification {
         given:
         def messageTypeDisplay = "ORU^R01"
         def bundle = new Bundle()
-        def messageHeader = HapiHelper.createMessageHeader(bundle)
+        def messageHeader = HapiHelper.createMSHMessageHeader(bundle)
         messageHeader.setEvent(new Coding().setDisplay(messageTypeDisplay))
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
-        def convertedMessageHeader = HapiHelper.getMessageHeader(bundle)
+        def convertedMessageHeader = HapiHelper.getMSHMessageHeader(bundle)
         def convertedDisplay = convertedMessageHeader.getEventCoding().getDisplay()
 
         then:
@@ -59,7 +58,7 @@ class RemoveMessageTypeStructureTest  extends Specification {
     def "don't throw exception if message type coding not present"() {
         given:
         def bundle = new Bundle()
-        HapiHelper.createMessageHeader(bundle)
+        HapiHelper.createMSHMessageHeader(bundle)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)

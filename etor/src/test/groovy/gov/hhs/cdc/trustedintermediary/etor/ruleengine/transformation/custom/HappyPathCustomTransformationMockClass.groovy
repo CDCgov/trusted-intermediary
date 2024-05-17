@@ -17,6 +17,6 @@ class HappyPathCustomTransformationMockClass implements CustomFhirTransformation
         def display = String.format("mock^code^%s", code)
 
         Coding eventCoding = new Coding(system, code, display)
-        HapiHelper.setMessageTypeCoding(bundle, eventCoding)
+        HapiHelper.setMSH9Coding(bundle, eventCoding)
     }
 }

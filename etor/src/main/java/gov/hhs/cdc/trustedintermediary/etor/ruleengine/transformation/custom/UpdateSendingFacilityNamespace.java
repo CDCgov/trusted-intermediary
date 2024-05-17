@@ -17,12 +17,12 @@ public class UpdateSendingFacilityNamespace implements CustomFhirTransformation 
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
-        Identifier namespaceIdentifier = HapiHelper.getSendingFacilityNamespace(bundle);
+        Identifier namespaceIdentifier = HapiHelper.getMSH4_1Identifier(bundle);
         if (namespaceIdentifier == null) {
             return;
         }
         namespaceIdentifier.setValue(args.get("name"));
-        HapiHelper.getSendingFacility(bundle)
+        HapiHelper.getMSH4Organization(bundle)
                 .setIdentifier(Collections.singletonList(namespaceIdentifier));
     }
 }
