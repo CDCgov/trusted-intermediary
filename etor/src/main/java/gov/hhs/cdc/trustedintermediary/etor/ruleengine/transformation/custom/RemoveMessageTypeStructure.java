@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom;
 
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhirTransformation;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
 import java.util.ArrayList;
@@ -14,23 +13,20 @@ import org.hl7.fhir.r4.model.Bundle;
 public class RemoveMessageTypeStructure implements CustomFhirTransformation {
 
     @Override
-    public void transform(FhirResource<?> resource, Map<String, String> args)
-            throws RuleExecutionException {
-        try {
-            Bundle bundle = (Bundle) resource.getUnderlyingResource();
-            String msh9_3 = HapiHelper.getMSH9_3Value(bundle);
-            String delimiter = "^";
-            List<String> displayList =
-                    new ArrayList<>(Arrays.asList(msh9_3.split("\\" + delimiter)));
-            if (displayList.size() < 3) {
-                return;
-            }
-            // Remove the third element from the list
-            displayList.remove(2);
-            String strippedString = String.join(delimiter, displayList);
-            HapiHelper.setMSH9_3Value(bundle, strippedString);
-        } catch (Exception e) {
-            throw new RuleExecutionException("Failed to remove message type structure", e);
+    public void transform(FhirResource<?> resource, Map<String, String> args) {
+        Bundle bundle = (Bundle) resource.getUnderlyingResource();
+        String msh9_3 = HapiHelper.getMSH9_3Value(bundle);
+        if (msh9_3 == null) {
+            return;
         }
+        String delimiter = "^";
+        List<String> displayList = new ArrayList<>(Arrays.asList(msh9_3.split("\\" + delimiter)));
+        if (displayList.size() < 3) {
+            return;
+        }
+        // Remove the third element from the list
+        displayList.remove(2);
+        String strippedString = String.join(delimiter, displayList);
+        HapiHelper.setMSH9_3Value(bundle, strippedString);
     }
 }

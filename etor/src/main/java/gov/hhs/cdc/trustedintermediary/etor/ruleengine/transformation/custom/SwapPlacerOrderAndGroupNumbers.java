@@ -14,6 +14,7 @@ import org.hl7.fhir.r4.model.ServiceRequest;
  * we're swapping ORC-2 for ORC-4 and vice versa.
  */
 public class SwapPlacerOrderAndGroupNumbers implements CustomFhirTransformation {
+
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();

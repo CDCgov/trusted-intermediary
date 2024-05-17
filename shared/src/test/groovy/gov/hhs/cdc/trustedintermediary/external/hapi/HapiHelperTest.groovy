@@ -210,7 +210,7 @@ class HapiHelperTest extends Specification {
         HapiHelper.getSendingFacility(bundle) == null
 
         when:
-        def sendingFacility = HapiHelper.createFacilityOrganization()
+        def sendingFacility = HapiHelper.createOrganization()
         HapiHelper.setSendingFacility(bundle, sendingFacility)
 
         then:
@@ -221,7 +221,7 @@ class HapiHelperTest extends Specification {
     def "receiving application's get, set and create work as expected"() {
         given:
         def bundle = new Bundle()
-        def expectedReceivingApplication = HapiHelper.createReceivingApplication()
+        def expectedReceivingApplication = HapiHelper.createMessageDestinationComponent()
         HapiHelper.createMessageHeader(bundle)
 
         expect:
@@ -246,7 +246,7 @@ class HapiHelperTest extends Specification {
         HapiHelper.getReceivingFacility(bundle) == null
 
         when:
-        def receivingFacility = HapiHelper.createFacilityOrganization()
+        def receivingFacility = HapiHelper.createOrganization()
         HapiHelper.setReceivingFacility(bundle, receivingFacility)
 
         then:
