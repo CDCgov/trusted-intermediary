@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.DiagnosticReport;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
@@ -13,6 +14,7 @@ import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ServiceRequest;
 import org.hl7.fhir.r4.model.StringType;
 
 /** Helper class that works on HapiFHIR constructs. */
@@ -34,6 +36,8 @@ public class HapiHelper {
             "https://reportstream.cdc.gov/fhir/StructureDefinition/xpn-human-name";
     public static final String EXTENSION_XPN7_URL = "XPN.7";
     public static final StringType EXTENSION_HD1_DATA_TYPE = new StringType("HD.1");
+    public static final StringType EXTENSION_ORC2_DATA_TYPE = new StringType("ORC.2");
+    public static final StringType EXTENSION_ORC4_DATA_TYPE = new StringType("ORC.4");
 
     public static final Coding OML_CODING =
             new Coding(
@@ -143,7 +147,7 @@ public class HapiHelper {
     public static Identifier getSendingFacilityNamespace(Bundle bundle) {
         Organization sendingFacility = getSendingFacility(bundle);
         List<Identifier> identifiers = sendingFacility.getIdentifier();
-        return getHDNamespaceIdentifier(identifiers);
+        return getHD1Identifier(identifiers);
     }
 
     // MSH.5 - Receiving Application
@@ -192,14 +196,63 @@ public class HapiHelper {
         return patient.getIdentifier();
     }
 
-    // HD.1 - Namespace Id
-    public static Identifier getHDNamespaceIdentifier(List<Identifier> identifiers) {
+    public static DiagnosticReport getDiagnosticReport(Bundle bundle) {
+        return resourceInBundle(bundle, DiagnosticReport.class);
+    }
+
+    // ORC
+    public static ServiceRequest getServiceRequestBasedOn(DiagnosticReport diagnosticReport) {
+        return (ServiceRequest) diagnosticReport.getBasedOnFirstRep().getResource();
+    }
+
+    // ORC.2 - Placer Order Number
+    public static Identifier getPlacerOrderNumberIdentifier(ServiceRequest serviceRequest) {
+        List<Identifier> identifiers = serviceRequest.getIdentifier();
+        return getHl7FieldIdentifier(identifiers, EXTENSION_ORC2_DATA_TYPE);
+    }
+
+    // ORC.4 - Placer Group Number
+    public static Coding getPlacerGroupNumberCoding(ServiceRequest serviceRequest) {
+        return serviceRequest.getCode().getCoding().get(0);
+    }
+
+    // HD - Hierarchic Designator
+    public static Identifier getHD1Identifier(List<Identifier> identifiers) {
+        return getHl7FieldIdentifier(identifiers, EXTENSION_HD1_DATA_TYPE);
+    }
+
+    // EI - Entity Identifier
+    public static String getEI1Value(Identifier identifier) {
+        return identifier.getValue();
+    }
+
+    public static void setEI1Value(Identifier identifier, String value) {
+        identifier.setValue(value);
+    }
+
+    public static String getEI2Value(Identifier identifier) {
+        return identifier
+                .getExtensionByUrl(EXTENSION_ASSIGNING_AUTHORITY_URL)
+                .getExtensionByUrl(EXTENSION_NAMESPACE_ID_URL)
+                .getValue()
+                .primitiveValue();
+    }
+
+    public static void setEI2Value(Identifier identifier, String value) {
+        identifier
+                .getExtensionByUrl(EXTENSION_ASSIGNING_AUTHORITY_URL)
+                .getExtensionByUrl(EXTENSION_NAMESPACE_ID_URL)
+                .setValue(new StringType(value));
+    }
+
+    private static Identifier getHl7FieldIdentifier(
+            List<Identifier> identifiers, StringType dataType) {
         for (Identifier identifier : identifiers) {
             if (identifier.hasExtension(EXTENSION_HL7_FIELD_URL)
                     && identifier
                             .getExtensionByUrl(EXTENSION_HL7_FIELD_URL)
                             .getValue()
-                            .equalsDeep(EXTENSION_HD1_DATA_TYPE)) {
+                            .equalsDeep(dataType)) {
                 return identifier;
             }
         }
