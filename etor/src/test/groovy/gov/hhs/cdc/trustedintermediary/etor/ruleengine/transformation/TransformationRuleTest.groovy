@@ -51,7 +51,7 @@ class TransformationRuleTest extends Specification {
         def ruleMessage = "Rule Warning Message"
         def ruleConditions = ["condition1", "condition2"]
         def ruleActions = [
-            new TransformationRuleMethod("HappyPathMockClass", null)
+            new TransformationRuleMethod("HappyPathCustomTransformationMockClass", null)
         ]
         TestApplicationContext.register(HapiFhir, Mock(HapiFhir))
 
