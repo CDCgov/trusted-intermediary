@@ -22,7 +22,7 @@ public class UpdateSendingFacilityNamespace implements CustomFhirTransformation 
             return;
         }
         namespaceIdentifier.setValue(args.get("name"));
-        HapiHelper.getSendingFacility(bundle)
+        HapiHelper.getMSH4Organization(bundle)
                 .setIdentifier(Collections.singletonList(namespaceIdentifier));
     }
 }
