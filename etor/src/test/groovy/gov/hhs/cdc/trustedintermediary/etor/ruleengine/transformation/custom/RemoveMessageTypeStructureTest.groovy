@@ -24,21 +24,20 @@ class RemoveMessageTypeStructureTest  extends Specification {
     def "remove message type structure"() {
         given:
         def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: 'ORM_O01')
-        def messageHeader = HapiHelper.getMessageHeader(bundle)
-        def displayArray = messageHeader.getEventCoding().getDisplay().split("\\^")
+        def msh9_3 = HapiHelper.getMSH9_3Value(bundle)
+        def msh9_3Array = msh9_3.split("\\^")
 
         expect:
-        displayArray.size() == 3
-        displayArray[2] != ""
+        msh9_3Array.size() == 3
+        msh9_3Array[2] != ""
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
-        def convertedMessageHeader = HapiHelper.getMessageHeader(bundle)
-        def convertedDisplay = convertedMessageHeader.getEventCoding().getDisplay()
-        def convertedDisplayArray = convertedDisplay.split("\\^")
+        def convertedMsh9_3 = HapiHelper.getMSH9_3Value(bundle)
+        def convertedMsh9_3Array = convertedMsh9_3.split("\\^")
 
         then:
-        convertedDisplayArray.size() == 2
+        convertedMsh9_3Array.size() == 2
     }
 
     def "don't do anything if message type structure not present"() {
