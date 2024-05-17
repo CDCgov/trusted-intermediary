@@ -6,6 +6,7 @@ import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Meta
+import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Provenance
 import org.hl7.fhir.r4.model.ResourceType
@@ -45,6 +46,7 @@ class HapiHelperTest extends Specification {
         patientStream.allMatch {patients.contains(it) && it.getResourceType() == ResourceType.Patient }
     }
 
+    // MSH - Message Header
     def "getMessageHeader returns the message header from the bundle if it exists"() {
         given:
         def bundle = new Bundle()
@@ -180,6 +182,79 @@ class HapiHelperTest extends Specification {
         messageHeader.getMeta().getTag().findAll {it.system == etorTag.system}.size() == 1
     }
 
+    // MSH-3 - Sending Application
+    def "sending application's get, set and create work as expected"() {
+        given:
+        def bundle = new Bundle()
+        def expectedSendingApplication = HapiHelper.createSendingApplication()
+        HapiHelper.createMessageHeader(bundle)
+
+        expect:
+        def existingSendingApplication = HapiHelper.getSendingApplication(bundle)
+        !existingSendingApplication.equalsDeep(expectedSendingApplication)
+
+        when:
+        HapiHelper.setSendingApplication(bundle, expectedSendingApplication)
+        def actualSendingApplication = HapiHelper.getSendingApplication(bundle)
+
+        then:
+        actualSendingApplication.equalsDeep(expectedSendingApplication)
+    }
+
+    // MSH-4 - Sending Facility
+    def "sending facility's get, set and create work as expected"() {
+        given:
+        def bundle = new Bundle()
+        HapiHelper.createMessageHeader(bundle)
+
+        expect:
+        HapiHelper.getSendingFacility(bundle) == null
+
+        when:
+        def sendingFacility = HapiHelper.createFacilityOrganization()
+        HapiHelper.setSendingFacility(bundle, sendingFacility)
+
+        then:
+        HapiHelper.getSendingFacility(bundle).equalsDeep(sendingFacility)
+    }
+
+    // MSH-5 - Receiving Application
+    def "receiving application's get, set and create work as expected"() {
+        given:
+        def bundle = new Bundle()
+        def expectedReceivingApplication = HapiHelper.createReceivingApplication()
+        HapiHelper.createMessageHeader(bundle)
+
+        expect:
+        def existingReceivingApplication = HapiHelper.getReceivingApplication(bundle)
+        !existingReceivingApplication.equalsDeep(expectedReceivingApplication)
+
+        when:
+        HapiHelper.setReceivingApplication(bundle, expectedReceivingApplication)
+        def actualReceivingApplication = HapiHelper.getReceivingApplication(bundle)
+
+        then:
+        actualReceivingApplication.equalsDeep(expectedReceivingApplication)
+    }
+
+    // MSH-6 - Receiving Facility
+    def "receiving facility's get, set and create work as expected"() {
+        given:
+        def bundle = new Bundle()
+        HapiHelper.createMessageHeader(bundle)
+
+        expect:
+        HapiHelper.getReceivingFacility(bundle) == null
+
+        when:
+        def receivingFacility = HapiHelper.createFacilityOrganization()
+        HapiHelper.setReceivingFacility(bundle, receivingFacility)
+
+        then:
+        HapiHelper.getReceivingFacility(bundle).equalsDeep(receivingFacility)
+    }
+
+    // MSH-9 - Message Type
     def "convert the pre-existing message type"() {
         given:
         def expectedSystem = "expectedSystem"
@@ -223,74 +298,79 @@ class HapiHelperTest extends Specification {
         convertedMessageHeader.getEventCoding().getDisplay() == expectedDisplay
     }
 
-    def "sending application's get, send and create work as expected"() {
+    // MSH-9.3 - Message Type
+    def "message type's get and set work as expected"() {
         given:
         def bundle = new Bundle()
-        def expectedSendingApplication = HapiHelper.createSendingApplication()
+        def msh9_3 = "msh9_3"
         HapiHelper.createMessageHeader(bundle)
 
-        expect:
-        def existingSendingApplication = HapiHelper.getSendingApplication(bundle)
-        !existingSendingApplication.equalsDeep(expectedSendingApplication)
-
         when:
-        HapiHelper.setSendingApplication(bundle, expectedSendingApplication)
-        def actualSendingApplication = HapiHelper.getSendingApplication(bundle)
+        HapiHelper.setMSH9_3Value(bundle, msh9_3)
 
         then:
-        actualSendingApplication.equalsDeep(expectedSendingApplication)
+        HapiHelper.getMSH9_3Value(bundle) == msh9_3
     }
 
-    def "sending facility's get, send and create work as expected"() {
+    // PID - Patient Identifier
+    def "getPatientIdentifier returns expected value"() {
         given:
         def bundle = new Bundle()
-        HapiHelper.createMessageHeader(bundle)
-
-        expect:
-        HapiHelper.getSendingFacility(bundle) == null
 
         when:
-        def sendingFacility = HapiHelper.createFacilityOrganization()
-        HapiHelper.setSendingFacility(bundle, sendingFacility)
+        def nullPatientIdentifier = HapiHelper.getPatientIdentifier(bundle)
 
         then:
-        HapiHelper.getSendingFacility(bundle).equalsDeep(sendingFacility)
+        nullPatientIdentifier == null
+
+        when:
+        def newPatientIdentifier = new Identifier()
+        HapiHelper.createPatient(bundle)
+        HapiHelper.createPatientIdentifier(bundle, newPatientIdentifier)
+
+        then:
+        HapiHelper.getPatientIdentifier(bundle) == newPatientIdentifier
     }
 
-    def "receiving application's get, send and create work as expected"() {
+    // PID-3.4 - Assigning Authority
+    def "patient assigning authority's get and set work as expected"() {
         given:
         def bundle = new Bundle()
-        def expectedReceivingApplication = HapiHelper.createReceivingApplication()
-        HapiHelper.createMessageHeader(bundle)
+        def pid3_4 = "pid3_4"
+        HapiHelper.createPatient(bundle)
+        HapiHelper.createPatientIdentifier(bundle, new Identifier())
+        HapiHelper.setPID3_4Identifier(bundle, new Identifier())
 
         expect:
-        def existingReceivingApplication = HapiHelper.getReceivingApplication(bundle)
-        !existingReceivingApplication.equalsDeep(expectedReceivingApplication)
+        HapiHelper.getPID3_4Value(bundle) == null
 
         when:
-        HapiHelper.setReceivingApplication(bundle, expectedReceivingApplication)
-        def actualReceivingApplication = HapiHelper.getReceivingApplication(bundle)
+        HapiHelper.setPID3_4Value(bundle, pid3_4)
 
         then:
-        actualReceivingApplication.equalsDeep(expectedReceivingApplication)
+        HapiHelper.getPID3_4Value(bundle) == pid3_4
     }
 
-    def "receiving facility's get, send and create work as expected"() {
+    // PID-3.5 - Assigning Identifier Type Code
+    def "patient assigning authority's get and set work as expected"() {
         given:
         def bundle = new Bundle()
-        HapiHelper.createMessageHeader(bundle)
+        def pid3_5 = "pid3_5"
+        HapiHelper.createPatient(bundle)
+        HapiHelper.createPatientIdentifier(bundle, new Identifier())
+        HapiHelper.setPID3_5Coding(bundle, new Coding())
 
         expect:
-        HapiHelper.getReceivingFacility(bundle) == null
+        HapiHelper.getPID3_5Value(bundle) == null
 
         when:
-        def receivingFacility = HapiHelper.createFacilityOrganization()
-        HapiHelper.setReceivingFacility(bundle, receivingFacility)
+        HapiHelper.setPID3_5Value(bundle, pid3_5)
 
         then:
-        HapiHelper.getReceivingFacility(bundle).equalsDeep(receivingFacility)
+        HapiHelper.getPID3_5Value(bundle) == pid3_5
     }
 
+    // HD - Hierarchic Designator
     def "getHD1Identifier returns the correct namespaceIdentifier"() {
         given:
         def expectedExtension = new Extension(HapiHelper.EXTENSION_HL7_FIELD_URL, HapiHelper.EXTENSION_HD1_DATA_TYPE)

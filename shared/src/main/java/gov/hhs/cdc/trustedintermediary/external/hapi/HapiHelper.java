@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DiagnosticReport;
 import org.hl7.fhir.r4.model.Extension;
@@ -168,14 +169,11 @@ public class HapiHelper {
 
     public static void setReceivingFacility(Bundle bundle, Organization receivingFacility) {
         MessageHeader messageHeader = getMessageHeader(bundle);
-        String organizationId = receivingFacility.getId();
-        Reference organizationReference = new Reference("Organization/" + organizationId);
-        organizationReference.setResource(receivingFacility);
+        Reference organizationReference = createOrganizationReference(bundle, receivingFacility);
         MessageHeader.MessageDestinationComponent destination =
                 new MessageHeader.MessageDestinationComponent();
         destination.setReceiver(organizationReference);
         messageHeader.setDestination(List.of(destination));
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(receivingFacility));
     }
 
     // MSH-9 - Message Type
@@ -205,6 +203,12 @@ public class HapiHelper {
         return resourceInBundle(bundle, Patient.class);
     }
 
+    public static Patient createPatient(Bundle bundle) {
+        Patient patient = new Patient();
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(patient));
+        return patient;
+    }
+
     // PID-3 - Patient Identifier List
     public static Identifier getPatientIdentifier(Bundle bundle) {
         Patient patient = getPatient(bundle);
@@ -212,6 +216,14 @@ public class HapiHelper {
             return null;
         }
         return patient.getIdentifierFirstRep();
+    }
+
+    public static void createPatientIdentifier(Bundle bundle, Identifier identifier) {
+        Patient patient = getPatient(bundle);
+        if (patient == null) {
+            return;
+        }
+        patient.setIdentifier(List.of(identifier));
     }
 
     // PID-3.4 - Assigning Authority
@@ -222,6 +234,17 @@ public class HapiHelper {
         }
         Organization organization = (Organization) identifier.getAssigner().getResource();
         return organization.getIdentifierFirstRep();
+    }
+
+    public static void setPID3_4Identifier(Bundle bundle, Identifier identifier) {
+        Identifier patientIdentifier = getPatientIdentifier(bundle);
+        if (patientIdentifier == null) {
+            return;
+        }
+        Organization organization = new Organization();
+        organization.setIdentifier(List.of(identifier));
+        Reference orgReference = createOrganizationReference(bundle, organization);
+        patientIdentifier.setAssigner(orgReference);
     }
 
     public static String getPID3_4Value(Bundle bundle) {
@@ -249,6 +272,14 @@ public class HapiHelper {
         return identifier.getType().getCodingFirstRep();
     }
 
+    public static void setPID3_5Coding(Bundle bundle, Coding coding) {
+        Identifier identifier = getPatientIdentifier(bundle);
+        if (identifier == null) {
+            return;
+        }
+        identifier.setType(new CodeableConcept().addCoding(coding));
+    }
+
     public static String getPID3_5Value(Bundle bundle) {
         Coding coding = getPID3_5Coding(bundle);
         if (coding == null) {
@@ -268,6 +299,9 @@ public class HapiHelper {
     // PID-5 - Patient Name
     public static Extension getPID5Extension(Bundle bundle) {
         Patient patient = getPatient(bundle);
+        if (patient == null) {
+            return null;
+        }
         HumanName name = patient.getNameFirstRep();
         return name.getExtensionByUrl(HapiHelper.EXTENSION_XPN_HUMAN_NAME_URL);
     }
@@ -402,6 +436,14 @@ public class HapiHelper {
                 .getExtensionByUrl(EXTENSION_ASSIGNING_AUTHORITY_URL)
                 .getExtensionByUrl(EXTENSION_NAMESPACE_ID_URL)
                 .setValue(new StringType(value));
+    }
+
+    private static Reference createOrganizationReference(Bundle bundle, Organization organization) {
+        String organizationId = organization.getId();
+        Reference organizationReference = new Reference("Organization/" + organizationId);
+        organizationReference.setResource(organization);
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(organization));
+        return organizationReference;
     }
 
     private static Identifier getHl7FieldIdentifier(
