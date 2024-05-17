@@ -352,6 +352,8 @@ public class HapiHelper {
     }
 
     // ORC - Common Order
+
+    // Diagnostic Report
     public static DiagnosticReport getDiagnosticReport(Bundle bundle) {
         return resourceInBundle(bundle, DiagnosticReport.class);
     }
@@ -362,7 +364,7 @@ public class HapiHelper {
         return diagnosticReport;
     }
 
-    public static ServiceRequest getServiceRequestBasedOn(DiagnosticReport diagnosticReport) {
+    public static ServiceRequest getBasedOnServiceRequest(DiagnosticReport diagnosticReport) {
         return (ServiceRequest) diagnosticReport.getBasedOnFirstRep().getResource();
     }
 
@@ -461,6 +463,23 @@ public class HapiHelper {
         coding.setDisplay(value);
     }
 
+    // ORC-21 - Ordering Facility Name
+    public static PractitionerRole getPractitionerRoleRequester(ServiceRequest serviceRequest) {
+        return (PractitionerRole) serviceRequest.getRequester().getResource();
+    }
+
+    public static Organization getOrganization(PractitionerRole practitionerRole) {
+        return (Organization) practitionerRole.getOrganization().getResource();
+    }
+
+    public static Extension getOrc21Extension(Organization organization) {
+        if (!organization.hasExtension(EXTENSION_XON_ORGANIZATION_URL)) {
+            return null;
+        }
+        Extension xonOrgExtension = organization.getExtensionByUrl(EXTENSION_XON_ORGANIZATION_URL);
+        return xonOrgExtension.getExtensionByUrl(EXTENSION_XON10_URL);
+    }
+
     // HD - Hierarchic Designator
     public static Identifier getHD1Identifier(List<Identifier> identifiers) {
         return getHl7FieldIdentifier(identifiers, EXTENSION_HD1_DATA_TYPE);
@@ -508,32 +527,6 @@ public class HapiHelper {
                             .equalsDeep(dataType)) {
                 return identifier;
             }
-        }
-        return null;
-    }
-
-    // Diagnostic Report
-    public static DiagnosticReport getDiagnosticReport(Bundle bundle) {
-        return resourceInBundle(bundle, DiagnosticReport.class);
-    }
-
-    public static ServiceRequest getServiceRequestBasedOn(DiagnosticReport diagnosticReport) {
-        return (ServiceRequest) diagnosticReport.getBasedOnFirstRep().getResource();
-    }
-
-    public static PractitionerRole getPractitionerRoleRequester(ServiceRequest serviceRequest) {
-        return (PractitionerRole) serviceRequest.getRequester().getResource();
-    }
-
-    public static Organization getOrganization(PractitionerRole practitionerRole) {
-        return (Organization) practitionerRole.getOrganization().getResource();
-    }
-
-    public static Extension getOrc21Extension(Organization organization) {
-        if (organization.hasExtension(EXTENSION_XON_ORGANIZATION_URL)) {
-            Extension xonOrgExtension =
-                    organization.getExtensionByUrl(EXTENSION_XON_ORGANIZATION_URL);
-            return xonOrgExtension.getExtensionByUrl(EXTENSION_XON10_URL);
         }
         return null;
     }

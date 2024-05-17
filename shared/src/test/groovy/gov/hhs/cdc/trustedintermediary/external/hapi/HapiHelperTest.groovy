@@ -475,7 +475,7 @@ class HapiHelperTest extends Specification {
         def dr = HapiHelper.createDiagnosticReport(bundle)
 
         expect:
-        HapiHelper.getServiceRequestBasedOn(dr) == null
+        HapiHelper.getBasedOnServiceRequest(dr) == null
         dr.getBasedOnFirstRep().getResource() == null
 
         when:
