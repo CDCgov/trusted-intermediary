@@ -53,7 +53,7 @@ class SwapPlacerOrderAndGroupNumbersTest extends Specification {
     def "don't throw exception if service request resource not present"() {
         given:
         def bundle = new Bundle()
-        HapiHelper.createMessageHeader(bundle)
+        HapiHelper.createMSHMessageHeader(bundle)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)

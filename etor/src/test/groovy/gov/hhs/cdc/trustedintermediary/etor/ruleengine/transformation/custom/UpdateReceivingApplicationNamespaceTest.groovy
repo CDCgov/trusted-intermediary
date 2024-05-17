@@ -23,21 +23,21 @@ class UpdateReceivingApplicationNamespaceTest extends Specification {
         given:
         def name = "EPIC"
         def bundle = new Bundle()
-        HapiHelper.createMessageHeader(bundle)
+        HapiHelper.createMSHMessageHeader(bundle)
         def receivingApplication = HapiHelper.createMessageDestinationComponent()
         receivingApplication.addExtension(HapiHelper.EXTENSION_UNIVERSAL_ID_URL, new StringType("universal-id"))
         receivingApplication.addExtension(HapiHelper.EXTENSION_UNIVERSAL_ID_TYPE_URL, new StringType("universal-id-type"))
-        HapiHelper.setReceivingApplication(bundle, receivingApplication)
+        HapiHelper.setMSH5MessageDestinationComponent(bundle, receivingApplication)
 
         expect:
-        def existingReceivingApplication = HapiHelper.getReceivingApplication(bundle)
+        def existingReceivingApplication = HapiHelper.getMSH5MessageDestinationComponent(bundle)
         existingReceivingApplication.name != name
         existingReceivingApplication.getExtensionByUrl(HapiHelper.EXTENSION_UNIVERSAL_ID_URL) != null
         existingReceivingApplication.getExtensionByUrl(HapiHelper.EXTENSION_UNIVERSAL_ID_TYPE_URL) != null
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), Map.of("name", name))
-        def transformedReceivingApplication = HapiHelper.getReceivingApplication(bundle)
+        def transformedReceivingApplication = HapiHelper.getMSH5MessageDestinationComponent(bundle)
 
         then:
         transformedReceivingApplication.name == name
@@ -48,7 +48,7 @@ class UpdateReceivingApplicationNamespaceTest extends Specification {
     def "don't throw exception if receiving application not in bundle"() {
         given:
         def bundle = new Bundle()
-        HapiHelper.createMessageHeader(bundle)
+        HapiHelper.createMSHMessageHeader(bundle)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), Map.of("name", ""))
