@@ -89,7 +89,7 @@
       ]
     },
     {
-      "name": "ucsdOruSwitchPlacerOrderAndGroupNumbers",
+      "name": "ucsdOruSwapPlacerOrderAndGroupNumbers",
       "description": "Swaps UCSD ORU's Placer Order Number (ORC-2) and Placer Group Number (ORC-4)",
       "message": "",
       "conditions": [
@@ -98,7 +98,7 @@
       ],
       "rules": [
         {
-          "name": "SwitchPlacerOrderAndGroupNumbers",
+          "name": "SwapPlacerOrderAndGroupNumbers",
           "args": { }
         }
       ]

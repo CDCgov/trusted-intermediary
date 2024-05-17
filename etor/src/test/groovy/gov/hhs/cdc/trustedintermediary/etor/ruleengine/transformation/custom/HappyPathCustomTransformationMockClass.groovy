@@ -6,7 +6,7 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
 
-class HappyPathMockClass implements CustomFhirTransformation {
+class HappyPathCustomTransformationMockClass implements CustomFhirTransformation {
 
     @Override
     public void transform(final FhirResource<?> resource, final Map<String, String> args) {

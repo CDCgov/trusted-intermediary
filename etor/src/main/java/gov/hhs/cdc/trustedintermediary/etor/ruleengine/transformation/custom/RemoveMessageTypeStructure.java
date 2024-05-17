@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Coding;
 
 /** Removes the Message Structure (MSH-9.3) from the Message Type (MSH-9). */
 public class RemoveMessageTypeStructure implements CustomFhirTransformation {
@@ -19,18 +18,17 @@ public class RemoveMessageTypeStructure implements CustomFhirTransformation {
             throws RuleExecutionException {
         try {
             Bundle bundle = (Bundle) resource.getUnderlyingResource();
-            Coding coding = HapiHelper.getMessageTypeCoding(bundle);
-            String display = coding.getDisplay();
+            String msh9_3 = HapiHelper.getMSH9_3Value(bundle);
             String delimiter = "^";
             List<String> displayList =
-                    new ArrayList<>(Arrays.asList(display.split("\\" + delimiter)));
+                    new ArrayList<>(Arrays.asList(msh9_3.split("\\" + delimiter)));
             if (displayList.size() < 3) {
                 return;
             }
             // Remove the third element from the list
             displayList.remove(2);
             String strippedString = String.join(delimiter, displayList);
-            coding.setDisplay(strippedString);
+            HapiHelper.setMSH9_3Value(bundle, strippedString);
         } catch (Exception e) {
             throw new RuleExecutionException("Failed to remove message type structure", e);
         }
