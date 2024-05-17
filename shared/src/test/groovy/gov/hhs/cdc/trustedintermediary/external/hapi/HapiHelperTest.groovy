@@ -6,7 +6,6 @@ import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Meta
-import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Provenance
 import org.hl7.fhir.r4.model.ResourceType
@@ -313,7 +312,7 @@ class HapiHelperTest extends Specification {
     }
 
     // PID - Patient Identifier
-    def "getPatientIdentifier returns expected value"() {
+    def "patient identifier methods work as expected"() {
         given:
         def bundle = new Bundle()
 
@@ -324,24 +323,38 @@ class HapiHelperTest extends Specification {
         nullPatientIdentifier == null
 
         when:
-        def newPatientIdentifier = new Identifier()
+        HapiHelper.setPatientIdentifier(bundle, new Identifier())
+
+        then:
+        noExceptionThrown()
+
+        when:
         HapiHelper.createPatient(bundle)
-        HapiHelper.createPatientIdentifier(bundle, newPatientIdentifier)
+        def newPatientIdentifier = new Identifier()
+        HapiHelper.setPatientIdentifier(bundle, newPatientIdentifier)
 
         then:
         HapiHelper.getPatientIdentifier(bundle) == newPatientIdentifier
     }
 
     // PID-3.4 - Assigning Authority
-    def "patient assigning authority's get and set work as expected"() {
+    def "patient assigning authority methods work as expected"() {
         given:
         def bundle = new Bundle()
         def pid3_4 = "pid3_4"
+
+        when:
+        HapiHelper.setPID3_4Value(bundle, pid3_4)
+
+        then:
+        HapiHelper.getPID3_4Value(bundle) == null
+
+        when:
         HapiHelper.createPatient(bundle)
-        HapiHelper.createPatientIdentifier(bundle, new Identifier())
+        HapiHelper.setPatientIdentifier(bundle, new Identifier())
         HapiHelper.setPID3_4Identifier(bundle, new Identifier())
 
-        expect:
+        then:
         HapiHelper.getPID3_4Value(bundle) == null
 
         when:
@@ -352,15 +365,23 @@ class HapiHelperTest extends Specification {
     }
 
     // PID-3.5 - Assigning Identifier Type Code
-    def "patient assigning authority's get and set work as expected"() {
+    def "patient assigning authority methods work as expected"() {
         given:
         def bundle = new Bundle()
         def pid3_5 = "pid3_5"
+
+        when:
+        HapiHelper.setPID3_5Value(bundle, pid3_5)
+
+        then:
+        HapiHelper.getPID3_5Value(bundle) == null
+
+        when:
         HapiHelper.createPatient(bundle)
-        HapiHelper.createPatientIdentifier(bundle, new Identifier())
+        HapiHelper.setPatientIdentifier(bundle, new Identifier())
         HapiHelper.setPID3_5Coding(bundle, new Coding())
 
-        expect:
+        then:
         HapiHelper.getPID3_5Value(bundle) == null
 
         when:
@@ -368,6 +389,57 @@ class HapiHelperTest extends Specification {
 
         then:
         HapiHelper.getPID3_5Value(bundle) == pid3_5
+    }
+
+    // PID-5 - Patient Name
+    def "patient name methods work as expected"() {
+        given:
+        def bundle = new Bundle()
+
+        when:
+        HapiHelper.createPID5Extension(bundle)
+
+        then:
+        HapiHelper.getPID5Extension(bundle) == null
+
+        when:
+        HapiHelper.createPatient(bundle)
+        HapiHelper.createPID5Extension(bundle)
+
+        then:
+        HapiHelper.getPID5Extension(bundle) != null
+    }
+
+    // PID-5.7 - Name Type Code
+    def "patient name type code methods work as expected"() {
+        given:
+        def bundle = new Bundle()
+        def pid5_7 = "pid5_7"
+
+        when:
+        HapiHelper.setPID5_7Value(bundle, pid5_7)
+
+        then:
+        HapiHelper.getPID5_7Value(bundle) == null
+
+        when:
+        HapiHelper.createPatient(bundle)
+        HapiHelper.createPID5Extension(bundle)
+
+        then:
+        HapiHelper.getPID5_7Value(bundle) == null
+
+        when:
+        HapiHelper.setPID5_7Value(bundle, pid5_7)
+
+        then:
+        HapiHelper.getPID5_7Value(bundle) == pid5_7
+
+        when:
+        HapiHelper.removePID5_7Extension(bundle)
+
+        then:
+        HapiHelper.getPID5_7Value(bundle) == null
     }
 
     // HD - Hierarchic Designator

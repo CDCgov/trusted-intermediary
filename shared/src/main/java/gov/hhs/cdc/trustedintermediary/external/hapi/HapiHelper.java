@@ -218,7 +218,7 @@ public class HapiHelper {
         return patient.getIdentifierFirstRep();
     }
 
-    public static void createPatientIdentifier(Bundle bundle, Identifier identifier) {
+    public static void setPatientIdentifier(Bundle bundle, Identifier identifier) {
         Patient patient = getPatient(bundle);
         if (patient == null) {
             return;
@@ -306,6 +306,15 @@ public class HapiHelper {
         return name.getExtensionByUrl(HapiHelper.EXTENSION_XPN_HUMAN_NAME_URL);
     }
 
+    public static void createPID5Extension(Bundle bundle) {
+        Patient patient = getPatient(bundle);
+        if (patient == null) {
+            return;
+        }
+        HumanName name = patient.getNameFirstRep();
+        name.addExtension(new Extension(HapiHelper.EXTENSION_XPN_HUMAN_NAME_URL));
+    }
+
     // PID-5.7 - Name Type Code
     public static String getPID5_7Value(Bundle bundle) {
         Extension extension = getPID5Extension(bundle);
@@ -316,6 +325,19 @@ public class HapiHelper {
                 .getExtensionByUrl(HapiHelper.EXTENSION_XPN7_URL)
                 .getValue()
                 .primitiveValue();
+    }
+
+    public static void setPID5_7Value(Bundle bundle, String value) {
+        Extension pid5Extension = getPID5Extension(bundle);
+        if (pid5Extension == null) {
+            return;
+        }
+        Extension xpn7Extension = pid5Extension.getExtensionByUrl(HapiHelper.EXTENSION_XPN7_URL);
+        if (xpn7Extension == null) {
+            xpn7Extension = new Extension(HapiHelper.EXTENSION_XPN7_URL);
+            pid5Extension.addExtension(xpn7Extension);
+        }
+        xpn7Extension.setValue(new StringType(value));
     }
 
     public static void removePID5_7Extension(Bundle bundle) {
