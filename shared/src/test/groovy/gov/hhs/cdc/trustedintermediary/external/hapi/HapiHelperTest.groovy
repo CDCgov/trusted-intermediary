@@ -344,6 +344,12 @@ class HapiHelperTest extends Specification {
         def pid3_4 = "pid3_4"
 
         when:
+        HapiHelper.setPID3_4Identifier(bundle, new Identifier())
+
+        then:
+        HapiHelper.getPID3_4Identifier(bundle) == null
+
+        when:
         HapiHelper.setPID3_4Value(bundle, pid3_4)
 
         then:
@@ -369,6 +375,12 @@ class HapiHelperTest extends Specification {
         given:
         def bundle = new Bundle()
         def pid3_5 = "pid3_5"
+
+        when:
+        HapiHelper.setPID3_5Coding(bundle, new Coding())
+
+        then:
+        HapiHelper.getPID3_5Coding(bundle) == null
 
         when:
         HapiHelper.setPID3_5Value(bundle, pid3_5)
@@ -440,6 +452,42 @@ class HapiHelperTest extends Specification {
 
         then:
         HapiHelper.getPID5_7Value(bundle) == null
+    }
+
+    // ORC-4.1 - Entity Identifier
+    def "orc-4.1 methods work as expected"() {
+        given:
+        def orc4_1 = "orc4_1"
+        def bundle = new Bundle()
+        def dr = HapiHelper.createDiagnosticReport(bundle)
+        def sr = HapiHelper.createBasedOnServiceRequest(dr)
+
+        expect:
+        HapiHelper.getORC4_1Value(sr) == null
+
+        when:
+        HapiHelper.setORC4_1Value(sr, orc4_1)
+
+        then:
+        HapiHelper.getORC4_1Value(sr) == orc4_1
+    }
+
+    // ORC-4.2 - Namespace ID
+    def "orc-4.2 methods work as expected"() {
+        given:
+        def orc4_2 = "orc4_2"
+        def bundle = new Bundle()
+        def dr = HapiHelper.createDiagnosticReport(bundle)
+        def sr = HapiHelper.createBasedOnServiceRequest(dr)
+
+        expect:
+        HapiHelper.getORC4_2Value(sr) == null
+
+        when:
+        HapiHelper.setORC4_2Value(sr, orc4_2)
+
+        then:
+        HapiHelper.getORC4_2Value(sr) == orc4_2
     }
 
     // HD - Hierarchic Designator

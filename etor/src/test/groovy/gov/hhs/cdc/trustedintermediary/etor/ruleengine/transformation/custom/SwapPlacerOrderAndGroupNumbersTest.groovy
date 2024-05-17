@@ -2,8 +2,6 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException
-import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.ServiceRequest
@@ -49,17 +47,5 @@ class SwapPlacerOrderAndGroupNumbersTest extends Specification {
         actualOrc2_2 == orc4_2
         actualOrc4_1 == orc2_1
         actualOrc4_2 == orc2_2
-    }
-
-    def "throw RuleExecutionException if ServiceRequest doesn't have identifiers"() {
-        given:
-        def bundle = new Bundle()
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(new ServiceRequest()))
-
-        when:
-        transformClass.transform(new HapiFhirResource(bundle), null)
-
-        then:
-        thrown(RuleExecutionException)
     }
 }

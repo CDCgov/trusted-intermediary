@@ -348,8 +348,24 @@ public class HapiHelper {
     }
 
     // ORC - Common Order
+    public static DiagnosticReport getDiagnosticReport(Bundle bundle) {
+        return resourceInBundle(bundle, DiagnosticReport.class);
+    }
+
+    public static DiagnosticReport createDiagnosticReport(Bundle bundle) {
+        DiagnosticReport diagnosticReport = new DiagnosticReport();
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(diagnosticReport));
+        return diagnosticReport;
+    }
+
     public static ServiceRequest getServiceRequestBasedOn(DiagnosticReport diagnosticReport) {
         return (ServiceRequest) diagnosticReport.getBasedOnFirstRep().getResource();
+    }
+
+    public static ServiceRequest createBasedOnServiceRequest(DiagnosticReport diagnosticReport) {
+        ServiceRequest serviceRequest = new ServiceRequest();
+        diagnosticReport.addBasedOn(new Reference(serviceRequest));
+        return serviceRequest;
     }
 
     // ORC-2 - Placer Order Number
@@ -394,7 +410,15 @@ public class HapiHelper {
 
     // ORC-4 - Placer Group Number
     public static Coding getORC4Coding(ServiceRequest serviceRequest) {
-        return serviceRequest.getCode().getCoding().get(0);
+        List<Coding> codings = serviceRequest.getCode().getCoding();
+        if (codings.isEmpty()) {
+            return null;
+        }
+        return codings.get(0);
+    }
+
+    public static void setORC4Coding(ServiceRequest serviceRequest, Coding coding) {
+        serviceRequest.getCode().setCoding(List.of(coding));
     }
 
     // ORC-4.1 - Entity Identifier
@@ -409,7 +433,8 @@ public class HapiHelper {
     public static void setORC4_1Value(ServiceRequest serviceRequest, String value) {
         Coding coding = getORC4Coding(serviceRequest);
         if (coding == null) {
-            return;
+            coding = new Coding();
+            setORC4Coding(serviceRequest, coding);
         }
         coding.setCode(value);
     }
@@ -426,7 +451,8 @@ public class HapiHelper {
     public static void setORC4_2Value(ServiceRequest serviceRequest, String value) {
         Coding coding = getORC4Coding(serviceRequest);
         if (coding == null) {
-            return;
+            coding = new Coding();
+            setORC4Coding(serviceRequest, coding);
         }
         coding.setDisplay(value);
     }
