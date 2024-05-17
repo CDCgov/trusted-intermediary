@@ -429,6 +429,7 @@ class HapiHelperTest extends Specification {
         def pid5_7 = "pid5_7"
 
         when:
+        HapiHelper.removePID5_7Extension(bundle)
         HapiHelper.setPID5_7Value(bundle, pid5_7)
 
         then:
@@ -446,6 +447,12 @@ class HapiHelperTest extends Specification {
 
         then:
         HapiHelper.getPID5_7Value(bundle) == pid5_7
+
+        when:
+        HapiHelper.setPID5_7Value(bundle, "")
+
+        then:
+        HapiHelper.getPID5_7Value(bundle) == ""
 
         when:
         HapiHelper.removePID5_7Extension(bundle)
