@@ -43,6 +43,7 @@ public class HapiHelper {
     public static final String EXTENSION_XON10_URL = "XON.10";
     public static final String EXTENSION_XPN7_URL = "XPN.7";
     public static final StringType EXTENSION_HD1_DATA_TYPE = new StringType("HD.1");
+    public static final StringType EXTENSION_HD2_HD3_DATA_TYPE = new StringType("HD.2,HD.3");
     public static final StringType EXTENSION_ORC2_DATA_TYPE = new StringType("ORC.2");
 
     public static final Coding OML_CODING =
@@ -169,6 +170,40 @@ public class HapiHelper {
     }
 
     // MSH-6.1 - Namespace ID
+    public static Identifier getMSH6_1Identifier(Bundle bundle) {
+        Organization receivingFacility = getMSH6Organization(bundle);
+        if (receivingFacility == null) {
+            return null;
+        }
+        List<Identifier> identifiers = receivingFacility.getIdentifier();
+        return getHD1Identifier(identifiers);
+    }
+
+    public static String getMSH6_1Value(Bundle bundle) {
+        Identifier identifier = getMSH6_1Identifier(bundle);
+        if (identifier == null) {
+            return null;
+        }
+        return identifier.getValue();
+    }
+
+    public static void setMSH6_1Value(Bundle bundle, String value) {
+        Identifier identifier = getMSH6_1Identifier(bundle);
+        if (identifier == null) {
+            return;
+        }
+        identifier.setValue(value);
+    }
+
+    // MSH-6.2 - Universal ID
+    public static void removeMSH6_2_and_3_Identifier(Bundle bundle) {
+        Organization receivingFacility = getMSH6Organization(bundle);
+        if (receivingFacility == null) {
+            return;
+        }
+        List<Identifier> identifiers = receivingFacility.getIdentifier();
+        removeHl7FieldIdentifier(identifiers, EXTENSION_HD2_HD3_DATA_TYPE);
+    }
 
     // MSH-9 - Message Type
     public static Coding getMSH9Coding(Bundle bundle) {
@@ -364,6 +399,14 @@ public class HapiHelper {
         return serviceRequest;
     }
 
+    public static PractitionerRole getPractitionerRoleRequester(ServiceRequest serviceRequest) {
+        return (PractitionerRole) serviceRequest.getRequester().getResource();
+    }
+
+    public static Organization getOrganization(PractitionerRole practitionerRole) {
+        return (Organization) practitionerRole.getOrganization().getResource();
+    }
+
     // ORC-2 - Placer Order Number
     public static Identifier getORC2Identifier(ServiceRequest serviceRequest) {
         List<Identifier> identifiers = serviceRequest.getIdentifier();
@@ -454,20 +497,15 @@ public class HapiHelper {
     }
 
     // ORC-21 - Ordering Facility Name
-    public static PractitionerRole getPractitionerRoleRequester(ServiceRequest serviceRequest) {
-        return (PractitionerRole) serviceRequest.getRequester().getResource();
-    }
-
-    public static Organization getOrganization(PractitionerRole practitionerRole) {
-        return (Organization) practitionerRole.getOrganization().getResource();
-    }
-
-    public static Extension getOrc21Extension(Organization organization) {
+    public static String getOrc21Value(ServiceRequest serviceRequest) {
+        PractitionerRole practitionerRole = getPractitionerRoleRequester(serviceRequest);
+        Organization organization = getOrganization(practitionerRole);
         if (!organization.hasExtension(EXTENSION_XON_ORGANIZATION_URL)) {
             return null;
         }
         Extension xonOrgExtension = organization.getExtensionByUrl(EXTENSION_XON_ORGANIZATION_URL);
-        return xonOrgExtension.getExtensionByUrl(EXTENSION_XON10_URL);
+        Extension orc21Extension = xonOrgExtension.getExtensionByUrl(EXTENSION_XON10_URL);
+        return orc21Extension.getValue().primitiveValue();
     }
 
     // HD - Hierarchic Designator
@@ -534,5 +572,16 @@ public class HapiHelper {
             }
         }
         return null;
+    }
+
+    protected static void removeHl7FieldIdentifier(
+            List<Identifier> identifiers, StringType dataType) {
+        identifiers.removeIf(
+                identifier ->
+                        identifier.hasExtension(EXTENSION_HL7_FIELD_URL)
+                                && identifier
+                                        .getExtensionByUrl(EXTENSION_HL7_FIELD_URL)
+                                        .getValue()
+                                        .equalsDeep(dataType));
     }
 }

@@ -25,25 +25,22 @@ class UpdateReceivingFacilityWithOrderingFacilityIdentifierTest extends Specific
         def bundle = fhirResource.getUnderlyingResource() as Bundle
         def diagnosticReport = HapiHelper.getDiagnosticReport(bundle)
         def serviceRequest = HapiHelper.getBasedOnServiceRequest(diagnosticReport)
-        def practitionerRole = HapiHelper.getPractitionerRoleRequester(serviceRequest)
-        def organization = HapiHelper.getOrganization(practitionerRole)
-        def orc21_10 = HapiHelper.getOrc21Extension(organization).getValue() as String
+        def orc21_10 = HapiHelper.getOrc21Value(serviceRequest)
 
         expect:
-        HapiHelper.getReceivingFacility(bundle).getIdentifier().size() > 1
-        HapiHelper.getMSH4_1Identifier(bundle).getValue() != orc21_10
+        HapiHelper.getMSH6_1Value(bundle) != orc21_10
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
 
         then:
-        HapiHelper.getMSH4_1Identifier(bundle).getValue() == orc21_10
+        HapiHelper.getMSH6_1Value(bundle) == orc21_10
     }
 
     def "don't throw exception if receiving facility not in bundle"() {
         given:
         def bundle = new Bundle()
-        HapiHelper.createMessageHeader(bundle)
+        HapiHelper.createMSHMessageHeader(bundle)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)

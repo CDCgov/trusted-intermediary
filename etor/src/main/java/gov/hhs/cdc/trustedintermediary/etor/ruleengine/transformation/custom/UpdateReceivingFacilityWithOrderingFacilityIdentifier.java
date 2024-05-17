@@ -3,11 +3,10 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhirTransformation;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
-import java.util.Collections;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.DiagnosticReport;
+import org.hl7.fhir.r4.model.ServiceRequest;
 
 /**
  * Updates the receiving facility (MSH-6) to value in Ordering Facility Name's Organization
@@ -19,14 +18,16 @@ public class UpdateReceivingFacilityWithOrderingFacilityIdentifier
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
-        Organization receivingFacility = HapiHelper.getReceivingFacility(bundle);
-        Identifier namespaceIdentifier =
-                HapiHelper.getHD1Identifier(receivingFacility.getIdentifier());
-        if (namespaceIdentifier == null) {
+        DiagnosticReport diagnosticReport = HapiHelper.getDiagnosticReport(bundle);
+        if (diagnosticReport == null) {
             return;
         }
-        String orderingFacilityNameOrganizationIdentifier = "R797"; // Get it from ORC-21.10
-        namespaceIdentifier.setValue(orderingFacilityNameOrganizationIdentifier);
-        receivingFacility.setIdentifier(Collections.singletonList(namespaceIdentifier));
+        ServiceRequest serviceRequest = HapiHelper.getBasedOnServiceRequest(diagnosticReport);
+        if (serviceRequest == null) {
+            return;
+        }
+        String orc21_10 = HapiHelper.getOrc21Value(serviceRequest);
+        HapiHelper.setMSH6_1Value(bundle, orc21_10);
+        HapiHelper.removeMSH6_2_and_3_Identifier(bundle);
     }
 }
