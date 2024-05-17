@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.ServiceRequest
@@ -47,5 +48,17 @@ class SwapPlacerOrderAndGroupNumbersTest extends Specification {
         actualOrc2_2 == orc4_2
         actualOrc4_1 == orc2_1
         actualOrc4_2 == orc2_2
+    }
+
+    def "don't throw exception if service request resource not present"() {
+        given:
+        def bundle = new Bundle()
+        HapiHelper.createMessageHeader(bundle)
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), null)
+
+        then:
+        noExceptionThrown()
     }
 }

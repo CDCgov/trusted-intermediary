@@ -56,7 +56,7 @@ class RemoveMessageTypeStructureTest  extends Specification {
         convertedDisplay == messageTypeDisplay
     }
 
-    def "throw RuleExecutionException if message type coding not present"() {
+    def "don't throw exception if message type coding not present"() {
         given:
         def bundle = new Bundle()
         HapiHelper.createMessageHeader(bundle)
@@ -65,6 +65,6 @@ class RemoveMessageTypeStructureTest  extends Specification {
         transformClass.transform(new HapiFhirResource(bundle), null)
 
         then:
-        thrown(RuleExecutionException)
+        noExceptionThrown()
     }
 }

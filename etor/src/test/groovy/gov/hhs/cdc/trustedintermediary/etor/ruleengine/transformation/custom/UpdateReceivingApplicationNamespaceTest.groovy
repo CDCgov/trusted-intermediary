@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import org.hl7.fhir.r4.model.Bundle
@@ -25,7 +24,7 @@ class UpdateReceivingApplicationNamespaceTest extends Specification {
         def name = "EPIC"
         def bundle = new Bundle()
         HapiHelper.createMessageHeader(bundle)
-        def receivingApplication = HapiHelper.createReceivingApplication()
+        def receivingApplication = HapiHelper.createMessageDestinationComponent()
         receivingApplication.addExtension(HapiHelper.EXTENSION_UNIVERSAL_ID_URL, new StringType("universal-id"))
         receivingApplication.addExtension(HapiHelper.EXTENSION_UNIVERSAL_ID_TYPE_URL, new StringType("universal-id-type"))
         HapiHelper.setReceivingApplication(bundle, receivingApplication)
@@ -46,15 +45,15 @@ class UpdateReceivingApplicationNamespaceTest extends Specification {
         transformedReceivingApplication.getExtensionByUrl(HapiHelper.EXTENSION_UNIVERSAL_ID_TYPE_URL) == null
     }
 
-    def "throw RuleExecutionException if receiving application not in bundle"() {
+    def "don't throw exception if receiving application not in bundle"() {
         given:
         def bundle = new Bundle()
         HapiHelper.createMessageHeader(bundle)
 
         when:
-        transformClass.transform(new HapiFhirResource(bundle), null)
+        transformClass.transform(new HapiFhirResource(bundle), Map.of("name", ""))
 
         then:
-        thrown(RuleExecutionException)
+        noExceptionThrown()
     }
 }

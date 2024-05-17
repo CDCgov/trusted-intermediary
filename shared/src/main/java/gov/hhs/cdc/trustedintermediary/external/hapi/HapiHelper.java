@@ -126,22 +126,15 @@ public class HapiHelper {
 
     public static void setSendingFacility(Bundle bundle, Organization sendingFacility) {
         MessageHeader messageHeader = getMessageHeader(bundle);
-        String organizationId = sendingFacility.getId();
-        Reference organizationReference = new Reference("Organization/" + organizationId);
-        organizationReference.setResource(sendingFacility);
+        Reference organizationReference = createOrganizationReference(bundle, sendingFacility);
         messageHeader.setSender(organizationReference);
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(sendingFacility));
-    }
-
-    public static Organization createFacilityOrganization() {
-        Organization organization = new Organization();
-        String organizationId = UUID.randomUUID().toString();
-        organization.setId(organizationId);
-        return organization;
     }
 
     public static Identifier getSendingFacilityNamespace(Bundle bundle) {
         Organization sendingFacility = getSendingFacility(bundle);
+        if (sendingFacility == null) {
+            return null;
+        }
         List<Identifier> identifiers = sendingFacility.getIdentifier();
         return getHD1Identifier(identifiers);
     }
@@ -156,13 +149,6 @@ public class HapiHelper {
             Bundle bundle, MessageHeader.MessageDestinationComponent receivingApplication) {
         MessageHeader messageHeader = getMessageHeader(bundle);
         messageHeader.setDestination(List.of(receivingApplication));
-    }
-
-    public static MessageHeader.MessageDestinationComponent createReceivingApplication() {
-        MessageHeader.MessageDestinationComponent destination =
-                new MessageHeader.MessageDestinationComponent();
-        destination.setId(UUID.randomUUID().toString());
-        return destination;
     }
 
     // MSH-6 - Receiving Facility
@@ -310,7 +296,7 @@ public class HapiHelper {
         return name.getExtensionByUrl(HapiHelper.EXTENSION_XPN_HUMAN_NAME_URL);
     }
 
-    public static void createPID5Extension(Bundle bundle) {
+    public static void setPID5Extension(Bundle bundle) {
         Patient patient = getPatient(bundle);
         if (patient == null) {
             return;
@@ -507,6 +493,20 @@ public class HapiHelper {
                 .getExtensionByUrl(EXTENSION_ASSIGNING_AUTHORITY_URL)
                 .getExtensionByUrl(EXTENSION_NAMESPACE_ID_URL)
                 .setValue(new StringType(value));
+    }
+
+    protected static Organization createOrganization() {
+        Organization organization = new Organization();
+        String organizationId = UUID.randomUUID().toString();
+        organization.setId(organizationId);
+        return organization;
+    }
+
+    protected static MessageHeader.MessageDestinationComponent createMessageDestinationComponent() {
+        MessageHeader.MessageDestinationComponent destination =
+                new MessageHeader.MessageDestinationComponent();
+        destination.setId(UUID.randomUUID().toString());
+        return destination;
     }
 
     private static Reference createOrganizationReference(Bundle bundle, Organization organization) {

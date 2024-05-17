@@ -210,7 +210,7 @@ class HapiHelperTest extends Specification {
         HapiHelper.getSendingFacility(bundle) == null
 
         when:
-        def sendingFacility = HapiHelper.createFacilityOrganization()
+        def sendingFacility = HapiHelper.createOrganization()
         HapiHelper.setSendingFacility(bundle, sendingFacility)
 
         then:
@@ -221,7 +221,7 @@ class HapiHelperTest extends Specification {
     def "receiving application's get, set and create work as expected"() {
         given:
         def bundle = new Bundle()
-        def expectedReceivingApplication = HapiHelper.createReceivingApplication()
+        def expectedReceivingApplication = HapiHelper.createMessageDestinationComponent()
         HapiHelper.createMessageHeader(bundle)
 
         expect:
@@ -246,7 +246,7 @@ class HapiHelperTest extends Specification {
         HapiHelper.getReceivingFacility(bundle) == null
 
         when:
-        def receivingFacility = HapiHelper.createFacilityOrganization()
+        def receivingFacility = HapiHelper.createOrganization()
         HapiHelper.setReceivingFacility(bundle, receivingFacility)
 
         then:
@@ -409,14 +409,14 @@ class HapiHelperTest extends Specification {
         def bundle = new Bundle()
 
         when:
-        HapiHelper.createPID5Extension(bundle)
+        HapiHelper.setPID5Extension(bundle)
 
         then:
         HapiHelper.getPID5Extension(bundle) == null
 
         when:
         HapiHelper.createPatient(bundle)
-        HapiHelper.createPID5Extension(bundle)
+        HapiHelper.setPID5Extension(bundle)
 
         then:
         HapiHelper.getPID5Extension(bundle) != null
@@ -429,6 +429,7 @@ class HapiHelperTest extends Specification {
         def pid5_7 = "pid5_7"
 
         when:
+        HapiHelper.removePID5_7Extension(bundle)
         HapiHelper.setPID5_7Value(bundle, pid5_7)
 
         then:
@@ -436,7 +437,8 @@ class HapiHelperTest extends Specification {
 
         when:
         HapiHelper.createPatient(bundle)
-        HapiHelper.createPID5Extension(bundle)
+        HapiHelper.setPID5Extension(bundle)
+        HapiHelper.removePID5_7Extension(bundle)
 
         then:
         HapiHelper.getPID5_7Value(bundle) == null
@@ -446,6 +448,12 @@ class HapiHelperTest extends Specification {
 
         then:
         HapiHelper.getPID5_7Value(bundle) == pid5_7
+
+        when:
+        HapiHelper.setPID5_7Value(bundle, "")
+
+        then:
+        HapiHelper.getPID5_7Value(bundle) == ""
 
         when:
         HapiHelper.removePID5_7Extension(bundle)
@@ -531,6 +539,9 @@ class HapiHelperTest extends Specification {
         def otherExtension = new Extension(HapiHelper.EXTENSION_HL7_FIELD_URL, new StringType("other"))
         def otherIdentifier = new Identifier().setExtension(List.of(otherExtension)) as Identifier
         List<Identifier> identifiers = List.of(expectedIdentifier, otherIdentifier)
+
+        expect:
+        HapiHelper.getHD1Identifier(List.of(new Identifier())) == null
 
         when:
         def actualNamespace = HapiHelper.getHD1Identifier(identifiers)

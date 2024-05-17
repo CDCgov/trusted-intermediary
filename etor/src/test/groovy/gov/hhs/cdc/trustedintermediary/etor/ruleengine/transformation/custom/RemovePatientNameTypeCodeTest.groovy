@@ -34,4 +34,16 @@ class RemovePatientNameTypeCodeTest extends Specification {
         then:
         HapiHelper.getPID5_7Value(bundle) == null
     }
+
+    def "don't throw exception if patient resource not present"() {
+        given:
+        def bundle = new Bundle()
+        HapiHelper.createMessageHeader(bundle)
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), null)
+
+        then:
+        noExceptionThrown()
+    }
 }
