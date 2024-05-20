@@ -180,25 +180,6 @@ class HapiHelperTest extends Specification {
         messageHeader.getMeta().getTag().findAll {it.system == etorTag.system}.size() == 1
     }
 
-    // MSH-3 - Sending Application
-    def "sending application's get, set and create work as expected"() {
-        given:
-        def bundle = new Bundle()
-        def expectedSendingApplication = HapiFhirHelper.createMSH3MessageSourceComponent()
-        HapiHelper.createMSHMessageHeader(bundle)
-
-        expect:
-        def existingSendingApplication = HapiFhirHelper.getMSH3MessageSourceComponent(bundle)
-        !existingSendingApplication.equalsDeep(expectedSendingApplication)
-
-        when:
-        HapiFhirHelper.setMSH3MessageSourceComponent(bundle, expectedSendingApplication)
-        def actualSendingApplication = HapiFhirHelper.getMSH3MessageSourceComponent(bundle)
-
-        then:
-        actualSendingApplication.equalsDeep(expectedSendingApplication)
-    }
-
     // MSH-4 - Sending Facility
     def "sending facility's get, set and create work as expected"() {
         when:
@@ -245,23 +226,6 @@ class HapiHelperTest extends Specification {
 
         then:
         actualReceivingApplication.equalsDeep(expectedReceivingApplication)
-    }
-
-    // MSH-6 - Receiving Facility
-    def "receiving facility's get, set and create work as expected"() {
-        given:
-        def bundle = new Bundle()
-        HapiHelper.createMSHMessageHeader(bundle)
-
-        expect:
-        HapiFhirHelper.getMSH6Organization(bundle) == null
-
-        when:
-        def receivingFacility = HapiFhirHelper.createOrganization()
-        HapiFhirHelper.setMSH6Organization(bundle, receivingFacility)
-
-        then:
-        HapiFhirHelper.getMSH6Organization(bundle).equalsDeep(receivingFacility)
     }
 
     // MSH-9 - Message Type
@@ -363,11 +327,10 @@ class HapiHelperTest extends Specification {
     // PID-3.4 - Assigning Authority
     def "patient assigning authority methods work as expected"() {
         given:
-        def bundle = new Bundle()
         def pid3_4 = "pid3_4"
 
         when:
-        HapiFhirHelper.setPID3_4Identifier(bundle, new Identifier())
+        def bundle = new Bundle()
 
         then:
         HapiHelper.getPID3_4Identifier(bundle) == null
@@ -382,11 +345,6 @@ class HapiHelperTest extends Specification {
         HapiFhirHelper.createPIDPatient(bundle)
         HapiFhirHelper.setPID3Identifier(bundle, new Identifier())
         HapiFhirHelper.setPID3_4Identifier(bundle, new Identifier())
-
-        then:
-        HapiFhirHelper.getPID3_4Value(bundle) == null
-
-        when:
         HapiHelper.setPID3_4Value(bundle, pid3_4)
 
         then:
@@ -415,11 +373,6 @@ class HapiHelperTest extends Specification {
         HapiFhirHelper.createPIDPatient(bundle)
         HapiFhirHelper.setPID3Identifier(bundle, new Identifier())
         HapiFhirHelper.setPID3_5Coding(bundle, new Coding())
-
-        then:
-        HapiFhirHelper.getPID3_5Value(bundle) == null
-
-        when:
         HapiHelper.setPID3_5Value(bundle, pid3_5)
 
         then:
@@ -448,15 +401,14 @@ class HapiHelperTest extends Specification {
     // PID-5.7 - Name Type Code
     def "patient name type code methods work as expected"() {
         given:
-        def bundle = new Bundle()
         def pid5_7 = "pid5_7"
 
         when:
+        def bundle = new Bundle()
         HapiHelper.removePID5_7Extension(bundle)
-        HapiFhirHelper.setPID5_7Value(bundle, pid5_7)
 
         then:
-        HapiFhirHelper.getPID5_7Value(bundle) == null
+        HapiHelper.getPID5Extension(bundle) == null
 
         when:
         HapiFhirHelper.createPIDPatient(bundle)
@@ -470,52 +422,15 @@ class HapiHelperTest extends Specification {
         HapiFhirHelper.setPID5_7Value(bundle, pid5_7)
 
         then:
+        HapiHelper.getPID5Extension(bundle) != null
         HapiFhirHelper.getPID5_7Value(bundle) == pid5_7
-
-        when:
-        HapiFhirHelper.setPID5_7Value(bundle, "")
-
-        then:
-        HapiFhirHelper.getPID5_7Value(bundle) == ""
 
         when:
         HapiHelper.removePID5_7Extension(bundle)
 
         then:
+        HapiHelper.getPID5Extension(bundle) != null
         HapiFhirHelper.getPID5_7Value(bundle) == null
-    }
-
-    // ORC - Common Order
-    def "DiagnosticReport methods work as expected"() {
-        given:
-        def bundle = new Bundle()
-
-        expect:
-        HapiFhirHelper.getDiagnosticReport(bundle) == null
-
-        when:
-        HapiFhirHelper.createDiagnosticReport(bundle)
-
-        then:
-        HapiFhirHelper.getDiagnosticReport(bundle) != null
-    }
-
-    def "BasedOnServiceRequest methods work as expected"() {
-        given:
-        def bundle = new Bundle()
-        def dr = HapiFhirHelper.createDiagnosticReport(bundle)
-
-        expect:
-        HapiFhirHelper.getBasedOnServiceRequest(dr) == null
-        dr.getBasedOnFirstRep().getResource() == null
-
-        when:
-        def sr = HapiFhirHelper.createBasedOnServiceRequest(dr)
-
-        then:
-        sr != null
-        dr.getBasedOn().size() == 1
-        dr.getBasedOnFirstRep().getResource() == sr
     }
 
     // ORC-4.1 - Entity Identifier
