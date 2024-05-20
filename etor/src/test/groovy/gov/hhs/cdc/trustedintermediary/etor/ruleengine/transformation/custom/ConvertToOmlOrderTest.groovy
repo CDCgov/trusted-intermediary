@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
-import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
+import gov.hhs.cdc.trustedintermediary.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
@@ -23,7 +23,7 @@ class ConvertToOmlOrderTest extends Specification {
 
     def "convert ORM order to OML"() {
         given:
-        def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: 'ORM_O01')
+        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORM_O01')
 
         expect:
         HapiHelper.resourceInBundle(bundle, MessageHeader).event.code == 'O01'

@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
-import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
+import gov.hhs.cdc.trustedintermediary.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
@@ -22,7 +22,7 @@ class RemoveMessageTypeStructureTest  extends Specification {
 
     def "remove message type structure"() {
         given:
-        def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: 'ORM_O01')
+        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORM_O01')
         def msh9_3 = HapiHelper.getMSH9_3Value(bundle)
         def msh9_3Array = msh9_3.split("\\^")
 
@@ -43,7 +43,7 @@ class RemoveMessageTypeStructureTest  extends Specification {
         given:
         def messageTypeDisplay = "ORU^R01"
         def bundle = new Bundle()
-        def messageHeader = FhirBundleHelper.createMSHMessageHeader(bundle)
+        def messageHeader = HapiFhirHelper.createMSHMessageHeader(bundle)
         messageHeader.setEvent(new Coding().setDisplay(messageTypeDisplay))
 
         when:
@@ -58,7 +58,7 @@ class RemoveMessageTypeStructureTest  extends Specification {
     def "don't throw exception if message type coding not present"() {
         given:
         def bundle = new Bundle()
-        FhirBundleHelper.createMSHMessageHeader(bundle)
+        HapiFhirHelper.createMSHMessageHeader(bundle)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)

@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation
 
-import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
+import gov.hhs.cdc.trustedintermediary.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleEngineHelper
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
@@ -42,7 +42,7 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
     def "transformation rules run without error"() {
         given:
-        def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: 'ORM_O01')
+        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORM_O01')
 
         when:
         engine.runRules(new HapiFhirResource(bundle))

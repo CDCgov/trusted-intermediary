@@ -1,7 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
-import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
+import gov.hhs.cdc.trustedintermediary.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
@@ -41,7 +41,7 @@ class UpdateSendingFacilityNamespaceTest extends Specification {
     def "don't throw exception if sending facility not in bundle"() {
         given:
         def bundle = new Bundle()
-        FhirBundleHelper.createMSHMessageHeader(bundle)
+        HapiFhirHelper.createMSHMessageHeader(bundle)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), Map.of("name", ""))

@@ -1,10 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
-import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
+import gov.hhs.cdc.trustedintermediary.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
-import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
 
@@ -23,7 +22,7 @@ class RemovePatientNameTypeCodeTest extends Specification {
         given:
         def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/002_CA_ORU_R01_initial_translation.fhir")
         def bundle = fhirResource.getUnderlyingResource() as Bundle
-        def pid5_7 = FhirBundleHelper.getPID5_7Value(bundle)
+        def pid5_7 = HapiFhirHelper.getPID5_7Value(bundle)
 
         expect:
         pid5_7 != null
@@ -32,13 +31,13 @@ class RemovePatientNameTypeCodeTest extends Specification {
         transformClass.transform(fhirResource, null)
 
         then:
-        FhirBundleHelper.getPID5_7Value(bundle) == null
+        HapiFhirHelper.getPID5_7Value(bundle) == null
     }
 
     def "don't throw exception if patient resource not present"() {
         given:
         def bundle = new Bundle()
-        FhirBundleHelper.createMSHMessageHeader(bundle)
+        HapiFhirHelper.createMSHMessageHeader(bundle)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)

@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
-import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
+import gov.hhs.cdc.trustedintermediary.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
@@ -22,7 +22,7 @@ class AddEtorProcessingTagTest extends Specification {
 
     def "add ETOR meta tag to message header"() {
         given:
-        def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: 'ORM_O01')
+        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORM_O01')
 
         expect:
         HapiHelper.getMSHMessageHeader(bundle).getMeta().getTag().size() == 0
