@@ -6,7 +6,7 @@ import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Reference
 
-class FhirBundleHelper {
+class HapiTestHelper {
 
     static Bundle createMessageBundle(Map params) {
         String messageTypeCode = params.messageTypeCode as String ?: "ORM_O01"

@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
-import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
+import gov.hhs.cdc.trustedintermediary.HapiTestHelper
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
@@ -38,7 +38,7 @@ class AddContactSectionToPatientResourceTest extends Specification {
 
     def "add patient contact section when there's none"() {
         given:
-        def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: 'OML_O21')
+        def bundle = HapiTestHelper.createMessageBundle(messageTypeCode: 'OML_O21')
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(new Patient()))
 
         expect:
