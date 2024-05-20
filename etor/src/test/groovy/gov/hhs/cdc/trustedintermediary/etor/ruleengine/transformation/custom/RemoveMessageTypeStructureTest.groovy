@@ -1,7 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
-import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
+
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import org.hl7.fhir.r4.model.Bundle
@@ -22,7 +23,7 @@ class RemoveMessageTypeStructureTest  extends Specification {
 
     def "remove message type structure"() {
         given:
-        def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: 'ORM_O01')
+        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORM_O01')
         def msh9_3 = HapiHelper.getMSH9_3Value(bundle)
         def msh9_3Array = msh9_3.split("\\^")
 
