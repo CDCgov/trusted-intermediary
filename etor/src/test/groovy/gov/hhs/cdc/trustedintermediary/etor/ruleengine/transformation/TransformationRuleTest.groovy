@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation
 
-import gov.hhs.cdc.trustedintermediary.HapiTestHelper
+import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
 import gov.hhs.cdc.trustedintermediary.FhirResourceMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
@@ -56,7 +56,7 @@ class TransformationRuleTest extends Specification {
         TestApplicationContext.register(HapiFhir, Mock(HapiFhir))
 
         def rule = new TransformationRule(ruleName, ruleDescription, ruleMessage, ruleConditions, ruleActions)
-        def fhirResource = new FhirResourceMock(HapiTestHelper.createMessageBundle(new HashMap()))
+        def fhirResource = new FhirResourceMock(FhirBundleHelper.createMessageBundle(new HashMap()))
 
         when:
         rule.runRule(fhirResource)
@@ -79,7 +79,7 @@ class TransformationRuleTest extends Specification {
 
         when:
         def rule = new TransformationRule(ruleName, ruleDescription, ruleMessage, ruleConditions, ruleActions)
-        def fhirResource = new FhirResourceMock(HapiTestHelper.createMessageBundle(new HashMap()))
+        def fhirResource = new FhirResourceMock(FhirBundleHelper.createMessageBundle(new HashMap()))
         rule.runRule(fhirResource)
 
         then:
@@ -100,7 +100,7 @@ class TransformationRuleTest extends Specification {
 
         when:
         def rule = new TransformationRule(ruleName, ruleDescription, ruleMessage, ruleConditions, ruleActions)
-        def fhirResource = new FhirResourceMock(HapiTestHelper.createMessageBundle(new HashMap()))
+        def fhirResource = new FhirResourceMock(FhirBundleHelper.createMessageBundle(new HashMap()))
         rule.runRule(fhirResource)
 
         then:
@@ -121,7 +121,7 @@ class TransformationRuleTest extends Specification {
 
         when:
         def rule = new TransformationRule(ruleName, ruleDescription, ruleMessage, ruleConditions, ruleActions)
-        def fhirResource = new FhirResourceMock(HapiTestHelper.createMessageBundle(new HashMap()))
+        def fhirResource = new FhirResourceMock(FhirBundleHelper.createMessageBundle(new HashMap()))
         rule.runRule(fhirResource)
 
         then:
@@ -142,7 +142,7 @@ class TransformationRuleTest extends Specification {
 
         when:
         def rule = new TransformationRule(ruleName, ruleDescription, ruleMessage, ruleConditions, ruleActions)
-        def fhirResource = new FhirResourceMock(HapiTestHelper.createMessageBundle(new HashMap()))
+        def fhirResource = new FhirResourceMock(FhirBundleHelper.createMessageBundle(new HashMap()))
         rule.runRule(fhirResource)
 
         then:
