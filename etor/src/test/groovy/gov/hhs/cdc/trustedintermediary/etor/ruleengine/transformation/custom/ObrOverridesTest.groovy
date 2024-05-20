@@ -22,25 +22,25 @@ class ObrOverridesTest  extends Specification {
 
     def "add override values when values already exist"() {
         given:
-        def fhirResource = ExamplesHelper.getExampleFhirResource("../MN/004_MN_ORU_R01_NBS_1_hl7_translation.fhir")
+        def fhirResource = ExamplesHelper.getExampleFhirResource("../Test/Results/002_AL_ORU_R01_NBS_Simplified_1_hl7_translation.fhir")
         def bundle = fhirResource.getUnderlyingResource() as Bundle
         def result = getOrbSections(bundle)
         def obr4_3 = result[0].getValue().primitiveValue()
         def obr4_4 = result[1]
 
         expect:
-        obr4_3 == "LN"
+        obr4_3 != null
         obr4_4 == null
 
         when:
         transformClass.transform(fhirResource, null)
         def transformedResult = getOrbSections(bundle)
-        def transformedObr4_3 = transformedResult[0].getValue().primitiveValue()
-        def transformedObr4_4 = transformedResult[1]
+        def transformedObr4_3 = transformedResult[0].getValueAsPrimitive()
+        def transformedObr4_4 = transformedResult[1].getValueAsPrimitive()
 
         then:
-        transformedObr4_3 == obr4_3
-        transformedObr4_4 == obr4_4
+        transformedObr4_3 == "LN"
+        transformedObr4_4 == "CDPHGSPEAP"
     }
 
     def "add override values when values don't exist"() {
