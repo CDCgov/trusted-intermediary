@@ -25,11 +25,11 @@ class AddEtorProcessingTagTest extends Specification {
         def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: 'ORM_O01')
 
         expect:
-        HapiHelper.getMessageHeader(bundle).getMeta().getTag().size() == 0
+        HapiHelper.getMSHMessageHeader(bundle).getMeta().getTag().size() == 0
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
-        def messageHeader = HapiHelper.getMessageHeader(bundle)
+        def messageHeader = HapiHelper.getMSHMessageHeader(bundle)
 
         then:
         messageHeader.getMeta().getTag().last().code == "ETOR"

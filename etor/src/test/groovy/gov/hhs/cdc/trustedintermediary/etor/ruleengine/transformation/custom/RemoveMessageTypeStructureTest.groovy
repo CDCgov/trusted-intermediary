@@ -4,7 +4,6 @@ import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
 import spock.lang.Specification
@@ -24,48 +23,47 @@ class RemoveMessageTypeStructureTest  extends Specification {
     def "remove message type structure"() {
         given:
         def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: 'ORM_O01')
-        def messageHeader = HapiHelper.getMessageHeader(bundle)
-        def displayArray = messageHeader.getEventCoding().getDisplay().split("\\^")
+        def msh9_3 = HapiHelper.getMSH9_3Value(bundle)
+        def msh9_3Array = msh9_3.split("\\^")
 
         expect:
-        displayArray.size() == 3
-        displayArray[2] != ""
+        msh9_3Array.size() == 3
+        msh9_3Array[2] != ""
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
-        def convertedMessageHeader = HapiHelper.getMessageHeader(bundle)
-        def convertedDisplay = convertedMessageHeader.getEventCoding().getDisplay()
-        def convertedDisplayArray = convertedDisplay.split("\\^")
+        def convertedMsh9_3 = HapiHelper.getMSH9_3Value(bundle)
+        def convertedMsh9_3Array = convertedMsh9_3.split("\\^")
 
         then:
-        convertedDisplayArray.size() == 2
+        convertedMsh9_3Array.size() == 2
     }
 
     def "don't do anything if message type structure not present"() {
         given:
         def messageTypeDisplay = "ORU^R01"
         def bundle = new Bundle()
-        def messageHeader = HapiHelper.createMessageHeader(bundle)
+        def messageHeader = HapiHelper.createMSHMessageHeader(bundle)
         messageHeader.setEvent(new Coding().setDisplay(messageTypeDisplay))
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
-        def convertedMessageHeader = HapiHelper.getMessageHeader(bundle)
+        def convertedMessageHeader = HapiHelper.getMSHMessageHeader(bundle)
         def convertedDisplay = convertedMessageHeader.getEventCoding().getDisplay()
 
         then:
         convertedDisplay == messageTypeDisplay
     }
 
-    def "throw RuleExecutionException if message type coding not present"() {
+    def "don't throw exception if message type coding not present"() {
         given:
         def bundle = new Bundle()
-        HapiHelper.createMessageHeader(bundle)
+        HapiHelper.createMSHMessageHeader(bundle)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
 
         then:
-        thrown(RuleExecutionException)
+        noExceptionThrown()
     }
 }

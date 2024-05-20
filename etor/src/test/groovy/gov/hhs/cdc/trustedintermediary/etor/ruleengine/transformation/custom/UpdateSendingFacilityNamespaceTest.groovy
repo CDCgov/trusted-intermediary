@@ -2,7 +2,6 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import org.hl7.fhir.r4.model.Bundle
@@ -27,26 +26,26 @@ class UpdateSendingFacilityNamespaceTest extends Specification {
         def bundle = fhirResource.getUnderlyingResource() as Bundle
 
         expect:
-        HapiHelper.getSendingFacility(bundle).getIdentifier().size() > 1
-        HapiHelper.getSendingFacilityNamespace(bundle).getValue() != name
+        HapiHelper.getMSH4Organization(bundle).getIdentifier().size() > 1
+        HapiHelper.getMSH4_1Identifier(bundle).getValue() != name
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), Map.of("name", name))
 
         then:
-        HapiHelper.getSendingFacility(bundle).getIdentifier().size() == 1
-        HapiHelper.getSendingFacilityNamespace(bundle).getValue() == name
+        HapiHelper.getMSH4Organization(bundle).getIdentifier().size() == 1
+        HapiHelper.getMSH4_1Identifier(bundle).getValue() == name
     }
 
-    def "throw RuleExecutionException if sending facility not in bundle"() {
+    def "don't throw exception if sending facility not in bundle"() {
         given:
         def bundle = new Bundle()
-        HapiHelper.createMessageHeader(bundle)
+        HapiHelper.createMSHMessageHeader(bundle)
 
         when:
-        transformClass.transform(new HapiFhirResource(bundle), null)
+        transformClass.transform(new HapiFhirResource(bundle), Map.of("name", ""))
 
         then:
-        thrown(RuleExecutionException)
+        noExceptionThrown()
     }
 }

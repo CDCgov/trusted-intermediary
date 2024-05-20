@@ -45,7 +45,8 @@ class HapiHelperTest extends Specification {
         patientStream.allMatch {patients.contains(it) && it.getResourceType() == ResourceType.Patient }
     }
 
-    def "getMessageHeader returns the message header from the bundle if it exists"() {
+    // MSH - Message Header
+    def "getMSHMessageHeader returns the message header from the bundle if it exists"() {
         given:
         def bundle = new Bundle()
         def messageHeader = new MessageHeader()
@@ -53,29 +54,29 @@ class HapiHelperTest extends Specification {
         bundle.getEntry().add(messageHeaderEntry)
 
         when:
-        def actualMessageHeader = HapiHelper.getMessageHeader(bundle)
+        def actualMessageHeader = HapiHelper.getMSHMessageHeader(bundle)
 
         then:
         actualMessageHeader == messageHeader
     }
 
-    def "getMessageHeader throws a NoSuchElementException if the message header does not exist"() {
+    def "getMSHMessageHeader throws a NoSuchElementException if the message header does not exist"() {
         given:
         def bundle = new Bundle()
 
         when:
-        HapiHelper.getMessageHeader(bundle)
+        HapiHelper.getMSHMessageHeader(bundle)
 
         then:
         thrown(NoSuchElementException)
     }
 
-    def "createMessageHeader creates a new message header if it does not exist"() {
+    def "createMSHMessageHeader creates a new message header if it does not exist"() {
         given:
         def bundle = new Bundle()
 
         when:
-        def actualMessageHeader = HapiHelper.createMessageHeader(bundle)
+        def actualMessageHeader = HapiHelper.createMSHMessageHeader(bundle)
 
         then:
         actualMessageHeader != null
@@ -89,7 +90,7 @@ class HapiHelperTest extends Specification {
         def expectedDisplay = "expectedDisplay"
 
         def mockBundle = new Bundle()
-        HapiHelper.createMessageHeader(mockBundle)
+        HapiHelper.createMSHMessageHeader(mockBundle)
 
         when:
         HapiHelper.addMetaTag(mockBundle, expectedSystem, expectedCode, expectedDisplay)
@@ -109,7 +110,7 @@ class HapiHelperTest extends Specification {
         def expectedCode = "expectedCode"
         def expectedDisplay = "expectedDisplay"
         def mockBundle = new Bundle()
-        HapiHelper.createMessageHeader(mockBundle)
+        HapiHelper.createMSHMessageHeader(mockBundle)
 
         when:
         HapiHelper.addMetaTag(mockBundle, expectedSystem, expectedCode, expectedDisplay)
@@ -180,6 +181,79 @@ class HapiHelperTest extends Specification {
         messageHeader.getMeta().getTag().findAll {it.system == etorTag.system}.size() == 1
     }
 
+    // MSH-3 - Sending Application
+    def "sending application's get, set and create work as expected"() {
+        given:
+        def bundle = new Bundle()
+        def expectedSendingApplication = HapiHelper.createMSH3MessageSourceComponent()
+        HapiHelper.createMSHMessageHeader(bundle)
+
+        expect:
+        def existingSendingApplication = HapiHelper.getMSH3MessageSourceComponent(bundle)
+        !existingSendingApplication.equalsDeep(expectedSendingApplication)
+
+        when:
+        HapiHelper.setMSH3MessageSourceComponent(bundle, expectedSendingApplication)
+        def actualSendingApplication = HapiHelper.getMSH3MessageSourceComponent(bundle)
+
+        then:
+        actualSendingApplication.equalsDeep(expectedSendingApplication)
+    }
+
+    // MSH-4 - Sending Facility
+    def "sending facility's get, set and create work as expected"() {
+        given:
+        def bundle = new Bundle()
+        HapiHelper.createMSHMessageHeader(bundle)
+
+        expect:
+        HapiHelper.getMSH4Organization(bundle) == null
+
+        when:
+        def sendingFacility = HapiHelper.createOrganization()
+        HapiHelper.setMSH4Organization(bundle, sendingFacility)
+
+        then:
+        HapiHelper.getMSH4Organization(bundle).equalsDeep(sendingFacility)
+    }
+
+    // MSH-5 - Receiving Application
+    def "receiving application's get, set and create work as expected"() {
+        given:
+        def bundle = new Bundle()
+        def expectedReceivingApplication = HapiHelper.createMessageDestinationComponent()
+        HapiHelper.createMSHMessageHeader(bundle)
+
+        expect:
+        def existingReceivingApplication = HapiHelper.getMSH5MessageDestinationComponent(bundle)
+        !existingReceivingApplication.equalsDeep(expectedReceivingApplication)
+
+        when:
+        HapiHelper.setMSH5MessageDestinationComponent(bundle, expectedReceivingApplication)
+        def actualReceivingApplication = HapiHelper.getMSH5MessageDestinationComponent(bundle)
+
+        then:
+        actualReceivingApplication.equalsDeep(expectedReceivingApplication)
+    }
+
+    // MSH-6 - Receiving Facility
+    def "receiving facility's get, set and create work as expected"() {
+        given:
+        def bundle = new Bundle()
+        HapiHelper.createMSHMessageHeader(bundle)
+
+        expect:
+        HapiHelper.getMSH6Organization(bundle) == null
+
+        when:
+        def receivingFacility = HapiHelper.createOrganization()
+        HapiHelper.setMSH6Organization(bundle, receivingFacility)
+
+        then:
+        HapiHelper.getMSH6Organization(bundle).equalsDeep(receivingFacility)
+    }
+
+    // MSH-9 - Message Type
     def "convert the pre-existing message type"() {
         given:
         def expectedSystem = "expectedSystem"
@@ -193,7 +267,7 @@ class HapiHelperTest extends Specification {
                 new MessageHeader().setEvent(coding)))
 
         when:
-        HapiHelper.setMessageTypeCoding(mockBundle, expectedCoding)
+        HapiHelper.setMSH9Coding(mockBundle, expectedCoding)
         def convertedMessageHeader = HapiHelper.resourceInBundle(mockBundle, MessageHeader.class) as MessageHeader
 
         then:
@@ -210,11 +284,11 @@ class HapiHelperTest extends Specification {
         def expectedDisplay = "expectedDisplay"
         def expectedCoding = new Coding(expectedSystem, expectedCode, expectedDisplay)
         def mockBundle = new Bundle()
-        HapiHelper.createMessageHeader(mockBundle)
+        HapiHelper.createMSHMessageHeader(mockBundle)
 
         when:
-        HapiHelper.setMessageTypeCoding(mockBundle, expectedCoding)
-        def convertedMessageHeader = HapiHelper.getMessageHeader(mockBundle)
+        HapiHelper.setMSH9Coding(mockBundle, expectedCoding)
+        def convertedMessageHeader = HapiHelper.getMSHMessageHeader(mockBundle)
 
         then:
         convertedMessageHeader != null
@@ -223,99 +297,269 @@ class HapiHelperTest extends Specification {
         convertedMessageHeader.getEventCoding().getDisplay() == expectedDisplay
     }
 
-    def "sending application's get, send and create work as expected"() {
+    // MSH-9.3 - Message Type
+    def "message type's get and set work as expected"() {
         given:
         def bundle = new Bundle()
-        def expectedSendingApplication = HapiHelper.createSendingApplication()
-        HapiHelper.createMessageHeader(bundle)
-
-        expect:
-        def existingSendingApplication = HapiHelper.getSendingApplication(bundle)
-        !existingSendingApplication.equalsDeep(expectedSendingApplication)
+        def msh9_3 = "msh9_3"
+        HapiHelper.createMSHMessageHeader(bundle)
 
         when:
-        HapiHelper.setSendingApplication(bundle, expectedSendingApplication)
-        def actualSendingApplication = HapiHelper.getSendingApplication(bundle)
+        HapiHelper.setMSH9_3Value(bundle, msh9_3)
 
         then:
-        actualSendingApplication.equalsDeep(expectedSendingApplication)
+        HapiHelper.getMSH9_3Value(bundle) == msh9_3
     }
 
-    def "sending facility's get, send and create work as expected"() {
+    // PID - Patient Identifier
+    def "patient identifier methods work as expected"() {
         given:
         def bundle = new Bundle()
-        HapiHelper.createMessageHeader(bundle)
-
-        expect:
-        HapiHelper.getSendingFacility(bundle) == null
 
         when:
-        def sendingFacility = HapiHelper.createFacilityOrganization()
-        HapiHelper.setSendingFacility(bundle, sendingFacility)
+        def nullPatientIdentifier = HapiHelper.getPID3Identifier(bundle)
 
         then:
-        HapiHelper.getSendingFacility(bundle).equalsDeep(sendingFacility)
+        nullPatientIdentifier == null
+
+        when:
+        HapiHelper.setPID3Identifier(bundle, new Identifier())
+
+        then:
+        noExceptionThrown()
+
+        when:
+        HapiHelper.createPIDPatient(bundle)
+        def newPatientIdentifier = new Identifier()
+        HapiHelper.setPID3Identifier(bundle, newPatientIdentifier)
+
+        then:
+        HapiHelper.getPID3Identifier(bundle) == newPatientIdentifier
     }
 
-    def "receiving application's get, send and create work as expected"() {
+    // PID-3.4 - Assigning Authority
+    def "patient assigning authority methods work as expected"() {
         given:
         def bundle = new Bundle()
-        def expectedReceivingApplication = HapiHelper.createReceivingApplication()
-        HapiHelper.createMessageHeader(bundle)
-
-        expect:
-        def existingReceivingApplication = HapiHelper.getReceivingApplication(bundle)
-        !existingReceivingApplication.equalsDeep(expectedReceivingApplication)
+        def pid3_4 = "pid3_4"
 
         when:
-        HapiHelper.setReceivingApplication(bundle, expectedReceivingApplication)
-        def actualReceivingApplication = HapiHelper.getReceivingApplication(bundle)
+        HapiHelper.setPID3_4Identifier(bundle, new Identifier())
 
         then:
-        actualReceivingApplication.equalsDeep(expectedReceivingApplication)
+        HapiHelper.getPID3_4Identifier(bundle) == null
+
+        when:
+        HapiHelper.setPID3_4Value(bundle, pid3_4)
+
+        then:
+        HapiHelper.getPID3_4Value(bundle) == null
+
+        when:
+        HapiHelper.createPIDPatient(bundle)
+        HapiHelper.setPID3Identifier(bundle, new Identifier())
+        HapiHelper.setPID3_4Identifier(bundle, new Identifier())
+
+        then:
+        HapiHelper.getPID3_4Value(bundle) == null
+
+        when:
+        HapiHelper.setPID3_4Value(bundle, pid3_4)
+
+        then:
+        HapiHelper.getPID3_4Value(bundle) == pid3_4
     }
 
-    def "receiving facility's get, send and create work as expected"() {
+    // PID-3.5 - Assigning Identifier Type Code
+    def "patient assigning authority methods work as expected"() {
         given:
         def bundle = new Bundle()
-        HapiHelper.createMessageHeader(bundle)
-
-        expect:
-        HapiHelper.getReceivingFacility(bundle) == null
+        def pid3_5 = "pid3_5"
 
         when:
-        def receivingFacility = HapiHelper.createFacilityOrganization()
-        HapiHelper.setReceivingFacility(bundle, receivingFacility)
+        HapiHelper.setPID3_5Coding(bundle, new Coding())
 
         then:
-        HapiHelper.getReceivingFacility(bundle).equalsDeep(receivingFacility)
+        HapiHelper.getPID3_5Coding(bundle) == null
+
+        when:
+        HapiHelper.setPID3_5Value(bundle, pid3_5)
+
+        then:
+        HapiHelper.getPID3_5Value(bundle) == null
+
+        when:
+        HapiHelper.createPIDPatient(bundle)
+        HapiHelper.setPID3Identifier(bundle, new Identifier())
+        HapiHelper.setPID3_5Coding(bundle, new Coding())
+
+        then:
+        HapiHelper.getPID3_5Value(bundle) == null
+
+        when:
+        HapiHelper.setPID3_5Value(bundle, pid3_5)
+
+        then:
+        HapiHelper.getPID3_5Value(bundle) == pid3_5
     }
 
-    def 'getHDNamespaceIdentifier returns the correct namespaceIdentifier'() {
+    // PID-5 - Patient Name
+    def "patient name methods work as expected"() {
         given:
-        def expectedExtension = new Extension(HapiHelper.EXTENSION_HL7_FIELD_URL, HapiHelper.EXTENSION_DATA_TYPE_HD1)
+        def bundle = new Bundle()
+
+        when:
+        HapiHelper.setPID5Extension(bundle)
+
+        then:
+        HapiHelper.getPID5Extension(bundle) == null
+
+        when:
+        HapiHelper.createPIDPatient(bundle)
+        HapiHelper.setPID5Extension(bundle)
+
+        then:
+        HapiHelper.getPID5Extension(bundle) != null
+    }
+
+    // PID-5.7 - Name Type Code
+    def "patient name type code methods work as expected"() {
+        given:
+        def bundle = new Bundle()
+        def pid5_7 = "pid5_7"
+
+        when:
+        HapiHelper.removePID5_7Extension(bundle)
+        HapiHelper.setPID5_7Value(bundle, pid5_7)
+
+        then:
+        HapiHelper.getPID5_7Value(bundle) == null
+
+        when:
+        HapiHelper.createPIDPatient(bundle)
+        HapiHelper.setPID5Extension(bundle)
+        HapiHelper.removePID5_7Extension(bundle)
+
+        then:
+        HapiHelper.getPID5_7Value(bundle) == null
+
+        when:
+        HapiHelper.setPID5_7Value(bundle, pid5_7)
+
+        then:
+        HapiHelper.getPID5_7Value(bundle) == pid5_7
+
+        when:
+        HapiHelper.setPID5_7Value(bundle, "")
+
+        then:
+        HapiHelper.getPID5_7Value(bundle) == ""
+
+        when:
+        HapiHelper.removePID5_7Extension(bundle)
+
+        then:
+        HapiHelper.getPID5_7Value(bundle) == null
+    }
+
+    // ORC - Common Order
+    def "DiagnosticReport methods work as expected"() {
+        given:
+        def bundle = new Bundle()
+
+        expect:
+        HapiHelper.getDiagnosticReport(bundle) == null
+
+        when:
+        HapiHelper.createDiagnosticReport(bundle)
+
+        then:
+        HapiHelper.getDiagnosticReport(bundle) != null
+    }
+
+    def "BasedOnServiceRequest methods work as expected"() {
+        given:
+        def bundle = new Bundle()
+        def dr = HapiHelper.createDiagnosticReport(bundle)
+
+        expect:
+        HapiHelper.getBasedOnServiceRequest(dr) == null
+        dr.getBasedOnFirstRep().getResource() == null
+
+        when:
+        def sr = HapiHelper.createBasedOnServiceRequest(dr)
+
+        then:
+        sr != null
+        dr.getBasedOn().size() == 1
+        dr.getBasedOnFirstRep().getResource() == sr
+    }
+
+    // ORC-4.1 - Entity Identifier
+    def "orc-4.1 methods work as expected"() {
+        given:
+        def orc4_1 = "orc4_1"
+        def bundle = new Bundle()
+        def dr = HapiHelper.createDiagnosticReport(bundle)
+        def sr = HapiHelper.createBasedOnServiceRequest(dr)
+
+        expect:
+        HapiHelper.getORC4_1Value(sr) == null
+
+        when:
+        HapiHelper.setORC4_1Value(sr, orc4_1)
+
+        then:
+        HapiHelper.getORC4_1Value(sr) == orc4_1
+    }
+
+    // ORC-4.2 - Namespace ID
+    def "orc-4.2 methods work as expected"() {
+        given:
+        def orc4_2 = "orc4_2"
+        def bundle = new Bundle()
+        def dr = HapiHelper.createDiagnosticReport(bundle)
+        def sr = HapiHelper.createBasedOnServiceRequest(dr)
+
+        expect:
+        HapiHelper.getORC4_2Value(sr) == null
+
+        when:
+        HapiHelper.setORC4_2Value(sr, orc4_2)
+
+        then:
+        HapiHelper.getORC4_2Value(sr) == orc4_2
+    }
+
+    // HD - Hierarchic Designator
+    def "getHD1Identifier returns the correct namespaceIdentifier"() {
+        given:
+        def expectedExtension = new Extension(HapiHelper.EXTENSION_HL7_FIELD_URL, HapiHelper.EXTENSION_HD1_DATA_TYPE)
         def expectedIdentifier = new Identifier().setExtension(List.of(expectedExtension)) as Identifier
         def otherExtension = new Extension(HapiHelper.EXTENSION_HL7_FIELD_URL, new StringType("other"))
         def otherIdentifier = new Identifier().setExtension(List.of(otherExtension)) as Identifier
         List<Identifier> identifiers = List.of(expectedIdentifier, otherIdentifier)
 
+        expect:
+        HapiHelper.getHD1Identifier(List.of(new Identifier())) == null
+
         when:
-        def actualNamespace = HapiHelper.getHDNamespaceIdentifier(identifiers)
+        def actualNamespace = HapiHelper.getHD1Identifier(identifiers)
 
         then:
         actualNamespace == expectedIdentifier
     }
 
-    def "getHDNamespaceIdentifier throws a NoSuchElementException if the namespace is not found"() {
+    def "getHD1Identifier returns null if the namespace is not found"() {
         given:
         def extension = new Extension(HapiHelper.EXTENSION_HL7_FIELD_URL, new StringType("other"))
         def identifier = new Identifier().setExtension(List.of(extension)) as Identifier
         List<Identifier> identifiers = List.of(identifier)
 
         when:
-        HapiHelper.getHDNamespaceIdentifier(identifiers)
+        def actualIdentifier = HapiHelper.getHD1Identifier(identifiers)
 
         then:
-        thrown(NoSuchElementException)
+        actualIdentifier == null
     }
 }
