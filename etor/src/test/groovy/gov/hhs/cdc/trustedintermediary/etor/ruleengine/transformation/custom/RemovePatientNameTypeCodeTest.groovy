@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
+import gov.hhs.cdc.trustedintermediary.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
@@ -22,7 +23,7 @@ class RemovePatientNameTypeCodeTest extends Specification {
         given:
         def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/002_CA_ORU_R01_initial_translation.fhir")
         def bundle = fhirResource.getUnderlyingResource() as Bundle
-        def pid5_7 = HapiHelper.getPID5_7Value(bundle)
+        def pid5_7 = HapiFhirHelper.getPID5_7Value(bundle)
 
         expect:
         pid5_7 != null
@@ -31,7 +32,7 @@ class RemovePatientNameTypeCodeTest extends Specification {
         transformClass.transform(fhirResource, null)
 
         then:
-        HapiHelper.getPID5_7Value(bundle) == null
+        HapiFhirHelper.getPID5_7Value(bundle) == null
     }
 
     def "don't throw exception if patient resource not present"() {

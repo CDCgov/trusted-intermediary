@@ -60,15 +60,15 @@ class HapiHelperTest extends Specification {
         actualMessageHeader == messageHeader
     }
 
-    def "getMSHMessageHeader throws a NoSuchElementException if the message header does not exist"() {
+    def "getMSHMessageHeader returns null if the message header does not exist"() {
         given:
         def bundle = new Bundle()
 
         when:
-        HapiHelper.getMSHMessageHeader(bundle)
+        def nullMessageHeader = HapiHelper.getMSHMessageHeader(bundle)
 
         then:
-        thrown(NoSuchElementException)
+        nullMessageHeader == null
     }
 
     def "createMSHMessageHeader creates a new message header if it does not exist"() {
@@ -185,16 +185,16 @@ class HapiHelperTest extends Specification {
     def "sending application's get, set and create work as expected"() {
         given:
         def bundle = new Bundle()
-        def expectedSendingApplication = HapiHelper.createMSH3MessageSourceComponent()
+        def expectedSendingApplication = HapiFhirHelper.createMSH3MessageSourceComponent()
         HapiHelper.createMSHMessageHeader(bundle)
 
         expect:
-        def existingSendingApplication = HapiHelper.getMSH3MessageSourceComponent(bundle)
+        def existingSendingApplication = HapiFhirHelper.getMSH3MessageSourceComponent(bundle)
         !existingSendingApplication.equalsDeep(expectedSendingApplication)
 
         when:
-        HapiHelper.setMSH3MessageSourceComponent(bundle, expectedSendingApplication)
-        def actualSendingApplication = HapiHelper.getMSH3MessageSourceComponent(bundle)
+        HapiFhirHelper.setMSH3MessageSourceComponent(bundle, expectedSendingApplication)
+        def actualSendingApplication = HapiFhirHelper.getMSH3MessageSourceComponent(bundle)
 
         then:
         actualSendingApplication.equalsDeep(expectedSendingApplication)
@@ -210,8 +210,8 @@ class HapiHelperTest extends Specification {
         HapiHelper.getMSH4Organization(bundle) == null
 
         when:
-        def sendingFacility = HapiHelper.createOrganization()
-        HapiHelper.setMSH4Organization(bundle, sendingFacility)
+        def sendingFacility = HapiFhirHelper.createOrganization()
+        HapiFhirHelper.setMSH4Organization(bundle, sendingFacility)
 
         then:
         HapiHelper.getMSH4Organization(bundle).equalsDeep(sendingFacility)
@@ -221,7 +221,7 @@ class HapiHelperTest extends Specification {
     def "receiving application's get, set and create work as expected"() {
         given:
         def bundle = new Bundle()
-        def expectedReceivingApplication = HapiHelper.createMessageDestinationComponent()
+        def expectedReceivingApplication = HapiFhirHelper.createMessageDestinationComponent()
         HapiHelper.createMSHMessageHeader(bundle)
 
         expect:
@@ -229,7 +229,7 @@ class HapiHelperTest extends Specification {
         !existingReceivingApplication.equalsDeep(expectedReceivingApplication)
 
         when:
-        HapiHelper.setMSH5MessageDestinationComponent(bundle, expectedReceivingApplication)
+        HapiFhirHelper.setMSH5MessageDestinationComponent(bundle, expectedReceivingApplication)
         def actualReceivingApplication = HapiHelper.getMSH5MessageDestinationComponent(bundle)
 
         then:
@@ -243,14 +243,14 @@ class HapiHelperTest extends Specification {
         HapiHelper.createMSHMessageHeader(bundle)
 
         expect:
-        HapiHelper.getMSH6Organization(bundle) == null
+        HapiFhirHelper.getMSH6Organization(bundle) == null
 
         when:
-        def receivingFacility = HapiHelper.createOrganization()
-        HapiHelper.setMSH6Organization(bundle, receivingFacility)
+        def receivingFacility = HapiFhirHelper.createOrganization()
+        HapiFhirHelper.setMSH6Organization(bundle, receivingFacility)
 
         then:
-        HapiHelper.getMSH6Organization(bundle).equalsDeep(receivingFacility)
+        HapiFhirHelper.getMSH6Organization(bundle).equalsDeep(receivingFacility)
     }
 
     // MSH-9 - Message Type
@@ -323,15 +323,15 @@ class HapiHelperTest extends Specification {
         nullPatientIdentifier == null
 
         when:
-        HapiHelper.setPID3Identifier(bundle, new Identifier())
+        HapiFhirHelper.setPID3Identifier(bundle, new Identifier())
 
         then:
         noExceptionThrown()
 
         when:
-        HapiHelper.createPIDPatient(bundle)
+        HapiFhirHelper.createPIDPatient(bundle)
         def newPatientIdentifier = new Identifier()
-        HapiHelper.setPID3Identifier(bundle, newPatientIdentifier)
+        HapiFhirHelper.setPID3Identifier(bundle, newPatientIdentifier)
 
         then:
         HapiHelper.getPID3Identifier(bundle) == newPatientIdentifier
@@ -344,7 +344,7 @@ class HapiHelperTest extends Specification {
         def pid3_4 = "pid3_4"
 
         when:
-        HapiHelper.setPID3_4Identifier(bundle, new Identifier())
+        HapiFhirHelper.setPID3_4Identifier(bundle, new Identifier())
 
         then:
         HapiHelper.getPID3_4Identifier(bundle) == null
@@ -353,21 +353,21 @@ class HapiHelperTest extends Specification {
         HapiHelper.setPID3_4Value(bundle, pid3_4)
 
         then:
-        HapiHelper.getPID3_4Value(bundle) == null
+        HapiFhirHelper.getPID3_4Value(bundle) == null
 
         when:
-        HapiHelper.createPIDPatient(bundle)
-        HapiHelper.setPID3Identifier(bundle, new Identifier())
-        HapiHelper.setPID3_4Identifier(bundle, new Identifier())
+        HapiFhirHelper.createPIDPatient(bundle)
+        HapiFhirHelper.setPID3Identifier(bundle, new Identifier())
+        HapiFhirHelper.setPID3_4Identifier(bundle, new Identifier())
 
         then:
-        HapiHelper.getPID3_4Value(bundle) == null
+        HapiFhirHelper.getPID3_4Value(bundle) == null
 
         when:
         HapiHelper.setPID3_4Value(bundle, pid3_4)
 
         then:
-        HapiHelper.getPID3_4Value(bundle) == pid3_4
+        HapiFhirHelper.getPID3_4Value(bundle) == pid3_4
     }
 
     // PID-3.5 - Assigning Identifier Type Code
@@ -377,7 +377,7 @@ class HapiHelperTest extends Specification {
         def pid3_5 = "pid3_5"
 
         when:
-        HapiHelper.setPID3_5Coding(bundle, new Coding())
+        HapiFhirHelper.setPID3_5Coding(bundle, new Coding())
 
         then:
         HapiHelper.getPID3_5Coding(bundle) == null
@@ -386,21 +386,21 @@ class HapiHelperTest extends Specification {
         HapiHelper.setPID3_5Value(bundle, pid3_5)
 
         then:
-        HapiHelper.getPID3_5Value(bundle) == null
+        HapiFhirHelper.getPID3_5Value(bundle) == null
 
         when:
-        HapiHelper.createPIDPatient(bundle)
-        HapiHelper.setPID3Identifier(bundle, new Identifier())
-        HapiHelper.setPID3_5Coding(bundle, new Coding())
+        HapiFhirHelper.createPIDPatient(bundle)
+        HapiFhirHelper.setPID3Identifier(bundle, new Identifier())
+        HapiFhirHelper.setPID3_5Coding(bundle, new Coding())
 
         then:
-        HapiHelper.getPID3_5Value(bundle) == null
+        HapiFhirHelper.getPID3_5Value(bundle) == null
 
         when:
         HapiHelper.setPID3_5Value(bundle, pid3_5)
 
         then:
-        HapiHelper.getPID3_5Value(bundle) == pid3_5
+        HapiFhirHelper.getPID3_5Value(bundle) == pid3_5
     }
 
     // PID-5 - Patient Name
@@ -409,14 +409,14 @@ class HapiHelperTest extends Specification {
         def bundle = new Bundle()
 
         when:
-        HapiHelper.setPID5Extension(bundle)
+        HapiFhirHelper.setPID5Extension(bundle)
 
         then:
         HapiHelper.getPID5Extension(bundle) == null
 
         when:
-        HapiHelper.createPIDPatient(bundle)
-        HapiHelper.setPID5Extension(bundle)
+        HapiFhirHelper.createPIDPatient(bundle)
+        HapiFhirHelper.setPID5Extension(bundle)
 
         then:
         HapiHelper.getPID5Extension(bundle) != null
@@ -430,36 +430,36 @@ class HapiHelperTest extends Specification {
 
         when:
         HapiHelper.removePID5_7Extension(bundle)
-        HapiHelper.setPID5_7Value(bundle, pid5_7)
+        HapiFhirHelper.setPID5_7Value(bundle, pid5_7)
 
         then:
-        HapiHelper.getPID5_7Value(bundle) == null
+        HapiFhirHelper.getPID5_7Value(bundle) == null
 
         when:
-        HapiHelper.createPIDPatient(bundle)
-        HapiHelper.setPID5Extension(bundle)
+        HapiFhirHelper.createPIDPatient(bundle)
+        HapiFhirHelper.setPID5Extension(bundle)
         HapiHelper.removePID5_7Extension(bundle)
 
         then:
-        HapiHelper.getPID5_7Value(bundle) == null
+        HapiFhirHelper.getPID5_7Value(bundle) == null
 
         when:
-        HapiHelper.setPID5_7Value(bundle, pid5_7)
+        HapiFhirHelper.setPID5_7Value(bundle, pid5_7)
 
         then:
-        HapiHelper.getPID5_7Value(bundle) == pid5_7
+        HapiFhirHelper.getPID5_7Value(bundle) == pid5_7
 
         when:
-        HapiHelper.setPID5_7Value(bundle, "")
+        HapiFhirHelper.setPID5_7Value(bundle, "")
 
         then:
-        HapiHelper.getPID5_7Value(bundle) == ""
+        HapiFhirHelper.getPID5_7Value(bundle) == ""
 
         when:
         HapiHelper.removePID5_7Extension(bundle)
 
         then:
-        HapiHelper.getPID5_7Value(bundle) == null
+        HapiFhirHelper.getPID5_7Value(bundle) == null
     }
 
     // ORC - Common Order
@@ -468,26 +468,26 @@ class HapiHelperTest extends Specification {
         def bundle = new Bundle()
 
         expect:
-        HapiHelper.getDiagnosticReport(bundle) == null
+        HapiFhirHelper.getDiagnosticReport(bundle) == null
 
         when:
-        HapiHelper.createDiagnosticReport(bundle)
+        HapiFhirHelper.createDiagnosticReport(bundle)
 
         then:
-        HapiHelper.getDiagnosticReport(bundle) != null
+        HapiFhirHelper.getDiagnosticReport(bundle) != null
     }
 
     def "BasedOnServiceRequest methods work as expected"() {
         given:
         def bundle = new Bundle()
-        def dr = HapiHelper.createDiagnosticReport(bundle)
+        def dr = HapiFhirHelper.createDiagnosticReport(bundle)
 
         expect:
-        HapiHelper.getBasedOnServiceRequest(dr) == null
+        HapiFhirHelper.getBasedOnServiceRequest(dr) == null
         dr.getBasedOnFirstRep().getResource() == null
 
         when:
-        def sr = HapiHelper.createBasedOnServiceRequest(dr)
+        def sr = HapiFhirHelper.createBasedOnServiceRequest(dr)
 
         then:
         sr != null
@@ -500,8 +500,8 @@ class HapiHelperTest extends Specification {
         given:
         def orc4_1 = "orc4_1"
         def bundle = new Bundle()
-        def dr = HapiHelper.createDiagnosticReport(bundle)
-        def sr = HapiHelper.createBasedOnServiceRequest(dr)
+        def dr = HapiFhirHelper.createDiagnosticReport(bundle)
+        def sr = HapiFhirHelper.createBasedOnServiceRequest(dr)
 
         expect:
         HapiHelper.getORC4_1Value(sr) == null
@@ -518,8 +518,8 @@ class HapiHelperTest extends Specification {
         given:
         def orc4_2 = "orc4_2"
         def bundle = new Bundle()
-        def dr = HapiHelper.createDiagnosticReport(bundle)
-        def sr = HapiHelper.createBasedOnServiceRequest(dr)
+        def dr = HapiFhirHelper.createDiagnosticReport(bundle)
+        def sr = HapiFhirHelper.createBasedOnServiceRequest(dr)
 
         expect:
         HapiHelper.getORC4_2Value(sr) == null

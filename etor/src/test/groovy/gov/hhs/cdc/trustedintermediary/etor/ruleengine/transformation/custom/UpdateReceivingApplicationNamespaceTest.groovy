@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
+import gov.hhs.cdc.trustedintermediary.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
@@ -24,10 +25,10 @@ class UpdateReceivingApplicationNamespaceTest extends Specification {
         def name = "EPIC"
         def bundle = new Bundle()
         HapiHelper.createMSHMessageHeader(bundle)
-        def receivingApplication = HapiHelper.createMessageDestinationComponent()
+        def receivingApplication = HapiFhirHelper.createMessageDestinationComponent()
         receivingApplication.addExtension(HapiHelper.EXTENSION_UNIVERSAL_ID_URL, new StringType("universal-id"))
         receivingApplication.addExtension(HapiHelper.EXTENSION_UNIVERSAL_ID_TYPE_URL, new StringType("universal-id-type"))
-        HapiHelper.setMSH5MessageDestinationComponent(bundle, receivingApplication)
+        HapiFhirHelper.setMSH5MessageDestinationComponent(bundle, receivingApplication)
 
         expect:
         def existingReceivingApplication = HapiHelper.getMSH5MessageDestinationComponent(bundle)

@@ -1,7 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
-import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
+import gov.hhs.cdc.trustedintermediary.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation
@@ -116,7 +116,7 @@ class ValidationRuleEngineIntegrationTest extends Specification {
                 .addIdentifier()
                 .setSystem("urn:ietf:rfc:3986")
                 .setValue("simulated-hospital-id")
-        def bundle = FhirBundleHelper.createMessageBundle(receiverOrganization: receiverOrganization)
+        def bundle = HapiFhirHelper.createMessageBundle(receiverOrganization: receiverOrganization)
         // for some reason, we need to encode and decode the bundle for resolve() to work
         def fhirResource = new HapiFhirResource(fhir.parseResource(fhir.encodeResourceToJson(bundle), Bundle))
         rule.runRule(fhirResource)
@@ -132,7 +132,7 @@ class ValidationRuleEngineIntegrationTest extends Specification {
                 .addIdentifier()
                 .setSystem("another-system")
                 .setValue("simulated-hospital-id")
-        bundle = FhirBundleHelper.createMessageBundle(receiverOrganization: receiverOrganization)
+        bundle = HapiFhirHelper.createMessageBundle(receiverOrganization: receiverOrganization)
         fhirResource = new HapiFhirResource(fhir.parseResource(fhir.encodeResourceToJson(bundle), Bundle))
         rule.runRule(fhirResource)
 
@@ -146,7 +146,7 @@ class ValidationRuleEngineIntegrationTest extends Specification {
         receiverOrganization
                 .addIdentifier()
                 .setValue("simulated-hospital-id")
-        bundle = FhirBundleHelper.createMessageBundle(receiverOrganization: receiverOrganization)
+        bundle = HapiFhirHelper.createMessageBundle(receiverOrganization: receiverOrganization)
         fhirResource = new HapiFhirResource(fhir.parseResource(fhir.encodeResourceToJson(bundle), Bundle))
         rule.runRule(fhirResource)
 
