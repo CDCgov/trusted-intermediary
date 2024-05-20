@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
+import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
@@ -22,8 +23,8 @@ class RemovePatientIdentifierTest extends Specification {
         given:
         def fhirResource = ExamplesHelper.getExampleFhirResource("../MN/004_MN_ORU_R01_NBS_1_hl7_translation.fhir")
         def bundle = fhirResource.getUnderlyingResource() as Bundle
-        def pid3_4 = HapiHelper.getPID3_4Value(bundle)
-        def pid3_5 = HapiHelper.getPID3_5Value(bundle)
+        def pid3_4 = FhirBundleHelper.getPID3_4Value(bundle)
+        def pid3_5 = FhirBundleHelper.getPID3_5Value(bundle)
 
         expect:
         pid3_4 != null
@@ -33,14 +34,14 @@ class RemovePatientIdentifierTest extends Specification {
         transformClass.transform(fhirResource, null)
 
         then:
-        HapiHelper.getPID3_4Value(bundle) == null
-        HapiHelper.getPID3_5Value(bundle) == null
+        FhirBundleHelper.getPID3_4Value(bundle) == null
+        FhirBundleHelper.getPID3_5Value(bundle) == null
     }
 
     def "don't throw exception if patient resource not present"() {
         given:
         def bundle = new Bundle()
-        HapiHelper.createMSHMessageHeader(bundle)
+        FhirBundleHelper.createMSHMessageHeader(bundle)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)

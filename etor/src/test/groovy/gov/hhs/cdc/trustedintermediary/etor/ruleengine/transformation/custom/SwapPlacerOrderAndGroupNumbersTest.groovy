@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
+import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
@@ -53,7 +54,7 @@ class SwapPlacerOrderAndGroupNumbersTest extends Specification {
     def "don't throw exception if service request resource not present"() {
         given:
         def bundle = new Bundle()
-        HapiHelper.createMSHMessageHeader(bundle)
+        FhirBundleHelper.createMSHMessageHeader(bundle)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)

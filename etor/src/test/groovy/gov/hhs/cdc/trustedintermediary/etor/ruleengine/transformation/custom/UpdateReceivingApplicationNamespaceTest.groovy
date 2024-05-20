@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
+import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
@@ -23,11 +24,11 @@ class UpdateReceivingApplicationNamespaceTest extends Specification {
         given:
         def name = "EPIC"
         def bundle = new Bundle()
-        HapiHelper.createMSHMessageHeader(bundle)
-        def receivingApplication = HapiHelper.createMessageDestinationComponent()
+        FhirBundleHelper.createMSHMessageHeader(bundle)
+        def receivingApplication = FhirBundleHelper.createMessageDestinationComponent()
         receivingApplication.addExtension(HapiHelper.EXTENSION_UNIVERSAL_ID_URL, new StringType("universal-id"))
         receivingApplication.addExtension(HapiHelper.EXTENSION_UNIVERSAL_ID_TYPE_URL, new StringType("universal-id-type"))
-        HapiHelper.setMSH5MessageDestinationComponent(bundle, receivingApplication)
+        FhirBundleHelper.setMSH5MessageDestinationComponent(bundle, receivingApplication)
 
         expect:
         def existingReceivingApplication = HapiHelper.getMSH5MessageDestinationComponent(bundle)
@@ -48,7 +49,7 @@ class UpdateReceivingApplicationNamespaceTest extends Specification {
     def "don't throw exception if receiving application not in bundle"() {
         given:
         def bundle = new Bundle()
-        HapiHelper.createMSHMessageHeader(bundle)
+        FhirBundleHelper.createMSHMessageHeader(bundle)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), Map.of("name", ""))

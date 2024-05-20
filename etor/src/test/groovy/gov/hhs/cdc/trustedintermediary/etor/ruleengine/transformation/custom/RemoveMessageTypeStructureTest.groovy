@@ -43,7 +43,7 @@ class RemoveMessageTypeStructureTest  extends Specification {
         given:
         def messageTypeDisplay = "ORU^R01"
         def bundle = new Bundle()
-        def messageHeader = HapiHelper.createMSHMessageHeader(bundle)
+        def messageHeader = FhirBundleHelper.createMSHMessageHeader(bundle)
         messageHeader.setEvent(new Coding().setDisplay(messageTypeDisplay))
 
         when:
@@ -58,7 +58,7 @@ class RemoveMessageTypeStructureTest  extends Specification {
     def "don't throw exception if message type coding not present"() {
         given:
         def bundle = new Bundle()
-        HapiHelper.createMSHMessageHeader(bundle)
+        FhirBundleHelper.createMSHMessageHeader(bundle)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
