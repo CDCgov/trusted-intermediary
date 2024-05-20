@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.hl7.fhir.r4.model.Bundle;
@@ -70,12 +69,8 @@ public class HapiHelper {
     }
 
     // MSH - Message Header
-    public static MessageHeader getMSHMessageHeader(Bundle bundle) throws NoSuchElementException {
-        MessageHeader messageHeader = resourceInBundle(bundle, MessageHeader.class);
-        if (messageHeader == null) {
-            throw new NoSuchElementException("MessageHeader not found in the bundle");
-        }
-        return messageHeader;
+    public static MessageHeader getMSHMessageHeader(Bundle bundle) {
+        return resourceInBundle(bundle, MessageHeader.class);
     }
 
     public static MessageHeader createMSHMessageHeader(Bundle bundle) {
