@@ -3665,7 +3665,7 @@
                 },
                 {
                   "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding-system",
-                  "valueString": "e3lcoj"
+                  "valueString": "HL70063"
                 }
               ],
               "version": "2.68",
@@ -4239,7 +4239,7 @@
                 },
                 {
                   "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding-system",
-                  "valueString": "e3lcoj"
+                  "valueString": "HL70063"
                 }
               ],
               "version": "2.68",
@@ -4596,7 +4596,7 @@
                 },
                 {
                   "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding-system",
-                  "valueString": "e3lcoj"
+                  "valueString": "HL70063"
                 }
               ],
               "version": "2.68",
@@ -4953,7 +4953,7 @@
                 },
                 {
                   "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding-system",
-                  "valueString": "e3lcoj"
+                  "valueString": "HL70063"
                 }
               ],
               "version": "2.68",
@@ -5310,7 +5310,7 @@
                 },
                 {
                   "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding-system",
-                  "valueString": "e3lcoj"
+                  "valueString": "HL70063"
                 }
               ],
               "version": "2.68",
@@ -5711,7 +5711,7 @@
                 },
                 {
                   "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding-system",
-                  "valueString": "e3lcoj"
+                  "valueString": "HL70063"
                 }
               ],
               "version": "2.68",
@@ -5846,7 +5846,7 @@
                 },
                 {
                   "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding-system",
-                  "valueString": "e3lcoj"
+                  "valueString": "HL70063"
                 }
               ],
               "version": "2.68",
@@ -5981,7 +5981,7 @@
                 },
                 {
                   "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding-system",
-                  "valueString": "e3lcoj"
+                  "valueString": "HL70063"
                 }
               ],
               "version": "2.68",
@@ -6116,7 +6116,7 @@
                 },
                 {
                   "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding-system",
-                  "valueString": "e3lcoj"
+                  "valueString": "HL70063"
                 }
               ],
               "version": "2.68",
@@ -6251,7 +6251,7 @@
                 },
                 {
                   "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding-system",
-                  "valueString": "e3lcoj"
+                  "valueString": "HL70063"
                 }
               ],
               "version": "2.68",
