@@ -16,13 +16,6 @@ import org.hl7.fhir.r4.model.StringType
 
 class HapiFhirHelper {
 
-    // MSH - Message Header
-    static MessageHeader createMSHMessageHeader(Bundle bundle) {
-        MessageHeader messageHeader = new MessageHeader()
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
-        return messageHeader
-    }
-
     // MSH-3 - Sending Application
     static MessageHeader.MessageSourceComponent getMSH3MessageSourceComponent(
             Bundle bundle) {

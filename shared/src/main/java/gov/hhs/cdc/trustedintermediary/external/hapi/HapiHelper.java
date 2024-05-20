@@ -69,9 +69,20 @@ public class HapiHelper {
         return resourceInBundle(bundle, MessageHeader.class);
     }
 
+    public static MessageHeader createMSHMessageHeader(Bundle bundle) {
+        MessageHeader messageHeader = new MessageHeader();
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader));
+        return messageHeader;
+    }
+
     public static void addMetaTag(
             Bundle messageBundle, String system, String code, String display) {
         MessageHeader messageHeader = getMSHMessageHeader(messageBundle);
+
+        if (messageHeader == null) {
+            messageHeader = createMSHMessageHeader(messageBundle);
+        }
+
         var meta = messageHeader.hasMeta() ? messageHeader.getMeta() : new Meta();
 
         if (meta.getTag(system, code) == null) {
@@ -84,6 +95,9 @@ public class HapiHelper {
     // MSH-4 - Sending Facility
     public static Organization getMSH4Organization(Bundle bundle) {
         MessageHeader messageHeader = getMSHMessageHeader(bundle);
+        if (messageHeader == null) {
+            return null;
+        }
         return (Organization) messageHeader.getSender().getResource();
     }
 
@@ -101,17 +115,26 @@ public class HapiHelper {
     public static MessageHeader.MessageDestinationComponent getMSH5MessageDestinationComponent(
             Bundle bundle) {
         MessageHeader messageHeader = getMSHMessageHeader(bundle);
+        if (messageHeader == null) {
+            return null;
+        }
         return messageHeader.getDestinationFirstRep();
     }
 
     // MSH-9 - Message Type
     public static Coding getMSH9Coding(Bundle bundle) {
         MessageHeader messageHeader = getMSHMessageHeader(bundle);
+        if (messageHeader == null) {
+            return null;
+        }
         return messageHeader.getEventCoding();
     }
 
     public static void setMSH9Coding(Bundle bundle, Coding coding) {
         var messageHeader = getMSHMessageHeader(bundle);
+        if (messageHeader == null) {
+            return;
+        }
         messageHeader.setEvent(coding);
     }
 

@@ -76,7 +76,7 @@ class HapiHelperTest extends Specification {
         def bundle = new Bundle()
 
         when:
-        def actualMessageHeader = HapiFhirHelper.createMSHMessageHeader(bundle)
+        def actualMessageHeader = HapiHelper.createMSHMessageHeader(bundle)
 
         then:
         actualMessageHeader != null
@@ -90,7 +90,7 @@ class HapiHelperTest extends Specification {
         def expectedDisplay = "expectedDisplay"
 
         def mockBundle = new Bundle()
-        HapiFhirHelper.createMSHMessageHeader(mockBundle)
+        HapiHelper.createMSHMessageHeader(mockBundle)
 
         when:
         HapiHelper.addMetaTag(mockBundle, expectedSystem, expectedCode, expectedDisplay)
@@ -110,7 +110,7 @@ class HapiHelperTest extends Specification {
         def expectedCode = "expectedCode"
         def expectedDisplay = "expectedDisplay"
         def mockBundle = new Bundle()
-        HapiFhirHelper.createMSHMessageHeader(mockBundle)
+        HapiHelper.createMSHMessageHeader(mockBundle)
 
         when:
         HapiHelper.addMetaTag(mockBundle, expectedSystem, expectedCode, expectedDisplay)
@@ -186,7 +186,7 @@ class HapiHelperTest extends Specification {
         given:
         def bundle = new Bundle()
         def expectedSendingApplication = HapiFhirHelper.createMSH3MessageSourceComponent()
-        HapiFhirHelper.createMSHMessageHeader(bundle)
+        HapiHelper.createMSHMessageHeader(bundle)
 
         expect:
         def existingSendingApplication = HapiFhirHelper.getMSH3MessageSourceComponent(bundle)
@@ -204,7 +204,7 @@ class HapiHelperTest extends Specification {
     def "sending facility's get, set and create work as expected"() {
         given:
         def bundle = new Bundle()
-        HapiFhirHelper.createMSHMessageHeader(bundle)
+        HapiHelper.createMSHMessageHeader(bundle)
 
         expect:
         HapiHelper.getMSH4Organization(bundle) == null
@@ -222,7 +222,7 @@ class HapiHelperTest extends Specification {
         given:
         def bundle = new Bundle()
         def expectedReceivingApplication = HapiFhirHelper.createMessageDestinationComponent()
-        HapiFhirHelper.createMSHMessageHeader(bundle)
+        HapiHelper.createMSHMessageHeader(bundle)
 
         expect:
         def existingReceivingApplication = HapiHelper.getMSH5MessageDestinationComponent(bundle)
@@ -240,7 +240,7 @@ class HapiHelperTest extends Specification {
     def "receiving facility's get, set and create work as expected"() {
         given:
         def bundle = new Bundle()
-        HapiFhirHelper.createMSHMessageHeader(bundle)
+        HapiHelper.createMSHMessageHeader(bundle)
 
         expect:
         HapiFhirHelper.getMSH6Organization(bundle) == null
@@ -284,7 +284,7 @@ class HapiHelperTest extends Specification {
         def expectedDisplay = "expectedDisplay"
         def expectedCoding = new Coding(expectedSystem, expectedCode, expectedDisplay)
         def mockBundle = new Bundle()
-        HapiFhirHelper.createMSHMessageHeader(mockBundle)
+        HapiHelper.createMSHMessageHeader(mockBundle)
 
         when:
         HapiHelper.setMSH9Coding(mockBundle, expectedCoding)
@@ -302,7 +302,7 @@ class HapiHelperTest extends Specification {
         given:
         def bundle = new Bundle()
         def msh9_3 = "msh9_3"
-        HapiFhirHelper.createMSHMessageHeader(bundle)
+        HapiHelper.createMSHMessageHeader(bundle)
 
         when:
         HapiHelper.setMSH9_3Value(bundle, msh9_3)

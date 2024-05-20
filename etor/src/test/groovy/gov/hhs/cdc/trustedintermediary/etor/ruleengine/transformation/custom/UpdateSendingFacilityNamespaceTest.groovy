@@ -41,7 +41,7 @@ class UpdateSendingFacilityNamespaceTest extends Specification {
     def "don't throw exception if sending facility not in bundle"() {
         given:
         def bundle = new Bundle()
-        HapiFhirHelper.createMSHMessageHeader(bundle)
+        HapiHelper.createMSHMessageHeader(bundle)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), Map.of("name", ""))

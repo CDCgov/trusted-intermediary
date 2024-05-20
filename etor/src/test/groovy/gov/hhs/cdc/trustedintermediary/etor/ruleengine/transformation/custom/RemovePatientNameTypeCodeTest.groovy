@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
 
@@ -37,7 +38,7 @@ class RemovePatientNameTypeCodeTest extends Specification {
     def "don't throw exception if patient resource not present"() {
         given:
         def bundle = new Bundle()
-        HapiFhirHelper.createMSHMessageHeader(bundle)
+        HapiHelper.createMSHMessageHeader(bundle)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)

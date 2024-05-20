@@ -33,14 +33,6 @@ class HapiFhirHelper {
         bundle.addEntry().setFullUrl(receiverOrganizationFullUrl).setResource(receiverOrganization)
         return bundle
     }
-
-    // MSH - Message Header
-    static MessageHeader createMSHMessageHeader(Bundle bundle) {
-        MessageHeader messageHeader = new MessageHeader()
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(messageHeader))
-        return messageHeader
-    }
-
     // MSH-5 - Receiving Application
     static void setMSH5MessageDestinationComponent(
             Bundle bundle, MessageHeader.MessageDestinationComponent receivingApplication) {

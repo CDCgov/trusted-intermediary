@@ -24,7 +24,7 @@ class UpdateReceivingApplicationNamespaceTest extends Specification {
         given:
         def name = "EPIC"
         def bundle = new Bundle()
-        HapiFhirHelper.createMSHMessageHeader(bundle)
+        HapiHelper.createMSHMessageHeader(bundle)
         def receivingApplication = HapiFhirHelper.createMessageDestinationComponent()
         receivingApplication.addExtension(HapiHelper.EXTENSION_UNIVERSAL_ID_URL, new StringType("universal-id"))
         receivingApplication.addExtension(HapiHelper.EXTENSION_UNIVERSAL_ID_TYPE_URL, new StringType("universal-id-type"))
@@ -49,7 +49,7 @@ class UpdateReceivingApplicationNamespaceTest extends Specification {
     def "don't throw exception if receiving application not in bundle"() {
         given:
         def bundle = new Bundle()
-        HapiFhirHelper.createMSHMessageHeader(bundle)
+        HapiHelper.createMSHMessageHeader(bundle)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), Map.of("name", ""))
