@@ -110,7 +110,6 @@ class HapiHelperTest extends Specification {
         def expectedCode = "expectedCode"
         def expectedDisplay = "expectedDisplay"
         def mockBundle = new Bundle()
-        HapiHelper.createMSHMessageHeader(mockBundle)
 
         when:
         HapiHelper.addMetaTag(mockBundle, expectedSystem, expectedCode, expectedDisplay)
@@ -202,11 +201,16 @@ class HapiHelperTest extends Specification {
 
     // MSH-4 - Sending Facility
     def "sending facility's get, set and create work as expected"() {
-        given:
+        when:
         def bundle = new Bundle()
+
+        then:
+        HapiHelper.getMSH4Organization(bundle) == null
+
+        when:
         HapiHelper.createMSHMessageHeader(bundle)
 
-        expect:
+        then:
         HapiHelper.getMSH4Organization(bundle) == null
 
         when:
@@ -220,12 +224,19 @@ class HapiHelperTest extends Specification {
     // MSH-5 - Receiving Application
     def "receiving application's get, set and create work as expected"() {
         given:
-        def bundle = new Bundle()
         def expectedReceivingApplication = HapiFhirHelper.createMessageDestinationComponent()
-        HapiHelper.createMSHMessageHeader(bundle)
 
-        expect:
+        when:
+        def bundle = new Bundle()
+
+        then:
+        HapiHelper.getMSH5MessageDestinationComponent(bundle) == null
+
+        when:
+        HapiHelper.createMSHMessageHeader(bundle)
         def existingReceivingApplication = HapiHelper.getMSH5MessageDestinationComponent(bundle)
+
+        then:
         !existingReceivingApplication.equalsDeep(expectedReceivingApplication)
 
         when:
@@ -283,10 +294,16 @@ class HapiHelperTest extends Specification {
         def expectedCode = "expectedCode"
         def expectedDisplay = "expectedDisplay"
         def expectedCoding = new Coding(expectedSystem, expectedCode, expectedDisplay)
-        def mockBundle = new Bundle()
-        HapiHelper.createMSHMessageHeader(mockBundle)
 
         when:
+        def mockBundle = new Bundle()
+        HapiHelper.setMSH9Coding(mockBundle, expectedCoding)
+
+        then:
+        HapiHelper.getMSH9Coding(mockBundle) == null
+
+        when:
+        HapiHelper.createMSHMessageHeader(mockBundle)
         HapiHelper.setMSH9Coding(mockBundle, expectedCoding)
         def convertedMessageHeader = HapiHelper.getMSHMessageHeader(mockBundle)
 
@@ -300,11 +317,17 @@ class HapiHelperTest extends Specification {
     // MSH-9.3 - Message Type
     def "message type's get and set work as expected"() {
         given:
-        def bundle = new Bundle()
         def msh9_3 = "msh9_3"
-        HapiHelper.createMSHMessageHeader(bundle)
 
         when:
+        def bundle = new Bundle()
+
+        then:
+        HapiHelper.setMSH9_3Value(bundle, msh9_3)
+        HapiHelper.getMSH9_3Value(bundle) == null
+
+        when:
+        HapiHelper.createMSHMessageHeader(bundle)
         HapiHelper.setMSH9_3Value(bundle, msh9_3)
 
         then:
