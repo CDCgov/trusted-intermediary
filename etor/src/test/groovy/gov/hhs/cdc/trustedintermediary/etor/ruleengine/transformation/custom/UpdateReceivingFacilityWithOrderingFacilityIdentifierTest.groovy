@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import org.hl7.fhir.r4.model.Bundle
@@ -28,13 +29,13 @@ class UpdateReceivingFacilityWithOrderingFacilityIdentifierTest extends Specific
         def orc21_10 = HapiHelper.getOrc21Value(serviceRequest)
 
         expect:
-        HapiHelper.getMSH6_1Value(bundle) != orc21_10
+        HapiFhirHelper.getMSH6_1Value(bundle) != orc21_10
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
 
         then:
-        HapiHelper.getMSH6_1Value(bundle) == orc21_10
+        HapiFhirHelper.getMSH6_1Value(bundle) == orc21_10
     }
 
     def "don't throw exception if receiving facility not in bundle"() {

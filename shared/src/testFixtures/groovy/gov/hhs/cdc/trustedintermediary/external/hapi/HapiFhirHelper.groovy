@@ -87,6 +87,15 @@ class HapiFhirHelper {
         messageHeader.setDestination(List.of(destination))
     }
 
+
+    // MSH-6.1 - Namespace ID
+    static String getMSH6_1Value(Bundle bundle) {
+        Identifier identifier = HapiHelper.getMSH6_1Identifier(bundle)
+        if (identifier == null) {
+            return null
+        }
+        return identifier.getValue()
+    }
     // PID - Patient
     static Patient createPIDPatient(Bundle bundle) {
         Patient patient = new Patient()

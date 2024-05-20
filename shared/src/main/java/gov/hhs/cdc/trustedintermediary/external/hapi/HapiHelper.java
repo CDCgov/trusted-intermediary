@@ -13,7 +13,6 @@ import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.PractitionerRole;
-import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ServiceRequest;
 import org.hl7.fhir.r4.model.StringType;
@@ -127,25 +126,10 @@ public class HapiHelper {
         return messageHeader.getDestinationFirstRep();
     }
 
-    public static void setMSH5MessageDestinationComponent(
-            Bundle bundle, MessageHeader.MessageDestinationComponent receivingApplication) {
-        MessageHeader messageHeader = getMSHMessageHeader(bundle);
-        messageHeader.setDestination(List.of(receivingApplication));
-    }
-
     // MSH-6 - Receiving Facility
     public static Organization getMSH6Organization(Bundle bundle) {
         MessageHeader messageHeader = getMSHMessageHeader(bundle);
         return (Organization) messageHeader.getDestinationFirstRep().getReceiver().getResource();
-    }
-
-    public static void setMSH6Organization(Bundle bundle, Organization receivingFacility) {
-        MessageHeader messageHeader = getMSHMessageHeader(bundle);
-        Reference organizationReference = createOrganizationReference(bundle, receivingFacility);
-        MessageHeader.MessageDestinationComponent destination =
-                new MessageHeader.MessageDestinationComponent();
-        destination.setReceiver(organizationReference);
-        messageHeader.setDestination(List.of(destination));
     }
 
     // MSH-6.1 - Namespace ID
@@ -156,14 +140,6 @@ public class HapiHelper {
         }
         List<Identifier> identifiers = receivingFacility.getIdentifier();
         return getHD1Identifier(identifiers);
-    }
-
-    public static String getMSH6_1Value(Bundle bundle) {
-        Identifier identifier = getMSH6_1Identifier(bundle);
-        if (identifier == null) {
-            return null;
-        }
-        return identifier.getValue();
     }
 
     public static void setMSH6_1Value(Bundle bundle, String value) {
@@ -291,20 +267,8 @@ public class HapiHelper {
         return resourceInBundle(bundle, DiagnosticReport.class);
     }
 
-    public static DiagnosticReport createDiagnosticReport(Bundle bundle) {
-        DiagnosticReport diagnosticReport = new DiagnosticReport();
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(diagnosticReport));
-        return diagnosticReport;
-    }
-
     public static ServiceRequest getBasedOnServiceRequest(DiagnosticReport diagnosticReport) {
         return (ServiceRequest) diagnosticReport.getBasedOnFirstRep().getResource();
-    }
-
-    public static ServiceRequest createBasedOnServiceRequest(DiagnosticReport diagnosticReport) {
-        ServiceRequest serviceRequest = new ServiceRequest();
-        diagnosticReport.setBasedOn(List.of(new Reference(serviceRequest)));
-        return serviceRequest;
     }
 
     public static PractitionerRole getPractitionerRoleRequester(ServiceRequest serviceRequest) {
