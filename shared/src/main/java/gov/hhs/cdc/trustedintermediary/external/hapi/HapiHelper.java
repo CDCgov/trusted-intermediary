@@ -141,11 +141,17 @@ public class HapiHelper {
     // MSH-9.3 - Message Structure
     public static String getMSH9_3Value(Bundle bundle) {
         Coding coding = getMSH9Coding(bundle);
+        if (coding == null) {
+            return null;
+        }
         return coding.getDisplay();
     }
 
     public static void setMSH9_3Value(Bundle bundle, String value) {
         Coding coding = getMSH9Coding(bundle);
+        if (coding == null) {
+            return;
+        }
         coding.setDisplay(value);
     }
 
