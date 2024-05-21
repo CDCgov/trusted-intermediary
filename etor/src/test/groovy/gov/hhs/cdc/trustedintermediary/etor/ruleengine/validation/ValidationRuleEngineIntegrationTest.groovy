@@ -1,9 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
-import gov.hhs.cdc.trustedintermediary.HapiFhirHelper
+
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson

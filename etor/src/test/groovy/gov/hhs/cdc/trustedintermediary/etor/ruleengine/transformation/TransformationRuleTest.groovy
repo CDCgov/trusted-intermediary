@@ -1,8 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation
 
-import gov.hhs.cdc.trustedintermediary.HapiFhirHelper
+
 import gov.hhs.cdc.trustedintermediary.FhirResourceMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
