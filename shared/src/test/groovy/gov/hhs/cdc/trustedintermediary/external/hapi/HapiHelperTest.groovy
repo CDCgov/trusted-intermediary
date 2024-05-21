@@ -187,6 +187,7 @@ class HapiHelperTest extends Specification {
 
         then:
         HapiHelper.getMSH4Organization(bundle) == null
+        HapiHelper.getMSH4_1Identifier(bundle) == null
 
         when:
         HapiHelper.createMSHMessageHeader(bundle)
@@ -200,6 +201,13 @@ class HapiHelperTest extends Specification {
 
         then:
         HapiHelper.getMSH4Organization(bundle).equalsDeep(sendingFacility)
+        HapiHelper.getMSH4_1Identifier(bundle) == null
+
+        when:
+        HapiFhirHelper.setMSH4_1Identifier(bundle, new Identifier())
+
+        then:
+        HapiHelper.getMSH4_1Identifier(bundle) != null
     }
 
     // MSH-5 - Receiving Application
@@ -431,6 +439,33 @@ class HapiHelperTest extends Specification {
         then:
         HapiHelper.getPID5Extension(bundle) != null
         HapiFhirHelper.getPID5_7Value(bundle) == null
+    }
+
+    // ORC-2 - Placer Order Number
+    def "orc-2.1 methods work as expected"() {
+        given:
+        def orc2_1 = "orc2_1"
+        def orc2_2 = "orc2_2"
+        def bundle = new Bundle()
+        def serviceRequest = new ServiceRequest()
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(serviceRequest))
+
+        when:
+        HapiFhirHelper.setORC2Identifier(serviceRequest, new Identifier())
+
+        then:
+        HapiHelper.getORC2Identifier(serviceRequest) != null
+        HapiHelper.getORC2_1Value(serviceRequest) == null
+        HapiHelper.getORC2_2Value(serviceRequest) == null
+
+        when:
+        HapiHelper.setORC2_1Value(serviceRequest, orc2_1)
+        HapiHelper.setORC2_2Value(serviceRequest, orc2_2)
+
+
+        then:
+        HapiHelper.getORC2_1Value(serviceRequest) == orc2_1
+        HapiHelper.getORC2_2Value(serviceRequest) == orc2_2
     }
 
     // ORC-4.1 - Entity Identifier

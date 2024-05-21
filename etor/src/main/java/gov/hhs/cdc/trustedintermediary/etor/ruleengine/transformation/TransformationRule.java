@@ -49,7 +49,7 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
             TransformationRuleMethod transformation, FhirResource<?> resource) {
         String name = transformation.name();
         Map<String, String> args = transformation.args();
-        logger.logInfo("Applying transformation: ", name);
+        logger.logInfo("Applying transformation: " + name);
 
         CustomFhirTransformation transformationInstance = getTransformationInstance(name);
         transformationInstance.transform(resource, args);
