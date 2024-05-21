@@ -182,20 +182,23 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleMetadata(DomainRequest request) {
         try {
             String metadataId = request.getPathParams().get("id");
-            Optional<PartnerMetadata> metadata =
+            Optional<PartnerMetadata> metadataOptional =
                     partnerMetadataOrchestrator.getMetadata(metadataId);
 
-            if (metadata.isEmpty()) {
+            if (metadataOptional.isEmpty()) {
                 return domainResponseHelper.constructErrorResponse(
                         404, "Metadata not found for ID: " + metadataId);
             }
 
+            var metadata = metadataOptional.get();
+
             Set<String> messageIdsToLink =
-                    partnerMetadataOrchestrator.findMessagesIdsToLink(metadataId);
+                    partnerMetadataOrchestrator.findMessagesIdsToLink(
+                            metadata.receivedSubmissionId());
 
             FhirMetadata<?> responseObject =
                     partnerMetadataConverter.extractPublicMetadataToOperationOutcome(
-                            metadata.get(), metadataId, messageIdsToLink);
+                            metadata, metadataId, messageIdsToLink);
 
             return domainResponseHelper.constructOkResponseFromString(
                     fhir.encodeResourceToJson(responseObject.getUnderlyingOutcome()));

@@ -50,7 +50,7 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
-        (1.._) * mockLogger.logInfo(_ as String, _ as String)
+        (1.._) * mockLogger.logInfo(_ as String)
     }
 
     def "all transformations in the definitions file have existing custom methods"() {
