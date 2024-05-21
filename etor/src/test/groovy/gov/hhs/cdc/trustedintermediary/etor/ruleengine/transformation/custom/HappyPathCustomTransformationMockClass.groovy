@@ -5,9 +5,8 @@ import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhir
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.MessageHeader
 
-class HappyPathMockClass implements CustomFhirTransformation {
+class HappyPathCustomTransformationMockClass implements CustomFhirTransformation {
 
     @Override
     public void transform(final FhirResource<?> resource, final Map<String, String> args) {
@@ -18,6 +17,6 @@ class HappyPathMockClass implements CustomFhirTransformation {
         def display = String.format("mock^code^%s", code)
 
         Coding eventCoding = new Coding(system, code, display)
-        HapiHelper.setMessageTypeCoding(bundle, eventCoding)
+        HapiHelper.setMSH9Coding(bundle, eventCoding)
     }
 }

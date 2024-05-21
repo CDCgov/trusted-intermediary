@@ -9,8 +9,8 @@ import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
 
-/** Custom transformation to convert an ORM order to OML. */
-public class convertToOmlOrder implements CustomFhirTransformation {
+/** Converts an ORM order to OML. */
+public class ConvertToOmlOrder implements CustomFhirTransformation {
 
     private final MetricMetadata metadata =
             ApplicationContext.getImplementation(MetricMetadata.class);
@@ -18,7 +18,7 @@ public class convertToOmlOrder implements CustomFhirTransformation {
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
-        HapiHelper.setMessageTypeCoding(bundle, HapiHelper.OML_CODING);
+        HapiHelper.setMSH9Coding(bundle, HapiHelper.OML_CODING);
         metadata.put(bundle.getId(), EtorMetadataStep.ORDER_CONVERTED_TO_OML);
     }
 }
