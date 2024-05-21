@@ -105,6 +105,7 @@ class HapiFhirHelper {
         }
         return identifier.getValue()
     }
+  
     // PID - Patient
     static Patient createPIDPatient(Bundle bundle) {
         Patient patient = new Patient()
