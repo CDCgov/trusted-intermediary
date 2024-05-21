@@ -82,11 +82,6 @@ class HapiFhirHelper {
     }
 
     // MSH-6 - Receiving Facility
-    static Organization getMSH6Organization(Bundle bundle) {
-        MessageHeader messageHeader = HapiHelper.getMSHMessageHeader(bundle)
-        return (Organization) messageHeader.getDestinationFirstRep().getReceiver().getResource()
-    }
-
     static void setMSH6Organization(Bundle bundle, Organization receivingFacility) {
         MessageHeader messageHeader = HapiHelper.getMSHMessageHeader(bundle)
         Reference organizationReference = createOrganizationReference(bundle, receivingFacility)
@@ -96,7 +91,6 @@ class HapiFhirHelper {
         messageHeader.setDestination(List.of(destination))
     }
 
-
     // MSH-6.1 - Namespace ID
     static String getMSH6_1Value(Bundle bundle) {
         Identifier identifier = HapiHelper.getMSH6_1Identifier(bundle)
@@ -105,7 +99,7 @@ class HapiFhirHelper {
         }
         return identifier.getValue()
     }
-  
+
     // PID - Patient
     static Patient createPIDPatient(Bundle bundle) {
         Patient patient = new Patient()
@@ -204,10 +198,6 @@ class HapiFhirHelper {
     static void setORC2Identifier(ServiceRequest serviceRequest, Identifier identifier) {
         identifier.addExtension(HapiHelper.EXTENSION_HL7_FIELD_URL, HapiHelper.EXTENSION_ORC2_DATA_TYPE)
         serviceRequest.addIdentifier(identifier)
-    }
-
-    static DiagnosticReport getDiagnosticReport(Bundle bundle) {
-        return HapiHelper.resourceInBundle(bundle, DiagnosticReport.class)
     }
 
     static DiagnosticReport createDiagnosticReport(Bundle bundle) {
