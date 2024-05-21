@@ -40,8 +40,9 @@ public class HapiHelper {
     public static final String EXTENSION_CODING_SYSTEM =
             "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding-system";
 
-    public static final String EXTENSION_ALTERNATE_VALUE =
-            "https://reportstream.cdc.gov/fhir/StructureDefinition/alternate-value";
+    public static final String EXTENSION_CWE_CODING =
+            "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding";
+    public static final String EXTENSION_ALT_CODING = "alt-coding";
 
     public static final Coding OML_CODING =
             new Coding(
