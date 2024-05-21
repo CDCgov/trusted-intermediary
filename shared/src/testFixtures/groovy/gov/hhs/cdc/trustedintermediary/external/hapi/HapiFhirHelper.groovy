@@ -206,10 +206,6 @@ class HapiFhirHelper {
         return diagnosticReport
     }
 
-    static ServiceRequest getBasedOnServiceRequest(DiagnosticReport diagnosticReport) {
-        return (ServiceRequest) diagnosticReport.getBasedOnFirstRep().getResource()
-    }
-
     static ServiceRequest createBasedOnServiceRequest(DiagnosticReport diagnosticReport) {
         ServiceRequest serviceRequest = new ServiceRequest()
         diagnosticReport.setBasedOn(List.of(new Reference(serviceRequest)))
