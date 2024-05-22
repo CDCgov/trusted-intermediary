@@ -26,7 +26,7 @@ class UpdateReceivingFacilityWithOrderingFacilityIdentifierTest extends Specific
         def bundle = fhirResource.getUnderlyingResource() as Bundle
         def diagnosticReport = HapiHelper.getDiagnosticReport(bundle)
         def serviceRequest = HapiHelper.getBasedOnServiceRequest(diagnosticReport)
-        def orc21_10 = HapiHelper.getOrc21Value(serviceRequest)
+        def orc21_10 = HapiHelper.getORC21Value(serviceRequest)
 
         expect:
         HapiFhirHelper.getMSH6_1Value(bundle) != orc21_10

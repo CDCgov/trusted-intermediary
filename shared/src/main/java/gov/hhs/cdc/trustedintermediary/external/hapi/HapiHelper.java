@@ -370,10 +370,19 @@ public class HapiHelper {
     }
 
     // ORC-21 - Ordering Facility Name
-    public static String getOrc21Value(ServiceRequest serviceRequest) {
+    public static String getORC21Value(ServiceRequest serviceRequest) {
         PractitionerRole practitionerRole = getPractitionerRoleRequester(serviceRequest);
+        if (practitionerRole == null) {
+            return null;
+        }
         Organization organization = getOrganization(practitionerRole);
-        if (!organization.hasExtension(EXTENSION_XON_ORGANIZATION_URL)) {
+        if (organization == null || !organization.hasExtension(EXTENSION_XON_ORGANIZATION_URL)) {
+            return null;
+        }
+        if (!organization.hasExtension(EXTENSION_XON_ORGANIZATION_URL)
+                || !organization
+                        .getExtensionByUrl(EXTENSION_XON_ORGANIZATION_URL)
+                        .hasExtension(EXTENSION_XON10_URL)) {
             return null;
         }
         Extension xonOrgExtension = organization.getExtensionByUrl(EXTENSION_XON_ORGANIZATION_URL);

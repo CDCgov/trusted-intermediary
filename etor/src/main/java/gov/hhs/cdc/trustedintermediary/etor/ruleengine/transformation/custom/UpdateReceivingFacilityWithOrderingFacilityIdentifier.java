@@ -26,7 +26,7 @@ public class UpdateReceivingFacilityWithOrderingFacilityIdentifier
         if (serviceRequest == null) {
             return;
         }
-        String orc21_10 = HapiHelper.getOrc21Value(serviceRequest);
+        String orc21_10 = HapiHelper.getORC21Value(serviceRequest);
         HapiHelper.setMSH6_1Value(bundle, orc21_10);
         HapiHelper.removeMSH6_2_and_3_Identifier(bundle);
     }

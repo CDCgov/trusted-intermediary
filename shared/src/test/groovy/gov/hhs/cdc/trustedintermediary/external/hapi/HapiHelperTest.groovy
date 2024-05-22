@@ -504,6 +504,23 @@ class HapiHelperTest extends Specification {
         HapiHelper.getORC4_2Value(sr) == orc4_2
     }
 
+    def "orc-21 methods work as expected"() {
+        given:
+        def orc21 = "orc21"
+        def bundle = new Bundle()
+        def dr = HapiFhirHelper.createDiagnosticReport(bundle)
+        def sr = HapiFhirHelper.createBasedOnServiceRequest(dr)
+
+        expect:
+        HapiHelper.getORC21Value(sr) == null
+
+        when:
+        HapiFhirHelper.setORC21Value(sr, orc21)
+
+        then:
+        HapiHelper.getORC21Value(sr) == orc21
+    }
+
     // HD - Hierarchic Designator
     def "getHD1Identifier returns the correct namespaceIdentifier"() {
         given:
