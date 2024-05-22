@@ -15,7 +15,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "database_token_expired_a
   resource_group_name = data.azurerm_resource_group.group.name
 
   action {
-    action_group  = [azurerm_monitor_action_group.monitor.id]
+    action_group  = [azurerm_monitor_action_group.notify_slack_email.id]
     email_subject = "FATAL: The access token has expired!"
   }
 
