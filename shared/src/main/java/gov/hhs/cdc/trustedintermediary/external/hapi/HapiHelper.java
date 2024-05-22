@@ -130,6 +130,9 @@ public class HapiHelper {
     // MSH-6 - Receiving Facility
     public static Organization getMSH6Organization(Bundle bundle) {
         MessageHeader messageHeader = getMSHMessageHeader(bundle);
+        if (messageHeader == null) {
+            return null;
+        }
         return (Organization) messageHeader.getDestinationFirstRep().getReceiver().getResource();
     }
 

@@ -38,15 +38,32 @@ class UpdateReceivingFacilityWithOrderingFacilityIdentifierTest extends Specific
         HapiFhirHelper.getMSH6_1Value(bundle) == orc21_10
     }
 
+
+    def "don't modify the bundle when there's missing service request"() {
+        given:
+        def bundle = new Bundle()
+        HapiHelper.createMSHMessageHeader(bundle)
+        HapiFhirHelper.createDiagnosticReport(bundle)
+        def bundleCopy = bundle.copy()
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), null)
+
+        then:
+        bundle.equalsDeep(bundleCopy)
+    }
+
     def "don't throw exception if receiving facility not in bundle"() {
         given:
         def bundle = new Bundle()
         HapiHelper.createMSHMessageHeader(bundle)
+        def bundleCopy = bundle.copy()
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
 
         then:
         noExceptionThrown()
+        bundle.equalsDeep(bundleCopy)
     }
 }
