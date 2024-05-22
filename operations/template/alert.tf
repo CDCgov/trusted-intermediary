@@ -1,4 +1,4 @@
-resource "azurerm_monitor_action_group" "monitor" {
+resource "azurerm_monitor_action_group" "notify_slack_email" {
   name                = "cdcti${var.environment}-actiongroup"
   resource_group_name = data.azurerm_resource_group.group.name
   short_name          = "cdcti-alerts"
