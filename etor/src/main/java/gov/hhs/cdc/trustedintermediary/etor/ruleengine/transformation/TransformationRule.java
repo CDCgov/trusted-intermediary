@@ -2,7 +2,6 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation;
 
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.Rule;
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,15 +35,18 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
     }
 
     @Override
-    public void runRule(FhirResource<?> resource) throws RuleExecutionException {
+    public void runRule(FhirResource<?> resource) {
         for (TransformationRuleMethod transformation : this.getRules()) {
-            applyTransformation(transformation, resource);
+            try {
+                applyTransformation(transformation, resource);
+            } catch (RuntimeException e) {
+                logger.logError("Error applying transformation: " + transformation.name(), e);
+            }
         }
     }
 
     private void applyTransformation(
-            TransformationRuleMethod transformation, FhirResource<?> resource)
-            throws RuleExecutionException {
+            TransformationRuleMethod transformation, FhirResource<?> resource) {
         String name = transformation.name();
         Map<String, String> args = transformation.args();
         logger.logInfo("Applying transformation: " + name);

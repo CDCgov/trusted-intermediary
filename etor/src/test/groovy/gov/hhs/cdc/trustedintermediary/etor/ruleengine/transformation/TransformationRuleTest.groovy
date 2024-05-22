@@ -67,7 +67,7 @@ class TransformationRuleTest extends Specification {
         messageHeader.getEventCoding().getCode() == "mock_code"
     }
 
-    def "runRule() throws RuntimeException when an invalid class is given as input"() {
+    def "runRule logs an error and continues when an invalid class is given as input"() {
         given:
         def ruleName = "Rule name"
         def ruleDescription = "Rule Description"
@@ -84,10 +84,10 @@ class TransformationRuleTest extends Specification {
         rule.runRule(fhirResource)
 
         then:
-        thrown(RuntimeException)
+        1 * mockLogger.logError(_, _)
     }
 
-    def "runRule() throws RuntimeException when given a class without transform"() {
+    def "runRule logs an error and continues when given a class without transform"() {
         given:
         def ruleName = "Rule name"
         def ruleDescription = "Rule Description"
@@ -105,10 +105,10 @@ class TransformationRuleTest extends Specification {
         rule.runRule(fhirResource)
 
         then:
-        thrown(RuntimeException)
+        1 * mockLogger.logError(_, _)
     }
 
-    def "runRule() throws RuntimeException when given abstract class input"() {
+    def "runRule logs an error and continues when given abstract class input"() {
         given:
         def ruleName = "Rule name"
         def ruleDescription = "Rule Description"
@@ -126,10 +126,10 @@ class TransformationRuleTest extends Specification {
         rule.runRule(fhirResource)
 
         then:
-        thrown(RuntimeException)
+        1 * mockLogger.logError(_, _)
     }
 
-    def "runRule() throws RuntimeException when given a private constructor class input"() {
+    def "runRule logs an error and continues when given a private constructor class input"() {
         given:
         def ruleName = "Rule name"
         def ruleDescription = "Rule Description"
@@ -147,6 +147,6 @@ class TransformationRuleTest extends Specification {
         rule.runRule(fhirResource)
 
         then:
-        thrown(RuntimeException)
+        1 * mockLogger.logError(_, _)
     }
 }
