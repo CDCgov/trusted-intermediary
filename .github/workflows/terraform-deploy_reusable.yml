@@ -13,10 +13,6 @@ on:
         type: string
         required: false
         default: ""
-      TERRAFORM_APPLY_PARAMETERS:
-        type: string
-        required: false
-        default: ""
     secrets:
       AZURE_CLIENT_ID:
         required: true
@@ -31,6 +27,8 @@ on:
       VPN_GITHUB_CERTIFICATE:
         required: false
       VPN_GITHUB_SECRET_KEY:
+        required: false
+      TERRAFORM_APPLY_PARAMETERS:
         required: false
     outputs:
       REGISTRY:
@@ -75,7 +73,7 @@ jobs:
         run: terraform validate -no-color
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -input=false ${{ inputs.TERRAFORM_APPLY_PARAMETERS }}
+        run: terraform apply -auto-approve -input=false ${{ secrets.TERRAFORM_APPLY_PARAMETERS }}
 
       - name: Login via Azure CLI
         uses: azure/login@v2
