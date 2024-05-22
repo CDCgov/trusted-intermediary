@@ -1,10 +1,11 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation
 
+
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleEngineHelper
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
-import gov.hhs.cdc.trustedintermediary.FhirBundleHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
@@ -42,82 +43,24 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
     def "transformation rules run without error"() {
         given:
-        def bundle = new Bundle()
+        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORM_O01')
 
         when:
         engine.runRules(new HapiFhirResource(bundle))
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
-        (1.._) * mockLogger.logInfo(_ as String, _ as String)
+        (1.._) * mockLogger.logInfo(_ as String)
     }
 
     def "all transformations in the definitions file have existing custom methods"() {
         when:
-        def transformationMethodNames = engine.rules.collect { rule -> rule.name }
+        def transformationMethodNames = engine.rules*.rules*.name.flatten()
 
         then:
         transformationMethodNames.each { transformationMethodName ->
             assert TransformationRule.getTransformationInstance(transformationMethodName) != null
         }
-    }
-
-    def "test rule transformation accuracy: addEtorProcessingTag"() {
-        given:
-        def ruleName = 'addEtorProcessingTag'
-        // we could also use this file for testing the rule: e2e/orders/001_OML_O21_short.fhir
-        def bundle = new Bundle()
-        def rule = RuleEngineHelper.getRuleByName(engine.rules, ruleName)
-
-        expect:
-        HapiHelper.resourceInBundle(bundle, MessageHeader) == null
-
-        when:
-        rule.runRule(new HapiFhirResource(bundle))
-        def messageHeader = HapiHelper.resourceInBundle(bundle, MessageHeader)
-
-        then:
-        0 * mockLogger.logError(_ as String, _ as Exception)
-        messageHeader.meta.tag.last().code == 'ETOR'
-    }
-
-    def "test rule transformation accuracy: convertToOmlOrder"() {
-        given:
-        def ruleName = 'convertToOmlOrder'
-        // we could also use this file for testing the rule: e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir
-        def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: 'ORM_O01')
-        def rule = RuleEngineHelper.getRuleByName(engine.rules, ruleName)
-
-        expect:
-        HapiHelper.resourceInBundle(bundle, MessageHeader).event.code == 'O01'
-
-        when:
-        rule.runRule(new HapiFhirResource(bundle))
-        def messageHeader = HapiHelper.resourceInBundle(bundle, MessageHeader) as MessageHeader
-
-        then:
-        0 * mockLogger.logError(_ as String, _ as Exception)
-        messageHeader.event.code == 'O21'
-    }
-
-    def "test rule transformation accuracy: addContactSectionToPatientResource"() {
-        given:
-        def ruleName = 'addContactSectionToPatientResource'
-        // we could also use this file for testing the rule: e2e/orders/003_2_ORM_O01_short_linked_to_002_ORU_R01_short.fhir
-        def bundle = FhirBundleHelper.createMessageBundle(messageTypeCode: 'OML_O21')
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(new Patient()))
-        def rule = RuleEngineHelper.getRuleByName(engine.rules, ruleName)
-
-        expect:
-        HapiHelper.resourceInBundle(bundle, Patient).contact.isEmpty()
-
-        when:
-        rule.runRule(new HapiFhirResource(bundle))
-        def patient = HapiHelper.resourceInBundle(bundle, Patient)
-
-        then:
-        0 * mockLogger.logError(_ as String, _ as Exception)
-        patient.contact.size() > 0
     }
 
     def "consecutively applied transformations don't interfere with each other: 003_2_ORM_O01_short_linked_to_002_ORU_R01_short"() {

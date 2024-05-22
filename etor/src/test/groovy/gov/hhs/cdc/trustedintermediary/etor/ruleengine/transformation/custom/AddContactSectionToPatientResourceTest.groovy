@@ -1,8 +1,9 @@
-package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation
+package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom.addContactSectionToPatientResource
+
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
@@ -33,7 +34,23 @@ class AddContactSectionToPatientResourceTest extends Specification {
         mockOrder = new OrderMock("fhirResourceId", "patientId", mockOrderBundle, null, null, null, null, null)
 
 
-        transformClass = new addContactSectionToPatientResource()
+        transformClass = new AddContactSectionToPatientResource()
+    }
+
+    def "add patient contact section when there's none"() {
+        given:
+        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'OML_O21')
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(new Patient()))
+
+        expect:
+        HapiHelper.resourceInBundle(bundle, Patient).contact.isEmpty()
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), null)
+        def patient = HapiHelper.resourceInBundle(bundle, Patient) as Patient
+
+        then:
+        patient.contact.size() > 0
     }
 
     def "add contact section to patient resource"() {

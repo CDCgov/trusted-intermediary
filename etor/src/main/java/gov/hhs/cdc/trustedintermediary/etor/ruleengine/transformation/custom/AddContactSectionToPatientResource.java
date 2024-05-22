@@ -12,8 +12,8 @@ import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Patient;
 
-/** Custom transformation to add a contact section to a patient resource. */
-public class addContactSectionToPatientResource implements CustomFhirTransformation {
+/** Adds mother's contact section to patient. */
+public class AddContactSectionToPatientResource implements CustomFhirTransformation {
 
     private final MetricMetadata metadata =
             ApplicationContext.getImplementation(MetricMetadata.class);
