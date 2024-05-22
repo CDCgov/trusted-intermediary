@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "3.104.0"
+      version = "3.104.2"
     }
   }
 
@@ -39,8 +39,9 @@ resource "azurerm_virtual_network" "vnet" { //create the PR Vnet because it has 
 module "template" {
   source = "../../template/"
 
-  environment = "pr${var.pr_number}"
-  deployer_id = "d59c2c86-de5e-41b7-a752-0869a73f5a60" //github app registration in Flexion Azure Entra
+  environment       = "pr${var.pr_number}"
+  deployer_id       = "d59c2c86-de5e-41b7-a752-0869a73f5a60" //github app registration in Flexion Azure Entra
+  alert_slack_email = var.alert_slack_email
 
   depends_on = [azurerm_resource_group.group, azurerm_virtual_network.vnet]
 }

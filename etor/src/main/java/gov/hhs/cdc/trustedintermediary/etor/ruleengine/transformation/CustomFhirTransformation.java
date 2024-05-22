@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation;
 
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException;
 import java.util.Map;
 
 /**
@@ -9,6 +8,5 @@ import java.util.Map;
  * implemented by classes in the custom/ folder.
  */
 public interface CustomFhirTransformation {
-    void transform(FhirResource<?> resource, Map<String, String> args)
-            throws RuleExecutionException;
+    void transform(FhirResource<?> resource, Map<String, String> args);
 }
