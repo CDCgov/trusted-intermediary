@@ -9,7 +9,7 @@ resource "azurerm_monitor_action_group" "notify_slack_email" {
   }
 }
 
-resource "azurerm_monitor_scheduled_query_rules_alert" "alert" {
+resource "azurerm_monitor_scheduled_query_rules_alert" "database_token_expired_alert" {
   name                = "cdcti-${var.environment}-api-log-token-alert"
   location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
