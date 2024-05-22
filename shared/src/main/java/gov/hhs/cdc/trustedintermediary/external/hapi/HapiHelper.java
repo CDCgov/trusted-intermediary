@@ -332,6 +332,9 @@ public class HapiHelper {
     }
 
     public static String getEI2Value(Identifier identifier) {
+        if (!identifier.hasExtension(EXTENSION_ASSIGNING_AUTHORITY_URL)) {
+            return null;
+        }
         return identifier
                 .getExtensionByUrl(EXTENSION_ASSIGNING_AUTHORITY_URL)
                 .getExtensionByUrl(EXTENSION_NAMESPACE_ID_URL)
@@ -340,14 +343,24 @@ public class HapiHelper {
     }
 
     public static void setEI2Value(Identifier identifier, String value) {
+        if (!identifier.hasExtension(EXTENSION_ASSIGNING_AUTHORITY_URL)) {
+            identifier.addExtension().setUrl(EXTENSION_ASSIGNING_AUTHORITY_URL);
+        }
+        if (!identifier
+                .getExtensionByUrl(EXTENSION_ASSIGNING_AUTHORITY_URL)
+                .hasExtension(EXTENSION_NAMESPACE_ID_URL)) {
+            identifier
+                    .getExtensionByUrl(EXTENSION_ASSIGNING_AUTHORITY_URL)
+                    .addExtension()
+                    .setUrl(EXTENSION_NAMESPACE_ID_URL);
+        }
         identifier
                 .getExtensionByUrl(EXTENSION_ASSIGNING_AUTHORITY_URL)
                 .getExtensionByUrl(EXTENSION_NAMESPACE_ID_URL)
                 .setValue(new StringType(value));
     }
 
-    protected static Identifier getHl7FieldIdentifier(
-            List<Identifier> identifiers, StringType dataType) {
+    static Identifier getHl7FieldIdentifier(List<Identifier> identifiers, StringType dataType) {
         for (Identifier identifier : identifiers) {
             if (identifier.hasExtension(EXTENSION_HL7_FIELD_URL)
                     && identifier

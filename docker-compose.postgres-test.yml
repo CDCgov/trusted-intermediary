@@ -1,0 +1,17 @@
+version: "3.7"
+
+services:
+  postgresql-test:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: "intermediary-test"
+      POSTGRES_PASSWORD: "changeIT!" # pragma: allowlist secret
+      POSTGRES_USER: "intermediary"
+    ports:
+      - 5434:5432
+    volumes:
+      - ti_postgres_test_data:/var/lib/postgresql/data
+
+volumes:
+  ti_postgres_test_data:

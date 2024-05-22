@@ -65,6 +65,15 @@ class HapiFhirHelper {
         messageHeader.setSender(organizationReference)
     }
 
+    static void setMSH4_1Identifier(Bundle bundle, Identifier identifier) {
+        Organization sendingFacility = HapiHelper.getMSH4Organization(bundle)
+        if (sendingFacility == null) {
+            return
+        }
+        setHD1Identifier(identifier)
+        sendingFacility.addIdentifier(identifier)
+    }
+
     // MSH-5 - Receiving Application
     static void setMSH5MessageDestinationComponent(
             Bundle bundle, MessageHeader.MessageDestinationComponent receivingApplication) {
@@ -175,7 +184,17 @@ class HapiFhirHelper {
         xpn7Extension.setValue(new StringType(value))
     }
 
+    // HD - Hierarchic Designator
+    static void setHD1Identifier(Identifier identifier) {
+        identifier.addExtension(HapiHelper.EXTENSION_HL7_FIELD_URL, HapiHelper.EXTENSION_HD1_DATA_TYPE)
+    }
+
     // ORC - Common Order
+    static void setORC2Identifier(ServiceRequest serviceRequest, Identifier identifier) {
+        identifier.addExtension(HapiHelper.EXTENSION_HL7_FIELD_URL, HapiHelper.EXTENSION_ORC2_DATA_TYPE)
+        serviceRequest.addIdentifier(identifier)
+    }
+
     static DiagnosticReport getDiagnosticReport(Bundle bundle) {
         return HapiHelper.resourceInBundle(bundle, DiagnosticReport.class)
     }
