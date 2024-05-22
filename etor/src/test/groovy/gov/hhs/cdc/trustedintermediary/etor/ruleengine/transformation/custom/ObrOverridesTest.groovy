@@ -9,6 +9,7 @@ import spock.lang.Specification
 
 class ObrOverridesTest  extends Specification {
     def transformClass
+    def fhirResource
     def args = Map.of(
     "checkValue", "54089-8",
     "codingSystem", "LN",
@@ -21,11 +22,11 @@ class ObrOverridesTest  extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         transformClass = new ObrOverrides()
+        fhirResource = ExamplesHelper.getExampleFhirResource("../Test/Results/005_AL_ORU_R01_NBS_Simplified_1_hl7_translation.fhir")
     }
 
     def "skip transformation if the coding identifier is missing"() {
         given:
-        def fhirResource = ExamplesHelper.getExampleFhirResource("../Test/Results/002_AL_ORU_R01_NBS_Simplified_1_hl7_translation.fhir")
         def bundle = fhirResource.getUnderlyingResource() as Bundle
         def result = getOrbSections(bundle)[0]
         def obr4_1 = result[0]
@@ -53,7 +54,6 @@ class ObrOverridesTest  extends Specification {
 
     def "skip transformation if the coding identifier is not the one we want"() {
         given:
-        def fhirResource = ExamplesHelper.getExampleFhirResource("../Test/Results/002_AL_ORU_R01_NBS_Simplified_1_hl7_translation.fhir")
         def bundle = fhirResource.getUnderlyingResource() as Bundle
         def result = getOrbSections(bundle)[1]
         def obr4_1 = result[0]
@@ -81,7 +81,6 @@ class ObrOverridesTest  extends Specification {
 
     def "override obr4 values when the code matches"() {
         given:
-        def fhirResource = ExamplesHelper.getExampleFhirResource("../Test/Results/002_AL_ORU_R01_NBS_Simplified_1_hl7_translation.fhir")
         def bundle = fhirResource.getUnderlyingResource() as Bundle
         def result = getOrbSections(bundle)[2]
         def obr4_1 = result[0]
@@ -109,7 +108,6 @@ class ObrOverridesTest  extends Specification {
 
     def "leave obr4 values unchanged if the code matches and they're already correct"() {
         given:
-        def fhirResource = ExamplesHelper.getExampleFhirResource("../Test/Results/002_AL_ORU_R01_NBS_Simplified_1_hl7_translation.fhir")
         def bundle = fhirResource.getUnderlyingResource() as Bundle
         def result = getOrbSections(bundle)[3]
         def obr4_1 = result[0]
