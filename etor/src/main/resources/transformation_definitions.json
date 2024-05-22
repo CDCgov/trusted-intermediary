@@ -135,7 +135,7 @@
     },
     {
       "name": "ucsdOruObrOverrides",
-      "description": "Manual overwrites on OBR-4 fields for a specific code",
+      "description": "Overrides the values of Name of Coding System (OBR-4.3) and Alternate Identifier (OBR-4.4) in Universal Type Code (OBR-4)",
       "message": "",
       "conditions": [
         "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
