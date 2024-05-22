@@ -1,0 +1,23 @@
+{
+  "definitions": [ {
+      "name": "messageHasRequiredReceiverId",
+      "description": "Message has required receiver id",
+      "message": "Message doesn't have required receiver id",
+      "conditions": [ ],
+      "rules": [
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(system = 'urn:ietf:rfc:3986').value.exists()"
+      ]
+    },
+    {
+      "name": "ORMHasRequiredCardNumber",
+      "description": "ORM has required Card Number",
+      "message": "ORM doesn't have required Card Number",
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'O01'"
+      ],
+      "rules": [
+        "Bundle.entry.resource.ofType(Observation).where(code.coding.code = '57723-9').value.coding.code.exists()"
+      ]
+    }
+  ]
+}

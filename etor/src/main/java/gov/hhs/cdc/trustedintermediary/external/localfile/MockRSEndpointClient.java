@@ -2,11 +2,13 @@ package gov.hhs.cdc.trustedintermediary.external.localfile;
 
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.UUID;
+import javax.inject.Inject;
 
 /**
  * A mock implementation of the RSEndpointClient interface that doesn't require a connection to
@@ -17,6 +19,8 @@ public class MockRSEndpointClient implements RSEndpointClient {
     static final String LOCAL_FILE_NAME = "localfileorder.json";
 
     private static final MockRSEndpointClient INSTANCE = new MockRSEndpointClient();
+
+    @Inject Logger logger;
 
     public static MockRSEndpointClient getInstance() {
         return INSTANCE;
@@ -38,6 +42,10 @@ public class MockRSEndpointClient implements RSEndpointClient {
         } catch (IOException e) {
             throw new ReportStreamEndpointClientException("Error writing the lab order", e);
         }
+
+        logger.logWarning(
+                "!@#$%^&*() THE BELOW REPORT ID is RaNdOmLy generated and will not populate into report stream !@#$%^&*()");
+
         return "{ \"reportId\": \"" + UUID.randomUUID() + "\" }";
     }
 

@@ -10,13 +10,11 @@ from locust.runners import MasterRunner
 
 HEALTH_ENDPOINT = "/health"
 AUTH_ENDPOINT = "/v1/auth/token"
-DEMOGRAPHICS_ENDPOINT = "/v1/etor/demographics"
 ORDERS_ENDPOINT = "/v1/etor/orders"
 RESULTS_ENDPOINT = "/v1/etor/results"
 METADATA_ENDPOINT = "/v1/etor/metadata"
 CONSOLIDATED_ENDPOINT = "/v1/etor/metadata/summary"
 
-demographics_request_body = None
 order_request_body = None
 result_request_body = None
 auth_request_body = None
@@ -57,14 +55,6 @@ class SampleUser(FastHttpUser):
     @task
     def get_health(self):
         self.client.get(HEALTH_ENDPOINT)
-
-    @task(5)
-    def post_v1_etor_demographics(self):
-        self.client.post(
-            DEMOGRAPHICS_ENDPOINT,
-            data=demographics_request_body,
-            headers={"Authorization": self.access_token},
-        )
 
     @task(5)
     def post_v1_etor_orders(self):
@@ -112,7 +102,6 @@ class SampleUser(FastHttpUser):
 
 @events.test_start.add_listener
 def test_start(environment):
-    global demographics_request_body
     global auth_request_body
     global order_request_body
     global result_request_body
@@ -121,7 +110,6 @@ def test_start(environment):
         # in a distributed run, the master does not typically need any test data
         return
 
-    demographics_request_body = get_demographics_request_body()
     auth_request_body = get_auth_request_body()
     order_request_body = get_orders_request_body()
     result_request_body = get_results_request_body()
@@ -149,12 +137,6 @@ def get_auth_request_body():
         {"scope": auth_scope, "client_assertion": auth_token.strip()}
     )
     return params.encode("utf-8")
-
-
-def get_demographics_request_body():
-    # read the sample request body for the demographics endpoint
-    with open("examples/Test/e2e/demographics/001_Patient_NBS.fhir", "r") as f:
-        return f.read()
 
 
 def get_orders_request_body():
