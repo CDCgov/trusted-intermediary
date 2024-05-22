@@ -236,6 +236,39 @@ class HapiHelperTest extends Specification {
         actualReceivingApplication.equalsDeep(expectedReceivingApplication)
     }
 
+    // MSH-6 - Receiving Facility
+    def "receiving facility's get, set and create work as expected"() {
+        when:
+        def msh6_1 = "msh6_1"
+        def bundle = new Bundle()
+
+        then:
+        HapiHelper.getMSH6Organization(bundle) == null
+        HapiHelper.getMSH6_1Identifier(bundle) == null
+
+        when:
+        HapiHelper.createMSHMessageHeader(bundle)
+
+        then:
+        HapiHelper.getMSH6Organization(bundle) == null
+
+        when:
+        def receivingFacility = HapiFhirHelper.createOrganization()
+        HapiFhirHelper.setMSH6Organization(bundle, receivingFacility)
+
+        then:
+        HapiHelper.getMSH6Organization(bundle).equalsDeep(receivingFacility)
+        HapiHelper.getMSH6_1Identifier(bundle) == null
+
+        when:
+        HapiFhirHelper.setMSH6_1Identifier(bundle, new Identifier())
+        HapiHelper.setMSH6_1Value(bundle, msh6_1)
+
+        then:
+        HapiHelper.getMSH6_1Identifier(bundle) != null
+        HapiFhirHelper.getMSH6_1Value(bundle) == msh6_1
+    }
+
     // MSH-9 - Message Type
     def "convert the pre-existing message type"() {
         given:

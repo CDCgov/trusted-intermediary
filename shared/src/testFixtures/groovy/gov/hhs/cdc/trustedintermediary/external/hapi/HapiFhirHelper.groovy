@@ -95,6 +95,15 @@ class HapiFhirHelper {
     }
 
     // MSH-6.1 - Namespace ID
+    static void setMSH6_1Identifier(Bundle bundle, Identifier identifier) {
+        Organization receivingFacility = HapiHelper.getMSH6Organization(bundle)
+        if (receivingFacility == null) {
+            return
+        }
+        setHD1Identifier(identifier)
+        receivingFacility.addIdentifier(identifier)
+    }
+
     static String getMSH6_1Value(Bundle bundle) {
         Identifier identifier = HapiHelper.getMSH6_1Identifier(bundle)
         if (identifier == null) {
