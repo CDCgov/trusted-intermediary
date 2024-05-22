@@ -7,7 +7,9 @@ import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.PractitionerRole
 import org.hl7.fhir.r4.model.Provenance
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.ServiceRequest
 import org.hl7.fhir.r4.model.StringType
@@ -255,10 +257,12 @@ class HapiHelperTest extends Specification {
         when:
         def receivingFacility = HapiFhirHelper.createOrganization()
         HapiFhirHelper.setMSH6Organization(bundle, receivingFacility)
+        HapiHelper.setMSH6_1Value(bundle, msh6_1)
 
         then:
         HapiHelper.getMSH6Organization(bundle).equalsDeep(receivingFacility)
         HapiHelper.getMSH6_1Identifier(bundle) == null
+        HapiFhirHelper.getMSH6_1Value(bundle) != msh6_1
 
         when:
         HapiFhirHelper.setMSH6_1Identifier(bundle, new Identifier())
@@ -545,6 +549,14 @@ class HapiHelperTest extends Specification {
         def sr = HapiFhirHelper.createBasedOnServiceRequest(dr)
 
         expect:
+        HapiHelper.getORC21Value(sr) == null
+
+        when:
+        def requester = HapiFhirHelper.createPractitionerRole()
+        Reference requesterReference = HapiFhirHelper.createPractitionerRoleReference(requester)
+        sr.setRequester(requesterReference)
+
+        then:
         HapiHelper.getORC21Value(sr) == null
 
         when:
