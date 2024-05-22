@@ -16,12 +16,12 @@ show_help() {
     echo "Usage: $(basename $0) <HURL_FILE> [OPTIONS]"
     echo
     echo "Options:"
-    echo "    -f <REL_PATH>         The path to the hl7/fhir file to submit, relative the root path (Required for waters API)"
+    echo "    -f <REL_PATH>         The path to the hl7/fhir file to submit, relative the root path (Required for orders and results APIs)"
+    echo "    -i <SUBMISSION_ID>    The submissionId to call the metadata API with (Required for orders, results and metadata API)"
     echo "    -r <ROOT_PATH>        The root path to the hl7/fhir files (Default: $root)"
     echo "    -e [local | staging]  The environment to run the test in (Default: $env)"
     echo "    -c <CLIENT>           The client id to use (Default: $client)"
     echo "    -j <JWT>              The JWT to use for authentication"
-    echo "    -i <SUBMISSION_ID>    The submissionId to call the metadata API with (Required for metadata API)"
     echo "    -v                    Verbose mode"
     echo "    -h                    Display this help and exit"
 }
@@ -47,6 +47,9 @@ while getopts ':f:r:e:c:j:i:vh' opt; do
     f)
         fpath="$OPTARG"
         ;;
+    i)
+        submission_id="--variable submissionid=$OPTARG"
+        ;;
     r)
         root="$OPTARG"
         ;;
@@ -58,9 +61,6 @@ while getopts ':f:r:e:c:j:i:vh' opt; do
         ;;
     j)
         jwt="$OPTARG"
-        ;;
-    i)
-        submission_id="--variable submissionid=$OPTARG"
         ;;
     v)
         verbose="--verbose"

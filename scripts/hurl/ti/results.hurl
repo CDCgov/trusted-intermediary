@@ -11,4 +11,5 @@ token: jsonpath "$['access_token']"
 
 POST {{url}}/v1/etor/results
 Authorization: Bearer {{token}}
+RecordId: {{submissionid}}
 file,{{fpath}};
