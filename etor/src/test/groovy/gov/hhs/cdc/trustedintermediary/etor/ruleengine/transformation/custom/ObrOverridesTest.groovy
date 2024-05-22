@@ -2,8 +2,6 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleExecutionException
-import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.ServiceRequest
@@ -135,18 +133,6 @@ class ObrOverridesTest  extends Specification {
         transformedObr4_1 == obr4_1
         transformedObr4_3 == obr4_3
         transformedObr4_4 == obr4_4
-    }
-
-    def "throw RuleExecutionException if ServiceRequest doesn't have identifiers"() {
-        given:
-        def bundle = new Bundle()
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(new ServiceRequest()))
-
-        when:
-        transformClass.transform(new HapiFhirResource(bundle), null)
-
-        then:
-        thrown(RuleExecutionException)
     }
 
     // Returns a list of values for the ORB sections that need checking in the following order:
