@@ -379,10 +379,8 @@ public class HapiHelper {
             return null;
         }
         Organization organization = getOrganization(practitionerRole);
-        if (organization == null || !organization.hasExtension(EXTENSION_XON_ORGANIZATION_URL)) {
-            return null;
-        }
-        if (!organization.hasExtension(EXTENSION_XON_ORGANIZATION_URL)
+        if (organization == null
+                || !organization.hasExtension(EXTENSION_XON_ORGANIZATION_URL)
                 || !organization
                         .getExtensionByUrl(EXTENSION_XON_ORGANIZATION_URL)
                         .hasExtension(EXTENSION_XON10_URL)) {

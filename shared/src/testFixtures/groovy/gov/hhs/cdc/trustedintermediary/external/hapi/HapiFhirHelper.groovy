@@ -227,13 +227,14 @@ class HapiFhirHelper {
 
     // ORC-21 - Ordering Facility Name
     static void setORC21Value(ServiceRequest serviceRequest, String value) {
-        PractitionerRole practitionerRole = new PractitionerRole()
-        Organization requester = createOrganization()
-        Reference reference = createOrganizationReference(requester)
-        serviceRequest.setRequester(reference)
-        requester.addExtension(HapiHelper.EXTENSION_XON_ORGANIZATION_URL, new Extension(HapiHelper.EXTENSION_XON_ORGANIZATION_URL, new StringType(value)))
+        PractitionerRole requester = createPractitionerRole()
+        Organization organization = createOrganization()
+        Reference organizationReference = createOrganizationReference(organization)
+        requester.setOrganization(organizationReference)
+        Reference requesterReference = createPractitionerRoleReference(requester)
+        serviceRequest.setRequester(requesterReference)
+        organization.addExtension().setUrl(HapiHelper.EXTENSION_XON_ORGANIZATION_URL).addExtension(HapiHelper.EXTENSION_XON10_URL, new StringType(value))
     }
-
 
     static Organization createOrganization() {
         Organization organization = new Organization()
@@ -246,6 +247,20 @@ class HapiFhirHelper {
         String organizationId = organization.getId()
         Reference organizationReference = new Reference("Organization/" + organizationId)
         organizationReference.setResource(organization)
+        return organizationReference
+    }
+
+    static PractitionerRole createPractitionerRole() {
+        PractitionerRole practitionerRole = new PractitionerRole()
+        String practitionerRoleId = UUID.randomUUID().toString()
+        practitionerRole.setId(practitionerRoleId)
+        return practitionerRole
+    }
+
+    static Reference createPractitionerRoleReference(PractitionerRole practitionerRole) {
+        String organizationId = practitionerRole.getId()
+        Reference organizationReference = new Reference("PractitionerRole/" + organizationId)
+        organizationReference.setResource(practitionerRole)
         return organizationReference
     }
 
