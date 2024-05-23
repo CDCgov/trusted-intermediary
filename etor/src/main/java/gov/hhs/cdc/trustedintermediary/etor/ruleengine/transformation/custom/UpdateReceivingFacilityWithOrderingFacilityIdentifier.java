@@ -22,7 +22,7 @@ public class UpdateReceivingFacilityWithOrderingFacilityIdentifier
         if (diagnosticReport == null) {
             return;
         }
-        ServiceRequest serviceRequest = HapiHelper.getBasedOnServiceRequest(diagnosticReport);
+        ServiceRequest serviceRequest = HapiHelper.getServiceRequest(diagnosticReport);
         if (serviceRequest == null) {
             return;
         }

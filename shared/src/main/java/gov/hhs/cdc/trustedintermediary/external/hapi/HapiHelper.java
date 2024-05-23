@@ -271,11 +271,11 @@ public class HapiHelper {
         return resourceInBundle(bundle, DiagnosticReport.class);
     }
 
-    public static ServiceRequest getBasedOnServiceRequest(DiagnosticReport diagnosticReport) {
+    public static ServiceRequest getServiceRequest(DiagnosticReport diagnosticReport) {
         return (ServiceRequest) diagnosticReport.getBasedOnFirstRep().getResource();
     }
 
-    public static PractitionerRole getPractitionerRoleRequester(ServiceRequest serviceRequest) {
+    public static PractitionerRole getPractitionerRole(ServiceRequest serviceRequest) {
         return (PractitionerRole) serviceRequest.getRequester().getResource();
     }
 
@@ -374,7 +374,7 @@ public class HapiHelper {
 
     // ORC-21 - Ordering Facility Name
     public static String getORC21Value(ServiceRequest serviceRequest) {
-        PractitionerRole practitionerRole = getPractitionerRoleRequester(serviceRequest);
+        PractitionerRole practitionerRole = getPractitionerRole(serviceRequest);
         if (practitionerRole == null) {
             return null;
         }
