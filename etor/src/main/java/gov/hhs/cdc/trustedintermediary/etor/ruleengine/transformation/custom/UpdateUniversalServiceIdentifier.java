@@ -16,7 +16,7 @@ import org.hl7.fhir.r4.model.StringType;
  * Override the Name of Coding System (OBR-4.3) and Alternate Identifier (OBR-4.4) In the Universal
  * Service Identifier (OBR-4)
  */
-public class OverrideRequestIdentifier implements CustomFhirTransformation {
+public class UpdateUniversalServiceIdentifier implements CustomFhirTransformation {
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
