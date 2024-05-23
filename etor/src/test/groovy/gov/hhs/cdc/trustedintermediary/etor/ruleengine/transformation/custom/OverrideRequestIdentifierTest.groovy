@@ -7,7 +7,7 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.ServiceRequest
 import spock.lang.Specification
 
-class ObrOverridesTest  extends Specification {
+class OverrideRequestIdentifierTest extends Specification {
     def transformClass
     def fhirResource
     def args = Map.of(
@@ -21,7 +21,7 @@ class ObrOverridesTest  extends Specification {
         TestApplicationContext.init()
         TestApplicationContext.injectRegisteredImplementations()
 
-        transformClass = new ObrOverrides()
+        transformClass = new OverrideRequestIdentifier()
         fhirResource = ExamplesHelper.getExampleFhirResource("../Test/Results/005_AL_ORU_R01_NBS_Simplified_1_hl7_translation.fhir")
     }
 
