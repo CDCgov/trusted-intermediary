@@ -47,16 +47,17 @@ public class HikariConnectionPool implements ConnectionPool {
 
         HikariConfig config = new HikariDataSource();
 
-        try {
-            String maxLife = ApplicationContext.getProperty("DB_MAX_LIFETIME");
-            if (maxLife != null && !maxLife.isEmpty()) {
-                config.setMaxLifetime(Long.parseLong(maxLife));
-            }
-        } catch (NumberFormatException e) {
-            LOGGER.logInfo("Using Hikari default DB Max Lifetime");
-        }
+        //        try {
+        //            String maxLife = ApplicationContext.getProperty("DB_MAX_LIFETIME");
+        //            if (maxLife != null && !maxLife.isEmpty()) {
+        //                config.setMaxLifetime(Long.parseLong(maxLife));
+        //            }
+        //        } catch (NumberFormatException e) {
+        //            LOGGER.logInfo("Using Hikari default DB Max Lifetime");
+        //        }
 
-        config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
+        config.setDataSourceClassName(
+                "gov.hhs.cdc.trustedintermediary.external.PasswordChangingPostgresDataSource");
         config.addDataSourceProperty("user", user);
         config.addDataSourceProperty("password", pass);
         config.addDataSourceProperty("serverName", serverName);
