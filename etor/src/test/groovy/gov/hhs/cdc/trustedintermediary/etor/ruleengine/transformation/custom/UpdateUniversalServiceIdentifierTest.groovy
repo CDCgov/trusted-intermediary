@@ -79,7 +79,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
         transformedObr4_4 == obr4_4
     }
 
-    def "override obr4 values when the code matches"() {
+    def "update obr4 values when the code matches"() {
         given:
         def bundle = fhirResource.getUnderlyingResource() as Bundle
         def result = getOrbSections(bundle)[2]
@@ -131,6 +131,33 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
         transformedObr4_1 == obr4_1
         transformedObr4_3 == obr4_3
         transformedObr4_4 == obr4_4
+    }
+
+    def "update values if the coding identifier is correct but the values are missing"() {
+        given:
+        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def result = getOrbSections(bundle)[4]
+        def obr4_1 = result[0]
+        def obr4_3 = result[1]
+        def obr4_4 = result[2]
+
+        expect:
+        obr4_1 == "54089-8"
+        obr4_3 == null
+        obr4_4 == null
+
+        when:
+        transformClass.transform(fhirResource, args)
+        bundle = fhirResource.getUnderlyingResource() as Bundle
+        def transformedResult = getOrbSections(bundle)[4]
+        def transformedObr4_1 = transformedResult[0]
+        def transformedObr4_3 = transformedResult[1]
+        def transformedObr4_4 = transformedResult[2]
+
+        then:
+        transformedObr4_1 == obr4_1
+        transformedObr4_3 == "LN"
+        transformedObr4_4 == "CDPHGSPEAP"
     }
 
     // Returns a list of values for the ORB sections that need checking in the following order:
