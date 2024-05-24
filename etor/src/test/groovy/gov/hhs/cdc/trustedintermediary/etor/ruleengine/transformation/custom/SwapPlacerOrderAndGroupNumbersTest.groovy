@@ -34,8 +34,8 @@ class SwapPlacerOrderAndGroupNumbersTest extends Specification {
         expect:
         orc2_1 == "423787478"
         orc2_2 == "EPIC"
-        orc4_1 == "57128-1"
-        orc4_2 == "Newborn Screening Report summary panel"
+        orc4_1 == null
+        orc4_2 == null
 
         when:
         transformClass.transform(fhirResource, null)

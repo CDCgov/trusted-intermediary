@@ -151,6 +151,21 @@
           }
         }
       ]
+    },
+    {
+      "name": "ucsdOruUpdateReceivingFacilityWithOrderingFacilityIdentifier",
+      "description": "Updates Receiving Facility (MSH-6) to value in ORC-21.10 and remove content from MSH-6.2 and MSH-6.3",
+      "message": "",
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'"
+      ],
+      "rules": [
+        {
+          "name": "UpdateReceivingFacilityWithOrderingFacilityIdentifier",
+          "args": { }
+        }
+      ]
     }
   ]
 }

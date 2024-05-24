@@ -7,7 +7,9 @@ import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.PractitionerRole
 import org.hl7.fhir.r4.model.Provenance
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.ServiceRequest
 import org.hl7.fhir.r4.model.StringType
@@ -236,6 +238,41 @@ class HapiHelperTest extends Specification {
         actualReceivingApplication.equalsDeep(expectedReceivingApplication)
     }
 
+    // MSH-6 - Receiving Facility
+    def "receiving facility's get, set and create work as expected"() {
+        when:
+        def msh6_1 = "msh6_1"
+        def bundle = new Bundle()
+
+        then:
+        HapiHelper.getMSH6Organization(bundle) == null
+        HapiHelper.getMSH6_1Identifier(bundle) == null
+
+        when:
+        HapiHelper.createMSHMessageHeader(bundle)
+
+        then:
+        HapiHelper.getMSH6Organization(bundle) == null
+
+        when:
+        def receivingFacility = HapiFhirHelper.createOrganization()
+        HapiFhirHelper.setMSH6Organization(bundle, receivingFacility)
+        HapiHelper.setMSH6_1Value(bundle, msh6_1)
+
+        then:
+        HapiHelper.getMSH6Organization(bundle).equalsDeep(receivingFacility)
+        HapiHelper.getMSH6_1Identifier(bundle) == null
+        HapiFhirHelper.getMSH6_1Value(bundle) != msh6_1
+
+        when:
+        HapiFhirHelper.setMSH6_1Identifier(bundle, new Identifier())
+        HapiHelper.setMSH6_1Value(bundle, msh6_1)
+
+        then:
+        HapiHelper.getMSH6_1Identifier(bundle) != null
+        HapiFhirHelper.getMSH6_1Value(bundle) == msh6_1
+    }
+
     // MSH-9 - Message Type
     def "convert the pre-existing message type"() {
         given:
@@ -360,18 +397,12 @@ class HapiHelperTest extends Specification {
     }
 
     // PID-3.5 - Assigning Identifier Type Code
-    def "patient assigning authority methods work as expected"() {
+    def "patient assigning identifier methods work as expected"() {
         given:
-        def bundle = new Bundle()
         def pid3_5 = "pid3_5"
 
         when:
-        HapiFhirHelper.setPID3_5Coding(bundle, new Coding())
-
-        then:
-        HapiHelper.getPID3_5Coding(bundle) == null
-
-        when:
+        def bundle = new Bundle()
         HapiHelper.setPID3_5Value(bundle, pid3_5)
 
         then:
@@ -380,7 +411,6 @@ class HapiHelperTest extends Specification {
         when:
         HapiFhirHelper.createPIDPatient(bundle)
         HapiFhirHelper.setPID3Identifier(bundle, new Identifier())
-        HapiFhirHelper.setPID3_5Coding(bundle, new Coding())
         HapiHelper.setPID3_5Value(bundle, pid3_5)
 
         then:
@@ -454,7 +484,7 @@ class HapiHelperTest extends Specification {
         HapiFhirHelper.setORC2Identifier(serviceRequest, new Identifier())
 
         then:
-        HapiHelper.getORC2Identifier(serviceRequest) != null
+        HapiHelper.getORC2Identifiers(serviceRequest) != null
         HapiHelper.getORC2_1Value(serviceRequest) == null
         HapiHelper.getORC2_2Value(serviceRequest) == null
 
@@ -502,6 +532,31 @@ class HapiHelperTest extends Specification {
 
         then:
         HapiHelper.getORC4_2Value(sr) == orc4_2
+    }
+
+    def "orc-21 methods work as expected"() {
+        given:
+        def orc21 = "orc21"
+        def bundle = new Bundle()
+        def dr = HapiFhirHelper.createDiagnosticReport(bundle)
+        def sr = HapiFhirHelper.createBasedOnServiceRequest(dr)
+
+        expect:
+        HapiHelper.getORC21Value(sr) == null
+
+        when:
+        def requester = HapiFhirHelper.createPractitionerRole()
+        Reference requesterReference = HapiFhirHelper.createPractitionerRoleReference(requester)
+        sr.setRequester(requesterReference)
+
+        then:
+        HapiHelper.getORC21Value(sr) == null
+
+        when:
+        HapiFhirHelper.setORC21Value(sr, orc21)
+
+        then:
+        HapiHelper.getORC21Value(sr) == orc21
     }
 
     // HD - Hierarchic Designator
