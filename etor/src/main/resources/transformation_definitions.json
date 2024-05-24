@@ -139,7 +139,7 @@
       "message": "",
       "conditions": [
         "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
-        "Bundle.entry.resource.ofType(ServiceRequest).code = '54089-8'"
+        "Bundle.entry.resource.ofType(ServiceRequest).code.coding.where(code = '54089-8').exists()"
       ],
       "rules": [
         {
