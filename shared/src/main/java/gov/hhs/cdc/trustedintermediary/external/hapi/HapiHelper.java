@@ -191,14 +191,6 @@ public class HapiHelper {
     }
 
     // PID-3.5 - Identifier Type Code
-    public static String getPID3_5Value(Bundle bundle) {
-        Identifier identifier = getPID3Identifier(bundle);
-        if (identifier == null) {
-            return null;
-        }
-        return getCX5Value(identifier);
-    }
-
     public static void setPID3_5Value(Bundle bundle, String value) {
         Identifier identifier = getPID3Identifier(bundle);
         if (identifier == null) {
@@ -358,7 +350,7 @@ public class HapiHelper {
 
     public static String getCX5Value(Identifier identifier) {
         if (!identifier.hasExtension(EXTENSION_CX_IDENTIFIER_URL)
-                || identifier
+                || !identifier
                         .getExtensionByUrl(EXTENSION_CX_IDENTIFIER_URL)
                         .hasExtension(EXTENSION_CX5_URL)) {
             return null;
