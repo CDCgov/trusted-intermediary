@@ -10,6 +10,7 @@ import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.PractitionerRole
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ServiceRequest
 import org.hl7.fhir.r4.model.StringType
@@ -61,7 +62,8 @@ class HapiFhirHelper {
     // MSH-4 - Sending Facility
     static void setMSH4Organization(Bundle bundle, Organization sendingFacility) {
         MessageHeader messageHeader = HapiHelper.getMSHMessageHeader(bundle)
-        Reference organizationReference = createOrganizationReference(bundle, sendingFacility)
+        Reference organizationReference = createOrganizationReference(sendingFacility)
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(sendingFacility))
         messageHeader.setSender(organizationReference)
     }
 
@@ -82,18 +84,32 @@ class HapiFhirHelper {
     }
 
     // MSH-6 - Receiving Facility
-    static Organization getMSH6Organization(Bundle bundle) {
-        MessageHeader messageHeader = HapiHelper.getMSHMessageHeader(bundle)
-        return (Organization) messageHeader.getDestinationFirstRep().getReceiver().getResource()
-    }
-
     static void setMSH6Organization(Bundle bundle, Organization receivingFacility) {
         MessageHeader messageHeader = HapiHelper.getMSHMessageHeader(bundle)
-        Reference organizationReference = createOrganizationReference(bundle, receivingFacility)
+        Reference organizationReference = createOrganizationReference(receivingFacility)
         MessageHeader.MessageDestinationComponent destination =
                 new MessageHeader.MessageDestinationComponent()
         destination.setReceiver(organizationReference)
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(receivingFacility))
         messageHeader.setDestination(List.of(destination))
+    }
+
+    // MSH-6.1 - Namespace ID
+    static void setMSH6_1Identifier(Bundle bundle, Identifier identifier) {
+        Organization receivingFacility = HapiHelper.getMSH6Organization(bundle)
+        if (receivingFacility == null) {
+            return
+        }
+        setHD1Identifier(identifier)
+        receivingFacility.addIdentifier(identifier)
+    }
+
+    static String getMSH6_1Value(Bundle bundle) {
+        Identifier identifier = HapiHelper.getMSH6_1Identifier(bundle)
+        if (identifier == null) {
+            return null
+        }
+        return identifier.getValue()
     }
 
     // PID - Patient
@@ -118,9 +134,10 @@ class HapiFhirHelper {
         if (patientIdentifier == null) {
             return
         }
-        Organization organization = new Organization()
+        Organization organization = createOrganization()
         organization.setIdentifier(List.of(identifier))
-        Reference orgReference = createOrganizationReference(bundle, organization)
+        Reference orgReference = createOrganizationReference(organization)
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(organization))
         patientIdentifier.setAssigner(orgReference)
     }
 
@@ -188,24 +205,27 @@ class HapiFhirHelper {
         serviceRequest.addIdentifier(identifier)
     }
 
-    static DiagnosticReport getDiagnosticReport(Bundle bundle) {
-        return HapiHelper.resourceInBundle(bundle, DiagnosticReport.class)
-    }
-
     static DiagnosticReport createDiagnosticReport(Bundle bundle) {
         DiagnosticReport diagnosticReport = new DiagnosticReport()
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(diagnosticReport))
         return diagnosticReport
     }
 
-    static ServiceRequest getBasedOnServiceRequest(DiagnosticReport diagnosticReport) {
-        return (ServiceRequest) diagnosticReport.getBasedOnFirstRep().getResource()
-    }
-
     static ServiceRequest createBasedOnServiceRequest(DiagnosticReport diagnosticReport) {
         ServiceRequest serviceRequest = new ServiceRequest()
         diagnosticReport.setBasedOn(List.of(new Reference(serviceRequest)))
         return serviceRequest
+    }
+
+    // ORC-21 - Ordering Facility Name
+    static void setORC21Value(ServiceRequest serviceRequest, String value) {
+        PractitionerRole requester = createPractitionerRole()
+        Organization organization = createOrganization()
+        Reference organizationReference = createOrganizationReference(organization)
+        requester.setOrganization(organizationReference)
+        Reference requesterReference = createPractitionerRoleReference(requester)
+        serviceRequest.setRequester(requesterReference)
+        organization.addExtension().setUrl(HapiHelper.EXTENSION_XON_ORGANIZATION_URL).addExtension(HapiHelper.EXTENSION_XON10_URL, new StringType(value))
     }
 
     static Organization createOrganization() {
@@ -215,19 +235,31 @@ class HapiFhirHelper {
         return organization
     }
 
+    static Reference createOrganizationReference(Organization organization) {
+        String organizationId = organization.getId()
+        Reference organizationReference = new Reference("Organization/" + organizationId)
+        organizationReference.setResource(organization)
+        return organizationReference
+    }
+
+    static PractitionerRole createPractitionerRole() {
+        PractitionerRole practitionerRole = new PractitionerRole()
+        String practitionerRoleId = UUID.randomUUID().toString()
+        practitionerRole.setId(practitionerRoleId)
+        return practitionerRole
+    }
+
+    static Reference createPractitionerRoleReference(PractitionerRole practitionerRole) {
+        String organizationId = practitionerRole.getId()
+        Reference organizationReference = new Reference("PractitionerRole/" + organizationId)
+        organizationReference.setResource(practitionerRole)
+        return organizationReference
+    }
+
     static MessageHeader.MessageDestinationComponent createMessageDestinationComponent() {
         MessageHeader.MessageDestinationComponent destination =
                 new MessageHeader.MessageDestinationComponent()
         destination.setId(UUID.randomUUID().toString())
         return destination
-    }
-
-    static Reference createOrganizationReference(
-            Bundle bundle, Organization organization) {
-        String organizationId = organization.getId()
-        Reference organizationReference = new Reference("Organization/" + organizationId)
-        organizationReference.setResource(organization)
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(organization))
-        return organizationReference
     }
 }
