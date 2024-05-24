@@ -32,7 +32,10 @@ public class HapiHelper {
             "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id";
     public static final String EXTENSION_XPN_HUMAN_NAME_URL =
             "https://reportstream.cdc.gov/fhir/StructureDefinition/xpn-human-name";
+    public static final String EXTENSION_CX_IDENTIFIER_URL =
+            "https://reportstream.cdc.gov/fhir/StructureDefinition/cx-identifier";
     public static final String EXTENSION_XPN7_URL = "XPN.7";
+    public static final String EXTENSION_CX5_URL = "CX.5";
     public static final StringType EXTENSION_HD1_DATA_TYPE = new StringType("HD.1");
     public static final StringType EXTENSION_ORC2_DATA_TYPE = new StringType("ORC.2");
     public static final StringType EXTENSION_ORC4_DATA_TYPE = new StringType("ORC.4");
@@ -188,20 +191,20 @@ public class HapiHelper {
     }
 
     // PID-3.5 - Identifier Type Code
-    public static Coding getPID3_5Coding(Bundle bundle) {
+    public static String getPID3_5Value(Bundle bundle) {
         Identifier identifier = getPID3Identifier(bundle);
         if (identifier == null) {
             return null;
         }
-        return identifier.getType().getCodingFirstRep();
+        return getCX5Value(identifier);
     }
 
     public static void setPID3_5Value(Bundle bundle, String value) {
-        Coding coding = getPID3_5Coding(bundle);
-        if (coding == null) {
+        Identifier identifier = getPID3Identifier(bundle);
+        if (identifier == null) {
             return;
         }
-        coding.setCode(value);
+        setCX5Value(identifier, value);
     }
 
     // PID-5 - Patient Name
@@ -350,6 +353,38 @@ public class HapiHelper {
         identifier
                 .getExtensionByUrl(EXTENSION_ASSIGNING_AUTHORITY_URL)
                 .getExtensionByUrl(EXTENSION_NAMESPACE_ID_URL)
+                .setValue(new StringType(value));
+    }
+
+    public static String getCX5Value(Identifier identifier) {
+        if (!identifier.hasExtension(EXTENSION_CX_IDENTIFIER_URL)
+                || identifier
+                        .getExtensionByUrl(EXTENSION_CX_IDENTIFIER_URL)
+                        .hasExtension(EXTENSION_CX5_URL)) {
+            return null;
+        }
+        return identifier
+                .getExtensionByUrl(EXTENSION_CX_IDENTIFIER_URL)
+                .getExtensionByUrl(EXTENSION_CX5_URL)
+                .getValue()
+                .primitiveValue();
+    }
+
+    public static void setCX5Value(Identifier identifier, String value) {
+        if (!identifier.hasExtension(EXTENSION_CX_IDENTIFIER_URL)) {
+            identifier.addExtension().setUrl(EXTENSION_CX_IDENTIFIER_URL);
+        }
+        if (!identifier
+                .getExtensionByUrl(EXTENSION_CX_IDENTIFIER_URL)
+                .hasExtension(EXTENSION_CX5_URL)) {
+            identifier
+                    .getExtensionByUrl(EXTENSION_CX_IDENTIFIER_URL)
+                    .addExtension()
+                    .setUrl(EXTENSION_CX5_URL);
+        }
+        identifier
+                .getExtensionByUrl(EXTENSION_CX_IDENTIFIER_URL)
+                .getExtensionByUrl(EXTENSION_CX5_URL)
                 .setValue(new StringType(value));
     }
 
