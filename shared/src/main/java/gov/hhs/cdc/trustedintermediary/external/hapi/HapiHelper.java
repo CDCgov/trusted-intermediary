@@ -257,52 +257,43 @@ public class HapiHelper {
     }
 
     // ORC-4 - Placer Group Number
-    public static Coding getORC4Coding(ServiceRequest serviceRequest) {
-        List<Coding> codings = serviceRequest.getCode().getCoding();
-        if (codings.isEmpty()) {
-            return null;
-        }
-        return codings.get(0);
-    }
-
-    public static void setORC4Coding(ServiceRequest serviceRequest, Coding coding) {
-        serviceRequest.getCode().setCoding(List.of(coding));
+    public static Identifier getORC4Identifier(ServiceRequest serviceRequest) {
+        List<Identifier> identifiers = serviceRequest.getIdentifier();
+        return getHl7FieldIdentifier(identifiers, EXTENSION_ORC4_DATA_TYPE);
     }
 
     // ORC-4.1 - Entity Identifier
     public static String getORC4_1Value(ServiceRequest serviceRequest) {
-        Coding coding = getORC4Coding(serviceRequest);
-        if (coding == null) {
+        Identifier identifier = getORC4Identifier(serviceRequest);
+        if (identifier == null) {
             return null;
         }
-        return coding.getCode();
+        return getEI1Value(identifier);
     }
 
     public static void setORC4_1Value(ServiceRequest serviceRequest, String value) {
-        Coding coding = getORC4Coding(serviceRequest);
-        if (coding == null) {
-            coding = new Coding();
-            setORC4Coding(serviceRequest, coding);
+        Identifier identifier = getORC4Identifier(serviceRequest);
+        if (identifier == null) {
+            return;
         }
-        coding.setCode(value);
+        setEI1Value(identifier, value);
     }
 
     // ORC-4.2 - Namespace ID
     public static String getORC4_2Value(ServiceRequest serviceRequest) {
-        Coding coding = getORC4Coding(serviceRequest);
-        if (coding == null) {
+        Identifier identifier = getORC4Identifier(serviceRequest);
+        if (identifier == null) {
             return null;
         }
-        return coding.getDisplay();
+        return getEI2Value(identifier);
     }
 
     public static void setORC4_2Value(ServiceRequest serviceRequest, String value) {
-        Coding coding = getORC4Coding(serviceRequest);
-        if (coding == null) {
-            coding = new Coding();
-            setORC4Coding(serviceRequest, coding);
+        Identifier identifier = getORC4Identifier(serviceRequest);
+        if (identifier == null) {
+            return;
         }
-        coding.setDisplay(value);
+        setEI2Value(identifier, value);
     }
 
     // HD - Hierarchic Designator
