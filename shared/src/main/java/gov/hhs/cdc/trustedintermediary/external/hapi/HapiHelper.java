@@ -262,6 +262,12 @@ public class HapiHelper {
         return getHl7FieldIdentifier(identifiers, EXTENSION_ORC4_DATA_TYPE);
     }
 
+    public static Identifier createORC4Identifier() {
+        Identifier identifier = new Identifier();
+        setHl7FieldExtensionValue(identifier, EXTENSION_ORC4_DATA_TYPE);
+        return identifier;
+    }
+
     // ORC-4.1 - Entity Identifier
     public static String getORC4_1Value(ServiceRequest serviceRequest) {
         Identifier identifier = getORC4Identifier(serviceRequest);
@@ -274,7 +280,8 @@ public class HapiHelper {
     public static void setORC4_1Value(ServiceRequest serviceRequest, String value) {
         Identifier identifier = getORC4Identifier(serviceRequest);
         if (identifier == null) {
-            return;
+            identifier = createORC4Identifier();
+            serviceRequest.addIdentifier(identifier);
         }
         setEI1Value(identifier, value);
     }
@@ -291,7 +298,8 @@ public class HapiHelper {
     public static void setORC4_2Value(ServiceRequest serviceRequest, String value) {
         Identifier identifier = getORC4Identifier(serviceRequest);
         if (identifier == null) {
-            return;
+            identifier = createORC4Identifier();
+            serviceRequest.addIdentifier(identifier);
         }
         setEI2Value(identifier, value);
     }
@@ -371,7 +379,8 @@ public class HapiHelper {
                 .setValue(new StringType(value));
     }
 
-    static Identifier getHl7FieldIdentifier(List<Identifier> identifiers, StringType dataType) {
+    public static Identifier getHl7FieldIdentifier(
+            List<Identifier> identifiers, StringType dataType) {
         for (Identifier identifier : identifiers) {
             if (identifier.hasExtension(EXTENSION_HL7_FIELD_URL)
                     && identifier
@@ -382,5 +391,12 @@ public class HapiHelper {
             }
         }
         return null;
+    }
+
+    public static void setHl7FieldExtensionValue(Identifier identifier, StringType dataType) {
+        if (!identifier.hasExtension(EXTENSION_HL7_FIELD_URL)) {
+            identifier.addExtension().setUrl(EXTENSION_HL7_FIELD_URL);
+        }
+        identifier.getExtensionByUrl(EXTENSION_HL7_FIELD_URL).setValue(dataType);
     }
 }
