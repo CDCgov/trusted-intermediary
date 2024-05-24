@@ -34,34 +34,18 @@ public class UpdateUniversalServiceIdentifier implements CustomFhirTransformatio
                     }
 
                     // check for the coding system label and create or override it
-                    var codingSystemLabel =
-                            codingSystemContainer.getExtensionByUrl(
-                                    HapiHelper.EXTENSION_CODING_SYSTEM);
-                    if (codingSystemLabel == null) {
-                        codingSystemLabel = new Extension();
-                        codingSystemLabel.setUrl(HapiHelper.EXTENSION_CODING_SYSTEM);
-                        codingSystemContainer.addExtension(codingSystemLabel);
-                    }
-                    codingSystemLabel.setValue(new StringType(args.get("codingSystem")));
+                    updateCodingSystemLabel(codingSystemContainer, args.get("codingSystem"));
 
                     // the alt id is stored on a separate coding object, so we need to filter
                     // for it
-                    var altCodingContainer = getAltCodingContainer(allCodings);
-
-                    if (altCodingContainer == null) {
-                        // build a Coding object with an "alt-coding" extension
-                        altCodingContainer = new Coding();
-                        var altCodingExtension = new Extension();
-                        altCodingExtension.setUrl(HapiHelper.EXTENSION_CWE_CODING);
-                        altCodingExtension.setValue(
-                                new StringType(HapiHelper.EXTENSION_ALT_CODING));
-                        altCodingContainer.addExtension(altCodingExtension);
-                        allCodings.add(altCodingContainer);
-                    }
-                    altCodingContainer.setCode(args.get("alternateId"));
+                    updateAlternateCodingId(allCodings, args);
                 });
     }
 
+    /**
+     * Extract the first "Coding System" object that matches a given string from a given list of
+     * Codings
+     */
     private Coding getCodingSystemContainer(List<Coding> allCodings, String checkValue) {
         return allCodings.stream()
                 .filter(ext -> Objects.equals(ext.getCode(), checkValue))
@@ -69,6 +53,19 @@ public class UpdateUniversalServiceIdentifier implements CustomFhirTransformatio
                 .orElse(null);
     }
 
+    /** Find and create or update the "Coding System" object in a given List */
+    private void updateCodingSystemLabel(Coding codingSystemContainer, String codingSystem) {
+        var codingSystemLabel =
+                codingSystemContainer.getExtensionByUrl(HapiHelper.EXTENSION_CODING_SYSTEM);
+        if (codingSystemLabel == null) {
+            codingSystemLabel = new Extension();
+            codingSystemLabel.setUrl(HapiHelper.EXTENSION_CODING_SYSTEM);
+            codingSystemContainer.addExtension(codingSystemLabel);
+        }
+        codingSystemLabel.setValue(new StringType(codingSystem));
+    }
+
+    /** Extract the first "Alternate Id" object in a given list of Codings */
     private Coding getAltCodingContainer(List<Coding> allCodings) {
         return allCodings.stream()
                 .filter(
@@ -81,5 +78,21 @@ public class UpdateUniversalServiceIdentifier implements CustomFhirTransformatio
                                                                 HapiHelper.EXTENSION_ALT_CODING)))
                 .findFirst()
                 .orElse(null);
+    }
+
+    /** Find and create or update the "Alternate Id" object in a given List */
+    private void updateAlternateCodingId(List<Coding> allCodings, Map<String, String> args) {
+        var altCodingContainer = getAltCodingContainer(allCodings);
+
+        if (altCodingContainer == null) {
+            // build a Coding object with an "alt-coding" extension
+            altCodingContainer = new Coding();
+            var altCodingExtension = new Extension();
+            altCodingExtension.setUrl(HapiHelper.EXTENSION_CWE_CODING);
+            altCodingExtension.setValue(new StringType(HapiHelper.EXTENSION_ALT_CODING));
+            altCodingContainer.addExtension(altCodingExtension);
+            allCodings.add(altCodingContainer);
+        }
+        altCodingContainer.setCode(args.get("alternateId"));
     }
 }
