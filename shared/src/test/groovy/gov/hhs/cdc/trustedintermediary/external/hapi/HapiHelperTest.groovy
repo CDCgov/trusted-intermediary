@@ -452,7 +452,7 @@ class HapiHelperTest extends Specification {
         HapiFhirHelper.setORC2Identifier(serviceRequest, new Identifier())
 
         then:
-        HapiHelper.getORC2Identifier(serviceRequest) != null
+        HapiHelper.getORC2Identifiers(serviceRequest) != null
         HapiHelper.getORC2_1Value(serviceRequest) == null
         HapiHelper.getORC2_2Value(serviceRequest) == null
 

@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
@@ -217,49 +218,49 @@ public class HapiHelper {
     }
 
     // ORC-2 - Placer Order Number
-    public static Identifier getORC2Identifier(ServiceRequest serviceRequest) {
+    public static List<Identifier> getORC2Identifiers(ServiceRequest serviceRequest) {
         List<Identifier> identifiers = serviceRequest.getIdentifier();
-        return getHl7FieldIdentifier(identifiers, EXTENSION_ORC2_DATA_TYPE);
+        return getHl7FieldIdentifiers(identifiers, EXTENSION_ORC2_DATA_TYPE);
     }
 
     // ORC-2.1 - Entity Identifier
     public static String getORC2_1Value(ServiceRequest serviceRequest) {
-        Identifier identifier = getORC2Identifier(serviceRequest);
-        if (identifier == null) {
+        List<Identifier> identifiers = getORC2Identifiers(serviceRequest);
+        if (identifiers.isEmpty()) {
             return null;
         }
-        return getEI1Value(identifier);
+        return getEI1Value(identifiers.get(0));
     }
 
     public static void setORC2_1Value(ServiceRequest serviceRequest, String value) {
-        Identifier identifier = getORC2Identifier(serviceRequest);
-        if (identifier == null) {
+        List<Identifier> identifiers = getORC2Identifiers(serviceRequest);
+        if (identifiers.isEmpty()) {
             return;
         }
-        setEI1Value(identifier, value);
+        identifiers.forEach(identifier -> setEI1Value(identifier, value));
     }
 
     // ORC-2.2 - Namespace ID
     public static String getORC2_2Value(ServiceRequest serviceRequest) {
-        Identifier identifier = getORC2Identifier(serviceRequest);
-        if (identifier == null) {
+        List<Identifier> identifiers = getORC2Identifiers(serviceRequest);
+        if (identifiers.isEmpty()) {
             return null;
         }
-        return getEI2Value(identifier);
+        return getEI2Value(identifiers.get(0));
     }
 
     public static void setORC2_2Value(ServiceRequest serviceRequest, String value) {
-        Identifier identifier = getORC2Identifier(serviceRequest);
-        if (identifier == null) {
+        List<Identifier> identifiers = getORC2Identifiers(serviceRequest);
+        if (identifiers.isEmpty()) {
             return;
         }
-        setEI2Value(identifier, value);
+        identifiers.forEach(identifier -> setEI2Value(identifier, value));
     }
 
     // ORC-4 - Placer Group Number
-    public static Identifier getORC4Identifier(ServiceRequest serviceRequest) {
+    public static List<Identifier> getORC4Identifiers(ServiceRequest serviceRequest) {
         List<Identifier> identifiers = serviceRequest.getIdentifier();
-        return getHl7FieldIdentifier(identifiers, EXTENSION_ORC4_DATA_TYPE);
+        return getHl7FieldIdentifiers(identifiers, EXTENSION_ORC4_DATA_TYPE);
     }
 
     public static Identifier createORC4Identifier() {
@@ -270,43 +271,50 @@ public class HapiHelper {
 
     // ORC-4.1 - Entity Identifier
     public static String getORC4_1Value(ServiceRequest serviceRequest) {
-        Identifier identifier = getORC4Identifier(serviceRequest);
-        if (identifier == null) {
+        List<Identifier> identifiers = getORC4Identifiers(serviceRequest);
+        if (identifiers.isEmpty()) {
             return null;
         }
-        return getEI1Value(identifier);
+        return getEI1Value(identifiers.get(0));
     }
 
     public static void setORC4_1Value(ServiceRequest serviceRequest, String value) {
-        Identifier identifier = getORC4Identifier(serviceRequest);
-        if (identifier == null) {
-            identifier = createORC4Identifier();
+        List<Identifier> identifiers = getORC4Identifiers(serviceRequest);
+        if (identifiers.isEmpty()) {
+            Identifier identifier = createORC4Identifier();
+            identifiers.add(identifier);
             serviceRequest.addIdentifier(identifier);
         }
-        setEI1Value(identifier, value);
+        identifiers.forEach(identifier -> setEI1Value(identifier, value));
     }
 
     // ORC-4.2 - Namespace ID
     public static String getORC4_2Value(ServiceRequest serviceRequest) {
-        Identifier identifier = getORC4Identifier(serviceRequest);
-        if (identifier == null) {
+        List<Identifier> identifiers = getORC4Identifiers(serviceRequest);
+        if (identifiers.isEmpty()) {
             return null;
         }
-        return getEI2Value(identifier);
+        return getEI2Value(identifiers.get(0));
     }
 
     public static void setORC4_2Value(ServiceRequest serviceRequest, String value) {
-        Identifier identifier = getORC4Identifier(serviceRequest);
-        if (identifier == null) {
-            identifier = createORC4Identifier();
+        List<Identifier> identifiers = getORC4Identifiers(serviceRequest);
+        if (identifiers.isEmpty()) {
+            Identifier identifier = createORC4Identifier();
+            identifiers.add(identifier);
             serviceRequest.addIdentifier(identifier);
         }
-        setEI2Value(identifier, value);
+        identifiers.forEach(identifier -> setEI2Value(identifier, value));
     }
 
     // HD - Hierarchic Designator
     public static Identifier getHD1Identifier(List<Identifier> identifiers) {
-        return getHl7FieldIdentifier(identifiers, EXTENSION_HD1_DATA_TYPE);
+        List<Identifier> hd1Identifiers =
+                getHl7FieldIdentifiers(identifiers, EXTENSION_HD1_DATA_TYPE);
+        if (hd1Identifiers.isEmpty()) {
+            return null;
+        }
+        return hd1Identifiers.get(0);
     }
 
     // EI - Entity Identifier
@@ -379,18 +387,17 @@ public class HapiHelper {
                 .setValue(new StringType(value));
     }
 
-    public static Identifier getHl7FieldIdentifier(
+    public static List<Identifier> getHl7FieldIdentifiers(
             List<Identifier> identifiers, StringType dataType) {
-        for (Identifier identifier : identifiers) {
-            if (identifier.hasExtension(EXTENSION_HL7_FIELD_URL)
-                    && identifier
-                            .getExtensionByUrl(EXTENSION_HL7_FIELD_URL)
-                            .getValue()
-                            .equalsDeep(dataType)) {
-                return identifier;
-            }
-        }
-        return null;
+        return identifiers.stream()
+                .filter(
+                        identifier ->
+                                identifier.hasExtension(EXTENSION_HL7_FIELD_URL)
+                                        && identifier
+                                                .getExtensionByUrl(EXTENSION_HL7_FIELD_URL)
+                                                .getValue()
+                                                .equalsDeep(dataType))
+                .collect(Collectors.toList());
     }
 
     public static void setHl7FieldExtensionValue(Identifier identifier, StringType dataType) {
