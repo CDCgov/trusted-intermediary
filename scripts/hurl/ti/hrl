@@ -9,22 +9,19 @@ fi
 # default values
 env=local
 root=$CDCTI_HOME/examples/Test/
-client_id=flexion
-client_sender=simulated-lab
+client=report-stream
 verbose=""
-submission_id=""
 
 show_help() {
     echo "Usage: $(basename $0) <HURL_FILE> [OPTIONS]"
     echo
     echo "Options:"
-    echo "    -f <REL_PATH>         The path to the hl7/fhir file to submit, relative the root path (Required for waters API)"
+    echo "    -f <REL_PATH>         The path to the hl7/fhir file to submit, relative the root path (Required for orders and results APIs)"
+    echo "    -i <SUBMISSION_ID>    The submissionId to call the metadata API with (Required for orders, results and metadata API)"
     echo "    -r <ROOT_PATH>        The root path to the hl7/fhir files (Default: $root)"
     echo "    -e [local | staging]  The environment to run the test in (Default: $env)"
-    echo "    -c <CLIENT_ID>        The client id to use (Default: $client_id)"
-    echo "    -s <CLIENT_SENDER>    The client sender to use (Default: $client_sender)"
-    echo "    -x <KEY_PATH>         The path to the client private key for the environment"
-    echo "    -i <SUBMISSION_ID>    The submissionId to call the history API with (Required for history API)"
+    echo "    -c <CLIENT>           The client id to use (Default: $client)"
+    echo "    -j <JWT>              The JWT to use for authentication"
     echo "    -v                    Verbose mode"
     echo "    -h                    Display this help and exit"
 }
@@ -45,10 +42,13 @@ fi
 hurl_file="$1" # Assign the first argument to hurl_file
 shift          # Remove the first argument from the list of arguments
 
-while getopts ':f:r:e:c:s:x:i:vh' opt; do
+while getopts ':f:r:e:c:j:i:vh' opt; do
     case "$opt" in
     f)
         fpath="$OPTARG"
+        ;;
+    i)
+        submission_id="--variable submissionid=$OPTARG"
         ;;
     r)
         root="$OPTARG"
@@ -57,16 +57,10 @@ while getopts ':f:r:e:c:s:x:i:vh' opt; do
         env="$OPTARG"
         ;;
     c)
-        client_id="$OPTARG"
+        client="$OPTARG"
         ;;
-    s)
-        client_sender="$OPTARG"
-        ;;
-    x)
-        secret="$OPTARG"
-        ;;
-    i)
-        submission_id="--variable submissionid=$OPTARG"
+    j)
+        jwt="$OPTARG"
         ;;
     v)
         verbose="--verbose"
@@ -91,12 +85,12 @@ shift "$(($OPTIND - 1))"
 
 if [ "$env" = "local" ]; then
     host=localhost
-    url=http://$host:7071
-    if [ -z "$secret" ] && [ "$client_id" = "flexion" ]; then
-        secret="$CDCTI_HOME/mock_credentials/organization-trusted-intermediary-private-key-local.pem"
+    url=http://$host:8080
+    if [ -z "$jwt" ] && [ "$client" = "report-stream" ]; then
+        jwt=$(cat "$CDCTI_HOME/mock_credentials/report-stream-valid-token.jwt")
     fi
 elif [ "$env" = "staging" ]; then
-    host=staging.prime.cdc.gov
+    host=cdcti-stg-api.azurewebsites.net
     url=https://$host:443
 else
     echo "Error: Invalid environment $env"
@@ -104,8 +98,8 @@ else
     exit 1
 fi
 
-if [ -z "$secret" ]; then
-    echo "Error: Please provide the private key for $client_id"
+if [ -z "$jwt" ]; then
+    echo "Error: Please provide the JWT for $client"
     exit 1
 fi
 
@@ -113,10 +107,9 @@ hurl \
     --variable fpath=$fpath \
     --file-root $root \
     --variable url=$url \
-    --variable client-id=$client_id \
-    --variable client-sender=$client_sender \
-    --variable jwt=$(jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 -k $client_id.$client_sender -i $client_id.$client_sender -s $client_id.$client_sender -a $host --no-iat -S @$secret) \
-    $verbose \
+    --variable client=$client \
+    --variable jwt=$jwt \
     $submission_id \
+    $verbose \
     $hurl_file \
     $@
