@@ -397,18 +397,12 @@ class HapiHelperTest extends Specification {
     }
 
     // PID-3.5 - Assigning Identifier Type Code
-    def "patient assigning authority methods work as expected"() {
+    def "patient assigning identifier methods work as expected"() {
         given:
-        def bundle = new Bundle()
         def pid3_5 = "pid3_5"
 
         when:
-        HapiFhirHelper.setPID3_5Coding(bundle, new Coding())
-
-        then:
-        HapiHelper.getPID3_5Coding(bundle) == null
-
-        when:
+        def bundle = new Bundle()
         HapiHelper.setPID3_5Value(bundle, pid3_5)
 
         then:
@@ -417,7 +411,6 @@ class HapiHelperTest extends Specification {
         when:
         HapiFhirHelper.createPIDPatient(bundle)
         HapiFhirHelper.setPID3Identifier(bundle, new Identifier())
-        HapiFhirHelper.setPID3_5Coding(bundle, new Coding())
         HapiHelper.setPID3_5Value(bundle, pid3_5)
 
         then:
@@ -491,7 +484,7 @@ class HapiHelperTest extends Specification {
         HapiFhirHelper.setORC2Identifier(serviceRequest, new Identifier())
 
         then:
-        HapiHelper.getORC2Identifier(serviceRequest) != null
+        HapiHelper.getORC2Identifiers(serviceRequest) != null
         HapiHelper.getORC2_1Value(serviceRequest) == null
         HapiHelper.getORC2_2Value(serviceRequest) == null
 
