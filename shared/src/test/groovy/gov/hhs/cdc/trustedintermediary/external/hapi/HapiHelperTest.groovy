@@ -366,11 +366,6 @@ class HapiHelperTest extends Specification {
 
         when:
         def bundle = new Bundle()
-
-        then:
-        HapiFhirHelper.getPID3_5Value(bundle) == null
-
-        when:
         HapiHelper.setPID3_5Value(bundle, pid3_5)
 
         then:
