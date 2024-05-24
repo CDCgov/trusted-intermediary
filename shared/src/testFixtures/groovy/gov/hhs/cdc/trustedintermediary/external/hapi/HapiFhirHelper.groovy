@@ -133,20 +133,12 @@ class HapiFhirHelper {
     }
 
     // PID-3.5 - Identifier Type Code
-    static void setPID3_5Coding(Bundle bundle, Coding coding) {
+    static String getPID3_5Value(Bundle bundle) {
         Identifier identifier = HapiHelper.getPID3Identifier(bundle)
         if (identifier == null) {
-            return
-        }
-        identifier.setType(new CodeableConcept().addCoding(coding))
-    }
-
-    static String getPID3_5Value(Bundle bundle) {
-        Coding coding = HapiHelper.getPID3_5Coding(bundle)
-        if (coding == null) {
             return null
         }
-        return coding.getCode()
+        return HapiHelper.getCX5Value(identifier)
     }
 
     // PID-5 - Patient Name
