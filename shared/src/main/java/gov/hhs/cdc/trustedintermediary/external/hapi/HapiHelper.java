@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DiagnosticReport;
 import org.hl7.fhir.r4.model.Extension;
@@ -11,9 +12,11 @@ import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.PractitionerRole;
+import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ServiceRequest;
 import org.hl7.fhir.r4.model.StringType;
@@ -388,6 +391,19 @@ public class HapiHelper {
         return orc21Extension.getValue().primitiveValue();
     }
 
+    // OBR - Observation Request
+
+    // OBR-4 - Universal Service Identifier
+
+    // OBR-4.1 - Identifier
+    public static String getOBR4_1Value(ServiceRequest serviceRequest) {
+        CodeableConcept cc = serviceRequest.getCode();
+        if (cc == null || cc.getCoding().isEmpty()) {
+            return null;
+        }
+        return getCWE1Value(cc.getCoding().get(0));
+    }
+
     // HD - Hierarchic Designator
     public static Identifier getHD1Identifier(List<Identifier> identifiers) {
         List<Identifier> hd1Identifiers =
@@ -396,6 +412,11 @@ public class HapiHelper {
             return null;
         }
         return hd1Identifiers.get(0);
+    }
+
+    // CWE - Coded with Exceptions
+    public static String getCWE1Value(Coding coding) {
+        return coding.getCode();
     }
 
     // EI - Entity Identifier
@@ -488,7 +509,7 @@ public class HapiHelper {
         identifier.getExtensionByUrl(EXTENSION_HL7_FIELD_URL).setValue(dataType);
     }
 
-    static void removeHl7FieldIdentifier(List<Identifier> identifiers, StringType dataType) {
+    public static void removeHl7FieldIdentifier(List<Identifier> identifiers, StringType dataType) {
         identifiers.removeIf(
                 identifier ->
                         identifier.hasExtension(EXTENSION_HL7_FIELD_URL)
@@ -496,5 +517,12 @@ public class HapiHelper {
                                         .getExtensionByUrl(EXTENSION_HL7_FIELD_URL)
                                         .getValue()
                                         .equalsDeep(dataType));
+    }
+
+    public static Reference createObservationReference(Observation observation) {
+        String observationId = observation.getId();
+        Reference observationReference = new Reference("Observation/" + observationId);
+        observationReference.setResource(observation);
+        return observationReference;
     }
 }

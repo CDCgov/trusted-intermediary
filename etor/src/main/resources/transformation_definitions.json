@@ -74,8 +74,23 @@
       ]
     },
     {
+      "name": "ucsdOruUpdateReceivingFacilityWithOrderingFacilityIdentifier",
+      "description": "Updates UCSD ORU Receiving Facility (MSH-6) to value in ORC-21.10 and remove content from MSH-6.2 and MSH-6.3",
+      "message": "",
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'"
+      ],
+      "rules": [
+        {
+          "name": "UpdateReceivingFacilityWithOrderingFacilityIdentifier",
+          "args": { }
+        }
+      ]
+    },
+    {
       "name": "ucsdOruRemoveMessageTypeStructure",
-      "description": "Removes UCSD ORU's Message Structure (MSH-9.3) from the Message Type (MSH-9)",
+      "description": "Removes UCSD ORU Message Structure (MSH-9.3) from the Message Type (MSH-9)",
       "message": "",
       "conditions": [
         "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
@@ -89,23 +104,8 @@
       ]
     },
     {
-      "name": "ucsdOruSwapPlacerOrderAndGroupNumbers",
-      "description": "Swaps UCSD ORU's Placer Order Number (ORC-2) and Placer Group Number (ORC-4)",
-      "message": "",
-      "conditions": [
-        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
-        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'"
-      ],
-      "rules": [
-        {
-          "name": "SwapPlacerOrderAndGroupNumbers",
-          "args": { }
-        }
-      ]
-    },
-    {
       "name": "ucsdOruRemovePatientIdentifiers",
-      "description": "Removes UCSD ORU's Assigning Authority (PID-3.4) and Identifier Type Code (PID-3.5) from Patient Identifier List (PID-3)",
+      "description": "Removes UCSD ORU Assigning Authority (PID-3.4) and Identifier Type Code (PID-3.5) from Patient Identifier List (PID-3)",
       "message": "",
       "conditions": [
         "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
@@ -119,8 +119,24 @@
       ]
     },
     {
+      "name": "ucsdOruRemoveObservationRequests",
+      "description": "Removes UCSD ORU OBRs with the exception of the 54089-8 OBR",
+      "message": "",
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'",
+        "Bundle.entry.resource.ofType(ServiceRequest).code.coding.where(code = '54089-8').exists()"
+      ],
+      "rules": [
+        {
+          "name": "RemoveObservationRequests",
+          "args": { }
+        }
+      ]
+    },
+    {
       "name": "ucsdOruRemovePatientNameTypeCode",
-      "description": "Removes UCSD ORU's Name Type Code (PID-5.7) from Patient Name (PID-5)",
+      "description": "Removes UCSD ORU Name Type Code (PID-5.7) from Patient Name (PID-5)",
       "message": "",
       "conditions": [
         "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
@@ -134,8 +150,8 @@
       ]
     },
     {
-      "name": "ucsdOruUpdateReceivingFacilityWithOrderingFacilityIdentifier",
-      "description": "Updates Receiving Facility (MSH-6) to value in ORC-21.10 and remove content from MSH-6.2 and MSH-6.3",
+      "name": "ucsdOruSwapPlacerOrderAndGroupNumbers",
+      "description": "Swaps UCSD ORU Placer Order Number (ORC-2) and Placer Group Number (ORC-4)",
       "message": "",
       "conditions": [
         "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
@@ -143,7 +159,7 @@
       ],
       "rules": [
         {
-          "name": "UpdateReceivingFacilityWithOrderingFacilityIdentifier",
+          "name": "SwapPlacerOrderAndGroupNumbers",
           "args": { }
         }
       ]
