@@ -18,27 +18,27 @@ public class RemoveObservationRequests implements CustomFhirTransformation {
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
+
         Stream<DiagnosticReport> diagnosticReports =
                 HapiHelper.resourcesInBundle(bundle, DiagnosticReport.class);
+        List<Observation> observations =
+                HapiHelper.resourcesInBundle(bundle, Observation.class).toList();
 
         for (DiagnosticReport report : diagnosticReports.toList()) {
             ServiceRequest serviceRequest = HapiHelper.getServiceRequest(report);
-            if (serviceRequest == null) {
-                return;
-            }
-            String ob4_1 = HapiHelper.getOBR4_1Value(serviceRequest);
-            if ("54089-8".equals(ob4_1)) {
-                List<Observation> observations =
-                        HapiHelper.resourcesInBundle(bundle, Observation.class).toList();
-                List<Reference> references =
-                        observations.stream()
-                                .map(HapiHelper::createObservationReference)
-                                .collect(Collectors.toList());
-                report.setResult(references);
-            } else {
+            if (serviceRequest != null) {
+                String ob4_1 = HapiHelper.getOBR4_1Value(serviceRequest);
+                if ("54089-8".equals(ob4_1)) {
+                    List<Reference> references =
+                            observations.stream()
+                                    .map(HapiHelper::createObservationReference)
+                                    .collect(Collectors.toList());
+                    report.setResult(references);
+                    continue;
+                }
                 bundle.getEntry().removeIf(entry -> entry.getResource().equalsDeep(serviceRequest));
-                bundle.getEntry().removeIf(entry -> entry.getResource().equalsDeep(report));
             }
+            bundle.getEntry().removeIf(entry -> entry.getResource().equalsDeep(report));
         }
     }
 }
