@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi
 
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DiagnosticReport
 import org.hl7.fhir.r4.model.Extension
@@ -225,6 +226,11 @@ class HapiFhirHelper {
         Reference requesterReference = createPractitionerRoleReference(requester)
         serviceRequest.setRequester(requesterReference)
         organization.addExtension().setUrl(HapiHelper.EXTENSION_XON_ORGANIZATION_URL).addExtension(HapiHelper.EXTENSION_XON10_URL, new StringType(value))
+    }
+
+    // OBR-4 - Universal Service Identifier
+    static void setOBR4_1Value(ServiceRequest serviceRequest, String value) {
+        serviceRequest.setCode(new CodeableConcept().addCoding(new Coding().setCode(value)))
     }
 
     static Organization createOrganization() {

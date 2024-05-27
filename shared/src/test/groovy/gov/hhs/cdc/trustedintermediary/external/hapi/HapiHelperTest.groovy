@@ -559,6 +559,24 @@ class HapiHelperTest extends Specification {
         HapiHelper.getORC21Value(sr) == orc21
     }
 
+    // OBR-4.1 - Observation Identifier
+    def "getOBR4_1Value returns the correct value"() {
+        given:
+        def expectedValue = "expectedValue"
+        def bundle = new Bundle()
+        def dr = HapiFhirHelper.createDiagnosticReport(bundle)
+        def sr = HapiFhirHelper.createBasedOnServiceRequest(dr)
+
+        expect:
+        HapiHelper.getOBR4_1Value(sr) == null
+
+        when:
+        HapiFhirHelper.setOBR4_1Value(sr, expectedValue)
+
+        then:
+        HapiHelper.getOBR4_1Value(sr) == expectedValue
+    }
+
     // HD - Hierarchic Designator
     def "getHD1Identifier returns the correct namespaceIdentifier"() {
         given:
