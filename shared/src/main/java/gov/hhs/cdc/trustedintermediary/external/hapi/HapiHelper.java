@@ -12,11 +12,9 @@ import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
-import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.PractitionerRole;
-import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ServiceRequest;
 import org.hl7.fhir.r4.model.StringType;
@@ -517,12 +515,5 @@ public class HapiHelper {
                                         .getExtensionByUrl(EXTENSION_HL7_FIELD_URL)
                                         .getValue()
                                         .equalsDeep(dataType));
-    }
-
-    public static Reference createObservationReference(Observation observation) {
-        String observationId = observation.getId();
-        Reference observationReference = new Reference("Observation/" + observationId);
-        observationReference.setResource(observation);
-        return observationReference;
     }
 }

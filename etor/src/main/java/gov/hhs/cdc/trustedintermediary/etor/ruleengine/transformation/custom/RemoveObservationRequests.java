@@ -31,7 +31,7 @@ public class RemoveObservationRequests implements CustomFhirTransformation {
                 if ("54089-8".equals(ob4_1)) {
                     List<Reference> references =
                             observations.stream()
-                                    .map(HapiHelper::createObservationReference)
+                                    .map(observation -> new Reference(observation.getId()))
                                     .collect(Collectors.toList());
                     report.setResult(references);
                     continue;
