@@ -120,7 +120,7 @@
     },
     {
       "name": "ucsdOruRemoveObservationRequests",
-      "description": "Removes UCSD ORU OBRs with the exception of the 54089-8 OBR",
+      "description": "Removes all OBRs from an UCSD ORU message except for the OBR with value '54089-8' in OBR-4.1. All OBXs are attached to the sole remaining OBR",
       "message": "",
       "conditions": [
         "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",

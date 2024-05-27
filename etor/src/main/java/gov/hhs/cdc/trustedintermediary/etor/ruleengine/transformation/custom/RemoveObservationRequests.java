@@ -13,6 +13,10 @@ import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.ServiceRequest;
 
+/**
+ * This transformation removes all OBRs from an ORU message except for the OBR with value "54089-8"
+ * in OBR-4.1. All OBXs are attached to the sole remaining OBR
+ */
 public class RemoveObservationRequests implements CustomFhirTransformation {
 
     @Override
