@@ -152,15 +152,22 @@
     {
       "name": "ucsdOruSwapPlacerOrderAndGroupNumbers",
       "description": "Swaps UCSD ORU Placer Order Number (ORC-2) and Placer Group Number (ORC-4)",
+      "name": "ucsdOruUpdateUniversalServiceIdentifier",
+      "description": "Overrides the values of Name of Coding System (OBR-4.3) and Alternate Identifier (OBR-4.4) in Universal Type Code (OBR-4)",
       "message": "",
       "conditions": [
         "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
+        "Bundle.entry.resource.ofType(ServiceRequest).code.coding.where(code = '54089-8').exists()",
         "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'"
       ],
       "rules": [
         {
-          "name": "SwapPlacerOrderAndGroupNumbers",
-          "args": { }
+          "name": "UpdateUniversalServiceIdentifier",
+          "args": {
+            "checkValue": "54089-8",
+            "codingSystem": "LN",
+            "alternateId": "CDPHGSPEAP"
+          }
         }
       ]
     }
