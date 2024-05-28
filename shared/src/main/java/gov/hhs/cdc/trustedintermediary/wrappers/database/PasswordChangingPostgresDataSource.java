@@ -4,7 +4,6 @@ import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.sql.Connection;
 import java.sql.SQLException;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.postgresql.ds.PGSimpleDataSource;
 
 public class PasswordChangingPostgresDataSource extends PGSimpleDataSource {
@@ -16,11 +15,6 @@ public class PasswordChangingPostgresDataSource extends PGSimpleDataSource {
         var latestPassword =
                 ApplicationContext.getImplementation(DatabaseCredentialsProvider.class)
                         .getPassword();
-
-        var passwordHash = DigestUtils.sha256Hex(latestPassword);
-        ApplicationContext.getImplementation(Logger.class)
-                .logInfo("Password hash={}", passwordHash);
-
         this.setPassword(latestPassword);
 
         return super.getConnection();
@@ -34,11 +28,6 @@ public class PasswordChangingPostgresDataSource extends PGSimpleDataSource {
         var latestPassword =
                 ApplicationContext.getImplementation(DatabaseCredentialsProvider.class)
                         .getPassword();
-
-        var passwordHash = DigestUtils.sha256Hex(latestPassword);
-        ApplicationContext.getImplementation(Logger.class)
-                .logInfo("Password hash={}", passwordHash);
-
         this.setPassword(latestPassword);
 
         return super.getConnection(username, latestPassword);
