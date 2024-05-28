@@ -1,8 +1,7 @@
-package gov.hhs.cdc.trustedintermediary.external;
+package gov.hhs.cdc.trustedintermediary.wrappers.database;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import gov.hhs.cdc.trustedintermediary.wrappers.database.DatabaseCredentialsProvider;
 import java.sql.Connection;
 import java.sql.SQLException;
 import org.apache.commons.codec.digest.DigestUtils;

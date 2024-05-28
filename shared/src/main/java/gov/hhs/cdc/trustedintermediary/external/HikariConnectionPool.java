@@ -19,7 +19,7 @@ public class HikariConnectionPool implements ConnectionPool {
 
     private static HikariConnectionPool INSTANCE;
 
-    public final HikariDataSource ds;
+    private final HikariDataSource ds;
 
     private static final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
 
@@ -37,27 +37,29 @@ public class HikariConnectionPool implements ConnectionPool {
 
     static HikariConfig constructHikariConfig() {
         String user = ApplicationContext.getProperty("DB_USER", "");
-        DatabaseCredentialsProvider credProvider =
-                ApplicationContext.getImplementation(DatabaseCredentialsProvider.class);
-
-        String pass = credProvider.getPassword();
         String serverName = ApplicationContext.getProperty("DB_URL", "");
         String dbName = ApplicationContext.getProperty("DB_NAME", "");
         String dbPort = ApplicationContext.getProperty("DB_PORT", "");
 
+        DatabaseCredentialsProvider credProvider =
+                ApplicationContext.getImplementation(DatabaseCredentialsProvider.class);
+        String pass = credProvider.getPassword();
+
         HikariConfig config = new HikariDataSource();
 
-        //        try {
-        //            String maxLife = ApplicationContext.getProperty("DB_MAX_LIFETIME");
-        //            if (maxLife != null && !maxLife.isEmpty()) {
-        //                config.setMaxLifetime(Long.parseLong(maxLife));
-        //            }
-        //        } catch (NumberFormatException e) {
-        //            LOGGER.logInfo("Using Hikari default DB Max Lifetime");
-        //        }
+        try {
+            String maxLife = ApplicationContext.getProperty("DB_MAX_LIFETIME");
+            if (maxLife != null && !maxLife.isEmpty()) {
+                config.setMaxLifetime(Long.parseLong(maxLife));
+            } else {
+                LOGGER.logInfo("Using Hikari default DB Max Lifetime");
+            }
+        } catch (NumberFormatException e) {
+            LOGGER.logInfo("Using Hikari default DB Max Lifetime");
+        }
 
         config.setDataSourceClassName(
-                "gov.hhs.cdc.trustedintermediary.external.PasswordChangingPostgresDataSource");
+                "gov.hhs.cdc.trustedintermediary.wrappers.database.PasswordChangingPostgresDataSource");
         config.addDataSourceProperty("user", user);
         config.addDataSourceProperty("password", pass);
         config.addDataSourceProperty("serverName", serverName);
