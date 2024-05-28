@@ -6,6 +6,12 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import org.postgresql.ds.PGSimpleDataSource;
 
+/**
+ * This class extends {@link PGSimpleDataSource} and overrides the getConnection methods to ensure
+ * that the latest password is always used when establishing a connection to the database. It
+ * retrieves the latest password from the {@link DatabaseCredentialsProvider}. This class is
+ * referenced through a string elsewhere, even though it seems it isn't referenced.
+ */
 public class PasswordChangingPostgresDataSource extends PGSimpleDataSource {
     @Override
     public Connection getConnection() throws SQLException {
