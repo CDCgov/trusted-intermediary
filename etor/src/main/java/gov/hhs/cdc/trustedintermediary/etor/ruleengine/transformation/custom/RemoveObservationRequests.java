@@ -14,8 +14,8 @@ import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.ServiceRequest;
 
 /**
- * This transformation removes all OBRs from an ORU message except for the OBR with value "54089-8"
- * in OBR-4.1. All OBXs are attached to the sole remaining OBR
+ * This transformation removes all OBRs from an ORU message except for the OBR with a given value in
+ * OBR-4.1. All OBXs are attached to the sole remaining OBR
  */
 public class RemoveObservationRequests implements CustomFhirTransformation {
 
@@ -32,7 +32,7 @@ public class RemoveObservationRequests implements CustomFhirTransformation {
             ServiceRequest serviceRequest = HapiHelper.getServiceRequest(report);
             if (serviceRequest != null) {
                 String ob4_1 = HapiHelper.getOBR4_1Value(serviceRequest);
-                if ("54089-8".equals(ob4_1)) {
+                if (args.get("universalServiceIdentifier").equals(ob4_1)) {
                     List<Reference> references =
                             observations.stream()
                                     .map(observation -> new Reference(observation.getId()))

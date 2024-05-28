@@ -22,6 +22,8 @@ class RemoveObservationRequestsTest extends Specification {
 
     def "remove all OBRs except for the one with OBR-4.1 = '54089-8' and attach all observations to the single OBR"() {
         given:
+        def obr4_1 = "54089-8"
+        def args = Map.of("universalServiceIdentifier", obr4_1)
         def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/002_CA_ORU_R01_initial_translation.fhir")
         def bundle = fhirResource.getUnderlyingResource() as Bundle
 
@@ -36,10 +38,10 @@ class RemoveObservationRequestsTest extends Specification {
         initialServiceRequests.size() > 1
         initialObservations.size() > 1
         initialDiagnosticReports.first().result.size() != observationCount
-        "54089-8" in obr4_1Values
+        obr4_1 in obr4_1Values
 
         when:
-        transformClass.transform(fhirResource, null)
+        transformClass.transform(fhirResource, args)
         def diagnosticReports = HapiHelper.resourcesInBundle(bundle, DiagnosticReport).toList()
         def serviceRequests = HapiHelper.resourcesInBundle(bundle, ServiceRequest).toList()
         def dr = diagnosticReports.first() as DiagnosticReport
@@ -48,7 +50,7 @@ class RemoveObservationRequestsTest extends Specification {
         then:
         diagnosticReports.size() == 1
         serviceRequests.size() == 1
-        HapiHelper.getOBR4_1Value(sr) == "54089-8"
+        HapiHelper.getOBR4_1Value(sr) == obr4_1
         dr.result.size() == observationCount
     }
 }

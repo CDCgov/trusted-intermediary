@@ -130,7 +130,9 @@
       "rules": [
         {
           "name": "RemoveObservationRequests",
-          "args": { }
+          "args": {
+            "universalServiceIdentifier": "54089-8"
+          }
         }
       ]
     },
@@ -150,8 +152,6 @@
       ]
     },
     {
-      "name": "ucsdOruSwapPlacerOrderAndGroupNumbers",
-      "description": "Swaps UCSD ORU Placer Order Number (ORC-2) and Placer Group Number (ORC-4)",
       "name": "ucsdOruUpdateUniversalServiceIdentifier",
       "description": "Overrides the values of Name of Coding System (OBR-4.3) and Alternate Identifier (OBR-4.4) in Universal Type Code (OBR-4)",
       "message": "",
