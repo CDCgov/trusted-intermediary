@@ -1,11 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.external;
 
-import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool;
-import gov.hhs.cdc.trustedintermediary.wrappers.database.DatabaseCredentialsProvider;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -24,8 +22,7 @@ public class HikariConnectionPool implements ConnectionPool {
     private static final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
 
     private HikariConnectionPool() {
-        HikariConfig config = constructHikariConfig();
-        ds = new HikariDataSource(config);
+        ds = constructHikariDataSource();
     }
 
     public static synchronized HikariConnectionPool getInstance() {
@@ -35,17 +32,9 @@ public class HikariConnectionPool implements ConnectionPool {
         return INSTANCE;
     }
 
-    static HikariConfig constructHikariConfig() {
-        String user = ApplicationContext.getProperty("DB_USER", "");
-        String serverName = ApplicationContext.getProperty("DB_URL", "");
-        String dbName = ApplicationContext.getProperty("DB_NAME", "");
-        String dbPort = ApplicationContext.getProperty("DB_PORT", "");
+    static HikariDataSource constructHikariDataSource() {
 
-        DatabaseCredentialsProvider credProvider =
-                ApplicationContext.getImplementation(DatabaseCredentialsProvider.class);
-        String pass = credProvider.getPassword();
-
-        HikariConfig config = new HikariDataSource();
+        HikariDataSource config = new PasswordChangingHikariDataSource();
 
         try {
             String maxLife = ApplicationContext.getProperty("DB_MAX_LIFETIME");
@@ -58,10 +47,13 @@ public class HikariConnectionPool implements ConnectionPool {
             LOGGER.logInfo("Using Hikari default DB Max Lifetime");
         }
 
-        config.setDataSourceClassName(
-                "gov.hhs.cdc.trustedintermediary.wrappers.database.PasswordChangingPostgresDataSource");
-        config.addDataSourceProperty("user", user);
-        config.addDataSourceProperty("password", pass);
+        String user = ApplicationContext.getProperty("DB_USER", "");
+        String serverName = ApplicationContext.getProperty("DB_URL", "");
+        String dbName = ApplicationContext.getProperty("DB_NAME", "");
+        String dbPort = ApplicationContext.getProperty("DB_PORT", "");
+
+        config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
+        config.setUsername(user);
         config.addDataSourceProperty("serverName", serverName);
         config.addDataSourceProperty("databaseName", dbName);
         config.addDataSourceProperty("portNumber", dbPort);
