@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.external
+package gov.hhs.cdc.trustedintermediary.external.hikari
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import spock.lang.Specification
@@ -13,9 +13,6 @@ class HikariConnectionPoolTest extends Specification {
         TestApplicationContext.addEnvironmentVariable("DB_URL", "test_url")
         TestApplicationContext.addEnvironmentVariable("DB_NAME", "test_name")
         TestApplicationContext.addEnvironmentVariable("DB_PORT", "1234")
-        //        TestApplicationContext.addEnvironmentVariable("DB_PASS", "test_pass")
-
-        //        TestApplicationContext.injectRegisteredImplementations()
     }
 
     def "connection pool works" () {

@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.external;
+package gov.hhs.cdc.trustedintermediary.external.hikari;
 
 import com.zaxxer.hikari.HikariDataSource;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;

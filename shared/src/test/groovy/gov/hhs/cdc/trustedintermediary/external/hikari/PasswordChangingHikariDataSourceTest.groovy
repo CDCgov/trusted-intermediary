@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.external
+package gov.hhs.cdc.trustedintermediary.external.hikari
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.wrappers.database.DatabaseCredentialsProvider
