@@ -47,6 +47,13 @@ public class HapiHelper {
     public static final StringType EXTENSION_ORC2_DATA_TYPE = new StringType("ORC.2");
     public static final StringType EXTENSION_ORC4_DATA_TYPE = new StringType("ORC.4");
 
+    public static final String EXTENSION_CODING_SYSTEM =
+            "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding-system";
+
+    public static final String EXTENSION_CWE_CODING =
+            "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding";
+    public static final String EXTENSION_ALT_CODING = "alt-coding";
+
     public static final Coding OML_CODING =
             new Coding(
                     "http://terminology.hl7.org/CodeSystem/v2-0003",

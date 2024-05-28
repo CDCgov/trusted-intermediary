@@ -199,7 +199,6 @@ class HapiFhirHelper {
     }
 
     // ORC - Common Order
-
     static void setORC2Identifier(ServiceRequest serviceRequest, Identifier identifier) {
         identifier.addExtension(HapiHelper.EXTENSION_HL7_FIELD_URL, HapiHelper.EXTENSION_ORC2_DATA_TYPE)
         serviceRequest.addIdentifier(identifier)
