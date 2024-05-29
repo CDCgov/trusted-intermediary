@@ -68,7 +68,7 @@ resource "azurerm_linux_web_app" "api" {
     DB_NAME                         = "postgres"
     DB_USER                         = "cdcti-${var.environment}-api"
     DB_SSL                          = "require"
-    DB_MAX_LIFETIME                 = "3480000"  # 58 minutes
+    DB_MAX_LIFETIME                 = "3480000" # 58 minutes
   }
 
   identity {
