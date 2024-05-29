@@ -27,16 +27,16 @@ public class RemoveObservationRequests implements CustomFhirTransformation {
                 HapiHelper.resourcesInBundle(bundle, DiagnosticReport.class);
         List<Observation> observations =
                 HapiHelper.resourcesInBundle(bundle, Observation.class).toList();
+        List<Reference> references =
+                observations.stream()
+                        .map(observation -> new Reference(observation.getId()))
+                        .collect(Collectors.toList());
 
         for (DiagnosticReport report : diagnosticReports.toList()) {
             ServiceRequest serviceRequest = HapiHelper.getServiceRequest(report);
             if (serviceRequest != null) {
                 String ob4_1 = HapiHelper.getOBR4_1Value(serviceRequest);
                 if (args.get("universalServiceIdentifier").equals(ob4_1)) {
-                    List<Reference> references =
-                            observations.stream()
-                                    .map(observation -> new Reference(observation.getId()))
-                                    .collect(Collectors.toList());
                     report.setResult(references);
                     bundle.getEntry()
                             .removeIf(
