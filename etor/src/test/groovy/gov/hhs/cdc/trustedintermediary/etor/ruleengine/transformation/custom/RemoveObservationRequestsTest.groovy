@@ -11,6 +11,8 @@ import spock.lang.Specification
 
 class RemoveObservationRequestsTest extends Specification {
     def transformClass
+    def obr4_1 = "54089-8"
+    def args = Map.of("universalServiceIdentifier", obr4_1)
 
     def setup() {
         TestApplicationContext.reset()
@@ -22,8 +24,6 @@ class RemoveObservationRequestsTest extends Specification {
 
     def "remove all OBRs except for the one with OBR-4.1 = '54089-8' and attach all observations to the single OBR"() {
         given:
-        def obr4_1 = "54089-8"
-        def args = Map.of("universalServiceIdentifier", obr4_1)
         def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/002_CA_ORU_R01_initial_translation.fhir")
         def bundle = fhirResource.getUnderlyingResource() as Bundle
 
@@ -52,5 +52,55 @@ class RemoveObservationRequestsTest extends Specification {
         serviceRequests.size() == 1
         HapiHelper.getOBR4_1Value(sr) == obr4_1
         dr.result.size() == observationCount
+    }
+
+    def "remove all irrelevant OBRs, with edge case of one DiagnosticReport not having a related ServiceRequest"() {
+        given:
+        def fhirResource = ExamplesHelper.getExampleFhirResource("../Test/Results/006_CA_ORU_R01_one_diagnostic_report_without_basedOn.fhir")
+
+        def bundle = fhirResource.getUnderlyingResource() as Bundle
+
+        def initialDiagnosticReports = HapiHelper.resourcesInBundle(bundle, DiagnosticReport).toList()
+        def initialServiceRequests = HapiHelper.resourcesInBundle(bundle, ServiceRequest).toList()
+        def initialObservations = HapiHelper.resourcesInBundle(bundle, Observation).toList()
+
+        expect:
+        initialDiagnosticReports.size() > 1
+        initialServiceRequests.size() > 1
+        initialObservations.size() > 1
+
+        when:
+        transformClass.transform(fhirResource, args)
+        def diagnosticReports = HapiHelper.resourcesInBundle(bundle, DiagnosticReport).toList()
+        def serviceRequests = HapiHelper.resourcesInBundle(bundle, ServiceRequest).toList()
+
+        then:
+        diagnosticReports.size() == 1
+        serviceRequests.size() == 1
+    }
+
+    def "remove all irrelevant OBRs, with edge case of all DiagnosticReports not having a related ServiceRequest"() {
+        given:
+        def fhirResource = ExamplesHelper.getExampleFhirResource("../Test/Results/006_CA_ORU_R01_all_diagnostic_reports_without_basedOn.fhir")
+
+        def bundle = fhirResource.getUnderlyingResource() as Bundle
+
+        def initialDiagnosticReports = HapiHelper.resourcesInBundle(bundle, DiagnosticReport).toList()
+        def initialServiceRequests = HapiHelper.resourcesInBundle(bundle, ServiceRequest).toList()
+        def initialObservations = HapiHelper.resourcesInBundle(bundle, Observation).toList()
+
+        expect:
+        initialDiagnosticReports.size() > 1
+        initialServiceRequests.size() > 1
+        initialObservations.size() > 1
+
+        when:
+        transformClass.transform(fhirResource, args)
+        def diagnosticReports = HapiHelper.resourcesInBundle(bundle, DiagnosticReport).toList()
+        def serviceRequests = HapiHelper.resourcesInBundle(bundle, ServiceRequest).toList()
+
+        then:
+        diagnosticReports.size() == initialDiagnosticReports.size()
+        serviceRequests.size() == serviceRequests.size()
     }
 }
