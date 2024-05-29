@@ -37,18 +37,21 @@ public class RemoveObservationRequests implements CustomFhirTransformation {
             if (serviceRequest != null) {
                 String ob4_1 = HapiHelper.getOBR4_1Value(serviceRequest);
                 if (args.get("universalServiceIdentifier").equals(ob4_1)) {
-                    report.setResult(references);
-                    bundle.getEntry()
-                            .removeIf(
-                                    entry ->
-                                            (entry.getResource() instanceof DiagnosticReport)
-                                                    || (entry.getResource()
-                                                            instanceof ServiceRequest));
+                    removeObrResources(bundle);
                     bundle.addEntry().setResource(report);
                     bundle.addEntry().setResource(serviceRequest);
+                    report.setResult(references);
                     break;
                 }
             }
         }
+    }
+
+    private void removeObrResources(Bundle bundle) {
+        bundle.getEntry()
+                .removeIf(
+                        entry ->
+                                (entry.getResource() instanceof DiagnosticReport)
+                                        || (entry.getResource() instanceof ServiceRequest));
     }
 }
