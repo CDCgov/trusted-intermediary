@@ -11,8 +11,10 @@ resource "azurerm_postgresql_flexible_server" "database" {
   storage_mb            = "32768"
   auto_grow_enabled     = true
   backup_retention_days = "14"
-  delegated_subnet_id   = local.cdc_domain_environment ? azurerm_subnet.database.id : null
-  private_dns_zone_id   = local.cdc_domain_environment ? azurerm_private_dns_zone.dns_zone.id : null
+
+  public_network_access_enabled = !local.cdc_domain_environment
+  delegated_subnet_id           = local.cdc_domain_environment ? azurerm_subnet.database.id : null
+  private_dns_zone_id           = local.cdc_domain_environment ? azurerm_private_dns_zone.dns_zone.id : null
 
   authentication {
     password_auth_enabled         = "false"

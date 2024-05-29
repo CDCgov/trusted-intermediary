@@ -132,6 +132,40 @@
           "args": { }
         }
       ]
+    },
+    {
+      "name": "ucsdOruUpdateUniversalServiceIdentifier",
+      "description": "Overrides the values of Name of Coding System (OBR-4.3) and Alternate Identifier (OBR-4.4) in Universal Type Code (OBR-4)",
+      "message": "",
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
+        "Bundle.entry.resource.ofType(ServiceRequest).code.coding.where(code = '54089-8').exists()"
+      ],
+      "rules": [
+        {
+          "name": "UpdateUniversalServiceIdentifier",
+          "args": {
+            "checkValue": "54089-8",
+            "codingSystem": "LN",
+            "alternateId": "CDPHGSPEAP"
+          }
+        }
+      ]
+    },
+    {
+      "name": "ucsdOruUpdateReceivingFacilityWithOrderingFacilityIdentifier",
+      "description": "Updates Receiving Facility (MSH-6) to value in ORC-21.10 and remove content from MSH-6.2 and MSH-6.3",
+      "message": "",
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'"
+      ],
+      "rules": [
+        {
+          "name": "UpdateReceivingFacilityWithOrderingFacilityIdentifier",
+          "args": { }
+        }
+      ]
     }
   ]
 }
