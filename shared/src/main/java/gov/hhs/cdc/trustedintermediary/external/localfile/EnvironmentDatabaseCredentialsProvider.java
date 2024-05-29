@@ -24,7 +24,7 @@ public class EnvironmentDatabaseCredentialsProvider implements DatabaseCredentia
     public String getPassword() {
         // this method is at least called during bootstrapping, so we can't use @Inject
         ApplicationContext.getImplementation(Logger.class)
-                .logInfo("Fetching database credentials environment variable DB_PASS");
+                .logInfo("Fetching database credentials from environment variable DB_PASS");
 
         return ApplicationContext.getProperty("DB_PASS");
     }
