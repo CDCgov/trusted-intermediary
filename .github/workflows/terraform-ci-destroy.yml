@@ -53,4 +53,4 @@ jobs:
         run: terraform init -backend-config="key=pr_${{ github.event.number }}.tfstate"
 
       - name: Terraform Destroy
-        run: terraform destroy -auto-approve -input=false -var="pr_number=${{ github.event.number }}"
+        run: terraform destroy -auto-approve -input=false -var="pr_number=${{ github.event.number }}" -var="alert_slack_email=${{ secrets.ALERT_SLACK_EMAIL }}"
