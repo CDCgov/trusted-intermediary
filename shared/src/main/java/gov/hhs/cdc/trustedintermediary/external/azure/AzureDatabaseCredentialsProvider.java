@@ -26,7 +26,7 @@ public class AzureDatabaseCredentialsProvider implements DatabaseCredentialsProv
 
         // this method is at least called during bootstrapping, so we can't use @Inject
         ApplicationContext.getImplementation(Logger.class)
-                .logInfo("Fetching credentials from Azure");
+                .logInfo("Fetching database credentials from Azure");
 
         return new DefaultAzureCredentialBuilder()
                 .build()
