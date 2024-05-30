@@ -57,7 +57,6 @@ class RemoveObservationRequestsTest extends Specification {
     def "remove all irrelevant OBRs, with edge case of one DiagnosticReport not having a related ServiceRequest"() {
         given:
         def fhirResource = ExamplesHelper.getExampleFhirResource("../Test/Results/006_CA_ORU_R01_one_diagnostic_report_without_basedOn.fhir")
-
         def bundle = fhirResource.getUnderlyingResource() as Bundle
 
         def initialDiagnosticReports = HapiHelper.resourcesInBundle(bundle, DiagnosticReport).toList()
@@ -82,7 +81,6 @@ class RemoveObservationRequestsTest extends Specification {
     def "remove all irrelevant OBRs, with edge case of all DiagnosticReports not having a related ServiceRequest"() {
         given:
         def fhirResource = ExamplesHelper.getExampleFhirResource("../Test/Results/006_CA_ORU_R01_all_diagnostic_reports_without_basedOn.fhir")
-
         def bundle = fhirResource.getUnderlyingResource() as Bundle
 
         def initialDiagnosticReports = HapiHelper.resourcesInBundle(bundle, DiagnosticReport).toList()
@@ -101,6 +99,30 @@ class RemoveObservationRequestsTest extends Specification {
 
         then:
         diagnosticReports.size() == initialDiagnosticReports.size()
-        serviceRequests.size() == serviceRequests.size()
+        serviceRequests.size() == initialServiceRequests.size()
+    }
+
+    def "no OBRs are removed because nothing matches the universalServiceIdentifier"() {
+        given:
+        def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/002_CA_ORU_R01_initial_translation.fhir")
+        def bundle = fhirResource.getUnderlyingResource() as Bundle
+
+        def initialDiagnosticReports = HapiHelper.resourcesInBundle(bundle, DiagnosticReport).toList()
+        def initialServiceRequests = HapiHelper.resourcesInBundle(bundle, ServiceRequest).toList()
+        def initialObservations = HapiHelper.resourcesInBundle(bundle, Observation).toList()
+
+        expect:
+        initialDiagnosticReports.size() > 1
+        initialServiceRequests.size() > 1
+        initialObservations.size() > 1
+
+        when:
+        transformClass.transform(fhirResource, Map.of("universalServiceIdentifier", "someFakeValue"))
+        def diagnosticReports = HapiHelper.resourcesInBundle(bundle, DiagnosticReport).toList()
+        def serviceRequests = HapiHelper.resourcesInBundle(bundle, ServiceRequest).toList()
+
+        then:
+        diagnosticReports.size() == initialDiagnosticReports.size()
+        serviceRequests.size() == initialServiceRequests.size()
     }
 }
