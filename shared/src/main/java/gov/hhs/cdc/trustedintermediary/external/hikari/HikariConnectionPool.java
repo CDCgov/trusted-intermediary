@@ -1,11 +1,9 @@
-package gov.hhs.cdc.trustedintermediary.external;
+package gov.hhs.cdc.trustedintermediary.external.hikari;
 
-import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool;
-import gov.hhs.cdc.trustedintermediary.wrappers.database.DatabaseCredentialsProvider;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -19,13 +17,12 @@ public class HikariConnectionPool implements ConnectionPool {
 
     private static HikariConnectionPool INSTANCE;
 
-    public final HikariDataSource ds;
+    private final HikariDataSource ds;
 
     private static final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
 
     private HikariConnectionPool() {
-        HikariConfig config = constructHikariConfig();
-        ds = new HikariDataSource(config);
+        ds = constructHikariDataSource();
     }
 
     public static synchronized HikariConnectionPool getInstance() {
@@ -35,30 +32,28 @@ public class HikariConnectionPool implements ConnectionPool {
         return INSTANCE;
     }
 
-    static HikariConfig constructHikariConfig() {
-        String user = ApplicationContext.getProperty("DB_USER", "");
-        DatabaseCredentialsProvider credProvider =
-                ApplicationContext.getImplementation(DatabaseCredentialsProvider.class);
+    static HikariDataSource constructHikariDataSource() {
 
-        String pass = credProvider.getPassword();
-        String serverName = ApplicationContext.getProperty("DB_URL", "");
-        String dbName = ApplicationContext.getProperty("DB_NAME", "");
-        String dbPort = ApplicationContext.getProperty("DB_PORT", "");
-
-        HikariConfig config = new HikariDataSource();
+        HikariDataSource config = new PasswordChangingHikariDataSource();
 
         try {
             String maxLife = ApplicationContext.getProperty("DB_MAX_LIFETIME");
             if (maxLife != null && !maxLife.isEmpty()) {
                 config.setMaxLifetime(Long.parseLong(maxLife));
+            } else {
+                LOGGER.logInfo("Using Hikari default DB Max Lifetime");
             }
         } catch (NumberFormatException e) {
             LOGGER.logInfo("Using Hikari default DB Max Lifetime");
         }
 
+        String user = ApplicationContext.getProperty("DB_USER", "");
+        String serverName = ApplicationContext.getProperty("DB_URL", "");
+        String dbName = ApplicationContext.getProperty("DB_NAME", "");
+        String dbPort = ApplicationContext.getProperty("DB_PORT", "");
+
         config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
-        config.addDataSourceProperty("user", user);
-        config.addDataSourceProperty("password", pass);
+        config.setUsername(user);
         config.addDataSourceProperty("serverName", serverName);
         config.addDataSourceProperty("databaseName", dbName);
         config.addDataSourceProperty("portNumber", dbPort);
