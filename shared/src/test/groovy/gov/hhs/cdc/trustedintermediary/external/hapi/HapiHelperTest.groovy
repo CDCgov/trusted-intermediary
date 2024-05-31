@@ -608,4 +608,44 @@ class HapiHelperTest extends Specification {
         then:
         actualIdentifier == null
     }
+
+    // MSH-6 - Receiving Facility
+    def "removeMSH6_2_and_3_Identifier does nothing if there's no facility"() {
+        when:
+        def bundle = new Bundle()
+        def copyBundle = bundle.copy()
+        HapiHelper.removeMSH6_2_and_3_Identifier(bundle)
+
+        then:
+        bundle.equalsDeep(copyBundle)
+
+        when:
+        HapiHelper.createMSHMessageHeader(bundle)
+        def receivingFacility = HapiFhirHelper.createOrganization()
+        HapiFhirHelper.setMSH6Organization(bundle, receivingFacility)
+        copyBundle = bundle.copy()
+        HapiHelper.removeMSH6_2_and_3_Identifier(bundle)
+
+        then:
+        bundle.equalsDeep(copyBundle)
+    }
+
+    // CX.5 - Identifier Type Code
+    def "getCX5Value returns null if no valid extensions are found"() {
+        given:
+        def pid3_5 = "pid3_5"
+
+        when:
+        def bundle = new Bundle()
+        HapiHelper.setPID3_5Value(bundle, pid3_5)
+        def identifier = new Identifier()
+        then:
+        HapiHelper.getCX5Value(identifier) == null
+
+        when:
+        identifier.addExtension().setUrl(HapiHelper.EXTENSION_CX_IDENTIFIER_URL)
+
+        then:
+        HapiHelper.getCX5Value(identifier) == null
+    }
 }
