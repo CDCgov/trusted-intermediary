@@ -7,7 +7,6 @@ import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.PractitionerRole
 import org.hl7.fhir.r4.model.Provenance
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ResourceType
@@ -647,5 +646,35 @@ class HapiHelperTest extends Specification {
 
         then:
         HapiHelper.getCX5Value(identifier) == null
+    }
+
+    def "setHl7FieldExtensionValue adds the extension if not found"() {
+        when:
+        def identifier = new Identifier()
+        HapiHelper.setHl7FieldExtensionValue(identifier, HapiHelper.EXTENSION_ORC4_DATA_TYPE)
+
+        then:
+        identifier.getExtensionByUrl(HapiHelper.EXTENSION_HL7_FIELD_URL).getValue() == HapiHelper.EXTENSION_ORC4_DATA_TYPE
+    }
+
+    def "setHl7FieldExtensionValue updates the extension value if one is there already"() {
+        when:
+        def identifier = new Identifier()
+        identifier.addExtension().setUrl(HapiHelper.EXTENSION_HL7_FIELD_URL)
+        HapiHelper.setHl7FieldExtensionValue(identifier, HapiHelper.EXTENSION_ORC4_DATA_TYPE)
+
+        then:
+        identifier.getExtensionByUrl(HapiHelper.EXTENSION_HL7_FIELD_URL).getValue() == HapiHelper.EXTENSION_ORC4_DATA_TYPE
+    }
+
+    def "removeHl7FieldIdentifier does nothing if the extension is not found"() {
+        when:
+        def identifier = new Identifier()
+        identifier.addExtension().setUrl(HapiHelper.EXTENSION_UNIVERSAL_ID_URL)
+        def identifiers = [identifier]
+        HapiHelper.removeHl7FieldIdentifier(identifiers, HapiHelper.EXTENSION_ORC4_DATA_TYPE)
+
+        then:
+        identifiers.first() == identifier
     }
 }
