@@ -556,6 +556,20 @@ class HapiHelperTest extends Specification {
 
         then:
         HapiHelper.getORC21Value(sr) == orc21
+
+        when:
+        def practitionerRole = HapiHelper.getPractitionerRole(sr)
+        def org = HapiHelper.getOrganization(practitionerRole)
+        org.getExtensionByUrl(HapiHelper.EXTENSION_XON_ORGANIZATION_URL).removeExtension(HapiHelper.EXTENSION_XON10_URL)
+
+        then:
+        HapiHelper.getORC21Value(sr) == null
+
+        when:
+        org.getExtension().clear()
+
+        then:
+        HapiHelper.getORC21Value(sr) == null
     }
 
     // OBR-4.1 - Observation Identifier
