@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DiagnosticReport
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.MessageHeader
@@ -44,6 +45,29 @@ class HapiHelperTest extends Specification {
 
         then:
         patientStream.allMatch {patients.contains(it) && it.getResourceType() == ResourceType.Patient }
+    }
+
+    def "removeTopLevelResources removes all resources of a specific type from a FHIR Bundle"() {
+        given:
+        def bundle = new Bundle()
+        HapiHelper.createMSHMessageHeader(bundle)
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(new ServiceRequest().setId("1")))
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(new ServiceRequest().setId("2")))
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(new DiagnosticReport().setId("1")))
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(new DiagnosticReport().setId("2")))
+
+        expect:
+        HapiHelper.resourceInBundle(bundle, MessageHeader) != null
+        HapiHelper.resourceInBundle(bundle, ServiceRequest) != null
+        HapiHelper.resourceInBundle(bundle, DiagnosticReport) != null
+
+        when:
+        HapiHelper.removeTopLevelResources(bundle, List.of(DiagnosticReport.class, ServiceRequest.class))
+
+        then:
+        HapiHelper.resourceInBundle(bundle, ServiceRequest) == null
+        HapiHelper.resourceInBundle(bundle, DiagnosticReport) == null
+        HapiHelper.resourceInBundle(bundle, MessageHeader) != null
     }
 
     // MSH - Message Header

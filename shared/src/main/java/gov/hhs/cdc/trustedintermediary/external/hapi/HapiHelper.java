@@ -82,6 +82,18 @@ public class HapiHelper {
         return resourcesInBundle(bundle, resourceType).findFirst().orElse(null);
     }
 
+    public static <T extends Resource> void removeTopLevelResources(
+            Bundle bundle, List<Class<? extends Resource>> resourceTypes) {
+        bundle.getEntry()
+                .removeIf(
+                        entry ->
+                                resourceTypes.stream()
+                                        .anyMatch(
+                                                resourceType ->
+                                                        resourceType.isInstance(
+                                                                entry.getResource())));
+    }
+
     // MSH - Message Header
     public static MessageHeader getMSHMessageHeader(Bundle bundle) {
         return resourceInBundle(bundle, MessageHeader.class);
