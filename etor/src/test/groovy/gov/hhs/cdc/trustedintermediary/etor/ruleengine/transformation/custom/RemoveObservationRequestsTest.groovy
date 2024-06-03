@@ -22,7 +22,7 @@ class RemoveObservationRequestsTest extends Specification {
         transformClass = new RemoveObservationRequests()
     }
 
-    def "remove all OBRs except for the one with OBR-4.1 = '54089-8' and attach all observations to the single OBR"() {
+    def "remove all OBRs except for the one with OBR-4.1 = '54089-8'"() {
         given:
         def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/002_CA_ORU_R01_initial_translation.fhir")
         def bundle = fhirResource.getUnderlyingResource() as Bundle
@@ -30,14 +30,12 @@ class RemoveObservationRequestsTest extends Specification {
         def initialDiagnosticReports = HapiHelper.resourcesInBundle(bundle, DiagnosticReport).toList()
         def initialServiceRequests = HapiHelper.resourcesInBundle(bundle, ServiceRequest).toList()
         def initialObservations = HapiHelper.resourcesInBundle(bundle, Observation).toList()
-        def observationCount = initialObservations.size()
         def obr4_1Values = initialServiceRequests.collect { HapiHelper.getOBR4_1Value(it) }
 
         expect:
         initialDiagnosticReports.size() > 1
         initialServiceRequests.size() > 1
         initialObservations.size() > 1
-        initialDiagnosticReports.first().result.size() != observationCount
         obr4_1 in obr4_1Values
 
         when:
@@ -51,6 +49,26 @@ class RemoveObservationRequestsTest extends Specification {
         diagnosticReports.size() == 1
         serviceRequests.size() == 1
         HapiHelper.getOBR4_1Value(sr) == obr4_1
+    }
+
+    def "once removed all OBRs except one, attach all observations to that single OBR"() {
+        given:
+        def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/002_CA_ORU_R01_initial_translation.fhir")
+        def bundle = fhirResource.getUnderlyingResource() as Bundle
+
+        def initialDiagnosticReports = HapiHelper.resourcesInBundle(bundle, DiagnosticReport).toList()
+        def initialObservations = HapiHelper.resourcesInBundle(bundle, Observation).toList()
+        def observationCount = initialObservations.size()
+
+        expect:
+        initialDiagnosticReports.first().result.size() != observationCount
+
+        when:
+        transformClass.transform(fhirResource, args)
+        def diagnosticReports = HapiHelper.resourcesInBundle(bundle, DiagnosticReport).toList()
+        def dr = diagnosticReports.first() as DiagnosticReport
+
+        then:
         dr.result.size() == observationCount
     }
 
