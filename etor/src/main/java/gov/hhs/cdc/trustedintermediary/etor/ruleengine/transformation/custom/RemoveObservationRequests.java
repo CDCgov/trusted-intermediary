@@ -29,6 +29,7 @@ public class RemoveObservationRequests implements CustomFhirTransformation {
         Set<Resource> resourcesToRemove = new HashSet<>();
         List<Reference> observationReferences = new ArrayList<>();
         DiagnosticReport singleDiagnosticReport = null;
+        ServiceRequest singleServiceRequest = null;
 
         for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
             Resource resourceEntry = entry.getResource();
@@ -40,11 +41,13 @@ public class RemoveObservationRequests implements CustomFhirTransformation {
                     String obr4_1 = HapiHelper.getOBR4_1Value(serviceRequest);
                     if (universalServiceIdentifier.equals(obr4_1)) {
                         singleDiagnosticReport = diagnosticReport;
+                        singleServiceRequest = serviceRequest;
                         continue;
                     }
-                    resourcesToRemove.add(serviceRequest);
                 }
                 resourcesToRemove.add(diagnosticReport);
+            } else if (resourceEntry instanceof ServiceRequest serviceRequest) {
+                resourcesToRemove.add(serviceRequest);
             }
         }
 
@@ -53,6 +56,7 @@ public class RemoveObservationRequests implements CustomFhirTransformation {
         }
 
         singleDiagnosticReport.setResult(observationReferences);
+        resourcesToRemove.remove(singleServiceRequest);
         bundle.getEntry().removeIf(entry -> resourcesToRemove.contains(entry.getResource()));
     }
 }
