@@ -29,25 +29,22 @@ public class RemoveObservationRequests implements CustomFhirTransformation {
         Set<Resource> resourcesToRemove = new HashSet<>();
         List<Reference> observationReferences = new ArrayList<>();
         DiagnosticReport singleDiagnosticReport = null;
-        ServiceRequest singleServiceRequest = null;
 
         for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
             Resource resourceEntry = entry.getResource();
             if (resourceEntry instanceof Observation observation) {
                 observationReferences.add(new Reference(observation.getId()));
             } else if (resourceEntry instanceof DiagnosticReport diagnosticReport) {
-                resourcesToRemove.add(diagnosticReport);
                 ServiceRequest serviceRequest = HapiHelper.getServiceRequest(diagnosticReport);
                 if (serviceRequest != null) {
                     String obr4_1 = HapiHelper.getOBR4_1Value(serviceRequest);
                     if (universalServiceIdentifier.equals(obr4_1)) {
                         singleDiagnosticReport = diagnosticReport;
-                        singleServiceRequest = serviceRequest;
+                        continue;
                     }
+                    resourcesToRemove.add(serviceRequest);
                 }
-
-            } else if (resourceEntry instanceof ServiceRequest serviceRequest) {
-                resourcesToRemove.add(serviceRequest);
+                resourcesToRemove.add(diagnosticReport);
             }
         }
 
@@ -55,9 +52,7 @@ public class RemoveObservationRequests implements CustomFhirTransformation {
             return;
         }
 
-        bundle.getEntry().removeIf(entry -> resourcesToRemove.contains(entry.getResource()));
-        bundle.addEntry().setResource(singleDiagnosticReport);
-        bundle.addEntry().setResource(singleServiceRequest);
         singleDiagnosticReport.setResult(observationReferences);
+        bundle.getEntry().removeIf(entry -> resourcesToRemove.contains(entry.getResource()));
     }
 }
