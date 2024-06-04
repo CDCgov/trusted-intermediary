@@ -44,8 +44,8 @@
       "description": "Updates UCSD ORU Sending Facility's Namespace Id (MSH-4) to 'CDPH'. It also removes Universal Id (MSH-4.2) and Universal Id Type (MSH-4.3).",
       "message": "",
       "conditions": [
-        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
-        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'"
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'",
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
       ],
       "rules": [
         {
@@ -61,8 +61,8 @@
       "description": "Updates UCSD ORU Receiving Application's Namespace Id (MSH-5.1) to 'EPIC'. It also removes Universal Id (MSH-5.2) and Universal Id Type (MSH-5.3)",
       "message": "",
       "conditions": [
-        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
-        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'"
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'",
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
       ],
       "rules": [
         {
@@ -78,8 +78,8 @@
       "description": "Updates UCSD ORU Receiving Facility (MSH-6) to value in ORC-21.10 and remove content from MSH-6.2 and MSH-6.3",
       "message": "",
       "conditions": [
-        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
-        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'"
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'",
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
       ],
       "rules": [
         {
@@ -93,8 +93,8 @@
       "description": "Removes UCSD ORU Message Structure (MSH-9.3) from the Message Type (MSH-9)",
       "message": "",
       "conditions": [
-        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
-        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'"
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'",
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
       ],
       "rules": [
         {
@@ -104,12 +104,27 @@
       ]
     },
     {
+      "name": "ucsdOruSwapPlacerOrderAndGroupNumbers",
+      "description": "Swaps UCSD ORU's Placer Order Number (ORC-2) and Placer Group Number (ORC-4)",
+      "message": "",
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'",
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
+      ],
+      "rules": [
+        {
+          "name": "SwapPlacerOrderAndGroupNumbers",
+          "args": { }
+        }
+      ]
+    },
+    {
       "name": "ucsdOruRemovePatientIdentifiers",
       "description": "Removes UCSD ORU Assigning Authority (PID-3.4) and Identifier Type Code (PID-3.5) from Patient Identifier List (PID-3)",
       "message": "",
       "conditions": [
-        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
-        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'"
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'",
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
       ],
       "rules": [
         {
@@ -123,8 +138,8 @@
       "description": "Removes UCSD ORU Name Type Code (PID-5.7) from Patient Name (PID-5)",
       "message": "",
       "conditions": [
-        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
-        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'"
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'",
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
       ],
       "rules": [
         {
@@ -138,8 +153,8 @@
       "description": "Removes all OBRs from an UCSD ORU message except for the OBR with value '54089-8' in OBR-4.1. All OBXs are attached to the sole remaining OBR",
       "message": "",
       "conditions": [
-        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
         "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'",
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
         "Bundle.entry.resource.ofType(ServiceRequest).code.coding.where(code = '54089-8').exists()"
       ],
       "rules": [
@@ -156,9 +171,9 @@
       "description": "Overrides the values of Name of Coding System (OBR-4.3) and Alternate Identifier (OBR-4.4) in Universal Type Code (OBR-4)",
       "message": "",
       "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'",
         "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
-        "Bundle.entry.resource.ofType(ServiceRequest).code.coding.where(code = '54089-8').exists()",
-        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'"
+        "Bundle.entry.resource.ofType(ServiceRequest).code.coding.where(code = '54089-8').exists()"
       ],
       "rules": [
         {
