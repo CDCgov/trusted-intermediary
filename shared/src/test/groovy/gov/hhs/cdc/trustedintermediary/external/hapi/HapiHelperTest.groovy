@@ -47,29 +47,6 @@ class HapiHelperTest extends Specification {
         patientStream.allMatch {patients.contains(it) && it.getResourceType() == ResourceType.Patient }
     }
 
-    def "removeTopLevelResources removes all resources of a specific type from a FHIR Bundle"() {
-        given:
-        def bundle = new Bundle()
-        HapiHelper.createMSHMessageHeader(bundle)
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(new ServiceRequest().setId("1")))
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(new ServiceRequest().setId("2")))
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(new DiagnosticReport().setId("1")))
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(new DiagnosticReport().setId("2")))
-
-        expect:
-        HapiHelper.resourceInBundle(bundle, MessageHeader) != null
-        HapiHelper.resourceInBundle(bundle, ServiceRequest) != null
-        HapiHelper.resourceInBundle(bundle, DiagnosticReport) != null
-
-        when:
-        HapiHelper.removeTopLevelResources(bundle, List.of(DiagnosticReport.class, ServiceRequest.class))
-
-        then:
-        HapiHelper.resourceInBundle(bundle, ServiceRequest) == null
-        HapiHelper.resourceInBundle(bundle, DiagnosticReport) == null
-        HapiHelper.resourceInBundle(bundle, MessageHeader) != null
-    }
-
     // MSH - Message Header
     def "getMSHMessageHeader returns the message header from the bundle if it exists"() {
         given:

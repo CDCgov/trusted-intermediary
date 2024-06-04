@@ -12,6 +12,7 @@ import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.PractitionerRole
 import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ServiceRequest
 import org.hl7.fhir.r4.model.StringType
 
@@ -38,6 +39,15 @@ class HapiFhirHelper {
         bundle.addEntry().setResource(messageHeader)
         bundle.addEntry().setFullUrl(receiverOrganizationFullUrl).setResource(receiverOrganization)
         return bundle
+    }
+
+
+    static <T extends Resource> void removeTopLevelResources(Bundle bundle, List<Class<? extends Resource>> resourceTypes) {
+        bundle.entry.removeIf { entry ->
+            resourceTypes.any { resourceType ->
+                resourceType.isInstance(entry.resource)
+            }
+        }
     }
 
     // MSH-3 - Sending Application
