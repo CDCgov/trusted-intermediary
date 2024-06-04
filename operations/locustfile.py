@@ -5,7 +5,7 @@ import urllib.parse
 import urllib.request
 import uuid
 
-from locust import FastHttpUser, events, task
+from locust import FastHttpUser, events, task, between
 from locust.runners import MasterRunner
 
 HEALTH_ENDPOINT = "/health"
@@ -27,6 +27,7 @@ class SampleUser(FastHttpUser):
 
     token_refresh_interval = 280
     access_token = None
+    wait_time = between(1, 5)
 
     def on_start(self):
         self.authenticate()
@@ -52,11 +53,11 @@ class SampleUser(FastHttpUser):
         data = response.json()
         self.access_token = data["access_token"]
 
-    @task
+    @task(1)
     def get_health(self):
         self.client.get(HEALTH_ENDPOINT)
 
-    @task(5)
+    @task(1)
     def post_v1_etor_orders(self):
         response = self.client.post(
             ORDERS_ENDPOINT,
@@ -69,7 +70,7 @@ class SampleUser(FastHttpUser):
         if response.status_code == 200:
             self.orders_api_called = True
 
-    @task(5)
+    @task(1)
     def post_v1_etor_results(self):
         response = self.client.post(
             RESULTS_ENDPOINT,
