@@ -148,7 +148,7 @@ def get_auth_request_body():
 
 def get_order_fhir_message():
     # read the sample request body for the orders endpoint
-    with open("examples/Test/e2e/orders/001_OML_O21_short.fhir", "r") as f:
+    with open("examples/Test/e2e/orders/002_ORM_O01_short.fhir", "r") as f:
         return f.read()
 
 
