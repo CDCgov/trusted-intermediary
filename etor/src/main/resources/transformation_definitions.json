@@ -119,6 +119,21 @@
       ]
     },
     {
+      "name": "ucsdOruRemovePatientNameTypeCode",
+      "description": "Removes UCSD ORU Name Type Code (PID-5.7) from Patient Name (PID-5)",
+      "message": "",
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'"
+      ],
+      "rules": [
+        {
+          "name": "RemovePatientNameTypeCode",
+          "args": { }
+        }
+      ]
+    },
+    {
       "name": "ucsdOruRemoveObservationRequests",
       "description": "Removes all OBRs from an UCSD ORU message except for the OBR with value '54089-8' in OBR-4.1. All OBXs are attached to the sole remaining OBR",
       "message": "",
@@ -133,21 +148,6 @@
           "args": {
             "universalServiceIdentifier": "54089-8"
           }
-        }
-      ]
-    },
-    {
-      "name": "ucsdOruRemovePatientNameTypeCode",
-      "description": "Removes UCSD ORU Name Type Code (PID-5.7) from Patient Name (PID-5)",
-      "message": "",
-      "conditions": [
-        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
-        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = 'UCSD'"
-      ],
-      "rules": [
-        {
-          "name": "RemovePatientNameTypeCode",
-          "args": { }
         }
       ]
     },
