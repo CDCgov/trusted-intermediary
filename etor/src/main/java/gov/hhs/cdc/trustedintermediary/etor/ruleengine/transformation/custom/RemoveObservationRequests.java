@@ -51,11 +51,13 @@ public class RemoveObservationRequests implements CustomFhirTransformation {
             }
         }
 
-        if (singleDiagnosticReport != null) {
-            bundle.getEntry().removeIf(entry -> resourcesToRemove.contains(entry.getResource()));
-            bundle.addEntry().setResource(singleDiagnosticReport);
-            bundle.addEntry().setResource(singleServiceRequest);
-            singleDiagnosticReport.setResult(observationReferences);
+        if (singleDiagnosticReport == null) {
+            return;
         }
+
+        bundle.getEntry().removeIf(entry -> resourcesToRemove.contains(entry.getResource()));
+        bundle.addEntry().setResource(singleDiagnosticReport);
+        bundle.addEntry().setResource(singleServiceRequest);
+        singleDiagnosticReport.setResult(observationReferences);
     }
 }
