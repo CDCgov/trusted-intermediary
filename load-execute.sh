@@ -46,14 +46,20 @@ wait_for_api() {
 
 warm_up_api() {
     echo 'Warming up API...'
-    curl --output /dev/null --silent --request POST http://localhost:8080/v1/etor/token
-    curl --output /dev/null --silent --request POST http://localhost:8080/v1/etor/token
-    curl --output /dev/null --silent --request POST http://localhost:8080/v1/etor/orders
-    curl --output /dev/null --silent --request POST http://localhost:8080/v1/etor/orders
-    curl --output /dev/null --silent --request POST http://localhost:8080/v1/etor/results
-    curl --output /dev/null --silent --request POST http://localhost:8080/v1/etor/results
-    curl --output /dev/null --silent --request POST http://localhost:8080/v1/etor/metadata/1
-    curl --output /dev/null --silent --request POST http://localhost:8080/v1/etor/results/1
+    local endpoint=(
+        "http://localhost:8080/v1/etor/token"
+        "http://localhost:8080/v1/etor/orders"
+        "http://localhost:8080/v1/etor/results"
+        "http://localhost:8080/v1/etor/metadata/1"
+        "http://localhost:8080/v1/etor/results/1"
+    )
+
+    for endpoint in "${endpoints[@]}"; do
+      for i in {1..2}; do
+        curl --output /dev/null --silent --request POST "$endpoint"
+      done
+    done
+
     sleep 15
     echo 'API is cozy'
 }
@@ -68,9 +74,7 @@ cleanup() {
     docker compose down
     echo "API Docker container stopped"
     echo "Stopping and deleting database"
-    docker stop trusted-intermediary-postgresql-1
-    docker rm -f trusted-intermediary-postgresql-1
-    docker volume rm trusted-intermediary_ti_postgres_test_data
+    docker compose -f docker-compose.postgres-test.yml down -v
     echo "Database stopped and deleted"
 }
 
