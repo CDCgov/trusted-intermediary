@@ -129,8 +129,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                                             AND (m1.sending_facility_details = m2.sending_facility_details
                                                 OR m1.sending_facility_details = m2.receiving_facility_details)
                                             AND m1.received_message_id <> m2.received_message_id
-                                    WHERE m1.received_message_id = ?
-                                    LIMIT 50;
+                                    WHERE m1.received_message_id = ?;
                                     """);
                                     // -- LIMIT 50 This is a potential fix for load test failures
                                     // since they link all the ids together;

@@ -23,7 +23,7 @@ start_database() {
 }
 migrate_database() {
     echo 'Migrating database'
-    liquibase update --changelog-file ./etor/databaseMigrations/root.yml --url jdbc:postgresql://localhost:5433/intermediary-test --username intermediary --password 'changeIT!' --label-filter '!azure'
+    liquibase update --changelog-file ./etor/databaseMigrations/root.yml --url jdbc:postgresql://localhost:5434/intermediary-test --username intermediary --password 'changeIT!' --label-filter '!azure'
     echo "Database migrated"
 }
 
@@ -46,21 +46,36 @@ wait_for_api() {
 
 warm_up_api() {
     echo 'Warming up API...'
-    local endpoint=(
-        "http://localhost:8080/v1/etor/token"
-        "http://localhost:8080/v1/etor/orders"
-        "http://localhost:8080/v1/etor/results"
-        "http://localhost:8080/v1/etor/metadata/1"
-        "http://localhost:8080/v1/etor/results/1"
-    )
+    pem=$(pwd)/mock_credentials/organization-trusted-intermediary-private-key-local.pem
+    token=$(jwt encode --exp='+30min' --jti $(uuidgen) --alg RS256  --no-iat -S@${pem})
 
-    for endpoint in "${endpoints[@]}"; do
-      for i in {1..2}; do
-        curl --output /dev/null --silent --request POST "$endpoint"
-      done
-    done
+    echo 'Warming up auth...'
+    tiAuthResponse=$(curl --silent --request POST "http://localhost:8080/v1/auth/token" \
+    --header "Content-Type: application/x-www-form-urlencoded" \
+    --data-urlencode "scope=trusted-intermediary" \
+    --data-urlencode "client_assertion=${token}")
 
-    sleep 15
+    tiToken=$(echo "${tiAuthResponse}" | awk -F '"' '{print $8}')
+
+    echo 'Warming up results...'
+    resultFile=$(pwd)/examples/Test/e2e/results/001_ORU_R01_short.fhir
+
+    curl --output /dev/null --silent --request POST "http://localhost:8080/v1/etor/results" \
+    --header "recordId: 9999" \
+    --header "Authorization: Bearer ${tiToken}" \
+    --data-binary "@${resultFile}"
+
+    echo 'Warming up orders...'
+    orderFile=$(pwd)/examples/Test/e2e/orders/002_ORM_O01_short.fhir
+
+    curl --output /dev/null --silent --request POST "http://localhost:8080/v1/etor/results" \
+        --header "recordId: 9999" \
+        --header "Authorization: Bearer ${tiToken}" \
+        --data-binary "@${orderFile}"
+
+    echo 'Warm up nap time...'
+    sleep 10
+
     echo 'API is cozy'
 }
 
