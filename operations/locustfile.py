@@ -81,7 +81,7 @@ class SampleUser(FastHttpUser):
     def post_v1_etor_results(self):
         self.submission_id = str(uuid.uuid4())
         poi = self.placer_order_id or str(uuid.uuid4())
-        self.placer_order_id = None
+        self.placer_order_id = None if self.placer_order_id else poi
         response = self.client.post(
             RESULTS_ENDPOINT,
             headers={
