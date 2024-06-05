@@ -12,6 +12,7 @@ import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.PractitionerRole
 import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ServiceRequest
 import org.hl7.fhir.r4.model.StringType
 
@@ -38,6 +39,15 @@ class HapiFhirHelper {
         bundle.addEntry().setResource(messageHeader)
         bundle.addEntry().setFullUrl(receiverOrganizationFullUrl).setResource(receiverOrganization)
         return bundle
+    }
+
+
+    static <T extends Resource> void removeTopLevelResources(Bundle bundle, List<Class<? extends Resource>> resourceTypes) {
+        bundle.entry.removeIf { entry ->
+            resourceTypes.any { resourceType ->
+                resourceType.isInstance(entry.resource)
+            }
+        }
     }
 
     // MSH-3 - Sending Application
@@ -225,6 +235,11 @@ class HapiFhirHelper {
         Reference requesterReference = createPractitionerRoleReference(requester)
         serviceRequest.setRequester(requesterReference)
         organization.addExtension().setUrl(HapiHelper.EXTENSION_XON_ORGANIZATION_URL).addExtension(HapiHelper.EXTENSION_XON10_URL, new StringType(value))
+    }
+
+    // OBR-4 - Universal Service Identifier
+    static void setOBR4_1Value(ServiceRequest serviceRequest, String value) {
+        serviceRequest.setCode(new CodeableConcept().addCoding(new Coding().setCode(value)))
     }
 
     static Organization createOrganization() {

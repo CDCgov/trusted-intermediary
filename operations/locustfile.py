@@ -32,7 +32,8 @@ class SampleUser(FastHttpUser):
     def on_start(self):
         self.authenticate()
 
-        self.submission_id = str(uuid.uuid4())
+        self.submission_id = None
+        self.placer_order_id = None
         self.orders_api_called = False
         self.results_api_called = False
         self.sender = "flexion.simulated-hospital"
@@ -50,8 +51,11 @@ class SampleUser(FastHttpUser):
     def authenticate(self):
         logging.debug("Authenticating...")
         response = self.client.post(AUTH_ENDPOINT, data=auth_request_body)
-        data = response.json()
-        self.access_token = data["access_token"]
+        if response.status_code == 200:
+            data = response.json()
+            self.access_token = data["access_token"]
+        else:
+            logging.error(f"Authentication failed: {response.error}")
 
     @task(1)
     def get_health(self):
@@ -59,33 +63,39 @@ class SampleUser(FastHttpUser):
 
     @task(1)
     def post_v1_etor_orders(self):
+        self.submission_id = str(uuid.uuid4())
+        poi = self.placer_order_id or str(uuid.uuid4())
+        self.placer_order_id = None if self.placer_order_id else poi
         response = self.client.post(
             ORDERS_ENDPOINT,
             headers={
                 "Authorization": self.access_token,
                 "RecordId": self.submission_id,
             },
-            data=order_request_body,
+            data=order_request_body.replace("{{placer_order_id}}", poi),
         )
         if response.status_code == 200:
             self.orders_api_called = True
 
     @task(1)
     def post_v1_etor_results(self):
+        self.submission_id = str(uuid.uuid4())
+        poi = self.placer_order_id or str(uuid.uuid4())
+        self.placer_order_id = None
         response = self.client.post(
             RESULTS_ENDPOINT,
             headers={
                 "Authorization": self.access_token,
                 "RecordId": self.submission_id,
             },
-            data=result_request_body,
+            data=result_request_body.replace("{{placer_order_id}}", poi),
         )
         if response.status_code == 200:
             self.results_api_called = True
 
     @task(1)
     def get_v1_etor_metadata(self):
-        if self.orders_api_called:
+        if self.orders_api_called or self.results_api_called:
             self.client.get(
                 f"{METADATA_ENDPOINT}/{self.submission_id}",
                 headers={"Authorization": self.access_token},
@@ -94,7 +104,7 @@ class SampleUser(FastHttpUser):
 
     @task(1)
     def get_v1_metadata_consolidated(self):
-        if self.orders_api_called:
+        if self.orders_api_called or self.results_api_called:
             self.client.get(
                 f"{CONSOLIDATED_ENDPOINT}/{self.sender}",
                 headers={"Authorization": self.access_token},
@@ -112,8 +122,8 @@ def test_start(environment):
         return
 
     auth_request_body = get_auth_request_body()
-    order_request_body = get_orders_request_body()
-    result_request_body = get_results_request_body()
+    order_request_body = get_order_fhir_message()
+    result_request_body = get_result_fhir_message()
 
 
 @events.quitting.add_listener
@@ -140,13 +150,13 @@ def get_auth_request_body():
     return params.encode("utf-8")
 
 
-def get_orders_request_body():
+def get_order_fhir_message():
     # read the sample request body for the orders endpoint
-    with open("examples/Test/e2e/orders/001_OML_O21_short.fhir", "r") as f:
+    with open("examples/Test/e2e/orders/002_ORM_O01_short.fhir", "r") as f:
         return f.read()
 
 
-def get_results_request_body():
+def get_result_fhir_message():
     # read the sample request body for the results endpoint
     with open("examples/Test/e2e/results/001_ORU_R01_short.fhir", "r") as f:
         return f.read()
