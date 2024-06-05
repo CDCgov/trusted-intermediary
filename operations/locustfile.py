@@ -5,7 +5,7 @@ import urllib.parse
 import urllib.request
 import uuid
 
-from locust import FastHttpUser, events, task
+from locust import FastHttpUser, between, events, task
 from locust.runners import MasterRunner
 
 HEALTH_ENDPOINT = "/health"
@@ -27,6 +27,7 @@ class SampleUser(FastHttpUser):
 
     token_refresh_interval = 280
     access_token = None
+    wait_time = between(1, 5)
 
     def on_start(self):
         self.authenticate()
