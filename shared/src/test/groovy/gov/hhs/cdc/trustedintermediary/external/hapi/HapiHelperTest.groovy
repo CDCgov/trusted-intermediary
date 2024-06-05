@@ -2,12 +2,12 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DiagnosticReport
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.PractitionerRole
 import org.hl7.fhir.r4.model.Provenance
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ResourceType
@@ -557,6 +557,38 @@ class HapiHelperTest extends Specification {
 
         then:
         HapiHelper.getORC21Value(sr) == orc21
+
+        when:
+        def practitionerRole = HapiHelper.getPractitionerRole(sr)
+        def org = HapiHelper.getOrganization(practitionerRole)
+        org.getExtensionByUrl(HapiHelper.EXTENSION_XON_ORGANIZATION_URL).removeExtension(HapiHelper.EXTENSION_XON10_URL)
+
+        then:
+        HapiHelper.getORC21Value(sr) == null
+
+        when:
+        org.getExtension().clear()
+
+        then:
+        HapiHelper.getORC21Value(sr) == null
+    }
+
+    // OBR-4.1 - Observation Identifier
+    def "getOBR4_1Value returns the correct value"() {
+        given:
+        def expectedValue = "expectedValue"
+        def bundle = new Bundle()
+        def dr = HapiFhirHelper.createDiagnosticReport(bundle)
+        def sr = HapiFhirHelper.createBasedOnServiceRequest(dr)
+
+        expect:
+        HapiHelper.getOBR4_1Value(sr) == null
+
+        when:
+        HapiFhirHelper.setOBR4_1Value(sr, expectedValue)
+
+        then:
+        HapiHelper.getOBR4_1Value(sr) == expectedValue
     }
 
     // HD - Hierarchic Designator
@@ -589,5 +621,75 @@ class HapiHelperTest extends Specification {
 
         then:
         actualIdentifier == null
+    }
+
+    // MSH-6 - Receiving Facility
+    def "removeMSH6_2_and_3_Identifier does nothing if there's no facility"() {
+        when:
+        def bundle = new Bundle()
+        def copyBundle = bundle.copy()
+        HapiHelper.removeMSH6_2_and_3_Identifier(bundle)
+
+        then:
+        bundle.equalsDeep(copyBundle)
+
+        when:
+        HapiHelper.createMSHMessageHeader(bundle)
+        def receivingFacility = HapiFhirHelper.createOrganization()
+        HapiFhirHelper.setMSH6Organization(bundle, receivingFacility)
+        copyBundle = bundle.copy()
+        HapiHelper.removeMSH6_2_and_3_Identifier(bundle)
+
+        then:
+        bundle.equalsDeep(copyBundle)
+    }
+
+    // CX.5 - Identifier Type Code
+    def "getCX5Value returns null if no valid extensions are found"() {
+        given:
+        def pid3_5 = "pid3_5"
+
+        when:
+        def bundle = new Bundle()
+        HapiHelper.setPID3_5Value(bundle, pid3_5)
+        def identifier = new Identifier()
+        then:
+        HapiHelper.getCX5Value(identifier) == null
+
+        when:
+        identifier.addExtension().setUrl(HapiHelper.EXTENSION_CX_IDENTIFIER_URL)
+
+        then:
+        HapiHelper.getCX5Value(identifier) == null
+    }
+
+    def "setHl7FieldExtensionValue adds the extension if not found"() {
+        when:
+        def identifier = new Identifier()
+        HapiHelper.setHl7FieldExtensionValue(identifier, HapiHelper.EXTENSION_ORC4_DATA_TYPE)
+
+        then:
+        identifier.getExtensionByUrl(HapiHelper.EXTENSION_HL7_FIELD_URL).getValue() == HapiHelper.EXTENSION_ORC4_DATA_TYPE
+    }
+
+    def "setHl7FieldExtensionValue updates the extension value if one is there already"() {
+        when:
+        def identifier = new Identifier()
+        identifier.addExtension().setUrl(HapiHelper.EXTENSION_HL7_FIELD_URL)
+        HapiHelper.setHl7FieldExtensionValue(identifier, HapiHelper.EXTENSION_ORC4_DATA_TYPE)
+
+        then:
+        identifier.getExtensionByUrl(HapiHelper.EXTENSION_HL7_FIELD_URL).getValue() == HapiHelper.EXTENSION_ORC4_DATA_TYPE
+    }
+
+    def "removeHl7FieldIdentifier does nothing if the extension is not found"() {
+        when:
+        def identifier = new Identifier()
+        identifier.addExtension().setUrl(HapiHelper.EXTENSION_UNIVERSAL_ID_URL)
+        def identifiers = [identifier]
+        HapiHelper.removeHl7FieldIdentifier(identifiers, HapiHelper.EXTENSION_ORC4_DATA_TYPE)
+
+        then:
+        identifiers.first() == identifier
     }
 }
