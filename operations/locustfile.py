@@ -50,8 +50,11 @@ class SampleUser(FastHttpUser):
     def authenticate(self):
         logging.debug("Authenticating...")
         response = self.client.post(AUTH_ENDPOINT, data=auth_request_body)
-        data = response.json()
-        self.access_token = data["access_token"]
+        if response.status_code == 200:
+            data = response.json()
+            self.access_token = data["access_token"]
+        else:
+            logging.error(f"Authentication failed: {response.error}")
 
     @task
     def get_health(self):
