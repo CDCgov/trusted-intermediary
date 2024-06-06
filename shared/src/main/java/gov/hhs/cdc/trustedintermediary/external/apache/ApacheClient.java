@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.external.apache;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import org.apache.hc.client5.http.fluent.Request;
 import org.apache.hc.core5.http.Header;
@@ -32,7 +33,7 @@ public class ApacheClient implements HttpClient {
         try {
             return Request.post(url)
                     .setHeaders(headers)
-                    .body(new StringEntity(body))
+                    .body(new StringEntity(body, StandardCharsets.UTF_8))
                     .execute()
                     .returnContent()
                     .asString();
