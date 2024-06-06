@@ -55,9 +55,7 @@ warm_up_api() {
     --data-urlencode "scope=trusted-intermediary" \
     --data-urlencode "client_assertion=${token}")
 
-    echo ${tiAuthResponse}
     tiToken=$(echo "${tiAuthResponse}" | jq -r '.access_token')
-    echo ${tiToken}
 
     echo 'Warming up results...'
     resultFile=$(pwd)/examples/Test/e2e/results/001_ORU_R01_short.fhir
@@ -73,9 +71,9 @@ warm_up_api() {
         --header "Authorization: Bearer ${tiToken}" \
         --data-binary "@${orderFile}"
 
-    echo 'Warming up metadata...'
-    curl --request GET "http://localhost:8080/v1/etor/metadata/1234" \
-        --header "Authorization: Bearer ${tiToken}" \
+#    echo 'Warming up metadata...'
+#    curl --request GET "http://localhost:8080/v1/etor/metadata/1234" \
+#        --header "Authorization: Bearer ${tiToken}" \
 
     echo 'Warm up nap time...'
     sleep 10
@@ -102,5 +100,6 @@ start_database
 migrate_database
 start_api
 wait_for_api
+warm_up_api
 warm_up_api
 run_tests

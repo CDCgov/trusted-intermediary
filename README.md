@@ -105,10 +105,12 @@ The `test` directory contains the tests.  The `main` directory contains our cust
 #### Load Testing
 
 Load tests are completed with [Locust.io](https://docs.locust.io/en/stable/installation.html).  Run the load tests by
-running...
+running... Currently, we are migrating to using docker (incomplete). The load tests running using gradle is also provided until the migration to docker is complete.
 
 ```shell
-./load-execute.sh
+./gradle-load-execute.sh
+
+./docker-load-execute.sh
 ```
 
 This will run the API for you, so no need to run it manually.
