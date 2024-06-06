@@ -5,7 +5,7 @@ import urllib.parse
 import urllib.request
 import uuid
 
-from locust import FastHttpUser, events, task, between
+from locust import FastHttpUser, between, events, task
 from locust.runners import MasterRunner
 
 HEALTH_ENDPOINT = "/health"
@@ -34,8 +34,7 @@ class SampleUser(FastHttpUser):
 
         self.submission_id = None
         self.placer_order_id = None
-        self.orders_api_called = False
-        self.results_api_called = False
+        self.message_api_called = False
         self.sender = "flexion.simulated-hospital"
 
         # Start the token refreshing thread
@@ -61,41 +60,32 @@ class SampleUser(FastHttpUser):
     def get_health(self):
         self.client.get(HEALTH_ENDPOINT)
 
-    @task(1)
-    def post_v1_etor_orders(self):
+    def post_message_request(self, endpoint, message):
         self.submission_id = str(uuid.uuid4())
         poi = self.placer_order_id or str(uuid.uuid4())
         self.placer_order_id = None if self.placer_order_id else poi
         response = self.client.post(
-            ORDERS_ENDPOINT,
+            endpoint,
             headers={
                 "Authorization": self.access_token,
                 "RecordId": self.submission_id,
             },
-            data=order_request_body.replace("{{placer_order_id}}", poi),
+            data=message.replace("{{placer_order_id}}", poi),
         )
         if response.status_code == 200:
-            self.orders_api_called = True
+            self.message_api_called = True
 
-    @task(1)
+    @task(5)
+    def post_v1_etor_orders(self):
+        self.post_message_request(ORDERS_ENDPOINT, order_request_body)
+
+    @task(5)
     def post_v1_etor_results(self):
-        self.submission_id = str(uuid.uuid4())
-        poi = self.placer_order_id or str(uuid.uuid4())
-        self.placer_order_id = None
-        response = self.client.post(
-            RESULTS_ENDPOINT,
-            headers={
-                "Authorization": self.access_token,
-                "RecordId": self.submission_id,
-            },
-            data=result_request_body.replace("{{placer_order_id}}", poi),
-        )
-        if response.status_code == 200:
-            self.results_api_called = True
+        self.post_message_request(RESULTS_ENDPOINT, result_request_body)
 
     @task(1)
     def get_v1_etor_metadata(self):
-        if self.orders_api_called or self.results_api_called:
+        if self.message_api_called:
             self.client.get(
                 f"{METADATA_ENDPOINT}/{self.submission_id}",
                 headers={"Authorization": self.access_token},
@@ -104,7 +94,7 @@ class SampleUser(FastHttpUser):
 
     @task(1)
     def get_v1_metadata_consolidated(self):
-        if self.orders_api_called or self.results_api_called:
+        if self.message_api_called:
             self.client.get(
                 f"{CONSOLIDATED_ENDPOINT}/{self.sender}",
                 headers={"Authorization": self.access_token},
