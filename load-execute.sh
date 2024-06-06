@@ -59,19 +59,21 @@ warm_up_api() {
 
     echo 'Warming up results...'
     resultFile=$(pwd)/examples/Test/e2e/results/001_ORU_R01_short.fhir
-
     curl --output /dev/null --silent --request POST "http://localhost:8080/v1/etor/results" \
-    --header "recordId: 9999" \
+    --header "recordId: 6789" \
     --header "Authorization: Bearer ${tiToken}" \
     --data-binary "@${resultFile}"
 
     echo 'Warming up orders...'
     orderFile=$(pwd)/examples/Test/e2e/orders/002_ORM_O01_short.fhir
-
-    curl --output /dev/null --silent --request POST "http://localhost:8080/v1/etor/results" \
-        --header "recordId: 9999" \
+    curl --output /dev/null --silent --request POST "http://localhost:8080/v1/etor/orders" \
+        --header "recordId: 1234" \
         --header "Authorization: Bearer ${tiToken}" \
         --data-binary "@${orderFile}"
+
+    echo 'Warming up metadata...'
+    curl --output /dev/null --silent --request GET "http://localhost:8080/v1/etor/metadata/1234" \
+        --header "Authorization: Bearer ${tiToken}" \
 
     echo 'Warm up nap time...'
     sleep 10
