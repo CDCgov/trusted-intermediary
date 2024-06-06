@@ -50,29 +50,31 @@ warm_up_api() {
     token=$(jwt encode --exp='+30min' --jti $(uuidgen) --alg RS256  --no-iat -S@${pem})
 
     echo 'Warming up auth...'
-    tiAuthResponse=$(curl --silent --request POST "http://localhost:8080/v1/auth/token" \
+    tiAuthResponse=$(curl --request POST "http://localhost:8080/v1/auth/token" \
     --header "Content-Type: application/x-www-form-urlencoded" \
     --data-urlencode "scope=trusted-intermediary" \
     --data-urlencode "client_assertion=${token}")
 
-    tiToken=$(echo "${tiAuthResponse}" | awk -F '"' '{print $8}')
+    echo ${tiAuthResponse}
+    tiToken=$(echo "${tiAuthResponse}" | jq -r '.access_token')
+    echo ${tiToken}
 
     echo 'Warming up results...'
     resultFile=$(pwd)/examples/Test/e2e/results/001_ORU_R01_short.fhir
-    curl --output /dev/null --silent --request POST "http://localhost:8080/v1/etor/results" \
+    curl --request POST "http://localhost:8080/v1/etor/results" \
     --header "recordId: 6789" \
     --header "Authorization: Bearer ${tiToken}" \
     --data-binary "@${resultFile}"
 
     echo 'Warming up orders...'
     orderFile=$(pwd)/examples/Test/e2e/orders/002_ORM_O01_short.fhir
-    curl --output /dev/null --silent --request POST "http://localhost:8080/v1/etor/orders" \
+    curl --request POST "http://localhost:8080/v1/etor/orders" \
         --header "recordId: 1234" \
         --header "Authorization: Bearer ${tiToken}" \
         --data-binary "@${orderFile}"
 
     echo 'Warming up metadata...'
-    curl --output /dev/null --silent --request GET "http://localhost:8080/v1/etor/metadata/1234" \
+    curl --request GET "http://localhost:8080/v1/etor/metadata/1234" \
         --header "Authorization: Bearer ${tiToken}" \
 
     echo 'Warm up nap time...'
