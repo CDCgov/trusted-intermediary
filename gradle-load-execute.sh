@@ -9,7 +9,7 @@ start_api() {
     export DB_USER=intermediary
     export DB_PASS=changeIT!
     export DB_SSL=require
-    ./gradlew --no-daemon app:clean app:run > /dev/null 2>&1 &
+    ./gradlew --no-daemon app:clean app:run > ./gradlew-load-tests.log 2>&1 &
     export API_PID="${!}"
     echo "API starting at PID ${API_PID}"
 }
@@ -44,6 +44,41 @@ wait_for_api() {
     echo 'API is responding'
 }
 
+warm_up_api() {
+    echo 'Warming up API...'
+    pem=$(pwd)/mock_credentials/organization-trusted-intermediary-private-key-local.pem
+    token=$(jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256  --no-iat -S@${pem})
+
+    echo ${token}
+
+    echo 'Warming up auth...'
+    tiAuthResponse=$(curl --request POST "http://localhost:8080/v1/auth/token" \
+    --header "Content-Type: application/x-www-form-urlencoded" \
+    --data-urlencode "scope=trusted-intermediary" \
+    --data-urlencode "client_assertion=${token}")
+
+    tiToken=$(echo "${tiAuthResponse}" | jq -r '.access_token')
+
+    echo 'Warming up results...'
+    resultFile=$(pwd)/examples/Test/e2e/results/001_ORU_R01_short.fhir
+    curl --silent --request POST "http://localhost:8080/v1/etor/results" \
+    --header "recordId: 6789" \
+    --header "Authorization: Bearer ${tiToken}" \
+    --data-binary "@${resultFile}"
+
+    echo 'Warming up orders...'
+    orderFile=$(pwd)/examples/Test/e2e/orders/002_ORM_O01_short.fhir
+    curl --silent --request POST "http://localhost:8080/v1/etor/orders" \
+        --header "recordId: 1234" \
+        --header "Authorization: Bearer ${tiToken}" \
+        --data-binary "@${orderFile}"
+
+    echo 'Warm up nap time...'
+    sleep 10
+
+    echo 'API is cozy'
+}
+
 run_tests() {
     echo 'Running the load test'
     locust --headless -f ./operations/locustfile.py -H http://localhost:8080 -u 1000 -r 17 -t 5m
@@ -54,9 +89,7 @@ cleanup() {
     kill "${API_PID}"
     echo "PID ${API_PID} killed"
     echo "Stopping and deleting database"
-    docker stop trusted-intermediary-postgresql-test-1
-    docker rm -f trusted-intermediary-postgresql-test-1
-    docker volume rm trusted-intermediary_ti_postgres_test_data
+    docker compose -f docker-compose.postgres-test.yml down -v
     echo "Database stopped and deleted"
 }
 
@@ -65,4 +98,5 @@ start_database
 migrate_database
 start_api
 wait_for_api
+#warm_up_api
 run_tests

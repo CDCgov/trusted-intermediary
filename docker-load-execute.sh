@@ -11,6 +11,7 @@ start_api() {
     export DB_SSL=require
     ./gradlew shadowJar
     docker compose up --build -d
+    docker compose logs router --no-color > docker-load-test-logs.txt
     export API_PID="${!}"
     echo "API starting at PID ${API_PID}"
 }
@@ -47,10 +48,12 @@ wait_for_api() {
 warm_up_api() {
     echo 'Warming up API...'
     pem=$(pwd)/mock_credentials/organization-trusted-intermediary-private-key-local.pem
-    token=$(jwt encode --exp='+30min' --jti $(uuidgen) --alg RS256  --no-iat -S@${pem})
+    token=$(jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256  --no-iat -S@${pem})
+
+    echo ${token}
 
     echo 'Warming up auth...'
-    tiAuthResponse=$(curl --silent --request POST "http://localhost:8080/v1/auth/token" \
+    tiAuthResponse=$(curl --request POST "http://localhost:8080/v1/auth/token" \
     --header "Content-Type: application/x-www-form-urlencoded" \
     --data-urlencode "scope=trusted-intermediary" \
     --data-urlencode "client_assertion=${token}")
