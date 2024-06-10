@@ -132,12 +132,11 @@ public class EtorDomainRegistration implements DomainConnector {
                     MessageLinkStorage.class, FileMessageLinkStorage.getInstance());
         }
 
-        if ((ApplicationContext.getEnvironment().equalsIgnoreCase("local"))
-                && (ApplicationContext.isPropertyNullOrBlank("REPORT_STREAM_URL_PREFIX"))) {
-            ApplicationContext.register(RSEndpointClient.class, MockRSEndpointClient.getInstance());
-        } else {
+        if (!ApplicationContext.isPropertyNullOrBlank("REPORT_STREAM_URL_PREFIX")) {
             ApplicationContext.register(
                     RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
+        } else {
+            ApplicationContext.register(RSEndpointClient.class, MockRSEndpointClient.getInstance());
         }
 
         return endpoints;
