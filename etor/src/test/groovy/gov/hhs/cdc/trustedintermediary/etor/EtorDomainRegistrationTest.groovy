@@ -60,6 +60,24 @@ class EtorDomainRegistrationTest extends Specification {
         endpoints.get(consolidatedOrdersEndpoint) != null
     }
 
+    def "domain registration has endpoints when DB_URL is not found"() {
+        given:
+        def domainRegistration = new EtorDomainRegistration()
+        def ordersEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.ORDERS_API_ENDPOINT, true)
+        def metadataEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.METADATA_API_ENDPOINT, true)
+        def consolidatedOrdersEndpoint = new HttpEndpoint("GET", EtorDomainRegistration.CONSOLIDATED_SUMMARY_API_ENDPOINT, true)
+        TestApplicationContext.addEnvironmentVariable("DB_URL", "")
+
+        when:
+        def endpoints = domainRegistration.domainRegistration()
+
+        then:
+        !endpoints.isEmpty()
+        endpoints.get(ordersEndpoint) != null
+        endpoints.get(metadataEndpoint) != null
+        endpoints.get(consolidatedOrdersEndpoint) != null
+    }
+
     def "RSEndpointClient uses the right implementation depending if REPORT_STREAM_URL_PREFIX is present or not"() {
         given:
         def domainRegistration = new EtorDomainRegistration()
