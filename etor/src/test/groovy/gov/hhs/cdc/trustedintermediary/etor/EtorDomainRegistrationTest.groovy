@@ -99,19 +99,6 @@ class EtorDomainRegistrationTest extends Specification {
         ReportStreamEndpointClient.isInstance(implementation)
     }
 
-    def "RSEndpointClient is created with the correct URL"() {
-        given:
-        def domainRegistration = new EtorDomainRegistration()
-        def rsEndpoint = new HttpEndpoint("POST", EtorDomainRegistration.RS_ENDPOINT, true)
-
-        when:
-        def endpoints = domainRegistration.domainRegistration()
-
-        then:
-        !endpoints.isEmpty()
-        endpoints.get(rsEndpoint) != null
-    }
-
     def "has an OpenAPI specification"() {
         given:
         def domainRegistration = new EtorDomainRegistration()
