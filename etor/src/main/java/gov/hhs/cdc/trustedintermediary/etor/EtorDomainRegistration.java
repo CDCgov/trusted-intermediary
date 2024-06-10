@@ -119,7 +119,7 @@ public class EtorDomainRegistration implements DomainConnector {
 
         ApplicationContext.register(SendMessageHelper.class, SendMessageHelper.getInstance());
 
-        if (ApplicationContext.getProperty("DB_URL") != null) {
+        if (!ApplicationContext.isPropertyNullOrBlank("DB_URL")) {
             ApplicationContext.register(DbDao.class, PostgresDao.getInstance());
             ApplicationContext.register(
                     PartnerMetadataStorage.class, DatabasePartnerMetadataStorage.getInstance());
@@ -131,7 +131,9 @@ public class EtorDomainRegistration implements DomainConnector {
             ApplicationContext.register(
                     MessageLinkStorage.class, FileMessageLinkStorage.getInstance());
         }
-        if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
+
+        if ((ApplicationContext.getEnvironment().equalsIgnoreCase("local"))
+                && (ApplicationContext.isPropertyNullOrBlank("REPORT_STREAM_URL_PREFIX"))) {
             ApplicationContext.register(RSEndpointClient.class, MockRSEndpointClient.getInstance());
         } else {
             ApplicationContext.register(

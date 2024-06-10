@@ -15,7 +15,7 @@ start_api() {
     JAR_NAME="app-all.jar"
 
     echo 'Starting API'
-    java -jar "${DIR}"/"${SUB_DIR}"/"${JAR_NAME}" > /dev/null &
+    REPORT_STREAM_URL_PREFIX= java -jar "${DIR}"/"${SUB_DIR}"/"${JAR_NAME}" > /dev/null &
     export API_PID="${!}"
     echo "API starting at PID ${API_PID}"
 
