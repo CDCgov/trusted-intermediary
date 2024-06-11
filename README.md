@@ -293,18 +293,7 @@ For database documentation [go here](/docs/database.md)
 #### CDC-TI Setup
 
 1. Checkout `main` branch for `CDCgov/trusted-intermediary`
-2. Edit the `app/src/main/java/gov/hhs/cdc/trustedintermediary/etor/EtorDomainRegistration.java` file and replace:
-   ```Java
-   if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
-      ApplicationContext.register(RSEndpointClient.class, MockRSEndpointClient.getInstance());
-   } else {
-      ApplicationContext.register(RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
-   }
-   ```
-   with:
-   ```Java
-   ApplicationContext.register(RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
-   ```
+2. Run `./generate_env.sh` to generate `.env` file with required environment variables
 3. Run TI with `./gradlew clean app:run`
 
 #### ReportStream Setup

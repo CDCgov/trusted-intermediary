@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor
 
 import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.ResultMock
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponse
@@ -22,6 +23,8 @@ import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultController
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultResponse
 import gov.hhs.cdc.trustedintermediary.etor.results.SendResultUseCase
+import gov.hhs.cdc.trustedintermediary.external.localfile.MockRSEndpointClient
+import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClient
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
@@ -73,6 +76,27 @@ class EtorDomainRegistrationTest extends Specification {
         endpoints.get(ordersEndpoint) != null
         endpoints.get(metadataEndpoint) != null
         endpoints.get(consolidatedOrdersEndpoint) != null
+    }
+
+    def "RSEndpointClient uses the right implementation depending if REPORT_STREAM_URL_PREFIX is present or not"() {
+        given:
+        def domainRegistration = new EtorDomainRegistration()
+
+        when:
+        TestApplicationContext.addEnvironmentVariable("REPORT_STREAM_URL_PREFIX", "")
+        domainRegistration.domainRegistration()
+        def mockImplementation = ApplicationContext.getImplementation(RSEndpointClient.class)
+
+        then:
+        MockRSEndpointClient.isInstance(mockImplementation)
+
+        when:
+        TestApplicationContext.addEnvironmentVariable("REPORT_STREAM_URL_PREFIX", "something")
+        domainRegistration.domainRegistration()
+        def implementation = ApplicationContext.getImplementation(RSEndpointClient.class)
+
+        then:
+        ReportStreamEndpointClient.isInstance(implementation)
     }
 
     def "has an OpenAPI specification"() {

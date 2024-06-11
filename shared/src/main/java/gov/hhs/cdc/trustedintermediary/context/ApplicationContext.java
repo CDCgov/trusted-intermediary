@@ -163,6 +163,11 @@ public class ApplicationContext {
         return DotEnv.get(key, defaultValue);
     }
 
+    public static boolean isPropertyPresent(String key) {
+        String value = getProperty(key);
+        return value != null && !value.isBlank();
+    }
+
     public static String getEnvironment() {
         return getProperty("ENV", "local");
     }
