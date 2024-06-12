@@ -57,6 +57,9 @@ warm_up_api() {
     --data-urlencode "scope=trusted-intermediary" \
     --data-urlencode "client_assertion=${token}")
 
+    echo 'Auth successful!'
+    echo ${tiAuthResponse}
+
     tiToken=$(echo "${tiAuthResponse}" | jq -r '.access_token')
 
     echo 'Warming up results...'
