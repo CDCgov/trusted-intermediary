@@ -9,6 +9,7 @@ start_api() {
     export DB_USER=intermediary
     export DB_PASS=changeIT!
     export DB_SSL=require
+    export REPORT_STREAM_URL_PREFIX=
     ./gradlew shadowJar
     docker compose up --build -d
     docker compose logs router --no-color > docker-load-test-logs.txt
@@ -58,7 +59,11 @@ warm_up_api() {
     --data-urlencode "scope=trusted-intermediary" \
     --data-urlencode "client_assertion=${token}")
 
-    tiToken=$(echo "${tiAuthResponse}" | jq -r '.access_token')
+    echo 'Retrieving access token...'
+
+    tiToken=$(echo "${tiAuthResponse}" | grep -o '"access_token": "[^"]*' test-response.json | grep -o '[^"]*$')
+
+    echo ${token}
 
     echo 'Warming up results...'
     resultFile=$(pwd)/examples/Test/e2e/results/001_ORU_R01_short.fhir

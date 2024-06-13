@@ -9,6 +9,7 @@ start_api() {
     export DB_USER=intermediary
     export DB_PASS=changeIT!
     export DB_SSL=require
+    export REPORT_STREAM_URL_PREFIX=
     ./gradlew --no-daemon app:clean app:run > ./gradlew-load-tests.log 2>&1 &
     export API_PID="${!}"
     echo "API starting at PID ${API_PID}"
@@ -57,10 +58,11 @@ warm_up_api() {
     --data-urlencode "scope=trusted-intermediary" \
     --data-urlencode "client_assertion=${token}")
 
-    echo 'Auth successful!'
-    echo ${tiAuthResponse}
+    echo 'Retrieving access token...'
 
-    tiToken=$(echo "${tiAuthResponse}" | jq -r '.access_token')
+    tiToken=$(echo "${tiAuthResponse}" | grep -o '"access_token": "[^"]*' test-response.json | grep -o '[^"]*$')
+
+    echo ${token}
 
     echo 'Warming up results...'
     resultFile=$(pwd)/examples/Test/e2e/results/001_ORU_R01_short.fhir
@@ -101,5 +103,5 @@ start_database
 migrate_database
 start_api
 wait_for_api
-#warm_up_api
+warm_up_api
 run_tests

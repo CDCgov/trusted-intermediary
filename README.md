@@ -105,8 +105,6 @@ The `test` directory contains the tests.  The `main` directory contains our cust
 #### Load Testing
 
 Load tests are completed with [Locust.io](https://docs.locust.io/en/stable/installation.html).
-Please make sure your `/shared/src/main/resoirces/.env` file does not contain the variable `REPORT_STREAM_URL_PREFIX=http://localhost:7071`.
-This causes the environment to use a Mock setup of ReportStream which is how load testing is configured.
 Run the load tests by running...
 
 ```shell
