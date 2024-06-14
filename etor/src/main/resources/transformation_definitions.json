@@ -45,7 +45,7 @@
       "description": "Updates UCSD ORU Receiving Facility (MSH-6) to value in ORC-21.10 and remove content from MSH-6.2 and MSH-6.3",
       "message": "",
       "conditions": [
-        "Bundle.entry.resource.ofType(DiagnosticReport)[0].basedOn.resolve().requester.resolve().organization.resolve().extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/xon-organization').extension.where(url = 'XON.10').value",
+        "Bundle.entry.resource.ofType(DiagnosticReport)[0].basedOn.resolve().requester.resolve().organization.resolve().extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/xon-organization').extension.where(url = 'XON.10').value in ('R797' | 'R508')",
         "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
       ],
       "rules": [
