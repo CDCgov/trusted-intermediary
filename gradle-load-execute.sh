@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
 set -e
 
+local_port=5434
+
 start_api() {
     echo 'Starting API'
     export DB_URL=localhost
-    export DB_PORT=5434
+    export DB_PORT=${local_port}
     export DB_NAME=intermediary-test
     export DB_USER=intermediary
     export DB_PASS=changeIT!
     export DB_SSL=require
     export REPORT_STREAM_URL_PREFIX=
-    ./gradlew --no-daemon app:clean app:run > ./gradlew-load-tests.log 2>&1 &
+    ./gradlew --no-daemon app:clean app:run > /dev/null 2>&1 &
     export API_PID="${!}"
     echo "API starting at PID ${API_PID}"
 }
@@ -24,7 +26,7 @@ start_database() {
 
 migrate_database() {
     echo 'Migrating database'
-    liquibase update --changelog-file ./etor/databaseMigrations/root.yml --url jdbc:postgresql://localhost:5434/intermediary-test --username intermediary --password 'changeIT!' --label-filter '!azure'
+    liquibase update --changelog-file ./etor/databaseMigrations/root.yml --url jdbc:postgresql://localhost:${local_port}/intermediary-test --username intermediary --password 'changeIT!' --label-filter '!azure'
     echo "Database migrated"
 }
 
@@ -47,8 +49,9 @@ wait_for_api() {
 
 warm_up_api() {
     echo 'Warming up API...'
-    pem=$(pwd)/mock_credentials/organization-trusted-intermediary-private-key-local.pem
-    token=$(jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256  --no-iat -S@${pem})
+    sleep 5
+    tokenPath=$(pwd)/mock_credentials/trusted-intermediary-valid-token.jwt
+    token=$(cat "${tokenPath}")
 
     echo ${token}
 
@@ -58,28 +61,29 @@ warm_up_api() {
     --data-urlencode "scope=trusted-intermediary" \
     --data-urlencode "client_assertion=${token}")
 
+    echo "$tiAuthResponse"
     echo 'Retrieving access token...'
 
-    tiToken=$(echo "${tiAuthResponse}" | grep -o '"access_token": "[^"]*' test-response.json | grep -o '[^"]*$')
+    accessToken=$(echo "$tiAuthResponse" | grep -o '"access_token":"[^"]*' | grep -o '[^"]*$')
 
-    echo ${token}
+    echo "$accessToken"
 
     echo 'Warming up results...'
     resultFile=$(pwd)/examples/Test/e2e/results/001_ORU_R01_short.fhir
     curl --silent --request POST "http://localhost:8080/v1/etor/results" \
     --header "recordId: 6789" \
-    --header "Authorization: Bearer ${tiToken}" \
+    --header "Authorization: Bearer ${accessToken}" \
     --data-binary "@${resultFile}"
 
     echo 'Warming up orders...'
     orderFile=$(pwd)/examples/Test/e2e/orders/002_ORM_O01_short.fhir
     curl --silent --request POST "http://localhost:8080/v1/etor/orders" \
         --header "recordId: 1234" \
-        --header "Authorization: Bearer ${tiToken}" \
+        --header "Authorization: Bearer ${accessToken}" \
         --data-binary "@${orderFile}"
 
     echo 'Warm up nap time...'
-    sleep 10
+    sleep 5
 
     echo 'API is cozy'
 }
