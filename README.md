@@ -104,12 +104,15 @@ The `test` directory contains the tests.  The `main` directory contains our cust
 
 #### Load Testing
 
-Load tests are completed with [Locust.io](https://docs.locust.io/en/stable/installation.html).  Run the load tests by
-running...
+Load tests are completed with [Locust.io](https://docs.locust.io/en/stable/installation.html).
+Run the load tests by running...
 
 ```shell
-./load-execute.sh
+./gradle-load-execute.sh
+
+./docker-load-execute.sh
 ```
+Currently, we are migrating to using Azure. Local load testing is using gradle, however a docker load test is available to mimic the Azure environment settings until the azure migration is complete.
 
 This will run the API for you, so no need to run it manually.
 **If you are already running the API, stop it before running the load tests or the cleanup steps won't work.**

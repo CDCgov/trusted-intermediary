@@ -1,7 +1,7 @@
 version: "3.7"
 
 services:
-  postgresql-test:
+  postgresql:
     image: postgres:16
     restart: unless-stopped
     environment:
