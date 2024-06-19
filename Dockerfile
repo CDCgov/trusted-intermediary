@@ -1,6 +1,8 @@
 # Use Linux-Alpine image
 FROM amazoncorretto:17.0.11-alpine
 
+RUN apk -U upgrade
+
 ARG JAR_LIB_FILE=./app/build/libs/app-all.jar
 
 # Create directory and switch to it
