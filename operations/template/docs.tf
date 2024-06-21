@@ -6,6 +6,7 @@ resource "azurerm_storage_account" "docs" {
   account_replication_type        = "GRS"
   account_kind                    = "StorageV2"
   allow_nested_items_to_be_public = false
+  min_tls_version                 = "TLS1_2"
 
   static_website {
     index_document = "index.html"
