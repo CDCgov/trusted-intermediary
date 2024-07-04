@@ -158,10 +158,21 @@ public class HapiHelper {
         return getHD1Identifier(identifiers);
     }
 
+    public static Identifier createMSH6_1Identifier() {
+        Identifier identifier = new Identifier();
+        setHD1Identifier(identifier);
+        return identifier;
+    }
+
     public static void setMSH6_1Value(Bundle bundle, String value) {
         Identifier identifier = getMSH6_1Identifier(bundle);
         if (identifier == null) {
-            return;
+            identifier = createMSH6_1Identifier();
+            Organization receivingFacility = getMSH6Organization(bundle);
+            if (receivingFacility == null) {
+                return;
+            }
+            receivingFacility.addIdentifier(identifier);
         }
         identifier.setValue(value);
     }
@@ -417,6 +428,10 @@ public class HapiHelper {
             return null;
         }
         return hd1Identifiers.get(0);
+    }
+
+    public static void setHD1Identifier(Identifier identifier) {
+        setHl7FieldExtensionValue(identifier, EXTENSION_HD1_DATA_TYPE);
     }
 
     // CWE - Coded with Exceptions
