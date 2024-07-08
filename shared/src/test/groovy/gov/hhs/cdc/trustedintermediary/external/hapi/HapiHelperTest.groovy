@@ -255,14 +255,29 @@ class HapiHelperTest extends Specification {
         HapiHelper.getMSH6Organization(bundle) == null
 
         when:
+        HapiHelper.setMSH6_1Value(bundle, msh6_1)
+
+        then:
+        HapiHelper.getMSH6_1Identifier(bundle) == null
+
+        when:
         def receivingFacility = HapiFhirHelper.createOrganization()
         HapiFhirHelper.setMSH6Organization(bundle, receivingFacility)
         HapiHelper.setMSH6_1Value(bundle, msh6_1)
 
         then:
+        HapiHelper.getMSH6_1Identifier(bundle) != null
+        HapiFhirHelper.getMSH6_1Value(bundle) == msh6_1
+
+        when:
+        receivingFacility = HapiFhirHelper.createOrganization()
+        HapiFhirHelper.setMSH6Organization(bundle, receivingFacility)
+        HapiHelper.setMSH6_1Value(bundle, msh6_1)
+
+        then:
         HapiHelper.getMSH6Organization(bundle).equalsDeep(receivingFacility)
-        HapiHelper.getMSH6_1Identifier(bundle) == null
-        HapiFhirHelper.getMSH6_1Value(bundle) != msh6_1
+        HapiHelper.getMSH6_1Identifier(bundle) != null
+        HapiFhirHelper.getMSH6_1Value(bundle) == msh6_1
 
         when:
         HapiFhirHelper.setMSH6_1Identifier(bundle, new Identifier())
