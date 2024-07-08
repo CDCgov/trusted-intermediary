@@ -2,7 +2,6 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.DiagnosticReport
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.MessageHeader
@@ -517,6 +516,7 @@ class HapiHelperTest extends Specification {
     def "orc-4.1 methods work as expected"() {
         given:
         def orc4_1 = "orc4_1"
+        def orc4_1b = "orc4_1b"
         def bundle = new Bundle()
         def dr = HapiFhirHelper.createDiagnosticReport(bundle)
         def sr = HapiFhirHelper.createBasedOnServiceRequest(dr)
@@ -529,12 +529,19 @@ class HapiHelperTest extends Specification {
 
         then:
         HapiHelper.getORC4_1Value(sr) == orc4_1
+
+        when:
+        HapiHelper.setORC4_1Value(sr, orc4_1b)
+
+        then:
+        HapiHelper.getORC4_1Value(sr) == orc4_1b
     }
 
     // ORC-4.2 - Namespace ID
     def "orc-4.2 methods work as expected"() {
         given:
         def orc4_2 = "orc4_2"
+        def orc4_2b = "orc4_2b"
         def bundle = new Bundle()
         def dr = HapiFhirHelper.createDiagnosticReport(bundle)
         def sr = HapiFhirHelper.createBasedOnServiceRequest(dr)
@@ -547,6 +554,12 @@ class HapiHelperTest extends Specification {
 
         then:
         HapiHelper.getORC4_2Value(sr) == orc4_2
+
+        when:
+        HapiHelper.setORC4_2Value(sr, orc4_2b)
+
+        then:
+        HapiHelper.getORC4_2Value(sr) == orc4_2b
     }
 
     def "orc-21 methods work as expected"() {
