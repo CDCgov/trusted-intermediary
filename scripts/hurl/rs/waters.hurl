@@ -12,13 +12,7 @@ HTTP 200
 token: jsonpath "$['access_token']"
 
 POST {{url}}/api/waters
-Content-Type: application/hl7-v2
+Content-Type: {{content-type}}
 Client: {{client-id}}.{{client-sender}}
 Authorization: Bearer {{token}}
 file,{{fpath}};
-
-# POST {{url}}/api/waters
-# Content-Type: application/fhir+ndjson
-# Client: {{client-id}}.{{client-sender}}
-# Authorization: Bearer {{token}}
-# file,{{fpath}};
