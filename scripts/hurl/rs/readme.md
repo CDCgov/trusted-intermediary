@@ -8,6 +8,7 @@ Usage: ./hrl <HURL_FILE> [OPTIONS]
 Options:
     -f <REL_PATH>         The path to the hl7/fhir file to submit, relative the root path (Required for waters API)
     -r <ROOT_PATH>        The root path to the hl7/fhir files (Default: $CDCTI_HOME/examples/Test/)
+    -t <CONTENT_TYPE>     The content type for the message (e.g. 'application/hl7-v2' or 'application/fhir+ndjson') (Default: application/hl7-v2)
     -e [local | staging]  The environment to run the test in (Default: local)
     -c <CLIENT_ID>        The client id to use (Default: flexion)
     -s <CLIENT_SENDER>    The client sender to use (Default: simulated-lab)
