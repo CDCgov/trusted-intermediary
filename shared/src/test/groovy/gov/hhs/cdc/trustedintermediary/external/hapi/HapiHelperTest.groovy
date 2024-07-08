@@ -604,6 +604,12 @@ class HapiHelperTest extends Specification {
 
         then:
         HapiHelper.getOBR4_1Value(sr) == expectedValue
+
+        when:
+        sr.setCode(null)
+
+        then:
+        HapiHelper.getOBR4_1Value(sr) == null
     }
 
     // HD - Hierarchic Designator
