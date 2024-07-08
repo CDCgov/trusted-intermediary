@@ -9,8 +9,9 @@ fi
 # default values
 env=local
 root=$CDCTI_HOME/examples/Test/
+content_type=application/hl7-v2
 client_id=flexion
-client_sender=simulated-lab
+client_sender=simulated-hospital
 verbose=""
 submission_id=""
 
@@ -20,6 +21,7 @@ show_help() {
     echo "Options:"
     echo "    -f <REL_PATH>         The path to the hl7/fhir file to submit, relative the root path (Required for waters API)"
     echo "    -r <ROOT_PATH>        The root path to the hl7/fhir files (Default: $root)"
+    echo "    -t <CONTENT_TYPE>     The content type for the message (e.g. 'application/hl7-v2' or 'application/fhir+ndjson') (Default: $content_type)"
     echo "    -e [local | staging]  The environment to run the test in (Default: $env)"
     echo "    -c <CLIENT_ID>        The client id to use (Default: $client_id)"
     echo "    -s <CLIENT_SENDER>    The client sender to use (Default: $client_sender)"
@@ -45,13 +47,16 @@ fi
 hurl_file="$1" # Assign the first argument to hurl_file
 shift          # Remove the first argument from the list of arguments
 
-while getopts ':f:r:e:c:s:x:i:vh' opt; do
+while getopts ':f:r:t:e:c:s:x:i:vh' opt; do
     case "$opt" in
     f)
         fpath="$OPTARG"
         ;;
     r)
         root="$OPTARG"
+        ;;
+    t)
+        content_type="$OPTARG"
         ;;
     e)
         env="$OPTARG"
@@ -113,6 +118,7 @@ hurl \
     --variable fpath=$fpath \
     --file-root $root \
     --variable url=$url \
+    --variable content-type=$content_type \
     --variable client-id=$client_id \
     --variable client-sender=$client_sender \
     --variable jwt=$(jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 -k $client_id.$client_sender -i $client_id.$client_sender -s $client_id.$client_sender -a $host --no-iat -S @$secret) \
