@@ -414,7 +414,7 @@ public class HapiHelper {
     // OBR-4.1 - Identifier
     public static String getOBR4_1Value(ServiceRequest serviceRequest) {
         CodeableConcept cc = serviceRequest.getCode();
-        if (cc == null || cc.getCoding().isEmpty()) {
+        if (cc.getCoding().isEmpty()) {
             return null;
         }
         return getCWE1Value(cc.getCoding().get(0));
