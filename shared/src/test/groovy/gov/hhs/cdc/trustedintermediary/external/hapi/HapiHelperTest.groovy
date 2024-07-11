@@ -457,7 +457,7 @@ class HapiHelperTest extends Specification {
 
         when:
         def bundle = new Bundle()
-        HapiHelper.removePID5_7Extension(bundle)
+        HapiHelper.setPID5_7ExtensionValue(bundle, null)
 
         then:
         HapiHelper.getPID5Extension(bundle) == null
@@ -465,7 +465,7 @@ class HapiHelperTest extends Specification {
         when:
         HapiFhirHelper.createPIDPatient(bundle)
         HapiFhirHelper.setPID5Extension(bundle)
-        HapiHelper.removePID5_7Extension(bundle)
+        HapiHelper.setPID5_7ExtensionValue(bundle, null)
 
         then:
         HapiFhirHelper.getPID5_7Value(bundle) == null
@@ -478,7 +478,7 @@ class HapiHelperTest extends Specification {
         HapiFhirHelper.getPID5_7Value(bundle) == pid5_7
 
         when:
-        HapiHelper.removePID5_7Extension(bundle)
+        HapiHelper.setPID5_7ExtensionValue(bundle, null)
 
         then:
         HapiHelper.getPID5Extension(bundle) != null

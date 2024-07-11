@@ -272,12 +272,12 @@ public class HapiHelper {
         return name.getExtensionByUrl(HapiHelper.EXTENSION_XPN_HUMAN_NAME_URL);
     }
 
-    public static void removePID5_7Extension(Bundle bundle) {
+    public static void setPID5_7ExtensionValue(Bundle bundle, String value) {
         Extension extension = getPID5Extension(bundle);
         if (extension != null && extension.hasExtension(HapiHelper.EXTENSION_XPN7_URL)) {
-            // Need to set the value for extension to empty instead of removing the extension,
-            // otherwise RS will set its own value in its place
-            extension.getExtensionByUrl(HapiHelper.EXTENSION_XPN7_URL).setValue(new StringType());
+            extension
+                    .getExtensionByUrl(HapiHelper.EXTENSION_XPN7_URL)
+                    .setValue(new StringType(value));
         }
     }
 
