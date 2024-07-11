@@ -12,6 +12,8 @@ public class RemovePatientNameTypeCode implements CustomFhirTransformation {
     @Override
     public void transform(final FhirResource<?> resource, final Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
-        HapiHelper.removePID5_7Extension(bundle);
+        // Need to set the value for extension to empty instead of removing the extension,
+        // otherwise RS will set its own value in its place
+        HapiHelper.setPID5_7ExtensionValue(bundle, null);
     }
 }
