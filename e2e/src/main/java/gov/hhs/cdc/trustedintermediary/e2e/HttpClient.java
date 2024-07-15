@@ -43,10 +43,6 @@ public class HttpClient {
         return handleResponseAndSetEntity(response);
     }
 
-    public static ClassicHttpResponse post(String path, String body) throws IOException {
-        return post(path, body, ContentType.APPLICATION_JSON, null);
-    }
-
     private static ClassicHttpResponse handleResponseAndSetEntity(Response response)
             throws IOException {
         var responseHandler = new ResponseHandlerWithoutException();

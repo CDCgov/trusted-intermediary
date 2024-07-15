@@ -966,7 +966,7 @@
                 }
               ]
             },
-            "value": "423787478"
+            "value": "{{placer_order_id}}"
           },
           {
             "extension": [

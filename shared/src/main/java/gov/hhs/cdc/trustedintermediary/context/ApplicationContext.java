@@ -5,6 +5,8 @@
 package gov.hhs.cdc.trustedintermediary.context;
 
 import java.lang.reflect.Field;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -161,7 +163,20 @@ public class ApplicationContext {
         return DotEnv.get(key, defaultValue);
     }
 
+    public static boolean isPropertyPresent(String key) {
+        String value = getProperty(key);
+        return value != null && !value.isBlank();
+    }
+
     public static String getEnvironment() {
         return getProperty("ENV", "local");
+    }
+
+    public static Path getRootPath() {
+        return Paths.get(System.getProperty("user.dir")).getParent();
+    }
+
+    public static Path getExamplesPath() {
+        return getRootPath().resolve("examples");
     }
 }

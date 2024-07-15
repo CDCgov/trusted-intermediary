@@ -5,8 +5,6 @@ import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkStorage
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
-import gov.hhs.cdc.trustedintermediary.etor.orders.OrderConverter
-import gov.hhs.cdc.trustedintermediary.external.hapi.HapiOrderConverter
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClientException
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
@@ -67,7 +65,6 @@ class PartnerMetadataOrchestratorTest extends Specification {
 
         TestApplicationContext.register(PartnerMetadataOrchestrator, PartnerMetadataOrchestrator.getInstance())
         TestApplicationContext.register(MessageLinkStorage, mockMessageLinkStorage)
-        TestApplicationContext.register(OrderConverter, HapiOrderConverter.getInstance())
         TestApplicationContext.register(PartnerMetadataStorage, mockPartnerMetadataStorage)
 
         TestApplicationContext.register(RSEndpointClient, mockClient)
@@ -282,17 +279,6 @@ class PartnerMetadataOrchestratorTest extends Specification {
         then:
         1 * mockPartnerMetadataStorage.readMetadata(receivedSubmissionId) >> Optional.of(partnerMetadata)
         1 * mockPartnerMetadataStorage.saveMetadata(updatedPartnerMetadata)
-    }
-
-    def "updateMetadataForSentMessage test case when sentSubmissionId is null"() {
-        given:
-        def sentSubmissionId = null
-
-        when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentMessage(receivedSubmissionId, sentSubmissionId)
-
-        then:
-        0 * mockPartnerMetadataStorage.readMetadata(receivedSubmissionId)
     }
 
     def "getMetadata throws PartnerMetadataException on client error"() {

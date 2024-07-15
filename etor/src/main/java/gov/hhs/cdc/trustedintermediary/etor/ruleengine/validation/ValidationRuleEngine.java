@@ -6,8 +6,8 @@ import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoaderException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
@@ -36,18 +36,21 @@ public class ValidationRuleEngine implements RuleEngine {
 
     @Override
     public void ensureRulesLoaded() throws RuleLoaderException {
+        // Double-checked locking - needed to protect from excessive sync locks
         if (rules.isEmpty()) {
             synchronized (this) {
                 if (rules.isEmpty()) {
-                    Path path =
-                            Paths.get(
-                                    getClass()
-                                            .getClassLoader()
-                                            .getResource(ruleDefinitionsFileName)
-                                            .getPath());
-
+                    InputStream resourceStream =
+                            getClass()
+                                    .getClassLoader()
+                                    .getResourceAsStream(ruleDefinitionsFileName);
+                    if (resourceStream == null) {
+                        throw new RuleLoaderException(
+                                "File not found: " + ruleDefinitionsFileName,
+                                new FileNotFoundException());
+                    }
                     List<ValidationRule> parsedRules =
-                            ruleLoader.loadRules(path, new TypeReference<>() {});
+                            ruleLoader.loadRules(resourceStream, new TypeReference<>() {});
                     this.rules.addAll(parsedRules);
                 }
             }

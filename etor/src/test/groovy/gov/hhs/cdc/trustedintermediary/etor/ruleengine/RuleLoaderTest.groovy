@@ -49,7 +49,7 @@ class RuleLoaderTest extends Specification {
         Files.writeString(tempFile, fileContents)
 
         when:
-        List<ValidationRule> rules = RuleLoader.getInstance().loadRules(tempFile, new TypeReference<Map<String, List<ValidationRule>>>() {})
+        List<ValidationRule> rules = RuleLoader.getInstance().loadRules(Files.newInputStream(tempFile), new TypeReference<Map<String, List<ValidationRule>>>() {})
 
         then:
         rules.size() == 1
@@ -68,7 +68,7 @@ class RuleLoaderTest extends Specification {
         Files.writeString(tempFile, "!K@WJ#8uhy")
 
         when:
-        RuleLoader.getInstance().loadRules(tempFile, new TypeReference<Map<String, List<ValidationRule>>>() {})
+        RuleLoader.getInstance().loadRules(Files.newInputStream(tempFile), new TypeReference<Map<String, List<ValidationRule>>>() {})
 
         then:
         thrown(RuleLoaderException)

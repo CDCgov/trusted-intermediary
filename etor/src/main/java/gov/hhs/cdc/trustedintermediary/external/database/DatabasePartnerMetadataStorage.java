@@ -130,8 +130,9 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                                                 OR m1.sending_facility_details = m2.receiving_facility_details)
                                             AND m1.received_message_id <> m2.received_message_id
                                     WHERE m1.received_message_id = ?;
-                                    -- LIMIT 50 This is a potential fix for load test failures since they link all the ids together;
                                     """);
+                                    // -- LIMIT 50 This is a potential fix for load test failures
+                                    // since they link all the ids together;
                                     statement.setString(1, submissionId);
                                     return statement;
                                 } catch (SQLException e) {

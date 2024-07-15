@@ -10,7 +10,7 @@ import java.util.List;
  * gov.hhs.cdc.trustedintermediary.etor.ruleengine.Rule#runRule(FhirResource) runRule} method to
  * evaluate the validation and log a warning if the validation fails.
  */
-public class ValidationRule extends Rule {
+public class ValidationRule extends Rule<String> {
 
     /**
      * Do not delete this constructor! It is used for JSON deserialization when loading rules from a

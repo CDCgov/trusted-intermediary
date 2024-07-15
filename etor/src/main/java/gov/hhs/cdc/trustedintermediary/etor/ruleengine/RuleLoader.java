@@ -7,8 +7,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -26,17 +24,17 @@ public class RuleLoader {
         return INSTANCE;
     }
 
-    public <T> List<T> loadRules(Path path, TypeReference<Map<String, List<T>>> typeReference)
+    public <T> List<T> loadRules(
+            InputStream ruleDefinitionStream, TypeReference<Map<String, List<T>>> typeReference)
             throws RuleLoaderException {
-        try (InputStream ruleDefinitionStream = Files.newInputStream(path)) {
+        try {
             var rulesString =
                     new String(ruleDefinitionStream.readAllBytes(), StandardCharsets.UTF_8);
             Map<String, List<T>> jsonObj =
                     formatter.convertJsonToObject(rulesString, typeReference);
             return jsonObj.getOrDefault("definitions", Collections.emptyList());
         } catch (IOException | FormatterProcessingException e) {
-            throw new RuleLoaderException(
-                    "Failed to load rules definitions for provided path: " + path, e);
+            throw new RuleLoaderException("Failed to load rules definitions", e);
         }
     }
 }

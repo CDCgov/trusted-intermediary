@@ -104,14 +104,19 @@ The `test` directory contains the tests.  The `main` directory contains our cust
 
 #### Load Testing
 
-Load tests are completed with [Locust.io](https://docs.locust.io/en/stable/installation.html).  Run the load tests by
-running...
+Load tests are completed with [Locust.io](https://docs.locust.io/en/stable/installation.html).
+Run the load tests by running...
 
 ```shell
-./load-execute.sh
+./gradle-load-execute.sh
+
+./docker-load-execute.sh
 ```
+Currently, we are migrating to using Azure. Local load testing is using gradle, however a docker load test is available to mimic the Azure environment settings until the azure migration is complete.
 
 This will run the API for you, so no need to run it manually.
+**If you are already running the API, stop it before running the load tests or the cleanup steps won't work.**
+The load tests will also spin up (and clean up) a local test DB on port 5434 that should not interfere with the local dev DB.
 
 The `locustfile.py` that specifies the load test is located at
 [`./operations/locustfile.py`](./operations/locustfile.py).
@@ -291,18 +296,7 @@ For database documentation [go here](/docs/database.md)
 #### CDC-TI Setup
 
 1. Checkout `main` branch for `CDCgov/trusted-intermediary`
-2. Edit the `app/src/main/java/gov/hhs/cdc/trustedintermediary/etor/EtorDomainRegistration.java` file and replace:
-   ```Java
-   if (ApplicationContext.getEnvironment().equalsIgnoreCase("local")) {
-      ApplicationContext.register(RSEndpointClient.class, MockRSEndpointClient.getInstance());
-   } else {
-      ApplicationContext.register(RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
-   }
-   ```
-   with:
-   ```Java
-   ApplicationContext.register(RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
-   ```
+2. Run `./generate_env.sh` to generate `.env` file with required environment variables
 3. Run TI with `./gradlew clean app:run`
 
 #### ReportStream Setup

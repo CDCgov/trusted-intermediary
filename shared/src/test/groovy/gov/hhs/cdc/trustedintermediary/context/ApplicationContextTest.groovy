@@ -35,12 +35,26 @@ class ApplicationContextTest extends Specification {
     }
 
     def "returns an environmental status"() {
-
         when:
         def environmentStatus = ApplicationContext.getEnvironment()
 
         then:
         environmentStatus == "local"
+    }
+
+    def "isPropertyNullOrBlank returns true when property is null or empty"() {
+        when:
+        def isPresentWhenNull = ApplicationContext.isPropertyPresent("nonExistentProperty")
+
+        then:
+        !isPresentWhenNull
+
+        when:
+        TestApplicationContext.addEnvironmentVariable("emptyProperty", "")
+        def isPresentWhenEmpty = ApplicationContext.isPropertyPresent("emptyProperty")
+
+        then:
+        !isPresentWhenEmpty
     }
 
     class InjectionDeclaringClass {

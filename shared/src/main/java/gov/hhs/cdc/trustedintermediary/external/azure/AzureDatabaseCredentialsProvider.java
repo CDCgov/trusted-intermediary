@@ -2,6 +2,8 @@ package gov.hhs.cdc.trustedintermediary.external.azure;
 
 import com.azure.core.credential.TokenRequestContext;
 import com.azure.identity.DefaultAzureCredentialBuilder;
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.database.DatabaseCredentialsProvider;
 
 /**
@@ -21,6 +23,11 @@ public class AzureDatabaseCredentialsProvider implements DatabaseCredentialsProv
 
     @Override
     public String getPassword() {
+
+        // this method is at least called during bootstrapping, so we can't use @Inject
+        ApplicationContext.getImplementation(Logger.class)
+                .logInfo("Fetching database credentials from Azure");
+
         return new DefaultAzureCredentialBuilder()
                 .build()
                 .getTokenSync(
