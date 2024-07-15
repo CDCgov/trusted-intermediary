@@ -317,7 +317,7 @@ with this option enabled.
    - `authTokenUrl`, `reportUrl`, `authHeaders.host` under REST `transport` in `receivers`
    - `type` and `credentialName` under SFTP `transport` in `receivers`
 7. Run the `./reset.sh` script to reset the database and apply the flexion org settings
-8. Run the `./setup-vault.sh` script to set up the local vault secrets
+8. Run the `./setup-local-vault.sh` script to set up the local vault secrets
    - You can verify that the script created the secrets succesfully by going to `http://localhost:8200/` in your browser, use the token in `prime-router/.vault/env/.env.local` to authenticate, and then go to `Secrets engines` > `secret/` to check the available secrets
 
 #### Submit request to ReportStream
