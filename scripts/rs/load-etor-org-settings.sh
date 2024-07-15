@@ -7,9 +7,9 @@
 env=${1:-"local"}
 
 if [ "$env" = "local" ]; then
-    secret="$CDCTI_HOME/mock_credentials/organization-trusted-intermediary-private-key-local.pem"
+    secret="$CDCTI_HOME/mock_credentials/organization-trusted-intermediary-public-key-local.pem"
 else
-    secret="/path/to/ti-staging-private-key.pem"
+    secret="/path/to/ti-staging-public-key.pem"
 fi
 
 ## Flexion
