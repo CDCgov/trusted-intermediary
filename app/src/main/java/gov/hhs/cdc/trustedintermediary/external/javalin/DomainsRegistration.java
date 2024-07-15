@@ -41,8 +41,6 @@ public class DomainsRegistration {
             Javalin app, Set<Class<? extends DomainConnector>> domainConnectors)
             throws UnableToReadOpenApiSpecificationException, DomainConnectorConstructionException {
 
-        LOGGER.logDebug("Debug");
-
         var instantiatedDomains = new HashSet<DomainConnector>();
         for (Class<? extends DomainConnector> domainConnector : domainConnectors) {
             DomainConnector connector = constructNewDomainConnector(domainConnector);
