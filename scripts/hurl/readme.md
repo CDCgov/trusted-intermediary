@@ -4,10 +4,8 @@
 
 - [hurl](https://hurl.dev/)
 
-## ReportStream
+## Available Hurl Scripts
 
-The hurl script to send requests to ReportStream's endpoints is in [rs/](./rs/)
-
-## CDC Intermediary
-
-The hurl script to send requests to the CDC Intermediary's endpoints is in [ti/](./ti/)
+- [ReportStream](./rs/): scripts to send requests to ReportStream's endpoints
+- [CDC Intermediary](./ti/): scripts to send requests to the CDC Intermediary's endpoints
+- [Epic/UCSD](./epic/): scripts to send requests to Epic endpoints for UCSD
