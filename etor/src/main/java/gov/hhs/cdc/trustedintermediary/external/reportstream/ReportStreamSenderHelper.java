@@ -70,7 +70,7 @@ public class ReportStreamSenderHelper {
             Map<String, Object> rsResponse =
                     formatter.convertJsonToObject(rsResponseBody, new TypeReference<>() {});
             return Optional.ofNullable(rsResponse.get("reportId").toString());
-        } catch (FormatterProcessingException e) {
+        } catch (FormatterProcessingException | NullPointerException e) {
             logger.logError("Unable to get the reportId", e);
         }
 
