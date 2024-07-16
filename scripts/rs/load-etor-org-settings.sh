@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+# This script loads the ETOR organization settings and adds the public keys for the senders.
 # NOTE: Remember to run this script inside the prime-router directory of the prime-reportstream codebase
 # Make sure to add a CDCTI_HOME environment variable pointing to the trusted-intermediary directory
 # export CDCTI_HOME="/path/to/trusted-intermediary"
