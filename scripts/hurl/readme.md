@@ -6,6 +6,6 @@
 
 ## Available Scripts
 
-- [ReportStream]((./rs/))
-- [CDC Intermediary]((./ti/))
-- [Epic/UCSD]((./epic/))
+- [ReportStream](./rs/)
+- [CDC Intermediary](./ti/)
+- [Epic/UCSD](./epic/)
