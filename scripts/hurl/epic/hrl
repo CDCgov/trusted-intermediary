@@ -9,5 +9,5 @@ hurl \
     --variable fpath=$fpath \
     --file-root $root \
     --variable jwt=$(jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 -k $client -i $client -s $client -a $audience --no-iat -S @$secret) \
-    test.hurl \
+    results.hurl \
     $@
