@@ -28,7 +28,7 @@ public interface DomainConnector {
      * An implementation would return the OpenAPI specification in YAML format for this domain
      *
      * @return The OpenAPI specifications for just this given domain
-     * @throws UnableToReadOpenApiSpecificationException
+     * @throws UnableToReadOpenApiSpecificationException When unable to load the expected file
      */
     String openApiSpecification() throws UnableToReadOpenApiSpecificationException;
 }
