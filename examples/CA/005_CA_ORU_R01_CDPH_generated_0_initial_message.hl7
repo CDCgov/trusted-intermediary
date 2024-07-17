@@ -24,7 +24,7 @@ OBX|9|TX|^^^99717-5^Accession Number^L|1|091-83-561/21-2013-11|||N|||F|||2024071
 OBX|10|TX|62324-9^Post-discharge provider name^LN||Dr Sue Great||||||F|||20240716090632
 OBX|11|TX|62325-6^Post-discharge provider practice ID^LN||1234567890||||||F|||20240716090632
 OBX|12|TX|62327-2^Post-discharge provider practice address^LN||333 Best Care Place, Suite 3B, Los Angeles, California 90001||||||F|||20240716090632
-OBX|13|TN|62328-0^Post-discharge provider practice telephone number^LN||(323) 123-4567||||||F|||20240716090632
+OBX|13|TX|62328-0^Post-discharge provider practice telephone number^LN||(323) 123-4567||||||F|||20240716090632
 OBR|4|ABC888^FormNumber||57794-0^Newborn screening test results panel in Dried blood spot|||202407120000|||||||||^James^Smith||||||20240716090632|||F
 OBR|5|ABC888^FormNumber||53261-4^Amino acid newborn screen panel|||202407120000|||||||||^James^Smith||||||20240716090632|||F
 OBX|1|NM|47633-3^Glycine [Moles/volume] in Dried blood spot^LN|1|0.5|µmol/L||N|||F|||20240716090632
