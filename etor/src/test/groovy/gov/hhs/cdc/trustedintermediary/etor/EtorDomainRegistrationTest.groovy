@@ -10,6 +10,7 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper
 import gov.hhs.cdc.trustedintermediary.domainconnector.HttpEndpoint
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageHdDataType
 import gov.hhs.cdc.trustedintermediary.etor.messages.MessageRequestHandler
+import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataConverter
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
@@ -454,5 +455,39 @@ class EtorDomainRegistrationTest extends Specification {
         then:
         1 * mockLogger.logError(_ as String)
         1 * requestHandler.handle(null)
+    }
+
+    def "handleMessageRequest logs an error and continues when unable to send message"() {
+        given:
+        def expectedStatusCode = 400
+
+        def request = new DomainRequest(headers: ["recordid": "recordId"])
+        def response
+
+        def requestHandler = Mock(MessageRequestHandler)
+        requestHandler.handle(_ as String) >> { throw new UnableToSendMessageException("DogCow", new NullPointerException()) }
+
+        def connector = new EtorDomainRegistration()
+        TestApplicationContext.register(EtorDomainRegistration, connector)
+
+        def mockResponseHelper = Mock(DomainResponseHelper)
+        TestApplicationContext.register(DomainResponseHelper, mockResponseHelper)
+
+        def mockPartnerMetadataOrchestrator = Mock(PartnerMetadataOrchestrator)
+        TestApplicationContext.register(PartnerMetadataOrchestrator,mockPartnerMetadataOrchestrator)
+
+        def mockLogger = Mock(Logger)
+        TestApplicationContext.register(Logger, mockLogger)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        when:
+        response = connector.handleMessageRequest(request, requestHandler, _ as String)
+
+        then:
+        response.statusCode == expectedStatusCode
+        1 * mockResponseHelper.constructErrorResponse(expectedStatusCode, _ as Exception) >> new DomainResponse(expectedStatusCode)
+        1 * mockLogger.logError(_ as String, _ as Exception)
+        1 * mockPartnerMetadataOrchestrator.setMetadataStatusToFailed(_ as String, _ as String)
     }
 }
