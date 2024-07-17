@@ -101,10 +101,6 @@ public enum Hl7FhirMappingPath {
         this.fhirPath = fhirPath;
     }
 
-    public String getHl7Path() {
-        return hl7Path;
-    }
-
     public String getFhirPath() {
         return fhirPath;
     }
