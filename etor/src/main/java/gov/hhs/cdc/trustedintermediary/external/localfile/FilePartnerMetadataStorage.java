@@ -33,10 +33,18 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
         try {
             Path userTempPath = Paths.get(System.getProperty("java.io.tmpdir"));
             METADATA_DIRECTORY = userTempPath.resolve("cdctimetadata");
-            FileAttribute<?> onlyOwnerAttrs =
-                    PosixFilePermissions.asFileAttribute(
-                            PosixFilePermissions.fromString("rwx------"));
-            Files.createDirectories(METADATA_DIRECTORY, onlyOwnerAttrs);
+            if (System.getProperty("os.name").toLowerCase().contains("win")) { // windows
+                var kicks = "kicks";
+            } else { // linux base
+                FileAttribute<?> onlyOwnerAttrs =
+                        PosixFilePermissions.asFileAttribute(
+                                PosixFilePermissions.fromString("rwx------"));
+                Files.createDirectories(METADATA_DIRECTORY, onlyOwnerAttrs);
+            }
+            //            FileAttribute<?> onlyOwnerAttrs =
+            //                    PosixFilePermissions.asFileAttribute(
+            //                            PosixFilePermissions.fromString("rwx------"));
+            //            Files.createDirectories(METADATA_DIRECTORY, onlyOwnerAttrs);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
