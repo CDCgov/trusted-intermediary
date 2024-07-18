@@ -1,5 +1,5 @@
 # Use Linux-Alpine image
-FROM amazoncorretto:17.0.11-alpine
+FROM amazoncorretto:17.0.12-alpine
 
 RUN apk -U upgrade
 
