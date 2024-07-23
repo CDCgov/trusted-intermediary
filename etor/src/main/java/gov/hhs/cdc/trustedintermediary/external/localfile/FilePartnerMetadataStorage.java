@@ -33,7 +33,7 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
         try {
             Path userTempPath = Paths.get(System.getProperty("java.io.tmpdir"));
             METADATA_DIRECTORY = userTempPath.resolve("cdctimetadata");
-            if (System.getProperty("os.name").toLowerCase().contains("win")) { // windows
+            if (System.getProperty("os.name").toLowerCase().contains("win")) { // Windows
                 Files.createDirectories(METADATA_DIRECTORY);
             } else { // Unix base
                 FileAttribute<?> onlyOwnerAttrs =
