@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.localfile;
 
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStorage;
@@ -10,9 +11,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,16 +29,9 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
 
     static {
         try {
-            Path userTempPath = Paths.get(System.getProperty("java.io.tmpdir"));
+            Path userTempPath = ApplicationContext.getTempPath();
             METADATA_DIRECTORY = userTempPath.resolve("cdctimetadata");
-            if (System.getProperty("os.name").toLowerCase().contains("win")) { // Windows base
-                Files.createDirectories(METADATA_DIRECTORY);
-            } else { // Unix base
-                FileAttribute<?> onlyOwnerAttrs =
-                        PosixFilePermissions.asFileAttribute(
-                                PosixFilePermissions.fromString("rwx------"));
-                Files.createDirectories(METADATA_DIRECTORY, onlyOwnerAttrs);
-            }
+            ApplicationContext.createDirectories(METADATA_DIRECTORY);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

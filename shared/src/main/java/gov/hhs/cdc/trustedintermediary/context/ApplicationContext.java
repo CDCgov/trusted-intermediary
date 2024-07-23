@@ -4,9 +4,13 @@
  */
 package gov.hhs.cdc.trustedintermediary.context;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -18,7 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 
 /**
- * Registers, retrieves and injects dependencies and will handle retrieving environmental constants
+ * Registers, retrieves and injects dependencies, and handles retrieving environmental constants
+ * and OS-specific folder operations
  * *
  */
 public class ApplicationContext {
@@ -176,7 +181,24 @@ public class ApplicationContext {
         return Paths.get(System.getProperty("user.dir")).getParent();
     }
 
+    public static Path getTempPath() {
+        return Paths.get(System.getProperty("java.io.tmpdir"));
+    }
+
     public static Path getExamplesPath() {
         return getRootPath().resolve("examples");
+    }
+
+    public static void createDirectories(Path dir) throws IOException {
+        if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
+            // Windows, do not use Posix attributes
+            Files.createDirectories(dir);
+        } else {
+            // Unix base
+            FileAttribute<?> onlyOwnerAttrs =
+                    PosixFilePermissions.asFileAttribute(
+                            PosixFilePermissions.fromString("rwx------"));
+            Files.createDirectories(dir, onlyOwnerAttrs);
+        }
     }
 }
