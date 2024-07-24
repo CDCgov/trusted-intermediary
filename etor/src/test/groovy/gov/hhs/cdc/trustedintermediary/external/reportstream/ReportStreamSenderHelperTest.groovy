@@ -137,4 +137,40 @@ class ReportStreamSenderHelperTest extends Specification {
         then:
         1 * mockLogger.logError(_ as String, exception)
     }
+
+    def "sendToReportStream correctly logs errors when it lacks a ReportId or it is blank"() {
+        given:
+        def requestBody = "testBody"
+        def bearerToken = "fake-token"
+        def responseBody = """{"reportId": ""}"""
+        def messageType = PartnerMetadataMessageType.ORDER
+
+        def mockFormatter = Mock(Formatter)
+        TestApplicationContext.register(Formatter, mockFormatter)
+
+        def mockRsClient = Mock(RSEndpointClient)
+        TestApplicationContext.register(RSEndpointClient, mockRsClient)
+
+        def mockLogger = Mock(Logger)
+        TestApplicationContext.register(Logger, mockLogger)
+
+        TestApplicationContext.injectRegisteredImplementations()
+
+        mockRsClient.getRsToken() >> "fake-token"
+        mockRsClient.requestWatersEndpoint(requestBody, bearerToken) >> responseBody
+
+        when:
+        mockFormatter.convertJsonToObject(responseBody, _ as TypeReference) >> ["": ""]
+        ReportStreamSenderHelper.getInstance().sendToReportStream(requestBody, _ as String, messageType)
+
+        then:
+        1 * mockLogger.logError("Unable to retrieve ReportId from ReportStream response")
+
+        when:
+        mockFormatter.convertJsonToObject(responseBody, _ as TypeReference) >> ["reportId": ""]
+        ReportStreamSenderHelper.getInstance().sendToReportStream(requestBody, _ as String, messageType)
+
+        then:
+        1 * mockLogger.logError("Unable to retrieve ReportId from ReportStream response")
+    }
 }

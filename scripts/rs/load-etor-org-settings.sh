@@ -9,24 +9,24 @@
 env=${1:-"local"}
 
 if [ "$env" = "local" ]; then
+    echo "Using local public keys"
     flexion_key="$CDCTI_HOME/mock_credentials/organization-trusted-intermediary-public-key-local.pem"
     # al_phl_key="/path/to/organization-al-phl-public-key-local.pem"
     # oracle_rln_key="/path/to/organization-oracle-rln-public-key-local.pem"
-    # ca_phl_key="/path/to/organization-ca-phl-public-key-local.pem"
     # la_phl_key="/path/to/organization-la-phl-public-key-local.pem"
     # la_ochsner_key="/path/to/organization-la-ochsner-public-key-local.pem"
 elif [ "$env" = "staging" ]; then
+    echo "Using staging public keys"
     # flexion_key="/path/to/organization-trusted-intermediary-public-key-staging.pem"
     # al_phl_key="/path/to/organization-al-phl-public-key-staging.pem"
     # oracle_rln_key="/path/to/organization-oracle-rln-public-key-staging.pem"
-    # ca_phl_key="/path/to/organization-ca-phl-public-key-staging.pem"
     # la_phl_key="/path/to/organization-la-phl-public-key-staging.pem"
     # la_ochsner_key="/path/to/organization-la-ochsner-public-key-staging.pem"
 elif [ "$env" = "prod" ]; then
+    echo "Using prod public keys"
     # flexion_key="/path/to/organization-trusted-intermediary-public-key-prod.pem"
     # al_phl_key="/path/to/organization-al-phl-public-key-prod.pem"
     # oracle_rln_key="/path/to/organization-oracle-rln-public-key-prod.pem"
-    # ca_phl_key="/path/to/organization-ca-phl-public-key-prod.pem"
     # la_phl_key="/path/to/organization-la-phl-public-key-prod.pem"
     # la_ochsner_key="/path/to/organization-la-ochsner-public-key-prod.pem"
 else
@@ -48,8 +48,6 @@ fi
 
 ## CA
 ./prime multiple-settings set -s -e $env -i ./settings/STLTs/CA/ucsd.yml
-./prime multiple-settings set -s -e $env -i ./settings/STLTs/CA/ca-phl.yml
-# ./prime organization addkey -e $env --public-key $ca_phl_key --scope "ca-phl.*.report" --orgName ca-phl --kid ca-phl.etor-nbs-results --doit
 
 ## LA
 ./prime multiple-settings set -s -e $env -i ./settings/STLTs/LA/la-phl.yml
