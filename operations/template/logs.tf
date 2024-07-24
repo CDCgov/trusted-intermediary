@@ -11,7 +11,7 @@ resource "azurerm_log_analytics_query_pack" "application_logs_pack" {
   location            = data.azurerm_resource_group.group.location
 }
 
-resource "azurerm_log_analytics_query_pack_query" "example" {
+resource "azurerm_log_analytics_query_pack_query" "application_logs" {
   display_name = "TI's Raw Application Logs"
   description  = "View all TI's application logs in a structured format"
 
@@ -21,7 +21,7 @@ resource "azurerm_log_analytics_query_pack_query" "example" {
   body = "AppServiceConsoleLogs | project JsonResult = parse_json(ResultDescription) | evaluate bag_unpack(JsonResult) | project-reorder ['@timestamp'], level, message"
 }
 
-resource "azurerm_log_analytics_query_pack_error_query" "example" {
+resource "azurerm_log_analytics_query_pack_query" "application_error_logs" {
   display_name = "TI's Application Error Logs"
   description  = "View all TI's application logs with error level in a structured format"
 
