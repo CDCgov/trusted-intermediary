@@ -411,6 +411,11 @@ public class HapiHelper {
 
     // OBR - Observation Request
 
+    // OBR-2 - Placer Order Number
+    public static void setOBR2_1Value(ServiceRequest serviceRequest, String value) {}
+
+    public static void setOBR2_2Value(ServiceRequest serviceRequest, String value) {}
+
     // OBR-4 - Universal Service Identifier
 
     // OBR-4.1 - Identifier
