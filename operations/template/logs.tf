@@ -28,7 +28,7 @@ resource "azurerm_log_analytics_query_pack_query" "application_error_logs" {
   query_pack_id = azurerm_log_analytics_query_pack.application_logs_pack.id
   categories    = ["applications"]
 
-  body = "AppServiceConsoleLogs | project JsonResult = parse_json(ResultDescription) | evaluate bag_unpack(JsonResult) | where level == 'ERROR' | project-reorder ['@timestamp'], level, message"
+  body = "AppServiceConsoleLogs | project JsonResult = parse_json(ResultDescription) | evaluate bag_unpack(JsonResult) | where level == 'ERROR' | project-away level | project-reorder ['@timestamp'], message"
 }
 
 resource "azurerm_monitor_diagnostic_setting" "app_to_logs" {
