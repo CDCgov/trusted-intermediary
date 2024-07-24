@@ -8,7 +8,7 @@ fi
 
 # default values
 env=local
-root=$CDCTI_HOME/examples/Test/
+root=$CDCTI_HOME/examples/
 content_type=application/hl7-v2
 client_id=flexion
 client_sender=simulated-hospital
