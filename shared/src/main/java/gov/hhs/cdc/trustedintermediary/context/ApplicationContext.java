@@ -22,9 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 
 /**
- * Registers, retrieves and injects dependencies, and handles retrieving environmental constants
- * and OS-specific folder operations
- * *
+ * Registers, retrieves and injects dependencies, and handles retrieving environmental constants and
+ * OS-specific folder operations *
  */
 public class ApplicationContext {
 
