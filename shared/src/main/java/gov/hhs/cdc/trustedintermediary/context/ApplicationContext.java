@@ -180,15 +180,18 @@ public class ApplicationContext {
         return Paths.get(System.getProperty("user.dir")).getParent();
     }
 
-    private static Path getTempPath() { return Paths.get(System.getProperty("java.io.tmpdir")); }
+    private static Path getTempPath() {
+        return Paths.get(System.getProperty("java.io.tmpdir"));
+    }
 
-    public static Path getExamplesPath() {return getRootPath().resolve("examples"); }
+    public static Path getExamplesPath() {
+        return getRootPath().resolve("examples");
+    }
 
     public static Path createTempFile(String fileName) throws IOException {
         Path tempFilePath = getTempPath().resolve(fileName);
 
-        if (!Files.exists(tempFilePath))
-        {
+        if (!Files.exists(tempFilePath)) {
             if (tempFilePath.getFileSystem().supportedFileAttributeViews().contains("posix")) {
                 // Unix base
                 FileAttribute<?> onlyOwnerAttrs =
