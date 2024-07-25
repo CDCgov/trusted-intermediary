@@ -176,28 +176,45 @@ public class ApplicationContext {
         return getProperty("ENV", "local");
     }
 
-    public static Path getRootPath() {
+    private static Path getRootPath() {
         return Paths.get(System.getProperty("user.dir")).getParent();
     }
 
-    public static Path getTempPath() {
-        return Paths.get(System.getProperty("java.io.tmpdir"));
+    private static Path getTempPath() { return Paths.get(System.getProperty("java.io.tmpdir")); }
+
+    public static Path getExamplesPath() {return getRootPath().resolve("examples"); }
+
+    public static Path createTempFile(String fileName) throws IOException {
+        Path tempFilePath = getTempPath().resolve(fileName);
+
+        if (!Files.exists(tempFilePath))
+        {
+            if (tempFilePath.getFileSystem().supportedFileAttributeViews().contains("posix")) {
+                // Unix base
+                FileAttribute<?> onlyOwnerAttrs =
+                        PosixFilePermissions.asFileAttribute(
+                                PosixFilePermissions.fromString("rwx------"));
+                Files.createFile(tempFilePath, onlyOwnerAttrs);
+            } else {
+                Files.createFile(tempFilePath);
+            }
+        }
+        return tempFilePath;
     }
 
-    public static Path getExamplesPath() {
-        return getRootPath().resolve("examples");
-    }
+    public static Path createTempDirectory(String subDirectoryName) throws IOException {
+        Path tempDirectoryPath = getTempPath().resolve(subDirectoryName);
 
-    public static void createDirectories(Path dir) throws IOException {
-        if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
+        if (!tempDirectoryPath.getFileSystem().supportedFileAttributeViews().contains("posix")) {
             // Windows, do not use Posix attributes
-            Files.createDirectories(dir);
+            Files.createDirectories(tempDirectoryPath);
         } else {
             // Unix base
             FileAttribute<?> onlyOwnerAttrs =
                     PosixFilePermissions.asFileAttribute(
                             PosixFilePermissions.fromString("rwx------"));
-            Files.createDirectories(dir, onlyOwnerAttrs);
+            Files.createDirectories(tempDirectoryPath, onlyOwnerAttrs);
         }
+        return tempDirectoryPath;
     }
 }

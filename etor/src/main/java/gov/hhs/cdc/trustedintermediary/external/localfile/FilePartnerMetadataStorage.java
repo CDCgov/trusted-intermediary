@@ -25,13 +25,12 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
     @Inject Formatter formatter;
     @Inject Logger logger;
 
+    static final String SUBDIRECTORY_NAME = "cdctimetadata";
     static final Path METADATA_DIRECTORY;
 
     static {
         try {
-            Path userTempPath = ApplicationContext.getTempPath();
-            METADATA_DIRECTORY = userTempPath.resolve("cdctimetadata");
-            ApplicationContext.createDirectories(METADATA_DIRECTORY);
+            METADATA_DIRECTORY = ApplicationContext.createTempDirectory(SUBDIRECTORY_NAME);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
