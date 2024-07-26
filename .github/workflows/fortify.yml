@@ -1,0 +1,28 @@
+name: Cron - DEX
+
+on:
+  schedule:
+    - cron: '0 8 1,15 * *'
+  workflow_dispatch:
+
+
+jobs:
+  trusted-intermediary:
+    uses: ./.github/workflows/scan-template.yml
+    with:
+      repository: CDCgov/trusted-intermediary
+      branch: main
+      workDir: fns-hl7-pipeline/fn-hl7-json-lake
+      appName: fn-hl7-json-lake
+      appVersionId: 11860
+    secrets: inherit # pragma: allowlist secret
+
+  upload-processor:
+    uses: ./.github/workflows/scan-template.yml
+    with:
+      repository: CDCgov/data-exchange-upload
+      branch: main
+      workDir: upload-processor/BulkFileUploadFunctionApp
+      appName: upload-processor
+      appVersionId: 11932
+    secrets: inherit # pragma: allowlist secret

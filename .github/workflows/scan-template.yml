@@ -1,0 +1,70 @@
+name: Template - Scan w/ Fortify SCA
+
+on:
+  workflow_call:
+    inputs:
+      repository:
+        description: 'Scan Github repository'
+        required: true
+        type: string
+      branch:
+        description: 'Scan Github branch'
+        default: 'main'
+        required: true
+        type: string
+      workDir:
+        type: string
+        description: 'Working Directory of Application code'
+        required: true
+      appName:
+        type: string
+        description: 'Application name'
+        required: true
+      appVersionId:
+        type: number
+        description: 'Application Version ID for Fortify'
+        required: true
+      commitID:
+        type: string
+        description: 'Git Commit Hash'
+        required: false
+
+
+jobs:
+  ########################################################################
+  ## Run static scan analysis on the codebase using Fortify's suite for
+  ## compliance purposes (Authority to Operate) and code quality.
+  ##
+  ## This prebuilt container image contains Fortify tools such as
+  ## - sourceanalyzer - for static scans
+  ## - FPRUtility - for reviewing the scans
+  ## - fortifyclient - for uploading the scans to a Fortify portal
+  ########################################################################
+  run_static_scan:
+    runs-on: [self-hosted, edso-fortify]
+    environment: prod
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Store and preserve Fortify script
+        run: |
+          cp fortify-scan.sh /tmp/fortify-scan.sh
+          cp fortify-upload.sh /tmp/fortify-upload.sh
+
+      - name: Checkout '${{ inputs.repository }}'
+        uses: actions/checkout@v4
+        with:
+          repository: '${{ inputs.repository }}'
+          fetch-depth: 0
+
+      - name: '${{ inputs.appName }} Static Test'
+        env:
+          SSC_AUTH_TOKEN: '${{ secrets.FORTIFY_ENCODED_TOKEN  }}'
+        run: |
+          bash /tmp/fortify-scan.sh '${{ inputs.workDir }}' '${{ inputs.appName }}.fpr'
+
+      - name: '${{ inputs.appName }} Upload to SSC'
+        env:
+          SSC_AUTH_TOKEN: '${{ secrets.FORTIFY_ENCODED_TOKEN  }}'
+        run: |
+          bash /tmp/fortify-upload.sh '${{ inputs.appVersionId }}' '${{ inputs.appName }}.fpr' '${{ env.FORTIFY_ENCODED_TOKEN  }}'
