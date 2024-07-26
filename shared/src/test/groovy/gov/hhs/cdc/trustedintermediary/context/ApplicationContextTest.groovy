@@ -64,7 +64,7 @@ class ApplicationContextTest extends Specification {
         def fileName = "ti_unit_test_file_not_already_exist.txt"
         def filePath = Paths.get(System.getProperty("java.io.tmpdir")).resolve(fileName)
 
-        and:
+        and: "the temp file does not exist"
         Files.deleteIfExists(filePath)
 
         when:
@@ -82,13 +82,18 @@ class ApplicationContextTest extends Specification {
         def fileName = "ti_unit_test_existing_file.txt"
         def filePath = Paths.get(System.getProperty("java.io.tmpdir")).resolve(fileName)
 
-        when:
+        and: "temp file already exists"
         Files.deleteIfExists(filePath)
         Files.createFile(filePath)
+
+        when:
         ApplicationContext.createTempFile(fileName)
 
         then:
         Files.exists(filePath)
+
+        cleanup: "remove temp file"
+        Files.deleteIfExists(filePath)
     }
 
     def "temp directory is created when one does not already exist"() {
