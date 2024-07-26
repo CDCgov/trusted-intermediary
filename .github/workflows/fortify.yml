@@ -12,17 +12,7 @@ jobs:
     with:
       repository: CDCgov/trusted-intermediary
       branch: main
-      workDir: fns-hl7-pipeline/fn-hl7-json-lake
-      appName: fn-hl7-json-lake
-      appVersionId: 11860
-    secrets: inherit # pragma: allowlist secret
-
-  upload-processor:
-    uses: ./.github/workflows/scan-template.yml
-    with:
-      repository: CDCgov/data-exchange-upload
-      branch: main
-      workDir: upload-processor/BulkFileUploadFunctionApp
-      appName: upload-processor
-      appVersionId: 11932
+      workDir: ./
+      appName: trusted-intermediary
+      appVersionId: 12016
     secrets: inherit # pragma: allowlist secret
