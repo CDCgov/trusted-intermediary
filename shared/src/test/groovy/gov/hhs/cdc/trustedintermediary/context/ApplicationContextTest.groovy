@@ -119,13 +119,18 @@ class ApplicationContextTest extends Specification {
         def directoryName = "ti_unit_test_existing_directory"
         def directoryPath = Paths.get(System.getProperty("java.io.tmpdir")).resolve(directoryName)
 
-        when:
+        and:
         Files.deleteIfExists(directoryPath)
         Files.createDirectory(directoryPath)
+
+        when:
         ApplicationContext.createTempDirectory(directoryName)
 
         then:
         Files.isDirectory(directoryPath)
+
+        cleanup:
+        Files.deleteIfExists(directoryPath)
     }
 
     class InjectionDeclaringClass {
