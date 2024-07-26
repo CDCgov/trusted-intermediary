@@ -101,12 +101,17 @@ class ApplicationContextTest extends Specification {
         def directoryName = "ti_unit_test_directory_not_already_exist"
         def directoryPath = Paths.get(System.getProperty("java.io.tmpdir")).resolve(directoryName)
 
-        when:
+        and:
         Files.deleteIfExists(directoryPath)
+
+        when:
         ApplicationContext.createTempDirectory(directoryName)
 
         then:
         Files.isDirectory(directoryPath)
+
+        cleanup:
+        Files.deleteIfExists(directoryPath)
     }
 
     def "temp directory creation does not fail if directory already exists"() {
