@@ -119,6 +119,7 @@ resource "azurerm_network_security_group" "db_security_group" {
   name                = "database-security-group"
   location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
+  #   below tags are managed by CDC
   lifecycle {
       ignore_changes = [
           tags["business_steward"],
