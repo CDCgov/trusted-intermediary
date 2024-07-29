@@ -184,6 +184,10 @@ public class ApplicationContext {
         return Paths.get(System.getProperty("java.io.tmpdir"));
     }
 
+    private static boolean isPosixFileSystem(Path path) {
+        return path.getFileSystem().supportedFileAttributeViews().contains("posix");
+    }
+
     public static Path getExamplesPath() {
         return getRootPath().resolve("examples");
     }
@@ -192,8 +196,7 @@ public class ApplicationContext {
         Path tempFilePath = getTempPath().resolve(fileName);
 
         if (!Files.exists(tempFilePath)) {
-            if (tempFilePath.getFileSystem().supportedFileAttributeViews().contains("posix")) {
-                // Unix base
+            if (isPosixFileSystem(tempFilePath)) {
                 FileAttribute<?> onlyOwnerAttrs =
                         PosixFilePermissions.asFileAttribute(
                                 PosixFilePermissions.fromString("rwx------"));
@@ -208,15 +211,13 @@ public class ApplicationContext {
     public static Path createTempDirectory(String subDirectoryName) throws IOException {
         Path tempDirectoryPath = getTempPath().resolve(subDirectoryName);
 
-        if (!tempDirectoryPath.getFileSystem().supportedFileAttributeViews().contains("posix")) {
-            // Windows, do not use Posix attributes
-            Files.createDirectories(tempDirectoryPath);
-        } else {
-            // Unix base
+        if (isPosixFileSystem(tempDirectoryPath)) {
             FileAttribute<?> onlyOwnerAttrs =
                     PosixFilePermissions.asFileAttribute(
                             PosixFilePermissions.fromString("rwx------"));
             Files.createDirectories(tempDirectoryPath, onlyOwnerAttrs);
+        } else {
+            Files.createDirectories(tempDirectoryPath);
         }
         return tempDirectoryPath;
     }
