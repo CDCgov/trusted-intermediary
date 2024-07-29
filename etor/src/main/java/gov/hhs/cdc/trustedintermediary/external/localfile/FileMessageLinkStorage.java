@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.localfile;
 
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink;
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkException;
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkStorage;
@@ -10,7 +11,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.HashSet;
 import java.util.List;
@@ -27,12 +27,12 @@ public class FileMessageLinkStorage implements MessageLinkStorage {
     @Inject Formatter formatter;
     @Inject Logger logger;
 
+    static final String MESSAGE_LINK_FILE_NAME = "cdctimetadata.json";
     static final Path MESSAGE_LINK_FILE_PATH;
 
     static {
         try {
-            Path userTempPath = Paths.get(System.getProperty("java.io.tmpdir"));
-            MESSAGE_LINK_FILE_PATH = userTempPath.resolve("cdctimessagelink.json");
+            MESSAGE_LINK_FILE_PATH = ApplicationContext.createTempFile(MESSAGE_LINK_FILE_NAME);
             Files.writeString(
                     MESSAGE_LINK_FILE_PATH,
                     "[]",

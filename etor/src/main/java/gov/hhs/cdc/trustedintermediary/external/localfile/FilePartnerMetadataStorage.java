@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.localfile;
 
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataStorage;
@@ -10,9 +11,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,16 +25,12 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
     @Inject Formatter formatter;
     @Inject Logger logger;
 
+    static final String SUBDIRECTORY_NAME = "cdctimetadata";
     static final Path METADATA_DIRECTORY;
 
     static {
         try {
-            Path userTempPath = Paths.get(System.getProperty("java.io.tmpdir"));
-            METADATA_DIRECTORY = userTempPath.resolve("cdctimetadata");
-            FileAttribute<?> onlyOwnerAttrs =
-                    PosixFilePermissions.asFileAttribute(
-                            PosixFilePermissions.fromString("rwx------"));
-            Files.createDirectories(METADATA_DIRECTORY, onlyOwnerAttrs);
+            METADATA_DIRECTORY = ApplicationContext.createTempDirectory(SUBDIRECTORY_NAME);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -82,7 +76,7 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
         }
 
         Path metadataFilePath =
-                getFilePath(metadata.receivedSubmissionId() + "|" + metadata.sentSubmissionId());
+                getFilePath(metadata.receivedSubmissionId() + "-" + metadata.sentSubmissionId());
         try {
             String content = formatter.convertToJsonString(metadata);
             Files.writeString(metadataFilePath, content);
