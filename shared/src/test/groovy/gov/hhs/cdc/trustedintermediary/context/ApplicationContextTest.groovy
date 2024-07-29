@@ -3,6 +3,8 @@ package gov.hhs.cdc.trustedintermediary.context
 import spock.lang.Specification
 
 import javax.inject.Inject
+import java.nio.file.Files
+import java.nio.file.Paths
 
 class ApplicationContextTest extends Specification {
 
@@ -55,6 +57,80 @@ class ApplicationContextTest extends Specification {
 
         then:
         !isPresentWhenEmpty
+    }
+
+    def "temp file is created when one does not already exist"() {
+        given:
+        def fileName = "ti_unit_test_file_not_already_exist.txt"
+        def filePath = Paths.get(System.getProperty("java.io.tmpdir")).resolve(fileName)
+
+        and: "the temp file does not exist"
+        Files.deleteIfExists(filePath)
+
+        when:
+        ApplicationContext.createTempFile(fileName)
+
+        then:
+        Files.exists(filePath)
+
+        cleanup:
+        Files.deleteIfExists(filePath)
+    }
+
+    def "temp file creation does not fail if file already exists"() {
+        given:
+        def fileName = "ti_unit_test_existing_file.txt"
+        def filePath = Paths.get(System.getProperty("java.io.tmpdir")).resolve(fileName)
+
+        and: "temp file already exists"
+        Files.deleteIfExists(filePath)
+        Files.createFile(filePath)
+
+        when:
+        ApplicationContext.createTempFile(fileName)
+
+        then:
+        Files.exists(filePath)
+
+        cleanup: "remove temp file"
+        Files.deleteIfExists(filePath)
+    }
+
+    def "temp directory is created when one does not already exist"() {
+        given:
+        def directoryName = "ti_unit_test_directory_not_already_exist"
+        def directoryPath = Paths.get(System.getProperty("java.io.tmpdir")).resolve(directoryName)
+
+        and:
+        Files.deleteIfExists(directoryPath)
+
+        when:
+        ApplicationContext.createTempDirectory(directoryName)
+
+        then:
+        Files.isDirectory(directoryPath)
+
+        cleanup:
+        Files.deleteIfExists(directoryPath)
+    }
+
+    def "temp directory creation does not fail if directory already exists"() {
+        given:
+        def directoryName = "ti_unit_test_existing_directory"
+        def directoryPath = Paths.get(System.getProperty("java.io.tmpdir")).resolve(directoryName)
+
+        and:
+        Files.deleteIfExists(directoryPath)
+        Files.createDirectory(directoryPath)
+
+        when:
+        ApplicationContext.createTempDirectory(directoryName)
+
+        then:
+        Files.isDirectory(directoryPath)
+
+        cleanup:
+        Files.deleteIfExists(directoryPath)
     }
 
     class InjectionDeclaringClass {
