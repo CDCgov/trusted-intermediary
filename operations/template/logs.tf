@@ -3,12 +3,48 @@ resource "azurerm_log_analytics_workspace" "logs_workspace" {
 
   resource_group_name = data.azurerm_resource_group.group.name
   location            = data.azurerm_resource_group.group.location
+
+  #   below tags are managed by CDC
+  lifecycle {
+    ignore_changes = [
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
+    ]
+  }
 }
 
 resource "azurerm_log_analytics_query_pack" "application_logs_pack" {
   name                = "TI Application Logs"
   resource_group_name = data.azurerm_resource_group.group.name
   location            = data.azurerm_resource_group.group.location
+
+  #   below tags are managed by CDC
+  lifecycle {
+    ignore_changes = [
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
+    ]
+  }
 }
 
 resource "azurerm_log_analytics_query_pack_query" "application_logs" {
