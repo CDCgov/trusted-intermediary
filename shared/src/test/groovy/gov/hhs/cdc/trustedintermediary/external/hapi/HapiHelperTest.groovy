@@ -601,6 +601,42 @@ class HapiHelperTest extends Specification {
         HapiHelper.getORC21Value(sr) == null
     }
 
+
+    // OBR-2 - Placer Order Number
+    def "obr-2 methods work as expected"() {
+        given:
+        def obr2_1 = "obr2_1"
+        def obr2_2 = "obr2_2"
+        def bundle = new Bundle()
+        def serviceRequest = new ServiceRequest()
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(serviceRequest))
+
+        when:
+        HapiFhirHelper.setOBR2Extension(serviceRequest, null)
+
+        then:
+        HapiHelper.getOBR2Identifier(serviceRequest) == null
+        HapiHelper.getOBR2_1Value(serviceRequest) == null
+        HapiHelper.getOBR2_2Value(serviceRequest) == null
+
+        when:
+        HapiFhirHelper.setOBR2Extension(serviceRequest, new Identifier())
+
+        then:
+        HapiHelper.getOBR2Identifier(serviceRequest) != null
+        HapiHelper.getOBR2_1Value(serviceRequest) == null
+        HapiHelper.getOBR2_2Value(serviceRequest) == null
+
+        when:
+        HapiHelper.setOBR2_1Value(serviceRequest, obr2_1)
+        HapiHelper.setOBR2_2Value(serviceRequest, obr2_2)
+
+
+        then:
+        HapiHelper.getOBR2_1Value(serviceRequest) == obr2_1
+        HapiHelper.getOBR2_2Value(serviceRequest) == obr2_2
+    }
+
     // OBR-4.1 - Observation Identifier
     def "getOBR4_1Value returns the correct value"() {
         given:

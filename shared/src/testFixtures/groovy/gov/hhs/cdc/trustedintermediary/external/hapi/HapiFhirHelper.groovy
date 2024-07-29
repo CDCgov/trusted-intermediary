@@ -237,6 +237,11 @@ class HapiFhirHelper {
         organization.addExtension().setUrl(HapiHelper.EXTENSION_XON_ORGANIZATION_URL).addExtension(HapiHelper.EXTENSION_XON10_URL, new StringType(value))
     }
 
+    // OBR - Placer Order Number
+    static void setOBR2Extension(ServiceRequest serviceRequest, Identifier identifier) {
+        serviceRequest.addExtension().setUrl(HapiHelper.EXTENSION_OBR_URL).addExtension(HapiHelper.EXTENSION_OBR2_DATA_TYPE.toString(), identifier)
+    }
+
     // OBR-4 - Universal Service Identifier
     static void setOBR4_1Value(ServiceRequest serviceRequest, String value) {
         serviceRequest.setCode(new CodeableConcept().addCoding(new Coding().setCode(value)))
