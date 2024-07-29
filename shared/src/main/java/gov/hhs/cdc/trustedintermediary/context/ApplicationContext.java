@@ -4,9 +4,13 @@
  */
 package gov.hhs.cdc.trustedintermediary.context;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -18,8 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 
 /**
- * Registers, retrieves and injects dependencies and will handle retrieving environmental constants
- * *
+ * Registers, retrieves and injects dependencies, and handles retrieving environmental constants and
+ * OS-specific folder operations *
  */
 public class ApplicationContext {
 
@@ -172,11 +176,49 @@ public class ApplicationContext {
         return getProperty("ENV", "local");
     }
 
-    public static Path getRootPath() {
+    private static Path getRootPath() {
         return Paths.get(System.getProperty("user.dir")).getParent();
+    }
+
+    private static Path getTempPath() {
+        return Paths.get(System.getProperty("java.io.tmpdir"));
+    }
+
+    private static boolean isPosixFileSystem(Path path) {
+        return path.getFileSystem().supportedFileAttributeViews().contains("posix");
     }
 
     public static Path getExamplesPath() {
         return getRootPath().resolve("examples");
+    }
+
+    public static Path createTempFile(String fileName) throws IOException {
+        Path tempFilePath = getTempPath().resolve(fileName);
+
+        if (!Files.exists(tempFilePath)) {
+            if (isPosixFileSystem(tempFilePath)) {
+                FileAttribute<?> onlyOwnerAttrs =
+                        PosixFilePermissions.asFileAttribute(
+                                PosixFilePermissions.fromString("rwx------"));
+                Files.createFile(tempFilePath, onlyOwnerAttrs);
+            } else {
+                Files.createFile(tempFilePath);
+            }
+        }
+        return tempFilePath;
+    }
+
+    public static Path createTempDirectory(String subDirectoryName) throws IOException {
+        Path tempDirectoryPath = getTempPath().resolve(subDirectoryName);
+
+        if (isPosixFileSystem(tempDirectoryPath)) {
+            FileAttribute<?> onlyOwnerAttrs =
+                    PosixFilePermissions.asFileAttribute(
+                            PosixFilePermissions.fromString("rwx------"));
+            Files.createDirectories(tempDirectoryPath, onlyOwnerAttrs);
+        } else {
+            Files.createDirectories(tempDirectoryPath);
+        }
+        return tempDirectoryPath;
     }
 }

@@ -59,6 +59,11 @@ Apply all outstanding migrations:
 liquibase update --changelog-file ./etor/databaseMigrations/root.yml --url jdbc:postgresql://localhost:5433/intermediary --username intermediary --password 'changeIT!' --label-filter '!azure'
 ```
 
+If running in Windows, use double quotes instead:
+```shell
+liquibase update --changelog-file ./etor/databaseMigrations/root.yml --url jdbc:postgresql://localhost:5433/intermediary --username intermediary --password "changeIT!" --label-filter "!azure"
+```
+
 ### Compiling
 
 To compile the application, execute...
