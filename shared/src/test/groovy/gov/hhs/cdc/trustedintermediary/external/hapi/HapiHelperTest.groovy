@@ -611,10 +611,7 @@ class HapiHelperTest extends Specification {
         def serviceRequest = new ServiceRequest()
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(serviceRequest))
 
-        when:
-        HapiFhirHelper.setOBR2Extension(serviceRequest, null)
-
-        then:
+        expect:
         HapiHelper.getOBR2Identifier(serviceRequest) == null
         HapiHelper.getOBR2_1Value(serviceRequest) == null
         HapiHelper.getOBR2_2Value(serviceRequest) == null
