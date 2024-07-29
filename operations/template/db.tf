@@ -27,7 +27,20 @@ resource "azurerm_postgresql_flexible_server" "database" {
   lifecycle {
     ignore_changes = [
       zone,
-      high_availability.0.standby_availability_zone
+      high_availability.0.standby_availability_zone,
+      #   below tags are managed by CDC
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
     ]
   }
 }
