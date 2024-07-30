@@ -7,6 +7,24 @@ resource "azurerm_monitor_action_group" "notify_slack_email" {
     name          = "cdcti-flexion-slack-email-receiver"
     email_address = var.alert_slack_email
   }
+
+  #   below tags are managed by CDC
+  lifecycle {
+    ignore_changes = [
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
+    ]
+  }
 }
 
 resource "azurerm_monitor_scheduled_query_rules_alert" "database_token_expired_alert" {
@@ -39,5 +57,23 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "database_token_expired_a
   trigger {
     operator  = "GreaterThan"
     threshold = 1
+  }
+
+  #   below tags are managed by CDC
+  lifecycle {
+    ignore_changes = [
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
+    ]
   }
 }

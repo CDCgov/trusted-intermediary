@@ -11,4 +11,22 @@ resource "azurerm_storage_account" "docs" {
   static_website {
     index_document = "index.html"
   }
+
+  #   below tags are managed by CDC
+  lifecycle {
+    ignore_changes = [
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
+    ]
+  }
 }

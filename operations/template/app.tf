@@ -5,6 +5,23 @@ resource "azurerm_container_registry" "registry" {
   location            = data.azurerm_resource_group.group.location
   sku                 = "Standard"
   admin_enabled       = true
+  #   below tags are managed by CDC
+  lifecycle {
+    ignore_changes = [
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
+    ]
+  }
 }
 
 # Create the staging service plan
@@ -15,6 +32,24 @@ resource "azurerm_service_plan" "plan" {
   os_type                = "Linux"
   sku_name               = local.higher_environment_level ? "P1v3" : "P0v3"
   zone_balancing_enabled = local.higher_environment_level
+
+  #   below tags are managed by CDC
+  lifecycle {
+    ignore_changes = [
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
+    ]
+  }
 }
 
 # Create the staging App Service
@@ -74,6 +109,24 @@ resource "azurerm_linux_web_app" "api" {
   identity {
     type = "SystemAssigned"
   }
+
+  #   below tags are managed by CDC
+  lifecycle {
+    ignore_changes = [
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
+    ]
+  }
 }
 
 resource "azurerm_monitor_autoscale_setting" "api_autoscale" {
@@ -81,7 +134,6 @@ resource "azurerm_monitor_autoscale_setting" "api_autoscale" {
   resource_group_name = data.azurerm_resource_group.group.name
   location            = data.azurerm_resource_group.group.location
   target_resource_id  = azurerm_service_plan.plan.id
-
 
   profile {
     name = "defaultProfile"
@@ -133,5 +185,23 @@ resource "azurerm_monitor_autoscale_setting" "api_autoscale" {
         cooldown  = "PT5M"
       }
     }
+  }
+
+  #   below tags are managed by CDC
+  lifecycle {
+    ignore_changes = [
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
+    ]
   }
 }
