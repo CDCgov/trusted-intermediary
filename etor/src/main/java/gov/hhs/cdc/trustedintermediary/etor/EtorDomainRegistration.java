@@ -39,6 +39,7 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiPartnerMetadataConverte
 import gov.hhs.cdc.trustedintermediary.external.localfile.FileMessageLinkStorage;
 import gov.hhs.cdc.trustedintermediary.external.localfile.FilePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.localfile.MockRSEndpointClient;
+import gov.hhs.cdc.trustedintermediary.external.openapi.OpenApiReaderImplementation;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpointClient;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamResultSender;
@@ -46,9 +47,6 @@ import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamSenderH
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -145,17 +143,7 @@ public class EtorDomainRegistration implements DomainConnector {
     @Override
     public String openApiSpecification() throws UnableToReadOpenApiSpecificationException {
         String fileName = "openapi_etor.yaml";
-        try {
-            return openApiStream(fileName);
-        } catch (IOException e) {
-            throw new UnableToReadOpenApiSpecificationException(
-                    "Failed to open OpenAPI specification for " + fileName, e);
-        }
-    }
-
-    public String openApiStream(String fileName) throws IOException {
-        InputStream openApiStream = getClass().getClassLoader().getResourceAsStream(fileName);
-        return new String(openApiStream.readAllBytes(), StandardCharsets.UTF_8);
+        return OpenApiReaderImplementation.getInstance().openAsString(fileName);
     }
 
     DomainResponse handleOrders(DomainRequest request) {
