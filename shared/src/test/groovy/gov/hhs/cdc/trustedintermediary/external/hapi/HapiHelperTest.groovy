@@ -601,9 +601,8 @@ class HapiHelperTest extends Specification {
         HapiHelper.getORC21Value(sr) == null
     }
 
-
     // OBR-2 - Placer Order Number
-    def "obr-2 methods work as expected"() {
+    def "obr-2 getter and setter methods work as expected"() {
         given:
         def obr2_1 = "obr2_1"
         def obr2_2 = "obr2_2"
