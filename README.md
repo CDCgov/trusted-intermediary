@@ -314,16 +314,16 @@ with this option enabled.
 2. Create a symbolic link or copy the scripts found at [/scripts/rs](/scripts/rs) to `prime-reportstream/prime-router`
    - **Note**: follow the instructions in [/scripts/rs/readme.md](/scripts/rs/readme.md) to set up the environment variable
 3. CD to `prime-reportstream/prime-router`
-   If attempting to access the metadata endpoint in ReportStream add the variable `ETOR_TI_baseurl="http://host.docker.internal:8080"` to `.prime-router/.vault/env/.env.local` file before building the container
-4. Run the `./cleanslate` script. For more information you can refer to the [ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/docs-deprecated/getting-started/getting-started.md#building-the-baseline)
-5. Run RS with `docker compose up --build -d`
-6. Edit `/settings/STLTs/Flexion/flexion.yml` to comment the lines related to staging settings, and uncomment the ones for local settings:
+4. Run the `./cleanslate` script. For more information you can refer to the [ReportStream docs](https://github.com/CDCgov/prime-reportstream/tree/master/prime-router/docs/getting-started#first-build)
+5. If attempting to access the metadata endpoint in ReportStream add the variable `ETOR_TI_baseurl="http://host.docker.internal:8080"` to `.prime-router/.vault/env/.env.local` file before building the container
+6. Run RS with `docker compose up --build -d`
+7. Edit `/settings/STLTs/Flexion/flexion.yml` to comment the lines related to staging settings, and uncomment the ones for local settings:
    - `authTokenUrl`, `reportUrl`, `authHeaders.host` under REST `transport` in `receivers`
    - `type` and `credentialName` under SFTP `transport` in `receivers`
-7. Run the `./reset.sh` script to reset the database
-8. Run the `./load-etor-org-settings.sh` to apply the ETOR organization settings
-9. Run the `./setup-local-vault.sh` script to set up the local vault secrets
-   - You can verify that the script created the secrets succesfully by going to `http://localhost:8200/` in your browser, use the token in `prime-router/.vault/env/.env.local` to authenticate, and then go to `Secrets engines` > `secret/` to check the available secrets
+8. Run the `./reset.sh` script to reset the database
+9. Run the `./load-etor-org-settings.sh` to apply the ETOR organization settings
+10. Run the `./setup-local-vault.sh` script to set up the local vault secrets
+   - You can verify that the script created the secrets successfully by going to `http://localhost:8200/` in your browser, use the token in `prime-router/.vault/env/.env.local` to authenticate, and then go to `Secrets engines` > `secret/` to check the available secrets
 
 #### Submit request to ReportStream
 
