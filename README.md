@@ -325,6 +325,7 @@ with this option enabled.
 10. Run the `./setup-local-vault.sh` script to set up the local vault secrets
    - You can verify that the script created the secrets successfully by going to `http://localhost:8200/` in your browser, use the token in `prime-router/.vault/env/.env.local` to authenticate, and then go to `Secrets engines` > `secret/` to check the available secrets
 
+
 #### Submit request to ReportStream
 
 ##### Locally
