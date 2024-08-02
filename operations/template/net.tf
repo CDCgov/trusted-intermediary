@@ -151,7 +151,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "db_network_link" {
   }
 }
 
-resource "azurerm_network_security_group" "db_security_group" {
+data "azurerm_network_security_group" "db_security_group" {
   name                = "database-security-group"
   location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
@@ -174,7 +174,7 @@ resource "azurerm_network_security_group" "db_security_group" {
   }
 }
 
-resource "azurerm_route_table" "database" {
+data "azurerm_route_table" "database" {
   name                = "database-route-table"
   location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
@@ -301,7 +301,7 @@ resource "azurerm_subnet_network_security_group_association" "database_security_
   network_security_group_id = azurerm_network_security_group.db_security_group.id
 }
 
-resource "azurerm_network_security_group" "app_security_group" {
+data "azurerm_network_security_group" "app_security_group" {
   name                = "app-security-group"
   location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
