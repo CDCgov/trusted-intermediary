@@ -155,47 +155,12 @@ data "azurerm_network_security_group" "db_security_group" {
   name                = "database-security-group"
   location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
-  #   below tags are managed by CDC
-  lifecycle {
-    ignore_changes = [
-      tags["business_steward"],
-      tags["center"],
-      tags["environment"],
-      tags["escid"],
-      tags["funding_source"],
-      tags["pii_data"],
-      tags["security_compliance"],
-      tags["security_steward"],
-      tags["support_group"],
-      tags["system"],
-      tags["technical_steward"],
-      tags["zone"]
-    ]
-  }
 }
 
 data "azurerm_route_table" "database" {
   name                = "database-route-table"
   location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
-
-  #   below tags are managed by CDC
-  lifecycle {
-    ignore_changes = [
-      tags["business_steward"],
-      tags["center"],
-      tags["environment"],
-      tags["escid"],
-      tags["funding_source"],
-      tags["pii_data"],
-      tags["security_compliance"],
-      tags["security_steward"],
-      tags["support_group"],
-      tags["system"],
-      tags["technical_steward"],
-      tags["zone"]
-    ]
-  }
 }
 
 resource "azurerm_route" "entra_internet" {
@@ -305,23 +270,6 @@ data "azurerm_network_security_group" "app_security_group" {
   name                = "app-security-group"
   location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
-  #   below tags are managed by CDC
-  lifecycle {
-    ignore_changes = [
-      tags["business_steward"],
-      tags["center"],
-      tags["environment"],
-      tags["escid"],
-      tags["funding_source"],
-      tags["pii_data"],
-      tags["security_compliance"],
-      tags["security_steward"],
-      tags["support_group"],
-      tags["system"],
-      tags["technical_steward"],
-      tags["zone"]
-    ]
-  }
 }
 
 resource "azurerm_network_security_rule" "App_Splunk_UF_omhsinf" {
