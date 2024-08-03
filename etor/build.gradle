@@ -14,7 +14,7 @@ dependencies {
     testImplementation testFixtures(project(':shared'))
 
     implementation 'com.azure:azure-storage-blob:12.27.0'
-    implementation 'com.azure:azure-identity:1.13.1'
+    implementation 'com.azure:azure-identity:1.13.2'
 
     testImplementation 'org.apache.groovy:groovy:4.0.22'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
