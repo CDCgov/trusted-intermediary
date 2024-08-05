@@ -161,13 +161,6 @@ data "azurerm_route_table" "database" {
   resource_group_name = data.azurerm_resource_group.group.name
 }
 
-resource "azurerm_route" "entra_internet" {
-  name                = "entra_internet"
-  resource_group_name = data.azurerm_resource_group.group.name
-  route_table_name    = data.azurerm_route_table.database.name
-  address_prefix      = "AzureActiveDirectory"
-  next_hop_type       = "Internet"
-}
 
 resource "azurerm_subnet_route_table_association" "database_database" {
   subnet_id      = azurerm_subnet.database.id
