@@ -15,7 +15,7 @@ import javax.inject.Inject;
 /** Implements the RuleEngine interface. It represents a rule engine for transformations. */
 public class TransformationRuleEngine implements RuleEngine {
     private String ruleDefinitionsFileName;
-    final List<TransformationRule> rules = new ArrayList<>();
+    volatile List<TransformationRule> rules = new ArrayList<>();
 
     private static final TransformationRuleEngine INSTANCE = new TransformationRuleEngine();
 

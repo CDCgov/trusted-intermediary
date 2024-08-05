@@ -15,7 +15,7 @@ import javax.inject.Inject;
 /** Implements the RuleEngine interface. It represents a rule engine for validations. */
 public class ValidationRuleEngine implements RuleEngine {
     private String ruleDefinitionsFileName;
-    final List<ValidationRule> rules = new ArrayList<>();
+    volatile List<ValidationRule> rules = new ArrayList<>();
 
     private static final ValidationRuleEngine INSTANCE = new ValidationRuleEngine();
 
