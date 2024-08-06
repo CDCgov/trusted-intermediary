@@ -37,7 +37,7 @@ public class ValidationRuleEngine implements RuleEngine {
 
     @Override
     public void ensureRulesLoaded() throws RuleLoaderException {
-        synchronized (this) {
+        synchronized (rules) {
             if (rules.isEmpty()) {
                 InputStream resourceStream =
                         getClass().getClassLoader().getResourceAsStream(ruleDefinitionsFileName);
@@ -48,7 +48,7 @@ public class ValidationRuleEngine implements RuleEngine {
                 }
                 List<ValidationRule> parsedRules =
                         ruleLoader.loadRules(resourceStream, new TypeReference<>() {});
-                this.rules.addAll(parsedRules);
+                rules.addAll(parsedRules);
             }
         }
     }
