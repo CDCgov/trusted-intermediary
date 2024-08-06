@@ -9,13 +9,14 @@ import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.inject.Inject;
 
 /** Implements the RuleEngine interface. It represents a rule engine for validations. */
 public class ValidationRuleEngine implements RuleEngine {
     private String ruleDefinitionsFileName;
-    volatile List<ValidationRule> rules = new ArrayList<>();
+    final List<ValidationRule> rules = Collections.synchronizedList(new ArrayList<>());
 
     private static final ValidationRuleEngine INSTANCE = new ValidationRuleEngine();
 
@@ -36,23 +37,18 @@ public class ValidationRuleEngine implements RuleEngine {
 
     @Override
     public void ensureRulesLoaded() throws RuleLoaderException {
-        // Double-checked locking - needed to protect from excessive sync locks
-        if (rules.isEmpty()) {
-            synchronized (this) {
-                if (rules.isEmpty()) {
-                    InputStream resourceStream =
-                            getClass()
-                                    .getClassLoader()
-                                    .getResourceAsStream(ruleDefinitionsFileName);
-                    if (resourceStream == null) {
-                        throw new RuleLoaderException(
-                                "File not found: " + ruleDefinitionsFileName,
-                                new FileNotFoundException());
-                    }
-                    List<ValidationRule> parsedRules =
-                            ruleLoader.loadRules(resourceStream, new TypeReference<>() {});
-                    this.rules.addAll(parsedRules);
+        synchronized (this) {
+            if (rules.isEmpty()) {
+                InputStream resourceStream =
+                        getClass().getClassLoader().getResourceAsStream(ruleDefinitionsFileName);
+                if (resourceStream == null) {
+                    throw new RuleLoaderException(
+                            "File not found: " + ruleDefinitionsFileName,
+                            new FileNotFoundException());
                 }
+                List<ValidationRule> parsedRules =
+                        ruleLoader.loadRules(resourceStream, new TypeReference<>() {});
+                this.rules.addAll(parsedRules);
             }
         }
     }
