@@ -17,7 +17,7 @@ import javax.inject.Inject;
 public class ValidationRuleEngine implements RuleEngine {
     private String ruleDefinitionsFileName;
     final List<ValidationRule> rules = Collections.synchronizedList(new ArrayList<>());
-
+    volatile boolean rulesLoaded = false;
     private static final ValidationRuleEngine INSTANCE = new ValidationRuleEngine();
 
     @Inject Logger logger;
@@ -37,18 +37,23 @@ public class ValidationRuleEngine implements RuleEngine {
 
     @Override
     public void ensureRulesLoaded() throws RuleLoaderException {
-        synchronized (rules) {
-            if (rules.isEmpty()) {
-                InputStream resourceStream =
-                        getClass().getClassLoader().getResourceAsStream(ruleDefinitionsFileName);
-                if (resourceStream == null) {
-                    throw new RuleLoaderException(
-                            "File not found: " + ruleDefinitionsFileName,
-                            new FileNotFoundException());
+        if (!rulesLoaded) {
+            synchronized (rules) {
+                if (rules.isEmpty()) {
+                    InputStream resourceStream =
+                            getClass()
+                                    .getClassLoader()
+                                    .getResourceAsStream(ruleDefinitionsFileName);
+                    if (resourceStream == null) {
+                        throw new RuleLoaderException(
+                                "File not found: " + ruleDefinitionsFileName,
+                                new FileNotFoundException());
+                    }
+                    List<ValidationRule> parsedRules =
+                            ruleLoader.loadRules(resourceStream, new TypeReference<>() {});
+                    rules.addAll(parsedRules);
+                    rulesLoaded = true;
                 }
-                List<ValidationRule> parsedRules =
-                        ruleLoader.loadRules(resourceStream, new TypeReference<>() {});
-                rules.addAll(parsedRules);
             }
         }
     }

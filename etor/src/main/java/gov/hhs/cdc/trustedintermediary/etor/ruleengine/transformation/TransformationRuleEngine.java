@@ -17,7 +17,7 @@ import javax.inject.Inject;
 public class TransformationRuleEngine implements RuleEngine {
     private String ruleDefinitionsFileName;
     final List<TransformationRule> rules = Collections.synchronizedList(new ArrayList<>());
-
+    volatile boolean rulesLoaded = false;
     private static final TransformationRuleEngine INSTANCE = new TransformationRuleEngine();
 
     @Inject Logger logger;
@@ -37,18 +37,23 @@ public class TransformationRuleEngine implements RuleEngine {
 
     @Override
     public void ensureRulesLoaded() throws RuleLoaderException {
-        synchronized (rules) {
-            if (rules.isEmpty()) {
-                InputStream resourceStream =
-                        getClass().getClassLoader().getResourceAsStream(ruleDefinitionsFileName);
-                if (resourceStream == null) {
-                    throw new RuleLoaderException(
-                            "File not found: " + ruleDefinitionsFileName,
-                            new FileNotFoundException());
+        if (!rulesLoaded) {
+            synchronized (rules) {
+                if (rules.isEmpty()) {
+                    InputStream resourceStream =
+                            getClass()
+                                    .getClassLoader()
+                                    .getResourceAsStream(ruleDefinitionsFileName);
+                    if (resourceStream == null) {
+                        throw new RuleLoaderException(
+                                "File not found: " + ruleDefinitionsFileName,
+                                new FileNotFoundException());
+                    }
+                    List<TransformationRule> parsedRules =
+                            ruleLoader.loadRules(resourceStream, new TypeReference<>() {});
+                    rules.addAll(parsedRules);
+                    rulesLoaded = true;
                 }
-                List<TransformationRule> parsedRules =
-                        ruleLoader.loadRules(resourceStream, new TypeReference<>() {});
-                rules.addAll(parsedRules);
             }
         }
     }
