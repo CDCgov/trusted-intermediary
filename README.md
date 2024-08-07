@@ -1,5 +1,7 @@
 # CDC Trusted Intermediary
 
+This document provides instructions for setting up the environment, running the application, and performing various tasks such as compiling, testing, and contributing to the project.
+
 ## Requirements
 Any distribution of the Java 17 JDK.
 
@@ -86,7 +88,7 @@ To run the unit tests, execute...
 
 #### End-to-end Tests
 
-End-to-end tests are meant to interact and assert the overall flow of the API is operating correctly. They require that the API to be running already.
+End-to-end tests are designed to interact with the API and verify that its overall flow operates correctly. They require that the API to be running already.
 The end-to-end tests use whatever database configuration is already in place - if you're using the local filesystem,
 so will the e2e tests (this is how they work on github), and if you're using a DB, so will the tests
 
@@ -120,7 +122,10 @@ Run the load tests by running...
 Currently, we are migrating to using Azure. Local load testing is using gradle, however a docker load test is available to mimic the Azure environment settings until the azure migration is complete.
 
 This will run the API for you, so no need to run it manually.
-**If you are already running the API, stop it before running the load tests or the cleanup steps won't work.**
+>**Note:**
+>
+>**If you are already running the API, stop it before running the load tests or the cleanup steps won't work.**
+>
 The load tests will also spin up (and clean up) a local test DB on port 5434 that should not interfere with the local dev DB.
 
 The `locustfile.py` that specifies the load test is located at
@@ -167,9 +172,12 @@ We have a number of environments that are split between CDC and non-CDC Azure En
 
 ##### Internal
 
-The Internal environment is meant to be the Wild West.  Meaning anyone can push to it to test something, and there is no
-requirement that only good builds be pushed to it.  Use the Internal environment if you want to test something in a
-deployed environment in a _non-CDC_ Azure Entra domain and subscription.
+The Internal environment is designed to be the Wild West, meaning anyone can push changes without restrictions. It allows for testing various configurations without the requirement that only stable builds be pushed.  Use the Internal environment if you want to test something in a
+deployed environment in a _non-CDC_ Azure Entra domain and subscription. See below:
+
+> **Before starting...**
+>
+>  Remember to ping the Engineering Channel to make sure someone is not already using the enviroment.
 
 To deploy to the Internal environment...
 1. Check with the team that no one is already using it.
@@ -211,7 +219,7 @@ occur when a release is published.
 
 #### Initial Azure and GitHub Configuration
 
-There is minimal set-up to do to get Terraform squared away before you can run the Terraform commands in
+There is minimal set-up to do to get Terraform setup before you can run the Terraform commands in
 a new Azure environment in the Flexion Entra domain.  For example, the `internal` environment.  This does not apply to the CDC
 Entra domains and subscriptions.
 
@@ -230,7 +238,7 @@ Entra domains and subscriptions.
    - A secret with the ID from the subscription that everything should be deployed into.
    - A secret with the ID of the App Registration created previously.
 6. Create a copy of one of the environments under the [operations](./operations) folder.
-   1. Name the copy off of the name of the new environment.
+   1. Name the copy off of the name of the new environment. Ex: `internal`
    2. Edit the `main.tf` file with the names of the resources previously created: `resource_group_name`,
       `storage_account_name`, `container_name`.  Also update the `environment` to match the new folder name.
 7. Create a GitHub Action workflow so that automatic deploys can occur.  You can take inspiration from our
@@ -257,7 +265,10 @@ firewall allow list.
    `192.168.0.1/32`.
 6. Click "Save".
 
-You will now be able to interact with that environment's application.  Don't forget to remove your rule and save when
+You will now be able to interact with that environment's application.
+> **Note:**
+>
+> Don't forget to remove your rule and save when
 you are done.
 
 ##### Database
@@ -294,8 +305,7 @@ CDC including this GitHub page may be subject to applicable federal law, includi
 
 ### Database
 
-For database documentation [go here](/docs/database.md)
-
+For database documentation: [/docs/database.md](/docs/database.md)
 ### Setup with ReportStream
 
 #### CDC-TI Setup
@@ -314,16 +324,16 @@ with this option enabled.
 2. Create a symbolic link or copy the scripts found at [/scripts/rs](/scripts/rs) to `prime-reportstream/prime-router`
    - **Note**: follow the instructions in [/scripts/rs/readme.md](/scripts/rs/readme.md) to set up the environment variable
 3. CD to `prime-reportstream/prime-router`
-   If attempting to access the metadata endpoint in ReportStream add the variable `ETOR_TI_baseurl="http://host.docker.internal:8080"` to `.prime-router/.vault/env/.env.local` file before building the container
 4. Run the `./cleanslate` script. For more information you can refer to the [ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/docs-deprecated/getting-started/getting-started.md#building-the-baseline)
-5. Run RS with `docker compose up --build -d`
-6. Edit `/settings/STLTs/Flexion/flexion.yml` to comment the lines related to staging settings, and uncomment the ones for local settings:
+5. If attempting to access the metadata endpoint in ReportStream add the variable `ETOR_TI_baseurl="http://host.docker.internal:8080"` to `.prime-router/.vault/env/.env.local` file before building the container
+6. Run RS with `docker compose up --build -d`
+7. Edit `/settings/STLTs/Flexion/flexion.yml` to comment the lines related to staging settings, and uncomment the ones for local settings:
    - `authTokenUrl`, `reportUrl`, `authHeaders.host` under REST `transport` in `receivers`
    - `type` and `credentialName` under SFTP `transport` in `receivers`
-7. Run the `./reset.sh` script to reset the database
-8. Run the `./load-etor-org-settings.sh` to apply the ETOR organization settings
-9. Run the `./setup-local-vault.sh` script to set up the local vault secrets
-   - You can verify that the script created the secrets succesfully by going to `http://localhost:8200/` in your browser, use the token in `prime-router/.vault/env/.env.local` to authenticate, and then go to `Secrets engines` > `secret/` to check the available secrets
+8. Run the `./reset.sh` script to reset the database
+9. Run the `./load-etor-org-settings.sh` to apply the ETOR organization settings
+10. Run the `./setup-local-vault.sh` script to set up the local vault secrets
+   - You can verify that the script created the secrets successfully by going to `http://localhost:8200/` in your browser, use the token in `prime-router/.vault/env/.env.local` to authenticate, and then go to `Secrets engines` > `secret/` to check the available secrets
 
 #### Submit request to ReportStream
 
