@@ -173,7 +173,11 @@ We have a number of environments that are split between CDC and non-CDC Azure En
 ##### Internal
 
 The Internal environment is designed to be the Wild West, meaning anyone can push changes without restrictions. It allows for testing various configurations without the requirement that only stable builds be pushed.  Use the Internal environment if you want to test something in a
-deployed environment in a _non-CDC_ Azure Entra domain and subscription.
+deployed environment in a _non-CDC_ Azure Entra domain and subscription. See below:
+
+> **Before starting...**
+>
+>  Remember to ping the Engineering Channel to make sure someone is not already using the enviroment.
 
 To deploy to the Internal environment...
 1. Check with the team that no one is already using it.
@@ -234,7 +238,7 @@ Entra domains and subscriptions.
    - A secret with the ID from the subscription that everything should be deployed into.
    - A secret with the ID of the App Registration created previously.
 6. Create a copy of one of the environments under the [operations](./operations) folder.
-   1. Name the copy off of the name of the new environment. ` Can we give an example here?`
+   1. Name the copy off of the name of the new environment. Ex: `internal`
    2. Edit the `main.tf` file with the names of the resources previously created: `resource_group_name`,
       `storage_account_name`, `container_name`.  Also update the `environment` to match the new folder name.
 7. Create a GitHub Action workflow so that automatic deploys can occur.  You can take inspiration from our
