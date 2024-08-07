@@ -9,14 +9,13 @@ import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import javax.inject.Inject;
 
 /** Implements the RuleEngine interface. It represents a rule engine for transformations. */
 public class TransformationRuleEngine implements RuleEngine {
     private String ruleDefinitionsFileName;
-    final List<TransformationRule> rules = Collections.synchronizedList(new ArrayList<>());
+    final List<TransformationRule> rules = new ArrayList<>();
     volatile boolean rulesLoaded = false;
     private static final TransformationRuleEngine INSTANCE = new TransformationRuleEngine();
 
