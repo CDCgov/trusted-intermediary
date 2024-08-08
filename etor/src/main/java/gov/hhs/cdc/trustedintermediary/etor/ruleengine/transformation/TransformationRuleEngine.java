@@ -39,7 +39,7 @@ public class TransformationRuleEngine implements RuleEngine {
     public void ensureRulesLoaded() throws RuleLoaderException {
         if (!rulesLoaded) {
             synchronized (rules) {
-                if (rules.isEmpty()) {
+                if (!rulesLoaded) {
                     InputStream resourceStream =
                             getClass()
                                     .getClassLoader()
