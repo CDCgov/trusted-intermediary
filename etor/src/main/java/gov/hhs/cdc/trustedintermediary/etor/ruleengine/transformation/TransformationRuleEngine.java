@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
+import org.apache.commons.io.IOUtils;
 
 /** Implements the RuleEngine interface. It represents a rule engine for transformations. */
 public class TransformationRuleEngine implements RuleEngine {
@@ -53,6 +54,7 @@ public class TransformationRuleEngine implements RuleEngine {
                             ruleLoader.loadRules(resourceStream, new TypeReference<>() {});
                     rules.addAll(parsedRules);
                     rulesLoaded = true;
+                    IOUtils.closeQuietly(resourceStream);
                 }
             }
         }
