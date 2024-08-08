@@ -29,8 +29,11 @@ public class OpenApiReaderImplementation implements OpenApiReader {
     public String openAsString(String fileName) throws UnableToReadOpenApiSpecificationException {
         InputStream stream = getClass().getClassLoader().getResourceAsStream(fileName);
         try {
-            return new String(
-                    Objects.requireNonNull(stream).readAllBytes(), StandardCharsets.UTF_8);
+            var out =
+                    new String(
+                            Objects.requireNonNull(stream).readAllBytes(), StandardCharsets.UTF_8);
+            stream.close();
+            return out;
         } catch (IOException | NullPointerException e) {
             throw new UnableToReadOpenApiSpecificationException(
                     "Failed to open OpenAPI specification for " + fileName, e);
