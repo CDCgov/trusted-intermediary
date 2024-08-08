@@ -16,7 +16,7 @@ import javax.inject.Inject;
 public class TransformationRuleEngine implements RuleEngine {
     private String ruleDefinitionsFileName;
     final List<TransformationRule> rules = new ArrayList<>();
-
+    volatile boolean rulesLoaded = false;
     private static final TransformationRuleEngine INSTANCE = new TransformationRuleEngine();
 
     @Inject Logger logger;
@@ -32,14 +32,14 @@ public class TransformationRuleEngine implements RuleEngine {
     @Override
     public void unloadRules() {
         rules.clear();
+        rulesLoaded = false;
     }
 
     @Override
     public void ensureRulesLoaded() throws RuleLoaderException {
-        // Double-checked locking - needed to protect from excessive sync locks
-        if (rules.isEmpty()) {
-            synchronized (this) {
-                if (rules.isEmpty()) {
+        if (!rulesLoaded) {
+            synchronized (rules) {
+                if (!rulesLoaded) {
                     InputStream resourceStream =
                             getClass()
                                     .getClassLoader()
@@ -51,7 +51,8 @@ public class TransformationRuleEngine implements RuleEngine {
                     }
                     List<TransformationRule> parsedRules =
                             ruleLoader.loadRules(resourceStream, new TypeReference<>() {});
-                    this.rules.addAll(parsedRules);
+                    rules.addAll(parsedRules);
+                    rulesLoaded = true;
                 }
             }
         }

@@ -16,7 +16,7 @@ import javax.inject.Inject;
 public class ValidationRuleEngine implements RuleEngine {
     private String ruleDefinitionsFileName;
     final List<ValidationRule> rules = new ArrayList<>();
-
+    volatile boolean rulesLoaded = false;
     private static final ValidationRuleEngine INSTANCE = new ValidationRuleEngine();
 
     @Inject Logger logger;
@@ -32,14 +32,14 @@ public class ValidationRuleEngine implements RuleEngine {
     @Override
     public void unloadRules() {
         rules.clear();
+        rulesLoaded = false;
     }
 
     @Override
     public void ensureRulesLoaded() throws RuleLoaderException {
-        // Double-checked locking - needed to protect from excessive sync locks
-        if (rules.isEmpty()) {
-            synchronized (this) {
-                if (rules.isEmpty()) {
+        if (!rulesLoaded) {
+            synchronized (rules) {
+                if (!rulesLoaded) {
                     InputStream resourceStream =
                             getClass()
                                     .getClassLoader()
@@ -51,7 +51,8 @@ public class ValidationRuleEngine implements RuleEngine {
                     }
                     List<ValidationRule> parsedRules =
                             ruleLoader.loadRules(resourceStream, new TypeReference<>() {});
-                    this.rules.addAll(parsedRules);
+                    rules.addAll(parsedRules);
+                    rulesLoaded = true;
                 }
             }
         }
