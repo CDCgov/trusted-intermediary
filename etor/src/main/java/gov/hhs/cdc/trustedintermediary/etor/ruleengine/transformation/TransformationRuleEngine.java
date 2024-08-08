@@ -39,14 +39,12 @@ public class TransformationRuleEngine implements RuleEngine {
     public void ensureRulesLoaded() throws RuleLoaderException {
         if (!rulesLoaded) {
             synchronized (rules) {
-                rulesLoaded = true;
                 if (rules.isEmpty()) {
                     InputStream resourceStream =
                             getClass()
                                     .getClassLoader()
                                     .getResourceAsStream(ruleDefinitionsFileName);
                     if (resourceStream == null) {
-                        rulesLoaded = false;
                         throw new RuleLoaderException(
                                 "File not found: " + ruleDefinitionsFileName,
                                 new FileNotFoundException());
@@ -54,6 +52,7 @@ public class TransformationRuleEngine implements RuleEngine {
                     List<TransformationRule> parsedRules =
                             ruleLoader.loadRules(resourceStream, new TypeReference<>() {});
                     rules.addAll(parsedRules);
+                    rulesLoaded = true;
                 }
             }
         }
