@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecif
 import gov.hhs.cdc.trustedintermediary.external.openapi.OpenApiReaderImplementation;
 import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombiner;
 import gov.hhs.cdc.trustedintermediary.wrappers.YamlCombinerException;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 /** Directs the construction of a full YAML OpenAPI specification */
@@ -37,6 +38,7 @@ public class OpenApi {
 
     String getBaselineDocumentation() throws UnableToReadOpenApiSpecificationException {
         String fileName = "openapi_base.yaml";
-        return OpenApiReaderImplementation.getInstance().openAsString(fileName);
+        return OpenApiReaderImplementation.getInstance()
+                .openAsString(fileName, StandardCharsets.UTF_8);
     }
 }

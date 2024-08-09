@@ -10,6 +10,7 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecif
 import gov.hhs.cdc.trustedintermediary.external.openapi.OpenApiReaderImplementation;
 import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.function.Function;
 import javax.inject.Inject;
@@ -41,7 +42,8 @@ public class AuthDomainRegistration implements DomainConnector {
     @Override
     public String openApiSpecification() throws UnableToReadOpenApiSpecificationException {
         String fileName = "openapi_auth.yaml";
-        return OpenApiReaderImplementation.getInstance().openAsString(fileName);
+        return OpenApiReaderImplementation.getInstance()
+                .openAsString(fileName, StandardCharsets.UTF_8);
     }
 
     DomainResponse handleAuth(DomainRequest request) {

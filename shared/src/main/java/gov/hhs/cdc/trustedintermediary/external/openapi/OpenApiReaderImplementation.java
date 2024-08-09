@@ -4,7 +4,7 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecif
 import gov.hhs.cdc.trustedintermediary.wrappers.OpenApiReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.util.Objects;
 
 /**
@@ -22,16 +22,15 @@ public class OpenApiReaderImplementation implements OpenApiReader {
      * Loads the stream of an OpenApi file and returns the output as a string.
      *
      * @param fileName Name of the file to load
+     * @param charset Charset used for the output string
      * @return File contents as string
      * @throws UnableToReadOpenApiSpecificationException If there is an issue loading the Api file
      */
     @Override
-    public String openAsString(String fileName) throws UnableToReadOpenApiSpecificationException {
-        InputStream stream = getClass().getClassLoader().getResourceAsStream(fileName);
-        try {
-            var out =
-                    new String(
-                            Objects.requireNonNull(stream).readAllBytes(), StandardCharsets.UTF_8);
+    public String openAsString(String fileName, Charset charset)
+            throws UnableToReadOpenApiSpecificationException {
+        try (InputStream stream = getClass().getClassLoader().getResourceAsStream(fileName)) {
+            var out = new String(Objects.requireNonNull(stream).readAllBytes(), charset);
             stream.close();
             return out;
         } catch (IOException | NullPointerException e) {

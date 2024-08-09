@@ -47,6 +47,7 @@ import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamSenderH
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -143,7 +144,8 @@ public class EtorDomainRegistration implements DomainConnector {
     @Override
     public String openApiSpecification() throws UnableToReadOpenApiSpecificationException {
         String fileName = "openapi_etor.yaml";
-        return OpenApiReaderImplementation.getInstance().openAsString(fileName);
+        return OpenApiReaderImplementation.getInstance()
+                .openAsString(fileName, StandardCharsets.UTF_8);
     }
 
     DomainResponse handleOrders(DomainRequest request) {
