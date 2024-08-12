@@ -7,11 +7,11 @@ import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoaderException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
-import org.apache.commons.io.IOUtils;
 
 /** Implements the RuleEngine interface. It represents a rule engine for validations. */
 public class ValidationRuleEngine implements RuleEngine {
@@ -41,20 +41,20 @@ public class ValidationRuleEngine implements RuleEngine {
         if (!rulesLoaded) {
             synchronized (rules) {
                 if (!rulesLoaded) {
-                    InputStream resourceStream =
+                    try (InputStream stream =
                             getClass()
                                     .getClassLoader()
-                                    .getResourceAsStream(ruleDefinitionsFileName);
-                    if (resourceStream == null) {
+                                    .getResourceAsStream(ruleDefinitionsFileName)) {
+                        List<ValidationRule> parsedRules =
+                                ruleLoader.loadRules(stream, new TypeReference<>() {});
+                        rules.addAll(parsedRules);
+                        rulesLoaded = true;
+
+                    } catch (IOException | NullPointerException e) {
                         throw new RuleLoaderException(
                                 "File not found: " + ruleDefinitionsFileName,
                                 new FileNotFoundException());
                     }
-                    List<ValidationRule> parsedRules =
-                            ruleLoader.loadRules(resourceStream, new TypeReference<>() {});
-                    rules.addAll(parsedRules);
-                    rulesLoaded = true;
-                    IOUtils.closeQuietly(resourceStream);
                 }
             }
         }

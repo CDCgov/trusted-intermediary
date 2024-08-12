@@ -5,7 +5,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.OpenApiReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
 /**
  * Basic implementation of a Reader for OpenApi to promote code reuse. If additional functionality
@@ -28,8 +27,7 @@ public class OpenApiReaderImplementation implements OpenApiReader {
     @Override
     public String openAsString(String fileName) throws UnableToReadOpenApiSpecificationException {
         try (InputStream stream = getClass().getClassLoader().getResourceAsStream(fileName)) {
-            return new String(
-                    Objects.requireNonNull(stream).readAllBytes(), StandardCharsets.UTF_8);
+            return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException | NullPointerException e) {
             throw new UnableToReadOpenApiSpecificationException(
                     "Failed to open OpenAPI specification for " + fileName, e);
