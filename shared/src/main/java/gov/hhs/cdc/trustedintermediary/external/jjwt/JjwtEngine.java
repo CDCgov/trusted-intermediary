@@ -145,7 +145,8 @@ public class JjwtEngine implements AuthEngine {
     }
 
     protected byte[] parseBase64(String keyString) throws IllegalArgumentException {
-        return Base64.getDecoder().decode(stripPemKeyHeaderAndFooter(keyString));
+        var cleanedKey = stripPemKeyHeaderAndFooter(keyString);
+        return Base64.getDecoder().decode(cleanedKey);
     }
 
     private String stripPemKeyHeaderAndFooter(String pemKey) {
@@ -153,6 +154,7 @@ public class JjwtEngine implements AuthEngine {
                 .replace("-----END PRIVATE KEY-----", "")
                 .replace("-----BEGIN PUBLIC KEY-----", "")
                 .replace("-----END PUBLIC KEY-----", "")
-                .replaceAll(System.lineSeparator(), "");
+                .replace("\r\n", "\n") // Normalize Windows-style line endings to Unix-style
+                .replace("\n", "");
     }
 }
