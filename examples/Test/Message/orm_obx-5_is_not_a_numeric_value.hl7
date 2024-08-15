@@ -1,0 +1,4 @@
+MSH|^~\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^receiver.test.com^DNS|20230101010000-0000||ORM^O01^ORM_O01|111111|T|2.5.1||||||||||
+ORC|NW|421832901^EPIC^1.2.840.114350.1.13.145.2.7.2.695071^ISO|||||||20230506052913-0500|||1265136360^JONES^JANE^^^^^^NPI^L^^^NPI|||||||||ST. CLOUD HOSPITAL^L^^^^CMS^NPI^^^1043269798~ST. CLOUD HOSPITAL^L^^^^MN Public Health Lab^Submitter ID^^^739
+OBR|1|421832901^EPIC^1.2.840.114350.1.13.145.2.7.2.695071^ISO||54089-8^Newborn screening panel American Health Information Community (AHIC)^LN|||20230506050000||||||||440500007&Blood spot specimen&SCT
+OBX|1|NM|8339-4^BIRTH WEIGHT MEASURED^LN|1|NOVALUE|g^gram^UCUM|||||O|||20230506050000-0500|||||||||||||||QST|AOE

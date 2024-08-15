@@ -7,7 +7,7 @@ Usage: hrl <HURL_FILE> [OPTIONS]
 
 Options:
     -f <REL_PATH>         The path to the hl7/fhir file to submit, relative the root path (Required for orders and results APIs)
-    -r <ROOT_PATH>        The root path to the hl7/fhir files (Default: $CDCTI_HOME/examples/Test/)
+    -r <ROOT_PATH>        The root path to the hl7/fhir files (Default: $CDCTI_HOME/examples/)
     -e [local | staging]  The environment to run the test in (Default: local)
     -c <CLIENT>           The client id to use (Default: report-stream)
     -j <JWT>              The JWT to use for authentication
@@ -20,18 +20,18 @@ Options:
 
 Submit an order to local environment:
 ```
-./hrl orders.hurl -f Orders/003_AL_ORM_O01_NBS_Fully_Populated_1_hl7_translation.fhir -i 100
+./hrl orders.hurl -f Test/Orders/003_AL_ORM_O01_NBS_Fully_Populated_1_hl7_translation.fhir -i 100
 ```
 
 Submit an order to staging:
 ```
-./hrl orders.hurl -f Orders/003_AL_ORM_O01_NBS_Fully_Populated_0_initial_message.hl7 -e staging -j eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ
+./hrl orders.hurl -f Test/Orders/003_AL_ORM_O01_NBS_Fully_Populated_0_initial_message.hl7 -e staging -j eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ
 
 ```
 
 Submit a result to local environment:
 ```
-./hrl results.hurl -f Results/002_AL_ORU_R01_NBS_Fully_Populated_1_hl7_translation.fhir -i 100
+./hrl results.hurl -f Test/Results/002_AL_ORU_R01_NBS_Fully_Populated_1_hl7_translation.fhir -i 100
 ```
 
 Get metadata from local environment:

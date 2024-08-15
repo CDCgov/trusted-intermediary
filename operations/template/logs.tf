@@ -3,22 +3,68 @@ resource "azurerm_log_analytics_workspace" "logs_workspace" {
 
   resource_group_name = data.azurerm_resource_group.group.name
   location            = data.azurerm_resource_group.group.location
+
+  #   below tags are managed by CDC
+  lifecycle {
+    ignore_changes = [
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
+    ]
+  }
 }
 
 resource "azurerm_log_analytics_query_pack" "application_logs_pack" {
   name                = "TI Application Logs"
   resource_group_name = data.azurerm_resource_group.group.name
   location            = data.azurerm_resource_group.group.location
+
+  #   below tags are managed by CDC
+  lifecycle {
+    ignore_changes = [
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
+    ]
+  }
 }
 
-resource "azurerm_log_analytics_query_pack_query" "example" {
+resource "azurerm_log_analytics_query_pack_query" "application_logs" {
   display_name = "TI's Raw Application Logs"
   description  = "View all TI's application logs in a structured format"
 
   query_pack_id = azurerm_log_analytics_query_pack.application_logs_pack.id
   categories    = ["applications"]
 
-  body = "AppServiceConsoleLogs | extend JsonResult = parse_json(ResultDescription) | project-away TimeGenerated, Level, ResultDescription, Host, Type, _ResourceId, OperationName, TenantId, SourceSystem | evaluate bag_unpack(JsonResult)"
+  body = "AppServiceConsoleLogs | project JsonResult = parse_json(ResultDescription) | evaluate bag_unpack(JsonResult) | project-reorder ['@timestamp'], level, message"
+}
+
+resource "azurerm_log_analytics_query_pack_query" "application_error_logs" {
+  display_name = "TI's Application Error Logs"
+  description  = "View all TI's application logs with error level in a structured format"
+
+  query_pack_id = azurerm_log_analytics_query_pack.application_logs_pack.id
+  categories    = ["applications"]
+
+  body = "AppServiceConsoleLogs | project JsonResult = parse_json(ResultDescription) | evaluate bag_unpack(JsonResult) | where level == 'ERROR' | project-away level | project-reorder ['@timestamp'], message"
 }
 
 resource "azurerm_monitor_diagnostic_setting" "app_to_logs" {

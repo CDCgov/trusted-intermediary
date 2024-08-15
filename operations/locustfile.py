@@ -56,7 +56,7 @@ class SampleUser(FastHttpUser):
         else:
             logging.error(f"Authentication failed: {response.error}")
 
-    @task
+    @task(1)
     def get_health(self):
         self.client.get(HEALTH_ENDPOINT)
 

@@ -7,6 +7,7 @@ import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoaderException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,7 @@ import javax.inject.Inject;
 public class TransformationRuleEngine implements RuleEngine {
     private String ruleDefinitionsFileName;
     final List<TransformationRule> rules = new ArrayList<>();
-
+    volatile boolean rulesLoaded = false;
     private static final TransformationRuleEngine INSTANCE = new TransformationRuleEngine();
 
     @Inject Logger logger;
@@ -32,26 +33,28 @@ public class TransformationRuleEngine implements RuleEngine {
     @Override
     public void unloadRules() {
         rules.clear();
+        rulesLoaded = false;
     }
 
     @Override
     public void ensureRulesLoaded() throws RuleLoaderException {
-        // Double-checked locking - needed to protect from excessive sync locks
-        if (rules.isEmpty()) {
-            synchronized (this) {
-                if (rules.isEmpty()) {
-                    InputStream resourceStream =
+        if (!rulesLoaded) {
+            synchronized (rules) {
+                if (!rulesLoaded) {
+                    try (InputStream stream =
                             getClass()
                                     .getClassLoader()
-                                    .getResourceAsStream(ruleDefinitionsFileName);
-                    if (resourceStream == null) {
+                                    .getResourceAsStream(ruleDefinitionsFileName)) {
+                        List<TransformationRule> parsedRules =
+                                ruleLoader.loadRules(stream, new TypeReference<>() {});
+                        rules.addAll(parsedRules);
+                        rulesLoaded = true;
+
+                    } catch (IOException | NullPointerException e) {
                         throw new RuleLoaderException(
                                 "File not found: " + ruleDefinitionsFileName,
                                 new FileNotFoundException());
                     }
-                    List<TransformationRule> parsedRules =
-                            ruleLoader.loadRules(resourceStream, new TypeReference<>() {});
-                    this.rules.addAll(parsedRules);
                 }
             }
         }

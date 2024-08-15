@@ -23,8 +23,11 @@ public class HapiMessageHelper {
     private HapiMessageHelper() {}
 
     public String extractPlacerOrderNumber(Bundle messageBundle) {
+        // Placer Order Number can be extracted from ORC-2 and OBR-2, but the value is always the
+        // same
+        // if available on both
         return fhirEngine.getStringFromFhirPath(
-                messageBundle, Hl7FhirMappingPath.PLACER_ORDER_NUMBER.getFhirPath());
+                messageBundle, Hl7FhirMappingPath.PLACER_ORDER_NUMBER_ORC_2.getFhirPath());
     }
 
     public String extractSendingApplicationNamespace(Bundle messageBundle) {

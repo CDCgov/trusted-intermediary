@@ -75,7 +75,7 @@ jobs:
         password: ${{ steps.retrieve-registry-password.outputs.ACR_PASSWORD }}
 
     - name: Build and push container image to registry
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         push: true
         tags: '${{ inputs.REGISTRY }}/${{ inputs.REPO }}:${{ github.sha }}'
@@ -83,7 +83,7 @@ jobs:
         context: .
 
     - name: Build and push documentation container image to registry
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         push: true
         tags: '${{ inputs.REGISTRY }}/${{ inputs.REPO_DOCS }}:${{ github.sha }}'

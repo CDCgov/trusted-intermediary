@@ -2,7 +2,6 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.DiagnosticReport
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.MessageHeader
@@ -255,14 +254,29 @@ class HapiHelperTest extends Specification {
         HapiHelper.getMSH6Organization(bundle) == null
 
         when:
+        HapiHelper.setMSH6_1Value(bundle, msh6_1)
+
+        then:
+        HapiHelper.getMSH6_1Identifier(bundle) == null
+
+        when:
         def receivingFacility = HapiFhirHelper.createOrganization()
         HapiFhirHelper.setMSH6Organization(bundle, receivingFacility)
         HapiHelper.setMSH6_1Value(bundle, msh6_1)
 
         then:
+        HapiHelper.getMSH6_1Identifier(bundle) != null
+        HapiFhirHelper.getMSH6_1Value(bundle) == msh6_1
+
+        when:
+        receivingFacility = HapiFhirHelper.createOrganization()
+        HapiFhirHelper.setMSH6Organization(bundle, receivingFacility)
+        HapiHelper.setMSH6_1Value(bundle, msh6_1)
+
+        then:
         HapiHelper.getMSH6Organization(bundle).equalsDeep(receivingFacility)
-        HapiHelper.getMSH6_1Identifier(bundle) == null
-        HapiFhirHelper.getMSH6_1Value(bundle) != msh6_1
+        HapiHelper.getMSH6_1Identifier(bundle) != null
+        HapiFhirHelper.getMSH6_1Value(bundle) == msh6_1
 
         when:
         HapiFhirHelper.setMSH6_1Identifier(bundle, new Identifier())
@@ -443,7 +457,7 @@ class HapiHelperTest extends Specification {
 
         when:
         def bundle = new Bundle()
-        HapiHelper.removePID5_7Extension(bundle)
+        HapiHelper.setPID5_7ExtensionValue(bundle, null)
 
         then:
         HapiHelper.getPID5Extension(bundle) == null
@@ -451,7 +465,7 @@ class HapiHelperTest extends Specification {
         when:
         HapiFhirHelper.createPIDPatient(bundle)
         HapiFhirHelper.setPID5Extension(bundle)
-        HapiHelper.removePID5_7Extension(bundle)
+        HapiHelper.setPID5_7ExtensionValue(bundle, null)
 
         then:
         HapiFhirHelper.getPID5_7Value(bundle) == null
@@ -464,7 +478,7 @@ class HapiHelperTest extends Specification {
         HapiFhirHelper.getPID5_7Value(bundle) == pid5_7
 
         when:
-        HapiHelper.removePID5_7Extension(bundle)
+        HapiHelper.setPID5_7ExtensionValue(bundle, null)
 
         then:
         HapiHelper.getPID5Extension(bundle) != null
@@ -502,6 +516,7 @@ class HapiHelperTest extends Specification {
     def "orc-4.1 methods work as expected"() {
         given:
         def orc4_1 = "orc4_1"
+        def orc4_1b = "orc4_1b"
         def bundle = new Bundle()
         def dr = HapiFhirHelper.createDiagnosticReport(bundle)
         def sr = HapiFhirHelper.createBasedOnServiceRequest(dr)
@@ -514,12 +529,19 @@ class HapiHelperTest extends Specification {
 
         then:
         HapiHelper.getORC4_1Value(sr) == orc4_1
+
+        when:
+        HapiHelper.setORC4_1Value(sr, orc4_1b)
+
+        then:
+        HapiHelper.getORC4_1Value(sr) == orc4_1b
     }
 
     // ORC-4.2 - Namespace ID
     def "orc-4.2 methods work as expected"() {
         given:
         def orc4_2 = "orc4_2"
+        def orc4_2b = "orc4_2b"
         def bundle = new Bundle()
         def dr = HapiFhirHelper.createDiagnosticReport(bundle)
         def sr = HapiFhirHelper.createBasedOnServiceRequest(dr)
@@ -532,6 +554,12 @@ class HapiHelperTest extends Specification {
 
         then:
         HapiHelper.getORC4_2Value(sr) == orc4_2
+
+        when:
+        HapiHelper.setORC4_2Value(sr, orc4_2b)
+
+        then:
+        HapiHelper.getORC4_2Value(sr) == orc4_2b
     }
 
     def "orc-21 methods work as expected"() {
@@ -573,6 +601,38 @@ class HapiHelperTest extends Specification {
         HapiHelper.getORC21Value(sr) == null
     }
 
+    // OBR-2 - Placer Order Number
+    def "obr-2 getter and setter methods work as expected"() {
+        given:
+        def obr2_1 = "obr2_1"
+        def obr2_2 = "obr2_2"
+        def bundle = new Bundle()
+        def serviceRequest = new ServiceRequest()
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(serviceRequest))
+
+        expect:
+        HapiHelper.getOBR2Identifier(serviceRequest) == null
+        HapiHelper.getOBR2_1Value(serviceRequest) == null
+        HapiHelper.getOBR2_2Value(serviceRequest) == null
+
+        when:
+        HapiFhirHelper.setOBR2Extension(serviceRequest, new Identifier())
+
+        then:
+        HapiHelper.getOBR2Identifier(serviceRequest) != null
+        HapiHelper.getOBR2_1Value(serviceRequest) == null
+        HapiHelper.getOBR2_2Value(serviceRequest) == null
+
+        when:
+        HapiHelper.setOBR2_1Value(serviceRequest, obr2_1)
+        HapiHelper.setOBR2_2Value(serviceRequest, obr2_2)
+
+
+        then:
+        HapiHelper.getOBR2_1Value(serviceRequest) == obr2_1
+        HapiHelper.getOBR2_2Value(serviceRequest) == obr2_2
+    }
+
     // OBR-4.1 - Observation Identifier
     def "getOBR4_1Value returns the correct value"() {
         given:
@@ -589,6 +649,12 @@ class HapiHelperTest extends Specification {
 
         then:
         HapiHelper.getOBR4_1Value(sr) == expectedValue
+
+        when:
+        sr.setCode(null)
+
+        then:
+        HapiHelper.getOBR4_1Value(sr) == null
     }
 
     // HD - Hierarchic Designator

@@ -23,9 +23,9 @@ dependencies {
     implementation project(':etor')
     testImplementation testFixtures(project(':shared'))
 
-    implementation 'io.javalin:javalin:6.1.6'
+    implementation 'io.javalin:javalin:6.2.0'
 
-    testImplementation 'org.apache.groovy:groovy:4.0.21'
+    testImplementation 'org.apache.groovy:groovy:4.0.22'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
     testImplementation 'com.openpojo:openpojo:0.9.1'
     testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.16.1'

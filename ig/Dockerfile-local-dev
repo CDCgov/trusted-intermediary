@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
-FROM alpine:3.20.0
-RUN apk update && apk add bash curl openjdk17 ruby-dev ruby-bundler ruby-jekyll npm git msttcorefonts-installer fontconfig && update-ms-fonts
+FROM alpine:3.20.2
+RUN apk -U upgrade && apk update && apk add bash curl openjdk17 ruby-dev ruby-bundler ruby-jekyll npm git msttcorefonts-installer fontconfig && update-ms-fonts
 RUN cp `find /usr/lib/ruby/gems/*/gems/jekyll-*/exe/jekyll` /usr/bin
 RUN npm install -g fsh-sushi
 

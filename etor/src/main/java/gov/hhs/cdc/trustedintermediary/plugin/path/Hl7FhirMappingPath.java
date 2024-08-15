@@ -7,10 +7,15 @@ package gov.hhs.cdc.trustedintermediary.plugin.path;
  * defines the HL7 field names.
  */
 public enum Hl7FhirMappingPath {
-    PLACER_ORDER_NUMBER(
+    PLACER_ORDER_NUMBER_ORC_2(
             "ORC.2",
             """
      Bundle.entry.resource.ofType(ServiceRequest).identifier.where(type.coding.code = 'PLAC').value
+     """),
+    PLACER_ORDER_NUMBER_OBR_2(
+            "OBR.2",
+            """
+     Bundle.entry.resource.ofType(ServiceRequest).extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/obr-observation-request').extension.where(url = 'OBR.2').value
      """),
     SENDING_FACILITY_NAMESPACE(
             "",
@@ -99,10 +104,6 @@ public enum Hl7FhirMappingPath {
     Hl7FhirMappingPath(String hl7Path, String fhirPath) {
         this.hl7Path = hl7Path;
         this.fhirPath = fhirPath;
-    }
-
-    public String getHl7Path() {
-        return hl7Path;
     }
 
     public String getFhirPath() {

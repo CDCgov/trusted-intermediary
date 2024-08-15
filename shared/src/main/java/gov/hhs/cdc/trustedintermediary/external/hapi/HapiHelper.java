@@ -47,6 +47,7 @@ public class HapiHelper {
     public static final StringType EXTENSION_HD2_HD3_DATA_TYPE = new StringType("HD.2,HD.3");
     public static final StringType EXTENSION_ORC2_DATA_TYPE = new StringType("ORC.2");
     public static final StringType EXTENSION_ORC4_DATA_TYPE = new StringType("ORC.4");
+    public static final StringType EXTENSION_OBR2_DATA_TYPE = new StringType("OBR.2");
 
     public static final String EXTENSION_CODING_SYSTEM =
             "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding-system";
@@ -60,6 +61,9 @@ public class HapiHelper {
                     "http://terminology.hl7.org/CodeSystem/v2-0003",
                     "O21",
                     "OML - Laboratory order");
+
+    public static final String EXTENSION_OBR_URL =
+            "https://reportstream.cdc.gov/fhir/StructureDefinition/obr-observation-request";
 
     /**
      * Returns a {@link Stream} of FHIR resources inside the provided {@link Bundle} that match the
@@ -158,10 +162,21 @@ public class HapiHelper {
         return getHD1Identifier(identifiers);
     }
 
+    public static Identifier createMSH6_1Identifier() {
+        Identifier identifier = new Identifier();
+        setHD1Identifier(identifier);
+        return identifier;
+    }
+
     public static void setMSH6_1Value(Bundle bundle, String value) {
         Identifier identifier = getMSH6_1Identifier(bundle);
         if (identifier == null) {
-            return;
+            identifier = createMSH6_1Identifier();
+            Organization receivingFacility = getMSH6Organization(bundle);
+            if (receivingFacility == null) {
+                return;
+            }
+            receivingFacility.addIdentifier(identifier);
         }
         identifier.setValue(value);
     }
@@ -261,10 +276,12 @@ public class HapiHelper {
         return name.getExtensionByUrl(HapiHelper.EXTENSION_XPN_HUMAN_NAME_URL);
     }
 
-    public static void removePID5_7Extension(Bundle bundle) {
+    public static void setPID5_7ExtensionValue(Bundle bundle, String value) {
         Extension extension = getPID5Extension(bundle);
         if (extension != null && extension.hasExtension(HapiHelper.EXTENSION_XPN7_URL)) {
-            extension.removeExtension(HapiHelper.EXTENSION_XPN7_URL);
+            extension
+                    .getExtensionByUrl(HapiHelper.EXTENSION_XPN7_URL)
+                    .setValue(new StringType(value));
         }
     }
 
@@ -398,12 +415,59 @@ public class HapiHelper {
 
     // OBR - Observation Request
 
+    // OBR-2 - Placer Order Number
+    public static Identifier getOBR2Identifier(ServiceRequest serviceRequest) {
+        if (!serviceRequest.hasExtension(EXTENSION_OBR_URL)
+                || !serviceRequest
+                        .getExtensionByUrl(EXTENSION_OBR_URL)
+                        .hasExtension(EXTENSION_OBR2_DATA_TYPE.toString())) {
+            return null;
+        }
+        var extension =
+                serviceRequest
+                        .getExtensionByUrl(EXTENSION_OBR_URL)
+                        .getExtensionByUrl(EXTENSION_OBR2_DATA_TYPE.toString());
+        return extension.castToIdentifier(extension.getValue());
+    }
+
+    // OBR-2.1 - Entity Identifier
+    public static String getOBR2_1Value(ServiceRequest serviceRequest) {
+        var identifier = getOBR2Identifier(serviceRequest);
+        if (identifier == null) {
+            return null;
+        }
+        return getEI1Value(identifier);
+    }
+
+    public static void setOBR2_1Value(ServiceRequest serviceRequest, String value) {
+        var identifier = getOBR2Identifier(serviceRequest);
+        if (identifier != null) {
+            setEI1Value(identifier, value);
+        }
+    }
+
+    // OBR-2.2 - Namespace ID
+    public static String getOBR2_2Value(ServiceRequest serviceRequest) {
+        var identifier = getOBR2Identifier(serviceRequest);
+        if (identifier == null) {
+            return null;
+        }
+        return getEI2Value(identifier);
+    }
+
+    public static void setOBR2_2Value(ServiceRequest serviceRequest, String value) {
+        var identifier = getOBR2Identifier(serviceRequest);
+        if (identifier != null) {
+            setEI2Value(identifier, value);
+        }
+    }
+
     // OBR-4 - Universal Service Identifier
 
     // OBR-4.1 - Identifier
     public static String getOBR4_1Value(ServiceRequest serviceRequest) {
         CodeableConcept cc = serviceRequest.getCode();
-        if (cc == null || cc.getCoding().isEmpty()) {
+        if (cc.getCoding().isEmpty()) {
             return null;
         }
         return getCWE1Value(cc.getCoding().get(0));
@@ -417,6 +481,10 @@ public class HapiHelper {
             return null;
         }
         return hd1Identifiers.get(0);
+    }
+
+    public static void setHD1Identifier(Identifier identifier) {
+        setHl7FieldExtensionValue(identifier, EXTENSION_HD1_DATA_TYPE);
     }
 
     // CWE - Coded with Exceptions

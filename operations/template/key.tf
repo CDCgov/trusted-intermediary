@@ -8,6 +8,24 @@ resource "azurerm_key_vault" "key_storage" {
   tenant_id = data.azurerm_client_config.current.tenant_id
 
   purge_protection_enabled = false
+
+  #   below tags are managed by CDC
+  lifecycle {
+    ignore_changes = [
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
+    ]
+  }
 }
 
 resource "azurerm_key_vault_access_policy" "allow_github_deployer" {
