@@ -21,6 +21,16 @@ We want to record our architectural decisions so that...
 - New team members who join can see why we made the decisions we made.
 - The team can revise or revisit decisions with more confidence and context.
 
+## Impact
+
+_The outcomes of the decision, both positive and negative. This section explains the impact of the decision, such as trade-offs, risks, and what needs to be done to implement it._
+
+- **Positive:** Allows us to show scope of considerations at the time of the decision
+- **Negative:** Time consumption?
+- **Risk(s)?:** None
+
+## Resources
+
 ### Related Issues
 
 - #1
