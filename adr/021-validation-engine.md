@@ -4,11 +4,7 @@ Date: 2024-06-11
 
 ## Decision
 
-We will use a variation of the [Rules Engine Pattern](https://deviq.com/design-patterns/rules-engine-pattern) to implement a Validation Rules Engine that will validate incoming FHIR messages, given a condition.
-
-The validations will be stored in the form of rule definitions that can be executed by the Validation Engine. The rule definitions will also have conditions that should be met for the validation to apply to the incoming message, and a message that will be shown when the validation fails.
-
-Initially, the validation definitions will be store in a JSON file, but we will consider using a database to store the rules in the future.
+We will implement a Validation Engine using the [Rules Engine Pattern](https://deviq.com/design-patterns/rules-engine-pattern) to validate incoming FHIR messages based on given conditions. Each validation will be represented as a rule, specifying conditions that must be met and the corresponding failure message if validation fails. Initially, rules will be stored in a JSON file, with considerations on transitioning to a database for scalability.
 
 ## Status
 
@@ -16,8 +12,18 @@ Accepted.
 
 ## Context
 
-The intermediary needs to be able to validate incoming messages based on requirements that could be universal or specific to partners. The validations are defined by the research done by SMEs and the requirements of the partners, so it's expected that we'll need to add and modify validations over time.
+The intermediary needs to validate FHIR messages based on SME research and partner-specific requirements, which are subject to change. The Rules Engine Pattern enables flexible, scalable, and maintainable rule management.
 
-The Rules Engine Pattern is a good fit for this problem because it allows us to define the rules in a way that is easy to understand and modify, and it also allows us to execute the rules in a way that is efficient and scalable.
+## Impact
+**Positive**:
+- Easy to update and scale validations. Separation of concerns.
+
+**Negative**:
+- Potential complexity in managing rules as they grow.
+
+**Risks**:
+- Transition to a database might introduce new challenges.
 
 ## Resources
+
+### Related Issues
