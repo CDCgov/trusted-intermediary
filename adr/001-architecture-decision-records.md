@@ -25,9 +25,14 @@ We want to record our architectural decisions so that...
 
 _The outcomes of the decision, both positive and negative. This section explains the impact of the decision, such as trade-offs, risks, and what needs to be done to implement it._
 
-- **Positive:** Allows us to show scope of considerations at the time of the decision
-- **Negative:** Time consumption?
-- **Risk(s)?:** None
+**Positive:**
+- Allows us to show scope of considerations at the time of the decision
+
+**Negative:**
+- Time consumption?
+
+**Risk(s)?:**
+- None
 
 ## Resources
 
