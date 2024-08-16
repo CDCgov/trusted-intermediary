@@ -25,8 +25,8 @@ class OrderResponseTest extends Specification {
         def actual = new OrderResponse(orders)
 
         then:
-        actual.getFhirResourceId() == expectedResourceId
-        actual.getPatientId() == expectedPatientId
+        actual.fhirResourceId() == expectedResourceId
+        actual.patientId() == expectedPatientId
     }
 
     def "test argument constructor"() {
@@ -38,7 +38,7 @@ class OrderResponseTest extends Specification {
         def actual = new OrderResponse(expectedResourceId, expectedPatientId)
 
         then:
-        actual.getFhirResourceId() == expectedResourceId
-        actual.getPatientId() == expectedPatientId
+        actual.fhirResourceId() == expectedResourceId
+        actual.patientId() == expectedPatientId
     }
 }

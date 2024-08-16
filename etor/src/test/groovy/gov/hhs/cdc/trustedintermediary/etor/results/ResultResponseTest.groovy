@@ -24,7 +24,7 @@ class ResultResponseTest extends Specification {
         def actual = new ResultResponse(result)
 
         then:
-        actual.getFhirResourceId() == expectedResourceId
+        actual.fhirResourceId() == expectedResourceId
     }
 
     def "test argument constructor"() {
@@ -35,6 +35,6 @@ class ResultResponseTest extends Specification {
         def actual = new ResultResponse(expectedResourceId)
 
         then:
-        actual.getFhirResourceId() == expectedResourceId
+        actual.fhirResourceId() == expectedResourceId
     }
 }
