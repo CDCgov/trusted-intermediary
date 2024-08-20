@@ -23,8 +23,8 @@ The intermediary needs to validate FHIR messages based on SME research and partn
 - Easy to update and scale validations. Easy to refine scope for validations (general or partner-specific)
 - Validation rules could be reused by multiple partners.
 - It should make it easier to add a UI in the future, which could potentially allow partners to self-serve and add their own validations.
-- The framework can leveraged to implement transformations as well.
-- Separation of concerns.
+- The framework can be leveraged to implement transformations as well.
+- Separation of concerns and code reusability.
 
 ### Negative
 
@@ -33,5 +33,5 @@ The intermediary needs to validate FHIR messages based on SME research and partn
 
 ### Risks
 
-- The engine will need to iterate over all rules to decide which ones to apply, which could impact performance if the rules grows substantially.
-- If the conditions are not well defined there could be potential leakage (transformations misapplied), but this should be identified in staging while onboarding.
+- The engine will need to iterate over all rules to decide which ones to apply, which could impact performance if the rules grow substantially.
+- If the conditions are not well defined there could be potential leakage (validations misapplied), but this should be identified in staging while onboarding.
