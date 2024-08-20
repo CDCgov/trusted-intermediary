@@ -27,6 +27,7 @@ The intermediary needs to transform incoming FHIR messages based on partner-spec
 - It should make it easier to add a UI in the future, which could potentially allow partners to self-serve and add their own transformations.
 - Leverages on existing code from the Validation Rules Engine.
 - Separation of concerns and code reusability.
+- It's modular enough that in the future we could decide to spin-off the Transformation Engine into its own microservice that could be used to transform any FHIR (and potentially HL7) message.
 
 ### Negative
 

@@ -25,6 +25,7 @@ The intermediary needs to validate FHIR messages based on SME research and partn
 - It should make it easier to add a UI in the future, which could potentially allow partners to self-serve and add their own validations.
 - The framework can be leveraged to implement transformations as well.
 - Separation of concerns and code reusability.
+- It's modular enough that in the future we could decide to spin-off the Validation Engine into its own microservice that could be used to validate any FHIR (and potentially HL7) message.
 
 ### Negative
 
