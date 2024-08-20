@@ -4,9 +4,9 @@ Date: 2024-06-11
 
 ## Decision
 
-As with the [Validation Rule Engine](021-validation-engine.md), we will use a variation of the [Rules Engine Pattern](https://deviq.com/design-patterns/rules-engine-pattern) to design and implement a transformation rule engine that can transform incoming FHIR messages, given a condition. Each transformation will be represented as a rule, specifying conditions that must be met, with a name and arguments. The name of the rule will match a Java function in [etor/src/main/java/gov/hhs/cdc/trustedintermediary/etor/ruleengine/transformation/custom/](etor/src/main/java/gov/hhs/cdc/trustedintermediary/etor/ruleengine/transformation/custom/) that will apply the transformation, using the given arguments.
+As with the [Validation Rule Engine](021-validation-engine.md), we will use a variation of the [Rules Engine Pattern](https://deviq.com/design-patterns/rules-engine-pattern) to design and implement a transformation rule engine that can transform incoming FHIR messages, given a condition. Each transformation will be represented as a rule, specifying conditions that must be met, with a name and arguments. The name of the rule will match a Java function in [/etor/src/main/java/gov/hhs/cdc/trustedintermediary/etor/ruleengine/transformation/custom/](/etor/src/main/java/gov/hhs/cdc/trustedintermediary/etor/ruleengine/transformation/custom/) that will apply the transformation, using the given arguments.
 
-Failed transformations will not interrupt the flow of the message. Any transformations that have errors will be skipped intead, making sure to log the error.
+Failed transformations will not interrupt the flow of the message. Any transformations that have errors will be skipped instead, making sure to log the error.
 
 Initially, rules will be stored in a JSON resource file, but the plan is to migrate them to a database or external storage in the future, which would allow to update the rules without the need for deploying the application.
 
@@ -25,7 +25,7 @@ The intermediary needs to transform incoming FHIR messages based on partner-spec
 - Easy to update and scale transformations. Easy to refine scope for transformations (general or partner-specific)
 - Transformation rules could be reused by multiple partners.
 - It should make it easier to add a UI in the future, which could potentially allow partners to self-serve and add their own transformations.
-- Leverages on exisiting code from the Validation Rules Engine.
+- Leverages on existing code from the Validation Rules Engine.
 - Separation of concerns and code reusability.
 
 ### Negative
