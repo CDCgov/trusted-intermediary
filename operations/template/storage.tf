@@ -1,12 +1,13 @@
 resource "azurerm_storage_account" "storage" {
-  name                            = "cdcti${var.environment}"
-  resource_group_name             = data.azurerm_resource_group.group.name
-  location                        = data.azurerm_resource_group.group.location
-  account_tier                    = "Standard"
-  account_replication_type        = "GRS"
-  account_kind                    = "StorageV2"
-  allow_nested_items_to_be_public = false
-  min_tls_version                 = "TLS1_2"
+  name                              = "cdcti${var.environment}"
+  resource_group_name               = data.azurerm_resource_group.group.name
+  location                          = data.azurerm_resource_group.group.location
+  account_tier                      = "Standard"
+  account_replication_type          = "GRS"
+  account_kind                      = "StorageV2"
+  allow_nested_items_to_be_public   = false
+  min_tls_version                   = "TLS1_2"
+  infrastructure_encryption_enabled = true
 
   #   below tags are managed by CDC
   lifecycle {
