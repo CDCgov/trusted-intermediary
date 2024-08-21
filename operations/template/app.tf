@@ -4,7 +4,7 @@ resource "azurerm_container_registry" "registry" {
   resource_group_name = data.azurerm_resource_group.group.name
   location            = data.azurerm_resource_group.group.location
   sku                 = "Standard"
-  admin_enabled       = true
+
   #   below tags are managed by CDC
   lifecycle {
     ignore_changes = [
@@ -65,6 +65,8 @@ resource "azurerm_linux_web_app" "api" {
 
   site_config {
     scm_use_main_ip_restriction = local.cdc_domain_environment ? true : null
+
+    container_registry_use_managed_identity = true
 
     dynamic "ip_restriction" {
       for_each = local.cdc_domain_environment ? [1] : []
