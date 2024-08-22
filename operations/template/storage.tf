@@ -1,6 +1,6 @@
 
 resource "azurerm_key_vault" "keyVault" {
-  name                = "tiKeyVault"
+  name                = "tiStorageKeyVault"
   location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
   tenant_id           = data.azurerm_client_config.current.tenant_id
