@@ -9,7 +9,7 @@ resource "azurerm_key_vault" "keyVault" {
   purge_protection_enabled = true
 }
 
-resource "azurerm_key_vault_access_policy" "keyVaultPolicy" {
+resource "azurerm_key_vault_access_policy" "accessPolicyStorage" {
   key_vault_id = azurerm_key_vault.keyVault.id
   tenant_id    = data.azurerm_client_config.current.tenant_id
   object_id    = azurerm_storage_account.storage.identity[0].principal_id
@@ -22,7 +22,7 @@ resource "azurerm_key_vault_access_policy" "keyVaultPolicy" {
   ]
 }
 
-resource "azurerm_key_vault_access_policy" "client" {
+resource "azurerm_key_vault_access_policy" "accessPolicyClient" {
   key_vault_id = azurerm_key_vault.keyVault.id
   tenant_id    = data.azurerm_client_config.current.tenant_id
   object_id    = data.azurerm_client_config.current.object_id
@@ -63,13 +63,12 @@ resource "azurerm_key_vault_key" "keyVaultKey" {
   ]
 
   depends_on = [
-    azurerm_key_vault_access_policy.client,
-    azurerm_key_vault_access_policy.keyVaultPolicy
+    azurerm_key_vault_access_policy.accessPolicyStorage,
+    azurerm_key_vault_access_policy.accessPolicyClient
   ]
 }
 
 resource "azurerm_storage_account" "storage" {
-<<<<<<< Updated upstream
   name                              = "cdcti${var.environment}"
   resource_group_name               = data.azurerm_resource_group.group.name
   location                          = data.azurerm_resource_group.group.location
@@ -94,25 +93,8 @@ resource "azurerm_storage_account" "storage" {
       tags["support_group"],
       tags["system"],
       tags["technical_steward"],
-      tags["zone"]
-=======
-  name                            = "cdcti${var.environment}"
-  resource_group_name             = data.azurerm_resource_group.group.name
-  location                        = data.azurerm_resource_group.group.location
-  account_tier                    = "Standard"
-  account_replication_type        = "GRS"
-  account_kind                    = "StorageV2"
-  allow_nested_items_to_be_public = false
-  min_tls_version                 = "TLS1_2"
-
-  identity {
-    type = "SystemAssigned"
-  }
-
-  lifecycle {
-    ignore_changes = [
+      tags["zone"],
       customer_managed_key
->>>>>>> Stashed changes
     ]
   }
 }
