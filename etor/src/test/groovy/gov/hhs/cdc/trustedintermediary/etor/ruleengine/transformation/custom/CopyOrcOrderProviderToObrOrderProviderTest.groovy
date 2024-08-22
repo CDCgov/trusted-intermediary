@@ -19,7 +19,7 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
         TestApplicationContext.injectRegisteredImplementations()
 
-        transformClass = new AddEtorProcessingTag()
+        transformClass = new CopyOrcOrderProviderToObrOrderProvider()
     }
 
     def "when both practitioner resources populated"() {
@@ -31,10 +31,11 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         def practitionerRole = HapiHelper.getPractitionerRole(serviceRequest)
 
         when:
+        transformClass.transform(fhirResource, null)
         def result = ""
 
         then:
-        practitionerRole.identifier.value.toString() == "the correct NPI"
+        result == "the extension for OBR-16 should have the NPI populated"
     }
 
 
