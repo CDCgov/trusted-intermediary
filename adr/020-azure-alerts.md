@@ -27,18 +27,20 @@ To ensure rapid response to application failures within our CI/CD infrastructure
 
 - **Notification:** Alerts sent to a Slack channel via email until PagerDuty is operational.
 
-## Consequences:
-**Positive:**
+## Impact
+
+### Positive
+
 - Immediate awareness of critical issues, reducing downtime
 
-**Negative:**
+### Negative
+
 - Possible alert fatigue if not fine-tuned
 
-**Risk(s)?:**
+### Risks
+
 - None
 
-
-## Resources
-### Related Issues
+## Related Issues
 
 - #1001
