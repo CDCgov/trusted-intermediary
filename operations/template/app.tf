@@ -111,7 +111,7 @@ resource "azurerm_linux_web_app" "api" {
 
   sticky_settings {
     app_setting_names = ["REPORT_STREAM_URL_PREFIX", "KEY_VAULT_NAME", "STORAGE_ACCOUNT_BLOB_ENDPOINT",
-      "METADATA_CONTAINER_NAME", "DB_URL", "DB_PORT", "DB_NAME", "DB_USER", "DB_SSL", "DB_MAX_LIFETIME"]
+    "METADATA_CONTAINER_NAME", "DB_URL", "DB_PORT", "DB_NAME", "DB_USER", "DB_SSL", "DB_MAX_LIFETIME"]
   }
 
   identity {
