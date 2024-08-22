@@ -79,6 +79,10 @@ resource "azurerm_storage_account" "storage" {
   min_tls_version                   = "TLS1_2"
   infrastructure_encryption_enabled = true
 
+  identity {
+    type = "SystemAssigned"
+  }
+
   #   below tags are managed by CDC
   lifecycle {
     ignore_changes = [
