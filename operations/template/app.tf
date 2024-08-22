@@ -25,9 +25,9 @@ resource "azurerm_container_registry" "registry" {
 }
 
 resource "azurerm_role_assignment" "allow_app_to_pull_from_registry" {
-  principal_id                     = azurerm_linux_web_app.api.identity.0.principal_id
-  role_definition_name             = "AcrPull"
-  scope                            = azurerm_container_registry.registry.id
+  principal_id         = azurerm_linux_web_app.api.identity.0.principal_id
+  role_definition_name = "AcrPull"
+  scope                = azurerm_container_registry.registry.id
 }
 
 # Create the staging service plan
