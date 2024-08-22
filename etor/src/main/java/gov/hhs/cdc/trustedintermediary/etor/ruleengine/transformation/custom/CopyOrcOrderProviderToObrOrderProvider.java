@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.DiagnosticReport;
+import org.hl7.fhir.r4.model.PractitionerRole;
 import org.hl7.fhir.r4.model.ServiceRequest;
 
 /**
@@ -25,8 +26,16 @@ public class CopyOrcOrderProviderToObrOrderProvider implements CustomFhirTransfo
         if (serviceRequest == null) {
             return;
         }
+
+        PractitionerRole practitionerRole = HapiHelper.getPractitionerRole(serviceRequest);
+        if (practitionerRole == null) {
+            return;
+        }
+
         String orc21_10 = HapiHelper.getORC21Value(serviceRequest);
-        HapiHelper.setMSH6_1Value(bundle, orc21_10);
-        HapiHelper.removeMSH6_2_and_3_Identifier(bundle);
+        // get ORC-12
+        // set ORC-12 in place of OBR-16
+        // HapiHelper.setMSH6_1Value(bundle, orc21_10);
+        // HapiHelper.removeMSH6_2_and_3_Identifier(bundle);
     }
 }

@@ -45,6 +45,7 @@ public class HapiHelper {
     public static final String EXTENSION_CX5_URL = "CX.5";
     public static final StringType EXTENSION_HD1_DATA_TYPE = new StringType("HD.1");
     public static final StringType EXTENSION_HD2_HD3_DATA_TYPE = new StringType("HD.2,HD.3");
+    public static final StringType EXTENSION_ORC12_DATA_TYPE = new StringType("ORC.12");
     public static final StringType EXTENSION_ORC2_DATA_TYPE = new StringType("ORC.2");
     public static final StringType EXTENSION_ORC4_DATA_TYPE = new StringType("ORC.4");
     public static final StringType EXTENSION_OBR2_DATA_TYPE = new StringType("OBR.2");
@@ -308,6 +309,25 @@ public class HapiHelper {
     public static List<Identifier> getORC2Identifiers(ServiceRequest serviceRequest) {
         List<Identifier> identifiers = serviceRequest.getIdentifier();
         return getHl7FieldIdentifiers(identifiers, EXTENSION_ORC2_DATA_TYPE);
+    }
+
+    public static String getORC12Value(ServiceRequest serviceRequest) {
+        PractitionerRole practitionerRole = getPractitionerRole(serviceRequest);
+        if (practitionerRole == null) {
+            return null;
+        }
+
+        Organization organization = getOrganization(practitionerRole);
+        if (organization == null
+                || !organization.hasExtension(EXTENSION_XON_ORGANIZATION_URL)
+                || !organization
+                        .getExtensionByUrl(EXTENSION_XON_ORGANIZATION_URL)
+                        .hasExtension(EXTENSION_XON10_URL)) {
+            return null;
+        }
+        Extension xonOrgExtension = organization.getExtensionByUrl(EXTENSION_XON_ORGANIZATION_URL);
+        Extension orc21Extension = xonOrgExtension.getExtensionByUrl(EXTENSION_XON10_URL);
+        return orc21Extension.getValue().primitiveValue();
     }
 
     // ORC-2.1 - Entity Identifier
