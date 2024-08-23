@@ -113,7 +113,7 @@ jobs:
       uses: azure/webapps-deploy@v3
       with:
         app-name: ${{ inputs.APP }}
-        slot-name: production
+        slot-name: pre-live
         images: '${{ inputs.REGISTRY }}/${{ inputs.REPO }}:${{ github.sha }}'
 
     - name: Azure Swap Slots
