@@ -29,6 +29,14 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         def diagnosticReport = HapiHelper.getDiagnosticReport(bundle)
         def serviceRequest = HapiHelper.getServiceRequest(diagnosticReport)
         def practitionerRole = HapiHelper.getPractitionerRole(serviceRequest)
+        def practitioner = practitionerRole.practitioner.getResource()
+
+        // practitionerRole.practitioner.getResource().identifier[0].value  <-- the NPI
+        // practitionerRole.practitioner.getResource().name[0]              <-- provider's name
+
+        def xcnExtension = practitionerRole.practitioner.getResource().getExtensionByUrl("https://reportstream.cdc.gov/fhir/StructureDefinition/xcn-practitioner")
+        def npiLabelText = xcnExtension.getExtensionByUrl("XCN.10").value
+
 
         when:
         transformClass.transform(fhirResource, null)
