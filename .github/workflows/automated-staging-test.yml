@@ -3,6 +3,7 @@ name: Automated Staging Test
 on:
   schedule:
     - cron: "0 0 * * *"  # Midnight UTC every day
+  workflow_dispatch:
 
 jobs:
   send_files:
