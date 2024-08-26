@@ -14,6 +14,7 @@ import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.PractitionerRole;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ServiceRequest;
@@ -301,6 +302,10 @@ public class HapiHelper {
         return (PractitionerRole) serviceRequest.getRequester().getResource();
     }
 
+    public static Practitioner getPractitioner(PractitionerRole practitionerRole) {
+        return (Practitioner) practitionerRole.getPractitioner().getResource();
+    }
+
     public static Organization getOrganization(PractitionerRole practitionerRole) {
         return (Organization) practitionerRole.getOrganization().getResource();
     }
@@ -309,25 +314,6 @@ public class HapiHelper {
     public static List<Identifier> getORC2Identifiers(ServiceRequest serviceRequest) {
         List<Identifier> identifiers = serviceRequest.getIdentifier();
         return getHl7FieldIdentifiers(identifiers, EXTENSION_ORC2_DATA_TYPE);
-    }
-
-    public static String getORC12Value(ServiceRequest serviceRequest) {
-        PractitionerRole practitionerRole = getPractitionerRole(serviceRequest);
-        if (practitionerRole == null) {
-            return null;
-        }
-
-        Organization organization = getOrganization(practitionerRole);
-        if (organization == null
-                || !organization.hasExtension(EXTENSION_XON_ORGANIZATION_URL)
-                || !organization
-                        .getExtensionByUrl(EXTENSION_XON_ORGANIZATION_URL)
-                        .hasExtension(EXTENSION_XON10_URL)) {
-            return null;
-        }
-        Extension xonOrgExtension = organization.getExtensionByUrl(EXTENSION_XON_ORGANIZATION_URL);
-        Extension orc21Extension = xonOrgExtension.getExtensionByUrl(EXTENSION_XON10_URL);
-        return orc21Extension.getValue().primitiveValue();
     }
 
     // ORC-2.1 - Entity Identifier
