@@ -50,6 +50,7 @@ public class HapiHelper {
     public static final StringType EXTENSION_ORC2_DATA_TYPE = new StringType("ORC.2");
     public static final StringType EXTENSION_ORC4_DATA_TYPE = new StringType("ORC.4");
     public static final StringType EXTENSION_OBR2_DATA_TYPE = new StringType("OBR.2");
+    public static final StringType EXTENSION_OBR16_DATA_TYPE = new StringType("OBR.16");
 
     public static final String EXTENSION_CODING_SYSTEM =
             "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding-system";
