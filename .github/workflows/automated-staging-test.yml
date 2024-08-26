@@ -1,0 +1,32 @@
+name: Automated Staging Test
+
+on:
+  schedule:
+    - cron: "0 0 * * *"  # Midnight UTC every day
+
+jobs:
+  send_files:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Install hurl
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y hurl
+
+      - name: Install jwt-cli
+        run: |
+            curl -L -o jwt-linux.tar.gz https://github.com/mike-engel/jwt-cli/releases/latest/download/jwt-linux.tar.gz
+            tar -xzf jwt-linux.tar.gz
+            sudo mv jwt /usr/local/bin/
+            sudo chmod +x /usr/local/bin/jwt
+            jwt --version
+
+      - name: Send HL7 sample messages to staging RS
+        run: |
+            cd scripts/hurl/rs
+            for file in Test/Staging/*.hl7; do
+                ./hrl waters.hurl -f "$file" -e staging --secret ${{ secrets.TI_STAGING_PRIVATE_KEY }}
+            done
