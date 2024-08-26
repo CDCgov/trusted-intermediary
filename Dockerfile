@@ -1,15 +1,18 @@
 # Use Linux-Alpine image
 FROM amazoncorretto:17.0.12-alpine
 
-RUN apk -U upgrade
+RUN apk update && apk -U upgrade && rm -rf /var/cache/apk/*
+
+RUN adduser -S myLowPrivilegeUser
+USER myLowPrivilegeUser
 
 ARG JAR_LIB_FILE=./app/build/libs/app-all.jar
 
 # Create directory and switch to it
-WORKDIR /app
+WORKDIR /home/myLowPrivilegeUser/app/
 
 # Add application JAR to created folder
-COPY ${JAR_LIB_FILE} app.jar
+COPY --chown=myLowPrivilegeUser ${JAR_LIB_FILE} app.jar
 
 # Run the api
 CMD ["java", "-jar", "app.jar"]
