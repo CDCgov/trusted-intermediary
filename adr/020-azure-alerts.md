@@ -1,10 +1,10 @@
-# 1. Architecture Decision Records
+# 20. Azure Alerts
 
 Date: 2024-05-17
 
 ## Decision
 
-We will use Azure alerts to notify our team of issues with our applications.
+We will implement Azure Alerts to notify our team of application issues.
 
 ## Status
 
@@ -14,12 +14,33 @@ Accepted.
 
 As part of our CI/CD infrastructure, we need notifications when failures occur.
 
-Current alert is configure to be:
-- [Azure Log Search Alerts](https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/alerts-types#log-alerts) for HikariCP Connection failures
-  - Trigger on any logged failures with database connections as Azure metrics weren't capturing the issues found in our logs.
-  - Stateful (Auto-mitigation), to keep alerts in a `fired` status until resolved and for less noise on frequent/duplicate alerts.
-  - Configured to a Slack channel email until our Pagerduty is set up.
+To ensure rapid response to application failures within our CI/CD infrastructure, we require real-time notifications for critical issues. The current alert setup focuses on:
 
-### Related Issues
+- **Type:** [Azure Log Search Alerts](https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/alerts-types#log-alerts) for HikariCP connection failures.
+
+
+- **Trigger:** Any logged failures with database connections.
+
+
+- **Configuration:** Alerts are stateful (auto-mitigation); set to `fired` status to reduce noise from frequent or duplicate alerts.
+
+
+- **Notification:** Alerts sent to a Slack channel via email until PagerDuty is operational.
+
+## Impact
+
+### Positive
+
+- Immediate awareness of critical issues, reducing downtime
+
+### Negative
+
+- Possible alert fatigue if not fine-tuned
+
+### Risks
+
+- None
+
+## Related Issues
 
 - #1001
