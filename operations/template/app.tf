@@ -64,6 +64,9 @@ resource "azurerm_linux_web_app" "api" {
   virtual_network_subnet_id = local.cdc_domain_environment ? azurerm_subnet.app.id : null
 
   site_config {
+    health_check_path                 = "/health"
+    health_check_eviction_time_in_min = 5
+
     scm_use_main_ip_restriction = local.cdc_domain_environment ? true : null
 
     dynamic "ip_restriction" {
