@@ -84,3 +84,21 @@ resource "azurerm_monitor_diagnostic_setting" "app_to_logs" {
     category = "AppServiceHTTPLogs"
   }
 }
+
+resource "azurerm_monitor_diagnostic_setting" "prelive_slot_to_logs" {
+  name                       = "ti-prelive-slot-to-logs-${var.environment}"
+  target_resource_id         = azurerm_linux_web_app_slot.pre_live.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.logs_workspace.id
+
+  log_analytics_destination_type = "Dedicated"
+
+  enabled_log {
+    category = "AppServiceConsoleLogs"
+  }
+  enabled_log {
+    category = "AppServiceAppLogs"
+  }
+  enabled_log {
+    category = "AppServiceHTTPLogs"
+  }
+}
