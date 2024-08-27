@@ -24,6 +24,13 @@ jobs:
             sudo chmod +x /usr/local/bin/jwt
             jwt --version
 
+      - name: Write private key to file
+        env:
+            SECRET: ${{ secrets.TI_STAGING_PRIVATE_KEY }}
+        run: |
+          echo "${{ secrets.TI_STAGING_PRIVATE_KEY }}" > /tmp/staging_private_key
+          chmod 600 /tmp/staging_private_key
+
       - name: Send HL7 sample messages to staging RS
         env:
             SECRET: ${{ secrets.TI_STAGING_PRIVATE_KEY }}
@@ -33,7 +40,7 @@ jobs:
             client_sender=automated-staging-test-sender
             jwt_token=$(jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 \
                 -k $client_id.$client_sender -i $client_id.$client_sender \
-                -s $client_id.$client_sender -a $host --no-iat -S "$SECRET")
+                -s $client_id.$client_sender -a $host --no-iat -S @/tmp/staging_private_key)
             sample_path=$(pwd)/examples/Test/Staging
             for file in $sample_path/*.hl7; do
                 hurl \
@@ -46,3 +53,8 @@ jobs:
                     --variable jwt=$jwt_token \
                     waters.hurl
             done
+
+      - name: Clean up private key
+        if: always()
+        run: |
+          rm -f /tmp/staging_private_key
