@@ -4,7 +4,7 @@ resource "azurerm_container_registry" "registry" {
   resource_group_name = data.azurerm_resource_group.group.name
   location            = data.azurerm_resource_group.group.location
   sku                 = "Standard"
-  admin_enabled       = true
+
   #   below tags are managed by CDC
   lifecycle {
     ignore_changes = [
@@ -22,6 +22,12 @@ resource "azurerm_container_registry" "registry" {
       tags["zone"]
     ]
   }
+}
+
+resource "azurerm_role_assignment" "allow_app_to_pull_from_registry" {
+  principal_id         = azurerm_linux_web_app.api.identity.0.principal_id
+  role_definition_name = "AcrPull"
+  scope                = azurerm_container_registry.registry.id
 }
 
 # Create the staging service plan
@@ -69,6 +75,8 @@ resource "azurerm_linux_web_app" "api" {
 
     scm_use_main_ip_restriction = local.cdc_domain_environment ? true : null
 
+    container_registry_use_managed_identity = true
+
     dynamic "ip_restriction" {
       for_each = local.cdc_domain_environment ? [1] : []
 
@@ -93,20 +101,18 @@ resource "azurerm_linux_web_app" "api" {
   }
 
   app_settings = {
-    DOCKER_REGISTRY_SERVER_URL      = "https://${azurerm_container_registry.registry.login_server}"
-    DOCKER_REGISTRY_SERVER_USERNAME = azurerm_container_registry.registry.admin_username
-    DOCKER_REGISTRY_SERVER_PASSWORD = azurerm_container_registry.registry.admin_password
-    ENV                             = var.environment
-    REPORT_STREAM_URL_PREFIX        = "https://${local.rs_domain_prefix}prime.cdc.gov"
-    KEY_VAULT_NAME                  = azurerm_key_vault.key_storage.name
-    STORAGE_ACCOUNT_BLOB_ENDPOINT   = azurerm_storage_account.storage.primary_blob_endpoint
-    METADATA_CONTAINER_NAME         = azurerm_storage_container.metadata.name
-    DB_URL                          = azurerm_postgresql_flexible_server.database.fqdn
-    DB_PORT                         = "5432"
-    DB_NAME                         = "postgres"
-    DB_USER                         = "cdcti-${var.environment}-api"
-    DB_SSL                          = "require"
-    DB_MAX_LIFETIME                 = "3480000" # 58 minutes
+    DOCKER_REGISTRY_SERVER_URL    = "https://${azurerm_container_registry.registry.login_server}"
+    ENV                           = var.environment
+    REPORT_STREAM_URL_PREFIX      = "https://${local.rs_domain_prefix}prime.cdc.gov"
+    KEY_VAULT_NAME                = azurerm_key_vault.key_storage.name
+    STORAGE_ACCOUNT_BLOB_ENDPOINT = azurerm_storage_account.storage.primary_blob_endpoint
+    METADATA_CONTAINER_NAME       = azurerm_storage_container.metadata.name
+    DB_URL                        = azurerm_postgresql_flexible_server.database.fqdn
+    DB_PORT                       = "5432"
+    DB_NAME                       = "postgres"
+    DB_USER                       = "cdcti-${var.environment}-api"
+    DB_SSL                        = "require"
+    DB_MAX_LIFETIME               = "3480000" # 58 minutes
   }
 
   sticky_settings {
