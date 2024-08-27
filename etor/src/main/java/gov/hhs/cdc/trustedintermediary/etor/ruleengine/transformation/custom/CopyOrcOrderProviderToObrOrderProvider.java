@@ -26,7 +26,7 @@ public class CopyOrcOrderProviderToObrOrderProvider implements CustomFhirTransfo
         // Get values
 
         // ORC 12.1 - id # XCN.1
-        String orc12_1 = HapiHelper.getORC12_1Value(serviceRequest);
+        // String orc12_1 = HapiHelper.getORC12_1Value(serviceRequest);
 
         var ref = serviceRequest.getRequester();
         var pract = HapiHelper.getPractitionerRole(serviceRequest);

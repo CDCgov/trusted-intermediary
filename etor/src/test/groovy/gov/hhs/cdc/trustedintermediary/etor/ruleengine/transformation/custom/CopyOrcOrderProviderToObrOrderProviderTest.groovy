@@ -7,13 +7,17 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.DiagnosticReport
+import org.hl7.fhir.r4.model.ServiceRequest
 import spock.lang.Specification
+
 
 class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
 
     def transformClass
-
+    def fhirOruPath = "../CA/017_CA_ORU_R01_CDPH_produced_UCSD2024-07-11-16-02-17-749_1_hl7_translation.fhir"
     def setup() {
+
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(MetricMetadata, Mock(MetricMetadata))
@@ -32,16 +36,15 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
 
     def "when both practitioner resources populated"() {
         given:
+        def bundle
+        def fhirOruPath = "../CA/007_CA_ORU_R01_CDPH_produced_UCSD2024-07-11-16-02-17-749_1_hl7_translation.fhir"
         final String EXPECTED_NPI = "1790743185"
         final String EXPECTED_FIRST_NAME = "EUSTRATIA"
         final String EXPECTED_LAST_NAME = "HUBBARD"
         final String EXPECTED_NPI_LABEL = "NPI"
         final String PRACTITIONER_EXTENSION_URL = "https://reportstream.cdc.gov/fhir/StructureDefinition/xcn-practitioner"
 
-        def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/007_CA_ORU_R01_CDPH_produced_UCSD2024-07-11-16-02-17-749_1_hl7_translation.fhir")
-        def bundle = getBundle(fhirResource)
-        def diagnosticReport = HapiHelper.getDiagnosticReport(bundle)
-        def serviceRequest = HapiHelper.getServiceRequest(diagnosticReport)
+        def serviceRequest = createServiceRequest(fhirOruPath, bundle)
 
         def orc12PractitionerRole = HapiHelper.getPractitionerRole(serviceRequest)
         def orc12Practitioner = HapiHelper.getPractitioner(orc12PractitionerRole)
@@ -93,10 +96,7 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         final String EXPECTED_NPI_LABEL = "NPI"
         final String PRACTITIONER_EXTENSION_URL = "https://reportstream.cdc.gov/fhir/StructureDefinition/xcn-practitioner"
 
-        def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/017_CA_ORU_R01_CDPH_produced_UCSD2024-07-11-16-02-17-749_1_hl7_translation.fhir")
-        def bundle = getBundle(fhirResource)
-        def diagnosticReport = HapiHelper.getDiagnosticReport(bundle)
-        def serviceRequest = HapiHelper.getServiceRequest(diagnosticReport)
+        def serviceRequest = createServiceRequest(fhirOruPath)
 
         def orc12PractitionerRole = HapiHelper.getPractitionerRole(serviceRequest)
         def orc12Practitioner = HapiHelper.getPractitioner(orc12PractitionerRole)
@@ -164,7 +164,24 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         1 == 0
     }
 
+    ServiceRequest createServiceRequest(String fhirOruPath) {
+        def fhirResource = ExamplesHelper.getExampleFhirResource(fhirOruPath)
+        def bundle = getBundle(fhirResource)
+        def diagnosticReport = getDiagnosticReport(bundle)
+
+        return getServiceRequest(diagnosticReport)
+    }
+
+    ServiceRequest getServiceRequest(DiagnosticReport diagnosticReport) {
+
+        return HapiHelper.getServiceRequest(diagnosticReport)
+    }
+
     Bundle getBundle(FhirResource fhirResource) {
         return fhirResource.getUnderlyingResource() as Bundle
+    }
+
+    DiagnosticReport getDiagnosticReport(Bundle bundle) {
+        return HapiHelper.getDiagnosticReport(bundle)
     }
 }
