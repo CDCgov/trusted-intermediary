@@ -160,8 +160,7 @@ resource "azurerm_key_vault_key" "customer_managed_key" {
     "sign",
     "unwrapKey",
     "verify",
-    "wrapKey",
-    "getrotationpolicy"
+    "wrapKey"
   ]
 
 
