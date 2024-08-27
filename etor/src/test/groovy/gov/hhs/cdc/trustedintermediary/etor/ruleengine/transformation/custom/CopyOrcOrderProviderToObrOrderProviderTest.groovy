@@ -2,11 +2,12 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import org.hl7.fhir.r4.model.Bundle
-
+import spock.lang.Specification
 
 class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
 
@@ -38,7 +39,7 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         final String PRACTITIONER_EXTENSION_URL = "https://reportstream.cdc.gov/fhir/StructureDefinition/xcn-practitioner"
 
         def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/007_CA_ORU_R01_CDPH_produced_UCSD2024-07-11-16-02-17-749_1_hl7_translation.fhir")
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = getBundle(fhirResource)
         def diagnosticReport = HapiHelper.getDiagnosticReport(bundle)
         def serviceRequest = HapiHelper.getServiceRequest(diagnosticReport)
 
@@ -93,7 +94,7 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         final String PRACTITIONER_EXTENSION_URL = "https://reportstream.cdc.gov/fhir/StructureDefinition/xcn-practitioner"
 
         def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/017_CA_ORU_R01_CDPH_produced_UCSD2024-07-11-16-02-17-749_1_hl7_translation.fhir")
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = getBundle(fhirResource)
         def diagnosticReport = HapiHelper.getDiagnosticReport(bundle)
         def serviceRequest = HapiHelper.getServiceRequest(diagnosticReport)
 
@@ -162,6 +163,8 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         then:
         1 == 0
     }
-}
 
-import spock.lang.Specification
+    Bundle getBundle(FhirResource fhirResource) {
+        return fhirResource.getUnderlyingResource() as Bundle
+    }
+}
