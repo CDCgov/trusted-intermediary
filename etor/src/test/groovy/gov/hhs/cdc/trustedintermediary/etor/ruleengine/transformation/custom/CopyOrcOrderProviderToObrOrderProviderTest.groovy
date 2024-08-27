@@ -50,13 +50,13 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         def obr16XcnExtension = obr16Practitioner.getExtensionByUrl(PRACTITIONER_EXTENSION_URL)
 
         expect:
-        // ORC12 values should remain the same
+        // ORC12 values to copy
         orc12Practitioner.identifier[0].value == EXPECTED_NPI
         orc12XcnExtension.getExtensionByUrl("XCN.3").value.toString() == EXPECTED_FIRST_NAME
         orc12Practitioner.name[0].family == EXPECTED_LAST_NAME
         orc12XcnExtension.getExtensionByUrl("XCN.10").value.toString() == EXPECTED_NPI_LABEL
 
-        // OBR16 values should be updated
+        // OBR16 original values
         obr16Practitioner.identifier[0] == null
         obr16XcnExtension.getExtensionByUrl("XCN.3").value.toString() == EXPECTED_FIRST_NAME
         obr16Practitioner.name[0].family == EXPECTED_LAST_NAME
@@ -65,7 +65,46 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
 
+        def diagnosticReport2 = HapiHelper.getDiagnosticReport(bundle)
+        def serviceRequest2 = HapiHelper.getServiceRequest(diagnosticReport2)
+        def obr16Practitioner2 = getObr16ExtensionPractitioner(serviceRequest2)
+        def obr16XcnExtension2 = obr16Practitioner2.getExtensionByUrl(PRACTITIONER_EXTENSION_URL)
+
         then:
+        // ORC12 values should remain the same
+        orc12Practitioner.identifier[0].value == EXPECTED_NPI
+        orc12XcnExtension.getExtensionByUrl("XCN.3").value.toString() == EXPECTED_FIRST_NAME
+        orc12Practitioner.name[0].family == EXPECTED_LAST_NAME
+        orc12XcnExtension.getExtensionByUrl("XCN.10").value.toString() == EXPECTED_NPI_LABEL
+
+        // OBR16 values should be updated
+        obr16Practitioner2.identifier[0].value == EXPECTED_NPI
+        obr16XcnExtension2.getExtensionByUrl("XCN.3").value.toString() == EXPECTED_FIRST_NAME
+        obr16Practitioner2.name[0].family == EXPECTED_LAST_NAME
+        obr16XcnExtension2.getExtensionByUrl("XCN.10").value.toString() == EXPECTED_NPI_LABEL
+    }
+
+    def "when ORC-12 extension populated and OBR-16 extension not populated"() {
+        given:
+        final String EXPECTED_NPI = "1790743185"
+        final String EXPECTED_FIRST_NAME = "EUSTRATIA"
+        final String EXPECTED_LAST_NAME = "HUBBARD"
+        final String EXPECTED_NPI_LABEL = "NPI"
+        final String PRACTITIONER_EXTENSION_URL = "https://reportstream.cdc.gov/fhir/StructureDefinition/xcn-practitioner"
+
+        def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/017_CA_ORU_R01_CDPH_produced_UCSD2024-07-11-16-02-17-749_1_hl7_translation.fhir")
+        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def diagnosticReport = HapiHelper.getDiagnosticReport(bundle)
+        def serviceRequest = HapiHelper.getServiceRequest(diagnosticReport)
+
+        def orc12PractitionerRole = HapiHelper.getPractitionerRole(serviceRequest)
+        def orc12Practitioner = HapiHelper.getPractitioner(orc12PractitionerRole)
+        def orc12XcnExtension = orc12Practitioner.getExtensionByUrl(PRACTITIONER_EXTENSION_URL)
+
+        def obr16Practitioner = getObr16ExtensionPractitioner(serviceRequest)
+        def obr16XcnExtension = obr16Practitioner.getExtensionByUrl(PRACTITIONER_EXTENSION_URL)
+
+        expect:
         // ORC12 values to copy
         orc12Practitioner.identifier[0].value == EXPECTED_NPI
         orc12XcnExtension.getExtensionByUrl("XCN.3").value.toString() == EXPECTED_FIRST_NAME
@@ -73,18 +112,31 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         orc12XcnExtension.getExtensionByUrl("XCN.10").value.toString() == EXPECTED_NPI_LABEL
 
         // OBR16 original values
-        obr16Practitioner.identifier[0].value == EXPECTED_NPI
+        obr16Practitioner.identifier[0] == null
         obr16XcnExtension.getExtensionByUrl("XCN.3").value.toString() == EXPECTED_FIRST_NAME
         obr16Practitioner.name[0].family == EXPECTED_LAST_NAME
-        obr16XcnExtension.getExtensionByUrl("XCN.10").value.toString() == EXPECTED_NPI_LABEL
-    }
+        obr16XcnExtension.getExtensionByUrl("XCN.10") == null
 
-    def "when ORC-12 extension populated and OBR-16 extension not populated"() {
-        given:
         when:
-        def result = ""
+        transformClass.transform(new HapiFhirResource(bundle), null)
+
+        def diagnosticReport2 = HapiHelper.getDiagnosticReport(bundle)
+        def serviceRequest2 = HapiHelper.getServiceRequest(diagnosticReport2)
+        def obr16Practitioner2 = getObr16ExtensionPractitioner(serviceRequest2)
+        def obr16XcnExtension2 = obr16Practitioner2.getExtensionByUrl(PRACTITIONER_EXTENSION_URL)
+
         then:
-        1 == 0
+        // ORC12 values should remain the same
+        orc12Practitioner.identifier[0].value == EXPECTED_NPI
+        orc12XcnExtension.getExtensionByUrl("XCN.3").value.toString() == EXPECTED_FIRST_NAME
+        orc12Practitioner.name[0].family == EXPECTED_LAST_NAME
+        orc12XcnExtension.getExtensionByUrl("XCN.10").value.toString() == EXPECTED_NPI_LABEL
+
+        // OBR16 values should be updated
+        obr16Practitioner2.identifier[0].value == EXPECTED_NPI
+        obr16XcnExtension2.getExtensionByUrl("XCN.3").value.toString() == EXPECTED_FIRST_NAME
+        obr16Practitioner2.name[0].family == EXPECTED_LAST_NAME
+        obr16XcnExtension2.getExtensionByUrl("XCN.10").value.toString() == EXPECTED_NPI_LABEL
     }
 
     def "when ORC-12 extension not populated and OBR-16 extension is populated"() {
@@ -96,6 +148,14 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
     }
 
     def "when neither is populated"() {
+        given:
+        when:
+        def result = ""
+        then:
+        1 == 0
+    }
+
+    def "when the OBR extension exists, but the OBR.16 extension does not exist"() {
         given:
         when:
         def result = ""
