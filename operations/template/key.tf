@@ -7,7 +7,7 @@ resource "azurerm_key_vault" "key_storage" {
   sku_name  = "standard"
   tenant_id = data.azurerm_client_config.current.tenant_id
 
-  purge_protection_enabled = false
+  purge_protection_enabled = true
 
   #   below tags are managed by CDC
   lifecycle {
@@ -49,6 +49,12 @@ resource "azurerm_key_vault_access_policy" "allow_api_read" {
   secret_permissions = [
     "List",
     "Get",
+  ]
+
+  key_permissions = [
+    "WrapKey",
+    "UnwrapKey",
+    "Get"
   ]
 }
 
