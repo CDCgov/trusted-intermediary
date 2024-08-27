@@ -13,11 +13,6 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v4
 
-      - name: Install hurl
-        run: |
-          curl --location --remote-name https://github.com/Orange-OpenSource/hurl/releases/download/4.3.0/hurl_4.3.0_amd64.deb
-          sudo apt update && sudo apt install ./hurl_4.3.0_amd64.deb
-
       - name: Install jq
         run: sudo apt-get install -y jq
 
@@ -36,28 +31,28 @@ jobs:
         run: |
             host=https://staging.prime.cdc.gov:443
             client_id=flexion
-            client_sender=simulated-hospital
+            client_sender=automated-staging-test-sender
             jwt=$(jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 \
                 -k $client_id.$client_sender -i $client_id.$client_sender \
                 -s $client_id.$client_sender -a $host --no-iat -S @/tmp/staging_private_key.pem)
-            root_path=$(pwd)
-            sample_path=$root_path/examples/Test/Staging
 
-            token=$(curl --silent \
+            token=$(curl \
                     --header "Content-Type: application/x-www-form-urlencoded" \
                     --data "scope=$client_id.*.report" \
                     --data "client_assertion=$jwt" \
                     --data "client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer" \
                     --data "grant_type=client_credentials" \
+                    --silent \
                     "$host/api/token" | jq -r ".access_token")
 
-            for file in $sample_path/*.hl7; do
+            for file in $(pwd)/examples/Test/Staging/*.hl7; do
                 echo "Sending $file"
                 curl \
                     --header "Content-Type: application/hl7-v2" \
                     --header "Client: $client_id.$client_sender" \
                     --header "Authorization: Bearer $token" \
                     --data-binary "@$file" \
+                    --silent \
                     "$host/api/waters"
             done
 
