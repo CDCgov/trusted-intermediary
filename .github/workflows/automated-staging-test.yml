@@ -45,7 +45,7 @@ jobs:
                     --silent \
                     "$host/api/token" | jq -r ".access_token")
 
-            for file in $(pwd)/examples/Test/Staging/*.hl7; do
+            for file in $(pwd)/examples/Test/Automated/*.hl7; do
                 echo "Sending $file"
                 curl \
                     --header "Content-Type: application/hl7-v2" \
