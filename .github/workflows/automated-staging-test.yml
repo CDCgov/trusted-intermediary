@@ -20,7 +20,6 @@ jobs:
         run: |
             curl --silent --location https://github.com/mike-engel/jwt-cli/releases/latest/download/jwt-linux.tar.gz | tar xvz -C /usr/local/bin/
             sudo chmod +x /usr/local/bin/jwt
-            jwt --version
 
       - name: Write private key to file
         run: |
