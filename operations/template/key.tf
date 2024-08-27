@@ -61,6 +61,20 @@ resource "azurerm_key_vault_access_policy" "allow_api_read" {
     "List",
     "Get",
   ]
+
+  key_permissions = [
+    "Get",
+    "WrapKey",
+    "UnwrapKey",
+    "Create",
+    "Delete",
+    "Get",
+    "Purge",
+    "Recover",
+    "Update",
+    "GetRotationPolicy",
+    "SetRotationPolicy"
+  ]
 }
 
 resource "azurerm_key_vault_access_policy" "allow_storage_account_wrapping" {
@@ -147,7 +161,10 @@ resource "azurerm_key_vault_key" "customer_managed_key" {
     "unwrapKey",
     "verify",
     "wrapKey",
+    "getrotationpolicy"
   ]
+
+
 
   depends_on = [azurerm_key_vault_access_policy.allow_github_deployer] //wait for the permission that allows our deployer to write the secret
 }
