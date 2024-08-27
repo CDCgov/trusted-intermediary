@@ -83,6 +83,9 @@ resource "azurerm_monitor_diagnostic_setting" "app_to_logs" {
   enabled_log {
     category = "AppServiceHTTPLogs"
   }
+  enabled_log {
+    category = "AppServicePlatformLogs"
+  }
 }
 
 resource "azurerm_monitor_diagnostic_setting" "prelive_slot_to_logs" {
@@ -100,5 +103,8 @@ resource "azurerm_monitor_diagnostic_setting" "prelive_slot_to_logs" {
   }
   enabled_log {
     category = "AppServiceHTTPLogs"
+  }
+  enabled_log {
+    category = "AppServicePlatformLogs"
   }
 }
