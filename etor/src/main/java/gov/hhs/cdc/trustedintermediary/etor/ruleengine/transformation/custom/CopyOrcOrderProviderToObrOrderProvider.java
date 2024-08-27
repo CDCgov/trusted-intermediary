@@ -6,13 +6,9 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.DiagnosticReport;
-import org.hl7.fhir.r4.model.PractitionerRole;
 import org.hl7.fhir.r4.model.ServiceRequest;
 
-/**
- * Updates the receiving facility (MSH-6) to value in Ordering Facility Name's Organization
- * Identifier (ORC-21.10).
- */
+/** Updates the order provider (OBR-16) from the order provider (ORC-12) */
 public class CopyOrcOrderProviderToObrOrderProvider implements CustomFhirTransformation {
 
     @Override
@@ -27,15 +23,40 @@ public class CopyOrcOrderProviderToObrOrderProvider implements CustomFhirTransfo
             return;
         }
 
-        PractitionerRole practitionerRole = HapiHelper.getPractitionerRole(serviceRequest);
-        if (practitionerRole == null) {
-            return;
-        }
+        // Get values
 
-        String orc21_10 = HapiHelper.getORC21Value(serviceRequest);
-        // get ORC-12
-        // set ORC-12 in place of OBR-16
-        // HapiHelper.setMSH6_1Value(bundle, orc21_10);
-        // HapiHelper.removeMSH6_2_and_3_Identifier(bundle);
+        // ORC 12.1 - id # XCN.1
+        String orc12_1 = HapiHelper.getORC12_1Value(serviceRequest);
+
+        var ref = serviceRequest.getRequester();
+        var pract = HapiHelper.getPractitionerRole(serviceRequest);
+
+        //        def obr16Practitioner = getObr16ExtensionPractitioner(serviceRequest)
+        //        def obr16XcnExtension =
+        // obr16Practitioner.getExtensionByUrl(PRACTITIONER_EXTENSION_URL)
+
+        var toOverwrite =
+                serviceRequest
+                        .getExtensionByUrl(HapiHelper.EXTENSION_OBR_URL)
+                        .getExtensionByUrl(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString());
+
+        //        toOverwrite.setValue(ref);
+        toOverwrite.setValue(pract.getPractitioner());
+
+        //        return serviceRequest
+        //                .getExtensionByUrl(HapiHelper.EXTENSION_OBR_URL)
+        //                .getExtensionByUrl(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString())
+        //                .value
+        //                .getResource()
+
+        //        String orc21_10 = HapiHelper.getORC21Value(serviceRequest);
+        //        HapiHelper.setMSH6_1Value(bundle, orc21_10);
+        //        HapiHelper.removeMSH6_2_and_3_Identifier(bundle);
+
+        //        ORC 12.2 - family name XCN.2
+        //        ORC 12.3 - given name XCN.3
+        //        ORC 12.10 - NPI XCN.10
+
+        // Set values in OBR-16
     }
 }
