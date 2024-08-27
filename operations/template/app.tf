@@ -100,6 +100,8 @@ resource "azurerm_linux_web_app" "api" {
     }
   }
 
+  #   When adding new settings that are needed for the live app but shouldn't be used in the pre-live
+  #   slot, add them to `sticky_settings` as well as `app_settings` for the main app resource
   app_settings = {
     DOCKER_REGISTRY_SERVER_URL    = "https://${azurerm_container_registry.registry.login_server}"
     ENV                           = var.environment
@@ -113,6 +115,11 @@ resource "azurerm_linux_web_app" "api" {
     DB_USER                       = "cdcti-${var.environment}-api"
     DB_SSL                        = "require"
     DB_MAX_LIFETIME               = "3480000" # 58 minutes
+  }
+
+  sticky_settings {
+    app_setting_names = ["REPORT_STREAM_URL_PREFIX", "KEY_VAULT_NAME", "STORAGE_ACCOUNT_BLOB_ENDPOINT",
+    "METADATA_CONTAINER_NAME", "DB_URL", "DB_PORT", "DB_NAME", "DB_USER", "DB_SSL", "DB_MAX_LIFETIME"]
   }
 
   identity {
@@ -135,6 +142,61 @@ resource "azurerm_linux_web_app" "api" {
       tags["technical_steward"],
       tags["zone"]
     ]
+  }
+}
+
+resource "azurerm_linux_web_app_slot" "pre_live" {
+  name           = "pre-live"
+  app_service_id = azurerm_linux_web_app.api.id
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to tags because the CDC sets these automagically
+      tags,
+    ]
+  }
+
+  https_only = true
+
+  virtual_network_subnet_id = local.cdc_domain_environment ? azurerm_subnet.app.id : null
+
+  site_config {
+    health_check_path                 = "/health"
+    health_check_eviction_time_in_min = 5
+
+    scm_use_main_ip_restriction = local.cdc_domain_environment ? true : null
+
+    dynamic "ip_restriction" {
+      for_each = local.cdc_domain_environment ? [1] : []
+
+      content {
+        name       = "deny_all_ipv4"
+        action     = "Deny"
+        ip_address = "0.0.0.0/0"
+        priority   = "200"
+      }
+    }
+
+    dynamic "ip_restriction" {
+      for_each = local.cdc_domain_environment ? [1] : []
+
+      content {
+        name       = "deny_all_ipv6"
+        action     = "Deny"
+        ip_address = "::/0"
+        priority   = "201"
+      }
+    }
+  }
+
+  app_settings = {
+    DOCKER_REGISTRY_SERVER_URL = "https://${azurerm_container_registry.registry.login_server}"
+
+    ENV = var.environment
+  }
+
+  identity {
+    type = "SystemAssigned"
   }
 }
 
