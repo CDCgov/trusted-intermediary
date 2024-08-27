@@ -44,4 +44,5 @@ resource "azurerm_key_vault_managed_storage_account" "key_vault_storage_account"
   storage_account_id           = azurerm_storage_account.docs.id
   storage_account_key          = azurerm_key_vault_key.customer_managed_key.name
   regenerate_key_automatically = false
+  regeneration_period          = "P360D"
 }
