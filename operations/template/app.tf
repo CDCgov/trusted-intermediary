@@ -100,6 +100,8 @@ resource "azurerm_linux_web_app" "api" {
     }
   }
 
+  #   When adding new settings that are needed for the live app but shouldn't be used in the pre-live
+  #   slot, add them to `sticky_settings` as well as `app_settings` for the main app resource
   app_settings = {
     DOCKER_REGISTRY_SERVER_URL    = "https://${azurerm_container_registry.registry.login_server}"
     ENV                           = var.environment
