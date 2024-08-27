@@ -26,7 +26,21 @@ jobs:
 
       - name: Send HL7 sample messages to staging RS
         run: |
-            cd scripts/hurl/rs
-            for file in Test/Staging/*.hl7; do
-                ./hrl waters.hurl -f "$file" -e staging --secret ${{ secrets.TI_STAGING_PRIVATE_KEY }}
+            host=https://staging.prime.cdc.gov:443
+            client_id=flexion
+            client_sender=automated-staging-test-sender
+            sample_path=$(pwd)/examples/Test/Staging
+            jwt_token=$(jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 \
+                -k $client_id.$client_sender -i $client_id.$client_sender \
+                -s $client_id.$client_sender -a $host --no-iat -S "${{ secrets.TI_STAGING_PRIVATE_KEY }}")
+            for file in $sample_path/*.hl7; do
+                hurl \
+                    --variable fpath=$file \
+                    --file-root $sample_path \
+                    --variable url=$host \
+                    --variable content-type=application/hl7-v2 \
+                    --variable client-id=$client_id \
+                    --variable client-sender=$client_sender \
+                    --variable jwt=$jwt_token \
+                    waters.hurl
             done
