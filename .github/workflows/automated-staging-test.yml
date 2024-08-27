@@ -15,7 +15,7 @@ jobs:
 
       - name: Install hurl
         run: |
-          curl --location --remote-name https://github.com/Orange-OpenSource/hurl/releases/download/$VERSION/hurl_4.3.0_amd64.deb
+          curl --location --remote-name https://github.com/Orange-OpenSource/hurl/releases/download/4.3.0/hurl_4.3.0_amd64.deb
           sudo apt update && sudo apt install ./hurl_4.3.0_amd64.deb
 
       - name: Install jwt-cli
