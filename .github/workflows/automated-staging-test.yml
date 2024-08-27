@@ -25,15 +25,13 @@ jobs:
             jwt --version
 
       - name: Send HL7 sample messages to staging RS
-        env:
-            PRIVATE_KEY: ${{ secrets.TI_STAGING_PRIVATE_KEY }}
         run: |
             host=https://staging.prime.cdc.gov:443
             client_id=flexion
             client_sender=automated-staging-test-sender
             jwt_token=$(jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 \
                 -k $client_id.$client_sender -i $client_id.$client_sender \
-                -s $client_id.$client_sender -a $host --no-iat -S "$PRIVATE_KEY")
+                -s $client_id.$client_sender -a $host --no-iat -S "${{ secrets.TI_STAGING_PRIVATE_KEY }}")
             sample_path=$(pwd)/examples/Test/Staging
             for file in $sample_path/*.hl7; do
                 hurl \
