@@ -115,6 +115,7 @@ resource "azurerm_linux_web_app" "api" {
     DB_USER                       = "cdcti-${var.environment}-api"
     DB_SSL                        = "require"
     DB_MAX_LIFETIME               = "3480000" # 58 minutes
+    FAKE_APP_SETTING              = "fake setting"
   }
 
   sticky_settings {
