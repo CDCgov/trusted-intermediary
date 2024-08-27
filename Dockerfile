@@ -9,7 +9,8 @@ USER myLowPrivilegeUser
 ARG JAR_LIB_FILE=./app/build/libs/app-all.jar
 
 # Create directory and switch to it
-WORKDIR /home/myLowPrivilegeUser/app
+#WORKDIR /home/myLowPrivilegeUser/app
+WORKDIR /usr/local/bin/
 
 # Add application JAR to created folder
 COPY --chown=myLowPrivilegeUser ${JAR_LIB_FILE} app.jar
