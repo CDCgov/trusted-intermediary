@@ -39,7 +39,8 @@ jobs:
             jwt_token=$(jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 \
                 -k $client_id.$client_sender -i $client_id.$client_sender \
                 -s $client_id.$client_sender -a $host --no-iat -S @/tmp/staging_private_key.pem)
-            sample_path=$(pwd)/examples/Test/Staging
+            root_path=$(pwd)
+            sample_path=$root_path/examples/Test/Staging
             for file in $sample_path/*.hl7; do
                 hurl \
                     --variable fpath=$file \
@@ -49,7 +50,7 @@ jobs:
                     --variable client-id=$client_id \
                     --variable client-sender=$client_sender \
                     --variable jwt=$jwt_token \
-                    waters.hurl
+                    $root_path/scripts/hurl/rs/waters.hurl
             done
 
       - name: Clean up private key
