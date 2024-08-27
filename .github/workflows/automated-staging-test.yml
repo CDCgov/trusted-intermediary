@@ -42,18 +42,23 @@ jobs:
                 -s $client_id.$client_sender -a $host --no-iat -S @/tmp/staging_private_key.pem)
             root_path=$(pwd)
             sample_path=$root_path/examples/Test/Staging
-            token=$(curl \
+
+            token=$(curl --silent \
                     --header "Content-Type: application/x-www-form-urlencoded" \
                     --data "scope=$client_id.*.report" \
                     --data "client_assertion=$jwt" \
                     --data "client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer" \
                     --data "grant_type=client_credentials" \
-                    --silent \
-                    "$host/api/token" \
-                    | jq -r ".access_token")
-            echo "Token: $token"
+                    "$host/api/token" | jq -r ".access_token")
+
             for file in $sample_path/*.hl7; do
                 echo "Sending $file"
+                curl \
+                    --header "Content-Type: application/hl7-v2" \
+                    --header "Client: $client_id.$client_sender" \
+                    --header "Authorization: Bearer $token" \
+                    --data-binary "@$file" \
+                    "$host/api/waters"
             done
 
       - name: Clean up private key
