@@ -9,14 +9,13 @@ USER myLowPrivilegeUser
 ARG JAR_LIB_FILE=./app/build/libs/app-all.jar
 
 # Create directory and switch to it
-#WORKDIR /home/myLowPrivilegeUser/app
-WORKDIR /usr/local/bin/
+WORKDIR /home/myLowPrivilegeUser/app/
 
 # Add application JAR to created folder
-COPY --chown=myLowPrivilegeUser ${JAR_LIB_FILE} app.jar
+COPY --chown=myLowPrivilegeUser ${JAR_LIB_FILE} /usr/local/bin/app.jar
 
 # Run the api
-CMD ["java", "-jar", "app.jar"]
+CMD ["java", "-jar", "/usr/local/bin/app.jar"]
 
 # Use port 8080
 EXPOSE 8080
