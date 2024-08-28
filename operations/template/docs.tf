@@ -45,4 +45,9 @@ resource "azurerm_key_vault_managed_storage_account" "key_vault_storage_account"
   storage_account_key          = "key1" # pragma: allowlist secret
 #   regenerate_key_automatically = false
 #   regeneration_period          = "P360D"
+
+  depends_on = [
+    azurerm_key_vault_access_policy.allow_github_deployer,
+    azurerm_key_vault_access_policy.allow_storage_account_wrapping
+  ] //wait for the permission that allows our deployer to write the secret
 }
