@@ -84,14 +84,18 @@ resource "azurerm_key_vault_access_policy" "allow_storage_account_wrapping" {
 
   key_permissions = [
     "Get",
-    "WrapKey",
-    "UnwrapKey",
     "Create",
     "Delete",
-    "Get",
-    "Purge",
+    "List",
+    "Restore",
     "Recover",
-    "Update",
+    "UnwrapKey",
+    "WrapKey",
+    "Purge",
+    "Encrypt",
+    "Decrypt",
+    "Sign",
+    "Verify",
     "GetRotationPolicy",
     "SetRotationPolicy"
   ]
