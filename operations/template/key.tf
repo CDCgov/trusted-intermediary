@@ -167,8 +167,6 @@ resource "azurerm_key_vault_key" "customer_managed_key" {
     "wrapKey"
   ]
 
-
-
   depends_on = [
     azurerm_key_vault_access_policy.allow_github_deployer,
     azurerm_key_vault_access_policy.allow_storage_account_wrapping

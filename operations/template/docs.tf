@@ -13,6 +13,11 @@ resource "azurerm_storage_account" "docs" {
     index_document = "index.html"
   }
 
+  customer_managed_key {
+    key_vault_key_id = azurerm_key_vault_key.customer_managed_key.id
+    user_assigned_identity_id = "SystemAssigned"
+  }
+
   #   below tags are managed by CDC
   lifecycle {
     ignore_changes = [
@@ -28,7 +33,7 @@ resource "azurerm_storage_account" "docs" {
       tags["system"],
       tags["technical_steward"],
       tags["zone"],
-      customer_managed_key,
+#       customer_managed_key,
     ]
   }
 
@@ -38,16 +43,16 @@ resource "azurerm_storage_account" "docs" {
 }
 
 
-resource "azurerm_key_vault_managed_storage_account" "key_vault_storage_account" {
-  name                         = "key-vault-storage-account-${var.environment}"
-  key_vault_id                 = azurerm_key_vault.key_storage.id
-  storage_account_id           = azurerm_storage_account.docs.id
-  storage_account_key          = "key1" # pragma: allowlist secret
-#   regenerate_key_automatically = false
-#   regeneration_period          = "P360D"
-
-  depends_on = [
-    azurerm_key_vault_access_policy.allow_github_deployer,
-    azurerm_key_vault_access_policy.allow_storage_account_wrapping
-  ] //wait for the permission that allows our deployer to write the secret
-}
+# resource "azurerm_key_vault_managed_storage_account" "key_vault_storage_account" {
+#   name                         = "key-vault-storage-account-${var.environment}"
+#   key_vault_id                 = azurerm_key_vault.key_storage.id
+#   storage_account_id           = azurerm_storage_account.docs.id
+#   storage_account_key          = "key1" # pragma: allowlist secret
+# #   regenerate_key_automatically = false
+# #   regeneration_period          = "P360D"
+#
+#   depends_on = [
+#     azurerm_key_vault_access_policy.allow_github_deployer,
+#     azurerm_key_vault_access_policy.allow_storage_account_wrapping
+#   ] //wait for the permission that allows our deployer to write the secret
+# }
