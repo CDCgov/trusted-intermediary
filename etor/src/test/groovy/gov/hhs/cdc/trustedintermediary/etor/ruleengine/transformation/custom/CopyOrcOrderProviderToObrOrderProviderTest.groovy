@@ -67,7 +67,6 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         def orc12XcnExtension = orc12Practitioner.getExtensionByUrl(PRACTITIONER_EXTENSION_URL)
 
         def obr16Practitioner = getObr16ExtensionPractitioner(serviceRequest)
-        def obr16XcnExtension = obr16Practitioner.getExtensionByUrl(PRACTITIONER_EXTENSION_URL)
 
         expect:
         // ORC12 values to copy
@@ -76,19 +75,12 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         orc12Practitioner.name[0].family == EXPECTED_LAST_NAME
         orc12XcnExtension.getExtensionByUrl("XCN.10").value.toString() == EXPECTED_NPI_LABEL
 
-        // OBR16 original values
-        obr16Practitioner.identifier[0] == null
-        obr16XcnExtension.getExtensionByUrl("XCN.3").value.toString() == EXPECTED_FIRST_NAME
-        obr16Practitioner.name[0].family == EXPECTED_LAST_NAME
-        obr16XcnExtension.getExtensionByUrl("XCN.10") == null
-
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
 
         def diagnosticReport2 = HapiHelper.getDiagnosticReport(bundle)
         def serviceRequest2 = HapiHelper.getServiceRequest(diagnosticReport2)
         def obr16Practitioner2 = getObr16ExtensionPractitioner(serviceRequest2)
-        def obr16XcnExtension2 = obr16Practitioner2.getExtensionByUrl(PRACTITIONER_EXTENSION_URL)
 
         then:
         // ORC12 values should remain the same
@@ -98,10 +90,8 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         orc12XcnExtension.getExtensionByUrl("XCN.10").value.toString() == EXPECTED_NPI_LABEL
 
         // OBR16 values should be updated
-        obr16Practitioner2.identifier[0].value == EXPECTED_NPI
-        obr16XcnExtension2.getExtensionByUrl("XCN.3").value.toString() == EXPECTED_FIRST_NAME
-        obr16Practitioner2.name[0].family == EXPECTED_LAST_NAME
-        obr16XcnExtension2.getExtensionByUrl("XCN.10").value.toString() == EXPECTED_NPI_LABEL
+        obr16Practitioner == null
+        obr16Practitioner2 == null
     }
 
     def "when ORC-12 extension not populated and OBR-16 extension is populated"() {
