@@ -80,7 +80,7 @@ resource "azurerm_key_vault_access_policy" "allow_api_read" {
 resource "azurerm_key_vault_access_policy" "allow_storage_account_wrapping" {
   key_vault_id = azurerm_key_vault.key_storage.id
   tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = azurerm_storage_account.docs.identity.0.principal_id
+  object_id    = data.azurerm_client_config.current.object_id
 
   key_permissions = [
     "Get",
@@ -165,5 +165,8 @@ resource "azurerm_key_vault_key" "customer_managed_key" {
 
 
 
-  depends_on = [azurerm_key_vault_access_policy.allow_github_deployer] //wait for the permission that allows our deployer to write the secret
+  depends_on = [
+    azurerm_key_vault_access_policy.allow_github_deployer,
+    azurerm_key_vault_access_policy.allow_storage_account_wrapping
+  ] //wait for the permission that allows our deployer to write the secret
 }
