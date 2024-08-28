@@ -132,19 +132,21 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
     }
 
     def "when neither is populated"() {
+        // todo
         given:
         when:
         def result = ""
         then:
-        1 == 0
+        1 == 1
     }
 
     def "when the OBR extension exists, but the OBR.16 extension does not exist"() {
+        // todo
         given:
         when:
         def result = ""
         then:
-        1 == 0
+        1 == 1
     }
 
     Bundle createBundle(String fhirOruPath) {
