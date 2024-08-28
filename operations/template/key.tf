@@ -62,19 +62,6 @@ resource "azurerm_key_vault_access_policy" "allow_api_read" {
     "Get",
   ]
 
-  key_permissions = [
-    "Get",
-    "WrapKey",
-    "UnwrapKey",
-    "Create",
-    "Delete",
-    "Get",
-    "Purge",
-    "Recover",
-    "Update",
-    "GetRotationPolicy",
-    "SetRotationPolicy"
-  ]
 }
 
 resource "azurerm_key_vault_access_policy" "allow_storage_account_wrapping" {
@@ -84,20 +71,8 @@ resource "azurerm_key_vault_access_policy" "allow_storage_account_wrapping" {
 
   key_permissions = [
     "Get",
-    "Create",
-    "Delete",
-    "List",
-    "Restore",
-    "Recover",
     "UnwrapKey",
     "WrapKey",
-    "Purge",
-    "Encrypt",
-    "Decrypt",
-    "Sign",
-    "Verify",
-    "GetRotationPolicy",
-    "SetRotationPolicy"
   ]
 }
 
@@ -169,6 +144,5 @@ resource "azurerm_key_vault_key" "customer_managed_key" {
 
   depends_on = [
     azurerm_key_vault_access_policy.allow_github_deployer,
-    azurerm_key_vault_access_policy.allow_storage_account_wrapping
   ] //wait for the permission that allows our deployer to write the secret
 }
