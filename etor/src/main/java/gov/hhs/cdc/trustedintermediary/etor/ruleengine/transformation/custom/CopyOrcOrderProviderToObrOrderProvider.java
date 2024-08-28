@@ -23,10 +23,17 @@ public class CopyOrcOrderProviderToObrOrderProvider implements CustomFhirTransfo
             return;
         }
         var pract = HapiHelper.getPractitionerRole(serviceRequest);
-        var toOverwrite =
-                serviceRequest
-                        .getExtensionByUrl(HapiHelper.EXTENSION_OBR_URL)
-                        .getExtensionByUrl(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString());
-        toOverwrite.setValue(pract.getPractitioner());
+        if (pract == null) {
+            return;
+        }
+        try {
+            var toOverwrite =
+                    serviceRequest
+                            .getExtensionByUrl(HapiHelper.EXTENSION_OBR_URL)
+                            .getExtensionByUrl(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString());
+            toOverwrite.setValue(pract.getPractitioner());
+        } catch (Exception e) {
+            // todo
+        }
     }
 }
