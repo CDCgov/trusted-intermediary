@@ -26,6 +26,8 @@ public class CopyOrcOrderProviderToObrOrderProvider implements CustomFhirTransfo
         if (pract == null) {
             return;
         }
+
+        // todo add OBR16 resource when empty
         try {
             var toOverwrite =
                     serviceRequest
