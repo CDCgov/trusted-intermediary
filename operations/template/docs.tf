@@ -43,7 +43,6 @@ resource "azurerm_storage_account" "docs" {
 
   depends_on = [
     azurerm_key_vault_access_policy.allow_github_deployer,
-    azurerm_key_vault_access_policy.allow_storage_account_wrapping
   ] //wait for the permission that allows our deployer to write the secret
 }
 
