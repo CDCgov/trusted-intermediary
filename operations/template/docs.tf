@@ -43,6 +43,6 @@ resource "azurerm_key_vault_managed_storage_account" "key_vault_storage_account"
   key_vault_id                 = azurerm_key_vault.key_storage.id
   storage_account_id           = azurerm_storage_account.docs.id
   storage_account_key          = "key1" # pragma: allowlist secret
-  regenerate_key_automatically = false
-  regeneration_period          = "P360D"
+#   regenerate_key_automatically = false
+#   regeneration_period          = "P360D"
 }
