@@ -106,10 +106,39 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
 
     def "when ORC-12 extension not populated and OBR-16 extension is populated"() {
         given:
+        final String EXPECTED_NPI = null
+        final String EXPECTED_FIRST_NAME = "EUSTRATIA"
+        final String EXPECTED_LAST_NAME = "HUBBARD"
+        final String EXPECTED_NPI_LABEL = null
+        final String FHIR_ORU_PATH = "../CA/019_CA_ORU_R01_CDPH_produced_UCSD2024-07-11-16-02-17-749_1_hl7_translation.fhir"
+
+        def bundle = createBundle(FHIR_ORU_PATH)
+        def serviceRequest = createServiceRequest(bundle)
+        def orc12PractitionerRole = HapiHelper.getPractitionerRole(serviceRequest)
+        def orc12Practitioner = HapiHelper.getPractitioner(orc12PractitionerRole)
+        def orc12XcnExtension = orc12Practitioner.getExtensionByUrl(PRACTITIONER_EXTENSION_URL)
+
+        def obr16Practitioner = getObr16ExtensionPractitioner(serviceRequest)
+        def obr16XcnExtension = obr16Practitioner.getExtensionByUrl(PRACTITIONER_EXTENSION_URL)
+
+        expect:
+        evaluateOrc12Values(serviceRequest, null, null, null, null)
+        evaluateObr16Values(serviceRequest, null, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, null)
+
         when:
-        def result = ""
+        transformClass.transform(new HapiFhirResource(bundle), null)
+
+        def orc12PractitionerRole2 = HapiHelper.getPractitionerRole(serviceRequest)
+        def orc12Practitioner2 = HapiHelper.getPractitioner(orc12PractitionerRole)
+        def orc12XcnExtension2 = orc12Practitioner.getExtensionByUrl(PRACTITIONER_EXTENSION_URL)
+
+        def obr16Practitioner2 = getObr16ExtensionPractitioner(serviceRequest)
+        def obr16XcnExtension2 = obr16Practitioner.getExtensionByUrl(PRACTITIONER_EXTENSION_URL)
+
+
         then:
-        1 == 0
+        evaluateOrc12Values(serviceRequest, null, null, null, null)
+        evaluateObr16Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NPI_LABEL)
     }
 
     def "when neither is populated"() {
