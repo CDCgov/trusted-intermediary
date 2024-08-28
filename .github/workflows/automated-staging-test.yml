@@ -20,6 +20,19 @@ jobs:
             curl --silent --location https://github.com/mike-engel/jwt-cli/releases/latest/download/jwt-linux.tar.gz | tar xvz -C /usr/local/bin/
             sudo chmod +x /usr/local/bin/jwt
 
+      - name: Log in to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CDC_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_CDC_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_CDC_DMZ_C1_SUBSCRIPTION_ID }}
+
+      - name: Download HL7 files from Azure Blob Storage
+        uses: azure/cli@v2
+        with:
+          inlineScript: |
+            az storage blob download-batch --destination ./downloaded_files --source https://cdctiautomatedstg.blob.core.windows.net/initial --account-key ${{ secrets.AZURE_STORAGE_KEY }} --pattern *.hl7
+
       - name: Write private key to file
         run: |
           echo "${{ secrets.TI_STAGING_PRIVATE_KEY }}" > /tmp/staging_private_key.pem
@@ -43,7 +56,7 @@ jobs:
                     --silent \
                     "$host/api/token" | jq -r ".access_token")
 
-            for file in $(pwd)/examples/Test/Automated/*.hl7; do
+            for file in ./downloaded_files/*.hl7; do
                 echo "Sending $file"
                 curl \
                     --header "Content-Type: application/hl7-v2" \
