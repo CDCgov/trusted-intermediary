@@ -189,10 +189,16 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
     }
 
     Practitioner getObr16ExtensionPractitioner (serviceRequest) {
-        return serviceRequest
-                .getExtensionByUrl(HapiHelper.EXTENSION_OBR_URL)
-                .getExtensionByUrl(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString())
-                .value
-                .getResource()
+        def resource
+        try {
+            def extensionByUrl1 =  serviceRequest.getExtensionByUrl(HapiHelper.EXTENSION_OBR_URL)
+            def extensionByUrl2 = extensionByUrl1.getExtensionByUrl(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString())
+            def value = extensionByUrl2.value
+            resource = value.getResource()
+            return resource
+        } catch(Exception e) {
+            resource = null
+            return resource
+        }
     }
 }
