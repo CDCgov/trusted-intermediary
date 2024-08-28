@@ -61,7 +61,6 @@ resource "azurerm_key_vault_access_policy" "allow_api_read" {
     "List",
     "Get",
   ]
-
 }
 
 resource "azurerm_key_vault_access_policy" "allow_storage_account_wrapping" {
