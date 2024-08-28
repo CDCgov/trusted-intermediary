@@ -40,10 +40,6 @@ resource "azurerm_storage_account" "docs" {
   identity {
     type = "SystemAssigned"
   }
-
-  depends_on = [
-    azurerm_key_vault_access_policy.allow_github_deployer,
-  ] //wait for the permission that allows our deployer to write the secret
 }
 
 resource "azurerm_storage_account_customer_managed_key" "storage_account_customer_key" {
