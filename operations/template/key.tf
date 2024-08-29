@@ -38,6 +38,7 @@ resource "azurerm_key_vault_access_policy" "allow_github_deployer" {
     "Get",
     "Delete",
     "Purge",
+    "Recover",
   ]
 
   key_permissions = [
@@ -48,7 +49,7 @@ resource "azurerm_key_vault_access_policy" "allow_github_deployer" {
     "Recover",
     "Update",
     "GetRotationPolicy",
-    "SetRotationPolicy"
+    "SetRotationPolicy",
   ]
 }
 
