@@ -36,7 +36,12 @@ jobs:
         uses: azure/cli@v2
         with:
           inlineScript: |
-            az storage blob download-batch --destination ./downloaded_files --source https://cdctiautomatedstg.blob.core.windows.net/initial --account-key ${{ secrets.AZURE_STORAGE_KEY }} --pattern *.hl7
+            az storage blob download-batch \
+              --destination ./downloaded_files \
+              --source "automated/initial" \
+              --account-name "cdctiautomatedstg" \
+              --account-key ${{ secrets.AZURE_STORAGE_KEY }} \
+              --pattern "*.hl7"
 
       - name: Write private key to file
         run: |
