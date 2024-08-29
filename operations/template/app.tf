@@ -43,13 +43,6 @@ resource "azurerm_user_assigned_identity" "key_vault_identity" {
   name = "key-vault-identity-${var.environment}"
 }
 
-resource "azurerm_user_assigned_identity" "docs_identity" {
-  resource_group_name = data.azurerm_resource_group.group.name
-  location            = data.azurerm_resource_group.group.location
-
-  name = "docs-identity-${var.environment}"
-}
-
 resource "azurerm_role_assignment" "allow_app_to_pull_from_registry" {
   principal_id         = azurerm_linux_web_app.api.identity.0.principal_id
   role_definition_name = "AcrPull"
