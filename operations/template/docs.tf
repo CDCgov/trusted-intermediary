@@ -34,21 +34,10 @@ resource "azurerm_storage_account" "docs" {
 
   identity {
     type = "SystemAssigned"
-#     type = "UserAssigned"
-#     identity_ids = [
-#       azurerm_user_assigned_identity.docs_identity.id
-#     ]
   }
 }
 
-# resource "azurerm_user_assigned_identity" "docs_identity" {
-#   resource_group_name = data.azurerm_resource_group.group.name
-#   location            = data.azurerm_resource_group.group.location
-#
-#   name = "docs-identity-${var.environment}"
-# }
-
-resource "azurerm_storage_account_customer_managed_key" "storage_account_customer_key" {
+resource "azurerm_storage_account_customer_managed_key" "docs_storage_account_customer_key" {
   storage_account_id = azurerm_storage_account.docs.id
   key_vault_id       = azurerm_key_vault.key_storage.id
   key_name           = azurerm_key_vault_key.customer_managed_key.name

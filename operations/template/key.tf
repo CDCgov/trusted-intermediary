@@ -64,7 +64,7 @@ resource "azurerm_key_vault_access_policy" "allow_api_read" {
   ]
 }
 
-resource "azurerm_key_vault_access_policy" "allow_storage_account_wrapping" {
+resource "azurerm_key_vault_access_policy" "allow_docs_storage_account_wrapping" {
   key_vault_id = azurerm_key_vault.key_storage.id
   tenant_id    = data.azurerm_client_config.current.tenant_id
   object_id    = azurerm_storage_account.docs.identity.0.principal_id
@@ -76,7 +76,7 @@ resource "azurerm_key_vault_access_policy" "allow_storage_account_wrapping" {
   ]
 }
 
-resource "azurerm_key_vault_access_policy" "allow_storage_account_real_wrapping" {
+resource "azurerm_key_vault_access_policy" "allow_storage_storage_account_wrapping" {
   key_vault_id = azurerm_key_vault.key_storage.id
   tenant_id    = data.azurerm_client_config.current.tenant_id
   object_id    = azurerm_storage_account.storage.identity.0.principal_id

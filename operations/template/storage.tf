@@ -32,7 +32,7 @@ resource "azurerm_storage_account" "storage" {
   }
 }
 
-resource "azurerm_storage_account_customer_managed_key" "storage_real_account_customer_key" {
+resource "azurerm_storage_account_customer_managed_key" "storage_storage_account_customer_key" {
   storage_account_id = azurerm_storage_account.storage.id
   key_vault_id       = azurerm_key_vault.key_storage.id
   key_name           = azurerm_key_vault_key.customer_managed_key.name
