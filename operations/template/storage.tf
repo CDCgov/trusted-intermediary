@@ -70,14 +70,14 @@ resource "azurerm_storage_account" "automated_storage" {
   }
 }
 
-resource "azurerm_storage_container" "initial_container" {
-  name                  = "initial"
+resource "azurerm_storage_container" "automated_container" {
+  name                  = "automated"
   storage_account_name  = azurerm_storage_account.automated_storage.name
   container_access_type = "private"
 }
 
-resource "azurerm_storage_container" "final_container" {
-  name                  = "final"
-  storage_account_name  = azurerm_storage_account.automated_storage.name
-  container_access_type = "private"
+resource "azurerm_role_assignment" "allow_automated_test_read_write" {
+  scope                = azurerm_storage_container.automated_container.resource_manager_id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = <PRINCIPAL_ID>
 }
