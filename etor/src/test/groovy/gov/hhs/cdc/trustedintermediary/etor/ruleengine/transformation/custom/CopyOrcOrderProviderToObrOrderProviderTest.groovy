@@ -61,37 +61,20 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
 
         def bundle = createBundle(FHIR_ORU_PATH)
         def serviceRequest = createServiceRequest(bundle)
-
-        def orc12PractitionerRole = HapiHelper.getPractitionerRole(serviceRequest)
-        def orc12Practitioner = HapiHelper.getPractitioner(orc12PractitionerRole)
-        def orc12XcnExtension = orc12Practitioner.getExtensionByUrl(PRACTITIONER_EXTENSION_URL)
-
-        def obr16Practitioner = getObr16ExtensionPractitioner(serviceRequest)
-
         expect:
         // ORC12 values to copy
-        orc12Practitioner.identifier[0].value == EXPECTED_NPI
-        orc12XcnExtension.getExtensionByUrl("XCN.3").value.toString() == EXPECTED_FIRST_NAME
-        orc12Practitioner.name[0].family == EXPECTED_LAST_NAME
-        orc12XcnExtension.getExtensionByUrl("XCN.10").value.toString() == EXPECTED_NPI_LABEL
-
+        evaluateOrc12Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NPI_LABEL)
+        // OBR16 should not exist initially
+        def obr16Practitioner = getObr16ExtensionPractitioner(serviceRequest)
+        obr16Practitioner == null
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
-
-        def diagnosticReport2 = HapiHelper.getDiagnosticReport(bundle)
-        def serviceRequest2 = HapiHelper.getServiceRequest(diagnosticReport2)
-        def obr16Practitioner2 = getObr16ExtensionPractitioner(serviceRequest2)
-
+        def serviceRequest2 = createServiceRequest(bundle)
         then:
         // ORC12 values should remain the same
-        orc12Practitioner.identifier[0].value == EXPECTED_NPI
-        orc12XcnExtension.getExtensionByUrl("XCN.3").value.toString() == EXPECTED_FIRST_NAME
-        orc12Practitioner.name[0].family == EXPECTED_LAST_NAME
-        orc12XcnExtension.getExtensionByUrl("XCN.10").value.toString() == EXPECTED_NPI_LABEL
-
-        // OBR16 values should be updated
-        obr16Practitioner == null
-        obr16Practitioner2 == null
+        evaluateOrc12Values(serviceRequest2, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NPI_LABEL)
+        // OBR16 values should be updated to match ORC12
+        evaluateObr16Values(serviceRequest2, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NPI_LABEL)
     }
 
     def "when ORC-12 extension not populated and OBR-16 extension is populated"() {
