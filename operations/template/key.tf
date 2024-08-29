@@ -74,6 +74,8 @@ resource "azurerm_key_vault_access_policy" "allow_storage_account_wrapping" {
     "UnwrapKey",
     "WrapKey",
   ]
+
+  depends_on = [azurerm_storage_account.docs]
 }
 
 resource "azurerm_key_vault_secret" "report_stream_public_key" {
