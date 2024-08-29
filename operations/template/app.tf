@@ -3,7 +3,20 @@ resource "azurerm_container_registry" "registry" {
   name                = "cdcti${var.environment}containerregistry"
   resource_group_name = data.azurerm_resource_group.group.name
   location            = data.azurerm_resource_group.group.location
-  sku                 = "Standard"
+  sku                 = "Premium"
+
+  identity {
+    type = "UserAssigned"
+    identity_ids = [
+      azurerm_user_assigned_identity.key_vault_identity.id
+    ]
+  }
+
+  encryption {
+    enabled            = true
+    key_vault_key_id   = azurerm_key_vault_key.customer_managed_key.id
+    identity_client_id = azurerm_user_assigned_identity.key_vault_identity.client_id
+  }
 
   #   below tags are managed by CDC
   lifecycle {
@@ -22,6 +35,13 @@ resource "azurerm_container_registry" "registry" {
       tags["zone"]
     ]
   }
+}
+
+resource "azurerm_user_assigned_identity" "key_vault_identity" {
+  resource_group_name = data.azurerm_resource_group.group.name
+  location            = data.azurerm_resource_group.group.location
+
+  name = "key-vault-identity-${var.environment}"
 }
 
 resource "azurerm_role_assignment" "allow_app_to_pull_from_registry" {
