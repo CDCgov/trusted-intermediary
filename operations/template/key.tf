@@ -100,7 +100,6 @@ resource "azurerm_key_vault_secret" "trusted_intermediary_public_key" {
   depends_on = [azurerm_key_vault_access_policy.allow_github_deployer] //wait for the permission that allows our deployer to write the secret
 }
 
-
 resource "azurerm_key_vault_secret" "trusted_intermediary_public_key_internal" {
   name  = "trusted-intermediary-public-key-${var.environment}"
   value = "dogcow"
@@ -142,7 +141,5 @@ resource "azurerm_key_vault_key" "customer_managed_key" {
     "wrapKey"
   ]
 
-  depends_on = [
-    azurerm_key_vault_access_policy.allow_github_deployer,
-  ] //wait for the permission that allows our deployer to write the secret
+  depends_on = [azurerm_key_vault_access_policy.allow_github_deployer] //wait for the permission that allows our deployer to write the secret
 }
