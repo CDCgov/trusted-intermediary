@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.DiagnosticReport;
+import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.ServiceRequest;
 
 /** Updates the order provider (OBR-16) from the order provider (ORC-12) */
@@ -27,15 +28,20 @@ public class CopyOrcOrderProviderToObrOrderProvider implements CustomFhirTransfo
             return;
         }
 
-        // todo add OBR16 resource when empty
-        try {
-            var toOverwrite =
-                    serviceRequest
-                            .getExtensionByUrl(HapiHelper.EXTENSION_OBR_URL)
-                            .getExtensionByUrl(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString());
-            toOverwrite.setValue(pract.getPractitioner());
-        } catch (Exception e) {
-            // todo
+        // check if the OBR 16 extension exists
+        var obrExtension = serviceRequest.getExtensionByUrl(HapiHelper.EXTENSION_OBR_URL);
+        if (obrExtension == null) {
+            obrExtension = new Extension(HapiHelper.EXTENSION_OBR_URL);
+            serviceRequest.addExtension(obrExtension);
         }
+
+        var obr16Extension =
+                obrExtension.getExtensionByUrl(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString());
+        if (obr16Extension == null) {
+            obr16Extension = new Extension(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString());
+            obrExtension.addExtension(obr16Extension);
+        }
+
+        obr16Extension.setValue(pract.getPractitioner());
     }
 }
