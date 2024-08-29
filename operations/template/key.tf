@@ -64,22 +64,10 @@ resource "azurerm_key_vault_access_policy" "allow_api_read" {
   ]
 }
 
-resource "terraform_data" "wait_for_identity" {
-  provisioner "local-exec" {
-    command = "echo 'Storage Account Identity Created'"
-  }
-
-  triggers_replace = [
-    azurerm_storage_account.docs.identity.0.principal_id
-  ]
-
-  input = azurerm_storage_account.docs.identity.0.principal_id
-}
-
 resource "azurerm_key_vault_access_policy" "allow_storage_account_wrapping" {
   key_vault_id = azurerm_key_vault.key_storage.id
   tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = terraform_data.wait_for_identity.output
+  object_id    = azurerm_user_assigned_identity.docs_identity.principal_id
 
   key_permissions = [
     "Get",

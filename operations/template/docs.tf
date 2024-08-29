@@ -33,7 +33,10 @@ resource "azurerm_storage_account" "docs" {
   }
 
   identity {
-    type = "SystemAssigned"
+    type = "UserAssigned"
+    identity_ids = [
+      azurerm_user_assigned_identity.docs_identity.id
+    ]
   }
 }
 
