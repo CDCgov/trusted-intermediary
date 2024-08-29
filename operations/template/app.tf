@@ -13,7 +13,6 @@ resource "azurerm_container_registry" "registry" {
   }
 
   encryption {
-    enabled            = true
     key_vault_key_id   = azurerm_key_vault_key.customer_managed_key.id
     identity_client_id = azurerm_user_assigned_identity.key_vault_identity.client_id
   }
