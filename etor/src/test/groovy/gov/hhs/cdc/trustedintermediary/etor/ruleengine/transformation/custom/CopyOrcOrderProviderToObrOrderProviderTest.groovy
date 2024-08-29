@@ -2,12 +2,10 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.DiagnosticReport
 import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.ServiceRequest
 import spock.lang.Specification
@@ -57,7 +55,7 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         final String EXPECTED_FIRST_NAME = "EUSTRATIA"
         final String EXPECTED_LAST_NAME = "HUBBARD"
         final String EXPECTED_NPI_LABEL = "NPI"
-        final String FHIR_ORU_PATH = "../CA/021_CA_ORU_R01_CDPH_empty_obr16_UCSD2024-07-11-16-02-17-749_1_hl7_translation.fhir"
+        final String FHIR_ORU_PATH = "../CA/017_CA_ORU_R01_CDPH_empty_obr16_UCSD2024-07-11-16-02-17-749_1_hl7_translation.fhir"
 
         def bundle = createBundle(FHIR_ORU_PATH)
         def serviceRequest = createServiceRequest(bundle)
@@ -86,7 +84,7 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         final String EXPECTED_FIRST_NAME = "EUSTRATIA"
         final String EXPECTED_LAST_NAME = "HUBBARD"
         final String EXPECTED_NPI_LABEL = null
-        final String FHIR_ORU_PATH = "../CA/022_CA_ORU_R01_CDPH_empty_orc12_UCSD2024-07-11-16-02-17-749_1_hl7_translation.fhir"
+        final String FHIR_ORU_PATH = "../CA/018_CA_ORU_R01_CDPH_empty_orc12_UCSD2024-07-11-16-02-17-749_1_hl7_translation.fhir"
 
         def bundle = createBundle(FHIR_ORU_PATH)
         def serviceRequest = createServiceRequest(bundle)
@@ -105,7 +103,7 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
 
     def "when neither is populated"() {
         given:
-        final String FHIR_ORU_PATH = "../CA/023_CA_ORU_R01_CDPH_empty_orc12_obr16_UCSD2024-07-11-16-02-17-749_1_hl7_translation.fhir"
+        final String FHIR_ORU_PATH = "../CA/019_CA_ORU_R01_CDPH_empty_orc12_obr16_UCSD2024-07-11-16-02-17-749_1_hl7_translation.fhir"
 
         def bundle = createBundle(FHIR_ORU_PATH)
         def serviceRequest = createServiceRequest(bundle)
@@ -120,15 +118,6 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         then:
         evaluateOrc12IsNull(serviceRequest)
         evaluateObr16IsNull(serviceRequest)
-    }
-
-    def "when the OBR extension exists, but the OBR.16 extension does not exist"() {
-        // todo
-        given:
-        when:
-        def result = ""
-        then:
-        1 == 1
     }
 
     Bundle createBundle(String fhirOruPath) {
