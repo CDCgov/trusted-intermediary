@@ -13,10 +13,10 @@ resource "azurerm_storage_account" "docs" {
     index_document = "index.html"
   }
 
-#   customer_managed_key {
-#     key_vault_key_id = azurerm_key_vault_key.customer_managed_key.id
-#     user_assigned_identity_id = "SystemAssigned"
-#   }
+  #   customer_managed_key {
+  #     key_vault_key_id = azurerm_key_vault_key.customer_managed_key.id
+  #     user_assigned_identity_id = "SystemAssigned"
+  #   }
 
   #   below tags are managed by CDC
   lifecycle {
@@ -44,8 +44,8 @@ resource "azurerm_storage_account" "docs" {
 
 resource "azurerm_storage_account_customer_managed_key" "storage_account_customer_key" {
   storage_account_id = azurerm_storage_account.docs.id
-  key_vault_id = azurerm_key_vault.key_storage.id
-  key_name = azurerm_key_vault_key.customer_managed_key.name
+  key_vault_id       = azurerm_key_vault.key_storage.id
+  key_name           = azurerm_key_vault_key.customer_managed_key.name
 
   depends_on = [
     azurerm_key_vault_access_policy.allow_github_deployer,
