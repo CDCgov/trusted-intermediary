@@ -23,8 +23,8 @@ public class CopyOrcOrderProviderToObrOrderProvider implements CustomFhirTransfo
         if (serviceRequest == null) {
             return;
         }
-        var pract = HapiHelper.getPractitionerRole(serviceRequest);
-        if (pract == null) {
+        var practitionerRole = HapiHelper.getPractitionerRole(serviceRequest);
+        if (practitionerRole == null) {
             return;
         }
 
@@ -42,6 +42,6 @@ public class CopyOrcOrderProviderToObrOrderProvider implements CustomFhirTransfo
             obrExtension.addExtension(obr16Extension);
         }
 
-        obr16Extension.setValue(pract.getPractitioner());
+        obr16Extension.setValue(practitionerRole.getPractitioner());
     }
 }
