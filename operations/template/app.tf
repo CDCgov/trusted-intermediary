@@ -191,13 +191,6 @@ resource "azurerm_linux_web_app_slot" "pre_live" {
   name           = "pre-live"
   app_service_id = azurerm_linux_web_app.api.id
 
-  lifecycle {
-    ignore_changes = [
-      # Ignore changes to tags because the CDC sets these automagically
-      tags,
-    ]
-  }
-
   https_only = true
 
   virtual_network_subnet_id = local.cdc_domain_environment ? azurerm_subnet.app.id : null
@@ -247,6 +240,8 @@ resource "azurerm_linux_web_app_slot" "pre_live" {
   lifecycle {
     ignore_changes = [
       site_config.application_stack.docker_image_name,
+      # Ignore changes to tags because the CDC sets these automagically
+      tags,
     ]
   }
 }
