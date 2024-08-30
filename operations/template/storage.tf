@@ -9,9 +9,10 @@ resource "azurerm_storage_account" "storage" {
   min_tls_version                   = "TLS1_2"
   infrastructure_encryption_enabled = true
 
-  #   below tags are managed by CDC
   lifecycle {
     ignore_changes = [
+      customer_managed_key,
+      # below tags are managed by CDC
       tags["business_steward"],
       tags["center"],
       tags["environment"],

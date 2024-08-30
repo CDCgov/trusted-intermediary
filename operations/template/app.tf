@@ -41,6 +41,24 @@ resource "azurerm_user_assigned_identity" "key_vault_identity" {
   location            = data.azurerm_resource_group.group.location
 
   name = "key-vault-identity-${var.environment}"
+
+  lifecycle {
+    ignore_changes = [
+      # below tags are managed by CDC
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
+    ]
+  }
 }
 
 resource "azurerm_role_assignment" "allow_app_to_pull_from_registry" {
