@@ -31,22 +31,23 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         final String EXPECTED_NPI = "1790743185"
         final String EXPECTED_FIRST_NAME = "EUSTRATIA"
         final String EXPECTED_LAST_NAME = "HUBBARD"
-        final String EXPECTED_NPI_LABEL = "NPI"
+        final String EXPECTED_NAME_TYPE_CODE = "NPI"
+        final String EXPECTED_IDENTIFIER_TYPE_CODE = null
         final String FHIR_ORU_PATH = "../CA/007_CA_ORU_R01_CDPH_produced_UCSD2024-07-11-16-02-17-749_1_hl7_translation.fhir"
 
         def bundle = createBundle(FHIR_ORU_PATH)
         def serviceRequest = createServiceRequest(bundle)
 
         expect:
-        evaluateOrc12Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NPI_LABEL)
-        evaluateObr16Values(serviceRequest, null, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, null)
+        evaluateOrc12Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
+        evaluateObr16Values(serviceRequest, null, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, null, null)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
 
         then:
-        evaluateOrc12Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NPI_LABEL)
-        evaluateObr16Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NPI_LABEL)
+        evaluateOrc12Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
+        evaluateObr16Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
     }
 
     def "when ORC-12 extension populated and OBR-16 extension not populated"() {
@@ -54,7 +55,8 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         final String EXPECTED_NPI = "1790743185"
         final String EXPECTED_FIRST_NAME = "EUSTRATIA"
         final String EXPECTED_LAST_NAME = "HUBBARD"
-        final String EXPECTED_NPI_LABEL = "NPI"
+        final String EXPECTED_NAME_TYPE_CODE = null
+        final String EXPECTED_IDENTIFIER_TYPE_CODE = "NPI"
         final String FHIR_ORU_PATH = "../CA/017_CA_ORU_R01_CDPH_empty_obr16_UCSD2024-07-11-16-02-17-749_1_hl7_translation.fhir"
 
         def bundle = createBundle(FHIR_ORU_PATH)
@@ -62,7 +64,7 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
 
         expect:
         // ORC12 values to copy
-        evaluateOrc12Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NPI_LABEL)
+        evaluateOrc12Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
 
         // OBR16 should not exist initially
         def obr16Practitioner = getObr16ExtensionPractitioner(serviceRequest)
@@ -73,9 +75,9 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
 
         then:
         // ORC12 values should remain the same
-        evaluateOrc12Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NPI_LABEL)
+        evaluateOrc12Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
         // OBR16 values should be updated to match ORC12
-        evaluateObr16Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NPI_LABEL)
+        evaluateObr16Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
     }
 
     def "when ORC-12 extension not populated and OBR-16 extension is populated"() {
@@ -83,22 +85,23 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         final String EXPECTED_NPI = null
         final String EXPECTED_FIRST_NAME = "EUSTRATIA"
         final String EXPECTED_LAST_NAME = "HUBBARD"
-        final String EXPECTED_NPI_LABEL = null
+        final String EXPECTED_NAME_TYPE_CODE = null
+        final String EXPECTED_IDENTIFIER_TYPE_CODE = null
         final String FHIR_ORU_PATH = "../CA/018_CA_ORU_R01_CDPH_empty_orc12_UCSD2024-07-11-16-02-17-749_1_hl7_translation.fhir"
 
         def bundle = createBundle(FHIR_ORU_PATH)
         def serviceRequest = createServiceRequest(bundle)
 
         expect:
-        evaluateOrc12Values(serviceRequest, null, null, null, null)
-        evaluateObr16Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NPI_LABEL)
+        evaluateOrc12Values(serviceRequest, null, null, null, null, null)
+        evaluateObr16Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
 
         then:
-        evaluateOrc12Values(serviceRequest, null, null, null, null)
-        evaluateObr16Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NPI_LABEL)
+        evaluateOrc12Values(serviceRequest, null, null, null, null, null)
+        evaluateObr16Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
     }
 
     def "when neither is populated"() {
@@ -135,7 +138,13 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         HapiHelper.getPractitioner(practitionerRole) == null
     }
 
-    def evaluateOrc12Values(ServiceRequest serviceRequest, String expectedNpi, String expectedFirstName, String expectedLastName, String expectedNpiLabel) {
+    def evaluateOrc12Values(
+            ServiceRequest serviceRequest,
+            String expectedNpi,
+            String expectedFirstName,
+            String expectedLastName,
+            String expectedNameTypeCode,
+            String expectedIdentifierTypeCode) {
         def practitionerRole = HapiHelper.getPractitionerRole(serviceRequest)
         def practitioner = HapiHelper.getPractitioner(practitionerRole)
         def xcnExtension = practitioner?.getExtensionByUrl(PRACTITIONER_EXTENSION_URL)
@@ -143,21 +152,31 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         practitioner.identifier[0]?.value == expectedNpi
         xcnExtension.getExtensionByUrl("XCN.3")?.value?.toString() == expectedFirstName
         practitioner.name[0]?.family == expectedLastName
-        xcnExtension.getExtensionByUrl("XCN.10")?.value?.toString() == expectedNpiLabel
+        xcnExtension.getExtensionByUrl("XCN.10")?.value?.toString() == expectedNameTypeCode
+        def codingSystem = practitioner.identifier[0]?.type?.coding
+        codingSystem == null || codingSystem[0]?.code == expectedIdentifierTypeCode
     }
 
     def evaluateObr16IsNull(ServiceRequest serviceRequest) {
         getObr16ExtensionPractitioner(serviceRequest) == null
     }
 
-    def evaluateObr16Values(ServiceRequest serviceRequest, String expectedNpi, String expectedFirstName, String expectedLastName, String expectedNpiLabel) {
+    def evaluateObr16Values(
+            ServiceRequest serviceRequest,
+            String expectedNpi,
+            String expectedFirstName,
+            String expectedLastName,
+            String expectedNameTypeCode,
+            String expectedIdentifierTypeCode) {
         def practitioner = getObr16ExtensionPractitioner(serviceRequest)
         def xcnExtension = practitioner.getExtensionByUrl(PRACTITIONER_EXTENSION_URL)
 
         practitioner.identifier[0]?.value == expectedNpi
         xcnExtension.getExtensionByUrl("XCN.3")?.value?.toString() == expectedFirstName
         practitioner.name[0]?.family == expectedLastName
-        xcnExtension.getExtensionByUrl("XCN.10")?.value?.toString() == expectedNpiLabel
+        xcnExtension.getExtensionByUrl("XCN.10")?.value?.toString() == expectedNameTypeCode
+        def codingSystem = practitioner.identifier[0]?.type?.coding
+        codingSystem == null || codingSystem[0]?.code == expectedIdentifierTypeCode
     }
 
     Practitioner getObr16ExtensionPractitioner (serviceRequest) {
@@ -168,7 +187,7 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
             def value = extensionByUrl2.value
             resource = value.getResource()
             return resource
-        } catch(Exception e) {
+        } catch(Exception ignored) {
             resource = null
             return resource
         }
