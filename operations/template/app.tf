@@ -114,6 +114,10 @@ resource "azurerm_linux_web_app" "api" {
 
     container_registry_use_managed_identity = true
 
+    application_stack {
+      docker_registry_url = "https://${azurerm_container_registry.registry.login_server}"
+    }
+
     dynamic "ip_restriction" {
       for_each = local.cdc_domain_environment ? [1] : []
 
@@ -140,7 +144,6 @@ resource "azurerm_linux_web_app" "api" {
   #   When adding new settings that are needed for the live app but shouldn't be used in the pre-live
   #   slot, add them to `sticky_settings` as well as `app_settings` for the main app resource
   app_settings = {
-    DOCKER_REGISTRY_SERVER_URL    = "https://${azurerm_container_registry.registry.login_server}"
     ENV                           = var.environment
     REPORT_STREAM_URL_PREFIX      = "https://${local.rs_domain_prefix}prime.cdc.gov"
     KEY_VAULT_NAME                = azurerm_key_vault.key_storage.name
@@ -203,6 +206,10 @@ resource "azurerm_linux_web_app_slot" "pre_live" {
 
     scm_use_main_ip_restriction = local.cdc_domain_environment ? true : null
 
+    application_stack {
+      docker_registry_url = "https://${azurerm_container_registry.registry.login_server}"
+    }
+
     dynamic "ip_restriction" {
       for_each = local.cdc_domain_environment ? [1] : []
 
@@ -227,8 +234,6 @@ resource "azurerm_linux_web_app_slot" "pre_live" {
   }
 
   app_settings = {
-    DOCKER_REGISTRY_SERVER_URL = "https://${azurerm_container_registry.registry.login_server}"
-
     ENV = var.environment
   }
 
