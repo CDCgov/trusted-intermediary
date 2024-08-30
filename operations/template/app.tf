@@ -116,6 +116,7 @@ resource "azurerm_linux_web_app" "api" {
 
     application_stack {
       docker_registry_url = "https://${azurerm_container_registry.registry.login_server}"
+      docker_image_name   = ""
     }
 
     dynamic "ip_restriction" {
@@ -208,6 +209,7 @@ resource "azurerm_linux_web_app_slot" "pre_live" {
 
     application_stack {
       docker_registry_url = "https://${azurerm_container_registry.registry.login_server}"
+      docker_image_name   = ""
     }
 
     dynamic "ip_restriction" {
