@@ -167,9 +167,10 @@ resource "azurerm_linux_web_app" "api" {
     type = "SystemAssigned"
   }
 
-  #   below tags are managed by CDC
   lifecycle {
     ignore_changes = [
+      site_config.application_stack.docker_image_name,
+      # below tags are managed by CDC
       tags["business_steward"],
       tags["center"],
       tags["environment"],
@@ -241,6 +242,12 @@ resource "azurerm_linux_web_app_slot" "pre_live" {
 
   identity {
     type = "SystemAssigned"
+  }
+
+  lifecycle {
+    ignore_changes = [
+      site_config.application_stack.docker_image_name,
+    ]
   }
 }
 
