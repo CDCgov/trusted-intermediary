@@ -9,7 +9,6 @@ resource "azurerm_storage_account" "storage" {
   min_tls_version                   = "TLS1_2"
   infrastructure_encryption_enabled = true
 
-
   lifecycle {
     ignore_changes = [
       customer_managed_key,
