@@ -13,9 +13,10 @@ resource "azurerm_storage_account" "docs" {
     index_document = "index.html"
   }
 
-  #   below tags are managed by CDC
   lifecycle {
     ignore_changes = [
+      customer_managed_key,
+      # below tags are managed by CDC
       tags["business_steward"],
       tags["center"],
       tags["environment"],
@@ -28,7 +29,6 @@ resource "azurerm_storage_account" "docs" {
       tags["system"],
       tags["technical_steward"],
       tags["zone"],
-      customer_managed_key,
     ]
   }
 
