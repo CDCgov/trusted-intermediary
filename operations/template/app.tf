@@ -169,7 +169,7 @@ resource "azurerm_linux_web_app" "api" {
 
   lifecycle {
     ignore_changes = [
-      site_config[0].application_stack.docker_image_name,
+      site_config[0].application_stack[0].docker_image_name,
       # below tags are managed by CDC
       tags["business_steward"],
       tags["center"],
@@ -239,7 +239,7 @@ resource "azurerm_linux_web_app_slot" "pre_live" {
 
   lifecycle {
     ignore_changes = [
-      site_config[0].application_stack.docker_image_name,
+      site_config[0].application_stack[0].docker_image_name,
       # Ignore changes to tags because the CDC sets these automagically
       tags,
     ]
