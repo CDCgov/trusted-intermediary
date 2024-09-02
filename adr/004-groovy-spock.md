@@ -21,7 +21,24 @@ Spock is a testing framework similar to [JUnit](https://junit.org/junit5/).  Som
 
 Spock requires we use Groovy, another JVM-based language.
 
-### Related Issues
+## Impact
+
+### Positive
+
+- expressive and readable tests
+- supports data-driven testing which is useful for testing FHIR resources across a variety of scenarios with different data sets
+- integrates well with java
+
+### Negative
+
+- limited IDE support
+
+### Risks
+
+- tests can run slow
+- dependency management difficulties
+
+## Related Issues
 
 - #1
 - #13
