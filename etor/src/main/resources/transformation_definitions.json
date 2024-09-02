@@ -181,7 +181,8 @@
           "name": "UpdateUniversalServiceIdentifier",
           "args": {
             "checkValue": "54089-8",
-            "codingSystem": "CDPHGSPEAP"
+            "codingSystem": "CDPHGSPEAP",
+            "alternateId": ""
           }
         }
       ]
