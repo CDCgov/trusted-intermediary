@@ -12,7 +12,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
     def fhirResource
     def args = Map.of(
     "checkValue", "54089-8",
-    "codingSystem", "LN",
+    "codingSystem", "CDPHGSPEAP",
     "alternateId", "CDPHGSPEAP"
     )
 
@@ -102,7 +102,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
         then:
         transformedObr4_1 == obr4_1
-        transformedObr4_3 == "LN"
+        transformedObr4_3 == "CDPHGSPEAP"
         transformedObr4_4 == "CDPHGSPEAP"
     }
 
@@ -116,7 +116,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
         expect:
         obr4_1 == "54089-8"
-        obr4_3 == "LN"
+        obr4_3 == "CDPHGSPEAP"
         obr4_4 == "CDPHGSPEAP"
 
         when:
@@ -156,7 +156,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
         then:
         transformedObr4_1 == obr4_1
-        transformedObr4_3 == "LN"
+        transformedObr4_3 == "CDPHGSPEAP"
         transformedObr4_4 == "CDPHGSPEAP"
     }
 
