@@ -25,18 +25,18 @@ Spock requires we use Groovy, another JVM-based language.
 
 ### Positive
 
-- expressive and readable tests
-- supports data-driven testing which is useful for testing FHIR resources across a variety of scenarios with different data sets
-- integrates well with java
+- Expressive and readable tests
+- Supports data-driven testing which is useful for testing FHIR resources across a variety of scenarios with different data sets
+- Integrates well with Java
 
 ### Negative
 
-- limited IDE support
+- Limited IDE support
 
 ### Risks
 
-- tests can run slow
-- dependency management difficulties
+- Tests can run slow
+- Dependency management difficulties
 
 ## Related Issues
 

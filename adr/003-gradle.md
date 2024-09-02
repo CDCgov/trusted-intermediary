@@ -22,19 +22,19 @@ Accepted.
 
 ### Positive
 
-- advanced dependency management capabilities help streamline the integration of FHIR libraries, such as HAPI FHIR, and other required dependencies.
-- highly customizable build scripts allow for fine-tuned configuration
-- reduced build times
-- integrates well with continuous integration and continuous deployment (CI/CD) pipelines, enabling automated testing
+- Advanced dependency management capabilities help streamline the integration of FHIR libraries, such as HAPI FHIR, and other required dependencies.
+- Highly customizable build scripts allow for fine-tuned configuration
+- Reduced build times
+- Integrates well with continuous integration and continuous deployment (CI/CD) pipelines, enabling automated testing
 
 ### Negative
 
-- flexibility can lead to complex and verbose build scripts; Managing these scripts can become cumbersome
-- custom configurations may not be fully compatible with certain versions of Java or FHIR libraries
+- Flexibility can lead to complex and verbose build scripts; Managing these scripts can become cumbersome
+- Custom configurations may not be fully compatible with certain versions of Java or FHIR libraries
 
 ### Risks
 
-- possible slow build times due to scripts and project size
+- Possible slow build times due to scripts and project size
 
 ## Related Issues
 
