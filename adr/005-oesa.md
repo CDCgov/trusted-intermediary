@@ -22,7 +22,27 @@ There are a couple main concepts that we strive to maintain while also being pra
    less important code depending on more important code.  For example, when business logic needs to call the
    database.
 
-### Related Issues
+## Impact
+
+### Positive
+
+- More flexible architecture
+- Risk mitigation through delayed decision-making
+- Minimizes large-scale changes and overhauls
+- Better maintainability
+
+### Negative
+
+- Requires more experience to implement successfully.
+- Increased initial development time
+- Requires much more forethought prior to implementation
+
+### Risks
+
+- Potential to over-engineer by keeping too many options open
+- Deferred decision-making can lead to technical debt
+
+## Related Issues
 
 - #1
 - #13
