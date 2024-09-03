@@ -26,7 +26,7 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         transformClass = new CopyOrcOrderProviderToObrOrderProvider()
     }
 
-    def "when both practitioner resources populated"() {
+    def "when both practitioner resources are populated ORC.12 overwrites OBR.16"() {
         given:
         final String EXPECTED_NPI = "1790743185"
         final String EXPECTED_FIRST_NAME = "EUSTRATIA"
@@ -50,7 +50,7 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         evaluateObr16Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
     }
 
-    def "when ORC-12 extension populated and OBR-16 extension not populated"() {
+    def "when ORC-12 extension populated and OBR-16 extension not populated, ORC.12 is copied over"() {
         given:
         final String EXPECTED_NPI = "1790743185"
         final String EXPECTED_FIRST_NAME = "EUSTRATIA"
@@ -80,7 +80,7 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         evaluateObr16Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
     }
 
-    def "when ORC-12 extension not populated and OBR-16 extension is populated"() {
+    def "when ORC-12 extension not populated and OBR-16 extension is populated, there is no change"() {
         given:
         final String EXPECTED_NPI = null
         final String EXPECTED_FIRST_NAME = "EUSTRATIA"
@@ -104,7 +104,7 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         evaluateObr16Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
     }
 
-    def "when neither is populated"() {
+    def "when neither is populated, there is no change"() {
         given:
         final String FHIR_ORU_PATH = "../CA/019_CA_ORU_R01_CDPH_empty_orc12_obr16_UCSD2024-07-11-16-02-17-749_1_hl7_translation.fhir"
 
