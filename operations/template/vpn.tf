@@ -4,7 +4,7 @@ resource "azurerm_public_ip" "vpn" {
   resource_group_name = data.azurerm_resource_group.group.name
 
   allocation_method = "Dynamic"
-
+  sku = "Basic"
   #   below tags are managed by CDC
   lifecycle {
     ignore_changes = [
