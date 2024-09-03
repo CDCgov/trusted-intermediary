@@ -35,7 +35,7 @@
     ]
   }
 
-    depends_on = [azurerm_key_vault_access_policy.allow_container_registry_wrapping] // Wait for keyvault access policy to be in place before creating
+  depends_on = [azurerm_user_assigned_identity.key_vault_identity]
 }
 
 resource "azurerm_user_assigned_identity" "key_vault_identity" {
@@ -61,6 +61,7 @@ resource "azurerm_user_assigned_identity" "key_vault_identity" {
       tags["zone"]
     ]
   }
+  depends_on = [azurerm_key_vault_access_policy.allow_container_registry_wrapping] // Wait for keyvault access policy to be in place before creating
 }
 
 resource "azurerm_role_assignment" "allow_app_to_pull_from_registry" {
