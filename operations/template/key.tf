@@ -50,8 +50,6 @@ resource "azurerm_key_vault_access_policy" "allow_github_deployer" {
     "Update",
     "GetRotationPolicy",
     "SetRotationPolicy",
-    "UnwrapKey",
-    "WrapKey",
   ]
 }
 
