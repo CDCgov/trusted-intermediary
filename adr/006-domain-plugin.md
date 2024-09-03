@@ -4,7 +4,7 @@ Date: 2022-10-24
 
 ## Decision
 
-A plugin paradigm will be used for the different business domains of the trusted intermediary.  This improves
+A plugin paradigm (plugin-based architecture) will be used for the different business domains of the trusted intermediary.  This improves
 modularity, separates concerns, and allows for flexibility in the future if it makes sense to extract this domain
 into a separate JAR, Gradle project, or even repository.
 
@@ -20,6 +20,20 @@ larger trusted intermediary application.  This also allows the domain to develop
 trusted intermediary operates.  E.g. Is the trusted intermediary in a Jetty Java container hosted on a VM or is it
 hosted in Azure Functions?
 
-### Related Issues
+## Impact
+
+### Positive
+
+-
+
+### Negative
+
+-
+
+### Risks
+
+-
+
+## Related Issues
 
 - #13
