@@ -1,5 +1,5 @@
 # Create the container registry
-resource "azurerm_container_registry" "registry" {
+  resource "azurerm_container_registry" "registry" {
   name                = "cdcti${var.environment}containerregistry"
   resource_group_name = data.azurerm_resource_group.group.name
   location            = data.azurerm_resource_group.group.location
@@ -35,7 +35,7 @@ resource "azurerm_container_registry" "registry" {
     ]
   }
 
-  depends_on = [azurerm_user_assigned_identity.key_vault_identity]
+    depends_on = [azurerm_key_vault_access_policy.allow_container_registry_wrapping] // Wait for keyvault access policy to be in place before creating
 }
 
 resource "azurerm_user_assigned_identity" "key_vault_identity" {
@@ -61,7 +61,6 @@ resource "azurerm_user_assigned_identity" "key_vault_identity" {
       tags["zone"]
     ]
   }
-  depends_on = [azurerm_key_vault_access_policy.allow_container_registry_wrapping] // Wait for keyvault access policy to be in place before creating
 }
 
 resource "azurerm_role_assignment" "allow_app_to_pull_from_registry" {
