@@ -13,9 +13,10 @@ resource "azurerm_storage_account" "docs" {
     index_document = "index.html"
   }
 
-  #   below tags are managed by CDC
   lifecycle {
     ignore_changes = [
+      customer_managed_key,
+      # below tags are managed by CDC
       tags["business_steward"],
       tags["center"],
       tags["environment"],
@@ -27,7 +28,22 @@ resource "azurerm_storage_account" "docs" {
       tags["support_group"],
       tags["system"],
       tags["technical_steward"],
-      tags["zone"]
+      tags["zone"],
     ]
   }
+
+  identity {
+    type = "SystemAssigned"
+  }
+}
+
+resource "azurerm_storage_account_customer_managed_key" "docs_storage_account_customer_key" {
+  storage_account_id = azurerm_storage_account.docs.id
+  key_vault_id       = azurerm_key_vault.key_storage.id
+  key_name           = azurerm_key_vault_key.customer_managed_key.name
+
+  depends_on = [
+    azurerm_key_vault_access_policy.allow_github_deployer,
+    azurerm_key_vault_access_policy.allow_docs_storage_account_wrapping
+  ] //wait for the permission that allows our deployer to write the secret
 }
