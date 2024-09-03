@@ -13,7 +13,6 @@
   }
 
   encryption {
-    enabled            = true
     key_vault_key_id   = azurerm_key_vault_key.customer_managed_key.id
     identity_client_id = azurerm_user_assigned_identity.key_vault_identity.client_id
   }
@@ -35,6 +34,8 @@
       tags["zone"]
     ]
   }
+
+    depends_on = [azurerm_key_vault_access_policy.allow_container_registry_wrapping] // Wait for keyvault access policy to be in place before creating
 }
 
 resource "azurerm_user_assigned_identity" "key_vault_identity" {
