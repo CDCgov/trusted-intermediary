@@ -36,12 +36,10 @@ jobs:
         uses: azure/cli@v2
         with:
           inlineScript: |
-            az storage blob upload \
-              --container-name automated \
-              --file ./examples/Test/Message/msh-12_has_value_2_3.hl7 \
-              --name initial/msh-12_has_value_2_3.hl7 \
-              --account-name cdctiautomateddev \
-              --account-key ${{ secrets.AZURE_STORAGE_KEY }}
+            az storage blob sync \
+              --container automated \
+              --source ./examples/Test/Message/ \
+              --account-name cdctiautomateddev
 
       - name: Write private key to file
         run: |
