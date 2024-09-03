@@ -38,7 +38,7 @@ jobs:
           inlineScript: |
             az storage blob sync \
               --container automated \
-              --source ./examples/Test/Message/ \
+              --source $(pwd)/examples/Test/Message/ \
               --account-name cdctiautomateddev
 
       - name: Write private key to file
