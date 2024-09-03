@@ -137,7 +137,7 @@ resource "azurerm_linux_web_app" "api" {
     }
   }
 
-  # New settings may also need to be added to the pre-live slot's app_settings
+  # New settings here should also be added to the pre-live slot's app_settings
   app_settings = {
     DOCKER_REGISTRY_SERVER_URL    = "https://${azurerm_container_registry.registry.login_server}"
     ENV                           = var.environment
