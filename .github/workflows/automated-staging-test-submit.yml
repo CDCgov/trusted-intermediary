@@ -1,4 +1,4 @@
-name: Automated Staging Test
+name: Automated Staging Test - Submit Messages
 
 on:
   schedule:
