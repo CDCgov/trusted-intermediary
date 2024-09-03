@@ -9,9 +9,6 @@ on:
 jobs:
   send_files:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
 
     steps:
       - name: Check out the repository
@@ -24,22 +21,6 @@ jobs:
         run: |
             curl --silent --location https://github.com/mike-engel/jwt-cli/releases/latest/download/jwt-linux.tar.gz | tar xvz -C /usr/local/bin/
             sudo chmod +x /usr/local/bin/jwt
-
-      - name: Log in to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CDC_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_CDC_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_CDC_DMZ_C1_SUBSCRIPTION_ID }}
-
-      - name: Upload file to Azure Blob Storage
-        uses: azure/cli@v2
-        with:
-          inlineScript: |
-            az storage blob sync \
-              --container automated \
-              --source $(pwd)/examples/Test/Message/ \
-              --account-name cdctiautomateddev
 
       - name: Write private key to file
         run: |
