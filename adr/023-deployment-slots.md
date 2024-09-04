@@ -14,6 +14,12 @@ Because TI is driven by web traffic from ReportStream, we can receive http calls
 If TI fails to respond, ReportStream will have to try sending the data again later, causing delays.
 By implementing zero-downtime deploys, our service can remain available to any incoming calls.
 
+Even though there are some significant downsides to Deployment Slots, they're Azure's recommended
+approach to zero-downtime deploys (ZDD), and they're lower effort and lower risk than the alternatives.
+Other options to achieve ZDD are Kubernetes (significantly more complexity and effort), creating
+our own custom deploy system (significantly more complexity, effort, and risk), or switching to
+a cloud service provider that makes this easier, like AWS (not currently in scope as an option).
+
 ## Impact
 ### Positive
 - **Zero-downtime deploys**: Zero-downtime deploys keep us from dropping incoming calls during deployment.
