@@ -116,11 +116,6 @@ resource "azurerm_linux_web_app" "api" {
 
     container_registry_use_managed_identity = true
 
-    application_stack {
-      docker_registry_url = "https://${azurerm_container_registry.registry.login_server}"
-      docker_image_name   = "ignore_because_specified_later_in_deployment"
-    }
-
     dynamic "ip_restriction" {
       for_each = local.cdc_domain_environment ? [1] : []
 
@@ -147,6 +142,7 @@ resource "azurerm_linux_web_app" "api" {
   #   When adding new settings that are needed for the live app but shouldn't be used in the pre-live
   #   slot, add them to `sticky_settings` as well as `app_settings` for the main app resource
   app_settings = {
+    DOCKER_REGISTRY_SERVER_URL    = "https://${azurerm_container_registry.registry.login_server}"
     ENV                           = var.environment
     REPORT_STREAM_URL_PREFIX      = "https://${local.rs_domain_prefix}prime.cdc.gov"
     KEY_VAULT_NAME                = azurerm_key_vault.key_storage.name
@@ -169,10 +165,9 @@ resource "azurerm_linux_web_app" "api" {
     type = "SystemAssigned"
   }
 
+  #   below tags are managed by CDC
   lifecycle {
     ignore_changes = [
-      site_config[0].application_stack[0].docker_image_name,
-      # below tags are managed by CDC
       tags["business_steward"],
       tags["center"],
       tags["environment"],
@@ -193,6 +188,13 @@ resource "azurerm_linux_web_app_slot" "pre_live" {
   name           = "pre-live"
   app_service_id = azurerm_linux_web_app.api.id
 
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to tags because the CDC sets these automagically
+      tags,
+    ]
+  }
+
   https_only = true
 
   virtual_network_subnet_id = local.cdc_domain_environment ? azurerm_subnet.app.id : null
@@ -202,11 +204,6 @@ resource "azurerm_linux_web_app_slot" "pre_live" {
     health_check_eviction_time_in_min = 5
 
     scm_use_main_ip_restriction = local.cdc_domain_environment ? true : null
-
-    application_stack {
-      docker_registry_url = "https://${azurerm_container_registry.registry.login_server}"
-      docker_image_name   = "ignore_because_specified_later_in_deployment"
-    }
 
     dynamic "ip_restriction" {
       for_each = local.cdc_domain_environment ? [1] : []
@@ -232,19 +229,13 @@ resource "azurerm_linux_web_app_slot" "pre_live" {
   }
 
   app_settings = {
+    DOCKER_REGISTRY_SERVER_URL = "https://${azurerm_container_registry.registry.login_server}"
+
     ENV = var.environment
   }
 
   identity {
     type = "SystemAssigned"
-  }
-
-  lifecycle {
-    ignore_changes = [
-      site_config[0].application_stack[0].docker_image_name,
-      # Ignore changes to tags because the CDC sets these automagically
-      tags,
-    ]
   }
 }
 
