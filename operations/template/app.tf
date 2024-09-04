@@ -137,8 +137,7 @@ resource "azurerm_linux_web_app" "api" {
     }
   }
 
-  #   When adding new settings that are needed for the live app but shouldn't be used in the pre-live
-  #   slot, add them to `sticky_settings` as well as `app_settings` for the main app resource
+  # New settings here should also be added to the pre-live slot's app_settings
   app_settings = {
     DOCKER_REGISTRY_SERVER_URL    = "https://${azurerm_container_registry.registry.login_server}"
     ENV                           = var.environment
@@ -152,11 +151,6 @@ resource "azurerm_linux_web_app" "api" {
     DB_USER                       = "cdcti-${var.environment}-api"
     DB_SSL                        = "require"
     DB_MAX_LIFETIME               = "3480000" # 58 minutes
-  }
-
-  sticky_settings {
-    app_setting_names = ["REPORT_STREAM_URL_PREFIX", "KEY_VAULT_NAME", "STORAGE_ACCOUNT_BLOB_ENDPOINT",
-    "METADATA_CONTAINER_NAME", "DB_URL", "DB_PORT", "DB_NAME", "DB_USER", "DB_SSL", "DB_MAX_LIFETIME"]
   }
 
   identity {
@@ -227,9 +221,18 @@ resource "azurerm_linux_web_app_slot" "pre_live" {
   }
 
   app_settings = {
-    DOCKER_REGISTRY_SERVER_URL = "https://${azurerm_container_registry.registry.login_server}"
-
-    ENV = var.environment
+    DOCKER_REGISTRY_SERVER_URL    = "https://${azurerm_container_registry.registry.login_server}"
+    ENV                           = var.environment
+    REPORT_STREAM_URL_PREFIX      = "https://${local.rs_domain_prefix}prime.cdc.gov"
+    KEY_VAULT_NAME                = azurerm_key_vault.key_storage.name
+    STORAGE_ACCOUNT_BLOB_ENDPOINT = azurerm_storage_account.storage.primary_blob_endpoint
+    METADATA_CONTAINER_NAME       = azurerm_storage_container.metadata.name
+    DB_URL                        = azurerm_postgresql_flexible_server.database.fqdn
+    DB_PORT                       = "5432"
+    DB_NAME                       = "postgres"
+    DB_USER                       = "cdcti-${var.environment}-api"
+    DB_SSL                        = "require"
+    DB_MAX_LIFETIME               = "3480000" # 58 minutes
   }
 
   identity {
