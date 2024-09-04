@@ -92,16 +92,16 @@ resource "azurerm_storage_account" "automated_storage" {
   }
 }
 
-resource "azurerm_storage_account_customer_managed_key" "automated_storage_storage_account_customer_key" {
-  storage_account_id = azurerm_storage_account.automated_storage.id
-  key_vault_id       = azurerm_key_vault.key_storage.id
-  key_name           = azurerm_key_vault_key.customer_managed_key.name
+# resource "azurerm_storage_account_customer_managed_key" "automated_storage_storage_account_customer_key" {
+#   storage_account_id = azurerm_storage_account.automated_storage.id
+#   key_vault_id       = azurerm_key_vault.key_storage.id
+#   key_name           = azurerm_key_vault_key.customer_managed_key.name
 
-  depends_on = [
-    azurerm_key_vault_access_policy.allow_github_deployer,
-    azurerm_key_vault_access_policy.allow_automated_storage_storage_account_wrapping
-  ] //wait for the permission that allows our deployer to write the secret
-}
+#   depends_on = [
+#     azurerm_key_vault_access_policy.allow_github_deployer,
+#     azurerm_key_vault_access_policy.allow_automated_storage_storage_account_wrapping
+#   ] //wait for the permission that allows our deployer to write the secret
+# }
 
 resource "azurerm_storage_container" "automated_container" {
   name                  = "automated"
