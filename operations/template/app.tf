@@ -34,6 +34,8 @@ resource "azurerm_container_registry" "registry" {
       tags["zone"]
     ]
   }
+
+  depends_on = [azurerm_key_vault_access_policy.allow_container_registry_wrapping] // Wait for keyvault access policy to be in place before creating
 }
 
 resource "azurerm_user_assigned_identity" "key_vault_identity" {
@@ -114,6 +116,11 @@ resource "azurerm_linux_web_app" "api" {
 
     container_registry_use_managed_identity = true
 
+    application_stack {
+      docker_registry_url = "https://${azurerm_container_registry.registry.login_server}"
+      docker_image_name   = "ignore_because_specified_later_in_deployment"
+    }
+
     dynamic "ip_restriction" {
       for_each = local.cdc_domain_environment ? [1] : []
 
@@ -139,7 +146,6 @@ resource "azurerm_linux_web_app" "api" {
 
   # New settings here should also be added to the pre-live slot's app_settings
   app_settings = {
-    DOCKER_REGISTRY_SERVER_URL    = "https://${azurerm_container_registry.registry.login_server}"
     ENV                           = var.environment
     REPORT_STREAM_URL_PREFIX      = "https://${local.rs_domain_prefix}prime.cdc.gov"
     KEY_VAULT_NAME                = azurerm_key_vault.key_storage.name
@@ -157,9 +163,10 @@ resource "azurerm_linux_web_app" "api" {
     type = "SystemAssigned"
   }
 
-  #   below tags are managed by CDC
   lifecycle {
     ignore_changes = [
+      site_config[0].application_stack[0].docker_image_name,
+      # below tags are managed by CDC
       tags["business_steward"],
       tags["center"],
       tags["environment"],
@@ -180,13 +187,6 @@ resource "azurerm_linux_web_app_slot" "pre_live" {
   name           = "pre-live"
   app_service_id = azurerm_linux_web_app.api.id
 
-  lifecycle {
-    ignore_changes = [
-      # Ignore changes to tags because the CDC sets these automagically
-      tags,
-    ]
-  }
-
   https_only = true
 
   virtual_network_subnet_id = local.cdc_domain_environment ? azurerm_subnet.app.id : null
@@ -196,6 +196,11 @@ resource "azurerm_linux_web_app_slot" "pre_live" {
     health_check_eviction_time_in_min = 5
 
     scm_use_main_ip_restriction = local.cdc_domain_environment ? true : null
+
+    application_stack {
+      docker_registry_url = "https://${azurerm_container_registry.registry.login_server}"
+      docker_image_name   = "ignore_because_specified_later_in_deployment"
+    }
 
     dynamic "ip_restriction" {
       for_each = local.cdc_domain_environment ? [1] : []
@@ -221,7 +226,6 @@ resource "azurerm_linux_web_app_slot" "pre_live" {
   }
 
   app_settings = {
-    DOCKER_REGISTRY_SERVER_URL    = "https://${azurerm_container_registry.registry.login_server}"
     ENV                           = var.environment
     REPORT_STREAM_URL_PREFIX      = "https://${local.rs_domain_prefix}prime.cdc.gov"
     KEY_VAULT_NAME                = azurerm_key_vault.key_storage.name
@@ -237,6 +241,14 @@ resource "azurerm_linux_web_app_slot" "pre_live" {
 
   identity {
     type = "SystemAssigned"
+  }
+
+  lifecycle {
+    ignore_changes = [
+      site_config[0].application_stack[0].docker_image_name,
+      # Ignore changes to tags because the CDC sets these automagically
+      tags,
+    ]
   }
 }
 
