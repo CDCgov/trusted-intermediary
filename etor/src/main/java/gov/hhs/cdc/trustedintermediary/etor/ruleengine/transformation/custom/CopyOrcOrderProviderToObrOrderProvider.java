@@ -28,20 +28,16 @@ public class CopyOrcOrderProviderToObrOrderProvider implements CustomFhirTransfo
             return;
         }
 
-        // check if the OBR 16 extension exists
-        var obrExtension = serviceRequest.getExtensionByUrl(HapiHelper.EXTENSION_OBR_URL);
-        if (obrExtension == null) {
-            obrExtension = new Extension(HapiHelper.EXTENSION_OBR_URL);
-            serviceRequest.addExtension(obrExtension);
-        }
+        // Extract or create the OBR-16 extension from the ServiceRequest
+        Extension obrExtension =
+                HapiHelper.ensureExtensionExists(serviceRequest, HapiHelper.EXTENSION_OBR_URL);
 
-        var obr16Extension =
-                obrExtension.getExtensionByUrl(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString());
-        if (obr16Extension == null) {
-            obr16Extension = new Extension(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString());
-            obrExtension.addExtension(obr16Extension);
-        }
+        // Extract or create the OBR-16 data type extension
+        Extension obr16Extension =
+                HapiHelper.ensureSubExtensionExists(
+                        obrExtension, HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString());
 
-        obr16Extension.setValue(practitionerRole.getPractitioner());
+        // Set the ORC-12 Practitioner in the OBR-16 extension
+        HapiHelper.setOBR16WithPractitioner(obr16Extension, practitionerRole);
     }
 }
