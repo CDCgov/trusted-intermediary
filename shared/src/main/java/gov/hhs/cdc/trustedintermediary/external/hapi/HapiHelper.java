@@ -480,6 +480,47 @@ public class HapiHelper {
         return getCWE1Value(cc.getCoding().get(0));
     }
 
+    // OBR16 - Ordering Provider
+
+    // OBR16 -
+    public static void setOBR16WithPractitioner(
+            Extension obr16Extension, PractitionerRole practitionerRole) {
+        if (practitionerRole == null) {
+            return;
+        }
+        obr16Extension.setValue(practitionerRole.getPractitioner());
+    }
+
+    /**
+     * Ensures that the extension exists for a given serviceRequest. If the extension does not
+     * exist, it will create it.
+     */
+    public static Extension ensureExtensionExists(
+            ServiceRequest serviceRequest, String extensionUrl) {
+        Extension extension = serviceRequest.getExtensionByUrl(extensionUrl);
+        if (extension == null) {
+            // If the extension does not exist, create it and add it to the ServiceRequest
+            extension = new Extension(extensionUrl);
+            serviceRequest.addExtension(extension);
+        }
+
+        return extension;
+    }
+
+    /**
+     * Ensures that a sub-extension exists within a parent extension. If the sub-extension does not
+     * exist, it will create it.
+     */
+    public static Extension ensureSubExtensionExists(
+            Extension parentExtension, String subExtensionUrl) {
+        Extension subExtension = parentExtension.getExtensionByUrl(subExtensionUrl);
+        if (subExtension == null) {
+            subExtension = new Extension(subExtensionUrl);
+            parentExtension.addExtension(subExtension);
+        }
+        return subExtension;
+    }
+
     // HD - Hierarchic Designator
     public static Identifier getHD1Identifier(List<Identifier> identifiers) {
         List<Identifier> hd1Identifiers =
