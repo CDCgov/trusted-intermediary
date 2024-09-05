@@ -657,6 +657,62 @@ class HapiHelperTest extends Specification {
         HapiHelper.getOBR4_1Value(sr) == null
     }
 
+    def "ensureExtensionExists returns extension if it exists"() {
+        given:
+        def serviceRequest = new ServiceRequest()
+        final String extensionUrl = "someExtensionUrl"
+        def expectedExtension = serviceRequest.addExtension().setUrl(extensionUrl)
+
+        when:
+        def actualExtension = HapiHelper.ensureExtensionExists(serviceRequest, extensionUrl)
+
+        then:
+        actualExtension == expectedExtension
+    }
+
+    def "ensureExtensionExists returns a newly created extension if it does not exist"() {
+        given:
+        def serviceRequest = new ServiceRequest()
+        final String extensionUrl = "someExtensionUrl"
+
+        expect:
+        serviceRequest.getExtensionByUrl(extensionUrl) == null
+
+        when:
+        def actualExtension = HapiHelper.ensureExtensionExists(serviceRequest, extensionUrl)
+
+        then:
+        actualExtension == serviceRequest.getExtensionByUrl(extensionUrl)
+    }
+
+    def "ensureSubExtensionExists returns extension if it exists"() {
+        given:
+        def parentExtension = new Extension()
+        final String subExtensionUrl = "someSubExtensionUrl"
+        def expectedExtension = parentExtension.addExtension().setUrl(subExtensionUrl)
+
+        when:
+        def actualExtension = HapiHelper.ensureSubExtensionExists(parentExtension, subExtensionUrl)
+
+        then:
+        actualExtension == expectedExtension
+    }
+
+    def "ensureSubExtensionExists returns a newly created extension if it does not exist"() {
+        given:
+        def parentExtension = new Extension()
+        final String subExtensionUrl = "someSubExtensionUrl"
+
+        expect:
+        parentExtension.getExtensionByUrl(subExtensionUrl) == null
+
+        when:
+        def actualExtension = HapiHelper.ensureSubExtensionExists(parentExtension, subExtensionUrl)
+
+        then:
+        actualExtension == parentExtension.getExtensionByUrl(subExtensionUrl)
+    }
+
     // HD - Hierarchic Designator
     def "getHD1Identifier returns the correct namespaceIdentifier"() {
         given:
