@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+    id 'groovy'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+dependencies {
+    testImplementation 'org.apache.groovy:groovy:4.0.22'
+    testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
+}
+
+test {
+    useJUnitPlatform()
+}
