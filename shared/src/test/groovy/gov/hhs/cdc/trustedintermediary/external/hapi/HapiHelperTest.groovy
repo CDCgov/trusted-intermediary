@@ -7,6 +7,8 @@ import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Practitioner
+import org.hl7.fhir.r4.model.PractitionerRole
 import org.hl7.fhir.r4.model.Provenance
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ResourceType
@@ -813,5 +815,21 @@ class HapiHelperTest extends Specification {
 
         then:
         identifiers.first() == identifier
+    }
+
+    def "setOBR16WithPractitioner sets the expected value on an extension"() {
+        given:
+        def ext = new Extension()
+        def role = new PractitionerRole()
+        def practitioner = new Practitioner()
+        practitioner.setId("test123")
+        def ref = new Reference(practitioner.getId())
+        role.setPractitioner(ref)
+
+        when:
+        HapiHelper.setOBR16WithPractitioner(ext, role)
+
+        then:
+        ext.getValue().getReference() == "test123"
     }
 }
