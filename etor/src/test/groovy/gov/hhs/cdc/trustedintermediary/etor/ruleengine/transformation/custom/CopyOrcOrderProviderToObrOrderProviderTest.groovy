@@ -61,24 +61,21 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
 
     def "should return when practitioner role is null"() {
         given:
-        def serviceRequest = Mock(ServiceRequest)
-        def diagnosticReport = Mock(DiagnosticReport)
-        def bundle = Mock(Bundle)
-        def resource = Mock(FhirResource) {
-            getUnderlyingResource() >> bundle
-        }
+        final String FHIR_ORU_PATH = "../CA/007_CA_ORU_R01_CDPH_produced_UCSD2024-07-11-16-02-17-749_1_hl7_translation.fhir"
+        def bundle = createBundle(FHIR_ORU_PATH)
+        def serviceRequest = createServiceRequest(bundle)
+        def diagnosticReport = HapiHelper.getDiagnosticReport(bundle)
+
+        serviceRequest.setRequester(null)
 
         when:
-        HapiHelper.getDiagnosticReport(bundle) >> diagnosticReport
-        HapiHelper.getServiceRequest(diagnosticReport) >> serviceRequest
-        HapiHelper.getPractitionerRole(serviceRequest) >> null
-
-        transformClass.transform(resource, null)
+        transformClass.transform(new HapiFhirResource(bundle), null)
 
         then:
-        1 * HapiHelper.getServiceRequest(_)
-        1 * HapiHelper.getPractitionerRole(_)
-        1 * HapiHelper.ensureExtensionExists(_,_)
+        def diagnosticReportInBundle = bundle.getEntry().find { it.getResource() instanceof DiagnosticReport }
+        diagnosticReportInBundle != null  // DiagnosticReport should still exist
+        HapiHelper.getServiceRequest(diagnosticReport) != null // ServiceRequest should still exist
+        HapiHelper.getPractitionerRole(serviceRequest) == null
     }
 
     def "when both practitioner resources are populated ORC.12 overwrites OBR.16"() {
