@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
@@ -24,6 +25,21 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         TestApplicationContext.injectRegisteredImplementations()
 
         transformClass = new CopyOrcOrderProviderToObrOrderProvider()
+    }
+
+    def "should return when diagnostic report is null"() {
+        given:
+        def bundle = Mock(Bundle)
+        def resource = Mock(FhirResource) {
+            getUnderlyingResource() >> bundle
+        }
+
+        when:
+        HapiHelper.getDiagnosticReport(bundle) >> null
+        transformClass.transform(resource, null)
+
+        then:
+        0 * HapiHelper.getServiceRequest(_)
     }
 
     def "when both practitioner resources are populated ORC.12 overwrites OBR.16"() {
