@@ -61,6 +61,26 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         0 * HapiHelper.getPractitionerRole(_)
     }
 
+    def "should return when practitioner role is null"() {
+        given:
+        def serviceRequest = Mock(ServiceRequest)
+        def diagnosticReport = Mock(DiagnosticReport)
+        def bundle = Mock(Bundle)
+        def resource = Mock(FhirResource) {
+            getUnderlyingResource() >> bundle
+        }
+
+        when:
+        HapiHelper.getDiagnosticReport(bundle) >> diagnosticReport
+        HapiHelper.getServiceRequest(diagnosticReport) >> serviceRequest
+        HapiHelper.getPractitionerRole(serviceRequest) >> null
+
+        transformClass.transform(resource, null)
+
+        then:
+        0 * HapiHelper.ensureExtensionExists(_,_)
+    }
+
     def "when both practitioner resources are populated ORC.12 overwrites OBR.16"() {
         given:
         final String EXPECTED_NPI = "1790743185"
