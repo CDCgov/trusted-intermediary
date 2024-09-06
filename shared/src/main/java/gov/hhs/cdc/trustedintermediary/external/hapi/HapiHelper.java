@@ -79,7 +79,9 @@ public class HapiHelper {
      */
     public static <T extends Resource> Stream<T> resourcesInBundle(
             Bundle bundle, Class<T> resourceType) {
-        // null check?
+        if (bundle == null || bundle.getEntry() == null) {
+            return Stream.empty();
+        }
         return bundle.getEntry().stream()
                 .map(Bundle.BundleEntryComponent::getResource)
                 .filter(resource -> resource.getClass().equals(resourceType))
