@@ -7,6 +7,7 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.DiagnosticReport
 import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.ServiceRequest
 import spock.lang.Specification
@@ -40,6 +41,24 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
 
         then:
         0 * HapiHelper.getServiceRequest(_)
+    }
+
+    def "should return when service request is null"() {
+        given:
+        def diagnosticReport = Mock(DiagnosticReport)
+        def bundle = Mock(Bundle)
+        def resource = Mock(FhirResource) {
+            getUnderlyingResource() >> bundle
+        }
+
+        when:
+        HapiHelper.getDiagnosticReport(bundle) >> diagnosticReport
+        HapiHelper.getServiceRequest(diagnosticReport) >> null
+
+        transformClass.transform(resource, null)
+
+        then:
+        0 * HapiHelper.getPractitionerRole(_)
     }
 
     def "when both practitioner resources are populated ORC.12 overwrites OBR.16"() {
