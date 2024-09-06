@@ -30,34 +30,32 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
 
     def "should return when diagnostic report is null"() {
         given:
-        def bundle = Mock(Bundle)
-        def resource = Mock(FhirResource) {
-            getUnderlyingResource() >> bundle
-        }
+        def bundle = createBundle(null)
 
         when:
-        HapiHelper.getDiagnosticReport(bundle) >> null
-        transformClass.transform(resource, null)
+        transformClass.transform(new HapiFhirResource(bundle), null)
 
         then:
-        0 * HapiHelper.getServiceRequest(_)
+        def serviceRequest = bundle.getEntry().find { it.getResource() instanceof ServiceRequest }
+        serviceRequest == null
     }
 
     def "should return when service request is null"() {
         given:
-        def diagnosticReport = Mock(DiagnosticReport)
-        def bundle = Mock(Bundle)
-        def resource = Mock(FhirResource) {
-            getUnderlyingResource() >> bundle
-        }
+        final String FHIR_ORU_PATH = "../CA/007_CA_ORU_R01_CDPH_produced_UCSD2024-07-11-16-02-17-749_1_hl7_translation.fhir"
 
-        when:
-        HapiHelper.getDiagnosticReport(bundle) >> diagnosticReport
+        def bundle = createBundle(FHIR_ORU_PATH)
+        def serviceRequest = createServiceRequest(bundle)
+        def diagnosticReport = HapiHelper.getDiagnosticReport(bundle)
+        diagnosticReport.setBasedOn(null)
         HapiHelper.getServiceRequest(diagnosticReport) >> null
 
-        transformClass.transform(resource, null)
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), null)
 
         then:
+        1 * HapiHelper.getDiagnosticReport(_)
+        1 * HapiHelper.getServiceRequest(_)
         0 * HapiHelper.getPractitionerRole(_)
     }
 
@@ -78,7 +76,9 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         transformClass.transform(resource, null)
 
         then:
-        0 * HapiHelper.ensureExtensionExists(_,_)
+        1 * HapiHelper.getServiceRequest(_)
+        1 * HapiHelper.getPractitionerRole(_)
+        1 * HapiHelper.ensureExtensionExists(_,_)
     }
 
     def "when both practitioner resources are populated ORC.12 overwrites OBR.16"() {
@@ -179,6 +179,11 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
     }
 
     Bundle createBundle(String fhirOruPath) {
+        if (fhirOruPath == null) {
+            // Return an empty Bundle if the path is null
+            return new Bundle()
+        }
+
         def fhirResource = ExamplesHelper.getExampleFhirResource(fhirOruPath)
         return fhirResource.getUnderlyingResource() as Bundle
     }
