@@ -60,10 +60,7 @@ public class HapiHelper {
     public static final String EXTENSION_ALT_CODING = "alt-coding";
 
     public static final Coding OML_CODING =
-            new Coding(
-                    "http://terminology.hl7.org/CodeSystem/v2-0003",
-                    "O21",
-                    "OML - Laboratory order");
+            new Coding("http://terminology.hl7.org/CodeSystem/v2-0003", "O21", "OML^O21^OML_O21");
 
     public static final String EXTENSION_OBR_URL =
             "https://reportstream.cdc.gov/fhir/StructureDefinition/obr-observation-request";
