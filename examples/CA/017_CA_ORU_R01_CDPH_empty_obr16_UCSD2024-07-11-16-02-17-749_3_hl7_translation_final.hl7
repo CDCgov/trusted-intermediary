@@ -1,8 +1,8 @@
 MSH|^~\&|SISGDSP|CDPH|EPIC|R797|20240711034913||ORU^R01|243747623|T|2.5.1
 PID|1||80009197||NICUABG^TESTONE||20240607|M||2076-8^Native Hawaiian or Other Pacific Islander||||||||||||2186-5^Not Hispanic or Latino||N|1
 NK1|1|NICUABG|MTH^Mother
-ORC|RE|189609160^HospOrdNumber||7241234515^FormNumber||||||||1790743185^HUBBARD^EUSTRATIA^^^^^^^NPI|||||||||^^^^^^^^^R797|N 054TS ARALC, TS102 E^^SAN DIEGO^CA^99999-9999
-OBR|1|189609160^HospOrdNumber||54089-8^NB Screen Panel Patient AHIC^LN^CDPHGSPEAP|||202407111346|||||||||1790743185^HUBBARD^EUSTRATIA^^^^^^^NPI||||||20240711034913
+ORC|RE|189609160^HospOrdNumber||7241234515^FormNumber||||||||1790743185^HUBBARD^EUSTRATIA^^^^^^^^^^NPI|||||||||^^^^^^^^^R797|N 054TS ARALC, TS102 E^^SAN DIEGO^CA^99999-9999
+OBR|1|189609160^HospOrdNumber||54089-8^NB Screen Panel Patient AHIC^LN^CDPHGSPEAP|||202407111346|||||||||1790743185^HUBBARD^EUSTRATIA^^^^^^^^^^NPI||||||20240711034913|||F
 OBX|1|CE|57721-3^Reason for lab test in Dried blood spot^LN|1|LA12421-6^Initial screen^LN|||N|||F|||20240711034913
 OBX|2|CE|57718-9^Sample quality of Dried blood spot^LN|1|LA12432-3^Acceptable^LN|||N|||F|||20240711034913
 OBX|3|CE|57130-7^Newborn screening report - overall interpretation^LN|1|LA18944-1^Screen is out of range for at least one condition^LN|||N|||F|||20240711034913
@@ -43,7 +43,7 @@ OBX|37|TX|58093-6^Acylcarnitine newborn screening comment/discussion^LN|1|Negati
 OBX|38|NM|38481-8^Carnitine.free (C0)^LN|1|33|µmol/L|6.4-125|N|||F|||20240711034913
 OBX|39|NM|53235-8^Carnitine.free (C0)/Palmitoylcarnitine (C16)+Stearoylcarnitine (C18)^LN|1|37.5|{Ratio}|<70|N|||F|||20240711034913
 OBX|40|NM|50157-7^Acetylcarnitine (C2)^LN|1|20.38|µmol/L|10-80|N|||F|||20240711034913
-OBX|41|NM|75212-1^Malonylcarnitine (C3-DC)/Decanoylcarnitine (C10) [Molar ratio] in Dried blood spot^LN|1|0.62500|{Ratio}|<7.6|N|||F|||20240711034913
+OBX|41|NM|75212-1^Malonylcarnitine (C3-DC)/Decanoylcarnitine (C10) [Molar ratio] in Dried blood spot^LN|1|0.625|{Ratio}|<7.6|N|||F|||20240711034913
 OBX|42|NM|45211-0^Hexanoylcarnitine (C6)^LN|1|0.48|µmol/L|<0.95|N|||F|||20240711034913
 OBX|43|NM|53175-6^Octanoylcarnitine (C8)^LN|1|0.3|µmol/L|<0.45|N|||F|||20240711034913
 OBX|44|NM|53177-2^Octanoylcarnitine (C8)/Decanoylcarnitine (C10)^LN|1|0.5|{Ratio}||N|||F|||20240711034913
@@ -60,7 +60,7 @@ OBX|54|NM|50281-5^3-Hydroxytetradecanoylcarnitine (C14-OH)^LN|1|0.1|µmol/L|<0.2
 OBX|55|NM|53199-6^Palmitoylcarnitine (C16)^LN|1|5|µmol/L|<12|N|||F|||20240711034913
 OBX|56|NM|53198-8^Palmitoleylcarnitine (C16:1)^LN|1|0.7|µmol/L|<1.4|N|||F|||20240711034913
 OBX|57|NM|50125-4^3-Hydroxypalmitoylcarnitine (C16-OH)^LN|1|0.05|µmol/L|<0.1|N|||F|||20240711034913
-OBX|58|NM|53201-0^3-Hydroxypalmitoylcarnitine (C16-OH)/Palmitoylcarnitine (C16)^LN|1|0.01000|{Ratio}|<0.07|N|||F|||20240711034913
+OBX|58|NM|53201-0^3-Hydroxypalmitoylcarnitine (C16-OH)/Palmitoylcarnitine (C16)^LN|1|0.01|{Ratio}|<0.07|N|||F|||20240711034913
 OBX|59|NM|53241-6^Stearoylcarnitine (C18)^LN|1|2|µmol/L|<3.5|N|||F|||20240711034913
 OBX|60|NM|53202-8^Oleoylcarnitine (C18:1)^LN|1|3.5|µmol/L|<7|N|||F|||20240711034913
 OBX|61|NM|45217-7^Linoleoylcarnitine (C18:2)^LN|1|0.5|µmol/L||N|||F|||20240711034913
@@ -75,22 +75,22 @@ OBX|69|NM|53240-8^Isovalerylcarnitine+Methylbutyrylcarnitine (C5)/Propionylcarni
 OBX|70|NM|53170-7^Tiglylcarnitine (C5:1)^LN|1|0.3|µmol/L|<0.5|N|||F|||20240711034913
 OBX|71|NM|50106-4^3-Hydroxyisovalerylcarnitine (C5-OH)^LN|1|0.45|µmol/L|<1.15|N|||F|||20240711034913
 OBX|72|NM|67710-4^Glutarylcarnitine (C5-DC)+3-Hydroxyhexanoylcarnitine (C6-OH)^LN|1|0.3|µmol/L|<0.38|N|||F|||20240711034913
-OBX|73|NM|75216-2^Glutarylcarnitine (C5-DC)/Malonylcarnitine (C3-DC) [Molar ratio] in Dried blood spot^LN|1|1.50000|{Ratio}|>0.1|N|||F|||20240711034913
-OBX|74|NM|48633-2^Trypsinogen I.free^LN|1|31.00|ng/mL|<69|N|||F|||20240711034913
+OBX|73|NM|75216-2^Glutarylcarnitine (C5-DC)/Malonylcarnitine (C3-DC) [Molar ratio] in Dried blood spot^LN|1|1.5|{Ratio}|>0.1|N|||F|||20240711034913
+OBX|74|NM|48633-2^Trypsinogen I.free^LN|1|31.0|ng/mL|<69|N|||F|||20240711034913
 OBX|75|CE|46769-6^Cystic fibrosis newborn screen interpretation^LN|1|LA18592-8^In range^LN|||N|||F|||20240711034913
 OBX|76|TX|57707-2^Cystic fibrosis newborn screening comment/discussion^LN|1|Negative|||N|||F|||20240711034913
 OBX|77|NM|38473-5^17-Hydroxyprogesterone^LN|1|35|nmol/L|<85|N|||F|||20240711034913
 OBX|78|CE|46758-9^Congenital adrenal hyperplasia newborn screen interpretation^LN|1|LA18592-8^In range^LN|||N|||F|||20240711034913
 OBX|79|TX|57706-4^Congenital adrenal hyperplasia newborn screening comment-discussion^LN|1|Negative|||N|||F|||20240711034913
-OBX|80|NM|29575-8^Thyrotropin^LN|1|14.50|mIU/L|<29|N|||F|||20240711034913
+OBX|80|NM|29575-8^Thyrotropin^LN|1|14.5|mIU/L|<29|N|||F|||20240711034913
 OBX|81|CE|46762-1^Congenital hypothyroidism newborn screen interpretation^LN|1|LA18592-8^In range^LN|||N|||F|||20240711034913
 OBX|82|TX|57705-6^Congenital hypothyroidism newborn screening comment-discussion^LN|1|Negative|||N|||F|||20240711034913
-OBX|83|NM|42906-8^Galactose 1 phosphate uridyl transferase^LN|1|55.00|enzyme units|>50|N|||F|||20240711034913
+OBX|83|NM|42906-8^Galactose 1 phosphate uridyl transferase^LN|1|55.0|enzyme units|>50|N|||F|||20240711034913
 OBX|84|CE|46737-3^Galactosemias newborn screen interpretation^LN|1|LA18592-8^In range^LN|||N|||F|||20240711034913
 OBX|85|TX|57704-9^Galactosemias newborn screening comment-discussion^LN|1|Negative|||N|||F|||20240711034913
 OBX|86|TX|54104-5^Hemoglobin pattern^LN|1|FA||||||F|||20240711034913
 OBX|87|TX|57703-1^Hemoglobin disorders newborn screening comment/discussion^LN|1|Usual hemoglobin pattern. These results assume no transfusion prior to testing and do not rule out the possibility of a thalassemia trait or rare hemoglobin variants.||||||F|||20240711034913
-OBX|88|NM|75217-0^Biotinidase [Enzymatic activity/volume] in Dried blood spot^LN|1|8.00|ERU|>10|L|||F|||20240711034913
+OBX|88|NM|75217-0^Biotinidase [Enzymatic activity/volume] in Dried blood spot^LN|1|8.0|ERU|>10|L|||F|||20240711034913
 OBX|89|CE|46761-3^Biotinidase deficiency newborn screen interpretation^LN|1|LA18593-6^Out of range^LN|||A|||F|||20240711034913
 OBX|90|TX|57699-1^Biotinidase deficiency newborn screening comment-discussion^LN|1|Positive|||A|||F|||20240711034913
 OBX|91|NM|62320-7^T-cell receptor excision circle [#/volume] in Dried blood spot by Probe and target amplification method^LN|1|33|copies/µL|>18|N|||F|||20240711034913

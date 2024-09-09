@@ -14,6 +14,7 @@ import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.PractitionerRole;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ServiceRequest;
@@ -45,9 +46,11 @@ public class HapiHelper {
     public static final String EXTENSION_CX5_URL = "CX.5";
     public static final StringType EXTENSION_HD1_DATA_TYPE = new StringType("HD.1");
     public static final StringType EXTENSION_HD2_HD3_DATA_TYPE = new StringType("HD.2,HD.3");
+    public static final StringType EXTENSION_ORC12_DATA_TYPE = new StringType("ORC.12");
     public static final StringType EXTENSION_ORC2_DATA_TYPE = new StringType("ORC.2");
     public static final StringType EXTENSION_ORC4_DATA_TYPE = new StringType("ORC.4");
     public static final StringType EXTENSION_OBR2_DATA_TYPE = new StringType("OBR.2");
+    public static final StringType EXTENSION_OBR16_DATA_TYPE = new StringType("OBR.16");
 
     public static final String EXTENSION_CODING_SYSTEM =
             "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding-system";
@@ -76,6 +79,9 @@ public class HapiHelper {
      */
     public static <T extends Resource> Stream<T> resourcesInBundle(
             Bundle bundle, Class<T> resourceType) {
+        if (bundle == null || bundle.getEntry() == null) {
+            return Stream.empty();
+        }
         return bundle.getEntry().stream()
                 .map(Bundle.BundleEntryComponent::getResource)
                 .filter(resource -> resource.getClass().equals(resourceType))
@@ -300,6 +306,10 @@ public class HapiHelper {
         return (PractitionerRole) serviceRequest.getRequester().getResource();
     }
 
+    public static Practitioner getPractitioner(PractitionerRole practitionerRole) {
+        return (Practitioner) practitionerRole.getPractitioner().getResource();
+    }
+
     public static Organization getOrganization(PractitionerRole practitionerRole) {
         return (Organization) practitionerRole.getOrganization().getResource();
     }
@@ -471,6 +481,47 @@ public class HapiHelper {
             return null;
         }
         return getCWE1Value(cc.getCoding().get(0));
+    }
+
+    // OBR16 - Ordering Provider
+
+    // OBR16 -
+    public static void setOBR16WithPractitioner(
+            Extension obr16Extension, PractitionerRole practitionerRole) {
+        if (practitionerRole == null) {
+            return;
+        }
+        obr16Extension.setValue(practitionerRole.getPractitioner());
+    }
+
+    /**
+     * Ensures that the extension exists for a given serviceRequest. If the extension does not
+     * exist, it will create it.
+     */
+    public static Extension ensureExtensionExists(
+            ServiceRequest serviceRequest, String extensionUrl) {
+        Extension extension = serviceRequest.getExtensionByUrl(extensionUrl);
+        if (extension == null) {
+            // If the extension does not exist, create it and add it to the ServiceRequest
+            extension = new Extension(extensionUrl);
+            serviceRequest.addExtension(extension);
+        }
+
+        return extension;
+    }
+
+    /**
+     * Ensures that a sub-extension exists within a parent extension. If the sub-extension does not
+     * exist, it will create it.
+     */
+    public static Extension ensureSubExtensionExists(
+            Extension parentExtension, String subExtensionUrl) {
+        Extension subExtension = parentExtension.getExtensionByUrl(subExtensionUrl);
+        if (subExtension == null) {
+            subExtension = new Extension(subExtensionUrl);
+            parentExtension.addExtension(subExtension);
+        }
+        return subExtension;
     }
 
     // HD - Hierarchic Designator
