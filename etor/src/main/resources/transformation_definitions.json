@@ -186,6 +186,22 @@
           }
         }
       ]
+    },
+    {
+      "name": "ucsdOruCopyOrcOrderProviderToObrOrderProvider",
+      "description": "Copies the value from ORC12 and uses this value to replace the value in OBR16",
+      "message": "",
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.1').value in ('R797' | 'R508')",
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
+        "Bundle.entry.resource.ofType(ServiceRequest).code.coding.where(code = '54089-8').exists()"
+      ],
+      "rules": [
+        {
+          "name": "CopyOrcOrderProviderToObrOrderProvider",
+          "args": {}
+        }
+      ]
     }
   ]
 }

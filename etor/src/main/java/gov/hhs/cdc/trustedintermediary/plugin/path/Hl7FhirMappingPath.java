@@ -17,6 +17,14 @@ public enum Hl7FhirMappingPath {
             """
      Bundle.entry.resource.ofType(ServiceRequest).extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/obr-observation-request').extension.where(url = 'OBR.2').value
      """),
+    ORDERING_PROVIDER_ORC_12(
+            "ORC.12",
+            "Bundle.entry.resource.ofType(ServiceRequest).requester.resolve().practicioner.resolve().name"),
+    ORDERING_PROVIDER_OBR_16(
+            "OBR.16",
+            """
+    Bundle.entry.resource.ofType(ServiceRequest).extension.where(url='https://reportstream.cdc.gov/fhir/StructureDefinition/obr-observation-request’).extension.where(url='OBR.16').resolve().name
+    """),
     SENDING_FACILITY_NAMESPACE(
             "",
             """

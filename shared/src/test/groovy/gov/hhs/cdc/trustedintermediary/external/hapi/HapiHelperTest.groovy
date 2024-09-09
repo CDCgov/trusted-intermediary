@@ -7,6 +7,8 @@ import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Practitioner
+import org.hl7.fhir.r4.model.PractitionerRole
 import org.hl7.fhir.r4.model.Provenance
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ResourceType
@@ -657,6 +659,62 @@ class HapiHelperTest extends Specification {
         HapiHelper.getOBR4_1Value(sr) == null
     }
 
+    def "ensureExtensionExists returns extension if it exists"() {
+        given:
+        def serviceRequest = new ServiceRequest()
+        final String extensionUrl = "someExtensionUrl"
+        def expectedExtension = serviceRequest.addExtension().setUrl(extensionUrl)
+
+        when:
+        def actualExtension = HapiHelper.ensureExtensionExists(serviceRequest, extensionUrl)
+
+        then:
+        actualExtension == expectedExtension
+    }
+
+    def "ensureExtensionExists returns a newly created extension if it does not exist"() {
+        given:
+        def serviceRequest = new ServiceRequest()
+        final String extensionUrl = "someExtensionUrl"
+
+        expect:
+        serviceRequest.getExtensionByUrl(extensionUrl) == null
+
+        when:
+        def actualExtension = HapiHelper.ensureExtensionExists(serviceRequest, extensionUrl)
+
+        then:
+        actualExtension == serviceRequest.getExtensionByUrl(extensionUrl)
+    }
+
+    def "ensureSubExtensionExists returns extension if it exists"() {
+        given:
+        def parentExtension = new Extension()
+        final String subExtensionUrl = "someSubExtensionUrl"
+        def expectedExtension = parentExtension.addExtension().setUrl(subExtensionUrl)
+
+        when:
+        def actualExtension = HapiHelper.ensureSubExtensionExists(parentExtension, subExtensionUrl)
+
+        then:
+        actualExtension == expectedExtension
+    }
+
+    def "ensureSubExtensionExists returns a newly created extension if it does not exist"() {
+        given:
+        def parentExtension = new Extension()
+        final String subExtensionUrl = "someSubExtensionUrl"
+
+        expect:
+        parentExtension.getExtensionByUrl(subExtensionUrl) == null
+
+        when:
+        def actualExtension = HapiHelper.ensureSubExtensionExists(parentExtension, subExtensionUrl)
+
+        then:
+        actualExtension == parentExtension.getExtensionByUrl(subExtensionUrl)
+    }
+
     // HD - Hierarchic Designator
     def "getHD1Identifier returns the correct namespaceIdentifier"() {
         given:
@@ -757,5 +815,40 @@ class HapiHelperTest extends Specification {
 
         then:
         identifiers.first() == identifier
+    }
+
+    def "setOBR16WithPractitioner sets the expected value on an extension"() {
+        given:
+        def ext = new Extension()
+        def role = new PractitionerRole()
+        def practitioner = new Practitioner()
+        practitioner.setId("test123")
+        def ref = new Reference(practitioner.getId())
+        role.setPractitioner(ref)
+
+        expect:
+        ext.getValue() == null
+
+        when:
+        HapiHelper.setOBR16WithPractitioner(ext, role)
+
+        then:
+        ext.getValue().getReference() == "test123"
+    }
+
+    def "setOBR16WithPractitioner does nothing if the provided PractitionerRole is null"() {
+        given:
+        def ext = new Extension()
+        def role = null
+
+        expect:
+        ext.getValue() == null
+
+        when:
+        HapiHelper.setOBR16WithPractitioner(ext, role)
+
+        then:
+        ext.getValue() == null
+
     }
 }
