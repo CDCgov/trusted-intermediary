@@ -18,42 +18,33 @@ public class HL7FileMatcher {
 
     public static Map<Message, Message> matchFiles(
             List<InputStream> inputFiles, List<InputStream> outputFiles) {
-        // Create maps to hold the MSH-10 values and corresponding HL7 message string
-        Map<String, Message> inputMap = new HashMap<>();
-        Map<String, Message> outputMap = new HashMap<>();
+
+        Map<String, Message> inputMap = mapMessageByControlId(inputFiles);
+        Map<String, Message> outputMap = mapMessageByControlId(outputFiles);
         Map<Message, Message> messageMap = new HashMap<>();
 
-        inputMap = mapMessageByControlId(inputFiles);
-        outputMap = mapMessageByControlId(outputFiles);
         /*
                make a map of MSH-10 to file contents for the input and output files
                then use the key from the input map to look up the matching buddy from the output map
                What should we do with any unmatched input and/or output files?
         */
-        // Identify any unmatched keys
-        // Get the key sets from both maps
-        Set<String> inputKeys = new HashSet<>(inputMap.keySet());
-        Set<String> outputKeys = new HashSet<>(outputMap.keySet());
 
-        // Find keys that exist in the input files but not the output
-        Set<String> uniqueInputKeys = new HashSet<>(inputKeys);
-        uniqueInputKeys.removeAll(outputKeys); // Remove keys present in map2
+        Set<String> unmatchedInputKeys = new HashSet<>(inputMap.keySet());
+        unmatchedInputKeys.removeAll(outputMap.keySet());
 
-        // Find keys that exist in the output files but not the input
-        Set<String> uniqueOutputKeys = new HashSet<>(outputKeys);
-        uniqueOutputKeys.removeAll(inputKeys); // Remove keys present in map1
+        Set<String> unmatchedOutputKeys = new HashSet<>(outputMap.keySet());
+        unmatchedOutputKeys.removeAll(inputMap.keySet());
 
-        if (uniqueOutputKeys.size() > 0 || uniqueInputKeys.size() > 0) {
+        if (!unmatchedInputKeys.isEmpty() || !unmatchedOutputKeys.isEmpty()) {
             // TODO - log the mismatched stuff here
         }
 
-        inputKeys.retainAll(outputKeys);
-        // loop through the input map and pair up matched values from the output map
-        for (String key : inputKeys) {
-            Message inputMessage = inputMap.get(key);
-            Message outputMessage = outputMap.get(key);
-            messageMap.put(inputMessage, outputMessage);
-        }
+        inputMap.keySet().retainAll(outputMap.keySet());
+        inputMap.forEach(
+                (key, inputMessage) -> {
+                    Message outputMessage = outputMap.get(key);
+                    messageMap.put(inputMessage, outputMessage);
+                });
 
         return messageMap;
     }
