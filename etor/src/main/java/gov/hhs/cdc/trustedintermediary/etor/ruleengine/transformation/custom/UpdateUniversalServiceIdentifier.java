@@ -17,6 +17,11 @@ import org.hl7.fhir.r4.model.StringType;
  * Service Identifier (OBR-4)
  */
 public class UpdateUniversalServiceIdentifier implements CustomFhirTransformation {
+
+    public static final String CHECK_VALUE_NAME = "checkValue";
+    public static final String CODING_SYSTEM_NAME = "codingSystem";
+    public static final String ALTERNATE_ID_NAME = "alternateId";
+
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
@@ -26,7 +31,7 @@ public class UpdateUniversalServiceIdentifier implements CustomFhirTransformatio
                 it -> {
                     var allCodings = it.getCode().getCoding();
                     var codingSystemContainer =
-                            getCodingSystemContainer(allCodings, args.get("checkValue"));
+                            getCodingSystemContainer(allCodings, args.get(CHECK_VALUE_NAME));
 
                     if (codingSystemContainer == null) {
                         // we're only interested in coding that matches the checkValue argument
@@ -34,11 +39,14 @@ public class UpdateUniversalServiceIdentifier implements CustomFhirTransformatio
                     }
 
                     // check for the coding system label and create or override it
-                    updateCodingSystemLabel(codingSystemContainer, args.get("codingSystem"));
+                    updateCodingSystemLabel(codingSystemContainer, args.get(CODING_SYSTEM_NAME));
 
                     // the alt id is stored on a separate coding object, so we need to filter
                     // for it
-                    updateAlternateCodingId(allCodings, args);
+                    String alternateId = args.get(ALTERNATE_ID_NAME);
+                    if (alternateId != null) {
+                        updateAlternateCodingId(allCodings, alternateId);
+                    }
                 });
     }
 
@@ -81,7 +89,7 @@ public class UpdateUniversalServiceIdentifier implements CustomFhirTransformatio
     }
 
     /** Find and create or update the "Alternate Id" object in a given List */
-    private void updateAlternateCodingId(List<Coding> allCodings, Map<String, String> args) {
+    private void updateAlternateCodingId(List<Coding> allCodings, String alternateId) {
         var altCodingContainer = getAltCodingContainer(allCodings);
 
         if (altCodingContainer == null) {
@@ -93,6 +101,6 @@ public class UpdateUniversalServiceIdentifier implements CustomFhirTransformatio
             altCodingContainer.addExtension(altCodingExtension);
             allCodings.add(altCodingContainer);
         }
-        altCodingContainer.setCode(args.get("alternateId"));
+        altCodingContainer.setCode(alternateId);
     }
 }
