@@ -826,10 +826,29 @@ class HapiHelperTest extends Specification {
         def ref = new Reference(practitioner.getId())
         role.setPractitioner(ref)
 
+        expect:
+        ext.getValue() == null
+
         when:
         HapiHelper.setOBR16WithPractitioner(ext, role)
 
         then:
         ext.getValue().getReference() == "test123"
+    }
+
+    def "setOBR16WithPractitioner does nothing if the provided PractitionerRole is null"() {
+        given:
+        def ext = new Extension()
+        def role = null
+
+        expect:
+        ext.getValue() == null
+
+        when:
+        HapiHelper.setOBR16WithPractitioner(ext, role)
+
+        then:
+        ext.getValue() == null
+
     }
 }
