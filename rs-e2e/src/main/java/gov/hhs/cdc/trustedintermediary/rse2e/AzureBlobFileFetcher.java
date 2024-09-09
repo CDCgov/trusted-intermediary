@@ -5,12 +5,13 @@ import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobContainerClientBuilder;
 import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.BlobProperties;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AzureBlobFileFetcher implements FileFetcher<BlobClient> {
+public class AzureBlobFileFetcher implements FileFetcher {
     private static final String AZURE_STORAGE_CONNECTION_STRING =
             System.getenv("AZURE_STORAGE_CONNECTION_STRING");
     private static final String AZURE_STORAGE_CONTAINER_NAME = "automated";
@@ -30,8 +31,8 @@ public class AzureBlobFileFetcher implements FileFetcher<BlobClient> {
     }
 
     @Override
-    public List<BlobClient> fetchFiles() {
-        List<BlobClient> recentFiles = new ArrayList<>();
+    public List<InputStream> fetchFiles() {
+        List<InputStream> recentFiles = new ArrayList<>();
         LocalDate mostRecentDay = null;
 
         for (BlobItem blobItem : blobContainerClient.listBlobs()) {
@@ -43,9 +44,9 @@ public class AzureBlobFileFetcher implements FileFetcher<BlobClient> {
             if (mostRecentDay == null || blobCreationDate.isAfter(mostRecentDay)) {
                 mostRecentDay = blobCreationDate;
                 recentFiles.clear();
-                recentFiles.add(blobClient);
+                recentFiles.add(blobClient.openInputStream());
             } else if (blobCreationDate.equals(mostRecentDay)) {
-                recentFiles.add(blobClient);
+                recentFiles.add(blobClient.openInputStream());
             }
         }
 
