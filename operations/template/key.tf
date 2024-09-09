@@ -76,10 +76,34 @@ resource "azurerm_key_vault_access_policy" "allow_docs_storage_account_wrapping"
   ]
 }
 
+resource "azurerm_key_vault_access_policy" "allow_container_registry_wrapping" {
+  key_vault_id = azurerm_key_vault.key_storage.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = azurerm_user_assigned_identity.key_vault_identity.principal_id
+
+  key_permissions = [
+    "Get",
+    "UnwrapKey",
+    "WrapKey",
+  ]
+}
+
 resource "azurerm_key_vault_access_policy" "allow_storage_storage_account_wrapping" {
   key_vault_id = azurerm_key_vault.key_storage.id
   tenant_id    = data.azurerm_client_config.current.tenant_id
   object_id    = azurerm_storage_account.storage.identity.0.principal_id
+
+  key_permissions = [
+    "Get",
+    "UnwrapKey",
+    "WrapKey",
+  ]
+}
+
+resource "azurerm_key_vault_access_policy" "allow_automated_storage_storage_account_wrapping" {
+  key_vault_id = azurerm_key_vault.key_storage.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = azurerm_storage_account.automated_storage.identity.0.principal_id
 
   key_permissions = [
     "Get",
