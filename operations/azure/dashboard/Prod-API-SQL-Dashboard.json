@@ -1,0 +1,728 @@
+{
+  "properties": {
+    "lenses": [
+      {
+        "order": 0,
+        "parts": [
+          {
+            "position": {
+              "x": 0,
+              "y": 0,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "value": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                          },
+                          "name": "cpu_percent",
+                          "aggregationType": 4,
+                          "namespace": "microsoft.dbforpostgresql/flexibleservers",
+                          "metricVisualization": {
+                            "displayName": "CPU percent",
+                            "resourceDisplayName": "cdcti-prd-database"
+                          }
+                        },
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                          },
+                          "name": "memory_percent",
+                          "aggregationType": 4,
+                          "namespace": "microsoft.dbforpostgresql/flexibleservers",
+                          "metricVisualization": {
+                            "displayName": "Memory percent",
+                            "resourceDisplayName": "cdcti-prd-database"
+                          }
+                        }
+                      ],
+                      "title": "Cpu and Memory",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        }
+                      },
+                      "timespan": {
+                        "relative": {
+                          "duration": 3600000
+                        },
+                        "showUTCTime": false,
+                        "grain": 1
+                      }
+                    }
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                          },
+                          "name": "cpu_percent",
+                          "aggregationType": 4,
+                          "namespace": "microsoft.dbforpostgresql/flexibleservers",
+                          "metricVisualization": {
+                            "displayName": "CPU percent",
+                            "resourceDisplayName": "cdcti-prd-database"
+                          }
+                        },
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                          },
+                          "name": "memory_percent",
+                          "aggregationType": 4,
+                          "namespace": "microsoft.dbforpostgresql/flexibleservers",
+                          "metricVisualization": {
+                            "displayName": "Memory percent",
+                            "resourceDisplayName": "cdcti-prd-database"
+                          }
+                        }
+                      ],
+                      "title": "Cpu and Memory",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              },
+              "filters": {
+                "MsPortalFx_TimeRange": {
+                  "model": {
+                    "format": "local",
+                    "granularity": "auto",
+                    "relative": "60m"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 6,
+              "y": 0,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "value": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                          },
+                          "name": "connections_failed",
+                          "aggregationType": 1,
+                          "namespace": "microsoft.dbforpostgresql/flexibleservers",
+                          "metricVisualization": {
+                            "displayName": "Failed Connections",
+                            "resourceDisplayName": "cdcti-prd-database"
+                          }
+                        },
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                          },
+                          "name": "connections_succeeded",
+                          "aggregationType": 1,
+                          "namespace": "microsoft.dbforpostgresql/flexibleservers",
+                          "metricVisualization": {
+                            "displayName": "Succeeded Connections",
+                            "resourceDisplayName": "cdcti-prd-database"
+                          }
+                        }
+                      ],
+                      "title": "DB Connections",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        }
+                      },
+                      "timespan": {
+                        "relative": {
+                          "duration": 3600000
+                        },
+                        "showUTCTime": false,
+                        "grain": 1
+                      }
+                    }
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                          },
+                          "name": "connections_failed",
+                          "aggregationType": 1,
+                          "namespace": "microsoft.dbforpostgresql/flexibleservers",
+                          "metricVisualization": {
+                            "displayName": "Failed Connections",
+                            "resourceDisplayName": "cdcti-prd-database"
+                          }
+                        },
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                          },
+                          "name": "connections_succeeded",
+                          "aggregationType": 1,
+                          "namespace": "microsoft.dbforpostgresql/flexibleservers",
+                          "metricVisualization": {
+                            "displayName": "Succeeded Connections",
+                            "resourceDisplayName": "cdcti-prd-database"
+                          }
+                        }
+                      ],
+                      "title": "DB Connections",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              },
+              "filters": {
+                "MsPortalFx_TimeRange": {
+                  "model": {
+                    "format": "local",
+                    "granularity": "auto",
+                    "relative": "60m"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 12,
+              "y": 0,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "value": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                          },
+                          "name": "is_db_alive",
+                          "aggregationType": 3,
+                          "namespace": "microsoft.dbforpostgresql/flexibleservers",
+                          "metricVisualization": {
+                            "displayName": "Database Is Alive",
+                            "resourceDisplayName": "cdcti-prd-database"
+                          }
+                        }
+                      ],
+                      "title": "Database availability",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        }
+                      },
+                      "timespan": {
+                        "relative": {
+                          "duration": 3600000
+                        },
+                        "showUTCTime": false,
+                        "grain": 1
+                      }
+                    }
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                          },
+                          "name": "is_db_alive",
+                          "aggregationType": 3,
+                          "namespace": "microsoft.dbforpostgresql/flexibleservers",
+                          "metricVisualization": {
+                            "displayName": "Database Is Alive",
+                            "resourceDisplayName": "cdcti-prd-database"
+                          }
+                        }
+                      ],
+                      "title": "Database availability",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              },
+              "filters": {
+                "MsPortalFx_TimeRange": {
+                  "model": {
+                    "format": "local",
+                    "granularity": "auto",
+                    "relative": "60m"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 18,
+              "y": 0,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "value": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                          },
+                          "name": "read_throughput",
+                          "aggregationType": 4,
+                          "namespace": "microsoft.dbforpostgresql/flexibleservers",
+                          "metricVisualization": {
+                            "displayName": "Read Throughput Bytes/Sec",
+                            "resourceDisplayName": "cdcti-prd-database"
+                          }
+                        },
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                          },
+                          "name": "write_throughput",
+                          "aggregationType": 4,
+                          "namespace": "microsoft.dbforpostgresql/flexibleservers",
+                          "metricVisualization": {
+                            "displayName": "Write Throughput Bytes/Sec",
+                            "resourceDisplayName": "cdcti-prd-database"
+                          }
+                        }
+                      ],
+                      "title": "Throughput",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        }
+                      },
+                      "timespan": {
+                        "relative": {
+                          "duration": 3600000
+                        },
+                        "showUTCTime": false,
+                        "grain": 1
+                      }
+                    }
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                          },
+                          "name": "read_throughput",
+                          "aggregationType": 4,
+                          "namespace": "microsoft.dbforpostgresql/flexibleservers",
+                          "metricVisualization": {
+                            "displayName": "Read Throughput Bytes/Sec",
+                            "resourceDisplayName": "cdcti-prd-database"
+                          }
+                        },
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                          },
+                          "name": "write_throughput",
+                          "aggregationType": 4,
+                          "namespace": "microsoft.dbforpostgresql/flexibleservers",
+                          "metricVisualization": {
+                            "displayName": "Write Throughput Bytes/Sec",
+                            "resourceDisplayName": "cdcti-prd-database"
+                          }
+                        }
+                      ],
+                      "title": "Throughput",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              },
+              "filters": {
+                "MsPortalFx_TimeRange": {
+                  "model": {
+                    "format": "local",
+                    "granularity": "auto",
+                    "relative": "60m"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 24,
+              "y": 0,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "value": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                          },
+                          "name": "storage_percent",
+                          "aggregationType": 4,
+                          "namespace": "microsoft.dbforpostgresql/flexibleservers",
+                          "metricVisualization": {
+                            "displayName": "Storage percent",
+                            "resourceDisplayName": "cdcti-prd-database"
+                          }
+                        }
+                      ],
+                      "title": "Storage",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        }
+                      },
+                      "timespan": {
+                        "relative": {
+                          "duration": 3600000
+                        },
+                        "showUTCTime": false,
+                        "grain": 1
+                      }
+                    }
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                          },
+                          "name": "storage_percent",
+                          "aggregationType": 4,
+                          "namespace": "microsoft.dbforpostgresql/flexibleservers",
+                          "metricVisualization": {
+                            "displayName": "Storage percent",
+                            "resourceDisplayName": "cdcti-prd-database"
+                          }
+                        }
+                      ],
+                      "title": "Storage",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              },
+              "filters": {
+                "MsPortalFx_TimeRange": {
+                  "model": {
+                    "format": "local",
+                    "granularity": "auto",
+                    "relative": "60m"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "model": {
+        "timeRange": {
+          "value": {
+            "relative": {
+              "duration": 24,
+              "timeUnit": 1
+            }
+          },
+          "type": "MsPortalFx.Composition.Configuration.ValueTypes.TimeRange"
+        },
+        "filterLocale": {
+          "value": "en-us"
+        },
+        "filters": {
+          "value": {
+            "MsPortalFx_TimeRange": {
+              "model": {
+                "format": "utc",
+                "granularity": "auto",
+                "relative": "24h"
+              },
+              "displayCache": {
+                "name": "UTC Time",
+                "value": "Past 24 hours"
+              },
+              "filteredPartIds": [
+                "StartboardPart-MonitorChartPart-26066109-b754-45af-a712-60c7511a0aad",
+                "StartboardPart-MonitorChartPart-26066109-b754-45af-a712-60c7511a0aaf",
+                "StartboardPart-MonitorChartPart-26066109-b754-45af-a712-60c7511a0ab1",
+                "StartboardPart-MonitorChartPart-26066109-b754-45af-a712-60c7511a0ab3",
+                "StartboardPart-MonitorChartPart-26066109-b754-45af-a712-60c7511a0ab5"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "name": "Prod API SQL Dashboard",
+  "type": "Microsoft.Portal/dashboards",
+  "location": "INSERT LOCATION",
+  "tags": {
+    "hidden-title": "Prod API SQL Dashboard"
+  },
+  "apiVersion": "2022-12-01-preview"
+}
