@@ -203,6 +203,8 @@ resource "azurerm_linux_web_app_slot" "pre_live" {
 
     scm_use_main_ip_restriction = local.cdc_domain_environment ? true : null
 
+    container_registry_use_managed_identity = true
+
     application_stack {
       docker_registry_url = "https://${azurerm_container_registry.registry.login_server}"
       docker_image_name   = "ignore_because_specified_later_in_deployment"
