@@ -8,36 +8,36 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * The TransformationRule class extends the {@link Rule Rule} class and represents a transformation
- * rule. It implements the {@link Rule#runRule(HL7Message) runRule} method to apply a transformation
- * to the FHIR resource.
+ * The AssertionRule class extends the {@link AssertionRule Rule} class and represents a assertion
+ * rule. It implements the {@link AssertionRule#runRule(HL7Message) runRule} method to apply a
+ * assertion to the FHIR resource.
  */
-public class Rule<T> {
+public class AssertionRule {
 
     protected final Logger logger = ApplicationContext.getImplementation(Logger.class);
     protected final HapiFhir fhirEngine = ApplicationContext.getImplementation(HapiFhir.class);
 
-    private static final Map<String, CustomFhirTransformation> transformationInstanceCache =
+    private static final Map<String, CustomFhirTransformation> assertionInstanceCache =
             new ConcurrentHashMap<>();
 
     private String name;
     private String description;
     private String message;
     private List<String> conditions;
-    private List<T> rules;
+    private List<AssertionRuleMethod> rules;
 
     /**
      * Do not delete this constructor! It is used for JSON deserialization when loading rules from a
      * file.
      */
-    public Rule() {}
+    public AssertionRule() {}
 
-    public Rule(
+    public AssertionRule(
             String ruleName,
             String ruleDescription,
             String ruleMessage,
             List<String> ruleConditions,
-            List<T> ruleActions) {
+            List<AssertionRuleMethod> ruleActions) {
         name = ruleName;
         description = ruleDescription;
         message = ruleMessage;
@@ -61,7 +61,7 @@ public class Rule<T> {
         return conditions;
     }
 
-    public List<T> getRules() {
+    public List<AssertionRuleMethod> getRules() {
         return rules;
     }
 
@@ -86,45 +86,41 @@ public class Rule<T> {
     }
 
     public void runRule(HL7Message<?> resource) {
-        for (TransformationRuleMethod transformation : this.getRules()) {
+        for (AssertionRuleMethod assertion : this.getRules()) {
             try {
-                applyTransformation(transformation, resource);
+                applyAssertion(assertion, resource);
             } catch (RuntimeException e) {
-                logger.logError("Error applying transformation: " + transformation.name(), e);
+                logger.logError("Error applying assertion: " + assertion.name(), e);
             }
         }
     }
 
-    private void applyTransformation(
-            TransformationRuleMethod transformation, HL7Message<?> resource) {
-        String name = transformation.name();
-        Map<String, String> args = transformation.args();
-        logger.logInfo("Applying transformation: " + name);
+    private void applyAssertion(AssertionRuleMethod assertion, HL7Message<?> resource) {
+        String name = assertion.name();
+        Map<String, String> args = assertion.args();
+        logger.logInfo("Applying assertion: " + name);
 
-        CustomFhirTransformation transformationInstance = getTransformationInstance(name);
-        transformationInstance.transform(resource, args);
+        CustomFhirTransformation assertionInstance = getAssertionInstance(name);
+        assertionInstance.transform(resource, args);
     }
 
-    static CustomFhirTransformation getTransformationInstance(String name) throws RuntimeException {
-        return transformationInstanceCache.computeIfAbsent(
-                name, TransformationRule::createTransformationInstance);
+    static CustomFhirTransformation getAssertionInstance(String name) throws RuntimeException {
+        return assertionInstanceCache.computeIfAbsent(name, AssertionRule::createAssertionInstance);
     }
 
-    private static CustomFhirTransformation createTransformationInstance(
-            String transformationName) {
-        String fullClassName = getFullClassName(transformationName);
+    private static CustomFhirTransformation createAssertionInstance(String assertionName) {
+        String fullClassName = getFullClassName(assertionName);
         try {
             Class<?> clazz = Class.forName(fullClassName);
             return (CustomFhirTransformation) clazz.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             throw new RuntimeException(
-                    "Error creating transformation instance for: " + transformationName, e);
+                    "Error creating assertion instance for: " + assertionName, e);
         }
     }
 
     private static String getFullClassName(String className) {
-        String packageName =
-                "gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom";
+        String packageName = "gov.hhs.cdc.trustedintermediary.rse2e.ruleengine.custom";
         return packageName + "." + className;
     }
 }

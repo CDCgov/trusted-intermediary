@@ -10,40 +10,33 @@ import java.util.List;
 import javax.inject.Inject;
 
 /** Implements the RuleEngine interface. It represents a rule engine for transformations. */
-public class TransformationRuleEngine {
-    private String ruleDefinitionsFileName;
-    final List<TransformationRule> rules = new ArrayList<>();
+public class AssertionRuleEngine {
+    private final String ruleDefinitionsFileName = "assertion_definitions.json";
+    final List<AssertionRule> assertionRules = new ArrayList<>();
     volatile boolean rulesLoaded = false;
-    private static final TransformationRuleEngine INSTANCE = new TransformationRuleEngine();
+    private static final AssertionRuleEngine INSTANCE = new AssertionRuleEngine();
 
     @Inject Logger logger;
     @Inject RuleLoader ruleLoader;
 
-    public static TransformationRuleEngine getInstance(String ruleDefinitionsFileName) {
-        INSTANCE.ruleDefinitionsFileName = ruleDefinitionsFileName;
-        return INSTANCE;
-    }
+    private AssertionRuleEngine() {}
 
-    private TransformationRuleEngine() {}
-
-    @Override
     public void unloadRules() {
-        rules.clear();
+        assertionRules.clear();
         rulesLoaded = false;
     }
 
-    @Override
     public void ensureRulesLoaded() throws RuleLoaderException {
         if (!rulesLoaded) {
-            synchronized (rules) {
+            synchronized (assertionRules) {
                 if (!rulesLoaded) {
                     try (InputStream stream =
                             getClass()
                                     .getClassLoader()
                                     .getResourceAsStream(ruleDefinitionsFileName)) {
-                        List<TransformationRule> parsedRules =
+                        List<AssertionRule> parsedRules =
                                 ruleLoader.loadRules(stream, new TypeReference<>() {});
-                        rules.addAll(parsedRules);
+                        assertionRules.addAll(parsedRules);
                         rulesLoaded = true;
 
                     } catch (IOException | NullPointerException e) {
@@ -56,7 +49,6 @@ public class TransformationRuleEngine {
         }
     }
 
-    @Override
     public void runRules(HL7Message<?> resource) {
         try {
             ensureRulesLoaded();
@@ -65,7 +57,7 @@ public class TransformationRuleEngine {
             return;
         }
 
-        for (TransformationRule rule : rules) {
+        for (AssertionRule rule : assertionRules) {
             if (rule.shouldRun(resource)) {
                 rule.runRule((resource));
             }

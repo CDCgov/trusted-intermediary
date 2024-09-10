@@ -23,26 +23,11 @@
           "type": "equalToValue",
           "args": {
             "fieldValuePairs": [
-              {
-                "field": "MSH-4",
-                "value": "CDPH"
-              },
-              {
-                "field": "MSH-5",
-                "value": "EPIC"
-              },
-              {
-                "field": "MSH-9",
-                "value": "ORU^R01"
-              },
-              {
-                "field": "OBR-4.3",
-                "value": "LN"
-              },
-              {
-                "field": "OBR-4.4",
-                "value": "CDPHGSPEAP"
-              }
+              [ "MSH-4", "CDPH" ],
+              [ "MSH-5", "EPIC" ],
+              [ "MSH-9", "ORU^R01" ],
+              [ "OBR-4.3", "LN" ],
+              [ "OBR-4.4", "CDPHGSPEAP" ]
             ]
           }
         },
