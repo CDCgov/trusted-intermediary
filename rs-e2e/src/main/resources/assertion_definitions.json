@@ -23,11 +23,11 @@
           "name": "equalToValue",
           "args": {
             "fieldValuePairs": [
-              [ "MSH-4", "CDPH" ],
-              [ "MSH-5", "EPIC" ],
-              [ "MSH-9", "ORU^R01" ],
-              [ "OBR-4.3", "LN" ],
-              [ "OBR-4.4", "CDPHGSPEAP" ]
+              { "MSH-4": "CDPH" },
+              { "MSH-5": "EPIC" },
+              { "MSH-9": "ORU^R01" },
+              { "OBR-4.3": "LN" },
+              { "OBR-4.4": "CDPHGSPEAP" }
             ]
           }
         },
@@ -41,11 +41,11 @@
           "name": "equalToOtherField",
           "args": {
             "fieldPairs": [
-              [ "ORC-2.1", "ORC-4.1" ],
-              [ "ORC-2.2", "ORC-4.2" ],
-              [ "OBR-2.1", "ORC-4.1" ],
-              [ "OBR-2.2", "ORC-4.2" ],
-              [ "OBR-16", "ORC-12" ]
+              { "ORC-2.1": "ORC-4.1" },
+              { "ORC-2.2": "ORC-4.2" },
+              { "OBR-2.1": "ORC-4.1" },
+              { "OBR-2.2": "ORC-4.2" },
+              { "OBR-16": "ORC-12" }
             ]
           }
         },
