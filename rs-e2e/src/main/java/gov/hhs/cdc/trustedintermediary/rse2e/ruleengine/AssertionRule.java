@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.rse2e.ruleengine;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,7 +18,7 @@ public class AssertionRule {
     protected final Logger logger = ApplicationContext.getImplementation(Logger.class);
     protected final HapiFhir fhirEngine = ApplicationContext.getImplementation(HapiFhir.class);
 
-    private static final Map<String, CustomFhirTransformation> assertionInstanceCache =
+    private static final Map<String, CustomHL7Assertion> assertionInstanceCache =
             new ConcurrentHashMap<>();
 
     private String name;
@@ -70,8 +71,9 @@ public class AssertionRule {
                 .allMatch(
                         condition -> {
                             try {
-                                return fhirEngine.evaluateCondition(
-                                        resource.getMessage(), condition);
+                                // TODO: Implement the evaluateCondition method for HL7
+                                //                                return
+                                // fhirEngine.evaluateCondition(resource.getMessage(), condition);
                             } catch (Exception e) {
                                 logger.logError(
                                         "Rule ["
@@ -97,22 +99,22 @@ public class AssertionRule {
 
     private void applyAssertion(AssertionRuleMethod assertion, HL7Message<?> resource) {
         String name = assertion.name();
-        Map<String, String> args = assertion.args();
+        Map<String, ArrayList<?>> args = assertion.args();
         logger.logInfo("Applying assertion: " + name);
 
-        CustomFhirTransformation assertionInstance = getAssertionInstance(name);
+        CustomHL7Assertion assertionInstance = getAssertionInstance(name);
         assertionInstance.transform(resource, args);
     }
 
-    static CustomFhirTransformation getAssertionInstance(String name) throws RuntimeException {
+    static CustomHL7Assertion getAssertionInstance(String name) throws RuntimeException {
         return assertionInstanceCache.computeIfAbsent(name, AssertionRule::createAssertionInstance);
     }
 
-    private static CustomFhirTransformation createAssertionInstance(String assertionName) {
+    private static CustomHL7Assertion createAssertionInstance(String assertionName) {
         String fullClassName = getFullClassName(assertionName);
         try {
             Class<?> clazz = Class.forName(fullClassName);
-            return (CustomFhirTransformation) clazz.getDeclaredConstructor().newInstance();
+            return (CustomHL7Assertion) clazz.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             throw new RuntimeException(
                     "Error creating assertion instance for: " + assertionName, e);
