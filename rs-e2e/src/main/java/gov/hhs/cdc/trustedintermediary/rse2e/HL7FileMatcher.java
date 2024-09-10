@@ -23,12 +23,6 @@ public class HL7FileMatcher {
         Map<String, Message> outputMap = mapMessageByControlId(outputFiles);
         Map<Message, Message> messageMap = new HashMap<>();
 
-        /*
-               make a map of MSH-10 to file contents for the input and output files
-               then use the key from the input map to look up the matching buddy from the output map
-               What should we do with any unmatched input and/or output files?
-        */
-
         Set<String> unmatchedInputKeys = new HashSet<>(inputMap.keySet());
         unmatchedInputKeys.removeAll(outputMap.keySet());
 
