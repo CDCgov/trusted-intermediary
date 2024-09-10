@@ -29,7 +29,6 @@ As a _, so that _, I need _.
 ## Definition of Done
 - [ ] Documentation tasks completed
   - [ ] Documentation and diagrams created or updated
-    - [ ] Implementation guide (`/ig` folder)
     - [ ] ADRs (`/adr` folder)
     - [ ] Main `README.md`
     - [ ] Other READMEs in the repo
