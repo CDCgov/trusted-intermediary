@@ -20,26 +20,26 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-${var.environment}-database"
                           },
                           "name": "cpu_percent",
                           "aggregationType": 4,
                           "namespace": "microsoft.dbforpostgresql/flexibleservers",
                           "metricVisualization": {
                             "displayName": "CPU percent",
-                            "resourceDisplayName": "cdcti-prd-database"
+                            "resourceDisplayName": "cdcti-${var.environment}-database"
                           }
                         },
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-${var.environment}-database"
                           },
                           "name": "memory_percent",
                           "aggregationType": 4,
                           "namespace": "microsoft.dbforpostgresql/flexibleservers",
                           "metricVisualization": {
                             "displayName": "Memory percent",
-                            "resourceDisplayName": "cdcti-prd-database"
+                            "resourceDisplayName": "cdcti-${var.environment}-database"
                           }
                         }
                       ],
@@ -88,26 +88,26 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-${var.environment}-database"
                           },
                           "name": "cpu_percent",
                           "aggregationType": 4,
                           "namespace": "microsoft.dbforpostgresql/flexibleservers",
                           "metricVisualization": {
                             "displayName": "CPU percent",
-                            "resourceDisplayName": "cdcti-prd-database"
+                            "resourceDisplayName": "cdcti-${var.environment}-database"
                           }
                         },
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-${var.environment}-database"
                           },
                           "name": "memory_percent",
                           "aggregationType": 4,
                           "namespace": "microsoft.dbforpostgresql/flexibleservers",
                           "metricVisualization": {
                             "displayName": "Memory percent",
-                            "resourceDisplayName": "cdcti-prd-database"
+                            "resourceDisplayName": "cdcti-${var.environment}-database"
                           }
                         }
                       ],
@@ -164,26 +164,26 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-${var.environment}-database"
                           },
                           "name": "connections_failed",
                           "aggregationType": 1,
                           "namespace": "microsoft.dbforpostgresql/flexibleservers",
                           "metricVisualization": {
                             "displayName": "Failed Connections",
-                            "resourceDisplayName": "cdcti-prd-database"
+                            "resourceDisplayName": "cdcti-${var.environment}-database"
                           }
                         },
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-${var.environment}-database"
                           },
                           "name": "connections_succeeded",
                           "aggregationType": 1,
                           "namespace": "microsoft.dbforpostgresql/flexibleservers",
                           "metricVisualization": {
                             "displayName": "Succeeded Connections",
-                            "resourceDisplayName": "cdcti-prd-database"
+                            "resourceDisplayName": "cdcti-${var.environment}-database"
                           }
                         }
                       ],
@@ -232,26 +232,26 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-${var.environment}-database"
                           },
                           "name": "connections_failed",
                           "aggregationType": 1,
                           "namespace": "microsoft.dbforpostgresql/flexibleservers",
                           "metricVisualization": {
                             "displayName": "Failed Connections",
-                            "resourceDisplayName": "cdcti-prd-database"
+                            "resourceDisplayName": "cdcti-${var.environment}-database"
                           }
                         },
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-${var.environment}-database"
                           },
                           "name": "connections_succeeded",
                           "aggregationType": 1,
                           "namespace": "microsoft.dbforpostgresql/flexibleservers",
                           "metricVisualization": {
                             "displayName": "Succeeded Connections",
-                            "resourceDisplayName": "cdcti-prd-database"
+                            "resourceDisplayName": "cdcti-${var.environment}-database"
                           }
                         }
                       ],
@@ -308,14 +308,14 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-${var.environment}-database"
                           },
                           "name": "is_db_alive",
                           "aggregationType": 3,
                           "namespace": "microsoft.dbforpostgresql/flexibleservers",
                           "metricVisualization": {
                             "displayName": "Database Is Alive",
-                            "resourceDisplayName": "cdcti-prd-database"
+                            "resourceDisplayName": "cdcti-${var.environment}-database"
                           }
                         }
                       ],
@@ -364,14 +364,14 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-${var.environment}-database"
                           },
                           "name": "is_db_alive",
                           "aggregationType": 3,
                           "namespace": "microsoft.dbforpostgresql/flexibleservers",
                           "metricVisualization": {
                             "displayName": "Database Is Alive",
-                            "resourceDisplayName": "cdcti-prd-database"
+                            "resourceDisplayName": "cdcti-${var.environment}-database"
                           }
                         }
                       ],
@@ -428,26 +428,26 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-${var.environment}-database"
                           },
                           "name": "read_throughput",
                           "aggregationType": 4,
                           "namespace": "microsoft.dbforpostgresql/flexibleservers",
                           "metricVisualization": {
                             "displayName": "Read Throughput Bytes/Sec",
-                            "resourceDisplayName": "cdcti-prd-database"
+                            "resourceDisplayName": "cdcti-${var.environment}-database"
                           }
                         },
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-${var.environment}-database"
                           },
                           "name": "write_throughput",
                           "aggregationType": 4,
                           "namespace": "microsoft.dbforpostgresql/flexibleservers",
                           "metricVisualization": {
                             "displayName": "Write Throughput Bytes/Sec",
-                            "resourceDisplayName": "cdcti-prd-database"
+                            "resourceDisplayName": "cdcti-${var.environment}-database"
                           }
                         }
                       ],
@@ -496,26 +496,26 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-${var.environment}-database"
                           },
                           "name": "read_throughput",
                           "aggregationType": 4,
                           "namespace": "microsoft.dbforpostgresql/flexibleservers",
                           "metricVisualization": {
                             "displayName": "Read Throughput Bytes/Sec",
-                            "resourceDisplayName": "cdcti-prd-database"
+                            "resourceDisplayName": "cdcti-${var.environment}-database"
                           }
                         },
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-${var.environment}-database"
                           },
                           "name": "write_throughput",
                           "aggregationType": 4,
                           "namespace": "microsoft.dbforpostgresql/flexibleservers",
                           "metricVisualization": {
                             "displayName": "Write Throughput Bytes/Sec",
-                            "resourceDisplayName": "cdcti-prd-database"
+                            "resourceDisplayName": "cdcti-${var.environment}-database"
                           }
                         }
                       ],
@@ -572,14 +572,14 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-${var.environment}-database"
                           },
                           "name": "storage_percent",
                           "aggregationType": 4,
                           "namespace": "microsoft.dbforpostgresql/flexibleservers",
                           "metricVisualization": {
                             "displayName": "Storage percent",
-                            "resourceDisplayName": "cdcti-prd-database"
+                            "resourceDisplayName": "cdcti-${var.environment}-database"
                           }
                         }
                       ],
@@ -628,14 +628,14 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-prd-database"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/cdcti-${var.environment}-database"
                           },
                           "name": "storage_percent",
                           "aggregationType": 4,
                           "namespace": "microsoft.dbforpostgresql/flexibleservers",
                           "metricVisualization": {
                             "displayName": "Storage percent",
-                            "resourceDisplayName": "cdcti-prd-database"
+                            "resourceDisplayName": "cdcti-${var.environment}-database"
                           }
                         }
                       ],

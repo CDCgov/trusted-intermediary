@@ -43,7 +43,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "AverageMemoryWorkingSet",
                           "aggregationType": 7,
@@ -97,7 +97,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "AverageMemoryWorkingSet",
                           "aggregationType": 7,
@@ -150,7 +150,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "CpuTime",
                           "aggregationType": 7,
@@ -204,7 +204,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "CpuTime",
                           "aggregationType": 7,
@@ -257,7 +257,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "Threads",
                           "aggregationType": 7,
@@ -311,7 +311,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "Threads",
                           "aggregationType": 7,
@@ -373,7 +373,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "Handles",
                           "aggregationType": 1,
@@ -427,7 +427,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "Handles",
                           "aggregationType": 1,
@@ -503,7 +503,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "HttpResponseTime",
                           "aggregationType": 7,
@@ -557,7 +557,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "HttpResponseTime",
                           "aggregationType": 7,
@@ -619,7 +619,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "Requests",
                           "aggregationType": 7,
@@ -673,7 +673,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "Requests",
                           "aggregationType": 7,
@@ -758,7 +758,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "Http5xx",
                           "aggregationType": 7,
@@ -812,7 +812,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "Http5xx",
                           "aggregationType": 7,
@@ -874,7 +874,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "Http401",
                           "aggregationType": 7,
@@ -885,7 +885,7 @@
                         },
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "Http403",
                           "aggregationType": 7,
@@ -896,7 +896,7 @@
                         },
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "Http404",
                           "aggregationType": 7,
@@ -907,7 +907,7 @@
                         },
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "Http404",
                           "aggregationType": 7,
@@ -918,7 +918,7 @@
                         },
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "Http406",
                           "aggregationType": 7,
@@ -929,7 +929,7 @@
                         },
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "Http2xx",
                           "aggregationType": 7,
@@ -983,7 +983,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "Http401",
                           "aggregationType": 7,
@@ -994,7 +994,7 @@
                         },
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "Http403",
                           "aggregationType": 7,
@@ -1005,7 +1005,7 @@
                         },
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "Http404",
                           "aggregationType": 7,
@@ -1016,7 +1016,7 @@
                         },
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "Http404",
                           "aggregationType": 7,
@@ -1027,7 +1027,7 @@
                         },
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "Http406",
                           "aggregationType": 7,
@@ -1038,7 +1038,7 @@
                         },
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "Http2xx",
                           "aggregationType": 7,
@@ -1114,7 +1114,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "BytesSent",
                           "aggregationType": 7,
@@ -1168,7 +1168,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "BytesSent",
                           "aggregationType": 7,
@@ -1221,7 +1221,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "BytesReceived",
                           "aggregationType": 7,
@@ -1275,7 +1275,7 @@
                       "metrics": [
                         {
                           "resourceMetadata": {
-                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                            "id": "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                           },
                           "name": "BytesReceived",
                           "aggregationType": 7,
@@ -1333,7 +1333,7 @@
                   "name": "Scope",
                   "value": {
                     "resourceIds": [
-                      "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-prd-api"
+                      "/subscriptions/${data.azurerm_client_config.current.object_id}/resourceGroups/csels-rsti-${var.environment}-moderate-rg/providers/Microsoft.Web/sites/cdcti-${var.environment}-api"
                     ]
                   },
                   "isOptional": true
@@ -1385,7 +1385,7 @@
                 },
                 {
                   "name": "PartSubTitle",
-                  "value": "cdcti-prd-api",
+                  "value": "cdcti-${var.environment}-api",
                   "isOptional": true
                 },
                 {
