@@ -74,6 +74,7 @@ public class AssertionRule {
                                 // TODO: Implement the evaluateCondition method for HL7
                                 //                                return
                                 // fhirEngine.evaluateCondition(resource.getMessage(), condition);
+                                return false;
                             } catch (Exception e) {
                                 logger.logError(
                                         "Rule ["

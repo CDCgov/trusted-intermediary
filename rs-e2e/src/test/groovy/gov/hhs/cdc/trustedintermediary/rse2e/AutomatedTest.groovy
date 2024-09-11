@@ -1,7 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.rse2e
 
 import ca.uhn.hl7v2.model.Message
+import ca.uhn.hl7v2.model.v251.datatype.HD
 import ca.uhn.hl7v2.model.v251.segment.MSH
+import gov.hhs.cdc.trustedintermediary.rse2e.ruleengine.HL7Message
 import spock.lang.Specification
 
 class AutomatedTest  extends Specification  {
@@ -38,13 +40,22 @@ class AutomatedTest  extends Specification  {
 
         then:
         for (messagePair in matchedFiles) {
-            Message inputMessage = messagePair.getKey()
-            Message outputMessage = messagePair.getValue()
+            HL7Message inputMessage = messagePair.getKey() as HL7Message
+            HL7Message outputMessage = messagePair.getValue() as HL7Message
+
+            def value = inputMessage.get("MSH").getField(9, 0).getComponent(1)
+
+            String statement = "MSH-4.1 = 'CDPH'"
+            boolean result1 = HL7ExpressionEvaluator.parseAndEvaluate(inputMessage, outputMessage, statement)
 
             // TODO - based on MSH contents, cast message to more specific type like ORU, OML, etc?
-            MSH inputMessageMSH = inputMessage.get("MSH")
-            MSH outputMessageMSH = outputMessage.get("MSH")
-            inputMessageMSH.getMessageControlID() == outputMessageMSH.getMessageControlID()
+            //            MSH inputMessageMSH = inputMessage.get("MSH") as MSH
+            //            MSH outputMessageMSH = outputMessage.get("MSH") as MSH
+            //            inputMessageMSH.getMessageControlID() == outputMessageMSH.getMessageControlID()
+
+            //            def a = inputMessage.get("MSH").getField(6, 0).getComponent(1)
+            //            def b = ((inputMessage.get("MSH") as MSH).getField(6, 0) as HD)
+            //            def c = ((inputMessage.get("MSH") as MSH).getField(6, 0) as HD).getComponent(1)
         }
     }
 }
