@@ -20,10 +20,6 @@ public class HL7ExpressionEvaluator {
     public static boolean parseAndEvaluate(
             HL7Message<Message> inputMessage, HL7Message<Message> outputMessage, String statement) {
 
-        //        Pattern pattern =
-        //                Pattern.compile(
-        //
-        // "(input|output)?\\.?(\\w+(-\\d+\\.\\d+)?)\\s*(=|!=|in)\\s*(?:'([^']*)'|\\(([^)]*)\\)|([A-Z]+-\\d+\\.\\d+))");
         Matcher matcher = operationPattern.matcher(statement);
 
         if (!matcher.matches()) {
@@ -45,38 +41,24 @@ public class HL7ExpressionEvaluator {
                 rightLiteralValueMatcher.matches()
                         ? rightLiteralValueMatcher.group(1)
                         : String.valueOf(getFieldValue(inputMessage.getMessage(), rightOperand));
-        //        inputMessage.getMessage();
-        //        HL7Message<Message> message =
 
-        if (operator.equals("=")) {
-            return leftValue.equals(rightValue);
-        } else if (operator.equals("!=")) {
-            return !leftValue.equals(rightValue);
-        } else if (operator.equals("in")) {
-            Matcher literalValueCollectionMatcher =
-                    literalValueCollectionPattern.matcher(rightOperand);
-            if (literalValueCollectionMatcher.matches()) {
-                String inValues = literalValueCollectionMatcher.group(1);
-                return false;
+        switch (operator) {
+            case "=" -> {
+                return leftValue.equals(rightValue);
+            }
+            case "!=" -> {
+                return !leftValue.equals(rightValue);
+            }
+            case "in" -> {
+                Matcher literalValueCollectionMatcher =
+                        literalValueCollectionPattern.matcher(rightOperand);
+                if (literalValueCollectionMatcher.matches()) {
+                    String inValues = literalValueCollectionMatcher.group(1);
+                    return false;
+                }
             }
         }
 
-        //        HL7Message<Message> leftMessage = "input".equals(leftFile) ? inputMessage :
-        // outputMessage;
-        //        Message message = leftMessage.getMessage();
-
-        //        String leftValue = leftMessage.getField(leftField);
-
-        //        if ("in".equals(operator) && inValues != null) {
-        //            Set<String> valuesSet = new
-        // HashSet<>(Arrays.asList(inValues.split("\\s*,\\s*")));
-        //            return valuesSet.contains(leftValue);
-        //        }
-        //
-        //        // Handle `=` or `!=` with literal value
-        //        if (literalValue != null) {
-        //            return evaluateComparison(leftValue, literalValue, operator);
-        //        }
         return false;
     }
 
