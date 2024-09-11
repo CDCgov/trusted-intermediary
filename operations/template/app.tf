@@ -69,6 +69,12 @@ resource "azurerm_role_assignment" "allow_app_to_pull_from_registry" {
   scope                = azurerm_container_registry.registry.id
 }
 
+resource "azurerm_role_assignment" "allow_app_slot_to_pull_from_registry" {
+  principal_id         = azurerm_linux_web_app_slot.pre_live.identity.0.principal_id
+  role_definition_name = "AcrPull"
+  scope                = azurerm_container_registry.registry.id
+}
+
 # Create the staging service plan
 resource "azurerm_service_plan" "plan" {
   name                   = "cdcti-${var.environment}-service-plan"
@@ -196,6 +202,8 @@ resource "azurerm_linux_web_app_slot" "pre_live" {
     health_check_eviction_time_in_min = 5
 
     scm_use_main_ip_restriction = local.cdc_domain_environment ? true : null
+
+    container_registry_use_managed_identity = true
 
     application_stack {
       docker_registry_url = "https://${azurerm_container_registry.registry.login_server}"

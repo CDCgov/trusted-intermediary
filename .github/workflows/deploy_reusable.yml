@@ -12,9 +12,6 @@ on:
       REPO:
         required: true
         type: string
-      REPO_DOCS:
-        required: true
-        type: string
       APP:
         required: true
         type: string
@@ -82,14 +79,6 @@ jobs:
         file: ./Dockerfile
         context: .
 
-    - name: Build and push documentation container image to registry
-      uses: docker/build-push-action@v6
-      with:
-        push: true
-        tags: '${{ inputs.REGISTRY }}/${{ inputs.REPO_DOCS }}:${{ github.sha }}'
-        file: ./ig/Dockerfile
-        context: ./ig
-
   deploy:
     runs-on: ubuntu-latest
     needs: build
@@ -121,38 +110,3 @@ jobs:
       with:
         inlineScript: |
           az webapp deployment slot swap -n ${{ inputs.APP }} --slot pre-live --resource-group csels-rsti-${{ inputs.ENVIRONMENT }}${{ github.event.number }}-moderate-rg
-
-    - name: Retrieve registry password
-      id: retrieve-registry-password
-      uses: azure/CLI@v2
-      with:
-        inlineScript: |
-          ACR_PASSWORD=$(az acr login --name ${{ inputs.REGISTRY }} --expose-token --output tsv --query accessToken)
-          echo "::add-mask::$ACR_PASSWORD"
-          echo "ACR_PASSWORD=$ACR_PASSWORD" >> "$GITHUB_OUTPUT"
-
-    - name: Log in to registry
-      uses: docker/login-action@v3
-      with:
-        registry: ${{ inputs.REGISTRY }}
-        username: 00000000-0000-0000-0000-000000000000
-        password: ${{ steps.retrieve-registry-password.outputs.ACR_PASSWORD }}
-
-    - name: Extract generated documentation from the documentation image
-      id: extract
-      uses: shrink/actions-docker-extract@v3
-      with:
-        image: '${{ inputs.REGISTRY }}/${{ inputs.REPO_DOCS }}:${{ github.sha }}'
-        path: /trusted-intermediary/output/.
-
-    - name: Upload docs to blob storage
-      uses: azure/CLI@v2
-      with:
-        inlineScript: |
-          if [ "${{ inputs.ENVIRONMENT }}" == "pr" ]; then
-            MODIFIED_ENVIRONMENT=${{ inputs.ENVIRONMENT }}${{ github.event.number }}
-          else
-            MODIFIED_ENVIRONMENT=${{ inputs.ENVIRONMENT }}
-          fi
-
-          az storage blob sync --account-name cdcti${MODIFIED_ENVIRONMENT}docs -c '$web' -s ${{ steps.extract.outputs.destination }}
