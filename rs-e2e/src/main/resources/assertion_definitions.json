@@ -4,57 +4,35 @@
       "name": "General requirements",
       "conditions": [],
       "rules": [
-        {
-          "name": "equalToSameInputField",
-          "args": {
-            "value": [ "MSH-1", "MSH-2", "MSH-7", "MSH-10", "MSH-11", "MSH-12" ]
-          }
-        }
+          "input.MSH-1 = MSH-1",
+          "input.MSH-2 = MSH-2",
+          "input.MSH-7 = MSH-7",
+          "input.MSH-10 = MSH-10",
+          "input.MSH-11 = MSH-11",
+          "input.MSH-12 = MSH-12"
       ]
     },
     {
       "name": "UCSD result requirements",
       "conditions": [
-        "MSH-9.1 == R01",
-        "MSH-6 in (R797, R508)"
+        "MSH-9.1 = 'R01'",
+        "MSH-6 in ('R797', 'R508')"
       ],
       "rules": [
-        {
-          "name": "equalToValue",
-          "args": {
-            "fieldValuePairs": [
-              { "MSH-4": "CDPH" },
-              { "MSH-5": "EPIC" },
-              { "MSH-9": "ORU^R01" },
-              { "OBR-4.3": "LN" },
-              { "OBR-4.4": "CDPHGSPEAP" }
-            ]
-          }
-        },
-        {
-          "name": "emptyValue",
-          "args": {
-            "fields": [ "PID-3.4", "PID-3.5", "PID-5.7" ]
-          }
-        },
-        {
-          "name": "equalToOtherField",
-          "args": {
-            "fieldPairs": [
-              { "ORC-2.1": "ORC-4.1" },
-              { "ORC-2.2": "ORC-4.2" },
-              { "OBR-2.1": "ORC-4.1" },
-              { "OBR-2.2": "ORC-4.2" },
-              { "OBR-16": "ORC-12" }
-            ]
-          }
-        },
-        {
-          "name": "uniqueSegment",
-          "args": {
-            "segments": [ "OBR" ]
-          }
-        }
+        "MSH-4 = 'CDPH'",
+        "MSH-5 = 'EPIC'",
+        "MSH-9 = 'ORU^R01'",
+        "OBR-4.3 = 'LN'",
+        "OBR-4.4 = 'CDPHGSPEAP'",
+        "PID-3.4 = ''",
+        "PID-3.5 = ''",
+        "PID-5.7 = ''",
+        "ORC-2.1 = ORC-4.1",
+        "ORC-2.2 = ORC-4.2",
+        "OBR-2.1 = ORC-4.1",
+        "OBR-2.2 = ORC-4.2",
+        "OBR-16 = ORC-12",
+        "OBR.count() = 1"
       ]
     }
   ]
