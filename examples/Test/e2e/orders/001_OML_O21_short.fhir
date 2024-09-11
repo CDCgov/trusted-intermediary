@@ -24,7 +24,7 @@
         "eventCoding": {
           "system": "http://terminology.hl7.org/CodeSystem/v2-0003",
           "code": "O21",
-          "display": "OML - Laboratory order"
+          "display": "OML^O21^OML_O21"
         },
         "source": {
           "name": "CDC Trusted Intermediary",
@@ -64,7 +64,7 @@
             {
               "system": "http://terminology.hl7.org/CodeSystem/v2-0003",
               "code": "O21",
-              "display": "OML - Laboratory order"
+              "display": "OML^O21^OML_O21"
             }
           ]
         }
