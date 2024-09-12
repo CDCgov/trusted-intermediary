@@ -3,9 +3,11 @@ package gov.hhs.cdc.trustedintermediary.rse2e;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Segment;
 import gov.hhs.cdc.trustedintermediary.rse2e.ruleengine.HL7Message;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class HL7ExpressionEvaluator {
 
@@ -31,7 +33,7 @@ public class HL7ExpressionEvaluator {
         String leftValue =
                 leftLiteralValueMatcher.matches()
                         ? leftLiteralValueMatcher.group(1)
-                        : String.valueOf(getFieldValue(inputMessage.getMessage(), leftOperand));
+                        : getFieldValue(inputMessage.getMessage(), leftOperand);
 
         if (operator.equals("in")) {
             return evaluateMembership(leftValue, rightOperand);
@@ -41,7 +43,7 @@ public class HL7ExpressionEvaluator {
         String rightValue =
                 rightLiteralValueMatcher.matches()
                         ? rightLiteralValueMatcher.group(1)
-                        : String.valueOf(getFieldValue(inputMessage.getMessage(), rightOperand));
+                        : getFieldValue(inputMessage.getMessage(), rightOperand);
 
         if (operator.equals("=")) {
             return leftValue.equals(rightValue);
@@ -54,15 +56,23 @@ public class HL7ExpressionEvaluator {
 
     private static boolean evaluateMembership(String leftValue, String rightOperand) {
         Pattern literalValueCollectionPattern = Pattern.compile("\\(([^)]+)\\)");
-        // TODO - parse right operand and evaluate membership
-        return false;
+        Matcher literalValueCollectionMatcher = literalValueCollectionPattern.matcher(rightOperand);
+        if (!literalValueCollectionMatcher.matches()) {
+            return false;
+        }
+        String arrayString = literalValueCollectionMatcher.group(1);
+        ArrayList<String> values =
+                Arrays.stream(arrayString.split(","))
+                        .map(s -> s.trim().replaceAll("^'|'$", ""))
+                        .collect(Collectors.toCollection(ArrayList::new));
+        return values.contains(leftValue);
     }
 
-    private static Optional<String> getFieldValue(Message message, String fieldName) {
+    private static String getFieldValue(Message message, String fieldName) {
         Pattern hl7FieldNamePattern = Pattern.compile("(input|output)?\\.?(\\S+)-(\\S+)");
         Matcher hl7FieldNameMatcher = hl7FieldNamePattern.matcher(fieldName);
         if (!hl7FieldNameMatcher.matches()) {
-            return Optional.empty();
+            return "";
         }
 
         // TODO - handle input/output
@@ -73,25 +83,24 @@ public class HL7ExpressionEvaluator {
         try {
             Segment segment = (Segment) message.get(segmentName);
             if (fieldComponents.length == 0) { // e.g. MSH
-                return Optional.of(segment.encode());
+                return segment.encode();
             } else if (fieldComponents.length == 1) { // e.g. MSH-9
-                return Optional.of(
-                        segment.getField(Integer.parseInt(fieldComponents[0]), 0).encode());
+                return segment.getField(Integer.parseInt(fieldComponents[0]), 0).encode();
             } else if (fieldComponents.length == 2) { // e.g. MSH-9.2
                 String field = segment.getField(Integer.parseInt(fieldComponents[0]), 0).encode();
                 // TODO - get the separator from the message instead of assuming
                 String[] subfieldsArray = field.split("\\^");
                 if (subfieldsArray.length > 1) {
                     // TODO - validate that we're not getting a sub-zero result after subtracting 1?
-                    return Optional.of(subfieldsArray[Integer.parseInt(fieldComponents[1]) - 1]);
+                    return subfieldsArray[Integer.parseInt(fieldComponents[1]) - 1];
                 }
-                return Optional.empty();
+                return "";
             } else {
-                return Optional.empty();
+                return "";
             }
         } catch (Exception e) {
             // log exception
-            return Optional.empty();
+            return "";
         }
     }
 }
