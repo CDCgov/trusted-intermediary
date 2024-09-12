@@ -68,6 +68,9 @@ public class HapiHelper {
     public static final String EXTENSION_OBR_URL =
             "https://reportstream.cdc.gov/fhir/StructureDefinition/obr-observation-request";
 
+    public static final String LOCALLY_DEFINED_CODE =
+            "https://terminology.hl7.org/CodeSystem-v2-0396.html#v2-0396-99zzzorL";
+
     /**
      * Returns a {@link Stream} of FHIR resources inside the provided {@link Bundle} that match the
      * given resource type.
