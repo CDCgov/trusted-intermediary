@@ -9,17 +9,10 @@ import java.util.regex.Pattern;
 
 public class HL7ExpressionEvaluator {
 
-    private static final Pattern operationPattern =
-            Pattern.compile("^(\\S+)\\s*(=|!=|in)\\s*(.+)$");
-    private static final Pattern hl7FieldNamePattern =
-            Pattern.compile("(input|output)?\\.?(\\S+)-(\\S+)");
-    private static final Pattern literalValuePattern = Pattern.compile("'(\\S+)'");
-    private static final Pattern literalValueCollectionPattern = Pattern.compile("\\(([^)]+)\\)");
-    private static final Pattern hl7CountPattern = Pattern.compile("(\\S+)\\.count\\(\\)");
-
     public static boolean parseAndEvaluate(
             HL7Message<Message> inputMessage, HL7Message<Message> outputMessage, String statement) {
 
+        Pattern operationPattern = Pattern.compile("^(\\S+)\\s*(=|!=|in)\\s*(.+)$");
         Matcher matcher = operationPattern.matcher(statement);
 
         if (!matcher.matches()) {
@@ -28,43 +21,46 @@ public class HL7ExpressionEvaluator {
 
         String leftOperand = matcher.group(1);
         String operator = matcher.group(2); // `=`, `!=`, or `in`
-        String rightOperand = matcher.group(3); // The right-hand side field, or null
+        String rightOperand = matcher.group(3);
 
+        // TODO - check if left operand is a count operation
+        Pattern hl7CountPattern = Pattern.compile("(\\S+)\\.count\\(\\)");
+
+        Pattern literalValuePattern = Pattern.compile("'(\\S+)'");
         Matcher leftLiteralValueMatcher = literalValuePattern.matcher(leftOperand);
-        Matcher rightLiteralValueMatcher = literalValuePattern.matcher(rightOperand);
-
         String leftValue =
                 leftLiteralValueMatcher.matches()
                         ? leftLiteralValueMatcher.group(1)
                         : String.valueOf(getFieldValue(inputMessage.getMessage(), leftOperand));
+
+        if (operator.equals("in")) {
+            return evaluateMembership(leftValue, rightOperand);
+        }
+
+        Matcher rightLiteralValueMatcher = literalValuePattern.matcher(rightOperand);
         String rightValue =
                 rightLiteralValueMatcher.matches()
                         ? rightLiteralValueMatcher.group(1)
                         : String.valueOf(getFieldValue(inputMessage.getMessage(), rightOperand));
 
-        switch (operator) {
-            case "=" -> {
-                return leftValue.equals(rightValue);
-            }
-            case "!=" -> {
-                return !leftValue.equals(rightValue);
-            }
-            case "in" -> {
-                Matcher literalValueCollectionMatcher =
-                        literalValueCollectionPattern.matcher(rightOperand);
-                if (literalValueCollectionMatcher.matches()) {
-                    String inValues = literalValueCollectionMatcher.group(1);
-                    return false;
-                }
-            }
+        if (operator.equals("=")) {
+            return leftValue.equals(rightValue);
+        } else if (operator.equals("!=")) {
+            return !leftValue.equals(rightValue);
         }
 
+        throw new IllegalArgumentException("Unknown operator: " + operator);
+    }
+
+    private static boolean evaluateMembership(String leftValue, String rightOperand) {
+        Pattern literalValueCollectionPattern = Pattern.compile("\\(([^)]+)\\)");
+        // TODO - parse right operand and evaluate membership
         return false;
     }
 
     private static Optional<String> getFieldValue(Message message, String fieldName) {
+        Pattern hl7FieldNamePattern = Pattern.compile("(input|output)?\\.?(\\S+)-(\\S+)");
         Matcher hl7FieldNameMatcher = hl7FieldNamePattern.matcher(fieldName);
-
         if (!hl7FieldNameMatcher.matches()) {
             return Optional.empty();
         }
@@ -98,14 +94,4 @@ public class HL7ExpressionEvaluator {
             return Optional.empty();
         }
     }
-
-    //    private static boolean evaluateComparison(
-    //            String leftValue, String rightValue, String operator) {
-    //        if ("=".equals(operator)) {
-    //            return leftValue != null && leftValue.equals(rightValue);
-    //        } else if ("!=".equals(operator)) {
-    //            return leftValue != null && !leftValue.equals(rightValue);
-    //        }
-    //        throw new IllegalArgumentException("Unknown operator: " + operator);
-    //    }
 }
