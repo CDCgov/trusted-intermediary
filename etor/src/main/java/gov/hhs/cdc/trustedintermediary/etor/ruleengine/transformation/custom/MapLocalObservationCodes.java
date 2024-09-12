@@ -3,8 +3,11 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhirTransformation;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Observation;
 
 //        The signature has to change from
@@ -14,19 +17,63 @@ import org.hl7.fhir.r4.model.Observation;
 //        Object some Java generic like
 //          TransformationRuleMethod(String name, Map<String, ?> args)
 public class MapLocalObservationCodes implements CustomFhirTransformation {
+
+    private HashMap<String, Identifier> map;
+
+    public MapLocalObservationCodes() {
+        InitMap();
+    }
+
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
         var observations = HapiHelper.resourcesInBundle(bundle, Observation.class);
 
-        //        CDPH local code
-        //        99717-32
+        for (Observation obv : observations.toList()) {
+            // get the 99717- prefixed value
 
-        //        Suggested LOINC code
-        //        85269-9
-        //        Suggested LOINC description
-        //        X-linked Adrenoleukodystrophy (X- ALD) newborn screen interpretation
+            var codingList = obv.getCode().getCoding();
 
+            for (Coding coding : codingList) {
+                if (Objects.equals(
+                                coding.getExtensionByUrl(
+                                                "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding")
+                                        .getValue()
+                                        .toString(),
+                                "alt-coding")
+                        && coding.getSystem().equals(HapiHelper.LOCALLY_DEFINED_CODE)) {
+                    // look up the code in the hash map
+                    var identifier = map.get(coding.getCode());
+
+                    // assuming for now that we found it. now create a new coding and add it to the
+                    // coding list
+                    var mappedCoding =
+                            new Coding(
+                                    identifier.codingSystem(),
+                                    identifier.code(),
+                                    identifier.description());
+                    mappedCoding.addExtension(
+                            HapiHelper.EXTENSION_CWE_CODING,
+                            "coding"); // <--- this isn't right, it's looking for a type here. we
+                    // need to get 'coding' into the valueString
+
+                    mappedCoding.addExtension(
+                            HapiHelper.EXTENSION_CODING_SYSTEM, identifier.codingSystem());
+
+                    codingList.add(0, mappedCoding);
+                }
+            }
+        }
+    }
+
+    private void InitMap() {
+        this.map = new HashMap<String, Identifier>();
+        map.put(
+                "99717-32",
+                new Identifier(
+                        "85269-9",
+                        "X-linked Adrenoleukodystrophy (X- ALD) newborn screen interpretation",
+                        "LN"));
         //        List<String> definedValues = new
         //                "99717-32",
         //        "99717-33",
@@ -44,18 +91,5 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
         //
         //        "99717-47",
         //        "99717-46"
-        //    ];
-
-        for (Observation obv : observations.toList()) {
-            // get the 99717- prefixed value
-
-            var coding = obv.getCode().getCodingFirstRep();
-
-            if (coding.getSystem().equals(HapiHelper.LOCALLY_DEFINED_CODE)) {
-                // update the values
-            }
-        }
-
-        var dummyLoinc = "55555";
     }
 }
