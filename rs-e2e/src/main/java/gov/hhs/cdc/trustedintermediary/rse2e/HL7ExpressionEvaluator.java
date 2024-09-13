@@ -31,7 +31,7 @@ public class HL7ExpressionEvaluator {
         Matcher hl7CountMatcher = hl7CountPattern.matcher(leftOperand);
         if (hl7CountMatcher.matches()) {
             return evaluateCollectionCount(
-                    outputMessage.getMessage(), hl7CountMatcher.group(1), rightOperand, operator);
+                    outputMessage, hl7CountMatcher.group(1), rightOperand, operator);
         }
 
         // matches either a literal value (e.g. 'EPIC') or a field reference (e.g. MSH-5.1,
@@ -41,8 +41,7 @@ public class HL7ExpressionEvaluator {
         String leftValue =
                 leftLiteralValueMatcher.matches()
                         ? leftLiteralValueMatcher.group(1)
-                        : getFieldValue(
-                                outputMessage.getMessage(), inputMessage.getMessage(), leftOperand);
+                        : getFieldValue(outputMessage, inputMessage, leftOperand);
 
         // matches membership operator (e.g. MSH-5.1 in ('EPIC', 'CERNER'))
         if (operator.equals("in")) {
@@ -55,10 +54,7 @@ public class HL7ExpressionEvaluator {
         String rightValue =
                 rightLiteralValueMatcher.matches()
                         ? rightLiteralValueMatcher.group(1)
-                        : getFieldValue(
-                                outputMessage.getMessage(),
-                                inputMessage.getMessage(),
-                                rightOperand);
+                        : getFieldValue(outputMessage, inputMessage, rightOperand);
 
         // matches equality operators (e.g. MSH-5.1 = 'EPIC', MSH-5.1 != 'EPIC')
         return evaluateEquality(leftValue, rightValue, operator);
