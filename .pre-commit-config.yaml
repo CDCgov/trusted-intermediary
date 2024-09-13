@@ -32,3 +32,13 @@ repos:
           - java
           - groovy
         pass_filenames: false
+
+  - repo: local
+    hooks:
+      - id: terraform-format
+        name: terraform-format
+        entry: bash -c 'terraform fmt -recursive -write'
+        language: system
+        types_or:
+          - terraform
+        pass_filenames: false
