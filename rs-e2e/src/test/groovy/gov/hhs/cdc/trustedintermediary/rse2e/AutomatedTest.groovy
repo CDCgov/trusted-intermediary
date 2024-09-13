@@ -52,5 +52,6 @@ class AutomatedTest  extends Specification  {
 
         then:
         0 * mockLogger.logError(_ as String, _ as Exception)
+        0 * mockLogger.logWarning(_ as String)
     }
 }
