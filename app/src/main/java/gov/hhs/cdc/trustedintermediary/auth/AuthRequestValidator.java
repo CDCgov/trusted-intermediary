@@ -21,7 +21,7 @@ public class AuthRequestValidator {
     private static final AuthRequestValidator INSTANCE = new AuthRequestValidator();
 
     @Inject private AuthEngine jwtEngine;
-    @Inject private Cache keyCache;
+    @Inject Cache keyCache;
     @Inject private Secrets secrets;
     @Inject private Logger logger;
 
@@ -42,19 +42,20 @@ public class AuthRequestValidator {
             return false;
         }
 
+        var ourPublicKey = "trusted-intermediary-public-key-" + ApplicationContext.getEnvironment();
         try {
             logger.logDebug("Checking if bearer token is valid...");
-            jwtEngine.validateToken(token, retrievePublicKey());
+            jwtEngine.validateToken(token, retrievePublicKey(ourPublicKey));
             logger.logInfo("Bearer token is valid");
             return true;
         } catch (InvalidTokenException e) {
             logger.logError("Invalid bearer token!", e);
+            this.keyCache.remove(ourPublicKey);
             return false;
         }
     }
 
-    protected String retrievePublicKey() throws SecretRetrievalException {
-        var ourPublicKey = "trusted-intermediary-public-key-" + ApplicationContext.getEnvironment();
+    protected String retrievePublicKey(String ourPublicKey) throws SecretRetrievalException {
         String key = this.keyCache.get(ourPublicKey);
         if (key != null) {
             return key;

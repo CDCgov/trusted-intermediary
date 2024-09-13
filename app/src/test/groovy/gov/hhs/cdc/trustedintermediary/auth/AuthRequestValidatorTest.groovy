@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.auth
 
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache
@@ -227,21 +228,17 @@ class AuthRequestValidatorTest extends Specification{
         def validator = AuthRequestValidator.getInstance()
         def token = "fake-token-here"
         def header = Map.of("Authorization", "Bearer " + token)
-        def mockEngine = Mock(JjwtEngine)
-        def mockCache = Mock(KeyCache)
         def request = new DomainRequest()
         def expected = false
-        TestApplicationContext.register(Cache, mockCache)
-        TestApplicationContext.register(AuthEngine, mockEngine)
+        TestApplicationContext.register(Cache, KeyCache.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
         request.setHeaders(header)
-        mockCache.get(_ as String) >> {"my-fake-private-key"}
-        mockEngine.validateToken(_ as String, _ as String) >> { throw new InvalidTokenException(new Throwable("fake exception"))}
         def actual = validator.isValidAuthenticatedRequest(request)
 
         then:
         actual == expected
+        validator.keyCache.get("trusted-intermediary-public-key-" + ApplicationContext.getEnvironment()) == null
     }
 }
