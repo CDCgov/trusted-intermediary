@@ -1,5 +1,5 @@
 resource "azurerm_monitor_action_group" "notify_slack_email" {
-  count               = contains(["internal", "dev", "stg", "prd"], var.environment) ? 1 : 0
+  count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti${var.environment}-actiongroup"
   resource_group_name = data.azurerm_resource_group.group.name
   short_name          = "cdcti-alerts"
@@ -29,7 +29,7 @@ resource "azurerm_monitor_action_group" "notify_slack_email" {
 }
 
 resource "azurerm_monitor_scheduled_query_rules_alert" "database_token_expired_alert" {
-  count               = contains(["internal", "dev", "stg", "prd"], var.environment) ? 1 : 0
+  count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti-${var.environment}-api-log-token-alert"
   location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
