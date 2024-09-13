@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.ruleengine;
 
+import ca.uhn.hl7v2.model.Message;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.io.FileNotFoundException;
@@ -49,7 +50,7 @@ public class AssertionRuleEngine {
         }
     }
 
-    public void runRules(HL7Message<?> resource) {
+    public void runRules(Message outputMessage, Message inputMessage) {
         try {
             ensureRulesLoaded();
         } catch (RuleLoaderException e) {
@@ -58,8 +59,8 @@ public class AssertionRuleEngine {
         }
 
         for (AssertionRule rule : assertionRules) {
-            if (rule.shouldRun(resource)) {
-                rule.runRule((resource));
+            if (rule.shouldRun(outputMessage)) {
+                rule.runRule(outputMessage, inputMessage);
             }
         }
     }

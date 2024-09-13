@@ -3,7 +3,6 @@ package gov.hhs.cdc.trustedintermediary.rse2e;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Segment;
-import gov.hhs.cdc.trustedintermediary.rse2e.ruleengine.HL7Message;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Matcher;
@@ -13,7 +12,7 @@ import java.util.stream.Collectors;
 public class HL7ExpressionEvaluator {
 
     public static boolean parseAndEvaluate(
-            HL7Message<Message> outputMessage, HL7Message<Message> inputMessage, String statement) {
+            Message outputMessage, Message inputMessage, String statement) {
 
         Pattern operationPattern = Pattern.compile("^(\\S+)\\s*(=|!=|in)\\s*(.+)$");
         Matcher matcher = operationPattern.matcher(statement);

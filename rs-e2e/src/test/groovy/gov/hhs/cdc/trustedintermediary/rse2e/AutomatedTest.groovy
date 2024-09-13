@@ -4,14 +4,12 @@ import ca.uhn.hl7v2.model.Message
 import ca.uhn.hl7v2.model.v251.datatype.HD
 import ca.uhn.hl7v2.model.v251.segment.MSH
 import gov.hhs.cdc.trustedintermediary.rse2e.ruleengine.AssertionRuleEngine
-import gov.hhs.cdc.trustedintermediary.rse2e.ruleengine.HL7Message
 import spock.lang.Specification
 
 class AutomatedTest  extends Specification  {
 
     List<InputStream> recentAzureFiles
     List<InputStream> recentLocalFiles
-    AssertionRuleEngine engine = new AssertionRuleEngine()
 
     def setup() {
         FileFetcher azureFileFetcher = new AzureBlobFileFetcher()
@@ -43,8 +41,8 @@ class AutomatedTest  extends Specification  {
         then:
         engine.runRules {}
         for (messagePair in matchedFiles) {
-            HL7Message inputMessage = messagePair.getKey() as HL7Message
-            HL7Message outputMessage = messagePair.getValue() as HL7Message
+            Message inputMessage = messagePair.getKey() as Message
+            Message outputMessage = messagePair.getValue() as Message
 
             String[] statements = [
                 "input.MSH-1 = MSH-1",

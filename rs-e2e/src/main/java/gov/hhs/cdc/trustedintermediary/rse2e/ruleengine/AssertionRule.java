@@ -1,16 +1,17 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.ruleengine;
 
+import ca.uhn.hl7v2.model.Message;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
+import gov.hhs.cdc.trustedintermediary.rse2e.HL7ExpressionEvaluator;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The AssertionRule class extends the {@link AssertionRule Rule} class and represents a assertion
- * rule. It implements the {@link AssertionRule#runRule(HL7Message) runRule} method to apply a
+ * rule. It implements the {@link AssertionRule#runRule(Message, Message) runRule} method to apply a
  * assertion to the FHIR resource.
  */
 public class AssertionRule {
@@ -25,7 +26,7 @@ public class AssertionRule {
     private String description;
     private String message;
     private List<String> conditions;
-    private List<AssertionRuleMethod> rules;
+    private List<String> rules;
 
     /**
      * Do not delete this constructor! It is used for JSON deserialization when loading rules from a
@@ -38,7 +39,7 @@ public class AssertionRule {
             String ruleDescription,
             String ruleMessage,
             List<String> ruleConditions,
-            List<AssertionRuleMethod> ruleActions) {
+            List<String> ruleActions) {
         name = ruleName;
         description = ruleDescription;
         message = ruleMessage;
@@ -62,19 +63,17 @@ public class AssertionRule {
         return conditions;
     }
 
-    public List<AssertionRuleMethod> getRules() {
+    public List<String> getRules() {
         return rules;
     }
 
-    public boolean shouldRun(HL7Message<?> resource) {
+    public boolean shouldRun(Message message) {
         return conditions.stream()
                 .allMatch(
                         condition -> {
                             try {
-                                // TODO: Implement the evaluateCondition method for HL7
-                                //                                return
-                                // fhirEngine.evaluateCondition(resource.getMessage(), condition);
-                                return false;
+                                return HL7ExpressionEvaluator.parseAndEvaluate(
+                                        message, null, condition);
                             } catch (Exception e) {
                                 logger.logError(
                                         "Rule ["
@@ -88,42 +87,25 @@ public class AssertionRule {
                         });
     }
 
-    public void runRule(HL7Message<?> resource) {
-        for (AssertionRuleMethod assertion : this.getRules()) {
+    public void runRule(Message outputMessage, Message inputMessage) {
+
+        for (String assertion : this.getRules()) {
             try {
-                applyAssertion(assertion, resource);
-            } catch (RuntimeException e) {
-                logger.logError("Error applying assertion: " + assertion.name(), e);
+                HL7ExpressionEvaluator.parseAndEvaluate(outputMessage, inputMessage, assertion);
+            } catch (Exception e) {
+                this.logger.logError(
+                        "Rule ["
+                                + this.getName()
+                                + "]: "
+                                + "An error occurred while evaluating the assertion: "
+                                + assertion,
+                        e);
             }
         }
-    }
-
-    private void applyAssertion(AssertionRuleMethod assertion, HL7Message<?> resource) {
-        String name = assertion.name();
-        Map<String, ArrayList<?>> args = assertion.args();
-        logger.logInfo("Applying assertion: " + name);
-
-        CustomHL7Assertion assertionInstance = getAssertionInstance(name);
-        assertionInstance.transform(resource, args);
-    }
-
-    static CustomHL7Assertion getAssertionInstance(String name) throws RuntimeException {
-        return assertionInstanceCache.computeIfAbsent(name, AssertionRule::createAssertionInstance);
-    }
-
-    private static CustomHL7Assertion createAssertionInstance(String assertionName) {
-        String fullClassName = getFullClassName(assertionName);
-        try {
-            Class<?> clazz = Class.forName(fullClassName);
-            return (CustomHL7Assertion) clazz.getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException(
-                    "Error creating assertion instance for: " + assertionName, e);
-        }
-    }
-
-    private static String getFullClassName(String className) {
-        String packageName = "gov.hhs.cdc.trustedintermediary.rse2e.ruleengine.custom";
-        return packageName + "." + className;
+        //        this.getName() (e.g. "General Rules"): {
+        //            assertion (e.g. "input.MSH-1 = MSH-1": result (e.g. true or false),
+        //            assertion: result,
+        //
+        //        }
     }
 }
