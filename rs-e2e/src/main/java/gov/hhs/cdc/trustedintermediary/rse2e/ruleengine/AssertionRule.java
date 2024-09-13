@@ -3,7 +3,6 @@ package gov.hhs.cdc.trustedintermediary.rse2e.ruleengine;
 import ca.uhn.hl7v2.model.Message;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.rse2e.HL7ExpressionEvaluator;
-import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.List;
 
@@ -15,7 +14,6 @@ import java.util.List;
 public class AssertionRule {
 
     protected final Logger logger = ApplicationContext.getImplementation(Logger.class);
-    protected final HapiFhir fhirEngine = ApplicationContext.getImplementation(HapiFhir.class);
 
     private String name;
     private List<String> conditions;

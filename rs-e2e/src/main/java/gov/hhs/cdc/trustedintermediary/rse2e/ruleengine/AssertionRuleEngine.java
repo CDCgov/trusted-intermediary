@@ -1,10 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.ruleengine;
 
 import ca.uhn.hl7v2.model.Message;
-import gov.hhs.cdc.trustedintermediary.external.slf4j.LocalLogger;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -13,12 +11,12 @@ import javax.inject.Inject;
 
 /** Implements the RuleEngine interface. It represents a rule engine for transformations. */
 public class AssertionRuleEngine {
-    private final String ruleDefinitionsFileName = "assertion_definitions.json";
     final List<AssertionRule> assertionRules = new ArrayList<>();
     volatile boolean rulesLoaded = false;
+
     private static final AssertionRuleEngine INSTANCE = new AssertionRuleEngine();
 
-    Logger logger = LocalLogger.getInstance();
+    @Inject Logger logger;
     @Inject RuleLoader ruleLoader;
 
     public AssertionRuleEngine() {}
@@ -32,12 +30,11 @@ public class AssertionRuleEngine {
         if (!rulesLoaded) {
             synchronized (assertionRules) {
                 if (!rulesLoaded) {
+                    String ruleDefinitionsFileName = "assertion_definitions.json";
                     try (InputStream stream =
                             getClass()
                                     .getClassLoader()
                                     .getResourceAsStream(ruleDefinitionsFileName)) {
-                        // TODO - the next line is where we're erroring out, something to do with
-                        // the TypeReference maybe?
                         List<AssertionRule> parsedRules =
                                 ruleLoader.loadRules(stream, new TypeReference<>() {});
                         assertionRules.addAll(parsedRules);
@@ -45,8 +42,7 @@ public class AssertionRuleEngine {
 
                     } catch (IOException | NullPointerException e) {
                         throw new RuleLoaderException(
-                                "File not found: " + ruleDefinitionsFileName,
-                                new FileNotFoundException());
+                                "File not found: " + ruleDefinitionsFileName, e);
                     }
                 }
             }
