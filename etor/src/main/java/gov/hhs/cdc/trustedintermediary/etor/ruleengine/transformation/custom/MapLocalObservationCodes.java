@@ -31,8 +31,6 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
         var observations = HapiHelper.resourcesInBundle(bundle, Observation.class);
 
         for (Observation obv : observations.toList()) {
-            // get the 99717- prefixed value
-
             var codingList = obv.getCode().getCoding();
 
             for (Coding coding : codingList) {
@@ -60,7 +58,8 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                             HapiHelper.EXTENSION_CODING_SYSTEM,
                             new StringType(identifier.codingSystem()));
 
-                    // We don't want to add this while we're in the for() loop
+                    // FIXME: We don't want to add this while we're in the for() loop because it
+                    // alters the list.
                     // codingList.add(0, mappedCoding);
                 }
             }
@@ -75,22 +74,26 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                         "85269-9",
                         "X-linked Adrenoleukodystrophy (X- ALD) newborn screen interpretation",
                         "LN"));
-        //        List<String> definedValues = new
-        //                "99717-32",
-        //        "99717-33",
-        //        "99717-34",
+        // "99717-33"
+        map.put(
+                "99717-34",
+                new Identifier(
+                        "PLT325",
+                        "ABCD1 gene mutation found [Identifier] in DBS by Sequencing",
+                        "PLT"));
+        // "99717-6"
         //
-        //        "99717-6",
+        // "99717-35"
+        // "99717-36"
         //
-        //        "99717-35",
-        //        "99717-36",
+        // "99717-48"
+        // "99717-44"
         //
-        //        "99717-48",
-        //        "99717-44",
+        // "99717-50"
         //
-        //        "99717-50",
+        // "99717-47"
+        // "99717-46"
         //
-        //        "99717-47",
-        //        "99717-46"
+        // "99717-60"
     }
 }
