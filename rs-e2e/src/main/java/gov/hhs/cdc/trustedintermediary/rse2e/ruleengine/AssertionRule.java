@@ -6,8 +6,6 @@ import gov.hhs.cdc.trustedintermediary.rse2e.HL7ExpressionEvaluator;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The AssertionRule class extends the {@link AssertionRule Rule} class and represents a assertion
@@ -19,12 +17,7 @@ public class AssertionRule {
     protected final Logger logger = ApplicationContext.getImplementation(Logger.class);
     protected final HapiFhir fhirEngine = ApplicationContext.getImplementation(HapiFhir.class);
 
-    private static final Map<String, CustomHL7Assertion> assertionInstanceCache =
-            new ConcurrentHashMap<>();
-
     private String name;
-    private String description;
-    private String message;
     private List<String> conditions;
     private List<String> rules;
 
@@ -34,29 +27,14 @@ public class AssertionRule {
      */
     public AssertionRule() {}
 
-    public AssertionRule(
-            String ruleName,
-            String ruleDescription,
-            String ruleMessage,
-            List<String> ruleConditions,
-            List<String> ruleActions) {
+    public AssertionRule(String ruleName, List<String> ruleConditions, List<String> ruleActions) {
         name = ruleName;
-        description = ruleDescription;
-        message = ruleMessage;
         conditions = ruleConditions;
         rules = ruleActions;
     }
 
     public String getName() {
         return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getMessage() {
-        return message;
     }
 
     public List<String> getConditions() {
@@ -91,7 +69,19 @@ public class AssertionRule {
 
         for (String assertion : this.getRules()) {
             try {
-                HL7ExpressionEvaluator.parseAndEvaluate(outputMessage, inputMessage, assertion);
+                boolean isValid =
+                        HL7ExpressionEvaluator.parseAndEvaluate(
+                                outputMessage, inputMessage, assertion);
+                if (!isValid) {
+                    this.logger.logWarning(
+                            "Assertion failed for '"
+                                    + this.getName()
+                                    + "': "
+                                    + assertion
+                                    + " ("
+                                    + outputMessage.getName()
+                                    + ")");
+                }
             } catch (Exception e) {
                 this.logger.logError(
                         "Rule ["
@@ -102,10 +92,5 @@ public class AssertionRule {
                         e);
             }
         }
-        //        this.getName() (e.g. "General Rules"): {
-        //            assertion (e.g. "input.MSH-1 = MSH-1": result (e.g. true or false),
-        //            assertion: result,
-        //
-        //        }
     }
 }

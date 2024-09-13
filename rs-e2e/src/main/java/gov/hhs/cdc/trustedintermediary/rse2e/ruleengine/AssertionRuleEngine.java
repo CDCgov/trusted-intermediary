@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.ruleengine;
 
 import ca.uhn.hl7v2.model.Message;
+import gov.hhs.cdc.trustedintermediary.external.slf4j.LocalLogger;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.io.FileNotFoundException;
@@ -17,10 +18,10 @@ public class AssertionRuleEngine {
     volatile boolean rulesLoaded = false;
     private static final AssertionRuleEngine INSTANCE = new AssertionRuleEngine();
 
-    @Inject Logger logger;
+    Logger logger = LocalLogger.getInstance();
     @Inject RuleLoader ruleLoader;
 
-    private AssertionRuleEngine() {}
+    public AssertionRuleEngine() {}
 
     public void unloadRules() {
         assertionRules.clear();
@@ -35,6 +36,8 @@ public class AssertionRuleEngine {
                             getClass()
                                     .getClassLoader()
                                     .getResourceAsStream(ruleDefinitionsFileName)) {
+                        // TODO - the next line is where we're erroring out, something to do with
+                        // the TypeReference maybe?
                         List<AssertionRule> parsedRules =
                                 ruleLoader.loadRules(stream, new TypeReference<>() {});
                         assertionRules.addAll(parsedRules);
