@@ -68,6 +68,8 @@ public class HapiHelper {
     public static final String LOCALLY_DEFINED_CODE =
             "https://terminology.hl7.org/CodeSystem-v2-0396.html#v2-0396-99zzzorL";
 
+    public static final String LOINC_CODE = "http://loinc.org";
+
     /**
      * Returns a {@link Stream} of FHIR resources inside the provided {@link Bundle} that match the
      * given resource type.

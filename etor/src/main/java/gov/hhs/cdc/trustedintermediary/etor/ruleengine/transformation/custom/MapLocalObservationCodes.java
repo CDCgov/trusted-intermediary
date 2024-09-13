@@ -9,6 +9,7 @@ import java.util.Objects;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Observation;
+import org.hl7.fhir.r4.model.StringType;
 
 //        The signature has to change from
 //          TransformationRuleMethod(String name, Map<String, String> args)
@@ -51,16 +52,16 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                             new Coding(
                                     identifier.codingSystem(),
                                     identifier.code(),
-                                    identifier.description());
+                                    identifier.display());
                     mappedCoding.addExtension(
-                            HapiHelper.EXTENSION_CWE_CODING,
-                            "coding"); // <--- this isn't right, it's looking for a type here. we
-                    // need to get 'coding' into the valueString
+                            HapiHelper.EXTENSION_CWE_CODING, new StringType("coding"));
 
                     mappedCoding.addExtension(
-                            HapiHelper.EXTENSION_CODING_SYSTEM, identifier.codingSystem());
+                            HapiHelper.EXTENSION_CODING_SYSTEM,
+                            new StringType(identifier.codingSystem()));
 
-                    codingList.add(0, mappedCoding);
+                    // We don't want to add this while we're in the for() loop
+                    // codingList.add(0, mappedCoding);
                 }
             }
         }
