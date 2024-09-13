@@ -25,6 +25,8 @@ public class AuthRequestValidator {
     @Inject private Secrets secrets;
     @Inject private Logger logger;
 
+    String ourPublicKey = "trusted-intermediary-public-key-" + ApplicationContext.getEnvironment();
+
     private AuthRequestValidator() {}
 
     public static AuthRequestValidator getInstance() {
@@ -42,10 +44,9 @@ public class AuthRequestValidator {
             return false;
         }
 
-        var ourPublicKey = "trusted-intermediary-public-key-" + ApplicationContext.getEnvironment();
         try {
             logger.logDebug("Checking if bearer token is valid...");
-            jwtEngine.validateToken(token, retrievePublicKey(ourPublicKey));
+            jwtEngine.validateToken(token, retrievePublicKey());
             logger.logInfo("Bearer token is valid");
             return true;
         } catch (InvalidTokenException e) {
@@ -55,7 +56,7 @@ public class AuthRequestValidator {
         }
     }
 
-    protected String retrievePublicKey(String ourPublicKey) throws SecretRetrievalException {
+    protected String retrievePublicKey() throws SecretRetrievalException {
         String key = this.keyCache.get(ourPublicKey);
         if (key != null) {
             return key;

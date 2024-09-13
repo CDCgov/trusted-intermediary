@@ -1,13 +1,12 @@
 package gov.hhs.cdc.trustedintermediary.auth
 
-import gov.hhs.cdc.trustedintermediary.context.ApplicationContext
+
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache
 import gov.hhs.cdc.trustedintermediary.external.jjwt.JjwtEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache
-import gov.hhs.cdc.trustedintermediary.wrappers.InvalidTokenException
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets
 import spock.lang.Specification
 
@@ -239,6 +238,6 @@ class AuthRequestValidatorTest extends Specification{
 
         then:
         actual == expected
-        validator.keyCache.get("trusted-intermediary-public-key-" + ApplicationContext.getEnvironment()) == null
+        validator.keyCache.get(validator.ourPublicKey) == null
     }
 }
