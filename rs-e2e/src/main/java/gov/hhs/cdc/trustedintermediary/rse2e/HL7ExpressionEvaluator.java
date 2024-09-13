@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class HL7ExpressionEvaluator {
 
     public static boolean parseAndEvaluate(
-            HL7Message<Message> inputMessage, HL7Message<Message> outputMessage, String statement) {
+            HL7Message<Message> outputMessage, HL7Message<Message> inputMessage, String statement) {
 
         Pattern operationPattern = Pattern.compile("^(\\S+)\\s*(=|!=|in)\\s*(.+)$");
         Matcher matcher = operationPattern.matcher(statement);
@@ -42,7 +42,8 @@ public class HL7ExpressionEvaluator {
         String leftValue =
                 leftLiteralValueMatcher.matches()
                         ? leftLiteralValueMatcher.group(1)
-                        : getFieldValue(outputMessage.getMessage(), leftOperand);
+                        : getFieldValue(
+                                outputMessage.getMessage(), inputMessage.getMessage(), leftOperand);
 
         // matches membership operator (e.g. MSH-5.1 in ('EPIC', 'CERNER'))
         if (operator.equals("in")) {
@@ -55,7 +56,10 @@ public class HL7ExpressionEvaluator {
         String rightValue =
                 rightLiteralValueMatcher.matches()
                         ? rightLiteralValueMatcher.group(1)
-                        : getFieldValue(outputMessage.getMessage(), rightOperand);
+                        : getFieldValue(
+                                outputMessage.getMessage(),
+                                inputMessage.getMessage(),
+                                rightOperand);
 
         // matches equality operators (e.g. MSH-5.1 = 'EPIC', MSH-5.1 != 'EPIC')
         return evaluateEquality(leftValue, rightValue, operator);
@@ -97,15 +101,16 @@ public class HL7ExpressionEvaluator {
         return evaluateEquality(count, rightValue, operator);
     }
 
-    private static String getFieldValue(Message message, String fieldName) {
+    private static String getFieldValue(
+            Message outputMessage, Message inputMessage, String fieldName) {
         Pattern hl7FieldNamePattern = Pattern.compile("(input|output)?\\.?(\\S+)-(\\S+)");
         Matcher hl7FieldNameMatcher = hl7FieldNamePattern.matcher(fieldName);
         if (!hl7FieldNameMatcher.matches()) {
             return "";
         }
 
-        // TODO - handle input/output
-        String file = hl7FieldNameMatcher.group(1);
+        Message message =
+                "input".equals(hl7FieldNameMatcher.group(1)) ? inputMessage : outputMessage;
         String segmentName = hl7FieldNameMatcher.group(2);
         String index = hl7FieldNameMatcher.group(3);
         String[] fieldComponents = index.split("\\.");
@@ -114,6 +119,7 @@ public class HL7ExpressionEvaluator {
             if (fieldComponents.length == 0) { // e.g. MSH
                 return segment.encode();
             } else if (fieldComponents.length == 1) { // e.g. MSH-9
+                // Encoding the `|` character shows as `\F\`, the field separator
                 return segment.getField(Integer.parseInt(fieldComponents[0]), 0).encode();
             } else if (fieldComponents.length == 2) { // e.g. MSH-9.2
                 String field = segment.getField(Integer.parseInt(fieldComponents[0]), 0).encode();

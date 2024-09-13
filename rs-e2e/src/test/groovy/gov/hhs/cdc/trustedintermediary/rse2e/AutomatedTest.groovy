@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.rse2e
 import ca.uhn.hl7v2.model.Message
 import ca.uhn.hl7v2.model.v251.datatype.HD
 import ca.uhn.hl7v2.model.v251.segment.MSH
+import gov.hhs.cdc.trustedintermediary.rse2e.ruleengine.AssertionRuleEngine
 import gov.hhs.cdc.trustedintermediary.rse2e.ruleengine.HL7Message
 import spock.lang.Specification
 
@@ -10,6 +11,7 @@ class AutomatedTest  extends Specification  {
 
     List<InputStream> recentAzureFiles
     List<InputStream> recentLocalFiles
+    AssertionRuleEngine engine = new AssertionRuleEngine()
 
     def setup() {
         FileFetcher azureFileFetcher = new AzureBlobFileFetcher()
@@ -39,11 +41,14 @@ class AutomatedTest  extends Specification  {
         def matchedFiles = HL7FileMatcher.matchFiles(recentAzureFiles, recentLocalFiles)
 
         then:
+        engine.runRules {}
         for (messagePair in matchedFiles) {
             HL7Message inputMessage = messagePair.getKey() as HL7Message
             HL7Message outputMessage = messagePair.getValue() as HL7Message
 
             String[] statements = [
+                "input.MSH-1 = MSH-1",
+                "MSH-1 = input.MSH-1",
                 "MSH-9.1 = 'R01'",
                 "ORC-2.1 = ORC-4.1",
                 "MSH-6 in ('R797', 'R508')",
@@ -51,8 +56,10 @@ class AutomatedTest  extends Specification  {
             ]
 
             for (String statement in statements) {
-                boolean result = HL7ExpressionEvaluator.parseAndEvaluate(inputMessage, outputMessage, statement)
+                HL7ExpressionEvaluator.parseAndEvaluate(inputMessage, outputMessage, statement)
             }
+
+            //            TODO make some asserts based on return values?
 
             // TODO - based on MSH contents, cast message to more specific type like ORU, OML, etc?
             //            MSH inputMessageMSH = inputMessage.get("MSH") as MSH

@@ -46,7 +46,7 @@ public class HL7FileMatcher {
     public static Map<String, Message> mapMessageByControlId(List<InputStream> files) {
 
         HapiContext context = new DefaultHapiContext();
-        Parser parser = context.getGenericParser();
+        Parser parser = context.getPipeParser();
 
         Map<String, Message> messageMap = new HashMap<>();
 
@@ -63,8 +63,8 @@ public class HL7FileMatcher {
             } catch (IOException | HL7Exception e) {
                 // TODO - log exceptions
                 // TODO - some transformations may make the messages unparseable - what do we want
-                // to do then?
-                // CA's transformation for MSH-9 for ORU messages is one example
+                //  to do then?
+                //  CA's transformation for MSH-9 for ORU messages is one example
             }
         }
 
