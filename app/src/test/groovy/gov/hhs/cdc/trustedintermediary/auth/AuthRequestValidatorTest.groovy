@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.auth
 
-
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainRequest
 import gov.hhs.cdc.trustedintermediary.external.inmemory.KeyCache
