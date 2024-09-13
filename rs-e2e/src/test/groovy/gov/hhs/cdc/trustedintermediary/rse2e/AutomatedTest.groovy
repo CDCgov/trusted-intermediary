@@ -43,10 +43,16 @@ class AutomatedTest  extends Specification  {
             HL7Message inputMessage = messagePair.getKey() as HL7Message
             HL7Message outputMessage = messagePair.getValue() as HL7Message
 
-            def value = inputMessage.get("MSH").getField(9, 0).getComponent(1)
+            String[] statements = [
+                "MSH-9.1 = 'R01'",
+                "ORC-2.1 = ORC-4.1",
+                "MSH-6 in ('R797', 'R508')",
+                "MSH.count() = 1"
+            ]
 
-            String statement = "MSH-4.1 = 'CDPH'"
-            boolean result1 = HL7ExpressionEvaluator.parseAndEvaluate(inputMessage, outputMessage, statement)
+            for (String statement in statements) {
+                boolean result = HL7ExpressionEvaluator.parseAndEvaluate(inputMessage, outputMessage, statement)
+            }
 
             // TODO - based on MSH contents, cast message to more specific type like ORU, OML, etc?
             //            MSH inputMessageMSH = inputMessage.get("MSH") as MSH

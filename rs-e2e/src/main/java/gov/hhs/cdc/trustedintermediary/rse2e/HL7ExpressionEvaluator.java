@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.rse2e;
 
+import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Segment;
 import gov.hhs.cdc.trustedintermediary.rse2e.ruleengine.HL7Message;
@@ -21,36 +22,52 @@ public class HL7ExpressionEvaluator {
             throw new IllegalArgumentException("Invalid statement format.");
         }
 
-        String leftOperand = matcher.group(1);
+        String leftOperand = matcher.group(1); // e.g. MSH-5.1, input.MSH-5.1, 'EPIC', OBR.count()
         String operator = matcher.group(2); // `=`, `!=`, or `in`
-        String rightOperand = matcher.group(3);
+        String rightOperand =
+                matcher.group(3); // e.g. MSH-5.1, input.MSH-5.1, 'EPIC', ('EPIC', 'CERNER'), 2
 
-        // TODO - check if left operand is a count operation
+        // matches a count operation (e.g. OBR.count())
         Pattern hl7CountPattern = Pattern.compile("(\\S+)\\.count\\(\\)");
+        Matcher hl7CountMatcher = hl7CountPattern.matcher(leftOperand);
+        if (hl7CountMatcher.matches()) {
+            return evaluateCollectionCount(
+                    outputMessage.getMessage(), hl7CountMatcher.group(1), rightOperand, operator);
+        }
 
+        // matches either a literal value (e.g. 'EPIC') or a field reference (e.g. MSH-5.1,
+        // input.MSH-5.1)
         Pattern literalValuePattern = Pattern.compile("'(\\S+)'");
         Matcher leftLiteralValueMatcher = literalValuePattern.matcher(leftOperand);
         String leftValue =
                 leftLiteralValueMatcher.matches()
                         ? leftLiteralValueMatcher.group(1)
-                        : getFieldValue(inputMessage.getMessage(), leftOperand);
+                        : getFieldValue(outputMessage.getMessage(), leftOperand);
 
+        // matches membership operator (e.g. MSH-5.1 in ('EPIC', 'CERNER'))
         if (operator.equals("in")) {
             return evaluateMembership(leftValue, rightOperand);
         }
 
+        // matches either a literal value (e.g. 'EPIC') or a field reference (e.g. MSH-5.1,
+        // input.MSH-5.1)
         Matcher rightLiteralValueMatcher = literalValuePattern.matcher(rightOperand);
         String rightValue =
                 rightLiteralValueMatcher.matches()
                         ? rightLiteralValueMatcher.group(1)
-                        : getFieldValue(inputMessage.getMessage(), rightOperand);
+                        : getFieldValue(outputMessage.getMessage(), rightOperand);
 
+        // matches equality operators (e.g. MSH-5.1 = 'EPIC', MSH-5.1 != 'EPIC')
+        return evaluateEquality(leftValue, rightValue, operator);
+    }
+
+    private static <T extends Comparable<T>> boolean evaluateEquality(
+            T leftValue, T rightValue, String operator) {
         if (operator.equals("=")) {
-            return leftValue.equals(rightValue);
+            return leftValue.compareTo(rightValue) == 0;
         } else if (operator.equals("!=")) {
-            return !leftValue.equals(rightValue);
+            return leftValue.compareTo(rightValue) != 0;
         }
-
         throw new IllegalArgumentException("Unknown operator: " + operator);
     }
 
@@ -66,6 +83,18 @@ public class HL7ExpressionEvaluator {
                         .map(s -> s.trim().replaceAll("^'|'$", ""))
                         .collect(Collectors.toCollection(ArrayList::new));
         return values.contains(leftValue);
+    }
+
+    private static boolean evaluateCollectionCount(
+            Message message, String segmentName, String rightOperand, String operator) {
+        int count;
+        try {
+            count = message.getAll(segmentName).length;
+        } catch (HL7Exception e) {
+            return false;
+        }
+        int rightValue = Integer.parseInt(rightOperand);
+        return evaluateEquality(count, rightValue, operator);
     }
 
     private static String getFieldValue(Message message, String fieldName) {
