@@ -3,6 +3,7 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhirTransformation;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -33,6 +34,7 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
         for (Observation obv : observations.toList()) {
             var codingList = obv.getCode().getCoding();
 
+            var updatedList = new ArrayList<Coding>();
             for (Coding coding : codingList) {
                 if (Objects.equals(
                                 coding.getExtensionByUrl(
@@ -61,8 +63,12 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                     // FIXME: We don't want to add this while we're in the for() loop because it
                     // alters the list.
                     // codingList.add(0, mappedCoding);
+                    updatedList.add(mappedCoding);
                 }
             }
+
+            codingList.addAll(0, updatedList);
+            //            obv.getCode().setCoding(updatedList);
         }
     }
 
