@@ -33,12 +33,11 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
 
         for (Observation obv : observations.toList()) {
             var codingList = obv.getCode().getCoding();
-
             var updatedList = new ArrayList<Coding>();
+
             for (Coding coding : codingList) {
                 if (Objects.equals(
-                                coding.getExtensionByUrl(
-                                                "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding")
+                                coding.getExtensionByUrl(HapiHelper.EXTENSION_CWE_CODING)
                                         .getValue()
                                         .toString(),
                                 "alt-coding")
@@ -60,15 +59,11 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                             HapiHelper.EXTENSION_CODING_SYSTEM,
                             new StringType(identifier.codingSystem()));
 
-                    // FIXME: We don't want to add this while we're in the for() loop because it
-                    // alters the list.
-                    // codingList.add(0, mappedCoding);
                     updatedList.add(mappedCoding);
                 }
             }
 
             codingList.addAll(0, updatedList);
-            //            obv.getCode().setCoding(updatedList);
         }
     }
 
