@@ -176,7 +176,7 @@ class MapLocalObservationCodesTest extends Specification {
 
     Coding getCoding(String code, String display, boolean localCoding, String cweCoding) {
         def coding = new Coding()
-        coding.system = localCoding ? HapiHelper.LOCALLY_DEFINED_CODE : HapiHelper.LOINC_CODE
+        coding.system = localCoding ? HapiHelper.LOCALLY_DEFINED_CODE : HapiHelper.LOINC_URL
         coding.code = code
         coding.display = display
 

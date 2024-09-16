@@ -39,12 +39,20 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
             var updatedList = new ArrayList<Coding>();
 
             for (Coding coding : codingList) {
+                var cwe =
+                        coding.getExtensionByUrl(HapiHelper.EXTENSION_CWE_CODING)
+                                .getValue()
+                                .toString();
+
+                // @todo this wont work if coding is not the first extension. see better way of
+                // doing it...
+                if (Objects.equals(cwe, "coding")
+                        || coding.getSystem().equals(HapiHelper.LOINC_CODE)) {
+                    break;
+                }
+
                 // alt coding is 4,5,6
-                if (Objects.equals(
-                                coding.getExtensionByUrl(HapiHelper.EXTENSION_CWE_CODING)
-                                        .getValue()
-                                        .toString(),
-                                "alt-coding")
+                if (Objects.equals(cwe, "alt-coding")
                         && coding.getSystem().equals(HapiHelper.LOCALLY_DEFINED_CODE)) {
                     // look up the code in the hash map
                     var identifier = map.get(coding.getCode());
