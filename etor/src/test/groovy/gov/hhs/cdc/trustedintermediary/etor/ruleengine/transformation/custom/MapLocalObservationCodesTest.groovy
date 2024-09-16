@@ -113,7 +113,7 @@ class MapLocalObservationCodesTest extends Specification {
             String expectedExtensionSystem) {
         assert coding.code == expectedCode
         assert coding.display == expectedDisplay
-        coding.system == expectedSystem
+        assert coding.system == expectedSystem
         assert coding.extension.size() == 2
         assert coding.getExtensionString(HapiHelper.EXTENSION_CWE_CODING) == expectedExtensionCoding
         assert coding.getExtensionString(HapiHelper.EXTENSION_CODING_SYSTEM) == expectedExtensionSystem
