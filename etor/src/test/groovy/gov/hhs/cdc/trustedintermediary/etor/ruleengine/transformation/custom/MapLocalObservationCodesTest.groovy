@@ -61,10 +61,38 @@ class MapLocalObservationCodesTest extends Specification {
         "99717-34"  | "Adrenoleukodystrophy Mutation comments/discussion"                || "PLT325"     | "ABCD1 gene mutation found [Identifier] in DBS by Sequencing"          | null                  | "PLT"
     }
 
+    def "When message has a mappable local observation code in OBX-3.4/5/6 and other content in OBX3-1/2/3, no mapping should occur"() {
+        given:
+        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
+
+        def observation = new Observation()
+        observation.code.addCoding(getCoding(obx31code, obx32display, false, "coding" ))
+        observation.code.addCoding(getCoding("99717-32", "Adrenoleukodystrophy deficiency newborn screening interpretation", true, "alt-coding" ))
+
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), null)
+
+        then:
+        def transformedObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
+        def transformedCodingList = transformedObservation.getCode().getCoding()
+        transformedCodingList.size() == 2
+
+        // Mapped code should be added as the primary coding
+        observation.code.coding == transformedCodingList
+
+        where:
+        obx31code    | obx32display
+        "some_code"  | "Some display"
+        "some_code"  | null
+        null         | "Some display"
+    }
+
     def "When message has a LOINC code, no mapping should occur"() {
         given:
         final String CODE = "A_LOINC_CODE"
-        final String DISPLAY = "Some description"
+        final String DISPLAY = "Some display"
 
         def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
 
