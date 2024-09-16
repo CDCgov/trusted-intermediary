@@ -8,6 +8,7 @@ locals {
   rs_domain_prefix               = "${local.selected_rs_environment_prefix}${length(local.selected_rs_environment_prefix) == 0 ? "" : "."}"
   higher_environment_level       = var.environment == "stg" || var.environment == "prd"
   cdc_domain_environment         = var.environment == "dev" || var.environment == "stg" || var.environment == "prd"
+  non_pr_environment             = !strcontains(var.environment, "pr")
 }
 
 data "azurerm_resource_group" "group" {
