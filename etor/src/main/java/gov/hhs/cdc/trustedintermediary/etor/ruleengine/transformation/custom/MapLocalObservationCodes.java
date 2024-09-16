@@ -1,8 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom;
 
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhirTransformation;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +21,7 @@ import org.hl7.fhir.r4.model.StringType;
 //        Object some Java generic like
 //          TransformationRuleMethod(String name, Map<String, ?> args)
 public class MapLocalObservationCodes implements CustomFhirTransformation {
+    protected final Logger logger = ApplicationContext.getImplementation(Logger.class);
 
     private HashMap<String, Identifier> map;
 
@@ -36,6 +39,7 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
             var updatedList = new ArrayList<Coding>();
 
             for (Coding coding : codingList) {
+                // alt coding is 4,5,6
                 if (Objects.equals(
                                 coding.getExtensionByUrl(HapiHelper.EXTENSION_CWE_CODING)
                                         .getValue()
@@ -45,11 +49,16 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                     // look up the code in the hash map
                     var identifier = map.get(coding.getCode());
 
+                    if (identifier == null) {
+                        logger.logWarning("Unmapped local code detected");
+                        continue;
+                    }
+
                     // assuming for now that we found it. now create a new coding and add it to the
                     // coding list
                     var mappedCoding =
                             new Coding(
-                                    identifier.codingSystem(),
+                                    UrlForCodetype(identifier.codingSystem()),
                                     identifier.code(),
                                     identifier.display());
                     mappedCoding.addExtension(
@@ -67,6 +76,14 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
         }
     }
 
+    private String UrlForCodetype(String code) {
+        return switch (code) {
+            case HapiHelper.LOINC_CODE -> HapiHelper.LOINC_URL;
+            case HapiHelper.PLT_CODE -> null;
+            default -> HapiHelper.LOCALLY_DEFINED_CODE;
+        };
+    }
+
     private void InitMap() {
         this.map = new HashMap<String, Identifier>();
         map.put(
@@ -74,14 +91,14 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                 new Identifier(
                         "85269-9",
                         "X-linked Adrenoleukodystrophy (X- ALD) newborn screen interpretation",
-                        "LN"));
+                        HapiHelper.LOINC_CODE));
         // "99717-33"
         map.put(
                 "99717-34",
                 new Identifier(
                         "PLT325",
                         "ABCD1 gene mutation found [Identifier] in DBS by Sequencing",
-                        "PLT"));
+                        HapiHelper.PLT_CODE));
         // "99717-6"
         //
         // "99717-35"

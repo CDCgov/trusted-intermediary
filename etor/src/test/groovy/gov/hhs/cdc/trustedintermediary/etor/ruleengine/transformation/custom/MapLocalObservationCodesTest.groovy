@@ -60,7 +60,7 @@ class MapLocalObservationCodesTest extends Specification {
 
         where:
         initialCode | initialDisplay                                                     || expectedCode | expectedDisplay                                                        | expectedCodingSystem  | expectedExtensionSystem
-        "99717-32"  | "Adrenoleukodystrophy deficiency newborn screening interpretation" || "85269-9"    | "X-linked Adrenoleukodystrophy (X- ALD) newborn screen interpretation" | HapiHelper.LOINC_CODE | "LN"
+        "99717-32"  | "Adrenoleukodystrophy deficiency newborn screening interpretation" || "85269-9"    | "X-linked Adrenoleukodystrophy (X- ALD) newborn screen interpretation" | HapiHelper.LOINC_URL | "LN"
         "99717-34"  | "Adrenoleukodystrophy Mutation comments/discussion"                || "PLT325"     | "ABCD1 gene mutation found [Identifier] in DBS by Sequencing"          | null                  | "PLT"
     }
 
@@ -145,9 +145,9 @@ class MapLocalObservationCodesTest extends Specification {
                 transformedCodingList[0],
                 CODE,
                 DISPLAY,
-                HapiHelper.LOINC_CODE,
+                HapiHelper.LOINC_URL,
                 codingSystem,
-                "LN")
+                HapiHelper.LOINC_CODE)
 
         where:
         codingSystem << ["coding", "alt-coding"]
