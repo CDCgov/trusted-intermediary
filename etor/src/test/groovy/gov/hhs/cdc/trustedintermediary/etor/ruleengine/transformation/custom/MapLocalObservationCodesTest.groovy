@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
+import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
@@ -172,6 +173,38 @@ class MapLocalObservationCodesTest extends Specification {
         def transformedObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
 
         observation == transformedObservation
+    }
+
+    def "When message has multiple observations, local and non-local codes are handled appropriately"() {
+        given:
+        final String FHIR_ORU_PATH = "../CA/020_CA_ORU_R01_CDPH_OBX_to_LOINC_1_hl7_translation.fhir"
+        def fhirResource = ExamplesHelper.getExampleFhirResource(FHIR_ORU_PATH)
+        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def initialObservations = HapiHelper.resourcesInBundle(bundle, Observation.class)
+
+        expect:
+        initialObservations.count() == 114
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), null)
+
+        then:
+        def transformedObservations = HapiHelper.resourcesInBundle(bundle, Observation.class)
+        transformedObservations.count() == 114
+
+        // Look up the first and a few other LOINC codes. Ensure they are present and there is no alt-coding
+        // 57721-3
+        // 8339-4
+        // 54104-5
+
+        // mapped LOINC - ensure evaluateCoding is correct
+        // 99717-33 to 85268-1
+
+        // mapped PLT - ensure evaluateCoding is correct
+        // 99717-48 to PLT3258
+
+        // unmapped - ensure it's left as-is
+        // 99717-5^Accession Number^L
     }
 
     Coding getCoding(String code, String display, boolean localCoding, String cweCoding) {
