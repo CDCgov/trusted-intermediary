@@ -30,4 +30,9 @@ public class KeyCache implements Cache {
     public String get(String key) {
         return keys.get(key);
     }
+
+    @Override
+    public void remove(String key) {
+        keys.remove(key);
+    }
 }
