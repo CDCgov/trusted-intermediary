@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Observation
@@ -12,11 +13,13 @@ import spock.lang.Specification
 
 class MapLocalObservationCodesTest extends Specification {
     def transformClass
+    def mockLogger = Mock(Logger)
 
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.injectRegisteredImplementations()
+        TestApplicationContext.register(Logger, mockLogger)
 
         transformClass = new MapLocalObservationCodes()
     }
@@ -59,6 +62,35 @@ class MapLocalObservationCodesTest extends Specification {
         initialCode | initialDisplay                                                     || expectedCode | expectedDisplay                                                        | expectedCodingSystem  | expectedExtensionSystem
         "99717-32"  | "Adrenoleukodystrophy deficiency newborn screening interpretation" || "85269-9"    | "X-linked Adrenoleukodystrophy (X- ALD) newborn screen interpretation" | HapiHelper.LOINC_CODE | "LN"
         "99717-34"  | "Adrenoleukodystrophy Mutation comments/discussion"                || "PLT325"     | "ABCD1 gene mutation found [Identifier] in DBS by Sequencing"          | null                  | "PLT"
+    }
+
+    def "When message has an unmapped local observation code in OBX-3.4/5/6, no mapping should occur and a warning should be logged"() {
+        given:
+        final String LOCAL_CODE = "UNMAPPED"
+        final String LOCAL_DISPLAY = "An unmapped local code"
+        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
+
+        def observation = new Observation()
+        observation.code.addCoding(getCoding(LOCAL_CODE, LOCAL_DISPLAY, true, "alt-coding" ))
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), null)
+
+        then:
+        1 * mockLogger.logWarning(_ as String)
+
+        def transformedObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
+        def transformedCodingList = transformedObservation.getCode().getCoding()
+        transformedCodingList.size() == 1
+
+        evaluateCoding(
+                transformedCodingList[0],
+                LOCAL_CODE,
+                LOCAL_DISPLAY,
+                HapiHelper.LOCALLY_DEFINED_CODE,
+                "alt-coding",
+                "L")
     }
 
     def "When message has a mappable local observation code in OBX-3.4/5/6 and other content in OBX3-1/2/3, no mapping should occur"() {
@@ -119,6 +151,27 @@ class MapLocalObservationCodesTest extends Specification {
 
         where:
         codingSystem << ["coding", "alt-coding"]
+    }
+
+    def "When no observation identifier, the observation does not change"() {
+        given:
+        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
+
+        // Add an observation with an observation value and a status, but no observation identifier
+        def observation = new Observation()
+        observation.status = Observation.ObservationStatus.FINAL
+        def valueCoding = new Coding()
+        valueCoding.code = "123456"
+        observation.valueCodeableConcept.coding.add(valueCoding)
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), null)
+
+        then:
+        def transformedObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
+
+        observation == transformedObservation
     }
 
     Coding getCoding(String code, String display, boolean localCoding, String cweCoding) {
