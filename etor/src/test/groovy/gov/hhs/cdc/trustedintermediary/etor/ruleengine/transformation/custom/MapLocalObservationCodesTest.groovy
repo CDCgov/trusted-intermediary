@@ -57,7 +57,6 @@ class MapLocalObservationCodesTest extends Specification {
                 HapiHelper.LOCALLY_DEFINED_CODE,
                 "alt-coding",
                 "L")
-
     }
 
     def "When message has a observation code with a PLT mapping, should add the mapped code to OBX-3.1/2/3"() {
@@ -96,6 +95,38 @@ class MapLocalObservationCodesTest extends Specification {
                 HapiHelper.LOCALLY_DEFINED_CODE,
                 "alt-coding",
                 "L")
+    }
+
+    def "When message has a LOINC code in 4/5/6, no mapping should occur"() {
+        given:
+        final String CODE = "A_LOINC_CODE"
+        final String DISPLAY = "Some description"
+
+        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
+
+        def observation = new Observation()
+        observation.code.addCoding(getCoding(CODE, DISPLAY, false, codingSystem ))
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), null)
+
+        then:
+        def transformedObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
+        def transformedCodingList = transformedObservation.getCode().getCoding()
+        transformedCodingList.size() == 1
+
+        // Code should remain as the alternate coding
+        evaluateCoding(
+                transformedCodingList[0],
+                CODE,
+                DISPLAY,
+                HapiHelper.LOINC_CODE,
+                codingSystem,
+                "LN")
+
+        where:
+        codingSystem << ["coding", "alt-coding"]
     }
 
     Coding getCoding(String code, String display, boolean localCoding, String cweCoding) {
