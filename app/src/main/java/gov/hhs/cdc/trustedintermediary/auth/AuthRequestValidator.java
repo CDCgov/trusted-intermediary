@@ -14,16 +14,19 @@ import javax.inject.Inject;
 /**
  * This class is used to check the validity of a http request. It has methods that extract the
  * bearer token, check if the token is empty or null, and if the token is valid. For example,
- * expired tokens, empty tokens, or tokens not signed by our private key, will be invalid.
+ * expired tokens, empty tokens, or tokens not signed by our private key, will be invalid. Tokens
+ * are cached on first use, and removed if invalid.
  */
 public class AuthRequestValidator {
 
     private static final AuthRequestValidator INSTANCE = new AuthRequestValidator();
 
     @Inject private AuthEngine jwtEngine;
-    @Inject private Cache keyCache;
+    @Inject Cache keyCache;
     @Inject private Secrets secrets;
     @Inject private Logger logger;
+
+    String ourPublicKey = "trusted-intermediary-public-key-" + ApplicationContext.getEnvironment();
 
     private AuthRequestValidator() {}
 
@@ -49,12 +52,12 @@ public class AuthRequestValidator {
             return true;
         } catch (InvalidTokenException e) {
             logger.logError("Invalid bearer token!", e);
+            this.keyCache.remove(ourPublicKey);
             return false;
         }
     }
 
     protected String retrievePublicKey() throws SecretRetrievalException {
-        var ourPublicKey = "trusted-intermediary-public-key-" + ApplicationContext.getEnvironment();
         String key = this.keyCache.get(ourPublicKey);
         if (key != null) {
             return key;
