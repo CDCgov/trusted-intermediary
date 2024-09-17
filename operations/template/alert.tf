@@ -1,4 +1,5 @@
 resource "azurerm_monitor_action_group" "notify_slack_email" {
+  count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti${var.environment}-actiongroup"
   resource_group_name = data.azurerm_resource_group.group.name
   short_name          = "cdcti-alerts"
@@ -28,12 +29,13 @@ resource "azurerm_monitor_action_group" "notify_slack_email" {
 }
 
 resource "azurerm_monitor_scheduled_query_rules_alert" "database_token_expired_alert" {
+  count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti-${var.environment}-api-log-token-alert"
   location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
 
   action {
-    action_group  = [azurerm_monitor_action_group.notify_slack_email.id]
+    action_group  = [azurerm_monitor_action_group.notify_slack_email[count.index].id]
     email_subject = "FATAL: The access token has expired!"
   }
 
