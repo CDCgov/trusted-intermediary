@@ -86,14 +86,14 @@ public class HL7ExpressionEvaluator {
 
     private static boolean evaluateCollectionCount(
             Message message, String segmentName, String rightOperand, String operator) {
-        int count;
         try {
-            count = message.getAll(segmentName).length;
-        } catch (HL7Exception e) {
+            int count = message.getAll(segmentName).length;
+            int rightValue = Integer.parseInt(rightOperand);
+            return evaluateEquality(count, rightValue, operator);
+        } catch (HL7Exception | NumberFormatException e) {
+            // TODO - log exception
             return false;
         }
-        int rightValue = Integer.parseInt(rightOperand);
-        return evaluateEquality(count, rightValue, operator);
     }
 
     private static String getFieldValue(
