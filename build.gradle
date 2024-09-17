@@ -87,6 +87,7 @@ subprojects {
 
 ext.jacoco_excludes = [
         '**/e2e/**',
+        '**/rs-e2e/**',
         '**/javalin/App*',
         '**/jackson/Jackson*',
         '**/slf4j/LocalLogger*',
