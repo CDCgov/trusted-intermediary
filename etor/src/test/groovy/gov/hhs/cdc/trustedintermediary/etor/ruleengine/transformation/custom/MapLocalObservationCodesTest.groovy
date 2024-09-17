@@ -55,14 +55,14 @@ class MapLocalObservationCodesTest extends Specification {
                 transformedCodingList[1],
                 initialCode,
                 initialDisplay,
-                HapiHelper.LOCALLY_DEFINED_CODE,
+                HapiHelper.LOCAL_CODE_URL,
                 "alt-coding",
-                "L")
+                HapiHelper.LOCAL_CODE)
 
         where:
         initialCode | initialDisplay                                                     || expectedCode | expectedDisplay                                                        | expectedCodingSystem  | expectedExtensionSystem
-        "99717-32"  | "Adrenoleukodystrophy deficiency newborn screening interpretation" || "85269-9"    | "X-linked Adrenoleukodystrophy (X- ALD) newborn screen interpretation" | HapiHelper.LOINC_URL | "LN"
-        "99717-34"  | "Adrenoleukodystrophy Mutation comments/discussion"                || "PLT325"     | "ABCD1 gene mutation found [Identifier] in DBS by Sequencing"          | null                  | "PLT"
+        "99717-32"  | "Adrenoleukodystrophy deficiency newborn screening interpretation" || "85269-9"    | "X-linked Adrenoleukodystrophy (X- ALD) newborn screen interpretation" | HapiHelper.LOINC_URL  | HapiHelper.LOINC_CODE
+        "99717-34"  | "Adrenoleukodystrophy Mutation comments/discussion"                || "PLT325"     | "ABCD1 gene mutation found [Identifier] in DBS by Sequencing"          | null                  | HapiHelper.PLT_CODE
     }
 
     def "When message has an unmapped local observation code in OBX-3.4/5/6, no mapping should occur and a warning should be logged"() {
@@ -207,9 +207,9 @@ class MapLocalObservationCodesTest extends Specification {
                 mappedLoinc.code.coding[1],
                 "99717-33",
                 "Adrenoleukodystrophy deficiency newborn screening comments-discussion",
-                HapiHelper.LOCALLY_DEFINED_CODE,
+                HapiHelper.LOCAL_CODE_URL,
                 "alt-coding",
-                "L")
+                HapiHelper.LOCAL_CODE)
 
         // Mappable local code to PLT - should have mapped code added
         def mappedPlt = getObservationByCode(transformedObservations, "99717-48")
@@ -227,9 +227,9 @@ class MapLocalObservationCodesTest extends Specification {
                 mappedPlt.code.coding[1],
                 "99717-48",
                 "MPS I IDUA Gene Sequence Mutation Information",
-                HapiHelper.LOCALLY_DEFINED_CODE,
+                HapiHelper.LOCAL_CODE_URL,
                 "alt-coding",
-                "L")
+                HapiHelper.LOCAL_CODE)
 
         // Unmapped local code - ensure it is left as-is
         def initialAccession = getObservationByCode(initialObservations, "99717-5")
@@ -243,12 +243,12 @@ class MapLocalObservationCodesTest extends Specification {
 
     Coding getCoding(String code, String display, boolean localCoding, String cweCoding) {
         def coding = new Coding()
-        coding.system = localCoding ? HapiHelper.LOCALLY_DEFINED_CODE : HapiHelper.LOINC_URL
+        coding.system = localCoding ? HapiHelper.LOCAL_CODE_URL : HapiHelper.LOINC_URL
         coding.code = code
         coding.display = display
 
         coding.addExtension(HapiHelper.EXTENSION_CWE_CODING, new StringType(cweCoding))
-        coding.addExtension(HapiHelper.EXTENSION_CODING_SYSTEM, new StringType(localCoding ? "L" : "LN"))
+        coding.addExtension(HapiHelper.EXTENSION_CODING_SYSTEM, new StringType(localCoding ? HapiHelper.LOCAL_CODE : HapiHelper.LOINC_CODE))
         return coding
     }
 

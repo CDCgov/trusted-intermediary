@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
+import gov.hhs.cdc.trustedintermediary.etor.messages.IdentifierCode;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhirTransformation;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
@@ -14,16 +15,10 @@ import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.StringType;
 
-//        The signature has to change from
-//          TransformationRuleMethod(String name, Map<String, String> args)
-//        to something like
-//          TransformationRuleMethod(String name, Map<String, Object> args) or instead of
-//        Object some Java generic like
-//          TransformationRuleMethod(String name, Map<String, ?> args)
 public class MapLocalObservationCodes implements CustomFhirTransformation {
     protected final Logger logger = ApplicationContext.getImplementation(Logger.class);
 
-    private HashMap<String, Identifier> map;
+    private HashMap<String, IdentifierCode> map;
 
     public MapLocalObservationCodes() {
         InitMap();
@@ -51,19 +46,20 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                     break;
                 }
 
-                // alt coding is 4,5,6
+                // alt coding is HL7 OBX-3.4,5,6
                 if (Objects.equals(cwe, "alt-coding")
-                        && coding.getSystem().equals(HapiHelper.LOCALLY_DEFINED_CODE)) {
+                        && coding.getSystem().equals(HapiHelper.LOCAL_CODE_URL)) {
+
                     // look up the code in the hash map
                     var identifier = map.get(coding.getCode());
 
                     if (identifier == null) {
+                        // The local code was not found in the mapping
                         logger.logWarning("Unmapped local code detected");
                         continue;
                     }
 
-                    // assuming for now that we found it. now create a new coding and add it to the
-                    // coding list
+                    // Create a new coding and add it to the coding list
                     var mappedCoding =
                             new Coding(
                                     UrlForCodetype(identifier.codingSystem()),
@@ -88,58 +84,58 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
         return switch (code) {
             case HapiHelper.LOINC_CODE -> HapiHelper.LOINC_URL;
             case HapiHelper.PLT_CODE -> null;
-            default -> HapiHelper.LOCALLY_DEFINED_CODE;
+            default -> HapiHelper.LOCAL_CODE_URL;
         };
     }
 
     private void InitMap() {
-        this.map = new HashMap<String, Identifier>();
+        this.map = new HashMap<String, IdentifierCode>();
         map.put(
                 "99717-32",
-                new Identifier(
+                new IdentifierCode(
                         "85269-9",
                         "X-linked Adrenoleukodystrophy (X- ALD) newborn screen interpretation",
                         HapiHelper.LOINC_CODE));
         map.put(
                 "99717-33",
-                new Identifier(
+                new IdentifierCode(
                         "85268-1",
                         "X-linked Adrenoleukodystrophy (X- ALD) newborn screening comment-discussion",
                         HapiHelper.LOINC_CODE));
         map.put(
                 "99717-34",
-                new Identifier(
+                new IdentifierCode(
                         "PLT325",
                         "ABCD1 gene mutation found [Identifier] in DBS by Sequencing",
                         HapiHelper.PLT_CODE));
         map.put(
                 "99717-6",
-                new Identifier(
+                new IdentifierCode(
                         "53340-6",
                         "17-Hydroxyprogesterone [Moles/volume] in DBS",
                         HapiHelper.LOINC_CODE));
-        map.put("99717-35", new Identifier("REQUEST_PLT", "REQUEST_PLT", HapiHelper.PLT_CODE));
-        map.put("99717-36", new Identifier("REQUEST PLT", "REQUEST_PLT", HapiHelper.PLT_CODE));
+        map.put("99717-35", new IdentifierCode("REQUEST_PLT", "REQUEST_PLT", HapiHelper.PLT_CODE));
+        map.put("99717-36", new IdentifierCode("REQUEST PLT", "REQUEST_PLT", HapiHelper.PLT_CODE));
         map.put(
                 "99717-48",
-                new Identifier(
+                new IdentifierCode(
                         "PLT3258",
                         "IDUA gene mutations found [Identifier] in DBS by Sequencing",
                         HapiHelper.PLT_CODE));
-        map.put("99717-44", new Identifier("REQUEST PLT", "REQUEST PLT", HapiHelper.PLT_CODE));
+        map.put("99717-44", new IdentifierCode("REQUEST PLT", "REQUEST PLT", HapiHelper.PLT_CODE));
         map.put(
                 "99717-50",
-                new Identifier(
+                new IdentifierCode(
                         "PLT3275",
                         "IDS gene mutations found [Identifier] in Dried Bloodspot by Molecular genetics method Nominal",
                         HapiHelper.PLT_CODE));
         map.put(
                 "99717-47",
-                new Identifier(
+                new IdentifierCode(
                         "PLT3252",
                         "GAA gene mutation found [Identifier] in DBS by Sequencing",
                         HapiHelper.PLT_CODE));
-        map.put("99717-46", new Identifier("REQUEST PLT", "REQUEST PLT", HapiHelper.PLT_CODE));
-        map.put("99717-60", new Identifier("REQUEST PLT", "REQUEST PLT", HapiHelper.PLT_CODE));
+        map.put("99717-46", new IdentifierCode("REQUEST PLT", "REQUEST PLT", HapiHelper.PLT_CODE));
+        map.put("99717-60", new IdentifierCode("REQUEST PLT", "REQUEST PLT", HapiHelper.PLT_CODE));
     }
 }
