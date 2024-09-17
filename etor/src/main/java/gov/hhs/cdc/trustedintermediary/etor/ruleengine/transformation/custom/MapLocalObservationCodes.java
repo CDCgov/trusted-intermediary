@@ -100,26 +100,46 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                         "85269-9",
                         "X-linked Adrenoleukodystrophy (X- ALD) newborn screen interpretation",
                         HapiHelper.LOINC_CODE));
-        // "99717-33"
+        map.put(
+                "99717-33",
+                new Identifier(
+                        "85268-1",
+                        "X-linked Adrenoleukodystrophy (X- ALD) newborn screening comment-discussion",
+                        HapiHelper.LOINC_CODE));
         map.put(
                 "99717-34",
                 new Identifier(
                         "PLT325",
                         "ABCD1 gene mutation found [Identifier] in DBS by Sequencing",
                         HapiHelper.PLT_CODE));
-        // "99717-6"
-        //
-        // "99717-35"
-        // "99717-36"
-        //
-        // "99717-48"
-        // "99717-44"
-        //
-        // "99717-50"
-        //
-        // "99717-47"
-        // "99717-46"
-        //
-        // "99717-60"
+        map.put(
+                "99717-6",
+                new Identifier(
+                        "53340-6",
+                        "17-Hydroxyprogesterone [Moles/volume] in DBS",
+                        HapiHelper.LOINC_CODE));
+        map.put("99717-35", new Identifier("REQUEST_PLT", "REQUEST_PLT", HapiHelper.PLT_CODE));
+        map.put("99717-36", new Identifier("REQUEST PLT", "REQUEST_PLT", HapiHelper.PLT_CODE));
+        map.put(
+                "99717-48",
+                new Identifier(
+                        "PLT3258",
+                        "IDUA gene mutations found [Identifier] in DBS by Sequencing",
+                        HapiHelper.PLT_CODE));
+        map.put("99717-44", new Identifier("REQUEST PLT", "REQUEST PLT", HapiHelper.PLT_CODE));
+        map.put(
+                "99717-50",
+                new Identifier(
+                        "PLT3275",
+                        "IDS gene mutations found [Identifier] in Dried Bloodspot by Molecular genetics method Nominal",
+                        HapiHelper.PLT_CODE));
+        map.put(
+                "99717-47",
+                new Identifier(
+                        "PLT3252",
+                        "GAA gene mutation found [Identifier] in DBS by Sequencing",
+                        HapiHelper.PLT_CODE));
+        map.put("99717-46", new Identifier("REQUEST PLT", "REQUEST PLT", HapiHelper.PLT_CODE));
+        map.put("99717-60", new Identifier("REQUEST PLT", "REQUEST PLT", HapiHelper.PLT_CODE));
     }
 }

@@ -85,13 +85,7 @@ class MapLocalObservationCodesTest extends Specification {
         def transformedCodingList = transformedObservation.getCode().getCoding()
         transformedCodingList.size() == 1
 
-        evaluateCoding(
-                transformedCodingList[0],
-                LOCAL_CODE,
-                LOCAL_DISPLAY,
-                HapiHelper.LOCALLY_DEFINED_CODE,
-                "alt-coding",
-                "L")
+        observation.code.coding == transformedCodingList
     }
 
     def "When message has a mappable local observation code in OBX-3.4/5/6 and other content in OBX3-1/2/3, no mapping should occur"() {
@@ -112,7 +106,6 @@ class MapLocalObservationCodesTest extends Specification {
         def transformedCodingList = transformedObservation.getCode().getCoding()
         transformedCodingList.size() == 2
 
-        // Mapped code should be added as the primary coding
         observation.code.coding == transformedCodingList
 
         where:
@@ -141,14 +134,7 @@ class MapLocalObservationCodesTest extends Specification {
         def transformedCodingList = transformedObservation.getCode().getCoding()
         transformedCodingList.size() == 1
 
-        // Code should remain as the alternate coding
-        evaluateCoding(
-                transformedCodingList[0],
-                CODE,
-                DISPLAY,
-                HapiHelper.LOINC_URL,
-                codingSystem,
-                HapiHelper.LOINC_CODE)
+        observation.code.coding == transformedCodingList
 
         where:
         codingSystem << ["coding", "alt-coding"]
@@ -180,31 +166,79 @@ class MapLocalObservationCodesTest extends Specification {
         final String FHIR_ORU_PATH = "../CA/020_CA_ORU_R01_CDPH_OBX_to_LOINC_1_hl7_translation.fhir"
         def fhirResource = ExamplesHelper.getExampleFhirResource(FHIR_ORU_PATH)
         def bundle = fhirResource.getUnderlyingResource() as Bundle
-        def initialObservations = HapiHelper.resourcesInBundle(bundle, Observation.class)
+        def initialObservations = HapiHelper.resourcesInBundle(bundle, Observation.class).toList()
 
         expect:
-        initialObservations.count() == 114
+        initialObservations.size() == 114
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
 
         then:
-        def transformedObservations = HapiHelper.resourcesInBundle(bundle, Observation.class)
-        transformedObservations.count() == 114
+        def transformedObservations = HapiHelper.resourcesInBundle(bundle, Observation.class).toList()
+        transformedObservations.size() == 114
 
-        // Look up the first and a few other LOINC codes. Ensure they are present and there is no alt-coding
-        // 57721-3
-        // 8339-4
-        // 54104-5
+        // Assortment of LOINC codes - ensure they are left as-is
+        def initialLoinc1 = getObservationByCode(initialObservations, "57721-3")
+        def transformedLoinc1 = getObservationByCode(transformedObservations, "57721-3")
+        initialLoinc1 == transformedLoinc1
 
-        // mapped LOINC - ensure evaluateCoding is correct
-        // 99717-33 to 85268-1
+        def initialLoinc2 = getObservationByCode(initialObservations, "8339-4")
+        def transformedLoinc2 = getObservationByCode(transformedObservations, "8339-4")
+        initialLoinc2 == transformedLoinc2
 
-        // mapped PLT - ensure evaluateCoding is correct
-        // 99717-48 to PLT3258
+        def initialLoinc3 = getObservationByCode(initialObservations, "54104-5")
+        def transformedLoinc3 = getObservationByCode(transformedObservations, "54104-5")
+        initialLoinc3 == transformedLoinc3
 
-        // unmapped - ensure it's left as-is
-        // 99717-5^Accession Number^L
+        // Mappable local code to LOINC - should have mapped code added
+        def mappedLoinc = getObservationByCode(transformedObservations, "99717-33")
+        mappedLoinc.code.coding.size() == 2
+
+        evaluateCoding(
+                mappedLoinc.code.coding[0],
+                "85268-1",
+                "X-linked Adrenoleukodystrophy (X- ALD) newborn screening comment-discussion",
+                HapiHelper.LOINC_URL,
+                "coding",
+                HapiHelper.LOINC_CODE)
+
+        evaluateCoding(
+                mappedLoinc.code.coding[1],
+                "99717-33",
+                "Adrenoleukodystrophy deficiency newborn screening comments-discussion",
+                HapiHelper.LOCALLY_DEFINED_CODE,
+                "alt-coding",
+                "L")
+
+        // Mappable local code to PLT - should have mapped code added
+        def mappedPlt = getObservationByCode(transformedObservations, "99717-48")
+        mappedPlt.code.coding.size() == 2
+
+        evaluateCoding(
+                mappedPlt.code.coding[0],
+                "PLT3258",
+                "IDUA gene mutations found [Identifier] in DBS by Sequencing",
+                null,
+                "coding",
+                HapiHelper.PLT_CODE)
+
+        evaluateCoding(
+                mappedPlt.code.coding[1],
+                "99717-48",
+                "MPS I IDUA Gene Sequence Mutation Information",
+                HapiHelper.LOCALLY_DEFINED_CODE,
+                "alt-coding",
+                "L")
+
+        // Unmapped local code - ensure it is left as-is
+        def initialAccession = getObservationByCode(initialObservations, "99717-5")
+        def transformedAccession = getObservationByCode(transformedObservations, "99717-5")
+        initialAccession == transformedAccession
+    }
+
+    Observation getObservationByCode(List<Observation> observationList, String code) {
+        return observationList.find {observation -> observation.code?.coding?.find { coding -> coding.code == code}}
     }
 
     Coding getCoding(String code, String display, boolean localCoding, String cweCoding) {
