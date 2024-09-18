@@ -128,13 +128,14 @@ public class HL7ExpressionEvaluator {
         try {
             Segment segment = (Segment) message.get(segmentName);
             return extractField(segment, fieldComponents);
-        } catch (HL7Exception e) {
+        } catch (HL7Exception | NumberFormatException e) {
             throw new IllegalArgumentException(
                     "Failed to extract field value for: " + fieldName, e);
         }
     }
 
-    private String extractField(Segment segment, String[] fieldComponents) throws HL7Exception {
+    private String extractField(Segment segment, String[] fieldComponents)
+            throws HL7Exception, NumberFormatException {
 
         // fieldComponents looks like 'MSH'
         if (fieldComponents.length == 0) { // e.g. MSH
