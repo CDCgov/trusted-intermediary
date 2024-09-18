@@ -3,10 +3,10 @@ package gov.hhs.cdc.trustedintermediary.rse2e
 import ca.uhn.hl7v2.model.Message
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
-import gov.hhs.cdc.trustedintermediary.rse2e.ruleengine.AssertionRuleEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
-import gov.hhs.cdc.trustedintermediary.rse2e.ruleengine.RuleLoader
+import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoader
+import gov.hhs.cdc.trustedintermediary.rse2e.ruleengine.AssertionRuleEngine
 import spock.lang.Specification
 
 class AutomatedTest  extends Specification  {

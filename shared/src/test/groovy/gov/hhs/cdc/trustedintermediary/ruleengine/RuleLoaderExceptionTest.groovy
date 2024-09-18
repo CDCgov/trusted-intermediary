@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.rse2e.ruleengine
+package gov.hhs.cdc.trustedintermediary.ruleengine
 
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException
 import spock.lang.Specification

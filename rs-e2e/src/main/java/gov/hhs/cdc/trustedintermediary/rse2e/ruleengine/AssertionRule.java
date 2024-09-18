@@ -1,21 +1,18 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.ruleengine;
 
-import ca.uhn.hl7v2.model.Message;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.rse2e.HL7ExpressionEvaluator;
+import gov.hhs.cdc.trustedintermediary.ruleengine.Rule;
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.List;
 
 /**
  * The AssertionRule class extends the {@link AssertionRule Rule} class and represents a assertion
- * rule. It implements the {@link AssertionRule#runRule(Message, Message) runRule} method to apply a
- * assertion to the FHIR resource.
+ * rule. It implements the {@link AssertionRule#runRule(HealthData, HealthData) runRule} method to
+ * apply a assertion to the FHIR resource.
  */
-public class AssertionRule {
-
-    private String name;
-    private List<String> conditions;
-    private List<String> rules;
+public class AssertionRule extends Rule<String> {
 
     protected final Logger logger = ApplicationContext.getImplementation(Logger.class);
     protected final HL7ExpressionEvaluator expressionEvaluator =
@@ -28,50 +25,19 @@ public class AssertionRule {
     public AssertionRule() {}
 
     public AssertionRule(String ruleName, List<String> ruleConditions, List<String> ruleActions) {
-        name = ruleName;
-        conditions = ruleConditions;
-        rules = ruleActions;
+        super(ruleName, null, null, ruleConditions, ruleActions);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public List<String> getConditions() {
-        return conditions;
-    }
-
-    public List<String> getRules() {
-        return rules;
-    }
-
-    public boolean shouldRun(Message message) {
-        return conditions.stream()
-                .allMatch(
-                        condition -> {
-                            try {
-                                return expressionEvaluator.parseAndEvaluate(
-                                        message, null, condition);
-                            } catch (Exception e) {
-                                logger.logError(
-                                        "Rule ["
-                                                + name
-                                                + "]: "
-                                                + "An error occurred while evaluating the condition: "
-                                                + condition,
-                                        e);
-                                return false;
-                            }
-                        });
-    }
-
-    public void runRule(Message outputMessage, Message inputMessage) {
+    @Override
+    public void runRule(HealthData<?> outputData, HealthData<?> inputData) {
 
         for (String assertion : this.getRules()) {
             try {
                 boolean isValid =
                         expressionEvaluator.parseAndEvaluate(
-                                outputMessage, inputMessage, assertion);
+                                outputData.getUnderlyingData(),
+                                inputData.getUnderlyingData(),
+                                assertion);
                 if (!isValid) {
                     this.logger.logWarning(
                             "Assertion failed for '"
@@ -79,7 +45,7 @@ public class AssertionRule {
                                     + "': "
                                     + assertion
                                     + " ("
-                                    + outputMessage.getName()
+                                    + outputData.getName()
                                     + ")");
                 }
             } catch (Exception e) {

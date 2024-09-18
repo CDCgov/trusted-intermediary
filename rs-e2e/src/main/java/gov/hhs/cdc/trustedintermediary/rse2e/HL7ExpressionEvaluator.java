@@ -23,7 +23,7 @@ public class HL7ExpressionEvaluator {
         return INSTANCE;
     }
 
-    public boolean parseAndEvaluate(Message outputMessage, Message inputMessage, String statement) {
+    public boolean parseAndEvaluate(Object outputMessage, Object inputMessage, String statement) {
 
         Pattern operationPattern = Pattern.compile("^(\\S+)\\s*(=|!=|in)\\s*(.+)$");
         Matcher matcher = operationPattern.matcher(statement);
