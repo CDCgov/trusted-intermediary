@@ -11,9 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Observation;
-import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.StringType;
 
 /**
@@ -32,7 +30,6 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
-        var messageHeader = HapiHelper.getMSHMessageHeader(bundle);
         var observations = HapiHelper.resourcesInBundle(bundle, Observation.class);
 
         for (Observation obv : observations.toList()) {
@@ -55,8 +52,15 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
 
                     if (identifier == null) {
                         // The local code was not found in the mapping
-                        // TODO: work on displaying the sender value, not the reference
-                        LOGGER.logWarning("Unmapped local code detected: " + coding.getCode() + " from sender: " + messageHeader.getSender() + ", having id: " + HapiHelper.getMessageControlId(bundle));
+                        var msh41Identifier = HapiHelper.getMSH4_1Identifier(bundle);
+                        var msh41Value =
+                                msh41Identifier != null ? msh41Identifier.getValue() : null;
+
+                        LOGGER.logWarning(
+                                "Unmapped local code detected: '{}', from sender: '{}', message Id: '{}'",
+                                coding.getCode(),
+                                msh41Value,
+                                HapiHelper.getMessageControlId(bundle));
                         continue;
                     }
 
