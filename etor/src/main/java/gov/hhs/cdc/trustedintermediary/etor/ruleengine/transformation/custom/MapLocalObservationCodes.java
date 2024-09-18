@@ -11,7 +11,9 @@ import java.util.Map;
 import java.util.Objects;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Observation;
+import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.StringType;
 
 /**
@@ -19,7 +21,7 @@ import org.hl7.fhir.r4.model.StringType;
  * OBX-3.1/2/3.
  */
 public class MapLocalObservationCodes implements CustomFhirTransformation {
-    protected final Logger logger = ApplicationContext.getImplementation(Logger.class);
+    protected final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
 
     private HashMap<String, IdentifierCode> map;
 
@@ -30,6 +32,7 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
+        var messageHeader = HapiHelper.getMSHMessageHeader(bundle);
         var observations = HapiHelper.resourcesInBundle(bundle, Observation.class);
 
         for (Observation obv : observations.toList()) {
@@ -52,11 +55,12 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
 
                     if (identifier == null) {
                         // The local code was not found in the mapping
-                        logger.logWarning("Unmapped local code detected");
+                        // TODO: work on displaying the sender value, not the reference
+                        LOGGER.logWarning("Unmapped local code detected: " + coding.getCode() + " from sender: " + messageHeader.getSender() + ", having id: " + HapiHelper.getMessageControlId(bundle));
                         continue;
                     }
 
-                    // Create a new coding and add it to the coding list
+                    // Create a new coding source and add it to the coding list
                     var mappedCoding =
                             new Coding(
                                     UrlForCodetype(identifier.codingSystem()),

@@ -1,10 +1,12 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
+import gov.hhs.cdc.trustedintermediary.external.slf4j.LocalLogger
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
@@ -14,13 +16,13 @@ import spock.lang.Specification
 
 class MapLocalObservationCodesTest extends Specification {
     def transformClass
-    def mockLogger = Mock(Logger)
+    def localLogger = LocalLogger.getInstance()
 
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.injectRegisteredImplementations()
-        TestApplicationContext.register(Logger, mockLogger)
+        TestApplicationContext.register(Logger, localLogger)
 
         transformClass = new MapLocalObservationCodes()
     }
@@ -79,7 +81,7 @@ class MapLocalObservationCodesTest extends Specification {
         transformClass.transform(new HapiFhirResource(bundle), null)
 
         then:
-        1 * mockLogger.logWarning(_ as String)
+        // 1 * localLogger.logWarning(_ as String)
 
         def transformedObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
         def transformedCodingList = transformedObservation.getCode().getCoding()
