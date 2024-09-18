@@ -11,9 +11,10 @@ import spock.lang.Specification
 
 class AutomatedTest  extends Specification  {
 
-    List<InputStream> recentAzureFiles
-    List<InputStream> recentLocalFiles
+    List<HL7FileStream> recentAzureFiles
+    List<HL7FileStream> recentLocalFiles
     AssertionRuleEngine engine
+    HL7FileMatcher fileMatcher
     def mockLogger = Mock(Logger)
 
     def setup() {
@@ -24,6 +25,7 @@ class AutomatedTest  extends Specification  {
         recentLocalFiles = localFileFetcher.fetchFiles()
 
         engine = new AssertionRuleEngine()
+        fileMatcher =  new HL7FileMatcher()
 
         TestApplicationContext.reset()
         TestApplicationContext.init()
@@ -31,17 +33,18 @@ class AutomatedTest  extends Specification  {
         TestApplicationContext.register(RuleLoader, RuleLoader.getInstance())
         TestApplicationContext.register(Logger, mockLogger)
         TestApplicationContext.register(Formatter, Jackson.getInstance())
+        TestApplicationContext.register(HL7FileMatcher, fileMatcher)
+        TestApplicationContext.register(HL7ExpressionEvaluator, HL7ExpressionEvaluator.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         // Figure out env vars (need Azure connection string)
         // Also add unit tests for file matcher
-        // TODO - fix MSH-9 segment to match spec
     }
 
 
     def "test defined assertions on relevant messages"() {
         given:
-        def matchedFiles = HL7FileMatcher.matchFiles(recentAzureFiles, recentLocalFiles)
+        def matchedFiles = fileMatcher.matchFiles(recentAzureFiles, recentLocalFiles)
 
         when:
         for (messagePair in matchedFiles) {

@@ -13,11 +13,13 @@ import java.util.List;
  */
 public class AssertionRule {
 
-    protected final Logger logger = ApplicationContext.getImplementation(Logger.class);
-
     private String name;
     private List<String> conditions;
     private List<String> rules;
+
+    protected final Logger logger = ApplicationContext.getImplementation(Logger.class);
+    protected final HL7ExpressionEvaluator expressionEvaluator =
+            ApplicationContext.getImplementation(HL7ExpressionEvaluator.class);
 
     /**
      * Do not delete this constructor! It is used for JSON deserialization when loading rules from a
@@ -48,7 +50,7 @@ public class AssertionRule {
                 .allMatch(
                         condition -> {
                             try {
-                                return HL7ExpressionEvaluator.parseAndEvaluate(
+                                return expressionEvaluator.parseAndEvaluate(
                                         message, null, condition);
                             } catch (Exception e) {
                                 logger.logError(
@@ -68,7 +70,7 @@ public class AssertionRule {
         for (String assertion : this.getRules()) {
             try {
                 boolean isValid =
-                        HL7ExpressionEvaluator.parseAndEvaluate(
+                        expressionEvaluator.parseAndEvaluate(
                                 outputMessage, inputMessage, assertion);
                 if (!isValid) {
                     this.logger.logWarning(

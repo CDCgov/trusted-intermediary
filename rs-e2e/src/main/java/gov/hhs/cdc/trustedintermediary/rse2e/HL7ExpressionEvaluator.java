@@ -3,16 +3,27 @@ package gov.hhs.cdc.trustedintermediary.rse2e;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Segment;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
 
 public class HL7ExpressionEvaluator {
 
-    public static boolean parseAndEvaluate(
-            Message outputMessage, Message inputMessage, String statement) {
+    private static final HL7ExpressionEvaluator INSTANCE = new HL7ExpressionEvaluator();
+
+    private HL7ExpressionEvaluator() {}
+
+    @Inject Logger logger;
+
+    public static HL7ExpressionEvaluator getInstance() {
+        return INSTANCE;
+    }
+
+    public boolean parseAndEvaluate(Message outputMessage, Message inputMessage, String statement) {
 
         Pattern operationPattern = Pattern.compile("^(\\S+)\\s*(=|!=|in)\\s*(.+)$");
         Matcher matcher = operationPattern.matcher(statement);
@@ -60,7 +71,7 @@ public class HL7ExpressionEvaluator {
         return evaluateEquality(leftValue, rightValue, operator);
     }
 
-    private static <T extends Comparable<T>> boolean evaluateEquality(
+    private <T extends Comparable<T>> boolean evaluateEquality(
             T leftValue, T rightValue, String operator) {
         if (operator.equals("=")) {
             return leftValue.compareTo(rightValue) == 0;
@@ -70,67 +81,85 @@ public class HL7ExpressionEvaluator {
         throw new IllegalArgumentException("Unknown operator: " + operator);
     }
 
-    private static boolean evaluateMembership(String leftValue, String rightOperand) {
+    private boolean evaluateMembership(String leftValue, String rightOperand) {
         Pattern literalValueCollectionPattern = Pattern.compile("\\(([^)]+)\\)");
         Matcher literalValueCollectionMatcher = literalValueCollectionPattern.matcher(rightOperand);
         if (!literalValueCollectionMatcher.matches()) {
-            return false;
+            throw new IllegalArgumentException("Invalid collection format: " + rightOperand);
         }
         String arrayString = literalValueCollectionMatcher.group(1);
         ArrayList<String> values =
                 Arrays.stream(arrayString.split(","))
-                        .map(s -> s.trim().replaceAll("^'|'$", ""))
+                        .map(s -> s.trim().replace("'", ""))
                         .collect(Collectors.toCollection(ArrayList::new));
         return values.contains(leftValue);
     }
 
-    private static boolean evaluateCollectionCount(
+    private boolean evaluateCollectionCount(
             Message message, String segmentName, String rightOperand, String operator) {
         try {
             int count = message.getAll(segmentName).length;
             int rightValue = Integer.parseInt(rightOperand);
             return evaluateEquality(count, rightValue, operator);
         } catch (HL7Exception | NumberFormatException e) {
-            // TODO - log exception
-            return false;
+            throw new IllegalArgumentException(
+                    "Error evaluating collection count. Segment: "
+                            + segmentName
+                            + ", count: "
+                            + rightOperand,
+                    e);
         }
     }
 
-    private static String getFieldValue(
-            Message outputMessage, Message inputMessage, String fieldName) {
+    private String getFieldValue(Message outputMessage, Message inputMessage, String fieldName) {
         Pattern hl7FieldNamePattern = Pattern.compile("(input|output)?\\.?(\\S+)-(\\S+)");
         Matcher hl7FieldNameMatcher = hl7FieldNamePattern.matcher(fieldName);
         if (!hl7FieldNameMatcher.matches()) {
-            return "";
+            throw new IllegalArgumentException("Invalid field name format: " + fieldName);
         }
 
         Message message =
-                "input".equals(hl7FieldNameMatcher.group(1)) ? inputMessage : outputMessage;
+                getMessageBySource(hl7FieldNameMatcher.group(1), inputMessage, outputMessage);
+
         String segmentName = hl7FieldNameMatcher.group(2);
         String index = hl7FieldNameMatcher.group(3);
         String[] fieldComponents = index.split("\\.");
+
         try {
             Segment segment = (Segment) message.get(segmentName);
-            if (fieldComponents.length == 0) { // e.g. MSH
-                return segment.encode();
-            } else if (fieldComponents.length == 1) { // e.g. MSH-9
-                // Encoding the `|` character shows as `\F\`, the field separator
-                return segment.getField(Integer.parseInt(fieldComponents[0]), 0).encode();
-            } else if (fieldComponents.length == 2) { // e.g. MSH-9.2
-                String field = segment.getField(Integer.parseInt(fieldComponents[0]), 0).encode();
-                // TODO - get the separator from the message instead of assuming
-                String[] subfieldsArray = field.split("\\^");
-                if (subfieldsArray.length > 1) {
-                    // TODO - validate that we're not getting a sub-zero result after subtracting 1?
-                    return subfieldsArray[Integer.parseInt(fieldComponents[1]) - 1];
-                }
-                return "";
-            } else {
-                return "";
-            }
-        } catch (Exception e) {
-            // log exception
-            return "";
+            return extractField(segment, fieldComponents);
+        } catch (HL7Exception e) {
+            throw new IllegalArgumentException(
+                    "Failed to extract field value for: " + fieldName, e);
         }
+    }
+
+    private String extractField(Segment segment, String[] fieldComponents) throws HL7Exception {
+
+        // fieldComponents looks like 'MSH'
+        if (fieldComponents.length == 0) { // e.g. MSH
+            return segment.encode();
+        }
+
+        // When the `|` character is encoded, it shows as `\F\`, the field separator
+        String field = segment.getField(Integer.parseInt(fieldComponents[0]), 0).encode();
+
+        // fieldComponents looks like 'MSH-9'
+        if (fieldComponents.length == 1) {
+            return field;
+        }
+
+        // fieldComponents looks like 'MSH-9.2'
+        // Since we control the sample files, we can assume the field separator is the standard `^`
+        String[] subfieldsArray = field.split("\\^");
+        int subFieldIndex = Integer.parseInt(fieldComponents[1]) - 1;
+
+        return subFieldIndex >= 0 && subFieldIndex < subfieldsArray.length
+                ? subfieldsArray[subFieldIndex]
+                : "";
+    }
+
+    private Message getMessageBySource(String source, Message inputMessage, Message outputMessage) {
+        return "input".equals(source) ? inputMessage : outputMessage;
     }
 }
