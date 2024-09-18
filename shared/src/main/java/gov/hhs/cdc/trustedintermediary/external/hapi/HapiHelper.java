@@ -99,7 +99,8 @@ public class HapiHelper {
 
     // MSH-10
     public static String getMessageControlId(Bundle bundle) {
-        return bundle.getIdentifier().getValue();
+        var msh10 = bundle.getIdentifier().getValue();
+        return msh10;
     }
 
     // MSH - Message Header
