@@ -9,12 +9,18 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 
-/** Implements the RuleEngine interface. It represents a rule engine for transformations. */
+/**
+ * The AssertionRuleEngine is responsible for loading and running assertion rules against HL7
+ * messages.
+ */
 public class AssertionRuleEngine {
+    private static final AssertionRuleEngine INSTANCE = new AssertionRuleEngine();
     final List<AssertionRule> assertionRules = new ArrayList<>();
     volatile boolean rulesLoaded = false;
 
-    private static final AssertionRuleEngine INSTANCE = new AssertionRuleEngine();
+    public static AssertionRuleEngine getInstance() {
+        return INSTANCE;
+    }
 
     @Inject Logger logger;
     @Inject RuleLoader ruleLoader;

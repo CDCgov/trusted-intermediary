@@ -18,14 +18,14 @@ class AutomatedTest  extends Specification  {
     def mockLogger = Mock(Logger)
 
     def setup() {
-        FileFetcher azureFileFetcher = new AzureBlobFileFetcher()
+        FileFetcher azureFileFetcher = AzureBlobFileFetcher.getInstance()
         recentAzureFiles = azureFileFetcher.fetchFiles()
 
-        FileFetcher localFileFetcher = new LocalFileFetcher()
+        FileFetcher localFileFetcher = LocalFileFetcher.getInstance()
         recentLocalFiles = localFileFetcher.fetchFiles()
 
-        engine = new AssertionRuleEngine()
-        fileMatcher =  new HL7FileMatcher()
+        engine = AssertionRuleEngine.getInstance()
+        fileMatcher =  HL7FileMatcher.getInstance()
 
         TestApplicationContext.reset()
         TestApplicationContext.init()
@@ -35,6 +35,8 @@ class AutomatedTest  extends Specification  {
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.register(HL7FileMatcher, fileMatcher)
         TestApplicationContext.register(HL7ExpressionEvaluator, HL7ExpressionEvaluator.getInstance())
+        TestApplicationContext.register(AzureBlobFileFetcher, azureFileFetcher)
+        TestApplicationContext.register(LocalFileFetcher, LocalFileFetcher.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         // Figure out env vars (need Azure connection string)

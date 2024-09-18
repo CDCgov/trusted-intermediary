@@ -15,9 +15,9 @@ public class HL7ExpressionEvaluator {
 
     private static final HL7ExpressionEvaluator INSTANCE = new HL7ExpressionEvaluator();
 
-    private HL7ExpressionEvaluator() {}
-
     @Inject Logger logger;
+
+    private HL7ExpressionEvaluator() {}
 
     public static HL7ExpressionEvaluator getInstance() {
         return INSTANCE;

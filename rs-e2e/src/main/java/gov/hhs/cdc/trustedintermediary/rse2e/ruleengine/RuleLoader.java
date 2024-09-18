@@ -14,7 +14,9 @@ import javax.inject.Inject;
 
 /** Manages the loading of rules from a definitions file. */
 public class RuleLoader {
+
     private static final RuleLoader INSTANCE = new RuleLoader();
+
     @Inject Formatter formatter;
     @Inject Logger logger;
 

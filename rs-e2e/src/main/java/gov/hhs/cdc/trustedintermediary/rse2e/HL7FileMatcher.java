@@ -18,9 +18,15 @@ import javax.inject.Inject;
 
 public class HL7FileMatcher {
 
+    private static final HL7FileMatcher INSTANCE = new HL7FileMatcher();
+
     @Inject Logger logger;
 
-    public HL7FileMatcher() {}
+    private HL7FileMatcher() {}
+
+    public static HL7FileMatcher getInstance() {
+        return INSTANCE;
+    }
 
     public Map<Message, Message> matchFiles(
             List<HL7FileStream> inputFiles, List<HL7FileStream> outputFiles) {

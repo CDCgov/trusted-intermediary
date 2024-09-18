@@ -11,22 +11,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AzureBlobFileFetcher implements FileFetcher {
-    private static final String AZURE_STORAGE_CONNECTION_STRING =
-            System.getenv("AZURE_STORAGE_CONNECTION_STRING");
-    private static final String AZURE_STORAGE_CONTAINER_NAME = "automated";
+
+    private static final FileFetcher INSTANCE = new AzureBlobFileFetcher();
 
     private final BlobContainerClient blobContainerClient;
 
-    public AzureBlobFileFetcher() {
-        if (AZURE_STORAGE_CONNECTION_STRING == null || AZURE_STORAGE_CONNECTION_STRING.isEmpty()) {
+    private AzureBlobFileFetcher() {
+        String azureStorageConnectionName = "automated";
+        String azureStorageConnectionString = System.getenv("AZURE_STORAGE_CONNECTION_STRING");
+
+        if (azureStorageConnectionString == null || azureStorageConnectionString.isEmpty()) {
             throw new IllegalArgumentException(
                     "Environment variable AZURE_STORAGE_CONNECTION_STRING is not set");
         }
         this.blobContainerClient =
                 new BlobContainerClientBuilder()
-                        .connectionString(AZURE_STORAGE_CONNECTION_STRING)
-                        .containerName(AZURE_STORAGE_CONTAINER_NAME)
+                        .connectionString(azureStorageConnectionString)
+                        .containerName(azureStorageConnectionName)
                         .buildClient();
+    }
+
+    public static FileFetcher getInstance() {
+        return INSTANCE;
     }
 
     @Override
@@ -37,6 +43,11 @@ public class AzureBlobFileFetcher implements FileFetcher {
         for (BlobItem blobItem : blobContainerClient.listBlobs()) {
             BlobClient blobClient = blobContainerClient.getBlobClient(blobItem.getName());
             BlobProperties properties = blobClient.getProperties();
+
+            // Currently we're doing everything in UTC. If we start uploading files manually and
+            // running
+            // this test manually, we may want to revisit this logic and/or the file structure
+            // because midnight UTC is 5pm PDT on the previous day
             LocalDate blobCreationDate =
                     properties.getLastModified().toInstant().atZone(ZoneOffset.UTC).toLocalDate();
 
