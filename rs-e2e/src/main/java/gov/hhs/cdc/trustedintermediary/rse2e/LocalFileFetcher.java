@@ -16,14 +16,16 @@ public class LocalFileFetcher implements FileFetcher {
     private static final String EXTENSION = "hl7";
 
     @Override
-    public List<InputStream> fetchFiles() {
+    public List<HL7FileStream> fetchFiles() {
         try (Stream<Path> stream = Files.walk(Paths.get(FILES_PATH))) {
             return stream.filter(Files::isRegularFile)
                     .filter(path -> path.toString().endsWith(EXTENSION))
                     .map(
                             p -> {
                                 try {
-                                    return new FileInputStream(p.toFile());
+                                    InputStream inputStream = new FileInputStream(p.toFile());
+                                    return new HL7FileStream(
+                                            p.getFileName().toString(), inputStream);
                                 } catch (IOException e) {
                                     throw new RuntimeException("Error opening file: " + p, e);
                                 }

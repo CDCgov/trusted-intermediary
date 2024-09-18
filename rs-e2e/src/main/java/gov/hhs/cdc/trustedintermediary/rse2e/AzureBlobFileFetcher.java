@@ -5,7 +5,6 @@ import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobContainerClientBuilder;
 import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.BlobProperties;
-import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -31,8 +30,8 @@ public class AzureBlobFileFetcher implements FileFetcher {
     }
 
     @Override
-    public List<InputStream> fetchFiles() {
-        List<InputStream> recentFiles = new ArrayList<>();
+    public List<HL7FileStream> fetchFiles() {
+        List<HL7FileStream> recentFiles = new ArrayList<>();
         LocalDate mostRecentDay = null;
 
         for (BlobItem blobItem : blobContainerClient.listBlobs()) {
@@ -44,9 +43,11 @@ public class AzureBlobFileFetcher implements FileFetcher {
             if (mostRecentDay == null || blobCreationDate.isAfter(mostRecentDay)) {
                 mostRecentDay = blobCreationDate;
                 recentFiles.clear();
-                recentFiles.add(blobClient.openInputStream());
+                recentFiles.add(
+                        new HL7FileStream(blobClient.getBlobName(), blobClient.openInputStream()));
             } else if (blobCreationDate.equals(mostRecentDay)) {
-                recentFiles.add(blobClient.openInputStream());
+                recentFiles.add(
+                        new HL7FileStream(blobClient.getBlobName(), blobClient.openInputStream()));
             }
         }
 
