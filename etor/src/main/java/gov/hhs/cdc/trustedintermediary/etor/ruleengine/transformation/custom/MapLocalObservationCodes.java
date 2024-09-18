@@ -14,6 +14,10 @@ import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.StringType;
 
+/**
+ * Maps local observation codes in OBX-3.4/5/6 to LOINC/PLT codes, placing the LOINC/PLT codes in
+ * OBX-3.1/2/3.
+ */
 public class MapLocalObservationCodes implements CustomFhirTransformation {
     protected final Logger logger = ApplicationContext.getImplementation(Logger.class);
 
