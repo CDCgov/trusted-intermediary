@@ -6,7 +6,6 @@ import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhirTransformation;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -31,20 +30,14 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
 
         for (Observation obv : observations.toList()) {
             var codingList = obv.getCode().getCoding();
-            var updatedList = new ArrayList<Coding>();
 
-            for (Coding coding : codingList) {
+            if (codingList.size() == 1) {
+                var coding = codingList.get(0);
+
                 var cwe =
                         coding.getExtensionByUrl(HapiHelper.EXTENSION_CWE_CODING)
                                 .getValue()
                                 .toString();
-
-                // @todo this wont work if coding is not the first extension. see better way of
-                // doing it...
-                if (Objects.equals(cwe, "coding")
-                        || coding.getSystem().equals(HapiHelper.LOINC_CODE)) {
-                    break;
-                }
 
                 // alt coding is HL7 OBX-3.4,5,6
                 if (Objects.equals(cwe, "alt-coding")
@@ -72,11 +65,9 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                             HapiHelper.EXTENSION_CODING_SYSTEM,
                             new StringType(identifier.codingSystem()));
 
-                    updatedList.add(mappedCoding);
+                    codingList.add(0, mappedCoding);
                 }
             }
-
-            codingList.addAll(0, updatedList);
         }
     }
 
@@ -115,14 +106,14 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                         "17-Hydroxyprogesterone [Moles/volume] in DBS",
                         HapiHelper.LOINC_CODE));
         map.put("99717-35", new IdentifierCode("REQUEST_PLT", "REQUEST_PLT", HapiHelper.PLT_CODE));
-        map.put("99717-36", new IdentifierCode("REQUEST PLT", "REQUEST_PLT", HapiHelper.PLT_CODE));
+        map.put("99717-36", new IdentifierCode("REQUEST_PLT", "REQUEST_PLT", HapiHelper.PLT_CODE));
         map.put(
                 "99717-48",
                 new IdentifierCode(
                         "PLT3258",
                         "IDUA gene mutations found [Identifier] in DBS by Sequencing",
                         HapiHelper.PLT_CODE));
-        map.put("99717-44", new IdentifierCode("REQUEST PLT", "REQUEST PLT", HapiHelper.PLT_CODE));
+        map.put("99717-44", new IdentifierCode("REQUEST_PLT", "REQUEST_PLT", HapiHelper.PLT_CODE));
         map.put(
                 "99717-50",
                 new IdentifierCode(
@@ -135,7 +126,7 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                         "PLT3252",
                         "GAA gene mutation found [Identifier] in DBS by Sequencing",
                         HapiHelper.PLT_CODE));
-        map.put("99717-46", new IdentifierCode("REQUEST PLT", "REQUEST PLT", HapiHelper.PLT_CODE));
-        map.put("99717-60", new IdentifierCode("REQUEST PLT", "REQUEST PLT", HapiHelper.PLT_CODE));
+        map.put("99717-46", new IdentifierCode("REQUEST_PLT", "REQUEST_PLT", HapiHelper.PLT_CODE));
+        map.put("99717-60", new IdentifierCode("REQUEST_PLT", "REQUEST_PLT", HapiHelper.PLT_CODE));
     }
 }
