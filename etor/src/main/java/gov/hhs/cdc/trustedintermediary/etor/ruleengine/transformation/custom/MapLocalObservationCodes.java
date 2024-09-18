@@ -117,15 +117,18 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                         "53340-6",
                         "17-Hydroxyprogesterone [Moles/volume] in DBS",
                         HapiHelper.LOINC_CODE));
-        map.put("99717-35", new IdentifierCode("REQUEST_PLT", "REQUEST_PLT", HapiHelper.PLT_CODE));
-        map.put("99717-36", new IdentifierCode("REQUEST_PLT", "REQUEST_PLT", HapiHelper.PLT_CODE));
+        // map.put("99717-35", new IdentifierCode("REQUEST_PLT", "REQUEST_PLT",
+        // HapiHelper.PLT_CODE));
+        // map.put("99717-36", new IdentifierCode("REQUEST_PLT", "REQUEST_PLT",
+        // HapiHelper.PLT_CODE));
         map.put(
                 "99717-48",
                 new IdentifierCode(
                         "PLT3258",
                         "IDUA gene mutations found [Identifier] in DBS by Sequencing",
                         HapiHelper.PLT_CODE));
-        map.put("99717-44", new IdentifierCode("REQUEST_PLT", "REQUEST_PLT", HapiHelper.PLT_CODE));
+        // map.put("99717-44", new IdentifierCode("REQUEST_PLT", "REQUEST_PLT",
+        // HapiHelper.PLT_CODE));
         map.put(
                 "99717-50",
                 new IdentifierCode(
@@ -138,7 +141,9 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                         "PLT3252",
                         "GAA gene mutation found [Identifier] in DBS by Sequencing",
                         HapiHelper.PLT_CODE));
-        map.put("99717-46", new IdentifierCode("REQUEST_PLT", "REQUEST_PLT", HapiHelper.PLT_CODE));
-        map.put("99717-60", new IdentifierCode("REQUEST_PLT", "REQUEST_PLT", HapiHelper.PLT_CODE));
+        // map.put("99717-46", new IdentifierCode("REQUEST_PLT", "REQUEST_PLT",
+        // HapiHelper.PLT_CODE));
+        // map.put("99717-60", new IdentifierCode("REQUEST_PLT", "REQUEST_PLT",
+        // HapiHelper.PLT_CODE));
     }
 }
