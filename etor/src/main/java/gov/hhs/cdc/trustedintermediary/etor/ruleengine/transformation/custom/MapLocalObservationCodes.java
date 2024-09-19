@@ -38,58 +38,46 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
         for (Observation obv : observations.toList()) {
             var codingList = obv.getCode().getCoding();
 
-            if (codingList.size() == 1) {
-                var coding = codingList.get(0);
-
-                if (!HapiHelper.hasCodingExtensionWithUrl(
-                        coding, HapiHelper.EXTENSION_CWE_CODING)) {
-
-                    continue;
-                }
-                var cwe =
-                        HapiHelper.getCodingExtensionByUrl(coding, HapiHelper.EXTENSION_CWE_CODING)
-                                .getValue()
-                                .toString();
-
-                if (!HapiHelper.hasCodingSystem(coding)) {
-                    continue;
-                }
-                var codingSystem = HapiHelper.getCodingSystem(coding);
-
-                if (Objects.equals(cwe, "alt-coding")
-                        && HapiHelper.LOCAL_CODE_URL.equals(codingSystem)) {
-
-                    var identifier = codingMap.get(coding.getCode());
-
-                    if (identifier == null) {
-
-                        var msh41Identifier = HapiHelper.getMSH4_1Identifier(bundle);
-                        var msh41Value =
-                                msh41Identifier != null ? msh41Identifier.getValue() : null;
-
-                        LOGGER.logWarning(
-                                "Unmapped local code detected: '{}', from sender: '{}', message Id: '{}'",
-                                coding.getCode(),
-                                msh41Value,
-                                HapiHelper.getMessageControlId(bundle));
-                        continue;
-                    }
-
-                    var mappedCoding =
-                            new Coding(
-                                    urlForCodeType(identifier.codingSystem()),
-                                    identifier.code(),
-                                    identifier.display());
-                    mappedCoding.addExtension(
-                            HapiHelper.EXTENSION_CWE_CODING, new StringType("coding"));
-
-                    mappedCoding.addExtension(
-                            HapiHelper.EXTENSION_CODING_SYSTEM,
-                            new StringType(identifier.codingSystem()));
-
-                    codingList.add(0, mappedCoding);
-                }
+            if (codingList.size() != 1) {
+                continue;
             }
+
+            var coding = codingList.get(0);
+
+            if (!HapiHelper.hasCodingExtensionWithUrl(coding, HapiHelper.EXTENSION_CWE_CODING)) {
+                continue;
+            }
+            var cwe =
+                    HapiHelper.getCodingExtensionByUrl(coding, HapiHelper.EXTENSION_CWE_CODING)
+                            .getValue()
+                            .toString();
+
+            if (!HapiHelper.hasCodingSystem(coding)) {
+                continue;
+            }
+            var codingSystem = HapiHelper.getCodingSystem(coding);
+
+            if (!Objects.equals(cwe, "alt-coding")
+                    || !HapiHelper.LOCAL_CODE_URL.equals(codingSystem)) {
+                continue;
+            }
+
+            var identifier = codingMap.get(coding.getCode());
+
+            if (identifier == null) {
+                var msh41Identifier = HapiHelper.getMSH4_1Identifier(bundle);
+                var msh41Value = msh41Identifier != null ? msh41Identifier.getValue() : null;
+
+                LOGGER.logWarning(
+                        "Unmapped local code detected: '{}', from sender: '{}', message Id: '{}'",
+                        coding.getCode(),
+                        msh41Value,
+                        HapiHelper.getMessageControlId(bundle));
+                continue;
+            }
+
+            var mappedCoding = getMappedCoding(identifier);
+            codingList.add(0, mappedCoding);
         }
     }
 
@@ -99,6 +87,20 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
             case HapiHelper.PLT_CODE -> null;
             default -> HapiHelper.LOCAL_CODE_URL;
         };
+    }
+
+    private Coding getMappedCoding(IdentifierCode identifierCode) {
+        var mappedCoding =
+                new Coding(
+                        urlForCodeType(identifierCode.codingSystem()),
+                        identifierCode.code(),
+                        identifierCode.display());
+        mappedCoding.addExtension(HapiHelper.EXTENSION_CWE_CODING, new StringType("coding"));
+
+        mappedCoding.addExtension(
+                HapiHelper.EXTENSION_CODING_SYSTEM, new StringType(identifierCode.codingSystem()));
+
+        return mappedCoding;
     }
 
     private void initMap() {
