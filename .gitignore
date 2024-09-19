@@ -34,3 +34,6 @@ __pycache__
 localfileorder.json
 
 logback.log
+
+# Ignore folder created when substituting receiver fields in MSH Header
+substituted_receivers
