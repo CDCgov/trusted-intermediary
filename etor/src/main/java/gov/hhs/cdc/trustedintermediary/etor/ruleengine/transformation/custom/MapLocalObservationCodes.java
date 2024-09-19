@@ -41,10 +41,9 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
             if (codingList.size() == 1) {
                 var coding = codingList.get(0);
 
-                // CWE extension
                 if (!HapiHelper.hasCodingExtensionWithUrl(
                         coding, HapiHelper.EXTENSION_CWE_CODING)) {
-                    // continue cycling through all the coding
+
                     continue;
                 }
                 var cwe =
@@ -52,21 +51,19 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                                 .getValue()
                                 .toString();
 
-                // Coding System
-
                 if (!HapiHelper.hasCodingSystem(coding)) {
                     continue;
                 }
                 var codingSystem = HapiHelper.getCodingSystem(coding);
 
-                // Alt coding is HL7 OBX-3.4,5,6
+
                 if (Objects.equals(cwe, "alt-coding")
                         && HapiHelper.LOCAL_CODE_URL.equals(codingSystem)) {
-                    // Look up the code in the hash map
+
                     var identifier = codingMap.get(coding.getCode());
 
                     if (identifier == null) {
-                        // The local code was not found in the mapping
+
                         var msh41Identifier = HapiHelper.getMSH4_1Identifier(bundle);
                         var msh41Value =
                                 msh41Identifier != null ? msh41Identifier.getValue() : null;
@@ -78,8 +75,7 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                                 HapiHelper.getMessageControlId(bundle));
                         continue;
                     }
-
-                    // Create a new coding source and add it to the coding list
+                    
                     var mappedCoding =
                             new Coding(
                                     urlForCodeType(identifier.codingSystem()),
