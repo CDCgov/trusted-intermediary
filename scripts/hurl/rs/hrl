@@ -14,6 +14,7 @@ client_id=flexion
 client_sender=simulated-hospital
 verbose=""
 submission_id=""
+allow_outbound=false
 
 show_help() {
     echo "Usage: $(basename $0) <HURL_FILE> [OPTIONS]"
@@ -29,6 +30,7 @@ show_help() {
     echo "    -i <SUBMISSION_ID>    The submissionId to call the history API with (Required for history API)"
     echo "    -v                    Verbose mode"
     echo "    -h                    Display this help and exit"
+    echo "    -p                    Produce a real message, receiver will not be Flexion specific"
 }
 
 # Check if required HURL_FILE is provided
@@ -47,7 +49,7 @@ fi
 hurl_file="$1" # Assign the first argument to hurl_file
 shift          # Remove the first argument from the list of arguments
 
-while getopts ':f:r:t:e:c:s:x:i:vh' opt; do
+while getopts ':f:r:t:e:c:s:x:i:vh:p' opt; do
     case "$opt" in
     f)
         fpath="$OPTARG"
@@ -79,6 +81,9 @@ while getopts ':f:r:t:e:c:s:x:i:vh' opt; do
     h)
         show_help
         exit 0
+        ;;
+    p)
+        allow_outbound=true
         ;;
     :)
         echo -e "Option requires an argument"
@@ -114,6 +119,20 @@ if [ -z "$secret" ]; then
     exit 1
 fi
 
+
+if [ "$allow_outbound" = true ]; then
+  echo "$allow_outbound"
+  receiverFieldsToSubstitute=$(head -n1 "$CDCTI_HOME/$fpath" | cut -d "|" -f 5,6)
+  echo "$receiverFieldsToSubstitute"
+  substitutedReceiverFields=$(sed -n "s/$receiverFieldsToSubstitute/substituted|ToPreventFileOutput/" "$CDCTI_HOME/$fpath")
+  echo "$substitutedReceiverFields"
+  exit 1
+fi
+
+if [ "$allow_outbound" = false ]; then
+  echo "$allow_outbound"
+  exit 1
+fi
 hurl \
     --variable fpath=$fpath \
     --file-root $root \
@@ -123,6 +142,7 @@ hurl \
     --variable client-sender=$client_sender \
     --variable jwt=$(jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 -k $client_id.$client_sender -i $client_id.$client_sender -s $client_id.$client_sender -a $host --no-iat -S @$secret) \
     $submission_id \
+    $allow_outbound \
     $verbose \
     $hurl_file \
     $@
