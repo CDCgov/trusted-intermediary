@@ -41,13 +41,18 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
             if (codingList.size() == 1) {
                 var coding = codingList.get(0);
 
-                var cweExtension = coding.getExtensionByUrl(HapiHelper.EXTENSION_CWE_CODING);
-                if (cweExtension == null) {
+                // CWE extension
+                if (!HapiHelper.hasCodingExtensionWithUrl(
+                        coding, HapiHelper.EXTENSION_CWE_CODING)) {
                     // continue cycling through all the coding
                     continue;
                 }
+                var cwe =
+                        HapiHelper.getCodingExtensionByUrl(coding, HapiHelper.EXTENSION_CWE_CODING)
+                                .getValue()
+                                .toString();
 
-                var cwe = cweExtension.getValue().toString();
+                // Coding System
                 var codingSystem = coding.getSystem();
                 if (codingSystem == null) {
                     continue;

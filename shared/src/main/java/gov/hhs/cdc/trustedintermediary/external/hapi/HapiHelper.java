@@ -549,6 +549,15 @@ public class HapiHelper {
         setHl7FieldExtensionValue(identifier, EXTENSION_HD1_DATA_TYPE);
     }
 
+    // Coding resource
+    public static Extension getCodingExtensionByUrl(Coding coding, String url) {
+        return coding.getExtensionByUrl(url);
+    }
+
+    public static boolean hasCodingExtensionWithUrl(Coding coding, String url) {
+        return coding.getExtensionByUrl(url) != null;
+    }
+
     // CWE - Coded with Exceptions
     public static String getCWE1Value(Coding coding) {
         return coding.getCode();
