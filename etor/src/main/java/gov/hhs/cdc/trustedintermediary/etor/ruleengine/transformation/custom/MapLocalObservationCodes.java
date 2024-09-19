@@ -56,7 +56,6 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                 }
                 var codingSystem = HapiHelper.getCodingSystem(coding);
 
-
                 if (Objects.equals(cwe, "alt-coding")
                         && HapiHelper.LOCAL_CODE_URL.equals(codingSystem)) {
 
@@ -75,7 +74,7 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                                 HapiHelper.getMessageControlId(bundle));
                         continue;
                     }
-                    
+
                     var mappedCoding =
                             new Coding(
                                     urlForCodeType(identifier.codingSystem()),
