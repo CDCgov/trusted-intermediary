@@ -54,7 +54,7 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                 }
                 // Alt coding is HL7 OBX-3.4,5,6
                 if (Objects.equals(cwe, "alt-coding")
-                        && HapiHelper.LOCAL_CODE_URL.equals(codingSystem) {
+                        && HapiHelper.LOCAL_CODE_URL.equals(codingSystem)) {
                     // Look up the code in the hash map
                     var identifier = codingMap.get(coding.getCode());
 
