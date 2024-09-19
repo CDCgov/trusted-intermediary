@@ -558,6 +558,14 @@ public class HapiHelper {
         return coding.getExtensionByUrl(url) != null;
     }
 
+    public static boolean hasCodingSystem(Coding coding) {
+        return coding.getSystem() != null;
+    }
+
+    public static String getCodingSystem(Coding coding) {
+        return coding.getSystem();
+    }
+
     // CWE - Coded with Exceptions
     public static String getCWE1Value(Coding coding) {
         return coding.getCode();
