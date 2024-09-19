@@ -41,10 +41,13 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
             if (codingList.size() == 1) {
                 var coding = codingList.get(0);
 
-                var cwe =
-                        coding.getExtensionByUrl(HapiHelper.EXTENSION_CWE_CODING)
-                                .getValue()
-                                .toString();
+                var cweExtension = coding.getExtensionByUrl(HapiHelper.EXTENSION_CWE_CODING);
+                if (cweExtension == null) {
+                    // continue cycling through all the coding
+                    continue;
+                }
+
+                var cwe = cweExtension.getValue().toString();
 
                 // Alt coding is HL7 OBX-3.4,5,6
                 if (Objects.equals(cwe, "alt-coding")
