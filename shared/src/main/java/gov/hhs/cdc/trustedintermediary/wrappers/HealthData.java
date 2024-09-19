@@ -4,6 +4,4 @@ public interface HealthData<T> {
     T getUnderlyingData();
 
     String getName();
-
-    Boolean evaluateCondition(String expression);
 }

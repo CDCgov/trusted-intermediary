@@ -2,7 +2,11 @@ package gov.hhs.cdc.trustedintermediary.rse2e
 
 import ca.uhn.hl7v2.model.Message
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHL7FileMatcher
+import gov.hhs.cdc.trustedintermediary.external.hapi.HL7FileStream
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHL7ExpressionEvaluator
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoader
@@ -14,7 +18,7 @@ class AutomatedTest  extends Specification  {
     List<HL7FileStream> recentAzureFiles
     List<HL7FileStream> recentLocalFiles
     AssertionRuleEngine engine
-    HL7FileMatcher fileMatcher
+    HapiHL7FileMatcher fileMatcher
     def mockLogger = Mock(Logger)
 
     def setup() {
@@ -25,7 +29,7 @@ class AutomatedTest  extends Specification  {
         recentLocalFiles = localFileFetcher.fetchFiles()
 
         engine = AssertionRuleEngine.getInstance()
-        fileMatcher =  HL7FileMatcher.getInstance()
+        fileMatcher =  HapiHL7FileMatcher.getInstance()
 
         TestApplicationContext.reset()
         TestApplicationContext.init()
@@ -33,8 +37,8 @@ class AutomatedTest  extends Specification  {
         TestApplicationContext.register(RuleLoader, RuleLoader.getInstance())
         TestApplicationContext.register(Logger, mockLogger)
         TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.register(HL7FileMatcher, fileMatcher)
-        TestApplicationContext.register(HL7ExpressionEvaluator, HL7ExpressionEvaluator.getInstance())
+        TestApplicationContext.register(HapiHL7FileMatcher, fileMatcher)
+        TestApplicationContext.register(HealthDataExpressionEvaluator, HapiHL7ExpressionEvaluator.getInstance())
         TestApplicationContext.register(AzureBlobFileFetcher, azureFileFetcher)
         TestApplicationContext.register(LocalFileFetcher, LocalFileFetcher.getInstance())
         TestApplicationContext.injectRegisteredImplementations()

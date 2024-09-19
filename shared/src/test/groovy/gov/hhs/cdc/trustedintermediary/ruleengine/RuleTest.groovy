@@ -2,15 +2,19 @@ package gov.hhs.cdc.trustedintermediary.ruleengine
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthData
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import spock.lang.Specification
 
 class RuleTest extends Specification {
 
+    def mockLogger = Mock(Logger)
+
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
-        TestApplicationContext.register(Logger, Mock(Logger))
+        TestApplicationContext.register(Logger, mockLogger)
+        TestApplicationContext.register(HealthDataExpressionEvaluator, Mock(HealthDataExpressionEvaluator))
         TestApplicationContext.injectRegisteredImplementations()
     }
 
@@ -36,8 +40,10 @@ class RuleTest extends Specification {
     def "shouldRun returns expected boolean depending on conditions"() {
         given:
         def mockHealthData = Mock(HealthData)
-        mockHealthData.evaluateCondition(_ as String) >> true >> conditionResult
-        TestApplicationContext.register(HealthData, mockHealthData)
+        def mockEvaluator = Mock(HealthDataExpressionEvaluator)
+        mockEvaluator.evaluateExpression(_ as String, mockHealthData) >> true >> conditionResult
+        TestApplicationContext.register(HealthDataExpressionEvaluator, mockEvaluator)
+        TestApplicationContext.injectRegisteredImplementations()
 
         def rule = new Rule(null, null, null, [
             "trueCondition",
@@ -55,16 +61,16 @@ class RuleTest extends Specification {
 
     def "shouldRun logs an error and returns false if an exception happens when evaluating a condition"() {
         given:
-        def mockLogger = Mock(Logger)
         def mockHealthData = Mock(HealthData)
-        mockHealthData.evaluateCondition("condition") >> { throw new Exception() }
-        TestApplicationContext.register(Logger, mockLogger)
-        TestApplicationContext.register(HealthData, mockHealthData)
+        def mockEvaluator = Mock(HealthDataExpressionEvaluator)
+        mockEvaluator.evaluateExpression(_ as String, mockHealthData) >> { throw new Exception() }
+        TestApplicationContext.register(HealthDataExpressionEvaluator, mockEvaluator)
+        TestApplicationContext.injectRegisteredImplementations()
 
         def rule = new Rule(null, null, null, ["condition"], null)
 
         when:
-        def applies = rule.shouldRun(Mock(HealthData))
+        def applies = rule.shouldRun(mockHealthData)
 
         then:
         1 * mockLogger.logError(_ as String, _ as Exception)

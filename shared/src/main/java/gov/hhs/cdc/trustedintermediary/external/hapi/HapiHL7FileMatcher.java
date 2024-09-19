@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.rse2e;
+package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HL7Exception;
@@ -16,15 +16,15 @@ import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 
-public class HL7FileMatcher {
+public class HapiHL7FileMatcher {
 
-    private static final HL7FileMatcher INSTANCE = new HL7FileMatcher();
+    private static final HapiHL7FileMatcher INSTANCE = new HapiHL7FileMatcher();
 
     @Inject Logger logger;
 
-    private HL7FileMatcher() {}
+    private HapiHL7FileMatcher() {}
 
-    public static HL7FileMatcher getInstance() {
+    public static HapiHL7FileMatcher getInstance() {
         return INSTANCE;
     }
 

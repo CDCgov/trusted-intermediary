@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.ruleengine;
 
 import ca.uhn.hl7v2.model.Message;
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHL7Message;
 import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoader;
 import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoaderException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
@@ -65,9 +66,12 @@ public class AssertionRuleEngine {
             return;
         }
 
+        HapiHL7Message outputHapiMessage = new HapiHL7Message(outputMessage);
+        HapiHL7Message inputHapiMessage = new HapiHL7Message(inputMessage);
+
         for (AssertionRule rule : assertionRules) {
-            if (rule.shouldRun(outputMessage)) {
-                rule.runRule(outputMessage, inputMessage);
+            if (rule.shouldRun(outputHapiMessage)) {
+                rule.runRule(outputHapiMessage, inputHapiMessage);
             }
         }
     }

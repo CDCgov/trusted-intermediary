@@ -4,6 +4,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException
 import spock.lang.Specification
 
 class RuleLoaderExceptionTest extends Specification {
+
     def "constructor works"() {
         given:
         def message = "rules loaded wrong!"

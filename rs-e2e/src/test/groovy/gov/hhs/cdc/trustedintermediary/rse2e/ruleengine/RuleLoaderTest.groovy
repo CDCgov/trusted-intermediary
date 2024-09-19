@@ -2,7 +2,7 @@ package gov.hhs.cdc.trustedintermediary.rse2e.ruleengine
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
-import gov.hhs.cdc.trustedintermediary.rse2e.HL7ExpressionEvaluator
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHL7ExpressionEvaluator
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
 import spock.lang.Specification
@@ -20,7 +20,7 @@ class RuleLoaderTest extends Specification {
         TestApplicationContext.init()
         TestApplicationContext.register(RuleLoader, RuleLoader.getInstance())
         TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.register(HL7ExpressionEvaluator, HL7ExpressionEvaluator.getInstance())
+        TestApplicationContext.register(HapiHL7ExpressionEvaluator, HapiHL7ExpressionEvaluator.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         tempFile = Files.createTempFile("test_validation_definition", ".json")

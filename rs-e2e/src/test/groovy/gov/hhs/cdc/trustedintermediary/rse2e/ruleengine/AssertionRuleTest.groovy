@@ -2,7 +2,7 @@ package gov.hhs.cdc.trustedintermediary.rse2e.ruleengine
 
 import ca.uhn.hl7v2.model.Message
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.rse2e.HL7ExpressionEvaluator
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHL7ExpressionEvaluator
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import spock.lang.Specification
 
@@ -14,7 +14,7 @@ class AssertionRuleTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(Logger, mockLogger)
-        TestApplicationContext.register(HL7ExpressionEvaluator, Mock(HL7ExpressionEvaluator))
+        TestApplicationContext.register(HapiHL7ExpressionEvaluator, Mock(HapiHL7ExpressionEvaluator))
         TestApplicationContext.injectRegisteredImplementations()
     }
 
@@ -36,9 +36,9 @@ class AssertionRuleTest extends Specification {
     def "shouldRun returns expected boolean depending on conditions"() {
         given:
         def mockMessage = Mock(Message)
-        def mockEvaluator = Mock(HL7ExpressionEvaluator)
+        def mockEvaluator = Mock(HapiHL7ExpressionEvaluator)
         mockEvaluator.parseAndEvaluate(mockMessage, null, _ as String) >> true >> conditionResult
-        TestApplicationContext.register(HL7ExpressionEvaluator, mockEvaluator)
+        TestApplicationContext.register(HapiHL7ExpressionEvaluator, mockEvaluator)
 
         def rule = new AssertionRule(null, [
             "trueCondition",
@@ -57,9 +57,9 @@ class AssertionRuleTest extends Specification {
     def "shouldRun logs an error and returns false if an exception happens when evaluating a condition"() {
         given:
         def mockMessage = Mock(Message)
-        def mockEvaluator = Mock(HL7ExpressionEvaluator)
+        def mockEvaluator = Mock(HapiHL7ExpressionEvaluator)
         mockEvaluator.parseAndEvaluate(mockMessage, null, _ as String) >> { throw new Exception() }
-        TestApplicationContext.register(HL7ExpressionEvaluator, mockEvaluator)
+        TestApplicationContext.register(HapiHL7ExpressionEvaluator, mockEvaluator)
 
         def rule = new AssertionRule(null, ["condition"], null)
 
@@ -74,8 +74,8 @@ class AssertionRuleTest extends Specification {
     def "runRule returns expected boolean depending on assertions"() {
         given:
         def mockMessage = Mock(Message)
-        def mockEvaluator = Mock(HL7ExpressionEvaluator)
-        TestApplicationContext.register(HL7ExpressionEvaluator, mockEvaluator)
+        def mockEvaluator = Mock(HapiHL7ExpressionEvaluator)
+        TestApplicationContext.register(HapiHL7ExpressionEvaluator, mockEvaluator)
 
         def rule = new AssertionRule(null, null, [
             "trueValidation",
@@ -103,9 +103,9 @@ class AssertionRuleTest extends Specification {
         given:
 
         def mockMessage = Mock(Message)
-        def mockEvaluator = Mock(HL7ExpressionEvaluator)
+        def mockEvaluator = Mock(HapiHL7ExpressionEvaluator)
         mockEvaluator.parseAndEvaluate(mockMessage, _ as Message, _ as String) >> { throw new Exception() }
-        TestApplicationContext.register(HL7ExpressionEvaluator, mockEvaluator)
+        TestApplicationContext.register(HapiHL7ExpressionEvaluator, mockEvaluator)
 
         def rule = new AssertionRule(null, null, ["validation"])
 

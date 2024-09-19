@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.rse2e;
+package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import java.io.InputStream;
 

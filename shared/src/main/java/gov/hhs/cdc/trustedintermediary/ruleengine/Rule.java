@@ -2,12 +2,15 @@ package gov.hhs.cdc.trustedintermediary.ruleengine;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.List;
 
 public class Rule<T> {
 
     protected final Logger logger = ApplicationContext.getImplementation(Logger.class);
+    protected final HealthDataExpressionEvaluator evaluator =
+            ApplicationContext.getImplementation(HealthDataExpressionEvaluator.class);
 
     private String name;
     private String description;
@@ -59,7 +62,7 @@ public class Rule<T> {
                 .allMatch(
                         condition -> {
                             try {
-                                return data.evaluateCondition(condition);
+                                return evaluator.evaluateExpression(condition, data);
                             } catch (Exception e) {
                                 logger.logError(
                                         "Rule ["
@@ -73,11 +76,7 @@ public class Rule<T> {
                         });
     }
 
-    public void runRule(HealthData<?> data) {
-        throw new UnsupportedOperationException("This method must be implemented by subclasses.");
-    }
-
-    public void runRule(HealthData<?> outputData, HealthData<?> inputData) {
+    public void runRule(HealthData<?>... data) {
         throw new UnsupportedOperationException("This method must be implemented by subclasses.");
     }
 }

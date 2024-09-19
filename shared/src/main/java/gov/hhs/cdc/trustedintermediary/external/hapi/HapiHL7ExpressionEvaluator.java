@@ -1,8 +1,10 @@
-package gov.hhs.cdc.trustedintermediary.rse2e;
+package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Segment;
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,22 +13,27 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 
-public class HL7ExpressionEvaluator {
+public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator {
 
-    private static final HL7ExpressionEvaluator INSTANCE = new HL7ExpressionEvaluator();
+    private static final HapiHL7ExpressionEvaluator INSTANCE = new HapiHL7ExpressionEvaluator();
 
     @Inject Logger logger;
 
-    private HL7ExpressionEvaluator() {}
+    private HapiHL7ExpressionEvaluator() {}
 
-    public static HL7ExpressionEvaluator getInstance() {
+    public static HapiHL7ExpressionEvaluator getInstance() {
         return INSTANCE;
     }
 
-    public boolean parseAndEvaluate(Object outputMessage, Object inputMessage, String statement) {
+    @Override
+    public final boolean evaluateExpression(String expression, HealthData<?>... data) {
+        if (data.length > 2) {
+            throw new IllegalArgumentException(
+                    "Expected two messages, but received: " + data.length);
+        }
 
         Pattern operationPattern = Pattern.compile("^(\\S+)\\s*(=|!=|in)\\s*(.+)$");
-        Matcher matcher = operationPattern.matcher(statement);
+        Matcher matcher = operationPattern.matcher(expression);
 
         if (!matcher.matches()) {
             throw new IllegalArgumentException("Invalid statement format.");
@@ -36,6 +43,9 @@ public class HL7ExpressionEvaluator {
         String operator = matcher.group(2); // `=`, `!=`, or `in`
         String rightOperand =
                 matcher.group(3); // e.g. MSH-5.1, input.MSH-5.1, 'EPIC', ('EPIC', 'CERNER'), 2
+
+        Message outputMessage = (Message) data[0].getUnderlyingData();
+        Message inputMessage = (data.length > 1) ? (Message) data[1].getUnderlyingData() : null;
 
         // matches a count operation (e.g. OBR.count())
         Pattern hl7CountPattern = Pattern.compile("(\\S+)\\.count\\(\\)");
