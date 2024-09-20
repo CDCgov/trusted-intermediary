@@ -120,25 +120,20 @@ if [ -z "$secret" ]; then
 fi
 
 
-if [ "$allow_outbound" = true ]; then
-  file_name=$(basename $fpath)
-  echo "$fpath"
-  mkdir -p "$CDCTI_HOME/substituted_receivers/$fpath" && touch -f "$CDCTI_HOME/substituted_receivers/$fpath/$file_name"
-  echo "$file_name"
-  receiverFieldsToSubstitute=$(head -n1 "$CDCTI_HOME/$fpath" | cut -d "|" -f 5,6)
-  echo "$receiverFieldsToSubstitute"
-  substitutedReceiverFields=$(sed "s/$receiverFieldsToSubstitute/!!!!!!!**********substituted|ToPreventFileOutput**********!!!!!!!/" "$CDCTI_HOME/$fpath" > "$CDCTI_HOME/substituted_receivers/$fpath/$file_name")
-  echo "$substitutedReceiverFields"
-  fpath=$CDCTI_HOME/substituted_receivers/$fpath
-
-  echo "$fpath"
-  exit 1
-fi
-
 if [ "$allow_outbound" = false ]; then
-  echo "$allow_outbound"
-  exit 1
+  file_path=$(dirname "$fpath")
+  substitutedFilePathPrefix="$CDCTI_HOME/substituted_receivers"
+#  Make temporary directory to store scrambled file
+  mkdir -p "$substitutedFilePathPrefix/$file_path" && touch -f "$substitutedFilePathPrefix/$fpath"
+#  Grab MSH Header receiver fields
+  receiverFieldsToSubstitute=$(head -n1 "$CDCTI_HOME/$fpath" | cut -d "|" -f 5,6)
+#  Substitute receivers fields with scramble and write into temporary directory
+  sed "s/$receiverFieldsToSubstitute/!!!!!!!**********substituted|ToPreventFileOutput**********!!!!!!!/" "$CDCTI_HOME/$fpath" > "$substitutedFilePathPrefix/$fpath"
+#  Update fpath to allow hurl to run scrambled file
+  fpath=$substitutedFilePathPrefix/$fpath
+  echo "The MSH Header receiver fields have been scrambled to prevent sending to a real receiver. To toggle this, run with -p."
 fi
+
 hurl \
     --variable fpath=$fpath \
     --file-root $root \
@@ -148,7 +143,6 @@ hurl \
     --variable client-sender=$client_sender \
     --variable jwt=$(jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 -k $client_id.$client_sender -i $client_id.$client_sender -s $client_id.$client_sender -a $host --no-iat -S @$secret) \
     $submission_id \
-    $allow_outbound \
     $verbose \
     $hurl_file \
     $@

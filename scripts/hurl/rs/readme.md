@@ -16,6 +16,7 @@ Options:
     -i <SUBMISSION_ID>    The submissionId to call the history API with (Required for history API)
     -v                    Verbose mode
     -h                    Display this help and exit
+    -p                    Produce a real message, receiver will not be Flexion specific
 ```
 
 ## Examples
