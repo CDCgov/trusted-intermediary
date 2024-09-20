@@ -5,19 +5,19 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Segment;
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator;
-import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 
 public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator {
 
     private static final HapiHL7ExpressionEvaluator INSTANCE = new HapiHL7ExpressionEvaluator();
-
-    @Inject Logger logger;
+    private static final Pattern OPERATION_PATTERN =
+            Pattern.compile("^(\\S+)\\s*(=|!=|in)\\s*(.+)$");
+    private static final Pattern HL7_COUNT_PATTERN = Pattern.compile("(\\S+)\\.count\\(\\)");
+    private static final Pattern LITERAL_VALUE_PATTERN = Pattern.compile("'(\\S+)'");
 
     private HapiHL7ExpressionEvaluator() {}
 
@@ -32,8 +32,7 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
                     "Expected two messages, but received: " + data.length);
         }
 
-        Pattern operationPattern = Pattern.compile("^(\\S+)\\s*(=|!=|in)\\s*(.+)$");
-        Matcher matcher = operationPattern.matcher(expression);
+        Matcher matcher = OPERATION_PATTERN.matcher(expression);
 
         if (!matcher.matches()) {
             throw new IllegalArgumentException("Invalid statement format.");
@@ -48,8 +47,7 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
         Message inputMessage = (data.length > 1) ? (Message) data[1].getUnderlyingData() : null;
 
         // matches a count operation (e.g. OBR.count())
-        Pattern hl7CountPattern = Pattern.compile("(\\S+)\\.count\\(\\)");
-        Matcher hl7CountMatcher = hl7CountPattern.matcher(leftOperand);
+        Matcher hl7CountMatcher = HL7_COUNT_PATTERN.matcher(leftOperand);
         if (hl7CountMatcher.matches()) {
             return evaluateCollectionCount(
                     outputMessage, hl7CountMatcher.group(1), rightOperand, operator);
@@ -57,12 +55,7 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
 
         // matches either a literal value (e.g. 'EPIC') or a field reference (e.g. MSH-5.1,
         // input.MSH-5.1)
-        Pattern literalValuePattern = Pattern.compile("'(\\S+)'");
-        Matcher leftLiteralValueMatcher = literalValuePattern.matcher(leftOperand);
-        String leftValue =
-                leftLiteralValueMatcher.matches()
-                        ? leftLiteralValueMatcher.group(1)
-                        : getFieldValue(outputMessage, inputMessage, leftOperand);
+        String leftValue = getLiteralOrFieldValue(outputMessage, inputMessage, leftOperand);
 
         // matches membership operator (e.g. MSH-5.1 in ('EPIC', 'CERNER'))
         if (operator.equals("in")) {
@@ -71,11 +64,7 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
 
         // matches either a literal value (e.g. 'EPIC') or a field reference (e.g. MSH-5.1,
         // input.MSH-5.1)
-        Matcher rightLiteralValueMatcher = literalValuePattern.matcher(rightOperand);
-        String rightValue =
-                rightLiteralValueMatcher.matches()
-                        ? rightLiteralValueMatcher.group(1)
-                        : getFieldValue(outputMessage, inputMessage, rightOperand);
+        String rightValue = getLiteralOrFieldValue(outputMessage, inputMessage, rightOperand);
 
         // matches equality operators (e.g. MSH-5.1 = 'EPIC', MSH-5.1 != 'EPIC')
         return evaluateEquality(leftValue, rightValue, operator);
@@ -119,6 +108,14 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
                             + rightOperand,
                     e);
         }
+    }
+
+    private String getLiteralOrFieldValue(
+            Message outputMessage, Message inputMessage, String operand) {
+        Matcher literalValueMatcher = LITERAL_VALUE_PATTERN.matcher(operand);
+        return literalValueMatcher.matches()
+                ? literalValueMatcher.group(1)
+                : getFieldValue(outputMessage, inputMessage, operand);
     }
 
     private String getFieldValue(Message outputMessage, Message inputMessage, String fieldName) {
@@ -171,6 +168,12 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
     }
 
     private Message getMessageBySource(String source, Message inputMessage, Message outputMessage) {
-        return "input".equals(source) ? inputMessage : outputMessage;
+        if ("input".equals(source)) {
+            if (inputMessage == null) {
+                throw new IllegalArgumentException("Input message is null for: " + source);
+            }
+            return inputMessage;
+        }
+        return outputMessage;
     }
 }
