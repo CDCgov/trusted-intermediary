@@ -31,7 +31,7 @@ show_help() {
     echo "    -i <SUBMISSION_ID>    The submissionId to call the history API with (Required for history API)"
     echo "    -v                    Verbose mode"
     echo "    -h                    Display this help and exit"
-    echo "    -p                    Produce a real message, receiver will not be Flexion specific"
+    echo "    -p                    By default, the MSH segment is replaced to contain a Flexion receiver in order to avoid sending messages to partners inadvertently. When using this flag, the MSH segment will not be replaced"
 }
 
 # Check if required HURL_FILE is provided
@@ -141,7 +141,7 @@ if [ "$allow_outbound" = false ]; then
 # Replace MSH Header and write into temporary directory
   sed "1s/.*/$msh_header_replacement/" "$CDCTI_HOME/$fpath" > "$substitutedFilePathPrefix/$fpath"
   fpath=$substitutedFilePathPrefix/$fpath
-  echo "The MSH Header was replaced to contain a Flexion receiver and sender. To toggle this, run with -p."
+  echo "By default, the MSH segment is replaced to contain a Flexion receiver in order to avoid sending messages to partners inadvertently. To toggle this, run with -p."
 fi
 
 hurl \

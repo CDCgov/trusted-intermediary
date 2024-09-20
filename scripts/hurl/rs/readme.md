@@ -16,7 +16,7 @@ Options:
     -i <SUBMISSION_ID>    The submissionId to call the history API with (Required for history API)
     -v                    Verbose mode
     -h                    Display this help and exit
-    -p                    Produce a real message, MSH Header will not be replaced to contain a Flexion receiver and sender
+    -p                    By default, the MSH segment is replaced to contain a Flexion receiver in order to avoid sending messages to partners inadvertently. When using this flag, the MSH segment will not be replaced
 ```
 
 ## Examples
