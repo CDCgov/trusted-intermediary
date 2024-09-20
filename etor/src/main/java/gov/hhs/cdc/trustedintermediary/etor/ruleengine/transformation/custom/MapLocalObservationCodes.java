@@ -43,42 +43,48 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
             }
 
             var coding = codingList.get(0);
-
-            if (!HapiHelper.hasCodingExtensionWithUrl(coding, HapiHelper.EXTENSION_CWE_CODING)) {
-                continue;
-            }
-            var cwe =
-                    HapiHelper.getCodingExtensionByUrl(coding, HapiHelper.EXTENSION_CWE_CODING)
-                            .getValue()
-                            .toString();
-
-            if (!HapiHelper.hasCodingSystem(coding)) {
-                continue;
-            }
-            var codingSystem = HapiHelper.getCodingSystem(coding);
-
-            if (!Objects.equals(cwe, "alt-coding")
-                    || !HapiHelper.LOCAL_CODE_URL.equals(codingSystem)) {
+            if (!hasLocalCodeInAlternateCoding(coding)) {
                 continue;
             }
 
             var identifier = codingMap.get(coding.getCode());
-
             if (identifier == null) {
-                var msh41Identifier = HapiHelper.getMSH4_1Identifier(bundle);
-                var msh41Value = msh41Identifier != null ? msh41Identifier.getValue() : null;
-
-                LOGGER.logWarning(
-                        "Unmapped local code detected: '{}', from sender: '{}', message Id: '{}'",
-                        coding.getCode(),
-                        msh41Value,
-                        HapiHelper.getMessageControlId(bundle));
+                logUnmappedLocalCode(bundle, coding);
                 continue;
             }
 
             var mappedCoding = getMappedCoding(identifier);
             codingList.add(0, mappedCoding);
         }
+    }
+
+    private Boolean hasLocalCodeInAlternateCoding(Coding coding) {
+        if (!HapiHelper.hasCodingExtensionWithUrl(coding, HapiHelper.EXTENSION_CWE_CODING)) {
+            return false;
+        }
+
+        if (!HapiHelper.hasCodingSystem(coding)) {
+            return false;
+        }
+
+        var cwe =
+                HapiHelper.getCodingExtensionByUrl(coding, HapiHelper.EXTENSION_CWE_CODING)
+                        .getValue()
+                        .toString();
+        var codingSystem = HapiHelper.getCodingSystem(coding);
+
+        return Objects.equals(cwe, "alt-coding") && HapiHelper.LOCAL_CODE_URL.equals(codingSystem);
+    }
+
+    private void logUnmappedLocalCode(Bundle bundle, Coding coding) {
+        var msh41Identifier = HapiHelper.getMSH4_1Identifier(bundle);
+        var msh41Value = msh41Identifier != null ? msh41Identifier.getValue() : null;
+
+        LOGGER.logWarning(
+                "Unmapped local code detected: '{}', from sender: '{}', message Id: '{}'",
+                coding.getCode(),
+                msh41Value,
+                HapiHelper.getMessageControlId(bundle));
     }
 
     private String urlForCodeType(String code) {
