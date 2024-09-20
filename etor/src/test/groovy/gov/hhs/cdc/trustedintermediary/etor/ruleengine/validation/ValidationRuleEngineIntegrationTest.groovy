@@ -3,12 +3,13 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader
+import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoader
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import org.hl7.fhir.r4.model.Bundle
@@ -28,6 +29,7 @@ class ValidationRuleEngineIntegrationTest extends Specification {
         TestApplicationContext.register(HapiFhir, fhir)
         TestApplicationContext.register(ValidationRuleEngine, engine)
         TestApplicationContext.register(RuleLoader, RuleLoader.getInstance())
+        TestApplicationContext.register(HealthDataExpressionEvaluator, HapiFhirImplementation.getInstance())
         TestApplicationContext.register(Logger, mockLogger)
 
         TestApplicationContext.injectRegisteredImplementations()

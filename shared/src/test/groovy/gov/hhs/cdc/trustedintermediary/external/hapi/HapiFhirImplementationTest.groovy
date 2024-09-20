@@ -47,10 +47,10 @@ class HapiFhirImplementationTest extends Specification {
         def path = "Bundle.id.exists()"
 
         when:
-        def result = fhir.evaluateCondition(bundle as IBaseResource, path)
+        def result = fhir.evaluateExpression(path, new HapiFhirResource(bundle))
 
         then:
-        result == true
+        result
     }
 
     def "evaluateCondition returns false on not finding non-existing value"() {
@@ -58,10 +58,10 @@ class HapiFhirImplementationTest extends Specification {
         def path = "Bundle.timestamp.exists()"
 
         when:
-        def result = fhir.evaluateCondition(bundle as IBaseResource, path)
+        def result = fhir.evaluateExpression(path, new HapiFhirResource(bundle))
 
         then:
-        result == false
+        !result
     }
 
     def "evaluateCondition returns false on not finding matching extension"() {
@@ -69,10 +69,10 @@ class HapiFhirImplementationTest extends Specification {
         def path = "Bundle.entry[0].resource.extension('blah')"
 
         when:
-        def result = fhir.evaluateCondition(bundle as IBaseResource, path)
+        def result = fhir.evaluateExpression(path, new HapiFhirResource(bundle))
 
         then:
-        result == false
+        !result
     }
 
     def "evaluateCondition throws Exception on empty string"() {
@@ -80,7 +80,7 @@ class HapiFhirImplementationTest extends Specification {
         def path = ""
 
         when:
-        fhir.evaluateCondition(bundle as IBaseResource, path)
+        fhir.evaluateExpression(path, new HapiFhirResource(bundle))
 
         then:
         thrown(Exception)
@@ -91,7 +91,7 @@ class HapiFhirImplementationTest extends Specification {
         def path = "Bundle.entry[0].resource.BadMethod('blah')"
 
         when:
-        fhir.evaluateCondition(bundle as IBaseResource, path)
+        fhir.evaluateExpression(path, new HapiFhirResource(bundle))
 
         then:
         thrown(Exception)

@@ -37,7 +37,7 @@ class HapiOrderTest extends Specification {
         def order = new HapiOrder(expectedInnerOrder)
 
         when:
-        def actualInnerOrder = order.getUnderlyingResource()
+        def actualInnerOrder = order.getUnderlyingData()
 
         then:
         actualInnerOrder == expectedInnerOrder

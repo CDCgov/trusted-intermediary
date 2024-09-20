@@ -1,10 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleEngine
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoaderException
+import gov.hhs.cdc.trustedintermediary.ruleengine.RuleEngine
+import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoader
+import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoaderException
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthData
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
 import spock.lang.Specification
@@ -94,7 +94,7 @@ class TransformationRuleEngineTest extends Specification {
         }
 
         when:
-        ruleEngine.runRules(Mock(FhirResource))
+        ruleEngine.runRules(Mock(HealthData))
 
         then:
         1 * mockLogger.logError(_ as String, exception)
@@ -103,7 +103,7 @@ class TransformationRuleEngineTest extends Specification {
     def "runRules handles logging warning correctly"() {
         given:
         def applyingTransformationMessage = "Applying transformation"
-        def fhirBundle = Mock(FhirResource)
+        def fhirBundle = Mock(HealthData)
         def testRule = Mock(TransformationRule)
         testRule.getMessage() >> applyingTransformationMessage
         testRule.shouldRun(fhirBundle) >> true
@@ -140,7 +140,7 @@ class TransformationRuleEngineTest extends Specification {
         mockRuleLoader.loadRules(_ as InputStream, _ as TypeReference) >> { throw exception }
 
         when:
-        ruleEngine.runRules(Mock(FhirResource))
+        ruleEngine.runRules(Mock(HealthData))
 
         then:
         1 * mockLogger.logError(_ as String, exception)

@@ -23,7 +23,7 @@ class SwapPlacerOrderAndGroupNumbersTest extends Specification {
     def "swap ORC-2.1 + OBR-2.1 with ORC-4.1 and ORC-2.2 + OBR-2.2 with ORC-4.2"() {
         given:
         def fhirResource = ExamplesHelper.getExampleFhirResource("../MN/004_MN_ORU_R01_NBS_1_hl7_translation.fhir")
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = fhirResource.getUnderlyingData() as Bundle
 
         def serviceRequest = HapiHelper.resourceInBundle(bundle, ServiceRequest)
         def orc2_1 = HapiHelper.getORC2_1Value(serviceRequest)
