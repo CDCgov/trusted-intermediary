@@ -141,7 +141,7 @@ if [ "$allow_outbound" = false ]; then
 # Replace MSH Header and write into temporary directory
   sed "1s/.*/$msh_header_replacement/" "$CDCTI_HOME/$fpath" > "$substitutedFilePathPrefix/$fpath"
   fpath=$substitutedFilePathPrefix/$fpath
-  echo "The MSH Header was replaced to contain Flexion receivers. To toggle this, run with -p."
+  echo "The MSH Header was replaced to contain a Flexion receiver and sender. To toggle this, run with -p."
 fi
 
 hurl \
