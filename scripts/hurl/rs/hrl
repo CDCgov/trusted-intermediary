@@ -124,14 +124,14 @@ if [ "$allow_outbound" = false ]; then
 # Grab MSH Header
   msh_header=$(head -n1 "$CDCTI_HOME/$fpath")
 # Check message type
-  if [[ "$msh_header" = *"|ORU^"* ]]; then
+  if [[ "$msh_header" = *"^R01"* ]]; then
     msh_header_replacement="MSH|^~\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-hospital-id^DNS|20230101010000-0000||ORU^R01^ORU_R01|111111|T|2.5.1||||||||||"
-  elif [[ "$msh_header" = *"|ORM^"* ]]; then
+  elif [[ "$msh_header" = *"^O01"* ]]; then
     msh_header_replacement="MSH|^~\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-lab-id^DNS|20230101010000-0000||ORM^O01^ORM_O01|111111|T|2.5.1||||||||||"
-  elif [[ "$msh_header" = *"|OML^"* ]]; then
+  elif [[ "$msh_header" = *"^O21"* ]]; then
       msh_header_replacement="MSH|^~\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-lab-id^DNS|20230101010000-0000||OML^O21^OML_O21|111111|T|2.5.1||||||||||"
   else
-      echo "File does not contain OMU, ORM, or OML"
+      echo "File does not contain any valid subfields."
       exit 1
   fi
   file_path=$(dirname "$fpath")
