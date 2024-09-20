@@ -121,14 +121,17 @@ fi
 
 
 if [ "$allow_outbound" = true ]; then
-  file_name=$(echo "$fpath" | awk -F'/')
+  file_name=$(basename $fpath)
+  echo "$fpath"
+  mkdir -p "$CDCTI_HOME/substituted_receivers/$fpath" && touch -f "$CDCTI_HOME/substituted_receivers/$fpath/$file_name"
   echo "$file_name"
-  mkdir "$CDCTI_HOME/substituted_receivers" && touch "$CDCTI_HOME/substituted_receivers/$fpath"
-  echo "$allow_outbound"
   receiverFieldsToSubstitute=$(head -n1 "$CDCTI_HOME/$fpath" | cut -d "|" -f 5,6)
   echo "$receiverFieldsToSubstitute"
-  substitutedReceiverFields=$(sed -n "s/$receiverFieldsToSubstitute/substituted|ToPreventFileOutput/p" "$CDCTI_HOME/$fpath" > "$CDCTI_HOME/substituted_receivers/$fpath")
+  substitutedReceiverFields=$(sed "s/$receiverFieldsToSubstitute/!!!!!!!**********substituted|ToPreventFileOutput**********!!!!!!!/" "$CDCTI_HOME/$fpath" > "$CDCTI_HOME/substituted_receivers/$fpath/$file_name")
   echo "$substitutedReceiverFields"
+  fpath=$CDCTI_HOME/substituted_receivers/$fpath
+
+  echo "$fpath"
   exit 1
 fi
 
