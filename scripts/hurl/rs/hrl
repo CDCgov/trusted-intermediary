@@ -15,6 +15,7 @@ client_sender=simulated-hospital
 verbose=""
 submission_id=""
 allow_outbound=false
+msh_header_replacement=""
 
 show_help() {
     echo "Usage: $(basename $0) <HURL_FILE> [OPTIONS]"
@@ -119,19 +120,28 @@ if [ -z "$secret" ]; then
     exit 1
 fi
 
-
 if [ "$allow_outbound" = false ]; then
+# Grab MSH Header
+  msh_header=$(head -n1 "$CDCTI_HOME/$fpath")
+# Check message type
+  if [[ "$msh_header" = *"|ORU^"* ]]; then
+    msh_header_replacement="MSH|^~\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-hospital-id^DNS|20230101010000-0000||ORU^R01^ORU_R01|111111|T|2.5.1||||||||||"
+  elif [[ "$msh_header" = *"|ORM^"* ]]; then
+    msh_header_replacement="MSH|^~\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-lab-id^DNS|20230101010000-0000||ORM^O01^ORM_O01|111111|T|2.5.1||||||||||"
+  elif [[ "$msh_header" = *"|OML^"* ]]; then
+      msh_header_replacement=""
+  else
+      echo "File is not OMU or ORM"
+      exit 1
+  fi
   file_path=$(dirname "$fpath")
-  substitutedFilePathPrefix="$CDCTI_HOME/substituted_receivers"
-#  Make temporary directory to store scrambled file
+  substitutedFilePathPrefix="$CDCTI_HOME/substituted_header"
+# Make temporary directory to store scrambled file
   mkdir -p "$substitutedFilePathPrefix/$file_path" && touch -f "$substitutedFilePathPrefix/$fpath"
-#  Grab MSH Header receiver fields
-  receiverFieldsToSubstitute=$(head -n1 "$CDCTI_HOME/$fpath" | cut -d "|" -f 5,6)
-#  Substitute receivers fields with scramble and write into temporary directory
-  sed "s/$receiverFieldsToSubstitute/!!!!!!!**********substituted|ToPreventFileOutput**********!!!!!!!/" "$CDCTI_HOME/$fpath" > "$substitutedFilePathPrefix/$fpath"
-#  Update fpath to allow hurl to run scrambled file
+# Replace MSH Header and write into temporary directory
+  sed "1s/.*/$msh_header_replacement/" "$CDCTI_HOME/$fpath" > "$substitutedFilePathPrefix/$fpath"
   fpath=$substitutedFilePathPrefix/$fpath
-  echo "The MSH Header receiver fields have been scrambled to prevent sending to a real receiver. To toggle this, run with -p."
+  echo "The MSH Header was replaced to contain Flexion receivers. To toggle this, run with -p."
 fi
 
 hurl \
