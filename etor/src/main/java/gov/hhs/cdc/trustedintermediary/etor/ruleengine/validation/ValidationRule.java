@@ -31,7 +31,7 @@ public class ValidationRule extends Rule<String> {
     public void runRule(HealthData<?>... resource) {
 
         if (resource.length != 1) {
-            logger.logError(
+            this.logger.logError(
                     "Rule ["
                             + this.getName()
                             + "]: Validation rules require exactly one resource object to be passed in.");

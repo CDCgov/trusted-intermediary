@@ -1,20 +1,21 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.ruleengine
 
-import ca.uhn.hl7v2.model.Message
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHL7ExpressionEvaluator
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthData
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator
 import spock.lang.Specification
 
 class AssertionRuleTest extends Specification {
 
     def mockLogger = Mock(Logger)
+    def mockEvaluator = Mock(HealthDataExpressionEvaluator)
 
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(Logger, mockLogger)
-        TestApplicationContext.register(HapiHL7ExpressionEvaluator, Mock(HapiHL7ExpressionEvaluator))
+        TestApplicationContext.register(HealthDataExpressionEvaluator, mockEvaluator)
         TestApplicationContext.injectRegisteredImplementations()
     }
 
@@ -35,10 +36,8 @@ class AssertionRuleTest extends Specification {
 
     def "shouldRun returns expected boolean depending on conditions"() {
         given:
-        def mockMessage = Mock(Message)
-        def mockEvaluator = Mock(HapiHL7ExpressionEvaluator)
-        mockEvaluator.parseAndEvaluate(mockMessage, null, _ as String) >> true >> conditionResult
-        TestApplicationContext.register(HapiHL7ExpressionEvaluator, mockEvaluator)
+        def mockData = Mock(HealthData)
+        mockEvaluator.evaluateExpression(_ as String, mockData) >> true >> conditionResult
 
         def rule = new AssertionRule(null, [
             "trueCondition",
@@ -46,7 +45,7 @@ class AssertionRuleTest extends Specification {
         ], null)
 
         expect:
-        rule.shouldRun(mockMessage) == applies
+        rule.shouldRun(mockData) == applies
 
         where:
         conditionResult | applies
@@ -56,15 +55,13 @@ class AssertionRuleTest extends Specification {
 
     def "shouldRun logs an error and returns false if an exception happens when evaluating a condition"() {
         given:
-        def mockMessage = Mock(Message)
-        def mockEvaluator = Mock(HapiHL7ExpressionEvaluator)
-        mockEvaluator.parseAndEvaluate(mockMessage, null, _ as String) >> { throw new Exception() }
-        TestApplicationContext.register(HapiHL7ExpressionEvaluator, mockEvaluator)
+        def mockData = Mock(HealthData)
+        mockEvaluator.evaluateExpression(_ as String, mockData) >> { throw new Exception() }
 
         def rule = new AssertionRule(null, ["condition"], null)
 
         when:
-        def applies = rule.shouldRun(mockMessage)
+        def applies = rule.shouldRun(mockData)
 
         then:
         1 * mockLogger.logError(_ as String, _ as Exception)
@@ -73,9 +70,7 @@ class AssertionRuleTest extends Specification {
 
     def "runRule returns expected boolean depending on assertions"() {
         given:
-        def mockMessage = Mock(Message)
-        def mockEvaluator = Mock(HapiHL7ExpressionEvaluator)
-        TestApplicationContext.register(HapiHL7ExpressionEvaluator, mockEvaluator)
+        def mockData = Mock(HealthData)
 
         def rule = new AssertionRule(null, null, [
             "trueValidation",
@@ -83,16 +78,16 @@ class AssertionRuleTest extends Specification {
         ])
 
         when:
-        mockEvaluator.parseAndEvaluate(mockMessage, _ as Message, _ as String) >> true >> true
-        rule.runRule(mockMessage, Mock(Message))
+        mockEvaluator.evaluateExpression(_ as String, mockData, _ as HealthData) >> true >> true
+        rule.runRule(mockData, Mock(HealthData))
 
         then:
         0 * mockLogger.logWarning(_ as String)
         0 * mockLogger.logError(_ as String, _ as Exception)
 
         when:
-        mockEvaluator.parseAndEvaluate(mockMessage, _ as Message, _ as String) >> true >> false
-        rule.runRule(mockMessage, Mock(Message))
+        mockEvaluator.evaluateExpression(_ as String, mockData, _ as HealthData) >> true >> false
+        rule.runRule(mockData, Mock(HealthData))
 
         then:
         1 * mockLogger.logWarning(_ as String)
@@ -102,15 +97,13 @@ class AssertionRuleTest extends Specification {
     def "runRule logs an error and returns false if an exception happens when evaluating an assertion"() {
         given:
 
-        def mockMessage = Mock(Message)
-        def mockEvaluator = Mock(HapiHL7ExpressionEvaluator)
-        mockEvaluator.parseAndEvaluate(mockMessage, _ as Message, _ as String) >> { throw new Exception() }
-        TestApplicationContext.register(HapiHL7ExpressionEvaluator, mockEvaluator)
+        def mockData = Mock(HealthData)
+        mockEvaluator.evaluateExpression(_ as String, mockData, _ as HealthData) >> { throw new Exception() }
 
         def rule = new AssertionRule(null, null, ["validation"])
 
         when:
-        rule.runRule(mockMessage, Mock(Message))
+        rule.runRule(mockData, Mock(HealthData))
 
         then:
         0 * mockLogger.logWarning(_ as String)

@@ -4,6 +4,7 @@ import ca.uhn.hl7v2.model.Message
 import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoader
 import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoaderException
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
 import spock.lang.Specification
@@ -23,7 +24,7 @@ class AssertionRuleEngineTest extends Specification {
         TestApplicationContext.register(RuleLoader, mockRuleLoader)
         TestApplicationContext.register(Logger, mockLogger)
         TestApplicationContext.register(AssertionRuleEngine, ruleEngine)
-
+        TestApplicationContext.register(HealthDataExpressionEvaluator, Mock(HealthDataExpressionEvaluator))
         TestApplicationContext.injectRegisteredImplementations()
     }
 

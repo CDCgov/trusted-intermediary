@@ -1,10 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.ruleengine;
 
-import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.ruleengine.Rule;
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
-import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator;
-import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.List;
 
 /**
@@ -13,10 +10,6 @@ import java.util.List;
  * assertion to the FHIR resource.
  */
 public class AssertionRule extends Rule<String> {
-
-    protected final Logger logger = ApplicationContext.getImplementation(Logger.class);
-    protected final HealthDataExpressionEvaluator expressionEvaluator =
-            ApplicationContext.getImplementation(HealthDataExpressionEvaluator.class);
 
     /**
      * Do not delete this constructor! It is used for JSON deserialization when loading rules from a
@@ -32,7 +25,7 @@ public class AssertionRule extends Rule<String> {
     public final void runRule(HealthData<?>... data) {
 
         if (data.length != 2) {
-            logger.logError(
+            this.logger.logError(
                     "Rule ["
                             + this.getName()
                             + "]: Assertion rules require exactly two data objects to be passed in.");
@@ -45,9 +38,9 @@ public class AssertionRule extends Rule<String> {
         for (String assertion : this.getRules()) {
             try {
                 boolean isValid =
-                        expressionEvaluator.evaluateExpression(assertion, inputData, outputData);
+                        this.evaluator.evaluateExpression(assertion, inputData, outputData);
                 if (!isValid) {
-                    logger.logWarning(
+                    this.logger.logWarning(
                             "Assertion failed for '"
                                     + this.getName()
                                     + "': "
@@ -57,7 +50,7 @@ public class AssertionRule extends Rule<String> {
                                     + ")");
                 }
             } catch (Exception e) {
-                logger.logError(
+                this.logger.logError(
                         "Rule ["
                                 + this.getName()
                                 + "]: "

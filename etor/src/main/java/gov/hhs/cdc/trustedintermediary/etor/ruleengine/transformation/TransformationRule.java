@@ -37,7 +37,7 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
     public void runRule(HealthData<?>... resource) {
 
         if (resource.length != 1) {
-            logger.logError(
+            this.logger.logError(
                     "Rule ["
                             + this.getName()
                             + "]: Transformation rules require exactly one resource object to be passed in.");
@@ -48,7 +48,7 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
             try {
                 applyTransformation(transformation, resource[0]);
             } catch (RuntimeException e) {
-                logger.logError("Error applying transformation: " + transformation.name(), e);
+                this.logger.logError("Error applying transformation: " + transformation.name(), e);
             }
         }
     }
@@ -57,7 +57,7 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
             TransformationRuleMethod transformation, HealthData<?> resource) {
         String name = transformation.name();
         Map<String, String> args = transformation.args();
-        logger.logInfo("Applying transformation: " + name);
+        this.logger.logInfo("Applying transformation: " + name);
 
         CustomFhirTransformation transformationInstance = getTransformationInstance(name);
         transformationInstance.transform(resource, args);
