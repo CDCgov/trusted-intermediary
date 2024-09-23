@@ -87,18 +87,10 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                 HapiHelper.getMessageControlId(bundle));
     }
 
-    private String urlForCodeType(String code) {
-        return switch (code) {
-            case HapiHelper.LOINC_CODE -> HapiHelper.LOINC_URL;
-            case HapiHelper.PLT_CODE -> null;
-            default -> HapiHelper.LOCAL_CODE_URL;
-        };
-    }
-
     private Coding getMappedCoding(IdentifierCode identifierCode) {
         var mappedCoding =
                 new Coding(
-                        urlForCodeType(identifierCode.codingSystem()),
+                        HapiHelper.urlForCodeType(identifierCode.codingSystem()),
                         identifierCode.code(),
                         identifierCode.display());
         mappedCoding.addExtension(HapiHelper.EXTENSION_CWE_CODING, new StringType("coding"));
