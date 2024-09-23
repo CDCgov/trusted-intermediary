@@ -49,7 +49,7 @@ class HapiHelperTest extends Specification {
         patientStream.allMatch {patients.contains(it) && it.getResourceType() == ResourceType.Patient }
     }
 
-    def "resourcesInBundle returns an empty stream when the bundle is null"() {
+    def "resourceInBundle returns null when the bundle is null"() {
         when:
         def result = HapiHelper.resourceInBundle(null, Patient)
 
@@ -339,6 +339,23 @@ class HapiHelperTest extends Specification {
         convertedMessageHeader.getEventCoding().getSystem() == expectedSystem
         convertedMessageHeader.getEventCoding().getCode() == expectedCode
         convertedMessageHeader.getEventCoding().getDisplay() == expectedDisplay
+    }
+
+    // MSH-10 - Message Control Id
+    def "return the correct value for message identifier"() {
+        given:
+        final String EXPECTED_CONTROL_ID = "SomeMessageControlId"
+
+        def bundle = new Bundle()
+        Identifier identifier = new Identifier()
+        identifier.setValue(EXPECTED_CONTROL_ID)
+        bundle.setIdentifier(identifier)
+
+        when:
+        def actualControlId = HapiHelper.getMessageControlId(bundle)
+
+        then:
+        actualControlId == EXPECTED_CONTROL_ID
     }
 
     def "adds the message type when it doesn't exist"() {
