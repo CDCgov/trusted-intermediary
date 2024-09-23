@@ -140,6 +140,60 @@ class MapLocalObservationCodesTest extends Specification {
         codingSystem << ["coding", "alt-coding"]
     }
 
+    def "When no coding system, no mapping should occur"() {
+        given:
+        final String LOCAL_CODE = "A_LOCAL_CODE"
+        final String LOCAL_DISPLAY = "The local code description"
+        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
+
+        def observation = new Observation()
+        def coding = new Coding()
+        coding.code = LOCAL_CODE
+        coding.display = LOCAL_DISPLAY
+        coding.addExtension(HapiHelper.EXTENSION_CWE_CODING, new StringType("alt-coding"))
+        coding.addExtension(HapiHelper.EXTENSION_CODING_SYSTEM, new StringType(HapiHelper.LOCAL_CODE))
+        observation.code.addCoding(coding)
+
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), null)
+
+        then:
+        def transformedObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
+        def transformedCodingList = transformedObservation.getCode().getCoding()
+        transformedCodingList.size() == 1
+
+        observation.code.coding == transformedCodingList
+    }
+
+    def "When no coding system extension, no mapping should occur"() {
+        given:
+        final String LOCAL_CODE = "A_LOCAL_CODE"
+        final String LOCAL_DISPLAY = "The local code description"
+        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
+
+        def observation = new Observation()
+        def coding = new Coding()
+        coding.system = HapiHelper.LOCAL_CODE_URL
+        coding.code = LOCAL_CODE
+        coding.display = LOCAL_DISPLAY
+        coding.addExtension(HapiHelper.EXTENSION_CWE_CODING, new StringType("alt-coding"))
+        observation.code.addCoding(coding)
+
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), null)
+
+        then:
+        def transformedObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
+        def transformedCodingList = transformedObservation.getCode().getCoding()
+        transformedCodingList.size() == 1
+
+        observation.code.coding == transformedCodingList
+    }
+
     def "When no observation identifier, the observation does not change"() {
         given:
         def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
