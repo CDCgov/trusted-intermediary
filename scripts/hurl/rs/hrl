@@ -156,3 +156,8 @@ hurl \
     $verbose \
     $hurl_file \
     $@
+
+# Remove temporary directory
+if [ "$allow_outbound" = false ]; then
+  rm -r "$substitutedFilePathPrefix"
+fi
