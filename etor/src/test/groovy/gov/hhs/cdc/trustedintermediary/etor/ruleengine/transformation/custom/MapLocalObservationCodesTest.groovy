@@ -167,7 +167,7 @@ class MapLocalObservationCodesTest extends Specification {
         observation.code.coding == transformedCodingList
     }
 
-    def "When no coding system extension, no mapping should occur"() {
+    def "When no coding extension, no mapping should occur"() {
         given:
         final String LOCAL_CODE = "A_LOCAL_CODE"
         final String LOCAL_DISPLAY = "The local code description"
@@ -178,7 +178,6 @@ class MapLocalObservationCodesTest extends Specification {
         coding.system = HapiHelper.LOCAL_CODE_URL
         coding.code = LOCAL_CODE
         coding.display = LOCAL_DISPLAY
-        coding.addExtension(HapiHelper.EXTENSION_CWE_CODING, new StringType("alt-coding"))
         observation.code.addCoding(coding)
 
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
