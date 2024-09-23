@@ -35,5 +35,5 @@ localfileorder.json
 
 logback.log
 
-# Ignore folder created when substituting receiver fields in MSH Header
-substituted_receivers
+# Ignore folder created when substituting header in MSH Header
+substituted_header
