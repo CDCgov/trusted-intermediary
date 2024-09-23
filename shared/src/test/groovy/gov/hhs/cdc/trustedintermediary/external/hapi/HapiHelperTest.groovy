@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi
 
+import java.util.stream.Stream
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
@@ -46,6 +47,25 @@ class HapiHelperTest extends Specification {
 
         then:
         patientStream.allMatch {patients.contains(it) && it.getResourceType() == ResourceType.Patient }
+    }
+
+    def "resourcesInBundle returns an empty stream when the bundle is null"() {
+        when:
+        def result = HapiHelper.resourcesInBundle(null, Patient)
+
+        then:
+        result.findAny().isEmpty()
+    }
+
+    def "resourcesInBundle returns an empty stream when the bundle has no entries"() {
+        given:
+        def bundle = new Bundle()
+
+        when:
+        def result = HapiHelper.resourcesInBundle(bundle, Patient)
+
+        then:
+        result.findAny().isEmpty()
     }
 
     // MSH - Message Header
