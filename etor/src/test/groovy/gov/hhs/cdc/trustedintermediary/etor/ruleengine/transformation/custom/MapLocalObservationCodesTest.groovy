@@ -19,8 +19,8 @@ class MapLocalObservationCodesTest extends Specification {
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
-        TestApplicationContext.injectRegisteredImplementations()
         TestApplicationContext.register(Logger, mockLogger)
+        TestApplicationContext.injectRegisteredImplementations()
 
         transformClass = new MapLocalObservationCodes()
     }
