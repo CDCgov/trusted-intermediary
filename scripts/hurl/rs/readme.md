@@ -16,6 +16,7 @@ Options:
     -i <SUBMISSION_ID>    The submissionId to call the history API with (Required for history API)
     -v                    Verbose mode
     -h                    Display this help and exit
+    -p                    By default, the MSH segment is replaced to contain a Flexion receiver in order to avoid sending messages to partners inadvertently. When using this flag, the MSH segment will not be replaced
 ```
 
 ## Examples
@@ -35,12 +36,12 @@ Sending an order to staging
 ./hrl waters.hurl -f Test/Orders/003_AL_ORM_O01_NBS_Fully_Populated_0_initial_message.hl7 -e staging -x /path/to/staging/private/key
 ```
 
-Checking the history in local environment for a submision id
+Checking the history in local environment for a submission id
 ```
 ./hrl history.hurl -i 100
 ```
 
-Checking the history in staging for a submision id
+Checking the history in staging for a submission id
 ```
 ./hrl history.hurl -i 100 -e staging -x /path/to/staging/private/key
 ```
