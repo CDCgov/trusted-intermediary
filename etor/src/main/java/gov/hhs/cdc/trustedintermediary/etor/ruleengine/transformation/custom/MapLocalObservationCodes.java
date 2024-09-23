@@ -22,7 +22,7 @@ import org.hl7.fhir.r4.model.StringType;
  * OBX-3.1/2/3 for the LOINC/PLT code.
  */
 public class MapLocalObservationCodes implements CustomFhirTransformation {
-    protected final Logger LOGGER = ApplicationContext.getImplementation(Logger.class);
+    protected final Logger logger = ApplicationContext.getImplementation(Logger.class);
 
     private HashMap<String, IdentifierCode> codingMap;
 
@@ -80,7 +80,7 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
         var msh41Identifier = HapiHelper.getMSH4_1Identifier(bundle);
         var msh41Value = msh41Identifier != null ? msh41Identifier.getValue() : null;
 
-        LOGGER.logWarning(
+        logger.logWarning(
                 "Unmapped local code detected: '{}', from sender: '{}', message Id: '{}'",
                 coding.getCode(),
                 msh41Value,
@@ -110,7 +110,7 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
     }
 
     private void initMap() {
-        this.codingMap = new HashMap<String, IdentifierCode>();
+        this.codingMap = new HashMap<>();
         codingMap.put(
                 "99717-32",
                 new IdentifierCode(
