@@ -51,6 +51,14 @@ class HapiHelperTest extends Specification {
 
     def "resourcesInBundle returns an empty stream when the bundle is null"() {
         when:
+        def result = HapiHelper.resourceInBundle(null, Patient)
+
+        then:
+        result == null
+    }
+
+    def "resourcesInBundle returns an empty stream when the bundle is null"() {
+        when:
         def result = HapiHelper.resourcesInBundle(null, Patient)
 
         then:
