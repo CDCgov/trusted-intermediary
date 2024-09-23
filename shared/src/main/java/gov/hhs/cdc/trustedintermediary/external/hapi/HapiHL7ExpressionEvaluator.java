@@ -70,7 +70,7 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
         return evaluateEquality(leftValue, rightValue, operator);
     }
 
-    private <T extends Comparable<T>> boolean evaluateEquality(
+    protected <T extends Comparable<T>> boolean evaluateEquality(
             T leftValue, T rightValue, String operator) {
         if (operator.equals("=")) {
             return leftValue.compareTo(rightValue) == 0;
@@ -80,7 +80,7 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
         throw new IllegalArgumentException("Unknown operator: " + operator);
     }
 
-    private boolean evaluateMembership(String leftValue, String rightOperand) {
+    protected boolean evaluateMembership(String leftValue, String rightOperand) {
         Pattern literalValueCollectionPattern = Pattern.compile("\\(([^)]+)\\)");
         Matcher literalValueCollectionMatcher = literalValueCollectionPattern.matcher(rightOperand);
         if (!literalValueCollectionMatcher.matches()) {
@@ -94,7 +94,7 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
         return values.contains(leftValue);
     }
 
-    private boolean evaluateCollectionCount(
+    protected boolean evaluateCollectionCount(
             Message message, String segmentName, String rightOperand, String operator) {
         try {
             int count = message.getAll(segmentName).length;
@@ -110,7 +110,7 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
         }
     }
 
-    private String getLiteralOrFieldValue(
+    protected String getLiteralOrFieldValue(
             Message outputMessage, Message inputMessage, String operand) {
         Matcher literalValueMatcher = LITERAL_VALUE_PATTERN.matcher(operand);
         return literalValueMatcher.matches()
@@ -118,7 +118,7 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
                 : getFieldValue(outputMessage, inputMessage, operand);
     }
 
-    private String getFieldValue(Message outputMessage, Message inputMessage, String fieldName) {
+    protected String getFieldValue(Message outputMessage, Message inputMessage, String fieldName) {
         Pattern hl7FieldNamePattern = Pattern.compile("(input|output)?\\.?(\\S+)-(\\S+)");
         Matcher hl7FieldNameMatcher = hl7FieldNamePattern.matcher(fieldName);
         if (!hl7FieldNameMatcher.matches()) {
@@ -141,7 +141,7 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
         }
     }
 
-    private String extractField(Segment segment, String[] fieldComponents)
+    protected String extractField(Segment segment, String[] fieldComponents)
             throws HL7Exception, NumberFormatException {
 
         // fieldComponents looks like 'MSH'
@@ -167,7 +167,8 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
                 : "";
     }
 
-    private Message getMessageBySource(String source, Message inputMessage, Message outputMessage) {
+    protected Message getMessageBySource(
+            String source, Message inputMessage, Message outputMessage) {
         if ("input".equals(source)) {
             if (inputMessage == null) {
                 throw new IllegalArgumentException("Input message is null for: " + source);
