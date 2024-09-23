@@ -669,4 +669,12 @@ public class HapiHelper {
                                         .getValue()
                                         .equalsDeep(dataType));
     }
+
+    public static String urlForCodeType(String code) {
+        return switch (code) {
+            case HapiHelper.LOINC_CODE -> HapiHelper.LOINC_URL;
+            case HapiHelper.PLT_CODE -> null;
+            default -> HapiHelper.LOCAL_CODE_URL;
+        };
+    }
 }
