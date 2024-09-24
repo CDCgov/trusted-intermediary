@@ -103,7 +103,7 @@ class ValidationRuleTest extends Specification {
         0 * mockLogger.logError(_ as String, _ as Exception)
     }
 
-    def "runRule logs an error and returns false if an exception happens when evaluating a validation"() {
+    def "runRule logs an error if an exception happens when evaluating a validation"() {
         given:
         def mockFhir = Mock(HapiFhirImplementation)
         mockFhir.evaluateExpression(_ as String, _ as HealthData) >> { throw new Exception() }
@@ -117,5 +117,19 @@ class ValidationRuleTest extends Specification {
         then:
         0 * mockLogger.logWarning(_ as String)
         1 * mockLogger.logError(_ as String, _ as Exception)
+    }
+
+    def "runRule logs an error if passing more than one HealthData"() {
+        given:
+        def mockFhir = Mock(HapiFhirImplementation)
+        TestApplicationContext.register(HealthDataExpressionEvaluator, mockFhir)
+
+        def rule = new ValidationRule(null, null, null, ["condition"], ["validation"])
+
+        when:
+        rule.runRule(Mock(HealthData), Mock(HealthData))
+
+        then:
+        1 * mockLogger.logError(_ as String)
     }
 }

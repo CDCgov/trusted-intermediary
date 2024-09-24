@@ -3,8 +3,10 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation
 
 import gov.hhs.cdc.trustedintermediary.HealthDataMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation.ValidationRule
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthData
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
@@ -151,5 +153,21 @@ class TransformationRuleTest extends Specification {
 
         then:
         1 * mockLogger.logError(_, _)
+    }
+
+    def "runRule logs an error if passing more than one HealthData"() {
+        given:
+        def mockFhir = Mock(HapiFhirImplementation)
+        TestApplicationContext.register(HealthDataExpressionEvaluator, mockFhir)
+
+        def rule = new TransformationRule(null, null, null, ["condition"], [
+            new TransformationRuleMethod("InstantiationExceptionMockClass", null)
+        ])
+
+        when:
+        rule.runRule(Mock(HealthData), Mock(HealthData))
+
+        then:
+        1 * mockLogger.logError(_ as String)
     }
 }
