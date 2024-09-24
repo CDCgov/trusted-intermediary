@@ -31,7 +31,7 @@ class HapiOrderTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
     }
 
-    def "getUnderlyingResource Works"() {
+    def "getUnderlyingData Works"() {
         given:
         def expectedInnerOrder = new Bundle()
         def order = new HapiOrder(expectedInnerOrder)

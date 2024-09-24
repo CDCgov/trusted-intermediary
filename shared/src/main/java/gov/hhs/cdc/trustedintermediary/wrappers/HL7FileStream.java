@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.external.hapi;
+package gov.hhs.cdc.trustedintermediary.wrappers;
 
 import java.io.InputStream;
 

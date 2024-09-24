@@ -6,6 +6,7 @@ import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v251.segment.MSH;
 import ca.uhn.hl7v2.parser.Parser;
+import gov.hhs.cdc.trustedintermediary.wrappers.HL7FileStream;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.io.IOException;
 import java.io.InputStream;

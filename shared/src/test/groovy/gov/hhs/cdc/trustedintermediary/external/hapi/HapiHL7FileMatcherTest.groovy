@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 
 import ca.uhn.hl7v2.model.Message
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.wrappers.HL7FileStream
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import spock.lang.Specification
 
