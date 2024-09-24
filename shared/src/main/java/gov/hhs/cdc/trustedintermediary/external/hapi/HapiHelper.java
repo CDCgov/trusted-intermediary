@@ -62,6 +62,10 @@ public class HapiHelper {
     public static final Coding OML_CODING =
             new Coding("http://terminology.hl7.org/CodeSystem/v2-0003", "O21", "OML^O21^OML_O21");
 
+    public static final String EXTENSION_ORC_URL =
+            "https://reportstream.cdc.gov/fhir/StructureDefinition/orc-common-order";
+    public static final String EXTENSION_ORC12_URL = "orc-12-ordering-provider";
+
     public static final String EXTENSION_OBR_URL =
             "https://reportstream.cdc.gov/fhir/StructureDefinition/obr-observation-request";
 
