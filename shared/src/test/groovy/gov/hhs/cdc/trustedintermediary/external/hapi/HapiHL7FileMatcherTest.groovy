@@ -34,7 +34,7 @@ class HapiHL7FileMatcherTest extends Specification {
         spyFileMatcher.mapMessageByControlId(mockOutputFiles) >> [ "2": mockOutputMessage2, "3": Mock(Message) ]
 
         when:
-        def result = spyFileMatcher.matchFiles(mockInputFiles, mockOutputFiles)
+        def result = spyFileMatcher.matchFiles(mockOutputFiles, mockInputFiles)
 
         then:
         result.size() == 1

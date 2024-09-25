@@ -32,13 +32,13 @@ public class AssertionRule extends Rule<String> {
             return;
         }
 
-        HealthData<?> inputData = data[0];
-        HealthData<?> outputData = data[1];
+        HealthData<?> outputData = data[0];
+        HealthData<?> inputData = data[1];
 
         for (String assertion : this.getRules()) {
             try {
                 boolean isValid =
-                        this.evaluator.evaluateExpression(assertion, inputData, outputData);
+                        this.evaluator.evaluateExpression(assertion, outputData, inputData);
                 if (!isValid) {
                     this.logger.logWarning(
                             "Assertion failed for '"

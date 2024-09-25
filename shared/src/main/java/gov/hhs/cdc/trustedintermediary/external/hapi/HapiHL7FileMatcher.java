@@ -30,8 +30,8 @@ public class HapiHL7FileMatcher {
     }
 
     public Map<Message, Message> matchFiles(
-            List<HL7FileStream> inputFiles, List<HL7FileStream> outputFiles) {
-        // We pair up input and output files based on the control ID, which is in MSH-10
+            List<HL7FileStream> outputFiles, List<HL7FileStream> inputFiles) {
+        // We pair up output and input files based on the control ID, which is in MSH-10
         // Any files (either input or output) that don't have a match are logged
         Map<String, Message> inputMap = mapMessageByControlId(inputFiles);
         Map<String, Message> outputMap = mapMessageByControlId(outputFiles);
