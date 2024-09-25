@@ -8,7 +8,6 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Observation;
@@ -43,7 +42,7 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
             }
 
             var coding = codingList.get(0);
-            if (!hasLocalCodeInAlternateCoding(coding)) {
+            if (!HapiHelper.hasLocalCodeInAlternateCoding(coding)) {
                 continue;
             }
 
@@ -56,24 +55,6 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
             var mappedCoding = getMappedCoding(identifier);
             codingList.add(0, mappedCoding);
         }
-    }
-
-    private Boolean hasLocalCodeInAlternateCoding(Coding coding) {
-        if (!HapiHelper.hasCodingExtensionWithUrl(coding, HapiHelper.EXTENSION_CWE_CODING)) {
-            return false;
-        }
-
-        if (!HapiHelper.hasCodingSystem(coding)) {
-            return false;
-        }
-
-        var cwe =
-                HapiHelper.getCodingExtensionByUrl(coding, HapiHelper.EXTENSION_CWE_CODING)
-                        .getValue()
-                        .toString();
-        var codingSystem = HapiHelper.getCodingSystem(coding);
-
-        return Objects.equals(cwe, "alt-coding") && HapiHelper.LOCAL_CODE_URL.equals(codingSystem);
     }
 
     private void logUnmappedLocalCode(Bundle bundle, Coding coding) {

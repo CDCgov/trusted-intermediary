@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.hl7.fhir.r4.model.Bundle;
@@ -676,5 +677,24 @@ public class HapiHelper {
             case HapiHelper.PLT_CODE -> null;
             default -> HapiHelper.LOCAL_CODE_URL;
         };
+    }
+
+    // @todo This can be turned into a more generic function for searching inside CWE coding objects
+    public static Boolean hasLocalCodeInAlternateCoding(Coding coding) {
+        if (!HapiHelper.hasCodingExtensionWithUrl(coding, HapiHelper.EXTENSION_CWE_CODING)) {
+            return false;
+        }
+
+        if (!HapiHelper.hasCodingSystem(coding)) {
+            return false;
+        }
+
+        var cwe =
+                HapiHelper.getCodingExtensionByUrl(coding, HapiHelper.EXTENSION_CWE_CODING)
+                        .getValue()
+                        .toString();
+        var codingSystem = HapiHelper.getCodingSystem(coding);
+
+        return Objects.equals(cwe, "alt-coding") && HapiHelper.LOCAL_CODE_URL.equals(codingSystem);
     }
 }
