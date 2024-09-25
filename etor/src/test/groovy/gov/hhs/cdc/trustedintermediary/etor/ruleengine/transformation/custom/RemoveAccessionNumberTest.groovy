@@ -22,7 +22,7 @@ class RemoveAccessionNumberTest extends Specification {
         TestApplicationContext.register(Logger, mockLogger)
         TestApplicationContext.injectRegisteredImplementations()
 
-        transformClass = new MapLocalObservationCodes()
+        transformClass = new RemoveAccessionNumber()
     }
 
     def "When message has all the expected values in OBX-3.4/6, they should be removed"() {
