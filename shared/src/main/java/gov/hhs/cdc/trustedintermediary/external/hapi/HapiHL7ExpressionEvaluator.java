@@ -14,10 +14,12 @@ import java.util.stream.Collectors;
 public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator {
 
     private static final HapiHL7ExpressionEvaluator INSTANCE = new HapiHL7ExpressionEvaluator();
+
+    private static final String NEWLINE_REGEX = "\\r?\\n|\\r";
     private static final Pattern OPERATION_PATTERN =
             Pattern.compile("^(\\S+)\\s*(=|!=|in)\\s*(.+)$");
     private static final Pattern HL7_COUNT_PATTERN = Pattern.compile("(\\S+)\\.count\\(\\)");
-    private static final Pattern LITERAL_VALUE_PATTERN = Pattern.compile("'(\\S+)'");
+    private static final Pattern LITERAL_VALUE_PATTERN = Pattern.compile("'(.*)'");
 
     private HapiHL7ExpressionEvaluator() {}
 
@@ -97,7 +99,7 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
     protected boolean evaluateCollectionCount(
             Message message, String segmentName, String rightOperand, String operator) {
         try {
-            int count = message.getAll(segmentName).length;
+            int count = countSegments(message.encode(), segmentName);
             int rightValue = Integer.parseInt(rightOperand);
             return evaluateEquality(count, rightValue, operator);
         } catch (HL7Exception | NumberFormatException e) {
@@ -113,9 +115,10 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
     protected String getLiteralOrFieldValue(
             Message outputMessage, Message inputMessage, String operand) {
         Matcher literalValueMatcher = LITERAL_VALUE_PATTERN.matcher(operand);
-        return literalValueMatcher.matches()
-                ? literalValueMatcher.group(1)
-                : getFieldValue(outputMessage, inputMessage, operand);
+        if (literalValueMatcher.matches()) {
+            return literalValueMatcher.group(1);
+        }
+        return getFieldValue(outputMessage, inputMessage, operand);
     }
 
     protected String getFieldValue(Message outputMessage, Message inputMessage, String fieldName) {
@@ -130,17 +133,67 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
 
         String segmentName = hl7FieldNameMatcher.group(2);
         String index = hl7FieldNameMatcher.group(3);
-        String[] fieldComponents = index.split("\\.");
 
         try {
-            Segment segment = (Segment) message.get(segmentName);
-            return extractField(segment, fieldComponents);
+            char fieldSeparator = message.getFieldSeparatorValue();
+            String encodingCharacters = message.getEncodingCharactersValue();
+            return getSegmentFieldValue(
+                    message.encode(), segmentName, index, fieldSeparator, encodingCharacters);
         } catch (HL7Exception | NumberFormatException e) {
             throw new IllegalArgumentException(
                     "Failed to extract field value for: " + fieldName, e);
         }
     }
 
+    protected static String getSegmentFieldValue(
+            String hl7Message,
+            String segmentName,
+            String fieldIndex,
+            char fieldSeparator,
+            String encodingCharacters) {
+        String[] lines = hl7Message.split(NEWLINE_REGEX);
+        for (String line : lines) {
+            if (!line.startsWith(segmentName)) {
+                continue;
+            }
+
+            String[] fields = line.split(Pattern.quote(String.valueOf(fieldSeparator)));
+
+            String[] indexParts = fieldIndex.split("\\.");
+            int fieldPos = Integer.parseInt(indexParts[0]);
+
+            if (segmentName.equals("MSH")) {
+                fieldPos--;
+            }
+
+            if (fieldPos < 0 || fieldPos >= fields.length) {
+                continue;
+            }
+
+            String field = fields[fieldPos];
+
+            if (indexParts.length == 1 || field.isEmpty()) {
+                return field;
+            }
+
+            int subFieldEncodingCharactersIndex = indexParts.length - 2;
+            char subfieldSeparator = encodingCharacters.charAt(subFieldEncodingCharactersIndex);
+            String[] subfields = field.split(Pattern.quote(String.valueOf(subfieldSeparator)));
+            int subFieldPos = Integer.parseInt(indexParts[1]) - 1;
+            return subFieldPos >= 0 && subFieldPos < subfields.length ? subfields[subFieldPos] : "";
+        }
+
+        return null;
+    }
+
+    protected static int countSegments(String hl7Message, String segmentName) {
+        return (int)
+                Arrays.stream(hl7Message.split(NEWLINE_REGEX))
+                        .filter(line -> line.startsWith(segmentName))
+                        .count();
+    }
+
+    // TODO - remove this method and use getSegmentFieldValue instead
     protected String extractField(Segment segment, String[] fieldComponents)
             throws HL7Exception, NumberFormatException {
 

@@ -4,7 +4,6 @@
       "name": "General requirements",
       "conditions": [],
       "rules": [
-          "MSH-1 = input.MSH-1",
           "MSH-2 = input.MSH-2",
           "MSH-7 = input.MSH-7",
           "MSH-10 = input.MSH-10",
