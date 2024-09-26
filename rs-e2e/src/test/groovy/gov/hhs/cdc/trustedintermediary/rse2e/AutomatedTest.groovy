@@ -42,9 +42,6 @@ class AutomatedTest extends Specification  {
         TestApplicationContext.register(AzureBlobFileFetcher, azureFileFetcher)
         TestApplicationContext.register(LocalFileFetcher, LocalFileFetcher.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
-
-        // Figure out env vars (need Azure connection string)
-        // Also add unit tests for file matcher
     }
 
 

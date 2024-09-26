@@ -69,20 +69,21 @@ public class HapiHL7FileMatcher {
         try (HapiContext context = new DefaultHapiContext()) {
             Parser parser = context.getPipeParser();
 
-            for (HL7FileStream inputFile : files) {
-                try (InputStream inputStream = inputFile.inputStream()) {
+            for (HL7FileStream hl7FileStream : files) {
+                try (InputStream inputStream = hl7FileStream.inputStream()) {
                     String content = new String(inputStream.readAllBytes());
                     Message message = parser.parse(content);
                     MSH mshSegment = (MSH) message.get("MSH");
                     String msh10 = mshSegment.getMessageControlID().getValue();
                     if (msh10 == null || msh10.isEmpty()) {
-                        logger.logError("MSH-10 is empty for : " + inputFile.fileName());
+                        logger.logError("MSH-10 is empty for : " + hl7FileStream.fileName());
                         continue;
                     }
                     messageMap.put(msh10, message);
                 } catch (IOException | HL7Exception e) {
                     logger.logError(
-                            "An error occurred while parsing the message: " + inputFile.fileName(),
+                            "An error occurred while parsing the message: "
+                                    + hl7FileStream.fileName(),
                             e);
                 }
             }
