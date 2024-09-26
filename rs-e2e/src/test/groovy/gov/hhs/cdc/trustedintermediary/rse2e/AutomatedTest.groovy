@@ -13,7 +13,7 @@ import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoader
 import gov.hhs.cdc.trustedintermediary.rse2e.ruleengine.AssertionRuleEngine
 import spock.lang.Specification
 
-class AutomatedTest  extends Specification  {
+class AutomatedTest extends Specification  {
 
     List<HL7FileStream> recentAzureFiles
     List<HL7FileStream> recentLocalFiles

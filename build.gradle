@@ -106,6 +106,7 @@ tasks.register('allUnitTests') {
     dependsOn 'app:test'
     dependsOn 'shared:test'
     dependsOn 'etor:test'
+    dependsOn 'rs-e2e:test'
 }
 
 tasks.register('allBuilds') {
