@@ -61,6 +61,30 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
         "OBR.count() = 1"             | _
     }
 
+    def "evaluateExpression allows null input message when no assertions use input"() {
+        given:
+        def spyEvaluator = Spy(HapiHL7ExpressionEvaluator.getInstance())
+        spyEvaluator.getLiteralOrFieldValue(_ as Message, null, _ as String) >> "mockedValue"
+        spyEvaluator.evaluateEquality(_ as String, _ as String, _ as String) >> true
+        spyEvaluator.evaluateMembership(_ as String, _ as String) >> true
+        spyEvaluator.evaluateCollectionCount(_ as Message, _ as String, _ as String, _ as String) >> true
+
+        def healthData = Mock(HealthData) {
+            getUnderlyingData() >> Mock(Message)
+        }
+
+        expect:
+        spyEvaluator.evaluateExpression(assertion, healthData)
+
+        where:
+        assertion                     | _
+        "MSH-1 = MSH-1"               | _
+        "output.MSH-1 = MSH-1"        | _
+        "MSH-9.1 = 'R01'"             | _
+        "MSH-6 in ('R797', 'R508')"   | _
+        "OBR.count() = 1"             | _
+    }
+
     def "evaluateExpression should throw exception for invalid expression format"() {
         when:
         evaluator.evaluateExpression("invalid format", Mock(HealthData))
@@ -255,7 +279,7 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
         result == msh3
     }
 
-    def "getFieldValue throws exception for invalid field"() {
+    def "getFieldValue throws exception for non numeric field index"() {
         given:
         def fieldName = "MSH-three"
         def inputMessage = Mock(Message)
@@ -266,6 +290,19 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
         then:
         def e = thrown(IllegalArgumentException)
         e.getCause().getClass() == NumberFormatException
+    }
+
+    def "getFieldValue throws exception for empty field name"() {
+        given:
+        def fieldName = ""
+        def inputMessage = Mock(Message)
+
+        when:
+        evaluator.getFieldValue(mshMessage, inputMessage, fieldName)
+
+        then:
+        def e = thrown(IllegalArgumentException)
+        e.getMessage().contains("Invalid field name format")
     }
 
     def "getSegmentFieldValue should return segment when field components indicate segment"() {
@@ -306,6 +343,64 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
     def "getSegmentFieldValue should return empty string when field components indicate subfield but subfield not present"() {
         given:
         def fieldName = "MSH-3.4"
+
+        when:
+        def result = evaluator.getSegmentFieldValue(mshSegmentText, fieldName, hl7FieldSeparator, hl7FieldEncodingCharacters)
+
+        then:
+        result == ""
+    }
+
+    def "getSegmentFieldValue returns null when looking for segment that isn't in message"() {
+        given:
+        def fieldName = "OBX"
+
+        when:
+        def result = evaluator.getSegmentFieldValue(mshSegmentText, fieldName, hl7FieldSeparator, hl7FieldEncodingCharacters)
+
+        then:
+        result == null
+    }
+
+    def "getSegmentFieldValue throws exception when field name is invalid"() {
+        given:
+        def fieldName = "MSH-"
+
+        when:
+        evaluator.getSegmentFieldValue(mshSegmentText, fieldName, hl7FieldSeparator, hl7FieldEncodingCharacters)
+
+        then:
+        def e = thrown(IllegalArgumentException)
+        e.getMessage().contains("Invalid HL7 field format: ")
+    }
+
+    def "getSegmentFieldValue throws exception when field index is out of bounds"() {
+        given:
+        def fieldName = "MSH-99"
+
+        when:
+        evaluator.getSegmentFieldValue(mshSegmentText, fieldName, hl7FieldSeparator, hl7FieldEncodingCharacters)
+
+        then:
+        def e = thrown(IllegalArgumentException)
+        e.getMessage().contains("Invalid field index (out of bounds)")
+    }
+
+    def "getSegmentFieldValue throws exception when there are too many subfield levels"() {
+        given:
+        def fieldName = "MSH-3.3.3.3.3.3"
+
+        when:
+        evaluator.getSegmentFieldValue(mshSegmentText, fieldName, hl7FieldSeparator, hl7FieldEncodingCharacters)
+
+        then:
+        def e = thrown(IllegalArgumentException)
+        e.getMessage().contains("Invalid subfield index (out of bounds)")
+    }
+
+    def "getSegmentFieldValue returns empty string when sub-field index is out of bounds"() {
+        given:
+        def fieldName = "MSH-3.99"
 
         when:
         def result = evaluator.getSegmentFieldValue(mshSegmentText, fieldName, hl7FieldSeparator, hl7FieldEncodingCharacters)
