@@ -151,6 +151,7 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
             String fieldIndex,
             char fieldSeparator,
             String encodingCharacters) {
+
         String[] lines = hl7Message.split(NEWLINE_REGEX);
         for (String line : lines) {
             if (!line.startsWith(segmentName)) {
@@ -158,29 +159,41 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
             }
 
             String[] fields = line.split(Pattern.quote(String.valueOf(fieldSeparator)));
-
             String[] indexParts = fieldIndex.split("\\.");
-            int fieldPos = Integer.parseInt(indexParts[0]);
 
-            if (segmentName.equals("MSH")) {
-                fieldPos--;
+            try {
+                int fieldPos = Integer.parseInt(indexParts[0]);
+
+                if (segmentName.equals("MSH")) {
+                    fieldPos--;
+                }
+
+                if (fieldPos < 0 || fieldPos >= fields.length) {
+                    throw new IllegalArgumentException(
+                            "Invalid field index (out of bounds): " + fieldIndex);
+                }
+
+                String field = fields[fieldPos];
+
+                if (indexParts.length == 1 || field.isEmpty()) {
+                    return field;
+                }
+
+                int subFieldEncodingCharactersIndex = indexParts.length - 2;
+                if (subFieldEncodingCharactersIndex >= encodingCharacters.length()) {
+                    throw new IllegalArgumentException(
+                            "Invalid subfield index (out of bounds): " + fieldIndex);
+                }
+                char subfieldSeparator = encodingCharacters.charAt(subFieldEncodingCharactersIndex);
+                String[] subfields = field.split(Pattern.quote(String.valueOf(subfieldSeparator)));
+                int subFieldPos = Integer.parseInt(indexParts[1]) - 1;
+                return subFieldPos >= 0 && subFieldPos < subfields.length
+                        ? subfields[subFieldPos]
+                        : "";
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException(
+                        "Invalid field index formatting: " + fieldIndex, e);
             }
-
-            if (fieldPos < 0 || fieldPos >= fields.length) {
-                continue;
-            }
-
-            String field = fields[fieldPos];
-
-            if (indexParts.length == 1 || field.isEmpty()) {
-                return field;
-            }
-
-            int subFieldEncodingCharactersIndex = indexParts.length - 2;
-            char subfieldSeparator = encodingCharacters.charAt(subFieldEncodingCharactersIndex);
-            String[] subfields = field.split(Pattern.quote(String.valueOf(subfieldSeparator)));
-            int subFieldPos = Integer.parseInt(indexParts[1]) - 1;
-            return subFieldPos >= 0 && subFieldPos < subfields.length ? subfields[subFieldPos] : "";
         }
 
         return null;
