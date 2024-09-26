@@ -121,13 +121,14 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
     }
 
     protected String getFieldValue(Message outputMessage, Message inputMessage, String fieldName) {
-        Pattern messageSourcePattern = Pattern.compile("(input|output)?\\.?\\S+");
+        Pattern messageSourcePattern = Pattern.compile("(input|output)?\\.?(\\S+)");
         Matcher messageSourceMatcher = messageSourcePattern.matcher(fieldName);
         if (!messageSourceMatcher.matches()) {
             throw new IllegalArgumentException("Invalid field name format: " + fieldName);
         }
 
         String fileSource = messageSourceMatcher.group(1);
+        String fieldNameWithoutFileSource = messageSourceMatcher.group(2);
         Message message = getMessageBySource(fileSource, inputMessage, outputMessage);
 
         try {
@@ -135,7 +136,7 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
             char fieldSeparator = message.getFieldSeparatorValue();
             String encodingCharacters = message.getEncodingCharactersValue();
             return getSegmentFieldValue(
-                    messageString, fieldName, fieldSeparator, encodingCharacters);
+                    messageString, fieldNameWithoutFileSource, fieldSeparator, encodingCharacters);
         } catch (HL7Exception | NumberFormatException e) {
             throw new IllegalArgumentException(
                     "Failed to extract field value for: " + fieldName, e);
