@@ -17,4 +17,4 @@ jobs:
       - name: Run automated tests
         env:
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AUTOMATED_TEST_AZURE_STORAGE_CONNECTION_STRING }}
-        run: ./gradlew rs-e2e:clean rs-e2e:automatedTest --info
+        run: ./gradlew rs-e2e:clean rs-e2e:automatedTest
