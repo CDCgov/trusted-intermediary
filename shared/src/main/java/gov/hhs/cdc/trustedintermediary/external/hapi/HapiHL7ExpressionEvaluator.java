@@ -2,7 +2,6 @@ package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.model.Segment;
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator;
 import java.util.ArrayList;
@@ -122,35 +121,40 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
     }
 
     protected String getFieldValue(Message outputMessage, Message inputMessage, String fieldName) {
-        Pattern hl7FieldNamePattern = Pattern.compile("(input|output)?\\.?(\\S+)-(\\S+)");
-        Matcher hl7FieldNameMatcher = hl7FieldNamePattern.matcher(fieldName);
-        if (!hl7FieldNameMatcher.matches()) {
+        Pattern messageSourcePattern = Pattern.compile("(input|output)?\\.?\\S+");
+        Matcher messageSourceMatcher = messageSourcePattern.matcher(fieldName);
+        if (!messageSourceMatcher.matches()) {
             throw new IllegalArgumentException("Invalid field name format: " + fieldName);
         }
 
-        Message message =
-                getMessageBySource(hl7FieldNameMatcher.group(1), inputMessage, outputMessage);
-
-        String segmentName = hl7FieldNameMatcher.group(2);
-        String index = hl7FieldNameMatcher.group(3);
+        String fileSource = messageSourceMatcher.group(1);
+        Message message = getMessageBySource(fileSource, inputMessage, outputMessage);
 
         try {
+            String messageString = message.encode();
             char fieldSeparator = message.getFieldSeparatorValue();
             String encodingCharacters = message.getEncodingCharactersValue();
             return getSegmentFieldValue(
-                    message.encode(), segmentName, index, fieldSeparator, encodingCharacters);
+                    messageString, fieldName, fieldSeparator, encodingCharacters);
         } catch (HL7Exception | NumberFormatException e) {
             throw new IllegalArgumentException(
                     "Failed to extract field value for: " + fieldName, e);
         }
     }
 
+    // We decided to implement our own simple HL7 parser as the Hapi library was not adequate for
+    // our needs.
     protected static String getSegmentFieldValue(
-            String hl7Message,
-            String segmentName,
-            String fieldIndex,
-            char fieldSeparator,
-            String encodingCharacters) {
+            String hl7Message, String fieldName, char fieldSeparator, String encodingCharacters) {
+
+        Pattern hl7FieldNamePattern = Pattern.compile("(\\w+)(?:-(\\S+))?");
+        Matcher hl7FieldNameMatcher = hl7FieldNamePattern.matcher(fieldName);
+        if (!hl7FieldNameMatcher.matches()) {
+            throw new IllegalArgumentException("Invalid HL7 field format: " + fieldName);
+        }
+
+        String segmentName = hl7FieldNameMatcher.group(1);
+        String segmentFieldIndex = hl7FieldNameMatcher.group(2);
 
         String[] lines = hl7Message.split(NEWLINE_REGEX);
         for (String line : lines) {
@@ -158,8 +162,12 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
                 continue;
             }
 
+            if (segmentFieldIndex == null) {
+                return line;
+            }
+
             String[] fields = line.split(Pattern.quote(String.valueOf(fieldSeparator)));
-            String[] indexParts = fieldIndex.split("\\.");
+            String[] indexParts = segmentFieldIndex.split("\\.");
 
             try {
                 int fieldPos = Integer.parseInt(indexParts[0]);
@@ -170,7 +178,7 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
 
                 if (fieldPos < 0 || fieldPos >= fields.length) {
                     throw new IllegalArgumentException(
-                            "Invalid field index (out of bounds): " + fieldIndex);
+                            "Invalid field index (out of bounds): " + segmentFieldIndex);
                 }
 
                 String field = fields[fieldPos];
@@ -182,7 +190,7 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
                 int subFieldEncodingCharactersIndex = indexParts.length - 2;
                 if (subFieldEncodingCharactersIndex >= encodingCharacters.length()) {
                     throw new IllegalArgumentException(
-                            "Invalid subfield index (out of bounds): " + fieldIndex);
+                            "Invalid subfield index (out of bounds): " + segmentFieldIndex);
                 }
                 char subfieldSeparator = encodingCharacters.charAt(subFieldEncodingCharactersIndex);
                 String[] subfields = field.split(Pattern.quote(String.valueOf(subfieldSeparator)));
@@ -192,7 +200,7 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
                         : "";
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException(
-                        "Invalid field index formatting: " + fieldIndex, e);
+                        "Invalid field index formatting: " + segmentFieldIndex, e);
             }
         }
 
@@ -204,33 +212,6 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
                 Arrays.stream(hl7Message.split(NEWLINE_REGEX))
                         .filter(line -> line.startsWith(segmentName))
                         .count();
-    }
-
-    // TODO - remove this method and use getSegmentFieldValue instead
-    protected String extractField(Segment segment, String[] fieldComponents)
-            throws HL7Exception, NumberFormatException {
-
-        // fieldComponents looks like 'MSH'
-        if (fieldComponents.length == 0) { // e.g. MSH
-            return segment.encode();
-        }
-
-        // When the `|` character is encoded, it shows as `\F\`, the field separator
-        String field = segment.getField(Integer.parseInt(fieldComponents[0]), 0).encode();
-
-        // fieldComponents looks like 'MSH-9'
-        if (fieldComponents.length == 1) {
-            return field;
-        }
-
-        // fieldComponents looks like 'MSH-9.2'
-        // Since we control the sample files, we can assume the field separator is the standard `^`
-        String[] subfieldsArray = field.split("\\^");
-        int subFieldIndex = Integer.parseInt(fieldComponents[1]) - 1;
-
-        return subFieldIndex >= 0 && subFieldIndex < subfieldsArray.length
-                ? subfieldsArray[subFieldIndex]
-                : "";
     }
 
     protected Message getMessageBySource(

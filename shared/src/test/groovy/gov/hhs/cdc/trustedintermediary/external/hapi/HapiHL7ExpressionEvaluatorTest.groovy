@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi
 
-import ca.uhn.hl7v2.HL7Exception
 import ca.uhn.hl7v2.model.Message
 import ca.uhn.hl7v2.model.Segment
 import ca.uhn.hl7v2.parser.PipeParser
@@ -11,6 +10,9 @@ import spock.lang.Specification
 class HapiHL7ExpressionEvaluatorTest extends Specification {
 
     def evaluator = HapiHL7ExpressionEvaluator.getInstance()
+
+    char hl7FieldSeparator = '|'
+    String hl7FieldEncodingCharacters = "^~\\&"
     Message mshMessage
     Segment mshSegment
     String mshSegmentText
@@ -19,7 +21,6 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(HapiHL7ExpressionEvaluator, evaluator)
-
 
         mshSegmentText = "MSH|^~\\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-lab-id^DNS|20230101010000-0000||ORM^O01^ORM_O01|111111|T|2.5.1"
         def pipeParser = new PipeParser()
@@ -202,32 +203,17 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
         e.getCause().getClass() == NumberFormatException
     }
 
-    def "evaluateCollectionCount throws exception when specified segment is missing"() {
+    def "evaluateCollectionCount evaluates correctly when specified segment is not in message"() {
         given:
         def rightOperand = "3"
         def segmentName = "OBX"
         def operator = "="
 
         when:
-        evaluator.evaluateCollectionCount(mshMessage, segmentName, rightOperand, operator)
+        def result = evaluator.evaluateCollectionCount(mshMessage, segmentName, rightOperand, operator)
 
         then:
-        def e = thrown(IllegalArgumentException)
-        e.getCause().getClass() == HL7Exception
-    }
-
-    def "evaluateCollectionCount throws exception when specified segment is invalid"() {
-        given:
-        def rightOperand = "3"
-        def segmentName = "OBXBBQ"
-        def operator = "="
-
-        when:
-        evaluator.evaluateCollectionCount(mshMessage, segmentName, rightOperand, operator)
-
-        then:
-        def e = thrown(IllegalArgumentException)
-        e.getCause().getClass() == HL7Exception
+        !result
     }
 
     def "getLiteralOrFieldValue returns literal value when literal is specified"() {
@@ -269,19 +255,6 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
         result == msh3
     }
 
-    def "getFieldValue throws exception for invalid field name format"() {
-        given:
-        def fieldName = "three"
-        def inputMessage = Mock(Message)
-
-        when:
-        evaluator.getFieldValue(mshMessage, inputMessage, fieldName)
-
-        then:
-        def e = thrown(IllegalArgumentException)
-        e.getMessage().contains("Invalid field name format")
-    }
-
     def "getFieldValue throws exception for invalid field"() {
         given:
         def fieldName = "MSH-three"
@@ -292,51 +265,50 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
 
         then:
         def e = thrown(IllegalArgumentException)
-        e.getMessage().contains("Failed to extract field value for")
         e.getCause().getClass() == NumberFormatException
     }
 
-    def "extractField should return segment when field components indicate segment"() {
+    def "getSegmentFieldValue should return segment when field components indicate segment"() {
         given:
-        String[] fieldComponents = []
+        def fieldName = "MSH"
 
         when:
-        def result = evaluator.extractField(mshSegment, fieldComponents)
+        def result = evaluator.getSegmentFieldValue(mshSegmentText, fieldName, hl7FieldSeparator, hl7FieldEncodingCharacters)
 
         then:
         result == mshSegmentText
     }
 
-    def "extractField should return field when field components indicate field"() {
+    def "getSegmentFieldValue should return field when field components indicate field"() {
         given:
+        def fieldName = "MSH-3"
         def msh3 = "Sender Application^sender.test.com^DNS"
-        String[] fieldComponents = ["3"]
 
         when:
-        def result = evaluator.extractField(mshSegment, fieldComponents)
+        def result = evaluator.getSegmentFieldValue(mshSegmentText, fieldName, hl7FieldSeparator, hl7FieldEncodingCharacters)
 
         then:
         result == msh3
     }
 
-    def "extractField should return subfield when field components indicate subfield"() {
+    def "getSegmentFieldValue should return subfield when field components indicate subfield"() {
         given:
+        def fieldName = "MSH-3.2"
         def msh32 = "sender.test.com"
-        String[] fieldComponents = ["3", "2"]
 
         when:
-        def result = evaluator.extractField(mshSegment, fieldComponents)
+        def result = evaluator.getSegmentFieldValue(mshSegmentText, fieldName, hl7FieldSeparator, hl7FieldEncodingCharacters)
 
         then:
         result == msh32
     }
 
-    def "extractField should return empty string when field components indicate subfield but subfield not present"() {
+    def "getSegmentFieldValue should return empty string when field components indicate subfield but subfield not present"() {
         given:
-        String[] fieldComponents = ["3", "4"]
+        def fieldName = "MSH-3.4"
 
         when:
-        def result = evaluator.extractField(mshSegment, fieldComponents)
+        def result = evaluator.getSegmentFieldValue(mshSegmentText, fieldName, hl7FieldSeparator, hl7FieldEncodingCharacters)
 
         then:
         result == ""
