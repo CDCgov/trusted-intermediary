@@ -59,7 +59,6 @@ class RemoveAccessionNumberTest extends Specification {
         def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
         def observation = new Observation()
 
-        // add the non-matching first to ensure transform looks beyond the first coding
         addCodingToObservation(observation, "ANOTHER_CODE", "ANOTHER_SYSTEM", "coding")
         addCodingToObservation(observation, MATCHING_CODE, MATCHING_CODING_SYSTEM_EXT, MATCHING_CODING_EXT)
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
@@ -105,7 +104,7 @@ class RemoveAccessionNumberTest extends Specification {
         "99717-5" | "L"             | "coding"
     }
 
-    def "When an observation has no identifier (OBX-3), it should NOT be removed"() {
+    def "When an observation has no identifier OBX-3, it should NOT be removed"() {
         given:
         def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
 
