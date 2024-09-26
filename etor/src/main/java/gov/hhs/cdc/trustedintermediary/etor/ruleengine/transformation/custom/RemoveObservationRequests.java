@@ -22,10 +22,13 @@ import org.hl7.fhir.r4.model.ServiceRequest;
 public class RemoveObservationRequests implements CustomFhirTransformation {
 
     @Override
-    public void transform(FhirResource<?> resource, Map<String, String> args) {
+    public void transform(FhirResource<?> resource, Map<String, Object> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
+        String universalServiceIdentifier =
+                args.get("universalServiceIdentifier") instanceof String
+                        ? (String) args.get("universalServiceIdentifier")
+                        : "";
 
-        String universalServiceIdentifier = args.get("universalServiceIdentifier");
         Set<Resource> resourcesToRemove = new HashSet<>();
         List<Reference> observationReferences = new ArrayList<>();
         DiagnosticReport singleDiagnosticReport = null;

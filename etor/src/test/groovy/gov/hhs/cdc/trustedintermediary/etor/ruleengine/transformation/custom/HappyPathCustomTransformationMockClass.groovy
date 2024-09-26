@@ -9,7 +9,7 @@ import org.hl7.fhir.r4.model.Coding
 class HappyPathCustomTransformationMockClass implements CustomFhirTransformation {
 
     @Override
-    public void transform(final FhirResource<?> resource, final Map<String, String> args) {
+    public void transform(final FhirResource<?> resource, final Map<String, Object> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource()
 
         def system = "http://terminology.hl7.org/CodeSystem/v2-0003"

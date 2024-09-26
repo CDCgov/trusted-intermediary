@@ -15,13 +15,14 @@ import org.hl7.fhir.r4.model.Identifier;
 public class UpdateSendingFacilityNamespace implements CustomFhirTransformation {
 
     @Override
-    public void transform(FhirResource<?> resource, Map<String, String> args) {
+    public void transform(FhirResource<?> resource, Map<String, Object> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
         Identifier namespaceIdentifier = HapiHelper.getMSH4_1Identifier(bundle);
         if (namespaceIdentifier == null) {
             return;
         }
-        namespaceIdentifier.setValue(args.get("name"));
+        namespaceIdentifier.setValue(
+                (args.get("name") instanceof String ? (String) args.get("name") : null));
         HapiHelper.getMSH4Organization(bundle)
                 .setIdentifier(Collections.singletonList(namespaceIdentifier));
     }

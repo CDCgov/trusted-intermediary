@@ -23,7 +23,7 @@ public class UpdateUniversalServiceIdentifier implements CustomFhirTransformatio
     public static final String ALTERNATE_ID_NAME = "alternateId";
 
     @Override
-    public void transform(FhirResource<?> resource, Map<String, String> args) {
+    public void transform(FhirResource<?> resource, Map<String, Object> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
         var serviceRequests = HapiHelper.resourcesInBundle(bundle, ServiceRequest.class);
 
@@ -31,7 +31,8 @@ public class UpdateUniversalServiceIdentifier implements CustomFhirTransformatio
                 it -> {
                     var allCodings = it.getCode().getCoding();
                     var codingSystemContainer =
-                            getCodingSystemContainer(allCodings, args.get(CHECK_VALUE_NAME));
+                            getCodingSystemContainer(
+                                    allCodings, castToString(args.get(CHECK_VALUE_NAME)));
 
                     if (codingSystemContainer == null) {
                         // we're only interested in coding that matches the checkValue argument
@@ -39,15 +40,21 @@ public class UpdateUniversalServiceIdentifier implements CustomFhirTransformatio
                     }
 
                     // check for the coding system label and create or override it
-                    updateCodingSystemLabel(codingSystemContainer, args.get(CODING_SYSTEM_NAME));
+                    updateCodingSystemLabel(
+                            codingSystemContainer, castToString(args.get(CODING_SYSTEM_NAME)));
 
                     // the alt id is stored on a separate coding object, so we need to filter
                     // for it
-                    String alternateId = args.get(ALTERNATE_ID_NAME);
+                    String alternateId = castToString(args.get(ALTERNATE_ID_NAME));
                     if (alternateId != null) {
                         updateAlternateCodingId(allCodings, alternateId);
                     }
                 });
+    }
+
+    // Returns null if it is not a String
+    private String castToString(Object obj) {
+        return obj instanceof String ? (String) obj : null;
     }
 
     /**
