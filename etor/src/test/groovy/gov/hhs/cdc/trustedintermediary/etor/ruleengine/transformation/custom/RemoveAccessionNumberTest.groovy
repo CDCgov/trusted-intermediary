@@ -1,6 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom
 
-
+import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
@@ -50,7 +50,7 @@ class RemoveAccessionNumberTest extends Specification {
         "my_code" | "MY_SYS"        | "coding"
     }
 
-    def "When an observation has the desired coding, and there is >1 coding, it should be removed"() {
+    def "When an observation with >1 coding has the desired coding, it should be removed"() {
         given:
         final String MATCHING_CODE = "99717-5"
         final String MATCHING_CODING_SYSTEM_EXT = "L"
@@ -139,26 +139,49 @@ class RemoveAccessionNumberTest extends Specification {
 
         def observation1 = new Observation()
         def observation2 = new Observation()
-        def observation3 = new Observation()
 
         addCodingToObservation(observation1, MATCHING_CODE, MATCHING_CODING_SYSTEM_EXT, MATCHING_CODING_EXT)
         addCodingToObservation(observation2, MATCHING_CODE, MATCHING_CODING_SYSTEM_EXT, MATCHING_CODING_EXT)
-        addCodingToObservation(observation3, "A_DIFFERENT_CODE", MATCHING_CODING_SYSTEM_EXT, MATCHING_CODING_EXT)
 
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation1))
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation2))
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation3))
 
         def args = getArgs(MATCHING_CODE, MATCHING_CODING_SYSTEM_EXT, MATCHING_CODING_EXT)
 
         expect:
-        HapiHelper.resourcesInBundle(bundle, Observation.class).count() == 3
+        HapiHelper.resourcesInBundle(bundle, Observation.class).count() == 2
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), args)
 
         then:
-        HapiHelper.resourcesInBundle(bundle, Observation.class).count() == 1
+        HapiHelper.resourcesInBundle(bundle, Observation.class).count() == 0
+    }
+
+    def "When message has multiple observations with only 1 matching, only 1 is removed"() {
+        given:
+        final String MATCHING_CODE = "99717-5"
+        final String MATCHING_CODING_SYSTEM_EXT = "L"
+        final String MATCHING_CODING_EXT = "alt-coding"
+
+        final String FHIR_ORU_PATH = "../CA/020_CA_ORU_R01_CDPH_OBX_to_LOINC_1_hl7_translation.fhir"
+        def fhirResource = ExamplesHelper.getExampleFhirResource(FHIR_ORU_PATH)
+        def bundle = fhirResource.getUnderlyingResource() as Bundle
+
+        def observation1 = new Observation()
+        addCodingToObservation(observation1, MATCHING_CODE, MATCHING_CODING_SYSTEM_EXT, MATCHING_CODING_EXT)
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation1))
+
+        def args = getArgs(MATCHING_CODE, MATCHING_CODING_SYSTEM_EXT, MATCHING_CODING_EXT)
+
+        expect:
+        HapiHelper.resourcesInBundle(bundle, Observation.class).count() == 115
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), args)
+
+        then:
+        HapiHelper.resourcesInBundle(bundle, Observation.class).count() == 114
     }
 
     void addCodingToObservation(Observation observation, String code, String codingSystemExtension, String codingExtension) {
