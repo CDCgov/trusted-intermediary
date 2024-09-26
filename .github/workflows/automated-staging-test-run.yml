@@ -1,0 +1,26 @@
+name: Automated Staging Test - Run integration tests
+
+on:
+  schedule:
+    - cron: "0 1 * * 2-6"  # Tuesday to Saturday at 1am UTC - an hour after the `automated-staging-test-submit`
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  test_files:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+#      - uses: actions/setup-java@v4
+#        with:
+#          java-version: 17
+#          distribution: corretto
+#          cache: gradle
+
+      - name: Run automated tests
+        env:
+          AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AUTOMATED_TEST_AZURE_STORAGE_CONNECTION_STRING }}
+        run: ./gradlew rs-e2e:clean rs-e2e:automatedTest

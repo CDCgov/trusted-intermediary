@@ -32,3 +32,8 @@ tasks.named('test') {
     useJUnitPlatform()
     exclude '**/AutomatedTest.*'
 }
+
+task automatedTest(type: Test) {
+    useJUnitPlatform()
+    include '**/AutomatedTest.*'
+}
