@@ -37,7 +37,7 @@ class RemoveObservationRequestsTest extends Specification {
         transformClass.transform(fhirResource, args)
 
         then:
-        thrown(NullPointerException)
+        noExceptionThrown()
     }
 
 
