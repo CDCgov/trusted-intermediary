@@ -7,9 +7,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * The TransformationRule class extends the {@link gov.hhs.cdc.trustedintermediary.ruleengine.Rule
- * Rule} class and represents a transformation rule. It implements the {@link
- * gov.hhs.cdc.trustedintermediary.ruleengine.Rule#runRule(HealthData...) runRule} method to apply a
+ * The TransformationRule class extends the {@link Rule Rule} class and represents a transformation
+ * rule. It implements the {@link Rule#runRule(HealthData...) runRule} method to apply a
  * transformation to the FHIR resource.
  */
 public class TransformationRule extends Rule<TransformationRuleMethod> {

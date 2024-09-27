@@ -10,6 +10,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * The HapiHL7ExpressionEvaluator class is responsible for evaluating expressions on HL7 messages.
+ * The expressions can be used to compare fields, count segments, and check for membership. The
+ * expressions are in the form of: `field = value`, `field != value`, `field in (value1, value2)`,
+ * `field.count() = value`, etc. The field can be a literal value (e.g. 'EPIC') or a field reference
+ * (e.g. MSH-5.1, input.MSH-5.1).
+ */
 public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator {
 
     private static final HapiHL7ExpressionEvaluator INSTANCE = new HapiHL7ExpressionEvaluator();

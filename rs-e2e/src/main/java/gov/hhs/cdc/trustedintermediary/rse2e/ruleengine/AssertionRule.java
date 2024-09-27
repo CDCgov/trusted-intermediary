@@ -5,9 +5,9 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
 import java.util.List;
 
 /**
- * The AssertionRule class extends the {@link AssertionRule Rule} class and represents a assertion
- * rule. It implements the {@link AssertionRule#runRule(HealthData...) runRule} method to apply a
- * assertion to the FHIR resource.
+ * The AssertionRule class extends the {@link Rule Rule} class and represents an assertion rule. It
+ * implements the {@link Rule#runRule(HealthData...) runRule} method to apply an assertion to the
+ * HL7 message.
  */
 public class AssertionRule extends Rule<String> {
 

@@ -11,6 +11,10 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The AzureBlobFileFetcher class implements the {@link FileFetcher FileFetcher} interface and
+ * fetches files from an Azure Blob Storage container.
+ */
 public class AzureBlobFileFetcher implements FileFetcher {
 
     private static final FileFetcher INSTANCE = new AzureBlobFileFetcher();

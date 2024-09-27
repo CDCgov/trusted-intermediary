@@ -17,6 +17,10 @@ import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 
+/**
+ * The HapiHL7FileMatcher class is responsible for matching input and output HL7 files based on the
+ * control ID (MSH-10).
+ */
 public class HapiHL7FileMatcher {
 
     private static final HapiHL7FileMatcher INSTANCE = new HapiHL7FileMatcher();

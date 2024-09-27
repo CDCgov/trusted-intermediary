@@ -5,10 +5,9 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
 import java.util.List;
 
 /**
- * The ValidationRule class extends the {@link gov.hhs.cdc.trustedintermediary.ruleengine.Rule Rule}
- * class and represents a validation rule. It implements the {@link
- * gov.hhs.cdc.trustedintermediary.ruleengine.Rule#runRule(HealthData...) runRule} method to
- * evaluate the validation and log a warning if the validation fails.
+ * The ValidationRule class extends the {@link Rule Rule} class and represents a validation rule. It
+ * implements the {@link Rule#runRule(HealthData...) runRule} method to evaluate the validation and
+ * log a warning if the validation fails.
  */
 public class ValidationRule extends Rule<String> {
 

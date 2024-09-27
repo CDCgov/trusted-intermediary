@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * The LocalFileFetcher class implements the {@link FileFetcher FileFetcher} interface and
+ * represents a file fetcher that fetches files from the local file system.
+ */
 public class LocalFileFetcher implements FileFetcher {
 
     private static final String FILES_PATH = "../examples/Test/Automated/";
