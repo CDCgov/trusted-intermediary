@@ -54,6 +54,8 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
             }
 
             var mappedCoding = getMappedCoding(identifier);
+
+            // Add the mapped code as the first in the list, ahead of the existing alternate code
             codingList.add(0, mappedCoding);
         }
     }
