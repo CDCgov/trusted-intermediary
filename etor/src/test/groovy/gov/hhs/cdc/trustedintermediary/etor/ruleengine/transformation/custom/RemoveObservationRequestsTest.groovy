@@ -22,7 +22,7 @@ class RemoveObservationRequestsTest extends Specification {
         transformClass = new RemoveObservationRequests()
     }
 
-    def "test when universalServiceIdentifier is not a String but a List<String>"() {
+    def "test when universalServiceIdentifier is not a String"() {
         given:
         // Load a FHIR resource example
         def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/002_CA_ORU_R01_initial_translation.fhir")
