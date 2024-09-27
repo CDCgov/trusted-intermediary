@@ -894,7 +894,6 @@ class HapiHelperTest extends Specification {
 
         then:
         ext.getValue() == null
-
     }
 
     def "urlForCodeType should return expected values"() {
