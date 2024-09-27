@@ -53,6 +53,8 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
             }
 
             var mappedCoding = getMappedCoding(identifier);
+
+            // Add the mapped code as the first in the list, ahead of the existing alternate code
             codingList.add(0, mappedCoding);
         }
     }
@@ -90,6 +92,7 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
      */
     private void initMap() {
         this.codingMap = new HashMap<>();
+        // ALD
         codingMap.put(
                 "99717-32",
                 new IdentifierCode(
@@ -108,39 +111,65 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                         "PLT325",
                         "ABCD1 gene mutation found [Identifier] in DBS by Sequencing",
                         HapiHelper.PLT_CODE));
+        // CAH
         codingMap.put(
                 "99717-6",
                 new IdentifierCode(
                         "53340-6",
                         "17-Hydroxyprogesterone [Moles/volume] in DBS",
                         HapiHelper.LOINC_CODE));
-        // map.put("99717-35", new IdentifierCode("REQUEST_PLT", "REQUEST_PLT",
-        // HapiHelper.PLT_CODE));
-        // map.put("99717-36", new IdentifierCode("REQUEST_PLT", "REQUEST_PLT",
-        // HapiHelper.PLT_CODE));
+        // CF
+        codingMap.put(
+                "99717-35",
+                new IdentifierCode(
+                        "PLT3289",
+                        "CFTR gene mutation found [Interpretation] in DBS by Sequencing",
+                        HapiHelper.PLT_CODE));
+        codingMap.put(
+                "99717-36",
+                new IdentifierCode(
+                        "PLT3290",
+                        "CFTR gene variant found [Identifier] in DBS by Sequencing comments/discussion",
+                        HapiHelper.PLT_CODE));
+        // MPS I
         codingMap.put(
                 "99717-48",
                 new IdentifierCode(
                         "PLT3258",
                         "IDUA gene mutations found [Identifier] in DBS by Sequencing",
                         HapiHelper.PLT_CODE));
-        // map.put("99717-44", new IdentifierCode("REQUEST_PLT", "REQUEST_PLT",
-        // HapiHelper.PLT_CODE));
+        codingMap.put(
+                "99717-44",
+                new IdentifierCode(
+                        "PLT3291",
+                        "IDUA gene variant analysis in DBS by Sequencing comments/discussion",
+                        HapiHelper.PLT_CODE));
+        // MPS II
         codingMap.put(
                 "99717-50",
                 new IdentifierCode(
-                        "PLT3275",
-                        "IDS gene mutations found [Identifier] in Dried Bloodspot by Molecular genetics method Nominal",
+                        "PLT3294",
+                        "IDS gene mutations found [Identifier] in Dried Bloodspot by Molecular genetics method",
                         HapiHelper.PLT_CODE));
+        // Pompe
         codingMap.put(
                 "99717-47",
                 new IdentifierCode(
                         "PLT3252",
                         "GAA gene mutation found [Identifier] in DBS by Sequencing",
                         HapiHelper.PLT_CODE));
-        // map.put("99717-46", new IdentifierCode("REQUEST_PLT", "REQUEST_PLT",
-        // HapiHelper.PLT_CODE));
-        // map.put("99717-60", new IdentifierCode("REQUEST_PLT", "REQUEST_PLT",
-        // HapiHelper.PLT_CODE));
+        codingMap.put(
+                "99717-46",
+                new IdentifierCode(
+                        "PLT3292",
+                        "GAA gene variant analysis in DBS by Sequencing comments/discussion",
+                        HapiHelper.PLT_CODE));
+        // SMA
+        codingMap.put(
+                "99717-60",
+                new IdentifierCode(
+                        "PLT3293",
+                        "SMN1 exon 7 deletion analysis in DBS by Sequencing",
+                        HapiHelper.PLT_CODE));
     }
 }
