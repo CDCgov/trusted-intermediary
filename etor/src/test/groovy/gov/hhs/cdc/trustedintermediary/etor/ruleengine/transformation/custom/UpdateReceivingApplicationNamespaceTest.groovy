@@ -49,7 +49,6 @@ class UpdateReceivingApplicationNamespaceTest extends Specification {
     def "don't throw exception if receiving application not in bundle"() {
         given:
         def bundle = new Bundle()
-        HapiHelper.createMSHMessageHeader(bundle)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), Map.of("name", (Object) ""))
