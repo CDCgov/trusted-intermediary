@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Resource;
 
@@ -27,18 +28,20 @@ public class RemoveAccessionNumber implements CustomFhirTransformation {
             Resource resourceEntry = entry.getResource();
 
             if (resourceEntry instanceof Observation observation) {
-                var coding = observation.getCode().getCodingFirstRep();
 
-                if (Objects.equals(coding.getCode(), args.get(CODE_NAME))
-                        && coding.getExtensionByUrl(HapiHelper.EXTENSION_CODING_SYSTEM)
-                                .getValue()
-                                .toString()
-                                .equals(args.get(CODING_SYSTEM_NAME))
-                        && coding.getExtensionByUrl(HapiHelper.EXTENSION_CWE_CODING)
-                                .getValue()
-                                .toString()
-                                .equals(args.get(CODING_NAME))) {
-                    resourcesToRemove.add(observation);
+                for (Coding coding : observation.getCode().getCoding()) {
+
+                    if (Objects.equals(coding.getCode(), args.get(CODE_NAME))
+                            && coding.getExtensionByUrl(HapiHelper.EXTENSION_CODING_SYSTEM)
+                                    .getValue()
+                                    .toString()
+                                    .equals(args.get(CODING_SYSTEM_NAME))
+                            && coding.getExtensionByUrl(HapiHelper.EXTENSION_CWE_CODING)
+                                    .getValue()
+                                    .toString()
+                                    .equals(args.get(CODING_NAME))) {
+                        resourcesToRemove.add(observation);
+                    }
                 }
             }
         }
