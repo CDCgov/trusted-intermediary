@@ -52,7 +52,7 @@ class UpdateReceivingApplicationNamespaceTest extends Specification {
         HapiHelper.createMSHMessageHeader(bundle)
 
         when:
-        transformClass.transform(new HapiFhirResource(bundle), Map.of("name", ""))
+        transformClass.transform(new HapiFhirResource(bundle), Map.of("name", (Object) ""))
 
         then:
         noExceptionThrown()
