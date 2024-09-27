@@ -27,7 +27,7 @@ public class RemoveObservationRequests implements CustomFhirTransformation {
         String universalServiceIdentifier =
                 args.get("universalServiceIdentifier") instanceof String
                         ? (String) args.get("universalServiceIdentifier")
-                        : "";
+                        : null;
 
         Set<Resource> resourcesToRemove = new HashSet<>();
         List<Reference> observationReferences = new ArrayList<>();
