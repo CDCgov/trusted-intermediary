@@ -13,8 +13,6 @@ import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Resource;
 
 public class RemoveAccessionNumber implements CustomFhirTransformation {
-    private static final String ACCESSION_NUMBER_CODE = "99717-5";
-
     public static final String CODE_NAME = "code";
     public static final String CODING_SYSTEM_NAME = "codingSystemExtension";
     public static final String CODING_NAME = "codingExtension";
@@ -28,24 +26,34 @@ public class RemoveAccessionNumber implements CustomFhirTransformation {
             Resource resourceEntry = entry.getResource();
 
             if (resourceEntry instanceof Observation observation) {
-
-                for (Coding coding : observation.getCode().getCoding()) {
-
-                    if (Objects.equals(coding.getCode(), args.get(CODE_NAME))
-                            && coding.getExtensionByUrl(HapiHelper.EXTENSION_CODING_SYSTEM)
-                                    .getValue()
-                                    .toString()
-                                    .equals(args.get(CODING_SYSTEM_NAME))
-                            && coding.getExtensionByUrl(HapiHelper.EXTENSION_CWE_CODING)
-                                    .getValue()
-                                    .toString()
-                                    .equals(args.get(CODING_NAME))) {
-                        resourcesToRemove.add(observation);
-                    }
-                }
+                processObservation(observation, resourcesToRemove, args);
             }
         }
 
         bundle.getEntry().removeIf(entry -> resourcesToRemove.contains(entry.getResource()));
+    }
+
+    private void processObservation(
+            Observation observation, Set<Resource> resourcesToRemove, Map<String, String> args) {
+        for (Coding coding : observation.getCode().getCoding()) {
+            if (isMatchingCode(coding, args)) {
+                resourcesToRemove.add(observation);
+                break; // No need to continue once a match is found
+            }
+        }
+    }
+
+    // TODO: Need to refactor this to handle missing extensions, etc. and determine if there's a way
+    // to generalize it along with HapiHelper.hasLocalCodeInAlternateCoding
+    private Boolean isMatchingCode(Coding coding, Map<String, String> args) {
+        return Objects.equals(coding.getCode(), args.get(CODE_NAME))
+                && coding.getExtensionByUrl(HapiHelper.EXTENSION_CODING_SYSTEM)
+                        .getValue()
+                        .toString()
+                        .equals(args.get(CODING_SYSTEM_NAME))
+                && coding.getExtensionByUrl(HapiHelper.EXTENSION_CWE_CODING)
+                        .getValue()
+                        .toString()
+                        .equals(args.get(CODING_NAME));
     }
 }
