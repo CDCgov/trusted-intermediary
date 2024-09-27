@@ -22,7 +22,7 @@ class UpdateReceivingApplicationNamespaceTest extends Specification {
 
     def "update receiving application namespace to given name and remove Universal Id and Universal Id Type "() {
         given:
-        def name = "EPIC"
+        def name = (Object) "EPIC"
         def bundle = new Bundle()
         HapiHelper.createMSHMessageHeader(bundle)
         def receivingApplication = HapiFhirHelper.createMessageDestinationComponent()
@@ -53,6 +53,23 @@ class UpdateReceivingApplicationNamespaceTest extends Specification {
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), Map.of("name", ""))
+
+        then:
+        noExceptionThrown()
+    }
+
+    def "don't throw exception if args.get('name') is not a string"() {
+        given:
+        def listOfNames = (Object) ["EPIC", "CIPE"]
+        def bundle = new Bundle()
+        HapiHelper.createMSHMessageHeader(bundle)
+        def receivingApplication = HapiFhirHelper.createMessageDestinationComponent()
+        receivingApplication.addExtension(HapiHelper.EXTENSION_UNIVERSAL_ID_URL, new StringType("universal-id"))
+        receivingApplication.addExtension(HapiHelper.EXTENSION_UNIVERSAL_ID_TYPE_URL, new StringType("universal-id-type"))
+        HapiFhirHelper.setMSH5MessageDestinationComponent(bundle, receivingApplication)
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), Map.of("name", listOfNames))
 
         then:
         noExceptionThrown()
