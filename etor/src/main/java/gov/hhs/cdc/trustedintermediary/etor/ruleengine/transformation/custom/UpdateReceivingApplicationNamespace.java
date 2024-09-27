@@ -17,10 +17,15 @@ public class UpdateReceivingApplicationNamespace implements CustomFhirTransforma
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
         String name = (args.get("name") instanceof String ? (String) args.get("name") : null);
         var receivingApplication = HapiHelper.getMSH5MessageDestinationComponent(bundle);
-        if (receivingApplication != null && name != null) {
-            receivingApplication.removeExtension(HapiHelper.EXTENSION_UNIVERSAL_ID_URL);
-            receivingApplication.removeExtension(HapiHelper.EXTENSION_UNIVERSAL_ID_TYPE_URL);
-            receivingApplication.setName(name);
+        if (name == null) {
+            return;
         }
+        if (receivingApplication == null) {
+            return;
+        }
+
+        receivingApplication.removeExtension(HapiHelper.EXTENSION_UNIVERSAL_ID_URL);
+        receivingApplication.removeExtension(HapiHelper.EXTENSION_UNIVERSAL_ID_TYPE_URL);
+        receivingApplication.setName(name);
     }
 }
