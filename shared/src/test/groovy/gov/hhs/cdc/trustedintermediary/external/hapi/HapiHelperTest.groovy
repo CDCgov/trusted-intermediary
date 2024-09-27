@@ -849,6 +849,5 @@ class HapiHelperTest extends Specification {
 
         then:
         ext.getValue() == null
-
     }
 }

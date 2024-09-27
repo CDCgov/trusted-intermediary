@@ -35,8 +35,11 @@ public class RequestSessionTokenUsecase {
     private RequestSessionTokenUsecase() {}
 
     public String getToken(AuthRequest request)
-            throws InvalidTokenException, IllegalArgumentException, TokenGenerationException,
-                    SecretRetrievalException, UnknownOrganizationException {
+            throws InvalidTokenException,
+                    IllegalArgumentException,
+                    TokenGenerationException,
+                    SecretRetrievalException,
+                    UnknownOrganizationException {
 
         logger.logInfo("Validating that organization {} exists", request.scope());
         var organization =
