@@ -14,10 +14,6 @@ import spock.lang.Specification
 class RemoveAccessionNumberTest extends Specification {
     def transformClass
 
-    final String CODE_NAME = "code"
-    final String CODING_SYSTEM_NAME = "codingSystem"
-    final String CODING_NAME = "coding"
-
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
@@ -167,20 +163,16 @@ class RemoveAccessionNumberTest extends Specification {
         def fhirResource = ExamplesHelper.getExampleFhirResource(FHIR_ORU_PATH)
         def bundle = fhirResource.getUnderlyingResource() as Bundle
 
-        def observation1 = new Observation()
-        addCodingToObservation(observation1, MATCHING_CODE, MATCHING_CODING_SYSTEM_EXT, MATCHING_CODING_EXT)
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation1))
-
         def args = getArgs(MATCHING_CODE, MATCHING_CODING_SYSTEM_EXT, MATCHING_CODING_EXT)
 
         expect:
-        HapiHelper.resourcesInBundle(bundle, Observation.class).count() == 115
+        HapiHelper.resourcesInBundle(bundle, Observation.class).count() == 114
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), args)
 
         then:
-        HapiHelper.resourcesInBundle(bundle, Observation.class).count() == 114
+        HapiHelper.resourcesInBundle(bundle, Observation.class).count() == 113
     }
 
     void addCodingToObservation(Observation observation, String code, String codingSystemExtension, String codingExtension) {
@@ -194,8 +186,8 @@ class RemoveAccessionNumberTest extends Specification {
 
     Map<String, String> getArgs(String code, String codingSystem, String coding) {
         return [
-            (CODE_NAME)         : code,
-            (CODING_SYSTEM_NAME): codingSystem,
-            (CODING_NAME)       : coding]
+            "code"                  : code,
+            "codingSystemExtension" : codingSystem,
+            codingExtension         : coding]
     }
 }

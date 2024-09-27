@@ -14,6 +14,10 @@ import org.hl7.fhir.r4.model.Resource;
 public class RemoveAccessionNumber implements CustomFhirTransformation {
     private static final String ACCESSION_NUMBER_CODE = "99717-5";
 
+    public static final String CODE_NAME = "code";
+    public static final String CODING_SYSTEM_NAME = "codingSystemExtension";
+    public static final String CODING_NAME = "codingExtension";
+
     @Override
     public void transform(FhirResource<?> resource, Map<String, String> args) {
         var bundle = (Bundle) resource.getUnderlyingResource();
@@ -25,8 +29,15 @@ public class RemoveAccessionNumber implements CustomFhirTransformation {
             if (resourceEntry instanceof Observation observation) {
                 var coding = observation.getCode().getCodingFirstRep();
 
-                if (HapiHelper.hasLocalCodeInAlternateCoding(coding)
-                        && Objects.equals(coding.getCode(), ACCESSION_NUMBER_CODE)) {
+                if (Objects.equals(coding.getCode(), args.get(CODE_NAME))
+                        && coding.getExtensionByUrl(HapiHelper.EXTENSION_CODING_SYSTEM)
+                                .getValue()
+                                .toString()
+                                .equals(args.get(CODING_SYSTEM_NAME))
+                        && coding.getExtensionByUrl(HapiHelper.EXTENSION_CWE_CODING)
+                                .getValue()
+                                .toString()
+                                .equals(args.get(CODING_NAME))) {
                     resourcesToRemove.add(observation);
                 }
             }
