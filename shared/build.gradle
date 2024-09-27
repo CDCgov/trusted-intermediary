@@ -22,10 +22,10 @@ dependencies {
     implementation 'net.logstash.logback:logstash-logback-encoder:8.0'
 
     //jackson
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.17.2'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.18.0'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.17.2'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.2'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.0'
 
     //fhir
     api 'ca.uhn.hapi.fhir:hapi-fhir-base:7.4.2'
@@ -51,7 +51,7 @@ dependencies {
     testFixturesImplementation 'org.apache.groovy:groovy:4.0.23'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
     testFixturesImplementation 'com.openpojo:openpojo:0.9.1'
-    testFixturesImplementation 'nl.jqno.equalsverifier:equalsverifier:3.16.2'
+    testFixturesImplementation 'nl.jqno.equalsverifier:equalsverifier:3.17'
 
     // dotenv-java
     implementation 'io.github.cdimascio:dotenv-java:3.0.2'
