@@ -49,4 +49,22 @@ class UpdateSendingFacilityNamespaceTest extends Specification {
         then:
         noExceptionThrown()
     }
+
+    def "don't throw exception if arg.get('name') is not a string"() {
+        given:
+        def name = "CDPH"
+        def fhirResource = ExamplesHelper.getExampleFhirResource("../MN/004_MN_ORU_R01_NBS_1_hl7_translation.fhir")
+        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def listOfNames = ["trusted", "intermediary"]
+
+        expect:
+        HapiHelper.getMSH4Organization(bundle).getIdentifier().size() > 1
+        HapiHelper.getMSH4_1Identifier(bundle).getValue() != name
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), Map.of("name", (Object) listOfNames))
+
+        then:
+        noExceptionThrown()
+    }
 }

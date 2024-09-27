@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhir
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Identifier;
 
@@ -21,9 +22,14 @@ public class UpdateSendingFacilityNamespace implements CustomFhirTransformation 
         if (namespaceIdentifier == null) {
             return;
         }
-        namespaceIdentifier.setValue(
-                (args.get("name") instanceof String ? (String) args.get("name") : null));
-        HapiHelper.getMSH4Organization(bundle)
+
+        String name = args.get("name") instanceof String ? (String) args.get("name") : null;
+        if (name == null) {
+            return;
+        }
+
+        namespaceIdentifier.setValue(name);
+        Objects.requireNonNull(HapiHelper.getMSH4Organization(bundle))
                 .setIdentifier(Collections.singletonList(namespaceIdentifier));
     }
 }
