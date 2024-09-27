@@ -8,6 +8,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DiagnosticReport
 import org.hl7.fhir.r4.model.Practitioner
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ServiceRequest
 import spock.lang.Specification
 
@@ -90,14 +91,14 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         def serviceRequest = createServiceRequest(bundle)
 
         expect:
-        evaluateOrc12Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
+        evaluateOrc12Values(bundle, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
         evaluateObr16Values(serviceRequest, null, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, null, null)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
 
         then:
-        evaluateOrc12Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
+        evaluateOrc12Values(bundle, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
         evaluateObr16Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
     }
 
@@ -115,7 +116,7 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
 
         expect:
         // ORC12 values to copy
-        evaluateOrc12Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
+        evaluateOrc12Values(bundle, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
 
         // OBR16 should not exist initially
         def obr16Practitioner = getObr16ExtensionPractitioner(serviceRequest)
@@ -126,7 +127,7 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
 
         then:
         // ORC12 values should remain the same
-        evaluateOrc12Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
+        evaluateOrc12Values(bundle, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
         // OBR16 values should be updated to match ORC12
         evaluateObr16Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
     }
@@ -144,14 +145,14 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         def serviceRequest = createServiceRequest(bundle)
 
         expect:
-        evaluateOrc12Values(serviceRequest, null, null, null, null, null)
+        evaluateOrc12IsNull(bundle)
         evaluateObr16Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
 
         then:
-        evaluateOrc12Values(serviceRequest, null, null, null, null, null)
+        evaluateOrc12IsNull(bundle)
         evaluateObr16Values(serviceRequest, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
     }
 
@@ -163,14 +164,14 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         def serviceRequest = createServiceRequest(bundle)
 
         expect:
-        evaluateOrc12IsNull(serviceRequest)
+        evaluateOrc12IsNull(bundle)
         evaluateObr16IsNull(serviceRequest)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
 
         then:
-        evaluateOrc12IsNull(serviceRequest)
+        evaluateOrc12IsNull(bundle)
         evaluateObr16IsNull(serviceRequest)
     }
 
@@ -189,35 +190,34 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         return HapiHelper.getServiceRequest(diagnosticReport)
     }
 
-    def evaluateOrc12IsNull(ServiceRequest serviceRequest) {
-        def practitionerRole = HapiHelper.getPractitionerRole(serviceRequest)
-        HapiHelper.getPractitioner(practitionerRole) == null
+    void evaluateOrc12IsNull(Bundle bundle) {
+        assert getOrc12ExtensionPractitioner(bundle) == null
     }
 
-    def evaluateOrc12Values(
-            ServiceRequest serviceRequest,
+    void evaluateOrc12Values(
+            Bundle bundle,
             String expectedNpi,
             String expectedFirstName,
             String expectedLastName,
             String expectedNameTypeCode,
             String expectedIdentifierTypeCode) {
-        def practitionerRole = HapiHelper.getPractitionerRole(serviceRequest)
-        def practitioner = HapiHelper.getPractitioner(practitionerRole)
-        def xcnExtension = practitioner?.getExtensionByUrl(PRACTITIONER_EXTENSION_URL)
+        def practitioner = getOrc12ExtensionPractitioner(bundle)
+        def xcnExtension = practitioner.getExtensionByUrl(PRACTITIONER_EXTENSION_URL)
 
-        practitioner.identifier[0]?.value == expectedNpi
-        xcnExtension.getExtensionByUrl("XCN.3")?.value?.toString() == expectedFirstName
-        practitioner.name[0]?.family == expectedLastName
-        xcnExtension.getExtensionByUrl("XCN.10")?.value?.toString() == expectedNameTypeCode
+        assert practitioner.identifier[0]?.value == expectedNpi
+        assert xcnExtension.getExtensionByUrl("XCN.3")?.value?.toString() == expectedFirstName
+        assert practitioner.name[0]?.family == expectedLastName
+        assert xcnExtension.getExtensionByUrl("XCN.10")?.value?.toString() == expectedNameTypeCode
+
         def codingSystem = practitioner.identifier[0]?.type?.coding
-        codingSystem == null || codingSystem[0]?.code == expectedIdentifierTypeCode
+        assert codingSystem == null || codingSystem[0]?.code == expectedIdentifierTypeCode
     }
 
-    def evaluateObr16IsNull(ServiceRequest serviceRequest) {
-        getObr16ExtensionPractitioner(serviceRequest) == null
+    void evaluateObr16IsNull(ServiceRequest serviceRequest) {
+        assert getObr16ExtensionPractitioner(serviceRequest) == null
     }
 
-    def evaluateObr16Values(
+    void evaluateObr16Values(
             ServiceRequest serviceRequest,
             String expectedNpi,
             String expectedFirstName,
@@ -227,12 +227,12 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         def practitioner = getObr16ExtensionPractitioner(serviceRequest)
         def xcnExtension = practitioner.getExtensionByUrl(PRACTITIONER_EXTENSION_URL)
 
-        practitioner.identifier[0]?.value == expectedNpi
-        xcnExtension.getExtensionByUrl("XCN.3")?.value?.toString() == expectedFirstName
-        practitioner.name[0]?.family == expectedLastName
-        xcnExtension.getExtensionByUrl("XCN.10")?.value?.toString() == expectedNameTypeCode
+        assert practitioner.identifier[0]?.value == expectedNpi
+        assert xcnExtension.getExtensionByUrl("XCN.3")?.value?.toString() == expectedFirstName
+        assert practitioner.name[0]?.family == expectedLastName
+        assert xcnExtension.getExtensionByUrl("XCN.10")?.value?.toString() == expectedNameTypeCode
         def codingSystem = practitioner.identifier[0]?.type?.coding
-        codingSystem == null || codingSystem[0]?.code == expectedIdentifierTypeCode
+        assert codingSystem == null || codingSystem[0]?.code == expectedIdentifierTypeCode
     }
 
     Practitioner getObr16ExtensionPractitioner (serviceRequest) {
@@ -247,5 +247,27 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
             resource = null
             return resource
         }
+    }
+
+    Practitioner getOrc12ExtensionPractitioner(Bundle bundle) {
+        def diagnosticReport = HapiHelper.getDiagnosticReport(bundle)
+        def serviceRequest = HapiHelper.getServiceRequest(diagnosticReport)
+
+        def orcExtension = serviceRequest.getExtensionByUrl(HapiHelper.EXTENSION_ORC_URL)
+        def orc12Extension = orcExtension.getExtensionByUrl(HapiHelper.EXTENSION_ORC12_URL)
+
+        if (orc12Extension == null) {
+            return null
+        }
+
+        def practitionerReference = (Reference) orc12Extension.getValue()
+        def practitionerUrl = practitionerReference.getReference()
+
+        for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
+            if (Objects.equals(entry.getFullUrl(), practitionerUrl) && entry.getResource() instanceof Practitioner)
+                return (Practitioner) entry.getResource()
+        }
+
+        return null
     }
 }
