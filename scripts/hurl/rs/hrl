@@ -21,17 +21,17 @@ show_help() {
     echo "Usage: $(basename $0) <HURL_FILE> [OPTIONS]"
     echo
     echo "Options:"
-    echo "    -f <REL_PATH>         The path to the hl7/fhir file to submit, relative the root path (Required for waters API)"
-    echo "    -r <ROOT_PATH>        The root path to the hl7/fhir files (Default: $root)"
-    echo "    -t <CONTENT_TYPE>     The content type for the message (e.g. 'application/hl7-v2' or 'application/fhir+ndjson') (Default: $content_type)"
-    echo "    -e [local | staging]  The environment to run the test in (Default: $env)"
-    echo "    -c <CLIENT_ID>        The client id to use (Default: $client_id)"
-    echo "    -s <CLIENT_SENDER>    The client sender to use (Default: $client_sender)"
-    echo "    -x <KEY_PATH>         The path to the client private key for the environment"
-    echo "    -i <SUBMISSION_ID>    The submissionId to call the history API with (Required for history API)"
-    echo "    -v                    Verbose mode"
-    echo "    -h                    Display this help and exit"
-    echo "    -p                    By default, the MSH segment is replaced to contain a Flexion receiver in order to avoid sending messages to partners inadvertently. When using this flag, the MSH segment will not be replaced"
+    echo "    -f <REL_PATH>                       The path to the hl7/fhir file to submit, relative the root path (Required for waters API)"
+    echo "    -r <ROOT_PATH>                      The root path to the hl7/fhir files (Default: $root)"
+    echo "    -t <CONTENT_TYPE>                   The content type for the message (e.g. 'application/hl7-v2' or 'application/fhir+ndjson') (Default: $content_type)"
+    echo "    -e [local | staging | production ]  The environment to run the test in (Default: $env)"
+    echo "    -c <CLIENT_ID>                      The client id to use (Default: $client_id)"
+    echo "    -s <CLIENT_SENDER>                  The client sender to use (Default: $client_sender)"
+    echo "    -x <KEY_PATH>                       The path to the client private key for the environment"
+    echo "    -i <SUBMISSION_ID>                  The submissionId to call the history API with (Required for history API)"
+    echo "    -v                                  Verbose mode"
+    echo "    -h                                  Display this help and exit"
+    echo "    -p                                  By default, the MSH segment is replaced to contain a Flexion receiver in order to avoid sending messages to partners inadvertently. When using this flag, the MSH segment will not be replaced"
 }
 
 # Check if required HURL_FILE is provided
@@ -109,6 +109,9 @@ if [ "$env" = "local" ]; then
 elif [ "$env" = "staging" ]; then
     host=staging.prime.cdc.gov
     url=https://$host:443
+elif [ "$env" = "production" ]; then
+    host=prime.cdc.gov
+    url=https://$host:443
 else
     echo "Error: Invalid environment $env"
     show_help
@@ -120,28 +123,28 @@ if [ -z "$secret" ]; then
     exit 1
 fi
 
-if [ "$allow_outbound" = false ]; then
-# Grab MSH Header
-  msh_header=$(head -n1 "$CDCTI_HOME/$fpath")
-# Check message type
-  if [[ "$msh_header" = *"^R01"* ]]; then
-    msh_header_replacement="MSH|^~\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-hospital-id^DNS|20230101010000-0000||ORU^R01^ORU_R01|111111|T|2.5.1||||||||||"
-  elif [[ "$msh_header" = *"^O01"* ]]; then
-    msh_header_replacement="MSH|^~\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-lab-id^DNS|20230101010000-0000||ORM^O01^ORM_O01|111111|T|2.5.1||||||||||"
-  elif [[ "$msh_header" = *"^O21"* ]]; then
-      msh_header_replacement="MSH|^~\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-lab-id^DNS|20230101010000-0000||OML^O21^OML_O21|111111|T|2.5.1||||||||||"
-  else
-      echo "File does not contain valid message type (MSH-9) values."
-      exit 1
-  fi
-  file_path=$(dirname "$fpath")
-  substitutedFilePathPrefix="$CDCTI_HOME/substituted_header"
-# Make temporary directory to store scrambled file
-  mkdir -p "$substitutedFilePathPrefix/$file_path" && touch -f "$substitutedFilePathPrefix/$fpath"
-# Replace MSH Header and write into temporary directory
-  sed "1s/.*/$msh_header_replacement/" "$CDCTI_HOME/$fpath" > "$substitutedFilePathPrefix/$fpath"
-  fpath=$substitutedFilePathPrefix/$fpath
-  echo "By default, the MSH segment is replaced to contain a Flexion receiver in order to avoid sending messages to partners inadvertently. To toggle this, run with -p."
+if [ "$allow_outbound" = false ] && [ -n "$fpath" ]; then
+    # Grab MSH Header
+    msh_header=$(head -n1 "$CDCTI_HOME/$fpath")
+    # Check message type
+    if [[ "$msh_header" = *"^R01"* ]]; then
+        msh_header_replacement="MSH|^~\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-hospital-id^DNS|20230101010000-0000||ORU^R01^ORU_R01|111111|T|2.5.1||||||||||"
+    elif [[ "$msh_header" = *"^O01"* ]]; then
+        msh_header_replacement="MSH|^~\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-lab-id^DNS|20230101010000-0000||ORM^O01^ORM_O01|111111|T|2.5.1||||||||||"
+    elif [[ "$msh_header" = *"^O21"* ]]; then
+        msh_header_replacement="MSH|^~\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-lab-id^DNS|20230101010000-0000||OML^O21^OML_O21|111111|T|2.5.1||||||||||"
+    else
+        echo "File does not contain valid message type (MSH-9) values."
+        exit 1
+    fi
+    file_path=$(dirname "$fpath")
+    substitutedFilePathPrefix="$CDCTI_HOME/substituted_header"
+    # Make temporary directory to store scrambled file
+    mkdir -p "$substitutedFilePathPrefix/$file_path" && touch -f "$substitutedFilePathPrefix/$fpath"
+    # Replace MSH Header and write into temporary directory
+    sed "1s/.*/$msh_header_replacement/" "$CDCTI_HOME/$fpath" >"$substitutedFilePathPrefix/$fpath"
+    fpath=$substitutedFilePathPrefix/$fpath
+    echo "By default, the MSH segment is replaced to contain a Flexion receiver in order to avoid sending messages to partners inadvertently. To toggle this, run with -p."
 fi
 
 hurl \
@@ -159,5 +162,5 @@ hurl \
 
 # Remove temporary directory
 if [ "$allow_outbound" = false ]; then
-  rm -r "$substitutedFilePathPrefix"
+    rm -r "$substitutedFilePathPrefix"
 fi
