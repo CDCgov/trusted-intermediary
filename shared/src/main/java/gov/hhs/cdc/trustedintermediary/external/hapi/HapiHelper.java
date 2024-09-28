@@ -69,6 +69,14 @@ public class HapiHelper {
     public static final String EXTENSION_OBR_URL =
             "https://reportstream.cdc.gov/fhir/StructureDefinition/obr-observation-request";
 
+    public static final String LOCAL_CODE_URL =
+            "https://terminology.hl7.org/CodeSystem-v2-0396.html#v2-0396-99zzzorL";
+    public static final String LOINC_URL = "http://loinc.org";
+
+    public static final String LOINC_CODE = "LN";
+    public static final String PLT_CODE = "PLT";
+    public static final String LOCAL_CODE = "L";
+
     /**
      * Returns a {@link Stream} of FHIR resources inside the provided {@link Bundle} that match the
      * given resource type.
@@ -91,6 +99,11 @@ public class HapiHelper {
 
     public static <T extends Resource> T resourceInBundle(Bundle bundle, Class<T> resourceType) {
         return resourcesInBundle(bundle, resourceType).findFirst().orElse(null);
+    }
+
+    // MSH-10
+    public static String getMessageControlId(Bundle bundle) {
+        return bundle.getIdentifier().getValue();
     }
 
     // MSH - Message Header
@@ -539,6 +552,23 @@ public class HapiHelper {
         setHl7FieldExtensionValue(identifier, EXTENSION_HD1_DATA_TYPE);
     }
 
+    // Coding resource
+    public static Extension getCodingExtensionByUrl(Coding coding, String url) {
+        return coding.getExtensionByUrl(url);
+    }
+
+    public static boolean hasCodingExtensionWithUrl(Coding coding, String url) {
+        return coding.getExtensionByUrl(url) != null;
+    }
+
+    public static boolean hasCodingSystem(Coding coding) {
+        return coding.getSystem() != null;
+    }
+
+    public static String getCodingSystem(Coding coding) {
+        return coding.getSystem();
+    }
+
     // CWE - Coded with Exceptions
     public static String getCWE1Value(Coding coding) {
         return coding.getCode();
@@ -642,5 +672,13 @@ public class HapiHelper {
                                         .getExtensionByUrl(EXTENSION_HL7_FIELD_URL)
                                         .getValue()
                                         .equalsDeep(dataType));
+    }
+
+    public static String urlForCodeType(String code) {
+        return switch (code) {
+            case HapiHelper.LOINC_CODE -> HapiHelper.LOINC_URL;
+            case HapiHelper.PLT_CODE -> null;
+            default -> HapiHelper.LOCAL_CODE_URL;
+        };
     }
 }
