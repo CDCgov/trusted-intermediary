@@ -156,15 +156,8 @@ class MapLocalObservationCodesTest extends Specification {
 
     def "When no observation identifier, the observation does not change"() {
         given:
-        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
-
-        // Add an observation with an observation value and a status, but no observation identifier
-        def observation = new Observation()
-        observation.status = Observation.ObservationStatus.FINAL
-        def valueCoding = new Coding()
-        valueCoding.code = "123456"
-        observation.valueCodeableConcept.coding.add(valueCoding)
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+        def bundle = createBundleWithNoIdentifier()
+        def originalObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
@@ -172,7 +165,7 @@ class MapLocalObservationCodesTest extends Specification {
         then:
         def transformedObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
 
-        observation == transformedObservation
+        originalObservation == transformedObservation
     }
 
     def "When message has multiple observations, local and non-local codes are handled appropriately"() {
@@ -320,6 +313,15 @@ class MapLocalObservationCodesTest extends Specification {
         coding.display = display
 
         observation.code.addCoding(coding)
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+        return bundle
+    }
+
+    def createBundleWithNoIdentifier() {
+        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
+        def observation = new Observation()
+        observation.status = Observation.ObservationStatus.FINAL
+        observation.valueCodeableConcept.coding.add(new Coding(code: "123456"))
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
         return bundle
     }
