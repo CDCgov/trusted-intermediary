@@ -124,19 +124,8 @@ class MapLocalObservationCodesTest extends Specification {
 
     def "When no coding system, no mapping should occur"() {
         given:
-        final String LOCAL_CODE = "A_LOCAL_CODE"
-        final String LOCAL_DISPLAY = "The local code description"
-        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
-
-        def observation = new Observation()
-        def coding = new Coding()
-        coding.code = LOCAL_CODE
-        coding.display = LOCAL_DISPLAY
-        coding.addExtension(HapiHelper.EXTENSION_CWE_CODING, new StringType("alt-coding"))
-        coding.addExtension(HapiHelper.EXTENSION_CODING_SYSTEM, new StringType(HapiHelper.LOCAL_CODE))
-        observation.code.addCoding(coding)
-
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+        def bundle = createBundleWithNoSystem()
+        def originalCodingList = HapiHelper.resourceInBundle(bundle, Observation.class).getCode().getCoding()
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
@@ -146,7 +135,7 @@ class MapLocalObservationCodesTest extends Specification {
         def transformedCodingList = transformedObservation.getCode().getCoding()
         transformedCodingList.size() == 1
 
-        observation.code.coding == transformedCodingList
+        originalCodingList == transformedCodingList
     }
 
     def "When no coding extension, no mapping should occur"() {
@@ -315,6 +304,18 @@ class MapLocalObservationCodesTest extends Specification {
         def observation = new Observation()
         observation.code.addCoding(createCoding(code1, display1, false, "coding"))
         observation.code.addCoding(createCoding(code2, display2, true, "alt-coding"))
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+        return bundle
+    }
+
+    def createBundleWithNoSystem() {
+        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
+        def observation = new Observation()
+        def coding = new Coding()
+        coding.code = "A_LOCAL_CODE"
+        coding.display = "The local code description"
+        coding.addExtension(HapiHelper.EXTENSION_CWE_CODING, new StringType("alt-coding"))
+        observation.code.addCoding(coding)
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
         return bundle
     }
