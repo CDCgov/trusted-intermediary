@@ -248,17 +248,6 @@ class MapLocalObservationCodesTest extends Specification {
         return observationList.find {observation -> observation.code?.coding?.find { coding -> coding.code == code}}
     }
 
-    Coding getCoding(String code, String display, boolean localCoding, String cweCoding) {
-        def coding = new Coding()
-        coding.system = localCoding ? HapiHelper.LOCAL_CODE_URL : HapiHelper.LOINC_URL
-        coding.code = code
-        coding.display = display
-
-        coding.addExtension(HapiHelper.EXTENSION_CWE_CODING, new StringType(cweCoding))
-        coding.addExtension(HapiHelper.EXTENSION_CODING_SYSTEM, new StringType(localCoding ? HapiHelper.LOCAL_CODE : HapiHelper.LOINC_CODE))
-        return coding
-    }
-
     void evaluateCoding(
             Coding coding,
             String expectedCode,
