@@ -105,14 +105,8 @@ class MapLocalObservationCodesTest extends Specification {
 
     def "When message has a LOINC code, no mapping should occur"() {
         given:
-        final String CODE = "A_LOINC_CODE"
-        final String DISPLAY = "Some display"
-
-        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
-
-        def observation = new Observation()
-        observation.code.addCoding(getCoding(CODE, DISPLAY, false, codingSystem ))
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+        def bundle = createBundleWithObservation("A_LOINC_CODE", "Some display", false)
+        def originalCodingList = HapiHelper.resourceInBundle(bundle, Observation.class).getCode().getCoding()
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
@@ -122,7 +116,7 @@ class MapLocalObservationCodesTest extends Specification {
         def transformedCodingList = transformedObservation.getCode().getCoding()
         transformedCodingList.size() == 1
 
-        observation.code.coding == transformedCodingList
+        originalCodingList == transformedCodingList
 
         where:
         codingSystem << ["coding", "alt-coding"]
