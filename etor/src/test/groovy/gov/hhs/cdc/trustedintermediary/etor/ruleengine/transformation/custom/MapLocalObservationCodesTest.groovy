@@ -140,18 +140,8 @@ class MapLocalObservationCodesTest extends Specification {
 
     def "When no coding extension, no mapping should occur"() {
         given:
-        final String LOCAL_CODE = "A_LOCAL_CODE"
-        final String LOCAL_DISPLAY = "The local code description"
-        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
-
-        def observation = new Observation()
-        def coding = new Coding()
-        coding.system = HapiHelper.LOCAL_CODE_URL
-        coding.code = LOCAL_CODE
-        coding.display = LOCAL_DISPLAY
-        observation.code.addCoding(coding)
-
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+        def bundle = createBundleWithNoExtension("A_LOCAL_CODE", "The local code description")
+        def originalCodingList = HapiHelper.resourceInBundle(bundle, Observation.class).getCode().getCoding()
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
@@ -161,7 +151,7 @@ class MapLocalObservationCodesTest extends Specification {
         def transformedCodingList = transformedObservation.getCode().getCoding()
         transformedCodingList.size() == 1
 
-        observation.code.coding == transformedCodingList
+        originalCodingList == transformedCodingList
     }
 
     def "When no observation identifier, the observation does not change"() {
@@ -315,6 +305,20 @@ class MapLocalObservationCodesTest extends Specification {
         coding.code = "A_LOCAL_CODE"
         coding.display = "The local code description"
         coding.addExtension(HapiHelper.EXTENSION_CWE_CODING, new StringType("alt-coding"))
+        observation.code.addCoding(coding)
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+        return bundle
+    }
+
+    def createBundleWithNoExtension(String code, String display) {
+        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
+        def observation = new Observation()
+
+        def coding = new Coding()
+        coding.system = HapiHelper.LOCAL_CODE_URL // System is present, but no extensions
+        coding.code = code
+        coding.display = display
+
         observation.code.addCoding(coding)
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
         return bundle
