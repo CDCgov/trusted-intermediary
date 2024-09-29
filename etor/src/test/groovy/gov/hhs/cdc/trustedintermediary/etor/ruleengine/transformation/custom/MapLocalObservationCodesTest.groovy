@@ -321,7 +321,6 @@ class MapLocalObservationCodesTest extends Specification {
         coding.code = code
         coding.display = display
 
-        // Add extensions properly using Extension objects
         coding.addExtension(new Extension(HapiHelper.EXTENSION_CWE_CODING, new StringType(cweCoding)))
         coding.addExtension(new Extension(HapiHelper.EXTENSION_CODING_SYSTEM, new StringType(isLocal ? HapiHelper.LOCAL_CODE : HapiHelper.LOINC_CODE)))
 
