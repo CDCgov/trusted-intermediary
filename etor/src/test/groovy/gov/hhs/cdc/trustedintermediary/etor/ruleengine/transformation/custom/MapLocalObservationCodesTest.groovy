@@ -83,13 +83,8 @@ class MapLocalObservationCodesTest extends Specification {
 
     def "When message has a mappable local observation code in OBX-3.4/5/6 and other content in OBX3-1/2/3, no mapping should occur"() {
         given:
-        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
-
-        def observation = new Observation()
-        observation.code.addCoding(getCoding(obx31code, obx32display, false, "coding" ))
-        observation.code.addCoding(getCoding("99717-32", "Adrenoleukodystrophy deficiency newborn screening interpretation", true, "alt-coding" ))
-
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+        def bundle = createBundleWithMultipleCodings(obx31code, obx32display, "99717-32", "Adrenoleukodystrophy deficiency")
+        def originalCodingList = HapiHelper.resourceInBundle(bundle, Observation.class).getCode().getCoding()
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
@@ -99,7 +94,7 @@ class MapLocalObservationCodesTest extends Specification {
         def transformedCodingList = transformedObservation.getCode().getCoding()
         transformedCodingList.size() == 2
 
-        observation.code.coding == transformedCodingList
+        originalCodingList == transformedCodingList
 
         where:
         obx31code    | obx32display
@@ -317,6 +312,15 @@ class MapLocalObservationCodesTest extends Specification {
         def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
         def observation = new Observation()
         observation.code.addCoding(createCoding(code, display, isLocal, "alt-coding"))
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+        return bundle
+    }
+
+    def createBundleWithMultipleCodings(String code1, String display1, String code2, String display2) {
+        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
+        def observation = new Observation()
+        observation.code.addCoding(createCoding(code1, display1, false, "coding"))
+        observation.code.addCoding(createCoding(code2, display2, true, "alt-coding"))
         bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
         return bundle
     }
