@@ -24,13 +24,8 @@ public class RemoveObservationRequests implements CustomFhirTransformation {
     @Override
     public void transform(FhirResource<?> resource, Map<String, Object> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
-        String universalServiceIdentifier =
-                args.get("universalServiceIdentifier") instanceof String
-                        ? (String) args.get("universalServiceIdentifier")
-                        : null;
-        if (universalServiceIdentifier == null) {
-            return;
-        }
+        // Let it fail if it is not a String
+        String universalServiceIdentifier = (String) args.get("universalServiceIdentifier");
 
         Set<Resource> resourcesToRemove = new HashSet<>();
         List<Reference> observationReferences = new ArrayList<>();

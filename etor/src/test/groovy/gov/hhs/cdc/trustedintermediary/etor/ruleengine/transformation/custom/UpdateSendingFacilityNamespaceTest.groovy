@@ -50,7 +50,7 @@ class UpdateSendingFacilityNamespaceTest extends Specification {
         noExceptionThrown()
     }
 
-    def "don't throw exception if arg.get('name') is not a string"() {
+    def "throw exception if arg.get('name') is not a string"() {
         given:
         def name = "CDPH"
         def fhirResource = ExamplesHelper.getExampleFhirResource("../MN/004_MN_ORU_R01_NBS_1_hl7_translation.fhir")
@@ -65,6 +65,6 @@ class UpdateSendingFacilityNamespaceTest extends Specification {
         transformClass.transform(new HapiFhirResource(bundle), Map.of("name", (Object) listOfNames))
 
         then:
-        noExceptionThrown()
+        thrown(ClassCastException)
     }
 }

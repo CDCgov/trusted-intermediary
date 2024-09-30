@@ -23,10 +23,8 @@ public class UpdateSendingFacilityNamespace implements CustomFhirTransformation 
             return;
         }
 
-        String name = args.get("name") instanceof String ? (String) args.get("name") : null;
-        if (name == null) {
-            return;
-        }
+        // Let it fail if it is not a string
+        String name = (String) args.get("name");
 
         namespaceIdentifier.setValue(name);
         Objects.requireNonNull(HapiHelper.getMSH4Organization(bundle))

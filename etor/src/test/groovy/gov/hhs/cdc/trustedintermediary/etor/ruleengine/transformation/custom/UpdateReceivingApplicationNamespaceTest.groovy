@@ -57,7 +57,7 @@ class UpdateReceivingApplicationNamespaceTest extends Specification {
         noExceptionThrown()
     }
 
-    def "don't throw exception if args.get('name') is not a string"() {
+    def "throw exception if args.get('name') is not a string"() {
         given:
         def listOfNames = (Object) ["EPIC", "CIPE"]
         def bundle = new Bundle()
@@ -71,6 +71,6 @@ class UpdateReceivingApplicationNamespaceTest extends Specification {
         transformClass.transform(new HapiFhirResource(bundle), Map.of("name", listOfNames))
 
         then:
-        noExceptionThrown()
+        thrown(ClassCastException)
     }
 }

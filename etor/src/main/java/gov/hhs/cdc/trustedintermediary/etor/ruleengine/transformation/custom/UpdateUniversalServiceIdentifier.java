@@ -54,7 +54,8 @@ public class UpdateUniversalServiceIdentifier implements CustomFhirTransformatio
 
     // Returns null if it is not a String
     private String castToString(Object obj) {
-        return obj instanceof String ? (String) obj : null;
+        // Let it fail if it is not a string
+        return (String) obj;
     }
 
     /**

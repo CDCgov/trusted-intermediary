@@ -15,11 +15,10 @@ public class UpdateReceivingApplicationNamespace implements CustomFhirTransforma
     @Override
     public void transform(FhirResource<?> resource, Map<String, Object> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
-        String name = (args.get("name") instanceof String ? (String) args.get("name") : null);
+        // Let it fail if it is not a string
+        String name = (String) args.get("name");
         var receivingApplication = HapiHelper.getMSH5MessageDestinationComponent(bundle);
-        if (name == null) {
-            return;
-        }
+
         if (receivingApplication == null) {
             return;
         }
