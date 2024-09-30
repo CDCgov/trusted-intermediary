@@ -105,6 +105,9 @@ jobs:
         slot-name: pre-live
         images: '${{ inputs.REGISTRY }}/${{ inputs.REPO }}:${{ github.sha }}'
 
+    - name: Sleep 2 minutes
+      run: sleep 2m
+
     - name: Azure Swap Slots
       uses: azure/CLI@v2
       with:
