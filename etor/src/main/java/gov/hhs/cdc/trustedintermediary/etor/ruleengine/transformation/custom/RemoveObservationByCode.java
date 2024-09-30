@@ -12,7 +12,7 @@ import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Resource;
 
-public class RemoveAccessionNumber implements CustomFhirTransformation {
+public class RemoveObservationByCode implements CustomFhirTransformation {
     public static final String CODE_NAME = "code";
     public static final String CODING_SYSTEM_NAME = "codingSystemExtension";
     public static final String CODING_NAME = "codingExtension";

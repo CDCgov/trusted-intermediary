@@ -11,7 +11,7 @@ import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.StringType
 import spock.lang.Specification
 
-class RemoveAccessionNumberTest extends Specification {
+class RemoveObservationByCodeTest extends Specification {
     def transformClass
 
     def setup() {
@@ -19,7 +19,7 @@ class RemoveAccessionNumberTest extends Specification {
         TestApplicationContext.init()
         TestApplicationContext.injectRegisteredImplementations()
 
-        transformClass = new RemoveAccessionNumber()
+        transformClass = new RemoveObservationByCode()
     }
 
     def "When an observation has the desired coding, it should be removed"() {
