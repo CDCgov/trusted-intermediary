@@ -60,6 +60,8 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
         }
     }
 
+    // @todo This will be moved to HapiHelper and turned into a more generic function for searching
+    // inside CWE coding objects
     private Boolean hasLocalCodeInAlternateCoding(Coding coding) {
         if (!HapiHelper.hasCodingExtensionWithUrl(coding, HapiHelper.EXTENSION_CWE_CODING)) {
             return false;
@@ -103,6 +105,12 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
         return mappedCoding;
     }
 
+    /**
+     * Initializes the local-to-LOINC/PLT hash map, customized for CDPH and UCSD. Currently, the
+     * mapping is hardcoded for simplicity. If expanded to support additional entities, the
+     * implementation may be updated to allow dynamic configuration via
+     * transformation_definitions.json or a database-driven mapping.
+     */
     private void initMap() {
         this.codingMap = new HashMap<>();
         // ALD
