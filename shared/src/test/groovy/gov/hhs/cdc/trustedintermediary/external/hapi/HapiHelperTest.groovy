@@ -909,18 +909,4 @@ class HapiHelperTest extends Specification {
         "L"        || HapiHelper.LOCAL_CODE_URL
         "PLT"      || null
     }
-
-    def "urlForCodeType should return expected values"() {
-        when:
-        def actualResult = HapiHelper.urlForCodeType(inputValue)
-
-        then:
-        actualResult == expectedResult
-
-        where:
-        inputValue || expectedResult
-        "LN"       || HapiHelper.LOINC_URL
-        "L"        || HapiHelper.LOCAL_CODE_URL
-        "PLT"      || null
-    }
 }
