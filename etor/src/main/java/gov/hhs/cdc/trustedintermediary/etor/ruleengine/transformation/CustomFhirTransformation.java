@@ -8,5 +8,5 @@ import java.util.Map;
  * implemented by classes in the custom/ folder.
  */
 public interface CustomFhirTransformation {
-    void transform(HealthData<?> resource, Map<String, String> args);
+    void transform(HealthData<?> resource, Map<String, Object> args);
 }

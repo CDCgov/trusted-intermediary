@@ -13,7 +13,7 @@ import org.hl7.fhir.r4.model.Bundle;
 public class RemoveMessageTypeStructure implements CustomFhirTransformation {
 
     @Override
-    public void transform(HealthData<?> resource, Map<String, String> args) {
+    public void transform(HealthData<?> resource, Map<String, Object> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingData();
         String msh9_3 = HapiHelper.getMSH9_3Value(bundle);
         if (msh9_3 == null) {

@@ -17,7 +17,7 @@ import org.hl7.fhir.r4.model.ServiceRequest;
 public class SwapPlacerOrderAndGroupNumbers implements CustomFhirTransformation {
 
     @Override
-    public void transform(HealthData<?> resource, Map<String, String> args) {
+    public void transform(HealthData<?> resource, Map<String, Object> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingData();
         var serviceRequests = HapiHelper.resourcesInBundle(bundle, ServiceRequest.class);
 

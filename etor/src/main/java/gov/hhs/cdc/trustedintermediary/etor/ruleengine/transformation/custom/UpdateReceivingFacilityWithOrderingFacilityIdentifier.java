@@ -16,7 +16,7 @@ public class UpdateReceivingFacilityWithOrderingFacilityIdentifier
         implements CustomFhirTransformation {
 
     @Override
-    public void transform(HealthData<?> resource, Map<String, String> args) {
+    public void transform(HealthData<?> resource, Map<String, Object> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingData();
         DiagnosticReport diagnosticReport = HapiHelper.getDiagnosticReport(bundle);
         if (diagnosticReport == null) {

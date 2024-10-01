@@ -5,6 +5,7 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Identifier;
 
@@ -15,14 +16,18 @@ import org.hl7.fhir.r4.model.Identifier;
 public class UpdateSendingFacilityNamespace implements CustomFhirTransformation {
 
     @Override
-    public void transform(HealthData<?> resource, Map<String, String> args) {
+    public void transform(HealthData<?> resource, Map<String, Object> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingData();
         Identifier namespaceIdentifier = HapiHelper.getMSH4_1Identifier(bundle);
         if (namespaceIdentifier == null) {
             return;
         }
-        namespaceIdentifier.setValue(args.get("name"));
-        HapiHelper.getMSH4Organization(bundle)
+
+        // Let it fail if it is not a string
+        String name = (String) args.get("name");
+
+        namespaceIdentifier.setValue(name);
+        Objects.requireNonNull(HapiHelper.getMSH4Organization(bundle))
                 .setIdentifier(Collections.singletonList(namespaceIdentifier));
     }
 }

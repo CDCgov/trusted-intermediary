@@ -16,7 +16,7 @@ public class AddEtorProcessingTag implements CustomFhirTransformation {
             ApplicationContext.getImplementation(MetricMetadata.class);
 
     @Override
-    public void transform(HealthData<?> resource, Map<String, String> args) {
+    public void transform(HealthData<?> resource, Map<String, Object> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingData();
 
         var system = "http://localcodes.org/ETOR";

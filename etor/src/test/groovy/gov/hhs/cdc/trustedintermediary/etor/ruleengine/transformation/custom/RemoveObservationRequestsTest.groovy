@@ -12,7 +12,7 @@ import spock.lang.Specification
 class RemoveObservationRequestsTest extends Specification {
     def transformClass
     def obr4_1 = "54089-8"
-    def args = Map.of("universalServiceIdentifier", obr4_1)
+    def args = Map.of("universalServiceIdentifier",  (Object) obr4_1)
 
     def setup() {
         TestApplicationContext.reset()
@@ -21,6 +21,25 @@ class RemoveObservationRequestsTest extends Specification {
 
         transformClass = new RemoveObservationRequests()
     }
+
+    def "test when universalServiceIdentifier is not a String"() {
+        given:
+        // Load a FHIR resource example
+        def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/002_CA_ORU_R01_initial_translation.fhir")
+        def bundle = fhirResource.getUnderlyingResource() as Bundle
+
+        // Prepare args with a List<String> instead of a String to trigger null response from ternary operator
+        def listOfIdentifiers = ["54089-8", "99717-5"]
+        def args = Map.of("universalServiceIdentifier", (Object) listOfIdentifiers)
+
+        when:
+        // Call transform with the complex args map
+        transformClass.transform(fhirResource, args)
+
+        then:
+        thrown(ClassCastException)
+    }
+
 
     def "remove all OBRs except for the one with OBR-4.1 = '54089-8'"() {
         given:

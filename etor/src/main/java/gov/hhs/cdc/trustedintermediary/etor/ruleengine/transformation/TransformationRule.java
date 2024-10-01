@@ -55,8 +55,8 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
     private void applyTransformation(
             TransformationRuleMethod transformation, HealthData<?> resource) {
         String name = transformation.name();
-        Map<String, String> args = transformation.args();
-        this.logger.logInfo("Applying transformation: " + name);
+        Map<String, Object> args = transformation.args();
+        logger.logInfo("Applying transformation: " + name);
 
         CustomFhirTransformation transformationInstance = getTransformationInstance(name);
         transformationInstance.transform(resource, args);

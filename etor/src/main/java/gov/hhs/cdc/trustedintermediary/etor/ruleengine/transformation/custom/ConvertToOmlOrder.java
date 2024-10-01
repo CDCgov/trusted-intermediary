@@ -16,7 +16,7 @@ public class ConvertToOmlOrder implements CustomFhirTransformation {
             ApplicationContext.getImplementation(MetricMetadata.class);
 
     @Override
-    public void transform(HealthData<?> resource, Map<String, String> args) {
+    public void transform(HealthData<?> resource, Map<String, Object> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingData();
         HapiHelper.setMSH9Coding(bundle, HapiHelper.OML_CODING);
         metadata.put(bundle.getId(), EtorMetadataStep.ORDER_CONVERTED_TO_OML);

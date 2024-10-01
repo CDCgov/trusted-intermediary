@@ -13,11 +13,18 @@ import org.hl7.fhir.r4.model.Bundle;
 public class UpdateReceivingApplicationNamespace implements CustomFhirTransformation {
 
     @Override
-    public void transform(HealthData<?> resource, Map<String, String> args) {
+    public void transform(HealthData<?> resource, Map<String, Object> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingData();
+        // Let it fail if it is not a string
+        String name = (String) args.get("name");
         var receivingApplication = HapiHelper.getMSH5MessageDestinationComponent(bundle);
+
+        if (receivingApplication == null) {
+            return;
+        }
+
         receivingApplication.removeExtension(HapiHelper.EXTENSION_UNIVERSAL_ID_URL);
         receivingApplication.removeExtension(HapiHelper.EXTENSION_UNIVERSAL_ID_TYPE_URL);
-        receivingApplication.setName(args.get("name"));
+        receivingApplication.setName(name);
     }
 }
