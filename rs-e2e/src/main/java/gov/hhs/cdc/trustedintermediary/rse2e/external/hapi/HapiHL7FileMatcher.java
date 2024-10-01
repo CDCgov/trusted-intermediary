@@ -10,6 +10,7 @@ import gov.hhs.cdc.trustedintermediary.rse2e.HL7FileStream;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -75,7 +76,7 @@ public class HapiHL7FileMatcher {
 
             for (HL7FileStream hl7FileStream : files) {
                 try (InputStream inputStream = hl7FileStream.inputStream()) {
-                    String content = new String(inputStream.readAllBytes());
+                    String content = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
                     Message message = parser.parse(content);
                     MSH mshSegment = (MSH) message.get("MSH");
                     String msh10 = mshSegment.getMessageControlID().getValue();
