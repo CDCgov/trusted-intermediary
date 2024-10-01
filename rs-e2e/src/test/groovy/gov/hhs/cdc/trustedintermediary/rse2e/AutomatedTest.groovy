@@ -43,6 +43,11 @@ class AutomatedTest extends Specification  {
         TestApplicationContext.injectRegisteredImplementations()
     }
 
+    def cleanup() {
+        for (HL7FileStream fileStream : recentLocalFiles + recentAzureFiles) {
+            fileStream.inputStream().close()
+        }
+    }
 
     def "test defined assertions on relevant messages"() {
         given:

@@ -32,7 +32,10 @@ public class LocalFileFetcher implements FileFetcher {
                     .filter(path -> path.toString().endsWith(EXTENSION))
                     .map(
                             p -> {
-                                try (InputStream inputStream = Files.newInputStream(p)) {
+                                try {
+                                    // Need to keep the input stream open until the test is done
+                                    // Must make sure to close the input stream after use
+                                    InputStream inputStream = Files.newInputStream(p);
                                     return new HL7FileStream(
                                             p.getFileName().toString(), inputStream);
                                 } catch (IOException e) {
