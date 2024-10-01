@@ -22,7 +22,7 @@ class UpdateSendingFacilityNamespaceTest extends Specification {
 
     def "update sending facility namespace to given name and remove other identifiers"() {
         given:
-        def name = "CDPH"
+        def name =  (Object) "CDPH"
         def fhirResource = ExamplesHelper.getExampleFhirResource("../MN/004_MN_ORU_R01_NBS_1_hl7_translation.fhir")
         def bundle = fhirResource.getUnderlyingResource() as Bundle
 
@@ -44,9 +44,27 @@ class UpdateSendingFacilityNamespaceTest extends Specification {
         HapiHelper.createMSHMessageHeader(bundle)
 
         when:
-        transformClass.transform(new HapiFhirResource(bundle), Map.of("name", ""))
+        transformClass.transform(new HapiFhirResource(bundle), Map.of("name", (Object) ""))
 
         then:
         noExceptionThrown()
+    }
+
+    def "throw exception if arg.get('name') is not a string"() {
+        given:
+        def name = "CDPH"
+        def fhirResource = ExamplesHelper.getExampleFhirResource("../MN/004_MN_ORU_R01_NBS_1_hl7_translation.fhir")
+        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def listOfNames = ["trusted", "intermediary"]
+
+        expect:
+        HapiHelper.getMSH4Organization(bundle).getIdentifier().size() > 1
+        HapiHelper.getMSH4_1Identifier(bundle).getValue() != name
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), Map.of("name", (Object) listOfNames))
+
+        then:
+        thrown(ClassCastException)
     }
 }

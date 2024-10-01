@@ -13,7 +13,7 @@ import org.hl7.fhir.r4.model.ServiceRequest;
 public class CopyOrcOrderProviderToObrOrderProvider implements CustomFhirTransformation {
 
     @Override
-    public void transform(FhirResource<?> resource, Map<String, String> args) {
+    public void transform(FhirResource<?> resource, Map<String, Object> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
         DiagnosticReport diagnosticReport = HapiHelper.getDiagnosticReport(bundle);
         if (diagnosticReport == null) {
