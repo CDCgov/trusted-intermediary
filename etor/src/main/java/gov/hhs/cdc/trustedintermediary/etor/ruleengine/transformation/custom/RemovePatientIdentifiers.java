@@ -13,7 +13,7 @@ import org.hl7.fhir.r4.model.Bundle;
 public class RemovePatientIdentifiers implements CustomFhirTransformation {
 
     @Override
-    public void transform(FhirResource<?> resource, Map<String, String> args) {
+    public void transform(FhirResource<?> resource, Map<String, Object> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
         HapiHelper.setPID3_4Value(bundle, ""); // remove PID.3-4
         HapiHelper.setPID3_5Value(bundle, ""); // remove PID.3-5

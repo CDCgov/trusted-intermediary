@@ -19,7 +19,7 @@ public class AddContactSectionToPatientResource implements CustomFhirTransformat
             ApplicationContext.getImplementation(MetricMetadata.class);
 
     @Override
-    public void transform(FhirResource<?> resource, Map<String, String> args) {
+    public void transform(FhirResource<?> resource, Map<String, Object> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
 
         HapiHelper.resourcesInBundle(bundle, Patient.class)

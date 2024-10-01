@@ -10,7 +10,7 @@ import org.hl7.fhir.r4.model.Bundle;
 public class RemovePatientNameTypeCode implements CustomFhirTransformation {
 
     @Override
-    public void transform(final FhirResource<?> resource, final Map<String, String> args) {
+    public void transform(final FhirResource<?> resource, final Map<String, Object> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
         // Need to set the value for extension to empty instead of removing the extension,
         // otherwise RS will set its own value in its place
