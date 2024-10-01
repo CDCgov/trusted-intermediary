@@ -27,12 +27,13 @@ public class UpdateUniversalServiceIdentifier implements CustomFhirTransformatio
         Bundle bundle = (Bundle) resource.getUnderlyingResource();
         var serviceRequests = HapiHelper.resourcesInBundle(bundle, ServiceRequest.class);
 
+        // Let it fail if args.get("<property>") is not a string
         serviceRequests.forEach(
                 it -> {
                     var allCodings = it.getCode().getCoding();
                     var codingSystemContainer =
                             getCodingSystemContainer(
-                                    allCodings, castToString(args.get(CHECK_VALUE_NAME)));
+                                    allCodings, (String) args.get(CHECK_VALUE_NAME));
 
                     if (codingSystemContainer == null) {
                         // we're only interested in coding that matches the checkValue argument
@@ -41,21 +42,15 @@ public class UpdateUniversalServiceIdentifier implements CustomFhirTransformatio
 
                     // check for the coding system label and create or override it
                     updateCodingSystemLabel(
-                            codingSystemContainer, castToString(args.get(CODING_SYSTEM_NAME)));
+                            codingSystemContainer, (String) args.get(CODING_SYSTEM_NAME));
 
                     // the alt id is stored on a separate coding object, so we need to filter
                     // for it
-                    String alternateId = castToString(args.get(ALTERNATE_ID_NAME));
+                    String alternateId = (String) args.get(ALTERNATE_ID_NAME);
                     if (alternateId != null) {
                         updateAlternateCodingId(allCodings, alternateId);
                     }
                 });
-    }
-
-    // Returns null if it is not a String
-    private String castToString(Object obj) {
-        // Let it fail if it is not a string
-        return (String) obj;
     }
 
     /**
