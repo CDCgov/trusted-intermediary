@@ -55,15 +55,17 @@ public class AzureBlobFileFetcher implements FileFetcher {
             LocalDate blobCreationDate =
                     properties.getLastModified().toInstant().atZone(ZoneOffset.UTC).toLocalDate();
 
+            if (mostRecentDay != null && blobCreationDate.isBefore(mostRecentDay)) {
+                continue;
+            }
+
             if (mostRecentDay == null || blobCreationDate.isAfter(mostRecentDay)) {
                 mostRecentDay = blobCreationDate;
                 recentFiles.clear();
-                recentFiles.add(
-                        new HL7FileStream(blobClient.getBlobName(), blobClient.openInputStream()));
-            } else if (blobCreationDate.equals(mostRecentDay)) {
-                recentFiles.add(
-                        new HL7FileStream(blobClient.getBlobName(), blobClient.openInputStream()));
             }
+
+            recentFiles.add(
+                    new HL7FileStream(blobClient.getBlobName(), blobClient.openInputStream()));
         }
 
         return recentFiles;
