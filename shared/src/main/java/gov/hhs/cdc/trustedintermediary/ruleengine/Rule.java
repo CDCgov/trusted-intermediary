@@ -6,6 +6,11 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.List;
 
+/**
+ * Represents a rule that can be run on HealthData objects. Each rule has a name, description,
+ * message for logging, conditions to determine if the rule should run, and actions to run in case
+ * the condition is met.
+ */
 public class Rule<T> {
 
     protected final Logger logger = ApplicationContext.getImplementation(Logger.class);
