@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.hl7.fhir.r4.model.Bundle;
@@ -88,7 +89,7 @@ public class HapiHelper {
      */
     public static <T extends Resource> Stream<T> resourcesInBundle(
             Bundle bundle, Class<T> resourceType) {
-        if (bundle == null || bundle.getEntry() == null) {
+        if (bundle == null || bundle.getEntry().isEmpty()) {
             return Stream.empty();
         }
         return bundle.getEntry().stream()
@@ -680,5 +681,28 @@ public class HapiHelper {
             case HapiHelper.PLT_CODE -> null;
             default -> HapiHelper.LOCAL_CODE_URL;
         };
+    }
+
+    /**
+     * Check if a given Coding resource has alternate coding, and if it has a value of the expected
+     * type.
+     *
+     * @param coding the resource to check. Expected to be converted from an HL7 CWE format field.
+     * @param codingSystem Name of coding system to look for (e.g. Local code, LOINC...)
+     * @return True if the Coding is formatted correctly and has the expected code type, else false
+     */
+    public static Boolean hasDefinedAlternateCoding(Coding coding, String codingSystem) {
+        if (!HapiHelper.hasCodingSystem(coding)
+                || !HapiHelper.hasCodingExtensionWithUrl(coding, HapiHelper.EXTENSION_CWE_CODING)) {
+            return false;
+        }
+
+        var cwe =
+                HapiHelper.getCodingExtensionByUrl(coding, HapiHelper.EXTENSION_CWE_CODING)
+                        .getValue()
+                        .toString();
+
+        return Objects.equals(cwe, HapiHelper.EXTENSION_ALT_CODING)
+                && HapiHelper.getCodingSystem(coding).equals(codingSystem);
     }
 }
