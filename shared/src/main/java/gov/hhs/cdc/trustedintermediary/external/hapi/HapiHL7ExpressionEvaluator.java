@@ -81,9 +81,9 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
     protected <T extends Comparable<T>> boolean evaluateEquality(
             T leftValue, T rightValue, String operator) {
         if (operator.equals("=")) {
-            return leftValue.compareTo(rightValue) == 0;
+            return leftValue.equals(rightValue);
         } else if (operator.equals("!=")) {
-            return leftValue.compareTo(rightValue) != 0;
+            return !leftValue.equals(rightValue);
         }
         throw new IllegalArgumentException("Unknown operator: " + operator);
     }
