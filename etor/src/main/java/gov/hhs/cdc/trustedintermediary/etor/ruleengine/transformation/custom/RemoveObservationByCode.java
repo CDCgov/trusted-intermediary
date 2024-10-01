@@ -18,7 +18,7 @@ public class RemoveObservationByCode implements CustomFhirTransformation {
     public static final String CODING_NAME = "codingExtension";
 
     @Override
-    public void transform(FhirResource<?> resource, Map<String, String> args) {
+    public void transform(FhirResource<?> resource, Map<String, Object> args) {
         var bundle = (Bundle) resource.getUnderlyingResource();
         Set<Resource> resourcesToRemove = new HashSet<>();
 
@@ -34,7 +34,7 @@ public class RemoveObservationByCode implements CustomFhirTransformation {
     }
 
     private void processObservation(
-            Observation observation, Set<Resource> resourcesToRemove, Map<String, String> args) {
+            Observation observation, Set<Resource> resourcesToRemove, Map<String, Object> args) {
         for (Coding coding : observation.getCode().getCoding()) {
             if (isMatchingCode(coding, args)) {
                 resourcesToRemove.add(observation);
@@ -45,7 +45,8 @@ public class RemoveObservationByCode implements CustomFhirTransformation {
 
     // TODO: Need to refactor this to handle missing extensions, etc. and determine if there's a way
     // to generalize it along with HapiHelper.hasLocalCodeInAlternateCoding
-    private Boolean isMatchingCode(Coding coding, Map<String, String> args) {
+    private Boolean isMatchingCode(Coding coding, Map<String, Object> args) {
+        // Let it fail if args.get(<property>) is not a string
         return Objects.equals(coding.getCode(), args.get(CODE_NAME))
                 && coding.getExtensionByUrl(HapiHelper.EXTENSION_CODING_SYSTEM)
                         .getValue()
