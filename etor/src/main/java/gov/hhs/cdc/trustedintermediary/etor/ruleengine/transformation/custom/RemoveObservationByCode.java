@@ -44,7 +44,7 @@ public class RemoveObservationByCode implements CustomFhirTransformation {
     }
 
     // TODO: Need to refactor this to handle missing extensions, etc. and determine if there's a way
-    // to generalize it along with HapiHelper.hasLocalCodeInAlternateCoding
+    // to generalize it
     private Boolean isMatchingCode(Coding coding, Map<String, String> args) {
         return Objects.equals(coding.getCode(), args.get(CODE_NAME))
                 && coding.getExtensionByUrl(HapiHelper.EXTENSION_CODING_SYSTEM)
