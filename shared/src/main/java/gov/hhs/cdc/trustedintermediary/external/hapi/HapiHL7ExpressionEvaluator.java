@@ -26,6 +26,8 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
             Pattern.compile("^(\\S+)\\s*(=|!=|in)\\s*(.+)$");
     private static final Pattern HL7_COUNT_PATTERN = Pattern.compile("(\\S+)\\.count\\(\\)");
     private static final Pattern LITERAL_VALUE_PATTERN = Pattern.compile("'(.*)'");
+    private static final Pattern LITERAL_VALUE_COLLECTION_PATTERN =
+            Pattern.compile("\\(([^)]+)\\)");
     private static final Pattern MESSAGE_SOURCE_PATTERN =
             Pattern.compile("(input|output)?\\.?(\\S+)");
     private static final Pattern HL7_FIELD_NAME_PATTERN = Pattern.compile("(\\w+)(?:-(\\S+))?");
@@ -92,8 +94,8 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
     }
 
     protected boolean evaluateMembership(String leftValue, String rightOperand) {
-        Pattern literalValueCollectionPattern = Pattern.compile("\\(([^)]+)\\)");
-        Matcher literalValueCollectionMatcher = literalValueCollectionPattern.matcher(rightOperand);
+        Matcher literalValueCollectionMatcher =
+                LITERAL_VALUE_COLLECTION_PATTERN.matcher(rightOperand);
         if (!literalValueCollectionMatcher.matches()) {
             throw new IllegalArgumentException("Invalid collection format: " + rightOperand);
         }
