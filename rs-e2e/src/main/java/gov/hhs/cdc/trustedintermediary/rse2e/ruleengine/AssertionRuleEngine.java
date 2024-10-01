@@ -21,12 +21,12 @@ public class AssertionRuleEngine {
     final List<AssertionRule> assertionRules = new ArrayList<>();
     volatile boolean rulesLoaded = false;
 
+    @Inject Logger logger;
+    @Inject RuleLoader ruleLoader;
+
     public static AssertionRuleEngine getInstance() {
         return INSTANCE;
     }
-
-    @Inject Logger logger;
-    @Inject RuleLoader ruleLoader;
 
     public AssertionRuleEngine() {}
 
