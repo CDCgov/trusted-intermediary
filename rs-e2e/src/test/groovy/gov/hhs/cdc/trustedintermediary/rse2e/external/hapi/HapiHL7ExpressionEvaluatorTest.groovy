@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.external.hapi
+package gov.hhs.cdc.trustedintermediary.rse2e.external.hapi
 
 import ca.uhn.hl7v2.model.Message
 import ca.uhn.hl7v2.model.Segment

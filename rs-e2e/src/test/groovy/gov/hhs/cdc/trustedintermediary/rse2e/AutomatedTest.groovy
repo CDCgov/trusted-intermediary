@@ -3,7 +3,7 @@ package gov.hhs.cdc.trustedintermediary.rse2e
 import ca.uhn.hl7v2.model.Message
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.rse2e.external.hapi.HapiHL7FileMatcher
-import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHL7ExpressionEvaluator
+import gov.hhs.cdc.trustedintermediary.rse2e.external.hapi.HapiHL7ExpressionEvaluator
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
