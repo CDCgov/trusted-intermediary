@@ -12,7 +12,7 @@
       ]
     },
     {
-      "name": "UCSD result requirements",
+      "name": "UCSD ORU requirements",
       "conditions": [
         "MSH-9.2 = 'R01'",
         "MSH-6 in ('R797', 'R508')"
