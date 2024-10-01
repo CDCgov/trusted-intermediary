@@ -43,8 +43,8 @@ public class RemoveObservationByCode implements CustomFhirTransformation {
         }
     }
 
-    // TODO: Need to refactor this to handle missing extensions, etc. and determine if there's a way
-    // to generalize it
+    // TODO: Need to refactor this to handle missing extensions, etc. and determine if we can
+    // generalize it
     private Boolean isMatchingCode(Coding coding, Map<String, Object> args) {
         // Let it fail if args.get(<property>) is not a string
         return Objects.equals(coding.getCode(), args.get(CODE_NAME))
