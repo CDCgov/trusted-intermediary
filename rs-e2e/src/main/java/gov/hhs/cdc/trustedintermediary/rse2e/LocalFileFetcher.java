@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.rse2e;
 
-import gov.hhs.cdc.trustedintermediary.wrappers.HL7FileStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;

@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.wrappers;
+package gov.hhs.cdc.trustedintermediary.rse2e;
 
 import java.io.InputStream;
 
