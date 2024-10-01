@@ -4,8 +4,8 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -100,10 +100,10 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
             throw new IllegalArgumentException("Invalid collection format: " + rightOperand);
         }
         String arrayString = literalValueCollectionMatcher.group(1);
-        ArrayList<String> values =
+        Set<String> values =
                 Arrays.stream(arrayString.split(","))
                         .map(s -> s.trim().replace("'", ""))
-                        .collect(Collectors.toCollection(ArrayList::new));
+                        .collect(Collectors.toSet());
         return values.contains(leftValue);
     }
 
