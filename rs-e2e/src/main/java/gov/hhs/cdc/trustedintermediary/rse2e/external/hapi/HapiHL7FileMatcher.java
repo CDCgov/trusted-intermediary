@@ -93,7 +93,7 @@ public class HapiHL7FileMatcher {
                 }
             }
         } catch (IOException e) {
-            logger.logError("An error occurred while reading the file", e);
+            logger.logError("An error occurred while constructing the DefaultHapiContext", e);
         }
 
         return messageMap;
