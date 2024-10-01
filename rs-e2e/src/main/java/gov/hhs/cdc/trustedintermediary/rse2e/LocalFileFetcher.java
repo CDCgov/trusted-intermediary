@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.rse2e;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -33,8 +32,7 @@ public class LocalFileFetcher implements FileFetcher {
                     .filter(path -> path.toString().endsWith(EXTENSION))
                     .map(
                             p -> {
-                                try {
-                                    InputStream inputStream = new FileInputStream(p.toFile());
+                                try (InputStream inputStream = Files.newInputStream(p)) {
                                     return new HL7FileStream(
                                             p.getFileName().toString(), inputStream);
                                 } catch (IOException e) {
