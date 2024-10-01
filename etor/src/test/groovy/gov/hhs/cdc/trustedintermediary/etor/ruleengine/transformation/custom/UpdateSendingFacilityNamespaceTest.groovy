@@ -54,7 +54,7 @@ class UpdateSendingFacilityNamespaceTest extends Specification {
         given:
         def name = "CDPH"
         def fhirResource = ExamplesHelper.getExampleFhirResource("../MN/004_MN_ORU_R01_NBS_1_hl7_translation.fhir")
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = fhirResource.getUnderlyingData() as Bundle
         def listOfNames = ["trusted", "intermediary"]
 
         expect:

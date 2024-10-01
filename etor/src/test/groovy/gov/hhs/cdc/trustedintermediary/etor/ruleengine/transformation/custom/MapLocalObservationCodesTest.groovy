@@ -172,7 +172,7 @@ class MapLocalObservationCodesTest extends Specification {
         given:
         final String FHIR_ORU_PATH = "../CA/020_CA_ORU_R01_CDPH_OBX_to_LOINC_1_hl7_translation.fhir"
         def fhirResource = ExamplesHelper.getExampleFhirResource(FHIR_ORU_PATH)
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = fhirResource.getUnderlyingData() as Bundle
         def initialObservations = HapiHelper.resourcesInBundle(bundle, Observation.class).toList()
 
         expect:

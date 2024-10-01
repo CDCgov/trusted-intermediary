@@ -26,7 +26,7 @@ class RemoveObservationRequestsTest extends Specification {
         given:
         // Load a FHIR resource example
         def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/002_CA_ORU_R01_initial_translation.fhir")
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = fhirResource.getUnderlyingData() as Bundle
 
         // Prepare args with a List<String> instead of a String to trigger null response from ternary operator
         def listOfIdentifiers = ["54089-8", "99717-5"]
