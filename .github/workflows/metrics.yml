@@ -42,7 +42,7 @@ jobs:
             [[repositories]]
             owner = "CDCgov"
             repo = "trusted-intermediary"
-            id = "42635194"
+            workflow_filename = "metrics.yml"
             deployment-frequency = "df"
             change-fail-rate = "cf"
             mean-time-to-recover = "mttrs"
