@@ -8,6 +8,7 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.StringType
 import spock.lang.Specification
@@ -27,11 +28,7 @@ class MapLocalObservationCodesTest extends Specification {
 
     def "When message has a mappable local observation code in OBX-3.4/5/6, should add the mapped code to OBX-3.1/2/3"() {
         given:
-        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
-
-        def observation = new Observation()
-        observation.code.addCoding(getCoding(initialCode, initialDisplay, true, "alt-coding" ))
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+        def bundle = createBundleWithObservation(initialCode, initialDisplay, true)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
@@ -67,13 +64,9 @@ class MapLocalObservationCodesTest extends Specification {
 
     def "When message has an unmapped local observation code in OBX-3.4/5/6, no mapping should occur and a warning should be logged"() {
         given:
-        final String LOCAL_CODE = "UNMAPPED"
-        final String LOCAL_DISPLAY = "An unmapped local code"
-        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
+        def bundle = createBundleWithObservation("UNMAPPED", "An unmapped local code", true)
+        def originalCodingList = HapiHelper.resourceInBundle(bundle, Observation.class).getCode().getCoding()
 
-        def observation = new Observation()
-        observation.code.addCoding(getCoding(LOCAL_CODE, LOCAL_DISPLAY, true, "alt-coding" ))
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
@@ -85,18 +78,13 @@ class MapLocalObservationCodesTest extends Specification {
         def transformedCodingList = transformedObservation.getCode().getCoding()
         transformedCodingList.size() == 1
 
-        observation.code.coding == transformedCodingList
+        originalCodingList == transformedCodingList
     }
 
     def "When message has a mappable local observation code in OBX-3.4/5/6 and other content in OBX3-1/2/3, no mapping should occur"() {
         given:
-        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
-
-        def observation = new Observation()
-        observation.code.addCoding(getCoding(obx31code, obx32display, false, "coding" ))
-        observation.code.addCoding(getCoding("99717-32", "Adrenoleukodystrophy deficiency newborn screening interpretation", true, "alt-coding" ))
-
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+        def bundle = createBundleWithMultipleCodings(obx31code, obx32display, "99717-32", "Adrenoleukodystrophy deficiency")
+        def originalCodingList = HapiHelper.resourceInBundle(bundle, Observation.class).getCode().getCoding()
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
@@ -106,7 +94,7 @@ class MapLocalObservationCodesTest extends Specification {
         def transformedCodingList = transformedObservation.getCode().getCoding()
         transformedCodingList.size() == 2
 
-        observation.code.coding == transformedCodingList
+        originalCodingList == transformedCodingList
 
         where:
         obx31code    | obx32display
@@ -117,14 +105,8 @@ class MapLocalObservationCodesTest extends Specification {
 
     def "When message has a LOINC code, no mapping should occur"() {
         given:
-        final String CODE = "A_LOINC_CODE"
-        final String DISPLAY = "Some display"
-
-        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
-
-        def observation = new Observation()
-        observation.code.addCoding(getCoding(CODE, DISPLAY, false, codingSystem ))
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+        def bundle = createBundleWithObservation("A_LOINC_CODE", "Some display", false)
+        def originalCodingList = HapiHelper.resourceInBundle(bundle, Observation.class).getCode().getCoding()
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
@@ -134,7 +116,7 @@ class MapLocalObservationCodesTest extends Specification {
         def transformedCodingList = transformedObservation.getCode().getCoding()
         transformedCodingList.size() == 1
 
-        observation.code.coding == transformedCodingList
+        originalCodingList == transformedCodingList
 
         where:
         codingSystem << ["coding", "alt-coding"]
@@ -142,19 +124,8 @@ class MapLocalObservationCodesTest extends Specification {
 
     def "When no coding system, no mapping should occur"() {
         given:
-        final String LOCAL_CODE = "A_LOCAL_CODE"
-        final String LOCAL_DISPLAY = "The local code description"
-        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
-
-        def observation = new Observation()
-        def coding = new Coding()
-        coding.code = LOCAL_CODE
-        coding.display = LOCAL_DISPLAY
-        coding.addExtension(HapiHelper.EXTENSION_CWE_CODING, new StringType("alt-coding"))
-        coding.addExtension(HapiHelper.EXTENSION_CODING_SYSTEM, new StringType(HapiHelper.LOCAL_CODE))
-        observation.code.addCoding(coding)
-
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+        def bundle = createBundleWithNoSystem()
+        def originalCodingList = HapiHelper.resourceInBundle(bundle, Observation.class).getCode().getCoding()
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
@@ -164,23 +135,13 @@ class MapLocalObservationCodesTest extends Specification {
         def transformedCodingList = transformedObservation.getCode().getCoding()
         transformedCodingList.size() == 1
 
-        observation.code.coding == transformedCodingList
+        originalCodingList == transformedCodingList
     }
 
     def "When no coding extension, no mapping should occur"() {
         given:
-        final String LOCAL_CODE = "A_LOCAL_CODE"
-        final String LOCAL_DISPLAY = "The local code description"
-        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
-
-        def observation = new Observation()
-        def coding = new Coding()
-        coding.system = HapiHelper.LOCAL_CODE_URL
-        coding.code = LOCAL_CODE
-        coding.display = LOCAL_DISPLAY
-        observation.code.addCoding(coding)
-
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+        def bundle = createBundleWithNoExtension("A_LOCAL_CODE", "The local code description")
+        def originalCodingList = HapiHelper.resourceInBundle(bundle, Observation.class).getCode().getCoding()
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
@@ -190,20 +151,13 @@ class MapLocalObservationCodesTest extends Specification {
         def transformedCodingList = transformedObservation.getCode().getCoding()
         transformedCodingList.size() == 1
 
-        observation.code.coding == transformedCodingList
+        originalCodingList == transformedCodingList
     }
 
     def "When no observation identifier, the observation does not change"() {
         given:
-        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
-
-        // Add an observation with an observation value and a status, but no observation identifier
-        def observation = new Observation()
-        observation.status = Observation.ObservationStatus.FINAL
-        def valueCoding = new Coding()
-        valueCoding.code = "123456"
-        observation.valueCodeableConcept.coding.add(valueCoding)
-        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+        def bundle = createBundleWithNoIdentifier()
+        def originalObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
@@ -211,7 +165,7 @@ class MapLocalObservationCodesTest extends Specification {
         then:
         def transformedObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
 
-        observation == transformedObservation
+        originalObservation == transformedObservation
     }
 
     def "When message has multiple observations, local and non-local codes are handled appropriately"() {
@@ -294,17 +248,6 @@ class MapLocalObservationCodesTest extends Specification {
         return observationList.find {observation -> observation.code?.coding?.find { coding -> coding.code == code}}
     }
 
-    Coding getCoding(String code, String display, boolean localCoding, String cweCoding) {
-        def coding = new Coding()
-        coding.system = localCoding ? HapiHelper.LOCAL_CODE_URL : HapiHelper.LOINC_URL
-        coding.code = code
-        coding.display = display
-
-        coding.addExtension(HapiHelper.EXTENSION_CWE_CODING, new StringType(cweCoding))
-        coding.addExtension(HapiHelper.EXTENSION_CODING_SYSTEM, new StringType(localCoding ? HapiHelper.LOCAL_CODE : HapiHelper.LOINC_CODE))
-        return coding
-    }
-
     void evaluateCoding(
             Coding coding,
             String expectedCode,
@@ -318,5 +261,69 @@ class MapLocalObservationCodesTest extends Specification {
         assert coding.extension.size() == 2
         assert coding.getExtensionString(HapiHelper.EXTENSION_CWE_CODING) == expectedExtensionCoding
         assert coding.getExtensionString(HapiHelper.EXTENSION_CODING_SYSTEM) == expectedExtensionSystem
+    }
+
+    def createBundleWithObservation(String code, String display, boolean isLocal) {
+        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
+        def observation = new Observation()
+        observation.code.addCoding(createCoding(code, display, isLocal, "alt-coding"))
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+        return bundle
+    }
+
+    def createBundleWithMultipleCodings(String code1, String display1, String code2, String display2) {
+        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
+        def observation = new Observation()
+        observation.code.addCoding(createCoding(code1, display1, false, "coding"))
+        observation.code.addCoding(createCoding(code2, display2, true, "alt-coding"))
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+        return bundle
+    }
+
+    def createBundleWithNoSystem() {
+        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
+        def observation = new Observation()
+        def coding = new Coding()
+        coding.code = "A_LOCAL_CODE"
+        coding.display = "The local code description"
+        coding.addExtension(HapiHelper.EXTENSION_CWE_CODING, new StringType("alt-coding"))
+        observation.code.addCoding(coding)
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+        return bundle
+    }
+
+    def createBundleWithNoExtension(String code, String display) {
+        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
+        def observation = new Observation()
+
+        def coding = new Coding()
+        coding.system = HapiHelper.LOCAL_CODE_URL // System is present, but no extensions
+        coding.code = code
+        coding.display = display
+
+        observation.code.addCoding(coding)
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+        return bundle
+    }
+
+    def createBundleWithNoIdentifier() {
+        def bundle = HapiFhirHelper.createMessageBundle(messageTypeCode: 'ORU_R01')
+        def observation = new Observation()
+        observation.status = Observation.ObservationStatus.FINAL
+        observation.valueCodeableConcept.coding.add(new Coding(code: "123456"))
+        bundle.addEntry(new Bundle.BundleEntryComponent().setResource(observation))
+        return bundle
+    }
+
+    def createCoding(String code, String display, boolean isLocal, String cweCoding) {
+        def coding = new Coding()
+        coding.system = isLocal ? HapiHelper.LOCAL_CODE_URL : HapiHelper.LOINC_URL
+        coding.code = code
+        coding.display = display
+
+        coding.addExtension(new Extension(HapiHelper.EXTENSION_CWE_CODING, new StringType(cweCoding)))
+        coding.addExtension(new Extension(HapiHelper.EXTENSION_CODING_SYSTEM, new StringType(isLocal ? HapiHelper.LOCAL_CODE : HapiHelper.LOINC_CODE)))
+
+        return coding
     }
 }

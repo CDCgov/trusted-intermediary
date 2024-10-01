@@ -31,7 +31,7 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
     }
 
     @Override
-    public void transform(FhirResource<?> resource, Map<String, String> args) {
+    public void transform(FhirResource<?> resource, Map<String, Object> args) {
         var bundle = (Bundle) resource.getUnderlyingResource();
         var observations = HapiHelper.resourcesInBundle(bundle, Observation.class);
 
