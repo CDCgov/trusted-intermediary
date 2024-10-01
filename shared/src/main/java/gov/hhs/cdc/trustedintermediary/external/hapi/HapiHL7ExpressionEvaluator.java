@@ -26,6 +26,9 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
             Pattern.compile("^(\\S+)\\s*(=|!=|in)\\s*(.+)$");
     private static final Pattern HL7_COUNT_PATTERN = Pattern.compile("(\\S+)\\.count\\(\\)");
     private static final Pattern LITERAL_VALUE_PATTERN = Pattern.compile("'(.*)'");
+    private static final Pattern MESSAGE_SOURCE_PATTERN =
+            Pattern.compile("(input|output)?\\.?(\\S+)");
+    private static final Pattern HL7_FIELD_NAME_PATTERN = Pattern.compile("(\\w+)(?:-(\\S+))?");
 
     private HapiHL7ExpressionEvaluator() {}
 
@@ -128,8 +131,7 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
     }
 
     protected String getFieldValue(Message outputMessage, Message inputMessage, String fieldName) {
-        Pattern messageSourcePattern = Pattern.compile("(input|output)?\\.?(\\S+)");
-        Matcher messageSourceMatcher = messageSourcePattern.matcher(fieldName);
+        Matcher messageSourceMatcher = MESSAGE_SOURCE_PATTERN.matcher(fieldName);
         if (!messageSourceMatcher.matches()) {
             throw new IllegalArgumentException("Invalid field name format: " + fieldName);
         }
@@ -154,9 +156,7 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
     // our needs.
     protected static String getSegmentFieldValue(
             String hl7Message, String fieldName, char fieldSeparator, String encodingCharacters) {
-
-        Pattern hl7FieldNamePattern = Pattern.compile("(\\w+)(?:-(\\S+))?");
-        Matcher hl7FieldNameMatcher = hl7FieldNamePattern.matcher(fieldName);
+        Matcher hl7FieldNameMatcher = HL7_FIELD_NAME_PATTERN.matcher(fieldName);
         if (!hl7FieldNameMatcher.matches()) {
             throw new IllegalArgumentException("Invalid HL7 field format: " + fieldName);
         }
