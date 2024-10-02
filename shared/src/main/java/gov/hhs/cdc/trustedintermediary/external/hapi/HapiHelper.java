@@ -693,7 +693,7 @@ public class HapiHelper {
      * @param codingSystemExt Name of coding system to look for (e.g. Local code "L", LOINC "LN"...)
      * @return True if the Coding is formatted correctly and has the expected code type, else false
      */
-    public static Boolean hasDefinedCoding(
+    public static boolean hasDefinedCoding(
             Coding coding, String codingExt, String codingSystemExt) {
         var codingExtMatch =
                 hasMatchingCodingExtension(coding, HapiHelper.EXTENSION_CWE_CODING, codingExt);
@@ -703,7 +703,7 @@ public class HapiHelper {
         return codingExtMatch && codingSystemExtMatch;
     }
 
-    private static Boolean hasMatchingCodingExtension(
+    private static boolean hasMatchingCodingExtension(
             Coding coding, String extensionUrl, String valueToMatch) {
         if (!HapiHelper.hasCodingExtensionWithUrl(coding, extensionUrl)) {
             return false;
@@ -723,7 +723,7 @@ public class HapiHelper {
      *     "LN"...)
      * @return True if the Coding is present in the observation, else false
      */
-    public static Boolean hasMatchingCoding(
+    public static boolean hasMatchingCoding(
             Observation observation,
             String codeToMatch,
             String codingExtToMatch,
