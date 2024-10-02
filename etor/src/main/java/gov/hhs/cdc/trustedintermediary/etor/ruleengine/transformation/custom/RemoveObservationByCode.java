@@ -26,19 +26,19 @@ public class RemoveObservationByCode implements CustomFhirTransformation {
             Resource resourceEntry = entry.getResource();
 
             if (resourceEntry instanceof Observation observation) {
-                processObservation(observation, resourcesToRemove, args);
+                removeMatchingObservation(observation, resourcesToRemove, args);
             }
         }
 
         bundle.getEntry().removeIf(entry -> resourcesToRemove.contains(entry.getResource()));
     }
 
-    private void processObservation(
+    private void removeMatchingObservation(
             Observation observation, Set<Resource> resourcesToRemove, Map<String, Object> args) {
         for (Coding coding : observation.getCode().getCoding()) {
             if (isMatchingCode(coding, args)) {
                 resourcesToRemove.add(observation);
-                break; // No need to continue once a match is found
+                break;
             }
         }
     }
