@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.hl7.fhir.r4.model.Bundle;
@@ -12,6 +13,7 @@ import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Practitioner;
@@ -88,7 +90,7 @@ public class HapiHelper {
      */
     public static <T extends Resource> Stream<T> resourcesInBundle(
             Bundle bundle, Class<T> resourceType) {
-        if (bundle == null || bundle.getEntry() == null) {
+        if (bundle == null || bundle.getEntry().isEmpty()) {
             return Stream.empty();
         }
         return bundle.getEntry().stream()
@@ -680,5 +682,58 @@ public class HapiHelper {
             case HapiHelper.PLT_CODE -> null;
             default -> HapiHelper.LOCAL_CODE_URL;
         };
+    }
+
+    /**
+     * Check if a given Coding resource has a coding extension and coding system extension with the
+     * specified type.
+     *
+     * @param coding the resource to check. Expected to be converted from an HL7 CWE format field.
+     * @param codingExt Name of coding extension (e.g. "coding", "alt-coding")
+     * @param codingSystemExt Name of coding system to look for (e.g. Local code "L", LOINC "LN"...)
+     * @return True if the Coding is formatted correctly and has the expected code type, else false
+     */
+    public static boolean hasDefinedCoding(
+            Coding coding, String codingExt, String codingSystemExt) {
+        var codingExtMatch =
+                hasMatchingCodingExtension(coding, HapiHelper.EXTENSION_CWE_CODING, codingExt);
+        var codingSystemExtMatch =
+                hasMatchingCodingExtension(
+                        coding, HapiHelper.EXTENSION_CODING_SYSTEM, codingSystemExt);
+        return codingExtMatch && codingSystemExtMatch;
+    }
+
+    private static boolean hasMatchingCodingExtension(
+            Coding coding, String extensionUrl, String valueToMatch) {
+        if (!HapiHelper.hasCodingExtensionWithUrl(coding, extensionUrl)) {
+            return false;
+        }
+
+        var extensionValue =
+                HapiHelper.getCodingExtensionByUrl(coding, extensionUrl).getValue().toString();
+        return Objects.equals(valueToMatch, extensionValue);
+    }
+
+    /**
+     * Check if an observation has a Coding resource with the given code, coding, and coding system
+     *
+     * @param codeToMatch The code to look for.
+     * @param codingExtToMatch Name of coding extension (e.g. "coding", "alt-coding")
+     * @param codingSystemToMatch Name of coding system to look for (e.g. Local code "L", LOINC
+     *     "LN"...)
+     * @return True if the Coding is present in the observation, else false
+     */
+    public static boolean hasMatchingCoding(
+            Observation observation,
+            String codeToMatch,
+            String codingExtToMatch,
+            String codingSystemToMatch) {
+        for (Coding coding : observation.getCode().getCoding()) {
+            if (Objects.equals(coding.getCode(), codeToMatch)
+                    && hasDefinedCoding(coding, codingExtToMatch, codingSystemToMatch)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

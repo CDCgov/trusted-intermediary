@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi
 
-import java.util.stream.Stream
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
@@ -908,5 +907,48 @@ class HapiHelperTest extends Specification {
         "LN"       || HapiHelper.LOINC_URL
         "L"        || HapiHelper.LOCAL_CODE_URL
         "PLT"      || null
+    }
+
+    def "check getPractitioner gets the correct resource"() {
+        given:
+        def bundle = new Bundle()
+        def dr = HapiFhirHelper.createDiagnosticReport(bundle)
+        def sr = HapiFhirHelper.createBasedOnServiceRequest(dr)
+
+        def role = HapiFhirHelper.createPractitionerRole()
+        Reference requesterReference = HapiFhirHelper.createPractitionerRoleReference(role)
+        sr.setRequester(requesterReference)
+
+        def practitioner = new Practitioner()
+        practitioner.setId(UUID.randomUUID().toString())
+
+        String organizationId = practitioner.getId()
+        Reference organizationReference = new Reference("Practitioner/" + organizationId)
+        organizationReference.setResource(practitioner)
+        role.setPractitioner(organizationReference)
+
+        expect:
+        def pr = HapiHelper.getPractitioner(role)
+        pr.id == practitioner.id
+    }
+
+    def "hasDefinedCoding returns the correct result"() {
+        given:
+        def coding = new Coding()
+        coding.code = "SOME_CODE"
+        coding.addExtension(HapiHelper.EXTENSION_CWE_CODING, new StringType("coding"))
+        coding.addExtension(HapiHelper.EXTENSION_CODING_SYSTEM, new StringType("L"))
+
+        when:
+        def actualResult = HapiHelper.hasDefinedCoding(coding, codingExt, codingSystemExt)
+
+        then:
+        actualResult == expectedResult
+
+        where:
+        codingExt     | codingSystemExt || expectedResult
+        "coding"      | "L"             || true
+        "alt-coding"  | "L"             || false
+        "coding"      | "LN"            || false
     }
 }
