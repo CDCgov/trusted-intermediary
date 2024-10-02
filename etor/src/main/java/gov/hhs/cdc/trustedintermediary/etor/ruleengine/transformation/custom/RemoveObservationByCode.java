@@ -5,10 +5,8 @@ import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhir
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Resource;
 
@@ -26,35 +24,17 @@ public class RemoveObservationByCode implements CustomFhirTransformation {
             Resource resourceEntry = entry.getResource();
 
             if (resourceEntry instanceof Observation observation) {
-                removeMatchingObservation(observation, resourcesToRemove, args);
+
+                if (HapiHelper.hasMatchingCoding(
+                        observation,
+                        args.get(CODE_NAME).toString(),
+                        args.get(CODING_NAME).toString(),
+                        args.get(CODING_SYSTEM_NAME).toString())) {
+                    resourcesToRemove.add(observation);
+                }
             }
         }
 
         bundle.getEntry().removeIf(entry -> resourcesToRemove.contains(entry.getResource()));
-    }
-
-    private void removeMatchingObservation(
-            Observation observation, Set<Resource> resourcesToRemove, Map<String, Object> args) {
-        for (Coding coding : observation.getCode().getCoding()) {
-            if (isMatchingCode(coding, args)) {
-                resourcesToRemove.add(observation);
-                break;
-            }
-        }
-    }
-
-    // TODO: Need to refactor this to handle missing extensions, etc. and determine if we can
-    // generalize it
-    private Boolean isMatchingCode(Coding coding, Map<String, Object> args) {
-        // Let it fail if args.get(<property>) is not a string
-        return Objects.equals(coding.getCode(), args.get(CODE_NAME))
-                && coding.getExtensionByUrl(HapiHelper.EXTENSION_CODING_SYSTEM)
-                        .getValue()
-                        .toString()
-                        .equals(args.get(CODING_SYSTEM_NAME))
-                && coding.getExtensionByUrl(HapiHelper.EXTENSION_CWE_CODING)
-                        .getValue()
-                        .toString()
-                        .equals(args.get(CODING_NAME));
     }
 }

@@ -42,7 +42,8 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
             }
 
             var coding = codingList.get(0);
-            if (!HapiHelper.hasDefinedAlternateCoding(coding, HapiHelper.LOCAL_CODE_URL)) {
+            if (!HapiHelper.hasDefinedCoding(
+                    coding, HapiHelper.EXTENSION_ALT_CODING, HapiHelper.LOCAL_CODE)) {
                 continue;
             }
 
