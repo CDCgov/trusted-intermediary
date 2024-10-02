@@ -109,6 +109,11 @@ This will start the API, wait for it to respond, run the end-to-end tests agains
 These tests are located under the `e2e` Gradle sub-project directory.  Like any Gradle project, there are the `main` and `test` directories.
 The `test` directory contains the tests.  The `main` directory contains our custom framework that helps us interact with the API.
 
+#### Automated ReportStream Integration/End-to-End Test
+
+These tests cover the integration between ReportStream and TI. They run automatically every
+weekday via Github actions. See [the rs-e2e readme](rs-e2e/readme.md) for more details.
+
 #### Load Testing
 
 Load tests are completed with [Locust.io](https://docs.locust.io/en/stable/installation.html).
