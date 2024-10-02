@@ -932,7 +932,7 @@ class HapiHelperTest extends Specification {
         pr.id == practitioner.id
     }
 
-    def "hasDefinedCoding returns the correct result"() {
+    def "hasDefinedCoding returns the correct results"() {
         given:
         def coding = new Coding()
         coding.code = "SOME_CODE"
