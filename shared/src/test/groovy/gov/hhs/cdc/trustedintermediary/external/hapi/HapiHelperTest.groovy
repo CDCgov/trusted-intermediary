@@ -931,4 +931,24 @@ class HapiHelperTest extends Specification {
         def pr = HapiHelper.getPractitioner(role)
         pr.id == practitioner.id
     }
+
+    def "hasDefinedCoding returns the correct result"() {
+        given:
+        def coding = new Coding()
+        coding.code = "SOME_CODE"
+        coding.addExtension(HapiHelper.EXTENSION_CWE_CODING, new StringType("coding"))
+        coding.addExtension(HapiHelper.EXTENSION_CODING_SYSTEM, new StringType("L"))
+
+        when:
+        def actualResult = HapiHelper.hasDefinedCoding(coding, codingExt, codingSystemExt)
+
+        then:
+        actualResult == expectedResult
+
+        where:
+        codingExt     | codingSystemExt || expectedResult
+        "coding"      | "L"             || true
+        "alt-coding"  | "L"             || false
+        "coding"      | "LN"            || false
+    }
 }
