@@ -216,6 +216,25 @@
           "args": {}
         }
       ]
+    },
+    {
+      "name": "ucsdOruRemoveAccessionNumberObservation",
+      "description": "Remove Observations for UCSD ORUs when their OBX-3.4 value is '99717-5' and OBX-3.6 is 'L'",
+      "message": "",
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.1').value in ('R797' | 'R508')",
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
+      ],
+      "rules": [
+        {
+          "name": "RemoveObservationByCode",
+          "args": {
+            "code": "99717-5",
+            "codingSystemExtension": "L",
+            "codingExtension": "alt-coding"
+          }
+        }
+      ]
     }
   ]
 }

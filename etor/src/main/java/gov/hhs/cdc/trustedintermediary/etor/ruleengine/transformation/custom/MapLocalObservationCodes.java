@@ -8,7 +8,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Observation;
@@ -43,7 +42,8 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
             }
 
             var coding = codingList.get(0);
-            if (!hasLocalCodeInAlternateCoding(coding)) {
+            if (!HapiHelper.hasDefinedCoding(
+                    coding, HapiHelper.EXTENSION_ALT_CODING, HapiHelper.LOCAL_CODE)) {
                 continue;
             }
 
@@ -58,24 +58,6 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
             // Add the mapped code as the first in the list, ahead of the existing alternate code
             codingList.add(0, mappedCoding);
         }
-    }
-
-    private Boolean hasLocalCodeInAlternateCoding(Coding coding) {
-        if (!HapiHelper.hasCodingExtensionWithUrl(coding, HapiHelper.EXTENSION_CWE_CODING)) {
-            return false;
-        }
-
-        if (!HapiHelper.hasCodingSystem(coding)) {
-            return false;
-        }
-
-        var cwe =
-                HapiHelper.getCodingExtensionByUrl(coding, HapiHelper.EXTENSION_CWE_CODING)
-                        .getValue()
-                        .toString();
-        var codingSystem = HapiHelper.getCodingSystem(coding);
-
-        return Objects.equals(cwe, "alt-coding") && HapiHelper.LOCAL_CODE_URL.equals(codingSystem);
     }
 
     private void logUnmappedLocalCode(Bundle bundle, Coding coding) {
@@ -103,6 +85,12 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
         return mappedCoding;
     }
 
+    /**
+     * Initializes the local-to-LOINC/PLT hash map, customized for CDPH and UCSD. Currently, the
+     * mapping is hardcoded for simplicity. If expanded to support additional entities, the
+     * implementation may be updated to allow dynamic configuration via
+     * transformation_definitions.json or a database-driven mapping.
+     */
     private void initMap() {
         this.codingMap = new HashMap<>();
         // ALD
