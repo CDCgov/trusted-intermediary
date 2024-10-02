@@ -23,15 +23,16 @@ public class RemoveObservationByCode implements CustomFhirTransformation {
         for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
             Resource resourceEntry = entry.getResource();
 
-            if (resourceEntry instanceof Observation observation) {
+            if (!(resourceEntry instanceof Observation observation)) {
+                continue;
+            }
 
-                if (HapiHelper.hasMatchingCoding(
-                        observation,
-                        args.get(CODE_NAME).toString(),
-                        args.get(CODING_NAME).toString(),
-                        args.get(CODING_SYSTEM_NAME).toString())) {
-                    resourcesToRemove.add(observation);
-                }
+            if (HapiHelper.hasMatchingCoding(
+                    observation,
+                    args.get(CODE_NAME).toString(),
+                    args.get(CODING_NAME).toString(),
+                    args.get(CODING_SYSTEM_NAME).toString())) {
+                resourcesToRemove.add(resourceEntry);
             }
         }
 
