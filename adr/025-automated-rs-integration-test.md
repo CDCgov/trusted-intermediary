@@ -1,0 +1,64 @@
+# 25. Automated RS Integration Test
+
+Date: 2024-10-02
+
+## Decisions
+
+1. We decided to create a full end-to-end test that covers the interaction of ReportStream and TI, using
+    existing ingestion and delivery mechanisms
+2. We decided to create Github Action workflows to schedule two tasks:
+   - One workflow submits sample HL7 files to ReportStream in staging, with output files expected to be delivered to an Azure blob container
+   - Another workflow later runs the integration tests on the output and input files
+3. We decided to use MSH-10 to match the input and output files, and to filter the receivers in ReportStream when MSH-6.2 not available.
+
+## Status
+
+Accepted.
+
+## Context
+### Decision 1
+The RS and TI applications each have their own unit and integration tests, but we didn't have any tests
+that cover the interaction between RS and TI, and we also didn't have a way to know when changes in
+RS have unintended consequences that impact our workflows.
+
+[put a nicer version of 'RS wouldn't let us put anything in their space' here?]
+Submitting data to RS using their existing REST endpoints and receiving it using their existing delivery
+mechanisms helps make this test realistic
+
+### Decision 2
+Since we decided to use RS's existing REST endpoints, we needed a way to submit data to them, and a way
+to trigger the data flow and subsequent tests on some kind of schedule. We chose Github Actions for this
+because it's easy to both schedule them based on a CRON expression and run them manually as needed. Github
+Actions also gave us a lightweight way to send the files to RS without having to add a new service [or
+whatever else we might have considered].
+
+We are using two separate actions - the first one sends data to RS, and the second one (currently
+scheduled 2 hours after the first) triggers the tests to run. The length of time it takes a file to
+run through the whole workflow (from RS to TI to RS to final delivery) usually doesn't take long, but we
+built in extra time in case of any issues that cause delays,
+
+### Decision 3
+We're using the value in MSH-10 for two purposes: matching input and output files, and some filtering in RS.
+
+We chose MSH-10 to match files on because it's a value that shouldn't change and should be unique to
+a particular message. We're also using it to filter receivers because in some cases, we apply
+transformations and validations based on the receiver in [we change values and filter on values]
+
+## Impact
+
+
+### Positive
+
+
+### Negative
+
+#### Decision 3
+- Because we rely on MSH-10 for matching files, engineers will have to take care in setting this field
+  when they create additional tests in future
+
+### Risks
+
+
+## Related ADRs
+
+- [Assertion Engine](024-assertion-engine.md)
