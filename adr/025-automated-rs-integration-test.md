@@ -21,42 +21,41 @@ The RS and TI applications each have their own unit and integration tests, but w
 that cover the interaction between RS and TI, and we also didn't have a way to know when changes in
 RS have unintended consequences that impact our workflows.
 
-[put a nicer version of 'RS wouldn't let us put anything in their space' here?]
 Submitting data to RS using their existing REST endpoints and receiving it using their existing delivery
-mechanisms helps make this test realistic
+mechanisms helps make these tests realistic.
 
 ### Decision 2
 Since we decided to use RS's existing REST endpoints, we needed a way to submit data to them, and a way
 to trigger the data flow and subsequent tests on some kind of schedule. We chose Github Actions for this
-because it's easy to both schedule them based on a CRON expression and run them manually as needed. Github
-Actions also gave us a lightweight way to send the files to RS without having to add a new service [or
-whatever else we might have considered].
+because it's easy to both schedule them based on a CRON expression and to run them manually as needed. Github
+Actions also gave us a lightweight way to send the files to RS without having to add a new service.
 
 We are using two separate actions - the first one sends data to RS, and the second one (currently
 scheduled 2 hours after the first) triggers the tests to run. The length of time it takes a file to
 run through the whole workflow (from RS to TI to RS to final delivery) usually doesn't take long, but we
-built in extra time in case of any issues that cause delays,
+built in extra time in case of any issues that cause delays.
 
 ### Decision 3
 We're using the value in MSH-10 for two purposes: matching input and output files, and some filtering in RS.
 
 We chose MSH-10 to match files on because it's a value that shouldn't change and should be unique to
-a particular message. We're also using it to filter receivers because in some cases, we apply
-transformations and validations based on the receiver in [we change values and filter on values]
+a particular message. We're also using it to route these test messages because in some cases, we apply
+transformations that will overwrite HL7 fields used for routing (MSH-5 and MSH-6), so we can't rely on those.
 
 ## Impact
 
-
 ### Positive
 
+- We will have a way to test the integration between RS and TI
+- We will be able to catch issues early whe changes in RS break our workflows
 
 ### Negative
 
+
+### Risks
 #### Decision 3
 - Because we rely on MSH-10 for matching files, engineers will have to take care in setting this field
   when they create additional tests in future
-
-### Risks
 
 
 ## Related ADRs
