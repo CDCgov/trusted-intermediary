@@ -47,13 +47,14 @@ transformations that will overwrite HL7 fields used for routing (MSH-5 and MSH-6
 ### Positive
 
 - We will have a way to test the integration between RS and TI
-- We will be able to catch issues early whe changes in RS break our workflows
+- We will be able to catch issues early when changes in RS break our workflows
 
 ### Negative
 
 
 ### Risks
-#### Decision 3
+- If we forget to add additional assertions when new transformations are added, these tests may give us
+  a false sense of confidence
 - Because we rely on MSH-10 for matching files, engineers will have to take care in setting this field
   when they create additional tests in future
 
