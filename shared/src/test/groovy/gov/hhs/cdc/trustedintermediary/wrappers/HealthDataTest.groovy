@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.wrappers
 
-import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
 import spock.lang.Specification
 
 class HealthDataTest extends Specification {
