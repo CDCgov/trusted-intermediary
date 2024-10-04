@@ -118,7 +118,7 @@ The `test` directory contains the tests.  The `main` directory contains our cust
 #### Automated ReportStream Integration/End-to-End Test
 
 These tests cover the integration between ReportStream and TI. They run automatically every
-weekday via Github actions. See [the rs-e2e readme](rs-e2e/README.MD) for more details.
+weekday via Github actions. See [the rs-e2e readme](rs-e2e/README.md) for more details.
 
 #### Load Testing
 

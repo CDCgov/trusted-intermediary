@@ -4,7 +4,7 @@ The ReportStream Integration Test is a framework meant to add test coverage for 
 Intermediary and ReportStream. It's scheduled to run daily using the
 [automated-staging-test-run.yml](/.github/workflows/automated-staging-test-run.yml) workflow
 
-Information on how to set up the sample files evaluated by the tests can be found [here](/examples/Test/Automated/README.MD)
+Information on how to set up the sample files evaluated by the tests can be found [here](/examples/Test/Automated/README.md)
 
 ## Running the tests
 
