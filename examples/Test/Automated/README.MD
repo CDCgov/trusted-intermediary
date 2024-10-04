@@ -3,8 +3,7 @@ integration tests. The [automated-staging-test-submit.yml](/.github/workflows/au
 Github workflow that runs daily will grab these files and send them to ReportStream in staging.
 The files are expected to go through the whole flow and to be delivered to an Azure blob
 container that will later be used by the
-[automated-staging-test-run.yml](/.github/workflows/automated-staging-test-run.yml)
-workflow to run tests on them.
+[automated-staging-test-run.yml](/.github/workflows/automated-staging-test-run.yml) workflow to run tests on them.
 
 ## Requirements for the HL7 files
 

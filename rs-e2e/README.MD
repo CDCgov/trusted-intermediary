@@ -21,8 +21,7 @@ Information on how to set up the sample files evaluated by the tests can be foun
 
 The assertions for the integration tests are defined in the
 [assertion_definitions.json](/rs-e2e/src/main/resources/assertion_definitions.json) file, which uses
-the same rules engine framework as the transformations and validations in the
-[etor](/etor) project
+the same rules engine framework as the transformations and validations in the [etor](/etor) project
 
 ### File Structure
 
