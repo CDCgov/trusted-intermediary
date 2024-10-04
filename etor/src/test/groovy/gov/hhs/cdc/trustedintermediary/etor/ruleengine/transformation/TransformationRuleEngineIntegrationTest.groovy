@@ -1,16 +1,16 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation
 
 
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleEngineHelper
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.TransformationRuleEngineHelper
 import gov.hhs.cdc.trustedintermediary.ExamplesHelper
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader
+import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoader
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
-import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
@@ -30,7 +30,7 @@ class TransformationRuleEngineIntegrationTest extends Specification {
         TestApplicationContext.init()
 
         TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.register(HapiFhir, fhir)
+        TestApplicationContext.register(HealthDataExpressionEvaluator, fhir)
         TestApplicationContext.register(TransformationRuleEngine, engine)
         TestApplicationContext.register(RuleLoader, RuleLoader.getInstance())
         TestApplicationContext.register(Logger, mockLogger)
@@ -71,7 +71,7 @@ class TransformationRuleEngineIntegrationTest extends Specification {
             'addContactSectionToPatientResource'
         ]
         def fhirResource = ExamplesHelper.getExampleFhirResource(testFile)
-        def bundle = (Bundle) fhirResource.getUnderlyingResource()
+        def bundle = (Bundle) fhirResource.getUnderlyingData()
 
         expect:
         HapiHelper.resourceInBundle(bundle, MessageHeader).event.code == 'O01'
@@ -79,7 +79,7 @@ class TransformationRuleEngineIntegrationTest extends Specification {
 
         when:
         transformationsToApply.each { ruleName ->
-            def rule = RuleEngineHelper.getRuleByName(engine.rules, ruleName)
+            def rule = TransformationRuleEngineHelper.getRuleByName(engine.rules, ruleName)
             rule.runRule(fhirResource)
         }
         def messageHeader = HapiHelper.resourceInBundle(bundle, MessageHeader) as MessageHeader

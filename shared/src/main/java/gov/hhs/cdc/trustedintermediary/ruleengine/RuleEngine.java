@@ -1,4 +1,6 @@
-package gov.hhs.cdc.trustedintermediary.etor.ruleengine;
+package gov.hhs.cdc.trustedintermediary.ruleengine;
+
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
 
 /**
  * The RuleEngine interface defines the structure for a rule engine. Each rule engine has methods to
@@ -9,5 +11,5 @@ public interface RuleEngine {
 
     void ensureRulesLoaded() throws RuleLoaderException;
 
-    void runRules(FhirResource<?> resource);
+    void runRules(HealthData<?> resource);
 }

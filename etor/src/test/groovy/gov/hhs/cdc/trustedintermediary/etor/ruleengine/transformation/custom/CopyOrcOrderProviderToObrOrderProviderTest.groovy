@@ -182,7 +182,7 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         }
 
         def fhirResource = ExamplesHelper.getExampleFhirResource(fhirOruPath)
-        return fhirResource.getUnderlyingResource() as Bundle
+        return fhirResource.getUnderlyingData() as Bundle
     }
 
     ServiceRequest createServiceRequest(Bundle bundle) {

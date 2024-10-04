@@ -1,12 +1,16 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation
 
 
-import gov.hhs.cdc.trustedintermediary.FhirResourceMock
+import gov.hhs.cdc.trustedintermediary.HealthDataMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation.ValidationRule
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthData
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.MessageHeader
 import spock.lang.Specification
@@ -18,6 +22,7 @@ class TransformationRuleTest extends Specification {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(Logger, mockLogger)
+        TestApplicationContext.register(HealthDataExpressionEvaluator, HapiFhirImplementation.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
     }
 
@@ -57,13 +62,13 @@ class TransformationRuleTest extends Specification {
         TestApplicationContext.register(HapiFhir, Mock(HapiFhir))
 
         def rule = new TransformationRule(ruleName, ruleDescription, ruleMessage, ruleConditions, ruleActions)
-        def fhirResource = new FhirResourceMock(HapiFhirHelper.createMessageBundle(new HashMap()))
+        def fhirResource = new HealthDataMock(HapiFhirHelper.createMessageBundle(new HashMap()))
 
         when:
         rule.runRule(fhirResource)
 
         then:
-        def messageHeader = HapiHelper.resourceInBundle(fhirResource.getUnderlyingResource() as Bundle, MessageHeader.class) as MessageHeader
+        def messageHeader = HapiHelper.resourceInBundle(fhirResource.getUnderlyingData() as Bundle, MessageHeader.class) as MessageHeader
         messageHeader.getEventCoding().getCode() == "mock_code"
     }
 
@@ -80,7 +85,7 @@ class TransformationRuleTest extends Specification {
 
         when:
         def rule = new TransformationRule(ruleName, ruleDescription, ruleMessage, ruleConditions, ruleActions)
-        def fhirResource = new FhirResourceMock(HapiFhirHelper.createMessageBundle(new HashMap()))
+        def fhirResource = new HealthDataMock(HapiFhirHelper.createMessageBundle(new HashMap()))
         rule.runRule(fhirResource)
 
         then:
@@ -101,7 +106,7 @@ class TransformationRuleTest extends Specification {
 
         when:
         def rule = new TransformationRule(ruleName, ruleDescription, ruleMessage, ruleConditions, ruleActions)
-        def fhirResource = new FhirResourceMock(HapiFhirHelper.createMessageBundle(new HashMap()))
+        def fhirResource = new HealthDataMock(HapiFhirHelper.createMessageBundle(new HashMap()))
         rule.runRule(fhirResource)
 
         then:
@@ -122,7 +127,7 @@ class TransformationRuleTest extends Specification {
 
         when:
         def rule = new TransformationRule(ruleName, ruleDescription, ruleMessage, ruleConditions, ruleActions)
-        def fhirResource = new FhirResourceMock(HapiFhirHelper.createMessageBundle(new HashMap()))
+        def fhirResource = new HealthDataMock(HapiFhirHelper.createMessageBundle(new HashMap()))
         rule.runRule(fhirResource)
 
         then:
@@ -143,10 +148,26 @@ class TransformationRuleTest extends Specification {
 
         when:
         def rule = new TransformationRule(ruleName, ruleDescription, ruleMessage, ruleConditions, ruleActions)
-        def fhirResource = new FhirResourceMock(HapiFhirHelper.createMessageBundle(new HashMap()))
+        def fhirResource = new HealthDataMock(HapiFhirHelper.createMessageBundle(new HashMap()))
         rule.runRule(fhirResource)
 
         then:
         1 * mockLogger.logError(_, _)
+    }
+
+    def "runRule logs an error if passing more than one HealthData"() {
+        given:
+        def mockFhir = Mock(HapiFhirImplementation)
+        TestApplicationContext.register(HealthDataExpressionEvaluator, mockFhir)
+
+        def rule = new TransformationRule(null, null, null, ["condition"], [
+            new TransformationRuleMethod("InstantiationExceptionMockClass", null)
+        ])
+
+        when:
+        rule.runRule(Mock(HealthData), Mock(HealthData))
+
+        then:
+        1 * mockLogger.logError(_ as String)
     }
 }

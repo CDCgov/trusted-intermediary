@@ -1,9 +1,8 @@
-package gov.hhs.cdc.trustedintermediary.etor.ruleengine
+package gov.hhs.cdc.trustedintermediary.ruleengine
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation.ValidationRule
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
-import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
 import spock.lang.Specification
@@ -19,9 +18,9 @@ class RuleLoaderTest extends Specification {
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
+        TestApplicationContext.register(HealthDataExpressionEvaluator, Mock(HealthDataExpressionEvaluator))
         TestApplicationContext.register(RuleLoader, RuleLoader.getInstance())
         TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.register(HapiFhir, Mock(HapiFhir))
         TestApplicationContext.injectRegisteredImplementations()
 
         tempFile = Files.createTempFile("test_validation_definition", ".json")
@@ -49,11 +48,11 @@ class RuleLoaderTest extends Specification {
         Files.writeString(tempFile, fileContents)
 
         when:
-        List<ValidationRule> rules = RuleLoader.getInstance().loadRules(Files.newInputStream(tempFile), new TypeReference<Map<String, List<ValidationRule>>>() {})
+        List<Rule> rules = RuleLoader.getInstance().loadRules(Files.newInputStream(tempFile), new TypeReference<Map<String, List<Rule>>>() {})
 
         then:
         rules.size() == 1
-        ValidationRule rule = rules.get(0) as ValidationRule
+        Rule rule = rules.get(0) as Rule
         rule.getName() == "patientName"
         rule.getDescription() == "a test rule"
         rule.getMessage() == "testing the message"
@@ -68,7 +67,7 @@ class RuleLoaderTest extends Specification {
         Files.writeString(tempFile, "!K@WJ#8uhy")
 
         when:
-        RuleLoader.getInstance().loadRules(Files.newInputStream(tempFile), new TypeReference<Map<String, List<ValidationRule>>>() {})
+        RuleLoader.getInstance().loadRules(Files.newInputStream(tempFile), new TypeReference<Map<String, List<Rule>>>() {})
 
         then:
         thrown(RuleLoaderException)

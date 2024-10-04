@@ -23,7 +23,7 @@ class RemovePatientNameTypeCodeTest extends Specification {
     def "remove PID.5-7 from Bundle"() {
         given:
         def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/002_CA_ORU_R01_initial_translation.fhir")
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = fhirResource.getUnderlyingData() as Bundle
         def pid5_7 = HapiFhirHelper.getPID5_7Value(bundle)
 
         expect:

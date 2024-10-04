@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.etor.ruleengine;
+package gov.hhs.cdc.trustedintermediary.ruleengine;
 
 /** Custom exception class use to catch RuleLoader exceptions */
 public class RuleLoaderException extends Exception {

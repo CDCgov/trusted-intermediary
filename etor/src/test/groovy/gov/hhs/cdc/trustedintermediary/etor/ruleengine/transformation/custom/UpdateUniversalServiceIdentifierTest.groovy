@@ -30,7 +30,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
     def "skip transformation if the coding identifier is missing"() {
         given:
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = fhirResource.getUnderlyingData() as Bundle
         def result = getObrSections(bundle)[0]
         def obr4_1 = result[0]
         def obr4_3 = result[1]
@@ -43,7 +43,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
         when:
         transformClass.transform(fhirResource, args)
-        bundle = fhirResource.getUnderlyingResource() as Bundle
+        bundle = fhirResource.getUnderlyingData() as Bundle
         def transformedResult = getObrSections(bundle)[0]
         def transformedObr4_1 = transformedResult[0]
         def transformedObr4_3 = transformedResult[1]
@@ -57,7 +57,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
     def "skip transformation if the coding identifier is not the one we want"() {
         given:
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = fhirResource.getUnderlyingData() as Bundle
         def result = getObrSections(bundle)[1]
         def obr4_1 = result[0]
         def obr4_3 = result[1]
@@ -70,7 +70,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
         when:
         transformClass.transform(fhirResource, args)
-        bundle = fhirResource.getUnderlyingResource() as Bundle
+        bundle = fhirResource.getUnderlyingData() as Bundle
         def transformedResult = getObrSections(bundle)[1]
         def transformedObr4_1 = transformedResult[0]
         def transformedObr4_3 = transformedResult[1]
@@ -84,7 +84,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
     def "update obr4 values when the code matches"() {
         given:
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = fhirResource.getUnderlyingData() as Bundle
         def result = getObrSections(bundle)[2]
         def obr4_1 = result[0]
         def obr4_3 = result[1]
@@ -97,7 +97,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
         when:
         transformClass.transform(fhirResource, args)
-        bundle = fhirResource.getUnderlyingResource() as Bundle
+        bundle = fhirResource.getUnderlyingData() as Bundle
         def transformedResult = getObrSections(bundle)[2]
         def transformedObr4_1 = transformedResult[0]
         def transformedObr4_3 = transformedResult[1]
@@ -112,7 +112,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
     def "update only obr4-1 through obr4-3 values when the code matches and alternate id is null"() {
         given:
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = fhirResource.getUnderlyingData() as Bundle
         def result = getObrSections(bundle)[2]
         def obr4_1 = result[0]
         def obr4_3 = result[1]
@@ -125,7 +125,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
         when:
         transformClass.transform(fhirResource, argsNoAlternateId)
-        bundle = fhirResource.getUnderlyingResource() as Bundle
+        bundle = fhirResource.getUnderlyingData() as Bundle
         def transformedResult = getObrSections(bundle)[2]
         def transformedObr4_1 = transformedResult[0]
         def transformedObr4_3 = transformedResult[1]
@@ -139,7 +139,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
     def "leave obr4 values unchanged if the code matches and they're already correct"() {
         given:
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = fhirResource.getUnderlyingData() as Bundle
         def result = getObrSections(bundle)[3]
         def obr4_1 = result[0]
         def obr4_3 = result[1]
@@ -152,7 +152,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
         when:
         transformClass.transform(fhirResource, args)
-        bundle = fhirResource.getUnderlyingResource() as Bundle
+        bundle = fhirResource.getUnderlyingData() as Bundle
         def transformedResult = getObrSections(bundle)[3]
         def transformedObr4_1 = transformedResult[0]
         def transformedObr4_3 = transformedResult[1]
@@ -166,7 +166,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
     def "update values if the coding identifier is correct but the values are missing"() {
         given:
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = fhirResource.getUnderlyingData() as Bundle
         def result = getObrSections(bundle)[4]
         def obr4_1 = result[0]
         def obr4_3 = result[1]
@@ -179,7 +179,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
         when:
         transformClass.transform(fhirResource, args)
-        bundle = fhirResource.getUnderlyingResource() as Bundle
+        bundle = fhirResource.getUnderlyingData() as Bundle
         def transformedResult = getObrSections(bundle)[4]
         def transformedObr4_1 = transformedResult[0]
         def transformedObr4_3 = transformedResult[1]

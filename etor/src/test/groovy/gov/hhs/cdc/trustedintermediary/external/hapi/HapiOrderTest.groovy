@@ -31,13 +31,13 @@ class HapiOrderTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
     }
 
-    def "getUnderlyingResource Works"() {
+    def "getUnderlyingData Works"() {
         given:
         def expectedInnerOrder = new Bundle()
         def order = new HapiOrder(expectedInnerOrder)
 
         when:
-        def actualInnerOrder = order.getUnderlyingResource()
+        def actualInnerOrder = order.getUnderlyingData()
 
         then:
         actualInnerOrder == expectedInnerOrder
