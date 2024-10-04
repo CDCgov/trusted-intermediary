@@ -55,12 +55,18 @@ transformations that will overwrite HL7 fields used for routing (MSH-5 and MSH-6
 
 ### Negative
 
+- We will run daily tests in RS' and our staging infrastructure, which will take up resources
+
 ### Risks
 
 - If we forget to add additional assertions when new transformations are added, these tests may give us
   a false sense of confidence
 - Because we rely on MSH-10 for matching files, engineers will have to take care in setting this field
   when they create additional tests in future
+- If we don't maintain the filtering in RS based on MSH-6.2 and MSH-10, we may not be able to route the test messages
+  correctly
+- Because we're using RS's existing REST endpoints and staging set up, if RS changes their endpoints or
+  the way they handle staging, these tests may break
 
 ## Related ADRs
 
