@@ -172,7 +172,7 @@
       "description": "Removes all OBRs from an LA Ochsner ORU message except for the OBR with value '54089-8' in OBR-4.1. All OBXs are attached to the sole remaining OBR",
       "message": "",
       "conditions": [
-        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.2,HD.3').value = '1.2.840.114350.1.13.286.2.7.2.695071'",
+        "Bundle.entry.resource.ofType(MessageHeader).destination.extension.where(url = 'https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id').value = '1.2.840.114350.1.13.286.2.7.2.695071'",
         "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
         "Bundle.entry.resource.ofType(ServiceRequest).code.coding.where(code = '54089-8').exists()"
       ],
