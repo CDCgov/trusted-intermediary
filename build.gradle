@@ -87,6 +87,7 @@ subprojects {
 
 ext.jacoco_excludes = [
         '**/e2e/**',
+        '**/rs-e2e/**',
         '**/javalin/App*',
         '**/jackson/Jackson*',
         '**/slf4j/LocalLogger*',
@@ -105,6 +106,7 @@ tasks.register('allUnitTests') {
     dependsOn 'app:test'
     dependsOn 'shared:test'
     dependsOn 'etor:test'
+    dependsOn 'rs-e2e:test'
 }
 
 tasks.register('allBuilds') {

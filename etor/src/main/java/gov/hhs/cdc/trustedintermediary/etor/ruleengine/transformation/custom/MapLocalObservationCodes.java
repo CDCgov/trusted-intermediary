@@ -2,9 +2,9 @@ package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.messages.IdentifierCode;
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhirTransformation;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,8 +30,8 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
     }
 
     @Override
-    public void transform(FhirResource<?> resource, Map<String, Object> args) {
-        var bundle = (Bundle) resource.getUnderlyingResource();
+    public void transform(HealthData<?> resource, Map<String, Object> args) {
+        var bundle = (Bundle) resource.getUnderlyingData();
         var observations = HapiHelper.resourcesInBundle(bundle, Observation.class);
 
         for (Observation obv : observations.toList()) {

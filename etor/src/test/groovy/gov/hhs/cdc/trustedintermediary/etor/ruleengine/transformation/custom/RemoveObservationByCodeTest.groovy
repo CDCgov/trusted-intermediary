@@ -161,7 +161,7 @@ class RemoveObservationByCodeTest extends Specification {
 
         final String FHIR_ORU_PATH = "../CA/020_CA_ORU_R01_CDPH_OBX_to_LOINC_1_hl7_translation.fhir"
         def fhirResource = ExamplesHelper.getExampleFhirResource(FHIR_ORU_PATH)
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = fhirResource.getUnderlyingData() as Bundle
 
         def args = getArgs(MATCHING_CODE, MATCHING_CODING_SYSTEM_EXT, MATCHING_CODING_EXT)
 

@@ -1,9 +1,10 @@
-package gov.hhs.cdc.trustedintermediary.etor.ruleengine
+package gov.hhs.cdc.trustedintermediary.ruleengine
 
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException
 import spock.lang.Specification
 
 class RuleLoaderExceptionTest extends Specification {
+
     def "constructor works"() {
         given:
         def message = "rules loaded wrong!"

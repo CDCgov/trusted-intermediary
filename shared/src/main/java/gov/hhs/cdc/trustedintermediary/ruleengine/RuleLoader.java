@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.etor.ruleengine;
+package gov.hhs.cdc.trustedintermediary.ruleengine;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
@@ -14,7 +14,9 @@ import javax.inject.Inject;
 
 /** Manages the loading of rules from a definitions file. */
 public class RuleLoader {
+
     private static final RuleLoader INSTANCE = new RuleLoader();
+
     @Inject Formatter formatter;
     @Inject Logger logger;
 

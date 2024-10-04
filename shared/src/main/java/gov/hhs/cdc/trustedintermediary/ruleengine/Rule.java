@@ -1,19 +1,22 @@
-package gov.hhs.cdc.trustedintermediary.etor.ruleengine;
+package gov.hhs.cdc.trustedintermediary.ruleengine;
 
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
-import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.List;
 
 /**
- * Represents a rule that can be run on a FHIR resource. Each rule has a name, description, logging
- * message, conditions to determine if the rule should run, and actions to run in case the condition
- * is met.
+ * Represents a rule that can be run on HealthData objects. Each rule has a name, description,
+ * message for logging, conditions to determine if the rule should run, and actions to run in case
+ * the condition is met.
  */
 public class Rule<T> {
 
     protected final Logger logger = ApplicationContext.getImplementation(Logger.class);
-    protected final HapiFhir fhirEngine = ApplicationContext.getImplementation(HapiFhir.class);
+    protected final HealthDataExpressionEvaluator evaluator =
+            ApplicationContext.getImplementation(HealthDataExpressionEvaluator.class);
+
     private String name;
     private String description;
     private String message;
@@ -59,13 +62,12 @@ public class Rule<T> {
         return rules;
     }
 
-    public boolean shouldRun(FhirResource<?> resource) {
+    public boolean shouldRun(HealthData<?> data) {
         return conditions.stream()
                 .allMatch(
                         condition -> {
                             try {
-                                return fhirEngine.evaluateCondition(
-                                        resource.getUnderlyingResource(), condition);
+                                return evaluator.evaluateExpression(condition, data);
                             } catch (Exception e) {
                                 logger.logError(
                                         "Rule ["
@@ -79,7 +81,7 @@ public class Rule<T> {
                         });
     }
 
-    public void runRule(FhirResource<?> resource) {
+    public void runRule(HealthData<?>... data) {
         throw new UnsupportedOperationException("This method must be implemented by subclasses.");
     }
 }

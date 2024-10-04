@@ -1,11 +1,11 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation
 
-import gov.hhs.cdc.trustedintermediary.FhirResourceMock
+import gov.hhs.cdc.trustedintermediary.HealthDataMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation
-import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthData
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator
 import spock.lang.Specification
 
 class ValidationRuleTest extends Specification {
@@ -26,7 +26,8 @@ class ValidationRuleTest extends Specification {
         def ruleWarningMessage = "Rule Warning Message"
         def conditions = ["condition1", "condition2"]
         def validations = ["validation1", "validation2"]
-        TestApplicationContext.register(HapiFhir, Mock(HapiFhir))
+        TestApplicationContext.register(HealthDataExpressionEvaluator, Mock(HealthDataExpressionEvaluator))
+        TestApplicationContext.injectRegisteredImplementations()
 
         when:
         def rule = new ValidationRule(ruleName, ruleDescription, ruleWarningMessage, conditions, validations)
@@ -41,9 +42,9 @@ class ValidationRuleTest extends Specification {
 
     def "shouldRun returns expected boolean depending on conditions"() {
         given:
-        def mockFhir = Mock(HapiFhir)
-        mockFhir.evaluateCondition(_ as Object, _ as String) >> true >> conditionResult
-        TestApplicationContext.register(HapiFhir, mockFhir)
+        def mockFhir = Mock(HapiFhirImplementation)
+        mockFhir.evaluateExpression(_ as String, _ as HealthData) >> true >> conditionResult
+        TestApplicationContext.register(HealthDataExpressionEvaluator, mockFhir)
 
         def rule = new ValidationRule(null, null, null, [
             "trueCondition",
@@ -51,7 +52,7 @@ class ValidationRuleTest extends Specification {
         ], null)
 
         expect:
-        rule.shouldRun(new FhirResourceMock("resource")) == applies
+        rule.shouldRun(Mock(HealthData)) == applies
 
         where:
         conditionResult | applies
@@ -62,13 +63,13 @@ class ValidationRuleTest extends Specification {
     def "shouldRun logs an error and returns false if an exception happens when evaluating a condition"() {
         given:
         def mockFhir = Mock(HapiFhirImplementation)
-        mockFhir.evaluateCondition(_ as Object, "condition") >> { throw new Exception() }
-        TestApplicationContext.register(HapiFhir, mockFhir)
+        mockFhir.evaluateExpression("condition", _ as HealthData) >> { throw new Exception() }
+        TestApplicationContext.register(HealthDataExpressionEvaluator, mockFhir)
 
         def rule = new ValidationRule(null, null, null, ["condition"], null)
 
         when:
-        def applies = rule.shouldRun(Mock(FhirResource))
+        def applies = rule.shouldRun(Mock(HealthData))
 
         then:
         1 * mockLogger.logError(_ as String, _ as Exception)
@@ -77,8 +78,8 @@ class ValidationRuleTest extends Specification {
 
     def "runRule returns expected boolean depending on validations"() {
         given:
-        def mockFhir = Mock(HapiFhir)
-        TestApplicationContext.register(HapiFhir, mockFhir)
+        def mockFhir = Mock(HapiFhirImplementation)
+        TestApplicationContext.register(HealthDataExpressionEvaluator, mockFhir)
 
         def rule = new ValidationRule(null, null, null, null, [
             "trueValidation",
@@ -86,35 +87,49 @@ class ValidationRuleTest extends Specification {
         ])
 
         when:
-        mockFhir.evaluateCondition(_ as Object, _ as String) >> true >> true
-        rule.runRule(new FhirResourceMock("resource"))
+        mockFhir.evaluateExpression(_ as String, _ as HealthData)  >> true >> true
+        rule.runRule(new HealthDataMock("resource"))
 
         then:
         0 * mockLogger.logWarning(_ as String)
         0 * mockLogger.logError(_ as String, _ as Exception)
 
         when:
-        mockFhir.evaluateCondition(_ as Object, _ as String) >> true >> false
-        rule.runRule(new FhirResourceMock("resource"))
+        mockFhir.evaluateExpression(_ as String, _ as HealthData) >> true >> false
+        rule.runRule(new HealthDataMock("resource"))
 
         then:
         1 * mockLogger.logWarning(_ as String)
         0 * mockLogger.logError(_ as String, _ as Exception)
     }
 
-    def "runRule logs an error and returns false if an exception happens when evaluating a validation"() {
+    def "runRule logs an error if an exception happens when evaluating a validation"() {
         given:
         def mockFhir = Mock(HapiFhirImplementation)
-        mockFhir.evaluateCondition(_ as Object, "condition") >> { throw new Exception() }
-        TestApplicationContext.register(HapiFhir, mockFhir)
+        mockFhir.evaluateExpression(_ as String, _ as HealthData) >> { throw new Exception() }
+        TestApplicationContext.register(HealthDataExpressionEvaluator, mockFhir)
 
         def rule = new ValidationRule(null, null, null, null, ["validation"])
 
         when:
-        rule.runRule(Mock(FhirResource))
+        rule.runRule(Mock(HealthData))
 
         then:
         0 * mockLogger.logWarning(_ as String)
         1 * mockLogger.logError(_ as String, _ as Exception)
+    }
+
+    def "runRule logs an error if passing more than one HealthData"() {
+        given:
+        def mockFhir = Mock(HapiFhirImplementation)
+        TestApplicationContext.register(HealthDataExpressionEvaluator, mockFhir)
+
+        def rule = new ValidationRule(null, null, null, ["condition"], ["validation"])
+
+        when:
+        rule.runRule(Mock(HealthData), Mock(HealthData))
+
+        then:
+        1 * mockLogger.logError(_ as String)
     }
 }
