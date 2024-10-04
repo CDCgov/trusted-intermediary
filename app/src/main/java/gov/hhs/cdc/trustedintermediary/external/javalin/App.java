@@ -38,7 +38,8 @@ import java.util.Set;
 public class App {
     private static final long MAX_REQUEST_SIZE = 2 * 1024 * 1024L; // 2 MB in bytes
     private static final int PORT = 8080;
-    static final String HEALTH_API_ENDPOINT = "/health";
+    private static final String HEALTH_API_ENDPOINT = "/health";
+    private static final String ROOT_API_ENDPOINT = "/";
 
     public static void main(String[] args) {
         var app =
@@ -50,6 +51,7 @@ public class App {
 
         try {
             app.get(HEALTH_API_ENDPOINT, ctx -> ctx.result("Operational"));
+            app.get(ROOT_API_ENDPOINT, ctx -> ctx.result("Operational"));
 
             registerClasses();
             registerDomains(app);
