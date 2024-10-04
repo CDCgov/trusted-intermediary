@@ -1,9 +1,9 @@
 This folder contains the HL7 sample files that are used in the automated ReportStream
-integration tests. The [automated-staging-test-submit.yml](../../../.github/workflows/automated-staging-test-submit.yml)
+integration tests. The [automated-staging-test-submit.yml](/.github/workflows/automated-staging-test-submit.yml)
 Github workflow that runs daily will grab these files and send them to ReportStream in staging.
 The files are expected to go through the whole flow and to be delivered to an Azure blob
 container that will later be used by the
-[automated-staging-test-run.yml](../../../.github/workflows/automated-staging-test-run.yml)
+[automated-staging-test-run.yml](/.github/workflows/automated-staging-test-run.yml)
 workflow to run tests on them.
 
 ## Requirements for the HL7 files

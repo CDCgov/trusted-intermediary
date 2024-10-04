@@ -2,17 +2,17 @@
 
 The ReportStream Integration Test is a framework meant to add test coverage for the integration between the
 Intermediary and ReportStream. It's scheduled to run daily using the
-[automated-staging-test-run.yml](../../../.github/workflows/automated-staging-test-run.yml) workflow
+[automated-staging-test-run.yml](/.github/workflows/automated-staging-test-run.yml) workflow
 
-Information on how to set up the sample files evaluated by the tests can be found [here](../examples/Test/Automated/readme.md)
+Information on how to set up the sample files evaluated by the tests can be found [here](/examples/Test/Automated/readme.md)
 
 ## Running the tests
 
 - Automatically - these are scheduled to run every weekday
 - Manually via Github
-  - Run the [automated-staging-test-submit](../../../.github/workflows/automated-staging-test-submit.yml) action
+  - Run the [automated-staging-test-submit](/.github/workflows/automated-staging-test-submit.yml) action
   - Wait for RS and TI to finish processing files
-  - Run the [automated-staging-test-run](../../../.github/workflows/automated-staging-test-run.yml) action
+  - Run the [automated-staging-test-run](/.github/workflows/automated-staging-test-run.yml) action
 - Locally
   - Set the `AZURE_STORAGE_CONNECTION_STRING` environment variable to the [value in Keybase](keybase://team/cdc_ti/service_keys/TI/staging/azure-storage-connection-string-for-automated-rs-e2e-tests.txt)
   - Run the tests with `./gradlew rs-e2e:clean rs-e2e:automatedTest`
@@ -20,9 +20,9 @@ Information on how to set up the sample files evaluated by the tests can be foun
 ## Assertions Definition
 
 The assertions for the integration tests are defined in the
-[assertion_definitions.json](src/main/resources/assertion_definitions.json) file, which uses
+[assertion_definitions.json](/rs-e2e/src/main/resources/assertion_definitions.json) file, which uses
 the same rules engine framework as the transformations and validations in the
-[etor](../etor) project
+[etor](/etor) project
 
 ### File Structure
 
