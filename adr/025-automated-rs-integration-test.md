@@ -16,7 +16,9 @@ Date: 2024-10-02
 Accepted.
 
 ## Context
+
 ### Decision 1
+
 The RS and TI applications each have their own unit and integration tests, but we didn't have any tests
 that cover the interaction between RS and TI, and we also didn't have a way to know when changes in
 RS have unintended consequences that impact our workflows.
@@ -25,6 +27,7 @@ Submitting data to RS using their existing REST endpoints and receiving it using
 mechanisms helps make these tests realistic.
 
 ### Decision 2
+
 Since we decided to use RS's existing REST endpoints, we needed a way to submit data to them, and a way
 to trigger the data flow and subsequent tests on some kind of schedule. We chose Github Actions for this
 because it's easy to both schedule them based on a CRON expression and to run them manually as needed. Github
@@ -36,6 +39,7 @@ run through the whole workflow (from RS to TI to RS to final delivery) usually d
 built in extra time in case of any issues that cause delays.
 
 ### Decision 3
+
 We're using the value in MSH-10 for two purposes: matching input and output files, and some filtering in RS.
 
 We chose MSH-10 to match files on because it's a value that shouldn't change and should be unique to
@@ -51,13 +55,12 @@ transformations that will overwrite HL7 fields used for routing (MSH-5 and MSH-6
 
 ### Negative
 
-
 ### Risks
+
 - If we forget to add additional assertions when new transformations are added, these tests may give us
   a false sense of confidence
 - Because we rely on MSH-10 for matching files, engineers will have to take care in setting this field
   when they create additional tests in future
-
 
 ## Related ADRs
 

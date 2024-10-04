@@ -20,6 +20,7 @@ We decided to use the Rule Engine framework, which is already used for transform
 This will allow us to reuse the existing code and make it easier to maintain.
 
 The reasoning behind the decisions in the previous sections is as follows:
+
 1. The Rule Engine framework is already in place and has been proven to work well for transformations and validations.
 2. Refactoring the Rule Engine framework will allow us to avoid code duplication and make it easier to maintain.
 3. While working with the Hapi library, we found some limitations that made it impossible to access values in the HL7 messages by segment index. The library's typing system doesn't allow to access HL7 fields by index, so we decided to create a very simple parser that would allow us to do that.
