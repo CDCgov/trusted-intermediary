@@ -41,7 +41,7 @@ As a _, so that _, I need _.
 - [ ] Testing tasks completed
   - [ ] Load tests passed
   - [ ] Additional e2e tests created
-  - [ ] Additional RS e2e tests created for any new transformations.  Includes improvements to the assertion code required to make the new tests
+  - [ ] Additional RS e2e assertions created in the `rs-e2e` project for any new transformations.  Includes improvements to the assertion code required to make the new assertions
 - [ ] Build & Deploy tasks completed
   - [ ] Build process updated
   - [ ] API(s) are versioned
