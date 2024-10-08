@@ -15,6 +15,15 @@
   - `3_hl7_translation_final`
 - File extension: either `hl7` or `fhir`
 
+## Routing of these files
+
+To avoid routing issues, we have decided to use `MSH-11` for routing of test messages. The values that we have decided to use are:
+- `D`: for test files not to be sent to partners and to be sent manually. Any files under `examples/Test/` and not in `examples/Test/Automated/` should have this value
+- `N`: for test files not to be sent to partners and sent by a scheduled task. Any files under `examples/Test/Automated/` should have this value
+- `T`: for test files to be sent to partners and to be sent manually. Usually files in `examples/` and not in `examples/Test/`, should have this value. Other values like `P` could be used, but they **should not** have `D` or `N`
+
+**Note**: for some sample files, our transformations will rewrite the `MSH-5` and/or `MSH-6` HL7 fields normally used for routing, so we can't rely only on those fields to route. This is the case for most of the files in the `examples/CA` folder. If you are sending any files in that folder and you don't want the message to be delivered to our partner, please make sure `MSH-11` is **not** `T`. Otherwise the message will be delivered to our partner regardless of what is there in `MSH-5` and `MSH-6`
+
 ## Previously renamed files
 
 - `fhir/MN NBS FHIR Order Message.json` => `Test/e2e/orders/002_ORM_O01.fhir`
@@ -43,3 +52,4 @@
 - The `ORM` messages with ids `003`, `004`, `005`, `006`, `007`, `008`, `009`, `010` in the `Test/Orders` folder were modified to comply with current requirements for ReportStream, as it doesn't yet support HL7 `2.3`:
   - Added `MSH-9.3`
   - Changed `MSH-10` to `2.5.1`
+- The `MSH-11` value for `CA/001_CA_OML_O21.hl7` was changed from `D` to `T` to comply with our routing requirements
