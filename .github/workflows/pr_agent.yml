@@ -17,7 +17,7 @@ jobs:
         uses: Codium-ai/pr-agent@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OPENAI.KEY: ${{ secrets.AZURE_OPENAI_KEY }}
+          OPENAI_KEY: ${{ secrets.AZURE_OPENAI_KEY }}
           OPENAI.API_TYPE: "azure"
           OPENAI.API_VERSION: "2023-05-15"  # Check Azure documentation for the current API version
           OPENAI.API_BASE: ${{ secrets.AZURE_OPENAI_BASE_URL }} # The base URL for your Azure OpenAI resource. e.g. "https://<your resource name>.openai.azure.com"
