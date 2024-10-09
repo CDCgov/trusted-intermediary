@@ -1,0 +1,24 @@
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+  issue_comment:
+jobs:
+  pr_agent_job:
+    if: ${{ github.event.sender.type != 'Bot' }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: write
+    name: Run pr agent on every pull request, respond to user comments
+    steps:
+      - name: PR Agent action step
+        id: pragent
+        uses: Codium-ai/pr-agent@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI.KEY: ${{ secrets.AZURE_OPENAI_KEY }}
+          OPENAI.API_TYPE: "azure"
+          OPENAI.API_VERSION: "2023-05-15"  # Check Azure documentation for the current API version
+          OPENAI.API_BASE: ${{ secrets.AZURE_OPENAI_BASE_URL }} # The base URL for your Azure OpenAI resource. e.g. "https://<your resource name>.openai.azure.com"
+          OPENAI.DEPLOYMENT_ID: ${{ secrets.AZURE_OPENAI_DEPLOYMENT_ID }}  # The deployment name you chose when you deployed the engine
