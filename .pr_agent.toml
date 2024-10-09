@@ -1,0 +1,4 @@
+[config]
+model="gpt-4" # the OpenAI model you've deployed on Azure (e.g. gpt-3.5-turbo)
+model_turbo="gpt-4" # the OpenAI model you've deployed on Azure (e.g. gpt-3.5-turbo)
+fallback_models=["gpt-4"] # the OpenAI model you've deployed on Azure (e.g. gpt-3.5-turbo)
