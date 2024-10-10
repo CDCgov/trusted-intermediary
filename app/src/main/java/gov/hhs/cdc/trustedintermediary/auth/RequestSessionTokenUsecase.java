@@ -88,13 +88,14 @@ public class RequestSessionTokenUsecase {
     }
 
     private String retrieveKey(String keyId) throws SecretRetrievalException {
-        String key = cache.get(keyId);
-        if (key != null) {
-            return key;
-        }
+        //        String key = cache.get(keyId);
+        //        if (key != null) {
+        //            return key;
+        //        }
 
-        key = secrets.getKey(keyId);
-        cache.put(keyId, key);
+        String key = secrets.getKey(keyId);
+        logger.logInfo("Successfully got secret {}", keyId);
+        //        cache.put(keyId, key);
 
         return key;
     }
