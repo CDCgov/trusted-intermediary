@@ -14,8 +14,6 @@ client_id=flexion
 client_sender=simulated-hospital
 verbose=""
 submission_id=""
-allow_outbound=false
-msh_header_replacement=""
 
 show_help() {
     echo "Usage: $(basename $0) <HURL_FILE> [OPTIONS]"
@@ -31,7 +29,6 @@ show_help() {
     echo "    -i <SUBMISSION_ID>                  The submissionId to call the history API with (Required for history API)"
     echo "    -v                                  Verbose mode"
     echo "    -h                                  Display this help and exit"
-    echo "    -p                                  By default, the MSH segment is replaced to contain a Flexion receiver in order to avoid sending messages to partners inadvertently. When using this flag, the MSH segment will not be replaced"
 }
 
 # Check if required HURL_FILE is provided
@@ -50,7 +47,7 @@ fi
 hurl_file="$1" # Assign the first argument to hurl_file
 shift          # Remove the first argument from the list of arguments
 
-while getopts ':f:r:t:e:c:s:x:i:vh:p' opt; do
+while getopts ':f:r:t:e:c:s:x:i:vh' opt; do
     case "$opt" in
     f)
         fpath="$OPTARG"
@@ -82,9 +79,6 @@ while getopts ':f:r:t:e:c:s:x:i:vh:p' opt; do
     h)
         show_help
         exit 0
-        ;;
-    p)
-        allow_outbound=true
         ;;
     :)
         echo -e "Option requires an argument"
@@ -123,30 +117,6 @@ if [ -z "$secret" ]; then
     exit 1
 fi
 
-if [ "$allow_outbound" = false ] && [ -n "$fpath" ]; then
-    # Grab MSH Header
-    msh_header=$(head -n1 "$CDCTI_HOME/$fpath")
-    # Check message type
-    if [[ "$msh_header" = *"^R01"* ]]; then
-        msh_header_replacement="MSH|^~\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-hospital-id^DNS|20230101010000-0000||ORU^R01^ORU_R01|111111|T|2.5.1||||||||||"
-    elif [[ "$msh_header" = *"^O01"* ]]; then
-        msh_header_replacement="MSH|^~\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-lab-id^DNS|20230101010000-0000||ORM^O01^ORM_O01|111111|T|2.5.1||||||||||"
-    elif [[ "$msh_header" = *"^O21"* ]]; then
-        msh_header_replacement="MSH|^~\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-lab-id^DNS|20230101010000-0000||OML^O21^OML_O21|111111|T|2.5.1||||||||||"
-    else
-        echo "File does not contain valid message type (MSH-9) values."
-        exit 1
-    fi
-    file_path=$(dirname "$fpath")
-    substitutedFilePathPrefix="$CDCTI_HOME/substituted_header"
-    # Make temporary directory to store scrambled file
-    mkdir -p "$substitutedFilePathPrefix/$file_path" && touch -f "$substitutedFilePathPrefix/$fpath"
-    # Replace MSH Header and write into temporary directory
-    sed "1s/.*/$msh_header_replacement/" "$CDCTI_HOME/$fpath" >"$substitutedFilePathPrefix/$fpath"
-    fpath=$substitutedFilePathPrefix/$fpath
-    echo "By default, the MSH segment is replaced to contain a Flexion receiver in order to avoid sending messages to partners inadvertently. To toggle this, run with -p."
-fi
-
 hurl \
     --variable fpath=$fpath \
     --file-root $root \
@@ -159,8 +129,3 @@ hurl \
     $verbose \
     $hurl_file \
     $@
-
-# Remove temporary directory
-if [ "$allow_outbound" = false ]; then
-    rm -r "$substitutedFilePathPrefix"
-fi
