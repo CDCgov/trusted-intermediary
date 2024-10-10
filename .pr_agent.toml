@@ -8,3 +8,32 @@ auto_review = true
 auto_describe = true
 auto_improve = true
 pr_actions = ["opened", "reopened", "ready_for_review", "review_requested"]
+
+[pr_reviewer] # /review #
+# enable/disable features
+require_score_review=false
+require_tests_review=true
+require_estimate_effort_to_review=true
+require_can_be_split_review=false
+require_security_review=true
+require_ticket_analysis_review=true
+# general options
+num_code_suggestions=0
+inline_code_comments = false
+ask_and_reflect=false
+#automatic_review=true
+persistent_comment=true
+extra_instructions = ""
+final_update_message = true
+# review labels
+enable_review_labels_security=true
+enable_review_labels_effort=true
+# specific configurations for incremental review (/review -i)
+require_all_thresholds_for_incremental_review=false
+minimal_commits_for_incremental_review=0
+minimal_minutes_for_incremental_review=0
+enable_intro_text=true
+enable_help_text=false # Determines whether to include help text in the PR review. Enabled by default.
+# auto approval
+enable_auto_approval=false
+maximal_review_effort=5
