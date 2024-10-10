@@ -17,12 +17,16 @@
 
 ## Routing of these files
 
-To avoid routing issues, we have decided to use `MSH-11` for routing of test messages. The values that we have decided to use are:
-- `D`: for test files not to be sent to partners and to be sent manually. Any files under `examples/Test/` and not in `examples/Test/Automated/` should have this value
-- `N`: for test files not to be sent to partners and sent by a scheduled task. Any files under `examples/Test/Automated/` should have this value
-- `T`: for test files to be sent to partners and to be sent manually. Usually files in `examples/` and not in `examples/Test/`, should have this value. `P` could be used as well
+To avoid routing issues, we have decided to use `MSH-11` for routing of test messages ([more context here](/adr/026-hl7-test-message-routing.md)). The values we have decided to use are:
+- `D`: for test files **not** to be sent to partners and to be sent manually. Any files under `examples/Test/` and not in `examples/Test/Automated/` should have this value
+- `N`: for test files **not** to be sent to partners and sent by a scheduled task. Any files under `examples/Test/Automated/` should have this value
+- `T`: for test files to be sent manually to partners. `P` will also be routed to partners
 
-**Note**: for some sample files, our transformations will rewrite the `MSH-5` and/or `MSH-6` HL7 fields normally used for routing, so we can't rely only on those fields to route. This is the case for most of the files in the `examples/CA` folder. If you are sending any files in that folder and you don't want the message to be delivered to our partner, please make sure `MSH-11` is **not** `T` or `P`. Otherwise the message will be delivered to our partner regardless of what is there in `MSH-5` and `MSH-6`
+Any new files added to the `examples/Test/` folder, should have `D` in `MSH-11`
+
+Any new files added to the `examples/Test/Automated/` folder, should have `N` in `MSH-11`
+
+**Note**: for some sample files, our transformations **will** rewrite the `MSH-5` and/or `MSH-6` HL7 fields normally used for routing, so we can't rely only on those fields to route. This is the case for most of the files in the `examples/CA` folder. If you are sending any files in that folder and you don't want the message to be delivered to our partner, please make sure `MSH-11` is **not** `T` or `P`. Otherwise the message will be delivered to our partner regardless of what is there in `MSH-5` and `MSH-6`
 
 ## Previously renamed files
 
