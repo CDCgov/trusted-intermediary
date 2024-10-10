@@ -27,4 +27,3 @@ jobs:
           GITHUB_ACTION_CONFIG.AUTO_REVIEW: "true" # enable\disable auto review
           GITHUB_ACTION_CONFIG.AUTO_DESCRIBE: "true" # enable\disable auto describe
           GITHUB_ACTION_CONFIG.AUTO_IMPROVE: "true" # enable\disable auto improve
-          GITHUB_ACTION_CONFIG.PR_ACTIONS: [ "opened", "reopened", "ready_for_review", "review_requested" ]
