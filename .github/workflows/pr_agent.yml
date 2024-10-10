@@ -15,13 +15,20 @@ jobs:
         id: pragent
         uses: Codium-ai/pr-agent@main
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_KEY: ${{ secrets.AZURE_OPENAI_KEY }}
-          OPENAI.API_TYPE: "azure"
-          OPENAI.API_VERSION: "2023-05-15"  # Check Azure documentation for the current API version
-          OPENAI.API_BASE: ${{ secrets.AZURE_OPENAI_BASE_URL }} # The base URL for your Azure OpenAI resource. e.g. "https://<your resource name>.openai.azure.com"
-          OPENAI.DEPLOYMENT_ID: ${{ secrets.AZURE_OPENAI_DEPLOYMENT_ID }}  # The deployment name you chose when you deployed the engine
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI.API_TYPE: 'azure'
+          OPENAI_API_TYPE: 'azure'
+          OPENAI_API_VERSION: "2023-05-15"
+          OPENAI.API_VERSION: "2023-05-15"
+          OPENAI.API_BASE: 'https://${{ vars.AZURE_DEPLOYMENT_ID }}.openai.azure.com'
+          OPENAI_API_BASE: 'https://${{ vars.AZURE_DEPLOYMENT_ID }}.openai.azure.com'
+          OPENAI.DEPLOYMENT_ID: ${{ vars.AZURE_DEPLOYMENT_ID }}
+          OPENAI_DEPLOYMENT_ID: ${{ vars.AZURE_DEPLOYMENT_ID }}
+          AZURE_API_TYPE: 'azure'
+          AZURE_API_KEY: ${{ secrets.AZURE_OPENAI_KEY }}
           AZURE_API_VERSION: "2023-05-15"
+          AZURE_API_BASE: 'https://${{ vars.AZURE_DEPLOYMENT_ID }}.openai.azure.com'
           GITHUB_ACTION_CONFIG_AUTO_REVIEW: "true"
           GITHUB_ACTION_CONFIG_AUTO_DESCRIBE: "true"
           GITHUB_ACTION_CONFIG_AUTO_IMPROVE: "true"
