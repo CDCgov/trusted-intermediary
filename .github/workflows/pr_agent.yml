@@ -19,15 +19,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI.API_TYPE: 'azure'
           OPENAI_API_TYPE: 'azure'
-          OPENAI_API_VERSION: "2023-05-15"
-          OPENAI.API_VERSION: "2023-05-15"
+          OPENAI_API_VERSION: "2023-03-15"
+          OPENAI.API_VERSION: "2023-03-15"
           OPENAI.API_BASE: 'https://${{ vars.AZURE_DEPLOYMENT_ID }}.openai.azure.com'
           OPENAI_API_BASE: 'https://${{ vars.AZURE_DEPLOYMENT_ID }}.openai.azure.com'
           OPENAI.DEPLOYMENT_ID: ${{ vars.AZURE_DEPLOYMENT_ID }}
           OPENAI_DEPLOYMENT_ID: ${{ vars.AZURE_DEPLOYMENT_ID }}
           AZURE_API_TYPE: 'azure'
           AZURE_API_KEY: ${{ secrets.AZURE_OPENAI_KEY }}
-          AZURE_API_VERSION: "2023-05-15"
+          AZURE_API_VERSION: "2023-03-15"
           AZURE_API_BASE: 'https://${{ vars.AZURE_DEPLOYMENT_ID }}.openai.azure.com'
           GITHUB_ACTION_CONFIG_AUTO_REVIEW: "true"
           GITHUB_ACTION_CONFIG_AUTO_DESCRIBE: "true"
