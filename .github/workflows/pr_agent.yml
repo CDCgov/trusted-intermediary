@@ -22,3 +22,7 @@ jobs:
           OPENAI.API_VERSION: "2023-05-15"  # Check Azure documentation for the current API version
           OPENAI.API_BASE: ${{ secrets.AZURE_OPENAI_BASE_URL }} # The base URL for your Azure OpenAI resource. e.g. "https://<your resource name>.openai.azure.com"
           OPENAI.DEPLOYMENT_ID: ${{ secrets.AZURE_OPENAI_DEPLOYMENT_ID }}  # The deployment name you chose when you deployed the engine
+          AZURE_API_VERSION: "2023-05-15"
+          GITHUB_ACTION_CONFIG_AUTO_REVIEW: "true"
+          GITHUB_ACTION_CONFIG_AUTO_DESCRIBE: "true"
+          GITHUB_ACTION_CONFIG_AUTO_IMPROVE: "true"
