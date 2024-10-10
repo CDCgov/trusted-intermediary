@@ -5,9 +5,9 @@ Date: 2024-10-10
 ## Decision
 
 We will use `MSH-11` to identify and route test and non-test messages in ReportStream. The values for `MSH-11` will be:
-- `T`: for test files to be sent manually to partners
-- `D`: for test files **not** to be sent to partners, and sent manually
-- `N`: for test files **not** to be sent to partners, and sent by a scheduled task
+- `T` (Training): for test files to be sent manually to partners
+- `D` (Debugging): for test files **not** to be sent to partners, and sent manually
+- `N` (Non-Production Testing): for test files **not** to be sent to partners, and sent by a scheduled task
 
 ## Status
 
@@ -18,6 +18,8 @@ Accepted.
 Some of the transformations we apply in the Intermediary overwrite `MSH-5` (Receiving Application) and `MSH-6` (Receiving Facility), which are normally used in HL7 for routing purposes. That's currently the case for UCSD transformations. Because of this, we can't rely on those fields to identify and route test messages in ReportStream.
 
 After internal discussion, we decided to use `MSH-11` (Processing ID) for this purpose as it is a field already used in HL7 to identify test messages.
+
+We decided to use `D` (Debugging) for internal test messages and `T` (Training/Testing) for partner test messages because `T` is already used by our partners for testing, so we need to stick to that value.
 
 ## Impact
 
