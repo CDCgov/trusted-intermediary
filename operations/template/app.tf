@@ -82,7 +82,7 @@ resource "azurerm_service_plan" "plan" {
   location               = data.azurerm_resource_group.group.location
   os_type                = "Linux"
   sku_name               = local.higher_environment_level ? "P1v3" : "P0v3"
-  zone_balancing_enabled = true
+  zone_balancing_enabled = false
 
   #   below tags are managed by CDC
   lifecycle {
