@@ -19,7 +19,7 @@ require_security_review=true
 require_ticket_analysis_review=true
 # general options
 num_code_suggestions=0
-inline_code_comments = false
+inline_code_comments = true
 ask_and_reflect=false
 #automatic_review=true
 persistent_comment=true
