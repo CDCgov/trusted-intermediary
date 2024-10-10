@@ -82,7 +82,7 @@ resource "azurerm_service_plan" "plan" {
   location               = data.azurerm_resource_group.group.location
   os_type                = "Linux"
   sku_name               = local.higher_environment_level ? "P1v3" : "P0v3"
-  zone_balancing_enabled = local.higher_environment_level
+  zone_balancing_enabled = true
 
   #   below tags are managed by CDC
   lifecycle {
@@ -270,9 +270,9 @@ resource "azurerm_monitor_autoscale_setting" "api_autoscale" {
     name = "defaultProfile"
 
     capacity {
-      default = local.higher_environment_level ? 3 : 1
-      minimum = local.higher_environment_level ? 3 : 1
-      maximum = local.higher_environment_level ? 10 : 1
+      default = 3
+      minimum = 3
+      maximum = 10
     }
 
     rule {
