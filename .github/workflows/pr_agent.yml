@@ -18,12 +18,11 @@ jobs:
         uses: Codium-ai/pr-agent@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OPENAI.KEY: ${{ secrets.AZURE_OPENAI_KEY }}
-          OPENAI.API_TYPE: "azure"
-          OPENAI.API_VERSION: "2023-03-15"
-          OPENAI.API_BASE: "https://${{ vars.AZURE_DEPLOYMENT_ID }}.openai.azure.com"
-          OPENAI.DEPLOYMENT_ID: ${{ vars.AZURE_DEPLOYMENT_ID }}
-          AZURE_API_VERSION: "2023-03-15"
-          GITHUB_ACTION_CONFIG.AUTO_REVIEW: "true" # enable\disable auto review
-          GITHUB_ACTION_CONFIG.AUTO_DESCRIBE: "true" # enable\disable auto describe
-          GITHUB_ACTION_CONFIG.AUTO_IMPROVE: "true" # enable\disable auto improve
+          github_action_config.auto_review: "true"
+          github_action_config.auto_describe: "true"
+          github_action_config.auto_improve: "true"
+          OPENAI_KEY: ${{ secrets.AZURE_OPENAI_KEY }}
+          OPENAI.API_TYPE: 'azure'
+          OPENAI.API_BASE: ${{ secrets.AZURE_OPENAI_BASE_URL }}
+          OPENAI.DEPLOYMENT_ID: ${{ secrets.AZURE_OPENAI_DEPLOYMENT_ID }}
+          OPENAI.API_VERSION: '2023-03-15'
