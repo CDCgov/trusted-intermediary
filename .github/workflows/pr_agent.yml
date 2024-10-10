@@ -23,4 +23,4 @@ jobs:
           OPENAI.API_BASE: ${{ secrets.AZURE_OPENAI_BASE_URL }}
           OPENAI.DEPLOYMENT_ID: ${{ secrets.AZURE_OPENAI_DEPLOYMENT_ID }}
           OPENAI_API_VERSION: '2023-03-15' # was OPENAI.API_VERSION but changed to see if this fixes gpt-4 issue
-          AZURE_API_VERSION: '2023-03-15' # added to see if this fixes gpt-4 issue
+          AZURE_API_VERSION: '2023-03-15-preview' # added to see if this fixes gpt-4 issue
