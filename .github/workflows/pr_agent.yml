@@ -18,9 +18,6 @@ jobs:
         uses: Codium-ai/pr-agent@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          github_action_config.auto_review: "true"
-          github_action_config.auto_describe: "true"
-          github_action_config.auto_improve: "true"
           OPENAI_KEY: ${{ secrets.AZURE_OPENAI_KEY }}
           OPENAI.API_TYPE: 'azure'
           OPENAI.API_BASE: ${{ secrets.AZURE_OPENAI_BASE_URL }}
