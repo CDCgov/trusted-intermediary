@@ -1,3 +1,5 @@
+name: Perry the PR Agent Platypus
+
 on:
   pull_request:
   issue_comment:
