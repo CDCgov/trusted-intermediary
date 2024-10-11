@@ -1,5 +1,8 @@
 # Sample message files
 
+> [!IMPORTANT]
+> Any new files added to the `examples/` folder should be updated to have `D` in `MSH-11`, except for files added to the `examples/Test/Automated/` folder, which should be updated to have `N` in `MSH-11`
+
 ## Naming convention
 
 `<XXX>_<SS>_<HL7_Type>_<HL7_Version>_<SUB_TYPE>_<DESCRIPTION>.[fhir|hl7]`
@@ -14,6 +17,15 @@
   - `2_fhir_transformation`
   - `3_hl7_translation_final`
 - File extension: either `hl7` or `fhir`
+
+## Routing of these files
+
+To avoid routing issues, we have decided to use `MSH-11` for routing of test messages ([more context here](/adr/026-hl7-test-message-routing.md)). The values we have decided to use are:
+- `D`: for test files **not** to be sent to partners and to be sent manually. Any files under `examples/` and not in `examples/Test/Automated/` should have this value
+- `N`: for test files **not** to be sent to partners and sent by a scheduled task. Any files under `examples/Test/Automated/` should have this value
+- `T`: for test files to be sent manually to partners. `P` will also be routed to partners
+
+**Note**: for some sample files, our transformations **will** rewrite the `MSH-5` and/or `MSH-6` HL7 fields normally used for routing, so we can't rely only on those fields to route. This is the case for most of the files in the `examples/CA` folder. If you are sending any files in that folder and you don't want the message to be delivered to our partner, please make sure `MSH-11` is **not** `T` or `P`. Otherwise the message will be delivered to our partner regardless of what is there in `MSH-5` and `MSH-6`. Please see [this ADR](/adr/026-hl7-test-message-routing.md) for more context
 
 ## Previously renamed files
 
@@ -43,3 +55,4 @@
 - The `ORM` messages with ids `003`, `004`, `005`, `006`, `007`, `008`, `009`, `010` in the `Test/Orders` folder were modified to comply with current requirements for ReportStream, as it doesn't yet support HL7 `2.3`:
   - Added `MSH-9.3`
   - Changed `MSH-10` to `2.5.1`
+- The `MSH-11` value for all sample files in `examples/` (with the exception of files in `examples/Test/Automated/`) was changed to `D`. This is to comply with our routing filters in RS for test messages
