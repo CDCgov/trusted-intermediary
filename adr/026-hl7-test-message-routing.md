@@ -21,6 +21,8 @@ After internal discussion, we decided to use `MSH-11` (Processing ID) for this p
 
 We decided to use `D` (Debugging) for internal test messages and `T` (Training/Testing) for partner test messages because `T` is already used by our partners for testing, so we need to stick to that value.
 
+For routing purposes in ReportStream, `N` should only be relevant in non-prod environments, where we have scheduled tasks sending test messages. For both prod and non-prod, we expect to use both `D` and `T`, so the `MSH-11` routing filters for those values can be the same in all environments.
+
 ## Impact
 
 ### Positive
