@@ -1,7 +1,7 @@
 # Sample message files
 
 > [!IMPORTANT]
-> Any new files added to the `examples/Test/` folder should be updated to have `D` in `MSH-11`. New files added to the `examples/Test/Automated/` folder should be updated to have `N` in `MSH-11`
+> Any new files added to the `examples/` folder should be updated to have `D` in `MSH-11`, except for files added to the `examples/Test/Automated/` folder, which should be updated to have `N` in `MSH-11`
 
 ## Naming convention
 
