@@ -5,29 +5,29 @@ fallback_models=["gpt-4"] # the OpenAI model you've deployed on Azure (e.g. gpt-
 
 [github_action_config]
 auto_review = true
-auto_describe = true
+auto_describe = false
 auto_improve = true
 pr_actions = ["opened", "reopened", "ready_for_review", "review_requested"]
 
 [pr_reviewer] # /review #
 # enable/disable features
-require_score_review=false
-require_tests_review=true
-require_estimate_effort_to_review=true
-require_can_be_split_review=false
-require_security_review=true
-require_ticket_analysis_review=true
+require_score_review=false # If set to true, the tool will add a section that scores the PR. Default is false.
+require_tests_review=true #If set to true, the tool will add a section that checks if the PR contains tests. Default is true.
+require_estimate_effort_to_review=true # If set to true, the tool will add a section that estimates the effort needed to review the PR. Default is true.
+require_can_be_split_review=false # If set to true, the tool will add a section that checks if the PR contains several themes, and can be split into smaller PRs. Default is false.
+require_security_review=true # If set to true, the tool will add a section that checks if the PR contains a possible security or vulnerability issue. Default is true.
+require_ticket_analysis_review=true # If set to true, and the PR contains a GitHub ticket number, the tool will add a section that checks if the PR in fact fulfilled the ticket requirements. Default is true.
 # general options
-num_code_suggestions=0
-inline_code_comments = true
+num_code_suggestions=3 # Number of code suggestions provided by the 'review' tool. Default is 0, meaning no code suggestions will be provided by the `review` tool.
+inline_code_comments = true # If set to true, the tool will publish the code suggestions as comments on the code diff. Default is false. Note that you need to set `num_code_suggestions`>0 to get code suggestions
 ask_and_reflect=false
 #automatic_review=true
-persistent_comment=true
-extra_instructions = ""
-final_update_message = true
+persistent_comment=true # If set to true, the review comment will be persistent, meaning that every new review request will edit the previous one. Default is true.
+extra_instructions = "" # Optional extra instructions to the tool. For example: "focus on the changes in the file X. Ignore change in ...".
+final_update_message = true # If set to true, it will add a comment message [`PR Description updated to latest commit...`](https://github.com/Codium-ai/pr-agent/pull/499#issuecomment-1837412176) after finishing calling `/describe`. Default is false.
 # review labels
-enable_review_labels_security=true
-enable_review_labels_effort=true
+enable_review_labels_security=false # If set to true, the tool will publish a 'possible security issue' label if it detects a security issue. Default is true.
+enable_review_labels_effort=false # If set to true, the tool will publish a 'Review effort [1-5]: x' label. Default is true.
 # specific configurations for incremental review (/review -i)
 require_all_thresholds_for_incremental_review=false
 minimal_commits_for_incremental_review=0
@@ -35,5 +35,5 @@ minimal_minutes_for_incremental_review=0
 enable_intro_text=true
 enable_help_text=false # Determines whether to include help text in the PR review. Enabled by default.
 # auto approval
-enable_auto_approval=false
-maximal_review_effort=5
+enable_auto_approval=false # If set to true, the tool will approve the PR when invoked with the 'auto_approve' command. Default is false. This flag can be changed only from a configuration file.
+maximal_review_effort=5 # Maximal effort level for auto-approval. If the PR's estimated review effort is above this threshold, the auto-approval will not run. Default is 5.
