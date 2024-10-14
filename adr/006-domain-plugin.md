@@ -24,15 +24,21 @@ hosted in Azure Functions?
 
 ### Positive
 
--
+Encapsulation of domain-specific logic: Ensuring isolation of concerns; Core application logic remains unaffected
+Reusability: Plugins can be reused reducing duplication
+Flexibility: Domains can evolve independently and potentially be extracted into separate projects.
+Targeted testing: Focused unit and integration testing
 
-### Negative
 
--
+### Negative 
+
+- Increased complexity: Managing multiple plugins can increase architectural complexity over time, especially with the addition of features.
+- Dependency management challenges: Ensuring compatibility across multiple version can become cumbersome
+
 
 ### Risks
-
--
+- Maintenance burden: Possible increased maintenance burden which can require more rigorous testing
+- Fragmentation: Increased possibility for inconsistencies across the system due to varying approaches
 
 ## Related Issues
 
