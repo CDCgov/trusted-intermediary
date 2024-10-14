@@ -41,6 +41,19 @@ class KeyCacheTest extends Specification {
         then:
         keys.size() == threadsNum // one key per thread
         keys.values().toSet().size() == 1 // all entries have same value, threads had to wait on the lock
+    }
 
+    def "keyCache removal works"() {
+        given:
+        def cache = KeyCache.getInstance()
+        def value = "fake_key"
+        def key = "report_stream"
+        def expected = null
+        when:
+        cache.put(key, value)
+        cache.remove(key)
+        def actual = cache.get(key)
+        then:
+        actual == expected
     }
 }

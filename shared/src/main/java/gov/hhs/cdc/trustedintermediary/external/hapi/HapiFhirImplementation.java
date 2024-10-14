@@ -5,12 +5,14 @@ import ca.uhn.fhir.fhirpath.IFhirPath;
 import ca.uhn.fhir.parser.IParser;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Base;
 import org.hl7.fhir.r4.model.BooleanType;
 
 /** Concrete implementation that calls the Hapi FHIR library. */
-public class HapiFhirImplementation implements HapiFhir {
+public class HapiFhirImplementation implements HapiFhir, HealthDataExpressionEvaluator {
 
     private static final HapiFhirImplementation INSTANCE = new HapiFhirImplementation();
     private static final FhirContext CONTEXT = FhirContext.forR4();
@@ -68,9 +70,15 @@ public class HapiFhirImplementation implements HapiFhir {
      * @return True if the expression has at least one match for the given root, else false.
      */
     @Override
-    public Boolean evaluateCondition(Object resource, String expression) {
+    public boolean evaluateExpression(String expression, HealthData<?>... data) {
+        if (data.length != 1) {
+            throw new IllegalArgumentException(
+                    "Expected one resource, but received: " + data.length);
+        }
+
         var result =
-                PATH_ENGINE.evaluateFirst((IBaseResource) resource, expression, BooleanType.class);
+                PATH_ENGINE.evaluateFirst(
+                        (IBaseResource) data[0].getUnderlyingData(), expression, BooleanType.class);
         return result.map(BooleanType::booleanValue).orElse(false);
     }
 

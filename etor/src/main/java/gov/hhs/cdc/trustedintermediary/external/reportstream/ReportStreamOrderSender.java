@@ -26,7 +26,7 @@ public class ReportStreamOrderSender implements OrderSender {
     @Override
     public Optional<String> send(final Order<?> order) throws UnableToSendMessageException {
         logger.logInfo("Sending the order to ReportStream");
-        String json = fhir.encodeResourceToJson(order.getUnderlyingResource());
+        String json = fhir.encodeResourceToJson(order.getUnderlyingData());
         return sender.sendOrderToReportStream(json, order.getFhirResourceId());
     }
 }

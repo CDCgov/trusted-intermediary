@@ -12,9 +12,12 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
     def fhirResource
     def args = Map.of(
     "checkValue", "54089-8",
-    "codingSystem", "LN",
-    "alternateId", "CDPHGSPEAP"
-    )
+    "codingSystem", "CDPHGSPEAP",
+    "alternateId", "CDPHGSPEAP")
+    def argsNoAlternateId = [
+        "checkValue": "54089-8",
+        "codingSystem": "CDPHGSPEAP",
+        "alternateId": null] as Map
 
     def setup() {
         TestApplicationContext.reset()
@@ -27,7 +30,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
     def "skip transformation if the coding identifier is missing"() {
         given:
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = fhirResource.getUnderlyingData() as Bundle
         def result = getObrSections(bundle)[0]
         def obr4_1 = result[0]
         def obr4_3 = result[1]
@@ -40,7 +43,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
         when:
         transformClass.transform(fhirResource, args)
-        bundle = fhirResource.getUnderlyingResource() as Bundle
+        bundle = fhirResource.getUnderlyingData() as Bundle
         def transformedResult = getObrSections(bundle)[0]
         def transformedObr4_1 = transformedResult[0]
         def transformedObr4_3 = transformedResult[1]
@@ -54,7 +57,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
     def "skip transformation if the coding identifier is not the one we want"() {
         given:
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = fhirResource.getUnderlyingData() as Bundle
         def result = getObrSections(bundle)[1]
         def obr4_1 = result[0]
         def obr4_3 = result[1]
@@ -67,7 +70,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
         when:
         transformClass.transform(fhirResource, args)
-        bundle = fhirResource.getUnderlyingResource() as Bundle
+        bundle = fhirResource.getUnderlyingData() as Bundle
         def transformedResult = getObrSections(bundle)[1]
         def transformedObr4_1 = transformedResult[0]
         def transformedObr4_3 = transformedResult[1]
@@ -81,7 +84,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
     def "update obr4 values when the code matches"() {
         given:
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = fhirResource.getUnderlyingData() as Bundle
         def result = getObrSections(bundle)[2]
         def obr4_1 = result[0]
         def obr4_3 = result[1]
@@ -94,7 +97,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
         when:
         transformClass.transform(fhirResource, args)
-        bundle = fhirResource.getUnderlyingResource() as Bundle
+        bundle = fhirResource.getUnderlyingData() as Bundle
         def transformedResult = getObrSections(bundle)[2]
         def transformedObr4_1 = transformedResult[0]
         def transformedObr4_3 = transformedResult[1]
@@ -102,13 +105,41 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
         then:
         transformedObr4_1 == obr4_1
-        transformedObr4_3 == "LN"
+        transformedObr4_3 == "CDPHGSPEAP"
         transformedObr4_4 == "CDPHGSPEAP"
+    }
+
+
+    def "update only obr4-1 through obr4-3 values when the code matches and alternate id is null"() {
+        given:
+        def bundle = fhirResource.getUnderlyingData() as Bundle
+        def result = getObrSections(bundle)[2]
+        def obr4_1 = result[0]
+        def obr4_3 = result[1]
+        def obr4_4 = result[2]
+
+        expect:
+        obr4_1 == "54089-8"
+        obr4_3 == "NA"
+        obr4_4 == "This value should change"
+
+        when:
+        transformClass.transform(fhirResource, argsNoAlternateId)
+        bundle = fhirResource.getUnderlyingData() as Bundle
+        def transformedResult = getObrSections(bundle)[2]
+        def transformedObr4_1 = transformedResult[0]
+        def transformedObr4_3 = transformedResult[1]
+        def transformedObr4_4 = transformedResult[2]
+
+        then:
+        transformedObr4_1 == obr4_1
+        transformedObr4_3 == "CDPHGSPEAP"
+        transformedObr4_4 == obr4_4
     }
 
     def "leave obr4 values unchanged if the code matches and they're already correct"() {
         given:
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = fhirResource.getUnderlyingData() as Bundle
         def result = getObrSections(bundle)[3]
         def obr4_1 = result[0]
         def obr4_3 = result[1]
@@ -116,12 +147,12 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
         expect:
         obr4_1 == "54089-8"
-        obr4_3 == "LN"
+        obr4_3 == "CDPHGSPEAP"
         obr4_4 == "CDPHGSPEAP"
 
         when:
         transformClass.transform(fhirResource, args)
-        bundle = fhirResource.getUnderlyingResource() as Bundle
+        bundle = fhirResource.getUnderlyingData() as Bundle
         def transformedResult = getObrSections(bundle)[3]
         def transformedObr4_1 = transformedResult[0]
         def transformedObr4_3 = transformedResult[1]
@@ -135,7 +166,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
     def "update values if the coding identifier is correct but the values are missing"() {
         given:
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = fhirResource.getUnderlyingData() as Bundle
         def result = getObrSections(bundle)[4]
         def obr4_1 = result[0]
         def obr4_3 = result[1]
@@ -148,7 +179,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
         when:
         transformClass.transform(fhirResource, args)
-        bundle = fhirResource.getUnderlyingResource() as Bundle
+        bundle = fhirResource.getUnderlyingData() as Bundle
         def transformedResult = getObrSections(bundle)[4]
         def transformedObr4_1 = transformedResult[0]
         def transformedObr4_3 = transformedResult[1]
@@ -156,7 +187,7 @@ class UpdateUniversalServiceIdentifierTest extends Specification {
 
         then:
         transformedObr4_1 == obr4_1
-        transformedObr4_3 == "LN"
+        transformedObr4_3 == "CDPHGSPEAP"
         transformedObr4_4 == "CDPHGSPEAP"
     }
 

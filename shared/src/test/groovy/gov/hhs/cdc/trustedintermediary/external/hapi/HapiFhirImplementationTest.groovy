@@ -42,59 +42,67 @@ class HapiFhirImplementationTest extends Specification {
         bundle.addEntry(entry2)
     }
 
-    def "evaluateCondition returns true on finding existing value"() {
+    def "evaluateExpression returns true on finding existing value"() {
         given:
         def path = "Bundle.id.exists()"
 
         when:
-        def result = fhir.evaluateCondition(bundle as IBaseResource, path)
+        def result = fhir.evaluateExpression(path, new HapiFhirResource(bundle))
 
         then:
-        result == true
+        result
     }
 
-    def "evaluateCondition returns false on not finding non-existing value"() {
+    def "evaluateExpression returns false on not finding non-existing value"() {
         given:
         def path = "Bundle.timestamp.exists()"
 
         when:
-        def result = fhir.evaluateCondition(bundle as IBaseResource, path)
+        def result = fhir.evaluateExpression(path, new HapiFhirResource(bundle))
 
         then:
-        result == false
+        !result
     }
 
-    def "evaluateCondition returns false on not finding matching extension"() {
+    def "evaluateExpression returns false on not finding matching extension"() {
         given:
         def path = "Bundle.entry[0].resource.extension('blah')"
 
         when:
-        def result = fhir.evaluateCondition(bundle as IBaseResource, path)
+        def result = fhir.evaluateExpression(path, new HapiFhirResource(bundle))
 
         then:
-        result == false
+        !result
     }
 
-    def "evaluateCondition throws Exception on empty string"() {
+    def "evaluateExpression throws Exception on empty string"() {
         given:
         def path = ""
 
         when:
-        fhir.evaluateCondition(bundle as IBaseResource, path)
+        fhir.evaluateExpression(path, new HapiFhirResource(bundle))
 
         then:
         thrown(Exception)
     }
 
-    def "evaluateCondition throws Exception on fake method"() {
+    def "evaluateExpression throws Exception on fake method"() {
         given:
         def path = "Bundle.entry[0].resource.BadMethod('blah')"
 
         when:
-        fhir.evaluateCondition(bundle as IBaseResource, path)
+        fhir.evaluateExpression(path, new HapiFhirResource(bundle))
 
         then:
         thrown(Exception)
+    }
+
+    def "evaluateExpression throws IllegalArgumentException when passing more than one HealthData"() {
+        when:
+        fhir.evaluateExpression("fhirpath", new HapiFhirResource(bundle), new HapiFhirResource(bundle))
+
+        then:
+        thrown(IllegalArgumentException)
     }
 
     def "getStringFromFhirPath returns correct string value for existing path"() {

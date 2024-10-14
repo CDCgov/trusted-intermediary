@@ -1,17 +1,15 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation;
 
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.Rule;
+import gov.hhs.cdc.trustedintermediary.ruleengine.Rule;
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * The TransformationRule class extends the {@link
- * gov.hhs.cdc.trustedintermediary.etor.ruleengine.Rule Rule} class and represents a transformation
- * rule. It implements the {@link
- * gov.hhs.cdc.trustedintermediary.etor.ruleengine.Rule#runRule(FhirResource) runRule} method to
- * apply a transformation to the FHIR resource.
+ * The TransformationRule class extends the {@link Rule Rule} class and represents a transformation
+ * rule. It implements the {@link Rule#runRule(HealthData...) runRule} method to apply a
+ * transformation to the FHIR resource.
  */
 public class TransformationRule extends Rule<TransformationRuleMethod> {
 
@@ -35,20 +33,29 @@ public class TransformationRule extends Rule<TransformationRuleMethod> {
     }
 
     @Override
-    public void runRule(FhirResource<?> resource) {
+    public void runRule(HealthData<?>... resource) {
+
+        if (resource.length != 1) {
+            this.logger.logError(
+                    "Rule ["
+                            + this.getName()
+                            + "]: Transformation rules require exactly one resource object to be passed in.");
+            return;
+        }
+
         for (TransformationRuleMethod transformation : this.getRules()) {
             try {
-                applyTransformation(transformation, resource);
+                applyTransformation(transformation, resource[0]);
             } catch (RuntimeException e) {
-                logger.logError("Error applying transformation: " + transformation.name(), e);
+                this.logger.logError("Error applying transformation: " + transformation.name(), e);
             }
         }
     }
 
     private void applyTransformation(
-            TransformationRuleMethod transformation, FhirResource<?> resource) {
+            TransformationRuleMethod transformation, HealthData<?> resource) {
         String name = transformation.name();
-        Map<String, String> args = transformation.args();
+        Map<String, Object> args = transformation.args();
         logger.logInfo("Applying transformation: " + name);
 
         CustomFhirTransformation transformationInstance = getTransformationInstance(name);

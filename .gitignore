@@ -29,13 +29,6 @@ Thumbs.db
 terraform.tfstate*
 .terraform*
 
-# Ignore generated directories that are part of the HL7 IG tooling process
-ig/fsh-generated
-ig/input-cache
-ig/output
-ig/temp
-ig/template
-
 __pycache__
 
 localfileorder.json

@@ -1,8 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom;
 
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhirTransformation;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -17,16 +17,23 @@ import org.hl7.fhir.r4.model.StringType;
  * Service Identifier (OBR-4)
  */
 public class UpdateUniversalServiceIdentifier implements CustomFhirTransformation {
+
+    public static final String CHECK_VALUE_NAME = "checkValue";
+    public static final String CODING_SYSTEM_NAME = "codingSystem";
+    public static final String ALTERNATE_ID_NAME = "alternateId";
+
     @Override
-    public void transform(FhirResource<?> resource, Map<String, String> args) {
-        Bundle bundle = (Bundle) resource.getUnderlyingResource();
+    public void transform(HealthData<?> resource, Map<String, Object> args) {
+        Bundle bundle = (Bundle) resource.getUnderlyingData();
         var serviceRequests = HapiHelper.resourcesInBundle(bundle, ServiceRequest.class);
 
+        // Let it fail if args.get("<property>") is not a string
         serviceRequests.forEach(
                 it -> {
                     var allCodings = it.getCode().getCoding();
                     var codingSystemContainer =
-                            getCodingSystemContainer(allCodings, args.get("checkValue"));
+                            getCodingSystemContainer(
+                                    allCodings, (String) args.get(CHECK_VALUE_NAME));
 
                     if (codingSystemContainer == null) {
                         // we're only interested in coding that matches the checkValue argument
@@ -34,11 +41,15 @@ public class UpdateUniversalServiceIdentifier implements CustomFhirTransformatio
                     }
 
                     // check for the coding system label and create or override it
-                    updateCodingSystemLabel(codingSystemContainer, args.get("codingSystem"));
+                    updateCodingSystemLabel(
+                            codingSystemContainer, (String) args.get(CODING_SYSTEM_NAME));
 
                     // the alt id is stored on a separate coding object, so we need to filter
                     // for it
-                    updateAlternateCodingId(allCodings, args);
+                    String alternateId = (String) args.get(ALTERNATE_ID_NAME);
+                    if (alternateId != null) {
+                        updateAlternateCodingId(allCodings, alternateId);
+                    }
                 });
     }
 
@@ -81,7 +92,7 @@ public class UpdateUniversalServiceIdentifier implements CustomFhirTransformatio
     }
 
     /** Find and create or update the "Alternate Id" object in a given List */
-    private void updateAlternateCodingId(List<Coding> allCodings, Map<String, String> args) {
+    private void updateAlternateCodingId(List<Coding> allCodings, String alternateId) {
         var altCodingContainer = getAltCodingContainer(allCodings);
 
         if (altCodingContainer == null) {
@@ -93,6 +104,6 @@ public class UpdateUniversalServiceIdentifier implements CustomFhirTransformatio
             altCodingContainer.addExtension(altCodingExtension);
             allCodings.add(altCodingContainer);
         }
-        altCodingContainer.setCode(args.get("alternateId"));
+        altCodingContainer.setCode(alternateId);
     }
 }

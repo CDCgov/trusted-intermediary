@@ -30,4 +30,22 @@ class PasswordChangingHikariDataSourceTest extends Specification {
         then:
         thrown(UnsupportedOperationException)
     }
+
+    def "getting the credential calls the credential provider for the latest password and doesn't change the username"() {
+        given:
+        def mockCredentialProvider = Mock(DatabaseCredentialsProvider)
+        TestApplicationContext.register(DatabaseCredentialsProvider, mockCredentialProvider)
+
+        def expectedUsername = "Clarus"
+
+        def passwordChangingDataSource = new PasswordChangingHikariDataSource()
+        passwordChangingDataSource.setUsername(expectedUsername)
+
+        when:
+        def actualCredential = passwordChangingDataSource.getCredentials()
+
+        then:
+        actualCredential.getUsername() == expectedUsername
+        1 * mockCredentialProvider.getPassword()
+    }
 }

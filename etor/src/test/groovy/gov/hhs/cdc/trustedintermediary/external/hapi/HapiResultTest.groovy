@@ -34,7 +34,7 @@ class HapiResultTest extends Specification {
         def result = new HapiResult(expectedResult)
 
         when:
-        def actualResult = result.getUnderlyingResource()
+        def actualResult = result.getUnderlyingData()
 
         then:
         actualResult == expectedResult

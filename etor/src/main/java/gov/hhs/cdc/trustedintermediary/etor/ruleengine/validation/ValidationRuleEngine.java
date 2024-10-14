@@ -1,9 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation;
 
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleEngine;
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader;
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoaderException;
+import gov.hhs.cdc.trustedintermediary.ruleengine.RuleEngine;
+import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoader;
+import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoaderException;
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.io.FileNotFoundException;
@@ -61,7 +61,7 @@ public class ValidationRuleEngine implements RuleEngine {
     }
 
     @Override
-    public void runRules(FhirResource<?> resource) {
+    public void runRules(HealthData<?> resource) {
         try {
             ensureRulesLoaded();
         } catch (RuleLoaderException e) {

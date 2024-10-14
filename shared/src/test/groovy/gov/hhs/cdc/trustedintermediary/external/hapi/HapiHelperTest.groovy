@@ -7,6 +7,8 @@ import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.MessageHeader
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Practitioner
+import org.hl7.fhir.r4.model.PractitionerRole
 import org.hl7.fhir.r4.model.Provenance
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ResourceType
@@ -44,6 +46,33 @@ class HapiHelperTest extends Specification {
 
         then:
         patientStream.allMatch {patients.contains(it) && it.getResourceType() == ResourceType.Patient }
+    }
+
+    def "resourceInBundle returns null when the bundle is null"() {
+        when:
+        def result = HapiHelper.resourceInBundle(null, Patient)
+
+        then:
+        result == null
+    }
+
+    def "resourcesInBundle returns an empty stream when the bundle is null"() {
+        when:
+        def result = HapiHelper.resourcesInBundle(null, Patient)
+
+        then:
+        result.findAny().isEmpty()
+    }
+
+    def "resourcesInBundle returns an empty stream when the bundle has no entries"() {
+        given:
+        def bundle = new Bundle()
+
+        when:
+        def result = HapiHelper.resourcesInBundle(bundle, Patient)
+
+        then:
+        result.findAny().isEmpty()
     }
 
     // MSH - Message Header
@@ -309,6 +338,23 @@ class HapiHelperTest extends Specification {
         convertedMessageHeader.getEventCoding().getSystem() == expectedSystem
         convertedMessageHeader.getEventCoding().getCode() == expectedCode
         convertedMessageHeader.getEventCoding().getDisplay() == expectedDisplay
+    }
+
+    // MSH-10 - Message Control Id
+    def "return the correct value for message identifier"() {
+        given:
+        final String EXPECTED_CONTROL_ID = "SomeMessageControlId"
+
+        def bundle = new Bundle()
+        Identifier identifier = new Identifier()
+        identifier.setValue(EXPECTED_CONTROL_ID)
+        bundle.setIdentifier(identifier)
+
+        when:
+        def actualControlId = HapiHelper.getMessageControlId(bundle)
+
+        then:
+        actualControlId == EXPECTED_CONTROL_ID
     }
 
     def "adds the message type when it doesn't exist"() {
@@ -657,6 +703,62 @@ class HapiHelperTest extends Specification {
         HapiHelper.getOBR4_1Value(sr) == null
     }
 
+    def "ensureExtensionExists returns extension if it exists"() {
+        given:
+        def serviceRequest = new ServiceRequest()
+        final String extensionUrl = "someExtensionUrl"
+        def expectedExtension = serviceRequest.addExtension().setUrl(extensionUrl)
+
+        when:
+        def actualExtension = HapiHelper.ensureExtensionExists(serviceRequest, extensionUrl)
+
+        then:
+        actualExtension == expectedExtension
+    }
+
+    def "ensureExtensionExists returns a newly created extension if it does not exist"() {
+        given:
+        def serviceRequest = new ServiceRequest()
+        final String extensionUrl = "someExtensionUrl"
+
+        expect:
+        serviceRequest.getExtensionByUrl(extensionUrl) == null
+
+        when:
+        def actualExtension = HapiHelper.ensureExtensionExists(serviceRequest, extensionUrl)
+
+        then:
+        actualExtension == serviceRequest.getExtensionByUrl(extensionUrl)
+    }
+
+    def "ensureSubExtensionExists returns extension if it exists"() {
+        given:
+        def parentExtension = new Extension()
+        final String subExtensionUrl = "someSubExtensionUrl"
+        def expectedExtension = parentExtension.addExtension().setUrl(subExtensionUrl)
+
+        when:
+        def actualExtension = HapiHelper.ensureSubExtensionExists(parentExtension, subExtensionUrl)
+
+        then:
+        actualExtension == expectedExtension
+    }
+
+    def "ensureSubExtensionExists returns a newly created extension if it does not exist"() {
+        given:
+        def parentExtension = new Extension()
+        final String subExtensionUrl = "someSubExtensionUrl"
+
+        expect:
+        parentExtension.getExtensionByUrl(subExtensionUrl) == null
+
+        when:
+        def actualExtension = HapiHelper.ensureSubExtensionExists(parentExtension, subExtensionUrl)
+
+        then:
+        actualExtension == parentExtension.getExtensionByUrl(subExtensionUrl)
+    }
+
     // HD - Hierarchic Designator
     def "getHD1Identifier returns the correct namespaceIdentifier"() {
         given:
@@ -757,5 +859,96 @@ class HapiHelperTest extends Specification {
 
         then:
         identifiers.first() == identifier
+    }
+
+    def "setOBR16WithPractitioner sets the expected value on an extension"() {
+        given:
+        def ext = new Extension()
+        def role = new PractitionerRole()
+        def practitioner = new Practitioner()
+        practitioner.setId("test123")
+        def ref = new Reference(practitioner.getId())
+        role.setPractitioner(ref)
+
+        expect:
+        ext.getValue() == null
+
+        when:
+        HapiHelper.setOBR16WithPractitioner(ext, role)
+
+        then:
+        ext.getValue().getReference() == "test123"
+    }
+
+    def "setOBR16WithPractitioner does nothing if the provided PractitionerRole is null"() {
+        given:
+        def ext = new Extension()
+        def role = null
+
+        expect:
+        ext.getValue() == null
+
+        when:
+        HapiHelper.setOBR16WithPractitioner(ext, role)
+
+        then:
+        ext.getValue() == null
+    }
+
+    def "urlForCodeType should return expected values"() {
+        when:
+        def actualResult = HapiHelper.urlForCodeType(inputValue)
+
+        then:
+        actualResult == expectedResult
+
+        where:
+        inputValue || expectedResult
+        "LN"       || HapiHelper.LOINC_URL
+        "L"        || HapiHelper.LOCAL_CODE_URL
+        "PLT"      || null
+    }
+
+    def "check getPractitioner gets the correct resource"() {
+        given:
+        def bundle = new Bundle()
+        def dr = HapiFhirHelper.createDiagnosticReport(bundle)
+        def sr = HapiFhirHelper.createBasedOnServiceRequest(dr)
+
+        def role = HapiFhirHelper.createPractitionerRole()
+        Reference requesterReference = HapiFhirHelper.createPractitionerRoleReference(role)
+        sr.setRequester(requesterReference)
+
+        def practitioner = new Practitioner()
+        practitioner.setId(UUID.randomUUID().toString())
+
+        String organizationId = practitioner.getId()
+        Reference organizationReference = new Reference("Practitioner/" + organizationId)
+        organizationReference.setResource(practitioner)
+        role.setPractitioner(organizationReference)
+
+        expect:
+        def pr = HapiHelper.getPractitioner(role)
+        pr.id == practitioner.id
+    }
+
+    def "hasDefinedCoding returns the correct result"() {
+        given:
+        def coding = new Coding()
+        coding.code = "SOME_CODE"
+        coding.addExtension(HapiHelper.EXTENSION_CWE_CODING, new StringType("coding"))
+        coding.addExtension(HapiHelper.EXTENSION_CODING_SYSTEM, new StringType("L"))
+
+        when:
+        def actualResult = HapiHelper.hasDefinedCoding(coding, codingExt, codingSystemExt)
+
+        then:
+        actualResult == expectedResult
+
+        where:
+        codingExt     | codingSystemExt || expectedResult
+        "coding"      | "L"             || true
+        "alt-coding"  | "L"             || false
+        "coding"      | "LN"            || false
     }
 }

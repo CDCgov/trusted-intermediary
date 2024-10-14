@@ -12,7 +12,7 @@ import spock.lang.Specification
 class RemoveObservationRequestsTest extends Specification {
     def transformClass
     def obr4_1 = "54089-8"
-    def args = Map.of("universalServiceIdentifier", obr4_1)
+    def args = Map.of("universalServiceIdentifier",  (Object) obr4_1)
 
     def setup() {
         TestApplicationContext.reset()
@@ -22,10 +22,29 @@ class RemoveObservationRequestsTest extends Specification {
         transformClass = new RemoveObservationRequests()
     }
 
+    def "test when universalServiceIdentifier is not a String"() {
+        given:
+        // Load a FHIR resource example
+        def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/002_CA_ORU_R01_initial_translation.fhir")
+        def bundle = fhirResource.getUnderlyingData() as Bundle
+
+        // Prepare args with a List<String> instead of a String to trigger null response from ternary operator
+        def listOfIdentifiers = ["54089-8", "99717-5"]
+        def args = Map.of("universalServiceIdentifier", (Object) listOfIdentifiers)
+
+        when:
+        // Call transform with the complex args map
+        transformClass.transform(fhirResource, args)
+
+        then:
+        thrown(ClassCastException)
+    }
+
+
     def "remove all OBRs except for the one with OBR-4.1 = '54089-8'"() {
         given:
         def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/002_CA_ORU_R01_initial_translation.fhir")
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = fhirResource.getUnderlyingData() as Bundle
 
         def initialDiagnosticReports = HapiHelper.resourcesInBundle(bundle, DiagnosticReport).toList()
         def initialServiceRequests = HapiHelper.resourcesInBundle(bundle, ServiceRequest).toList()
@@ -54,7 +73,7 @@ class RemoveObservationRequestsTest extends Specification {
     def "once removed all OBRs except one, attach all observations to that single OBR"() {
         given:
         def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/002_CA_ORU_R01_initial_translation.fhir")
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = fhirResource.getUnderlyingData() as Bundle
 
         def initialDiagnosticReports = HapiHelper.resourcesInBundle(bundle, DiagnosticReport).toList()
         def initialObservations = HapiHelper.resourcesInBundle(bundle, Observation).toList()
@@ -75,7 +94,7 @@ class RemoveObservationRequestsTest extends Specification {
     def "remove all irrelevant OBRs, with edge case of one DiagnosticReport not having a related ServiceRequest"() {
         given:
         def fhirResource = ExamplesHelper.getExampleFhirResource("../Test/Results/006_CA_ORU_R01_one_diagnostic_report_without_basedOn.fhir")
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = fhirResource.getUnderlyingData() as Bundle
 
         def initialDiagnosticReports = HapiHelper.resourcesInBundle(bundle, DiagnosticReport).toList()
         def initialServiceRequests = HapiHelper.resourcesInBundle(bundle, ServiceRequest).toList()
@@ -99,7 +118,7 @@ class RemoveObservationRequestsTest extends Specification {
     def "remove all irrelevant OBRs, with edge case of all DiagnosticReports not having a related ServiceRequest"() {
         given:
         def fhirResource = ExamplesHelper.getExampleFhirResource("../Test/Results/006_CA_ORU_R01_all_diagnostic_reports_without_basedOn.fhir")
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = fhirResource.getUnderlyingData() as Bundle
 
         def initialDiagnosticReports = HapiHelper.resourcesInBundle(bundle, DiagnosticReport).toList()
         def initialServiceRequests = HapiHelper.resourcesInBundle(bundle, ServiceRequest).toList()
@@ -123,7 +142,7 @@ class RemoveObservationRequestsTest extends Specification {
     def "no OBRs are removed because nothing matches the universalServiceIdentifier"() {
         given:
         def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/002_CA_ORU_R01_initial_translation.fhir")
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = fhirResource.getUnderlyingData() as Bundle
 
         def initialDiagnosticReports = HapiHelper.resourcesInBundle(bundle, DiagnosticReport).toList()
         def initialServiceRequests = HapiHelper.resourcesInBundle(bundle, ServiceRequest).toList()

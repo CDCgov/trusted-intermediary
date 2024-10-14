@@ -8,4 +8,4 @@ import java.util.Map;
  * @param name The name of the transformation.
  * @param args The arguments to pass to the transformation method.
  */
-public record TransformationRuleMethod(String name, Map<String, String> args) {}
+public record TransformationRuleMethod(String name, Map<String, Object> args) {}

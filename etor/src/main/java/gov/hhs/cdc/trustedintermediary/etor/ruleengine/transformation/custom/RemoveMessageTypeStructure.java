@@ -1,8 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom;
 
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhirTransformation;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,8 +13,8 @@ import org.hl7.fhir.r4.model.Bundle;
 public class RemoveMessageTypeStructure implements CustomFhirTransformation {
 
     @Override
-    public void transform(FhirResource<?> resource, Map<String, String> args) {
-        Bundle bundle = (Bundle) resource.getUnderlyingResource();
+    public void transform(HealthData<?> resource, Map<String, Object> args) {
+        Bundle bundle = (Bundle) resource.getUnderlyingData();
         String msh9_3 = HapiHelper.getMSH9_3Value(bundle);
         if (msh9_3 == null) {
             return;

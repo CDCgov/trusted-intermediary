@@ -1,8 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom;
 
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhirTransformation;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -22,10 +22,11 @@ import org.hl7.fhir.r4.model.ServiceRequest;
 public class RemoveObservationRequests implements CustomFhirTransformation {
 
     @Override
-    public void transform(FhirResource<?> resource, Map<String, String> args) {
-        Bundle bundle = (Bundle) resource.getUnderlyingResource();
+    public void transform(HealthData<?> resource, Map<String, Object> args) {
+        Bundle bundle = (Bundle) resource.getUnderlyingData();
+        // Let it fail if it is not a String
+        String universalServiceIdentifier = (String) args.get("universalServiceIdentifier");
 
-        String universalServiceIdentifier = args.get("universalServiceIdentifier");
         Set<Resource> resourcesToRemove = new HashSet<>();
         List<Reference> observationReferences = new ArrayList<>();
         DiagnosticReport singleDiagnosticReport = null;

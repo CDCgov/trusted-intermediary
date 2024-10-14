@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.hikari;
 
 import com.zaxxer.hikari.HikariDataSource;
+import com.zaxxer.hikari.util.Credentials;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.wrappers.database.DatabaseCredentialsProvider;
 
@@ -21,5 +22,13 @@ public class PasswordChangingHikariDataSource extends HikariDataSource {
     public void setPassword(String newPassword) {
         throw new UnsupportedOperationException(
                 "Password changing using this method is not supported");
+    }
+
+    @Override
+    public Credentials getCredentials() {
+        return new Credentials(
+                getUsername(),
+                ApplicationContext.getImplementation(DatabaseCredentialsProvider.class)
+                        .getPassword());
     }
 }

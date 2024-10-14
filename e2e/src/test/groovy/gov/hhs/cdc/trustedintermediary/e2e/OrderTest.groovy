@@ -89,7 +89,7 @@ class OrderTest extends Specification {
         //test that the MessageHeader's event is now an OML_O21
         parsedSentPayload.entry[0].resource.resourceType == "MessageHeader"
         parsedSentPayload.entry[0].resource.eventCoding.code == "O21"
-        parsedSentPayload.entry[0].resource.eventCoding.display.contains("OML")
+        parsedSentPayload.entry[0].resource.eventCoding.display == "OML^O21^OML_O21"
     }
 
     def "return a 400 response when request has unexpected format"() {

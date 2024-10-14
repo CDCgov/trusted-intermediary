@@ -32,7 +32,7 @@ class ResultControllerTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def actualBundle = controller.parseResults(new DomainRequest()).underlyingResource
+        def actualBundle = controller.parseResults(new DomainRequest()).getUnderlyingData()
 
         then:
         actualBundle == expectedBundle

@@ -27,13 +27,13 @@ import gov.hhs.cdc.trustedintermediary.etor.results.ResultController;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultResponse;
 import gov.hhs.cdc.trustedintermediary.etor.results.ResultSender;
 import gov.hhs.cdc.trustedintermediary.etor.results.SendResultUseCase;
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.TransformationRuleEngine;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation.ValidationRuleEngine;
 import gov.hhs.cdc.trustedintermediary.external.database.DatabaseMessageLinkStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.DatabasePartnerMetadataStorage;
 import gov.hhs.cdc.trustedintermediary.external.database.DbDao;
 import gov.hhs.cdc.trustedintermediary.external.database.PostgresDao;
+import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirImplementation;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiMessageHelper;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiPartnerMetadataConverter;
 import gov.hhs.cdc.trustedintermediary.external.localfile.FileMessageLinkStorage;
@@ -44,8 +44,10 @@ import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamEndpoin
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamOrderSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamResultSender;
 import gov.hhs.cdc.trustedintermediary.external.reportstream.ReportStreamSenderHelper;
+import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoader;
 import gov.hhs.cdc.trustedintermediary.wrappers.FhirParseException;
 import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.Map;
 import java.util.Optional;
@@ -107,6 +109,8 @@ public class EtorDomainRegistration implements DomainConnector {
         ApplicationContext.register(
                 PartnerMetadataConverter.class, HapiPartnerMetadataConverter.getInstance());
         // Validation rules
+        ApplicationContext.register(
+                HealthDataExpressionEvaluator.class, HapiFhirImplementation.getInstance());
         ApplicationContext.register(RuleLoader.class, RuleLoader.getInstance());
         ApplicationContext.register(
                 ValidationRuleEngine.class,

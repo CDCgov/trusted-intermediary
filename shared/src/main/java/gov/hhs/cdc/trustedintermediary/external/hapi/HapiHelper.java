@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.external.hapi;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.hl7.fhir.r4.model.Bundle;
@@ -12,8 +13,10 @@ import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.MessageHeader;
 import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.PractitionerRole;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ServiceRequest;
@@ -45,9 +48,11 @@ public class HapiHelper {
     public static final String EXTENSION_CX5_URL = "CX.5";
     public static final StringType EXTENSION_HD1_DATA_TYPE = new StringType("HD.1");
     public static final StringType EXTENSION_HD2_HD3_DATA_TYPE = new StringType("HD.2,HD.3");
+    public static final StringType EXTENSION_ORC12_DATA_TYPE = new StringType("ORC.12");
     public static final StringType EXTENSION_ORC2_DATA_TYPE = new StringType("ORC.2");
     public static final StringType EXTENSION_ORC4_DATA_TYPE = new StringType("ORC.4");
     public static final StringType EXTENSION_OBR2_DATA_TYPE = new StringType("OBR.2");
+    public static final StringType EXTENSION_OBR16_DATA_TYPE = new StringType("OBR.16");
 
     public static final String EXTENSION_CODING_SYSTEM =
             "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding-system";
@@ -57,13 +62,22 @@ public class HapiHelper {
     public static final String EXTENSION_ALT_CODING = "alt-coding";
 
     public static final Coding OML_CODING =
-            new Coding(
-                    "http://terminology.hl7.org/CodeSystem/v2-0003",
-                    "O21",
-                    "OML - Laboratory order");
+            new Coding("http://terminology.hl7.org/CodeSystem/v2-0003", "O21", "OML^O21^OML_O21");
+
+    public static final String EXTENSION_ORC_URL =
+            "https://reportstream.cdc.gov/fhir/StructureDefinition/orc-common-order";
+    public static final String EXTENSION_ORC12_URL = "orc-12-ordering-provider";
 
     public static final String EXTENSION_OBR_URL =
             "https://reportstream.cdc.gov/fhir/StructureDefinition/obr-observation-request";
+
+    public static final String LOCAL_CODE_URL =
+            "https://terminology.hl7.org/CodeSystem-v2-0396.html#v2-0396-99zzzorL";
+    public static final String LOINC_URL = "http://loinc.org";
+
+    public static final String LOINC_CODE = "LN";
+    public static final String PLT_CODE = "PLT";
+    public static final String LOCAL_CODE = "L";
 
     /**
      * Returns a {@link Stream} of FHIR resources inside the provided {@link Bundle} that match the
@@ -76,6 +90,9 @@ public class HapiHelper {
      */
     public static <T extends Resource> Stream<T> resourcesInBundle(
             Bundle bundle, Class<T> resourceType) {
+        if (bundle == null || bundle.getEntry().isEmpty()) {
+            return Stream.empty();
+        }
         return bundle.getEntry().stream()
                 .map(Bundle.BundleEntryComponent::getResource)
                 .filter(resource -> resource.getClass().equals(resourceType))
@@ -84,6 +101,11 @@ public class HapiHelper {
 
     public static <T extends Resource> T resourceInBundle(Bundle bundle, Class<T> resourceType) {
         return resourcesInBundle(bundle, resourceType).findFirst().orElse(null);
+    }
+
+    // MSH-10
+    public static String getMessageControlId(Bundle bundle) {
+        return bundle.getIdentifier().getValue();
     }
 
     // MSH - Message Header
@@ -300,6 +322,10 @@ public class HapiHelper {
         return (PractitionerRole) serviceRequest.getRequester().getResource();
     }
 
+    public static Practitioner getPractitioner(PractitionerRole practitionerRole) {
+        return (Practitioner) practitionerRole.getPractitioner().getResource();
+    }
+
     public static Organization getOrganization(PractitionerRole practitionerRole) {
         return (Organization) practitionerRole.getOrganization().getResource();
     }
@@ -473,6 +499,47 @@ public class HapiHelper {
         return getCWE1Value(cc.getCoding().get(0));
     }
 
+    // OBR16 - Ordering Provider
+
+    // OBR16 -
+    public static void setOBR16WithPractitioner(
+            Extension obr16Extension, PractitionerRole practitionerRole) {
+        if (practitionerRole == null) {
+            return;
+        }
+        obr16Extension.setValue(practitionerRole.getPractitioner());
+    }
+
+    /**
+     * Ensures that the extension exists for a given serviceRequest. If the extension does not
+     * exist, it will create it.
+     */
+    public static Extension ensureExtensionExists(
+            ServiceRequest serviceRequest, String extensionUrl) {
+        Extension extension = serviceRequest.getExtensionByUrl(extensionUrl);
+        if (extension == null) {
+            // If the extension does not exist, create it and add it to the ServiceRequest
+            extension = new Extension(extensionUrl);
+            serviceRequest.addExtension(extension);
+        }
+
+        return extension;
+    }
+
+    /**
+     * Ensures that a sub-extension exists within a parent extension. If the sub-extension does not
+     * exist, it will create it.
+     */
+    public static Extension ensureSubExtensionExists(
+            Extension parentExtension, String subExtensionUrl) {
+        Extension subExtension = parentExtension.getExtensionByUrl(subExtensionUrl);
+        if (subExtension == null) {
+            subExtension = new Extension(subExtensionUrl);
+            parentExtension.addExtension(subExtension);
+        }
+        return subExtension;
+    }
+
     // HD - Hierarchic Designator
     public static Identifier getHD1Identifier(List<Identifier> identifiers) {
         List<Identifier> hd1Identifiers =
@@ -485,6 +552,23 @@ public class HapiHelper {
 
     public static void setHD1Identifier(Identifier identifier) {
         setHl7FieldExtensionValue(identifier, EXTENSION_HD1_DATA_TYPE);
+    }
+
+    // Coding resource
+    public static Extension getCodingExtensionByUrl(Coding coding, String url) {
+        return coding.getExtensionByUrl(url);
+    }
+
+    public static boolean hasCodingExtensionWithUrl(Coding coding, String url) {
+        return coding.getExtensionByUrl(url) != null;
+    }
+
+    public static boolean hasCodingSystem(Coding coding) {
+        return coding.getSystem() != null;
+    }
+
+    public static String getCodingSystem(Coding coding) {
+        return coding.getSystem();
     }
 
     // CWE - Coded with Exceptions
@@ -590,5 +674,66 @@ public class HapiHelper {
                                         .getExtensionByUrl(EXTENSION_HL7_FIELD_URL)
                                         .getValue()
                                         .equalsDeep(dataType));
+    }
+
+    public static String urlForCodeType(String code) {
+        return switch (code) {
+            case HapiHelper.LOINC_CODE -> HapiHelper.LOINC_URL;
+            case HapiHelper.PLT_CODE -> null;
+            default -> HapiHelper.LOCAL_CODE_URL;
+        };
+    }
+
+    /**
+     * Check if a given Coding resource has a coding extension and coding system extension with the
+     * specified type.
+     *
+     * @param coding the resource to check. Expected to be converted from an HL7 CWE format field.
+     * @param codingExt Name of coding extension (e.g. "coding", "alt-coding")
+     * @param codingSystemExt Name of coding system to look for (e.g. Local code "L", LOINC "LN"...)
+     * @return True if the Coding is formatted correctly and has the expected code type, else false
+     */
+    public static boolean hasDefinedCoding(
+            Coding coding, String codingExt, String codingSystemExt) {
+        var codingExtMatch =
+                hasMatchingCodingExtension(coding, HapiHelper.EXTENSION_CWE_CODING, codingExt);
+        var codingSystemExtMatch =
+                hasMatchingCodingExtension(
+                        coding, HapiHelper.EXTENSION_CODING_SYSTEM, codingSystemExt);
+        return codingExtMatch && codingSystemExtMatch;
+    }
+
+    private static boolean hasMatchingCodingExtension(
+            Coding coding, String extensionUrl, String valueToMatch) {
+        if (!HapiHelper.hasCodingExtensionWithUrl(coding, extensionUrl)) {
+            return false;
+        }
+
+        var extensionValue =
+                HapiHelper.getCodingExtensionByUrl(coding, extensionUrl).getValue().toString();
+        return Objects.equals(valueToMatch, extensionValue);
+    }
+
+    /**
+     * Check if an observation has a Coding resource with the given code, coding, and coding system
+     *
+     * @param codeToMatch The code to look for.
+     * @param codingExtToMatch Name of coding extension (e.g. "coding", "alt-coding")
+     * @param codingSystemToMatch Name of coding system to look for (e.g. Local code "L", LOINC
+     *     "LN"...)
+     * @return True if the Coding is present in the observation, else false
+     */
+    public static boolean hasMatchingCoding(
+            Observation observation,
+            String codeToMatch,
+            String codingExtToMatch,
+            String codingSystemToMatch) {
+        for (Coding coding : observation.getCode().getCoding()) {
+            if (Objects.equals(coding.getCode(), codeToMatch)
+                    && hasDefinedCoding(coding, codingExtToMatch, codingSystemToMatch)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

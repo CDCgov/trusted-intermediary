@@ -181,8 +181,57 @@
           "name": "UpdateUniversalServiceIdentifier",
           "args": {
             "checkValue": "54089-8",
-            "codingSystem": "LN",
-            "alternateId": "CDPHGSPEAP"
+            "codingSystem": "CDPHGSPEAP"
+          }
+        }
+      ]
+    },
+    {
+      "name": "ucsdOruMapLocalObservationCodes",
+      "description": "Maps local observation codes in OBX-3.4/5/6 to LOINC/PLT codes in OBX-3.1/2/3",
+      "message": "",
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.1').value in ('R797' | 'R508')",
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
+      ],
+      "rules": [
+        {
+          "name": "MapLocalObservationCodes",
+          "args": {}
+        }
+      ]
+    },
+    {
+      "name": "ucsdOruCopyOrcOrderProviderToObrOrderProvider",
+      "description": "Copies the value from ORC12 and uses this value to replace the value in OBR16",
+      "message": "",
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.1').value in ('R797' | 'R508')",
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'",
+        "Bundle.entry.resource.ofType(ServiceRequest).code.coding.where(code = '54089-8').exists()"
+      ],
+      "rules": [
+        {
+          "name": "CopyOrcOrderProviderToObrOrderProvider",
+          "args": {}
+        }
+      ]
+    },
+    {
+      "name": "ucsdOruRemoveAccessionNumberObservation",
+      "description": "Remove Observations for UCSD ORUs when their OBX-3.4 value is '99717-5' and OBX-3.6 is 'L'",
+      "message": "",
+      "conditions": [
+        "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.1').value in ('R797' | 'R508')",
+        "Bundle.entry.resource.ofType(MessageHeader).event.code = 'R01'"
+      ],
+      "rules": [
+        {
+          "name": "RemoveObservationByCode",
+          "args": {
+            "code": "99717-5",
+            "codingSystemExtension": "L",
+            "codingExtension": "alt-coding"
           }
         }
       ]

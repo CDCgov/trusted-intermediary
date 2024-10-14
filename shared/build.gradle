@@ -16,27 +16,31 @@ dependencies {
     api 'javax.inject:javax.inject:1'
     implementation 'javax.annotation:javax.annotation-api:1.3.2'
 
-    //logging
+    // logging
     implementation 'org.slf4j:slf4j-api:2.0.16'
-    implementation 'ch.qos.logback:logback-classic:1.5.7'
+    implementation 'ch.qos.logback:logback-classic:1.5.10'
     implementation 'net.logstash.logback:logstash-logback-encoder:8.0'
 
     //jackson
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.17.2'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.17.2'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.2'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.18.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.0'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.0'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.0'
 
-    //fhir
-    api 'ca.uhn.hapi.fhir:hapi-fhir-base:7.4.0'
-    api 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:7.4.0'
-    implementation 'ca.uhn.hapi.fhir:hapi-fhir-caching-caffeine:7.4.0'
-    implementation 'ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:7.4.0'
+    // hapi fhir
+    api 'ca.uhn.hapi.fhir:hapi-fhir-base:7.4.3'
+    api 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:7.4.3'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-caching-caffeine:7.4.3'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:7.4.3'
     api 'org.fhir:ucum:1.0.8'
 
+    // hapi hl7
+    implementation 'ca.uhn.hapi:hapi-base:2.5.1'
+    implementation 'ca.uhn.hapi:hapi-structures-v251:2.5.1'
+
     // Apache Client
-    implementation 'org.apache.httpcomponents.client5:httpclient5:5.3.1'
-    implementation 'org.apache.httpcomponents.client5:httpclient5-fluent:5.3.1'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.4'
+    implementation 'org.apache.httpcomponents.client5:httpclient5-fluent:5.4'
 
     // jjwt
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
@@ -44,14 +48,14 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 
     // azure sdk
-    implementation 'com.azure:azure-security-keyvault-secrets:4.8.6'
-    implementation 'com.azure:azure-identity:1.13.2'
+    implementation 'com.azure:azure-security-keyvault-secrets:4.8.7'
+    implementation 'com.azure:azure-identity:1.14.0'
 
-    testImplementation 'org.apache.groovy:groovy:4.0.22'
-    testFixturesImplementation 'org.apache.groovy:groovy:4.0.22'
+    testImplementation 'org.apache.groovy:groovy:4.0.23'
+    testFixturesImplementation 'org.apache.groovy:groovy:4.0.23'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
     testFixturesImplementation 'com.openpojo:openpojo:0.9.1'
-    testFixturesImplementation 'nl.jqno.equalsverifier:equalsverifier:3.16.2'
+    testFixturesImplementation 'nl.jqno.equalsverifier:equalsverifier:3.17.1'
 
     // dotenv-java
     implementation 'io.github.cdimascio:dotenv-java:3.0.2'
@@ -60,7 +64,7 @@ dependencies {
     implementation 'org.postgresql:postgresql:42.7.4'
 
     // hikari connection pool
-    implementation 'com.zaxxer:HikariCP:5.1.0'
+    implementation 'com.zaxxer:HikariCP:6.0.0'
 }
 
 jacocoTestCoverageVerification {
