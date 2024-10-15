@@ -17,6 +17,7 @@ pr_actions = ["opened", "reopened", "ready_for_review", "review_requested"]
 num_code_suggestions=3 # Number of code suggestions provided by the 'review' tool. Default is 0, meaning no code suggestions will be provided by the `review` tool.
 inline_code_comments = true # If set to true, the tool will publish the code suggestions as comments on the code diff. Default is false. Note that you need to set `num_code_suggestions`>0 to get code suggestions
 ask_and_reflect=false
+persistent_comment=false
 #automatic_review=true
 extra_instructions = "" # Optional extra instructions to the tool. For example: "focus on the changes in the file X. Ignore change in ...".
 final_update_message = true # If set to true, it will add a comment message [`PR Description updated to latest commit...`](https://github.com/Codium-ai/pr-agent/pull/499#issuecomment-1837412176) after finishing calling `/describe`. Default is false.
@@ -34,3 +35,6 @@ enable_auto_approval=false # If set to true, the tool will approve the PR when i
 
 [pr_description] # /describe #
 publish_labels=false
+# describe as comment
+publish_description_as_comment=true
+publish_description_as_comment_persistent=false
