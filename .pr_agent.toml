@@ -1,3 +1,5 @@
+# See https://github.com/Codium-ai/pr-agent/blob/main/pr_agent/settings/configuration.toml for all possible config options
+
 [config]
 model="gpt-4" # the OpenAI model you've deployed on Azure (e.g. gpt-3.5-turbo)
 model_turbo="gpt-4" # the OpenAI model you've deployed on Azure (e.g. gpt-3.5-turbo)
@@ -8,8 +10,6 @@ auto_review = true
 auto_describe = false
 auto_improve = true
 pr_actions = ["opened", "reopened", "ready_for_review", "review_requested"]
-
-# See https://github.com/Codium-ai/pr-agent/blob/main/pr_agent/settings/configuration.toml for all possible config options
 
 [pr_reviewer] # /review #
 # enable/disable features
