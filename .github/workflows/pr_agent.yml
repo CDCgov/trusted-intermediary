@@ -2,6 +2,8 @@ name: Perry the PR Agent Platypus
 
 on:
   pull_request:
+  pull_request_review_comment:
+    types: [created]
   issue_comment:
     types: [created]
 jobs:
