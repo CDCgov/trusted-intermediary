@@ -1,4 +1,6 @@
 # See https://github.com/Codium-ai/pr-agent/blob/main/pr_agent/settings/configuration.toml for all possible config options
+# The pr_agent.yml action reads this file from the `main` branch, so changes to this file
+# will not take effect until they are merged into main
 
 [config]
 model="gpt-4" # the OpenAI model you've deployed on Azure (e.g. gpt-3.5-turbo)
