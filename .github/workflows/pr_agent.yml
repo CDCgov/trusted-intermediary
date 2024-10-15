@@ -1,5 +1,10 @@
 name: Perry the PR Agent Platypus
 
+# Config for this action lives in .pr_agent.toml, but only the version on
+# main is read - you'll need to merge config changes before they take effect.
+# You can test config changes by making them in the `env` section below, but
+# should then move them to the config file for consistency/readability
+
 on:
   pull_request:
   issue_comment:
