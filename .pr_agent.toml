@@ -37,3 +37,6 @@ enable_help_text=false # Determines whether to include help text in the PR revie
 # auto approval
 enable_auto_approval=false # If set to true, the tool will approve the PR when invoked with the 'auto_approve' command. Default is false. This flag can be changed only from a configuration file.
 maximal_review_effort=5 # Maximal effort level for auto-approval. If the PR's estimated review effort is above this threshold, the auto-approval will not run. Default is 5.
+
+[pr_description] # /describe #
+publish_labels=false
