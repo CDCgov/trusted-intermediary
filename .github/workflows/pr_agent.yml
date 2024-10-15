@@ -27,3 +27,4 @@ jobs:
           OPENAI.DEPLOYMENT_ID: ${{ secrets.AZURE_OPENAI_DEPLOYMENT_ID }}
           OPENAI_API_VERSION: '2023-03-15'
           AZURE_API_VERSION: '2023-03-15-preview' # Specific version required to address compatibility issues with GPT-4 deployment on Azure.
+          pr_description.publish_labels: 'false'
