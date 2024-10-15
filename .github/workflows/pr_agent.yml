@@ -3,6 +3,7 @@ name: Perry the PR Agent Platypus
 on:
   pull_request:
   issue_comment:
+    types: [created]
 jobs:
   pr_agent_job:
     if: ${{ github.event.sender.type != 'Bot' }}
