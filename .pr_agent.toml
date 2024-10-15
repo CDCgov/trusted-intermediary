@@ -38,3 +38,6 @@ publish_labels=false
 # describe as comment
 publish_description_as_comment=true
 publish_description_as_comment_persistent=false
+
+[pr_code_suggestions] # /improve #
+persistent_comment=false
