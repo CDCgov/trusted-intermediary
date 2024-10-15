@@ -1,0 +1,32 @@
+name: Perry the PR Agent Platypus
+
+# Config for this action lives in .pr_agent.toml, but only the version on
+# main is read - you'll need to merge config changes before they take effect.
+# You can test config changes by making them in the `env` section below, but
+# should then move them to the config file for consistency/readability
+
+on:
+  pull_request:
+  issue_comment:
+    types: [created]
+jobs:
+  pr_agent_job:
+    if: ${{ github.event.sender.type != 'Bot' }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: write
+    name: Run pr agent on every pull request, respond to user comments
+    steps:
+      - name: PR Agent action step
+        id: pragent
+        uses: Codium-ai/pr-agent@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_KEY: ${{ secrets.AZURE_OPENAI_KEY }}
+          OPENAI.API_TYPE: 'azure'
+          OPENAI.API_BASE: ${{ secrets.AZURE_OPENAI_BASE_URL }}
+          OPENAI.DEPLOYMENT_ID: ${{ secrets.AZURE_OPENAI_DEPLOYMENT_ID }}
+          OPENAI_API_VERSION: '2023-03-15'
+          AZURE_API_VERSION: '2023-03-15-preview' # Specific version required to address compatibility issues with GPT-4 deployment on Azure.
