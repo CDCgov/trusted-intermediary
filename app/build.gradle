@@ -27,6 +27,7 @@ dependencies {
     // Import the Jetty BOM to pull consistent Jetty versions
     implementation 'org.eclipse.jetty:jetty-bom:12.0.14'
 
+    // Version 6.3.0 has jetty vulnerabilities. We are pulling the jetty directly to by pass this.
     implementation 'io.javalin:javalin:6.3.0'
 
     testImplementation 'org.apache.groovy:groovy:4.0.23'
