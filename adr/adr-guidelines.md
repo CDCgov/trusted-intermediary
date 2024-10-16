@@ -4,7 +4,7 @@ Below is a formatting checklist with some guidelines that serves to help keep ou
 1. See [adr/001-architecture-decision-records.md](adr/001-architecture-decision-records.md) for template and section guidelines/requirements.
 
 
-2. Review ‘Context’ section for grammar, typos, and clarity. ** **Keep in mind -** ** readers may have less inside knowledge or experience with the project when reading these documents.
+2. Review ‘Context’ section for grammar, typos, and clarity. ** **Keep in mind** ** readers may have less inside knowledge or experience with the project when reading these documents.
 
 
 2. **Bulleted Lists:** Full sentences get periods and first letter capitalized. Fragmented sentences have no period and aren’t capitalized.
