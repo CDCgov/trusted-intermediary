@@ -4,8 +4,6 @@ about: Suggest a user story for this product
 title: ''
 labels: story
 assignees: ''
-projects:
-  - CDCgov/45
 
 ---
 
