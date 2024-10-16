@@ -23,6 +23,12 @@ dependencies {
     implementation project(':etor')
     testImplementation testFixtures(project(':shared'))
 
+    // Patch: Add the fixed Jetty version
+    implementation('org.eclipse.jetty:jetty-server:12.0.12') {
+        // Exclude the vulnerable version brought by Javalin
+        exclude group: 'org.eclipse.jetty', module: 'jetty-server'
+    }
+
     implementation 'io.javalin:javalin:6.3.0'
 
     testImplementation 'org.apache.groovy:groovy:4.0.23'
