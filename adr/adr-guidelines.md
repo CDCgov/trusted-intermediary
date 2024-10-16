@@ -16,10 +16,7 @@ Below is a formatting checklist with some guidelines that serves to help keep ou
 4. Make sure line spacing is appropriate give a full line of space between bullet points
 
 
-5. **DO NOT** use the word ‘trusted’ in reference to the Intermediary Application
-
-
-6. If you are unsure about something, ask!
+5. If you are unsure about something, ask!
 
 
 
