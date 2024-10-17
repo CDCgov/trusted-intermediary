@@ -30,6 +30,22 @@ There are probably even more.
 Terraform is multi-cloud and multi-tool, has a full-featured DSL, tracks state and dependencies, and is agentless.
 Terraform is also used by ReportStream.
 
+## Impact
+
+### Positive
+
+-
+
+
+### Negative
+
+-
+
+
+### Risks
+
+-
+
 
 ### Related Issues
 

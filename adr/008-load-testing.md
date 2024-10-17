@@ -28,6 +28,23 @@ real-life load conditions, both normal and extreme.
  - Easy to use UI
  - Simple setup and task configuration
 
+## Impact
+
+### Positive
+
+- 
+
+
+### Negative
+
+- 
+
+
+### Risks
+
+- 
+
+
 ### Related Issues
 
 - #76

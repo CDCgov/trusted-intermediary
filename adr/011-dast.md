@@ -21,6 +21,23 @@ Zed Attack Proxy (ZAP) is a free, open-source penetration testing tool being mai
 
 [Reference](https://www.zaproxy.org/getting-started/)
 
+## Impact
+
+### Positive
+
+-
+
+
+### Negative
+
+-
+
+
+### Risks
+
+-
+
+
 ### Related Issues
 
 - #77

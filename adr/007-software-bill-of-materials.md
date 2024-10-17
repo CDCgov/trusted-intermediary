@@ -26,6 +26,23 @@ and hierarchical relationships.
 - CycloneDX can work with [Anchore/Grype](https://github.com/anchore/grype#recommended) for vulnerability scanning
 - CycloneDX is an accepted standard for the industry
 
+## Impact
+
+### Positive
+
+- 
+
+
+### Negative
+
+- 
+
+
+### Risks
+
+- 
+
+
 ### Related Issues
 
 - #76

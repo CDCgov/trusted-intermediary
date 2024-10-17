@@ -18,6 +18,23 @@ Docker is an open platform for developing, shipping, and running applications. D
 - When you’re ready, deploy your application into your production environment, as a container or an orchestrated service.
 - Allows for responsive deployment and scaling.
 
+## Impact
+
+### Positive
+
+-
+
+
+### Negative
+
+-
+
+
+### Risks
+
+-
+
+
 [Reference](https://docs.docker.com/get-started/overview/)
 
 ### Related Issues
