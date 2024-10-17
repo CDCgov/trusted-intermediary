@@ -152,6 +152,12 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                         "PLT3294",
                         "IDS gene mutations found [Identifier] in Dried Bloodspot by Molecular genetics method",
                         HapiHelper.PLT_CODE));
+        codingMap.put(
+                "99717-49",
+                new IdentifierCode(
+                        "76030-6",
+                        "IDS gene full mutation analysis in Blood or Tissue by Sequencing",
+                        HapiHelper.LOINC_CODE));
         // Pompe
         codingMap.put(
                 "99717-47",
