@@ -12,11 +12,15 @@ if ! command -v az &>/dev/null; then
     exit
 fi
 
-TIMEOUT=300
-RETRY_INTERVAL=10
+TIMEOUT=180       # seconds
+RETRY_INTERVAL=10 # seconds
 CURRENT_DIR=$(pwd)
-ROOT="$CDCTI_HOME/examples/Temp"
+ROOT="$CDCTI_HOME/examples"
 AZURITE_CONNECTION_STRING="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://localhost:10000/devstoreaccount1;" # pragma: allowlist secret
+FILE_NAME_SUFFIX_STEP_0="_0_initial_message.hl7"
+FILE_NAME_SUFFIX_STEP_1="_1_hl7_translation.fhir"
+FILE_NAME_SUFFIX_STEP_2="_2_fhir_transformation.fhir"
+FILE_NAME_SUFFIX_STEP_3="_3_hl7_translation_final.hl7"
 
 check_submission_status() {
     local submission_id=$1
@@ -55,21 +59,30 @@ download_from_azurite() {
     local blob_name=$1
     local file_path=$2
 
-    echo "  Downloading from blob storage '$translated_blob_name' to '$translated_file_path'"
+    echo "  Downloading from blob storage '$blob_name' to '$file_path'"
     az storage blob download \
         --container-name "reports" \
         --name $blob_name \
         --file $file_path \
         --connection-string $AZURITE_CONNECTION_STRING \
         --output none
+
+    if [[ "$file_path" == *.fhir ]]; then
+        echo "  Formatting the content for: $file_path"
+        formatted_content=$(jq '.' "$file_path")
+        echo "$formatted_content" >"$file_path"
+    fi
 }
 
-find $ROOT -type f -name '*0_initial_message.hl7' | while read -r file; do
-    echo "Submitting file: $file"
+find $ROOT -type f -name "*$FILE_NAME_SUFFIX_STEP_0" | while read -r file; do
+    echo "Submitting message: $file"
 
     temp_file=$(mktemp)
     temp_dir_path=$(dirname "$temp_file")
     temp_file_name=$(basename "$temp_file")
+    message_file_path=$(dirname "$file")
+    message_file_name=$(basename "$file")
+    message_base_name="${message_file_name%$FILE_NAME_SUFFIX_STEP_0}"
 
     # Read the file content, update MSH-6, and write the result to a temporary file
     awk -F'|' '/^MSH/ { $6 = "^simulated-hospital-id^" } 1' OFS='|' "$file" >"$temp_file"
@@ -87,7 +100,7 @@ find $ROOT -type f -name '*0_initial_message.hl7' | while read -r file; do
 
     inbound_submission_id=$(get_sent_report_id_from_history_response "$history_response")
     translated_blob_name="ready/flexion.etor-service-receiver-results/$inbound_submission_id.fhir"
-    translated_file_path="$ROOT/translated.fhir"
+    translated_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_1"
     download_from_azurite "$translated_blob_name" "$translated_file_path"
 
     cd ../ti || exit 1
@@ -96,7 +109,7 @@ find $ROOT -type f -name '*0_initial_message.hl7' | while read -r file; do
     cd "$CURRENT_DIR"
 
     transformed_blob_name="receive/flexion.etor-service-sender/$outbound_submission_id.fhir"
-    transformed_file_path="$ROOT/transformed.fhir"
+    transformed_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_2"
     download_from_azurite "$transformed_blob_name" "$transformed_file_path"
 
     echo "[Second leg] Checking submission status for ID: $outbound_submission_id"
@@ -108,7 +121,7 @@ find $ROOT -type f -name '*0_initial_message.hl7' | while read -r file; do
 
     final_submission_id=$(get_sent_report_id_from_history_response "$history_response")
     final_blob_name="ready/flexion.simulated-hospital/$final_submission_id.hl7"
-    final_file_path="$ROOT/final.hl7"
+    final_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_3"
     download_from_azurite "$final_blob_name" "$final_file_path"
 
     rm "$temp_file"
