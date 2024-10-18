@@ -11,7 +11,7 @@ env=local
 root=$CDCTI_HOME/examples/
 content_type=application/hl7-v2
 client_id=flexion
-client_sender=simulated-hospital
+client_sender=simulated-sender
 verbose=""
 submission_id=""
 

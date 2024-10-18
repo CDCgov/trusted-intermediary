@@ -30,7 +30,7 @@ jobs:
         run: |
             host=https://staging.prime.cdc.gov:443
             client_id=flexion
-            client_sender=automated-staging-test-sender
+            client_sender=simulated-sender
             jwt=$(jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 \
                 -k $client_id.$client_sender -i $client_id.$client_sender \
                 -s $client_id.$client_sender -a $host --no-iat -S @/tmp/staging_private_key.pem)
