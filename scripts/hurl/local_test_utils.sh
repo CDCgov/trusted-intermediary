@@ -3,10 +3,10 @@
 CURRENT_DIR=$(pwd)
 RS_HRL_SCRIPT_PATH="$CDCTI_HOME/scripts/hurl/rs"
 TI_HRL_SCRIPT_PATH="$CDCTI_HOME/scripts/hurl/ti"
-FILE_NAME_SUFFIX_STEP_0="_0_initial_message.hl7"
-FILE_NAME_SUFFIX_STEP_1="_1_hl7_translation.fhir"
-FILE_NAME_SUFFIX_STEP_2="_2_fhir_transformation.fhir"
-FILE_NAME_SUFFIX_STEP_3="_3_hl7_translation_final.hl7"
+FILE_NAME_SUFFIX_STEP_0="_0_initial_message"
+FILE_NAME_SUFFIX_STEP_1="_1_hl7_translation"
+FILE_NAME_SUFFIX_STEP_2="_2_fhir_transformation"
+FILE_NAME_SUFFIX_STEP_3="_3_hl7_translation_final"
 
 TIMEOUT=180       # 3 minutes
 RETRY_INTERVAL=10 # Retry every 10 seconds
@@ -97,7 +97,7 @@ submit_message() {
     local message_file_path=$(dirname "$file")
     local message_file_name=$(basename "$file")
     local message_base_name="${message_file_name%.hl7}"
-    message_base_name="${message_base_name%FILE_NAME_SUFFIX_STEP_0}"
+    message_base_name="${message_base_name%$FILE_NAME_SUFFIX_STEP_0}"
 
     msh9=$(awk -F'|' '/^MSH/ { print $9 }' "$file")
     if [[ "$msh9" == "ORU^R01^ORU_R01" ]]; then
@@ -125,7 +125,7 @@ submit_message() {
 
     inbound_submission_id=$(get_sent_report_id_from_history_response "$history_response")
     translated_blob_name="ready/flexion.etor-service-receiver-results/$inbound_submission_id.fhir"
-    translated_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_1"
+    translated_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_1.fhir"
     download_from_azurite "$translated_blob_name" "$translated_file_path"
 
     metadata_response=$(
@@ -135,7 +135,7 @@ submit_message() {
     outbound_submission_id=$(echo "$metadata_response" | jq -r '.issue[] | select(.details.text == "outbound submission id") | .diagnostics')
 
     transformed_blob_name="receive/flexion.etor-service-sender/$outbound_submission_id.fhir"
-    transformed_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_2"
+    transformed_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_2.fhir"
     download_from_azurite "$transformed_blob_name" "$transformed_file_path"
 
     echo "[Second leg] Checking submission status for ID: $outbound_submission_id"
@@ -146,6 +146,6 @@ submit_message() {
 
     final_submission_id=$(get_sent_report_id_from_history_response "$history_response")
     final_blob_name="ready/$receiver/$final_submission_id.hl7"
-    final_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_3"
+    final_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_3.hl7"
     download_from_azurite "$final_blob_name" "$final_file_path"
 }
