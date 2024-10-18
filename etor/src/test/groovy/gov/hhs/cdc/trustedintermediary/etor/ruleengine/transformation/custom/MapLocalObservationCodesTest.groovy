@@ -244,6 +244,71 @@ class MapLocalObservationCodesTest extends Specification {
         initialAccession == transformedAccession
     }
 
+    def "When bad args - missing coding system"() {
+        // getMapFromArgs is fine, but throws a NullPointerException in getMappedCoding call to urlForCodeType
+        // Note: the "code" and "display" can be missing and there is no exception.
+        given:
+        def bundle = createBundleWithObservation("99717-32", "Adrenoleukodystrophy deficiency newborn screening interpretation", true)
+        def args = [
+            "codingMap": [
+                "99717-32": [
+                    "code"        : "85269-9",
+                    "display"     : "X-linked Adrenoleukodystrophy (X- ALD) newborn screen interpretation",
+                ]
+            ]
+        ]
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), args)
+
+        then:
+        0 == 1
+    }
+
+    def "When bad args - codingMap is improperly structured"() {
+        // throws ClassCastException: class java.lang.String cannot be cast to class java.util.Map
+        given:
+        def bundle = createBundleWithObservation("99717-32", "Adrenoleukodystrophy deficiency newborn screening interpretation", true)
+        def args = [
+            "codingMap": [
+                "code" : "99717-32"
+            ]
+        ]
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), args)
+
+        then:
+        0 == 1
+    }
+
+    def "When bad args - codingMap is not present in the args"() {
+        // throws NullPointerException: Cannot invoke "java.util.Map.entrySet()" because "argsCodingMap" is null
+        given:
+        def bundle = createBundleWithObservation("99717-32", "Adrenoleukodystrophy deficiency newborn screening interpretation", true)
+        def argsMissingCodingSystem = [
+            "theCodingMap": "IsNotHere"
+        ]
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), argsMissingCodingSystem)
+
+        then:
+        0 == 1
+    }
+
+    def "When bad args - args is null"() {
+        // throws NullPointerException: Cannot invoke "java.util.Map.get(Object)" because "args" is null
+        given:
+        def bundle = createBundleWithObservation("99717-32", "Adrenoleukodystrophy deficiency newborn screening interpretation", true)
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), null)
+
+        then:
+        0 == 1
+    }
+
     Observation getObservationByCode(List<Observation> observationList, String code) {
         return observationList.find {observation -> observation.code?.coding?.find { coding -> coding.code == code}}
     }
@@ -329,7 +394,7 @@ class MapLocalObservationCodesTest extends Specification {
 
     def getArgs() {
         return [
-            "codingMap" : [
+            "codingMap": [
                 "99717-32": [
                     "code"        : "85269-9",
                     "display"     : "X-linked Adrenoleukodystrophy (X- ALD) newborn screen interpretation",

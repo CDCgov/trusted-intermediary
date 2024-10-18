@@ -23,11 +23,9 @@ import org.hl7.fhir.r4.model.StringType;
 public class MapLocalObservationCodes implements CustomFhirTransformation {
     protected final Logger logger = ApplicationContext.getImplementation(Logger.class);
 
-    private Map<String, IdentifierCode> codingMap = new HashMap<>();
-
     @Override
     public void transform(HealthData<?> resource, Map<String, Object> args) {
-        initMap(args);
+        var codingMap = getMapFromArgs(args);
 
         var bundle = (Bundle) resource.getUnderlyingData();
         var observations = HapiHelper.resourcesInBundle(bundle, Observation.class);
@@ -83,13 +81,12 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
         return mappedCoding;
     }
 
-    private void initMap(Map<String, Object> args) {
-        if (!this.codingMap.isEmpty()) {
-            return;
-        }
+    private Map<String, IdentifierCode> getMapFromArgs(Map<String, Object> args) {
+        var codingMap = new HashMap<String, IdentifierCode>();
 
         // Should fail if null
-        // TODO: how do we want to handle if this isn't structured correctly?
+        // TODO: Determine how we want to handle if args is not structured properly and update the
+        // "When bad args" tests to reflect the approach.
         var argsCodingMap = (Map<String, Map<String, String>>) args.get("codingMap");
 
         for (Map.Entry<String, Map<String, String>> entry : argsCodingMap.entrySet()) {
@@ -99,7 +96,9 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                     new IdentifierCode(
                             value.get("code"), value.get("display"), value.get("codingSystem"));
 
-            this.codingMap.put(localCode, mappedCode);
+            codingMap.put(localCode, mappedCode);
         }
+
+        return codingMap;
     }
 }
