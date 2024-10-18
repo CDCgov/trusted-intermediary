@@ -12,8 +12,8 @@ if ! command -v az &>/dev/null; then
     exit
 fi
 
-TIMEOUT=180       # seconds
-RETRY_INTERVAL=10 # seconds
+TIMEOUT=180       # 3 minutes
+RETRY_INTERVAL=10 # Retry every 10 seconds
 CURRENT_DIR=$(pwd)
 ROOT="$CDCTI_HOME/examples"
 AZURITE_CONNECTION_STRING="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://localhost:10000/devstoreaccount1;" # pragma: allowlist secret
@@ -129,6 +129,7 @@ submit_message() {
 }
 
 find $ROOT -type f -name "*$FILE_NAME_SUFFIX_STEP_0" | while read -r file; do
+    echo "-----------------------------------------------------------------------------------------------------------"
     echo "Submitting message: $file"
     submit_message "$file"
 done
