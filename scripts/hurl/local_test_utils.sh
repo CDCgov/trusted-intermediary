@@ -96,7 +96,8 @@ submit_message() {
     local file=$1
     local message_file_path=$(dirname "$file")
     local message_file_name=$(basename "$file")
-    local message_base_name="${message_file_name%$FILE_NAME_SUFFIX_STEP_0}"
+    local message_base_name="${message_file_name%.hl7}"
+    message_base_name="${message_base_name%FILE_NAME_SUFFIX_STEP_0}"
 
     msh9=$(awk -F'|' '/^MSH/ { print $9 }' "$file")
     if [[ "$msh9" == "ORU^R01^ORU_R01" ]]; then
@@ -110,7 +111,6 @@ submit_message() {
 
     echo "Assuming receiver is '$receiver' because of MSH-9 value '$msh9'"
 
-    # Submit the updated file, capture the JSON response and extract the submission ID
     waters_response=$(
         cd "$RS_HRL_SCRIPT_PATH" || exit 1
         ./hrl waters.hurl -f "$message_file_name" -r "$message_file_path"
