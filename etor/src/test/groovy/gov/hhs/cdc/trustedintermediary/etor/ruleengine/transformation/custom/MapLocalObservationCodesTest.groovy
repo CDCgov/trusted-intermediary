@@ -31,7 +31,7 @@ class MapLocalObservationCodesTest extends Specification {
         def bundle = createBundleWithObservation(initialCode, initialDisplay, true)
 
         when:
-        transformClass.transform(new HapiFhirResource(bundle), null)
+        transformClass.transform(new HapiFhirResource(bundle), getArgs())
 
         then:
         def transformedObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
@@ -69,7 +69,7 @@ class MapLocalObservationCodesTest extends Specification {
 
 
         when:
-        transformClass.transform(new HapiFhirResource(bundle), null)
+        transformClass.transform(new HapiFhirResource(bundle), getArgs())
 
         then:
         1 * mockLogger.logWarning(*_)
@@ -87,7 +87,7 @@ class MapLocalObservationCodesTest extends Specification {
         def originalCodingList = HapiHelper.resourceInBundle(bundle, Observation.class).getCode().getCoding()
 
         when:
-        transformClass.transform(new HapiFhirResource(bundle), null)
+        transformClass.transform(new HapiFhirResource(bundle), getArgs())
 
         then:
         def transformedObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
@@ -109,7 +109,7 @@ class MapLocalObservationCodesTest extends Specification {
         def originalCodingList = HapiHelper.resourceInBundle(bundle, Observation.class).getCode().getCoding()
 
         when:
-        transformClass.transform(new HapiFhirResource(bundle), null)
+        transformClass.transform(new HapiFhirResource(bundle), getArgs())
 
         then:
         def transformedObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
@@ -128,7 +128,7 @@ class MapLocalObservationCodesTest extends Specification {
         def originalCodingList = HapiHelper.resourceInBundle(bundle, Observation.class).getCode().getCoding()
 
         when:
-        transformClass.transform(new HapiFhirResource(bundle), null)
+        transformClass.transform(new HapiFhirResource(bundle), getArgs())
 
         then:
         def transformedObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
@@ -144,7 +144,7 @@ class MapLocalObservationCodesTest extends Specification {
         def originalCodingList = HapiHelper.resourceInBundle(bundle, Observation.class).getCode().getCoding()
 
         when:
-        transformClass.transform(new HapiFhirResource(bundle), null)
+        transformClass.transform(new HapiFhirResource(bundle), getArgs())
 
         then:
         def transformedObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
@@ -160,7 +160,7 @@ class MapLocalObservationCodesTest extends Specification {
         def originalObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
 
         when:
-        transformClass.transform(new HapiFhirResource(bundle), null)
+        transformClass.transform(new HapiFhirResource(bundle), getArgs())
 
         then:
         def transformedObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
@@ -179,7 +179,7 @@ class MapLocalObservationCodesTest extends Specification {
         initialObservations.size() == 114
 
         when:
-        transformClass.transform(new HapiFhirResource(bundle), null)
+        transformClass.transform(new HapiFhirResource(bundle), getArgs())
 
         then:
         def transformedObservations = HapiHelper.resourcesInBundle(bundle, Observation.class).toList()
@@ -325,5 +325,32 @@ class MapLocalObservationCodesTest extends Specification {
         coding.addExtension(new Extension(HapiHelper.EXTENSION_CODING_SYSTEM, new StringType(isLocal ? HapiHelper.LOCAL_CODE : HapiHelper.LOINC_CODE)))
 
         return coding
+    }
+
+    def getArgs() {
+        return [
+            "codingMap" : [
+                "99717-32": [
+                    "code"        : "85269-9",
+                    "display"     : "X-linked Adrenoleukodystrophy (X- ALD) newborn screen interpretation",
+                    "codingSystem": "LN"
+                ],
+                "99717-33": [
+                    "code"        : "85268-1",
+                    "display"     : "X-linked Adrenoleukodystrophy (X- ALD) newborn screening comment-discussion",
+                    "codingSystem": "LN"
+                ],
+                "99717-34": [
+                    "code"        : "PLT325",
+                    "display"     : "ABCD1 gene mutation found [Identifier] in DBS by Sequencing",
+                    "codingSystem": "PLT"
+                ],
+                "99717-48": [
+                    "code"        : "PLT3258",
+                    "display"     : "IDUA gene mutations found [Identifier] in DBS by Sequencing",
+                    "codingSystem": "PLT"
+                ]
+            ]
+        ]
     }
 }

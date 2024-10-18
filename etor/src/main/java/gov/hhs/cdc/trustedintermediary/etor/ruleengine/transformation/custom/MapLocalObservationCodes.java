@@ -25,10 +25,6 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
 
     private Map<String, IdentifierCode> codingMap = new HashMap<>();
 
-    public MapLocalObservationCodes() {
-        initMap();
-    }
-
     @Override
     public void transform(HealthData<?> resource, Map<String, Object> args) {
         initMap(args);
@@ -85,101 +81,6 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                 HapiHelper.EXTENSION_CODING_SYSTEM, new StringType(identifierCode.codingSystem()));
 
         return mappedCoding;
-    }
-
-    /**
-     * Initializes the local-to-LOINC/PLT hash map, customized for CDPH and UCSD. Currently, the
-     * mapping is hardcoded for simplicity. If expanded to support additional entities, the
-     * implementation may be updated to allow dynamic configuration via
-     * transformation_definitions.json or a database-driven mapping.
-     */
-    private void initMap() {
-        this.codingMap = new HashMap<>();
-        // ALD
-        codingMap.put(
-                "99717-32",
-                new IdentifierCode(
-                        "85269-9",
-                        "X-linked Adrenoleukodystrophy (X- ALD) newborn screen interpretation",
-                        HapiHelper.LOINC_CODE));
-        codingMap.put(
-                "99717-33",
-                new IdentifierCode(
-                        "85268-1",
-                        "X-linked Adrenoleukodystrophy (X- ALD) newborn screening comment-discussion",
-                        HapiHelper.LOINC_CODE));
-        codingMap.put(
-                "99717-34",
-                new IdentifierCode(
-                        "PLT325",
-                        "ABCD1 gene mutation found [Identifier] in DBS by Sequencing",
-                        HapiHelper.PLT_CODE));
-        // CAH
-        codingMap.put(
-                "99717-6",
-                new IdentifierCode(
-                        "53340-6",
-                        "17-Hydroxyprogesterone [Moles/volume] in DBS",
-                        HapiHelper.LOINC_CODE));
-        // CF
-        codingMap.put(
-                "99717-35",
-                new IdentifierCode(
-                        "PLT3289",
-                        "CFTR gene mutation found [Interpretation] in DBS by Sequencing",
-                        HapiHelper.PLT_CODE));
-        codingMap.put(
-                "99717-36",
-                new IdentifierCode(
-                        "PLT3290",
-                        "CFTR gene variant found [Identifier] in DBS by Sequencing comments/discussion",
-                        HapiHelper.PLT_CODE));
-        // MPS I
-        codingMap.put(
-                "99717-48",
-                new IdentifierCode(
-                        "PLT3258",
-                        "IDUA gene mutations found [Identifier] in DBS by Sequencing",
-                        HapiHelper.PLT_CODE));
-        codingMap.put(
-                "99717-44",
-                new IdentifierCode(
-                        "PLT3291",
-                        "IDUA gene variant analysis in DBS by Sequencing comments/discussion",
-                        HapiHelper.PLT_CODE));
-        // MPS II
-        codingMap.put(
-                "99717-50",
-                new IdentifierCode(
-                        "PLT3294",
-                        "IDS gene mutations found [Identifier] in Dried Bloodspot by Molecular genetics method",
-                        HapiHelper.PLT_CODE));
-        codingMap.put(
-                "99717-49",
-                new IdentifierCode(
-                        "76030-6",
-                        "IDS gene full mutation analysis in Blood or Tissue by Sequencing",
-                        HapiHelper.LOINC_CODE));
-        // Pompe
-        codingMap.put(
-                "99717-47",
-                new IdentifierCode(
-                        "PLT3252",
-                        "GAA gene mutation found [Identifier] in DBS by Sequencing",
-                        HapiHelper.PLT_CODE));
-        codingMap.put(
-                "99717-46",
-                new IdentifierCode(
-                        "PLT3292",
-                        "GAA gene variant analysis in DBS by Sequencing comments/discussion",
-                        HapiHelper.PLT_CODE));
-        // SMA
-        codingMap.put(
-                "99717-60",
-                new IdentifierCode(
-                        "PLT3293",
-                        "SMN1 exon 7 deletion analysis in DBS by Sequencing",
-                        HapiHelper.PLT_CODE));
     }
 
     private void initMap(Map<String, Object> args) {
