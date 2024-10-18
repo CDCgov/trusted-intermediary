@@ -74,28 +74,32 @@ download_from_azurite() {
     fi
 }
 
-find $ROOT -type f -name "*$FILE_NAME_SUFFIX_STEP_0" | while read -r file; do
-    echo "Submitting message: $file"
+submit_message() {
+    local file=$1
+    local message_file_path=$(dirname "$file")
+    local message_file_name=$(basename "$file")
+    local message_base_name="${message_file_name%$FILE_NAME_SUFFIX_STEP_0}"
 
-    temp_file=$(mktemp)
-    temp_dir_path=$(dirname "$temp_file")
-    temp_file_name=$(basename "$temp_file")
-    message_file_path=$(dirname "$file")
-    message_file_name=$(basename "$file")
-    message_base_name="${message_file_name%$FILE_NAME_SUFFIX_STEP_0}"
+    msh9=$(awk -F'|' '/^MSH/ { print $9 }' "$file")
+    if [[ "$msh9" == "ORU^R01^ORU_R01" ]]; then
+        receiver="flexion.simulated-hospital"
+    elif [[ "$msh9" == "OML^O21^OML_O21" || "$msh9" == "ORM^O01^ORM_O01" ]]; then
+        receiver="flexion.simulated-lab"
+    else
+        echo "Unknown receiver for MSH-9 value '$msh9'. Skipping the message"
+        return
+    fi
 
-    # Read the file content, update MSH-6, and write the result to a temporary file
-    awk -F'|' '/^MSH/ { $6 = "^simulated-hospital-id^" } 1' OFS='|' "$file" >"$temp_file"
+    echo "Assuming receiver is '$receiver' because of MSH-9 value '$msh9'"
 
     # Submit the updated file, capture the JSON response and extract the submission ID
-    waters_response=$(./hrl waters.hurl -f "$temp_file_name" -r "$temp_dir_path")
+    waters_response=$(./hrl waters.hurl -f "$message_file_name" -r "$message_file_path")
     submission_id=$(echo "$waters_response" | jq -r '.id')
 
     echo "[First leg] Checking submission status for ID: $submission_id"
     if ! check_submission_status "$submission_id"; then
         echo "Failed to deliver the first leg of the message. Skipping the next steps."
-        rm "$temp_file"
-        continue
+        return
     fi
 
     inbound_submission_id=$(get_sent_report_id_from_history_response "$history_response")
@@ -115,17 +119,16 @@ find $ROOT -type f -name "*$FILE_NAME_SUFFIX_STEP_0" | while read -r file; do
     echo "[Second leg] Checking submission status for ID: $outbound_submission_id"
     if ! check_submission_status "$outbound_submission_id"; then
         echo "Failed to deliver the second leg of the message. Skipping the next steps."
-        rm "$temp_file"
-        continue
+        return
     fi
 
     final_submission_id=$(get_sent_report_id_from_history_response "$history_response")
-    final_blob_name="ready/flexion.simulated-hospital/$final_submission_id.hl7"
+    final_blob_name="ready/$receiver/$final_submission_id.hl7"
     final_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_3"
     download_from_azurite "$final_blob_name" "$final_file_path"
+}
 
-    rm "$temp_file"
-
-    echo "Waiting 5 seconds before the next submission..."
-    sleep 5
+find $ROOT -type f -name "*$FILE_NAME_SUFFIX_STEP_0" | while read -r file; do
+    echo "Submitting message: $file"
+    submit_message "$file"
 done
