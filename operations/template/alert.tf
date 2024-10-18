@@ -47,7 +47,6 @@ resource "azurerm_monitor_activity_log_alert" "azure_service_health_alert" {
 
   action {
     action_group_id = azurerm_monitor_action_group.notify_slack_email[count.index].id
-    email_subject   = "FATAL: Azure Outage Alert!"
   }
 
   description = "Alert service(s) appear to be down"
