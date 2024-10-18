@@ -4,7 +4,7 @@ Date: 2022-12-07
 
 ## Decision
 
-In the context of generating a secure modern application, facing the need to monitor application dependencies and generate a reliable SBOM, we decided to use the [CycloneDX Gradle Plugin](https://github.com/CycloneDX/cyclonedx-gradle-plugin#usage) and we chose not to use Anchore/Syft or Snyk FOSSID" for a smoother read.for SBOM generation at release of a version build, accepting that an SBOM needs to be generated during the CI/CD process
+In the context of generating a secure modern application, facing the need to monitor application dependencies and generate a reliable SBOM, we decided to use the [CycloneDX Gradle Plugin](https://github.com/CycloneDX/cyclonedx-gradle-plugin#usage) and we chose not to use [Anchore/Syft](https://github.com/anchore/syft#supported-ecosystems) or Snyk FOSSID" for a smoother read.for SBOM generation at release of a version build, accepting that an SBOM needs to be generated during the CI/CD process
 
 
 ## Status
@@ -14,10 +14,6 @@ Accepted.
 ## Context
 
 An SBOM (a Software Bill of Materials) is a machine-readable inventory document (that will be generated with each release build) that captures all the software components and dependencies, info on those components, and hierarchical relationships.
-- CycloneDX plugin for gradle can be automated for use with existing CI/CD pipeline
-- CycloneDX can work with [Anchore/Syft](https://github.com/anchore/syft#supported-ecosystems) for format conversion
-- CycloneDX can work with [Anchore/Grype](https://github.com/anchore/grype#recommended) for vulnerability scanning
-- CycloneDX is an accepted standard for the industry
 
 ## Impact
 
@@ -28,7 +24,7 @@ An SBOM (a Software Bill of Materials) is a machine-readable inventory document 
 - **Industry Standard:** CycloneDX is widely accepted in the industry, ensuring compatibility with other tools and making compliance with security standards easier. 
 
 
-- **Vulnerability Scanning:** With the ability to integrate with tools like Anchore/Grype, one can easily add vulnerability scanning to the process. 
+- **Vulnerability Scanning:** With the ability to integrate with tools like [Anchore/Grype](https://github.com/anchore/grype#recommended), one can easily add vulnerability scanning to the process. 
 
 
 - **Format Conversion:** supports integration with Anchore/Syft for SBOM format conversion, providing flexibility to meet different ecosystem requirements
