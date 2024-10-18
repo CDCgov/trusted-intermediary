@@ -15,7 +15,8 @@ fi
 TIMEOUT=180       # 3 minutes
 RETRY_INTERVAL=10 # Retry every 10 seconds
 CURRENT_DIR=$(pwd)
-ROOT="$CDCTI_HOME/examples"
+RS_HRL_SCRIPT_PATH="$CDCTI_HOME/scripts/hurl/rs"
+TI_HRL_SCRIPT_PATH="$CDCTI_HOME/scripts/hurl/ti"
 AZURITE_CONNECTION_STRING="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://localhost:10000/devstoreaccount1;" # pragma: allowlist secret
 FILE_NAME_SUFFIX_STEP_0="_0_initial_message.hl7"
 FILE_NAME_SUFFIX_STEP_1="_1_hl7_translation.fhir"
@@ -27,7 +28,10 @@ check_submission_status() {
     start_time=$(date +%s)
 
     while true; do
-        history_response=$(./hrl history.hurl -i "$submission_id")
+        history_response=$(
+            cd "$RS_HRL_SCRIPT_PATH" || exit 1
+            ./hrl history.hurl -i "$submission_id"
+        )
         overall_status=$(echo "$history_response" | jq -r '.overallStatus')
 
         echo -n "  Status: $overall_status"
@@ -93,7 +97,10 @@ submit_message() {
     echo "Assuming receiver is '$receiver' because of MSH-9 value '$msh9'"
 
     # Submit the updated file, capture the JSON response and extract the submission ID
-    waters_response=$(./hrl waters.hurl -f "$message_file_name" -r "$message_file_path")
+    waters_response=$(
+        cd "$RS_HRL_SCRIPT_PATH" || exit 1
+        ./hrl waters.hurl -f "$message_file_name" -r "$message_file_path"
+    )
     submission_id=$(echo "$waters_response" | jq -r '.id')
 
     echo "[First leg] Checking submission status for ID: $submission_id"
@@ -107,10 +114,11 @@ submit_message() {
     translated_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_1"
     download_from_azurite "$translated_blob_name" "$translated_file_path"
 
-    cd ../ti || exit 1
-    metadata_response=$(./hrl metadata.hurl -i "$inbound_submission_id")
+    metadata_response=$(
+        cd "$TI_HRL_SCRIPT_PATH" || exit 1
+        ./hrl metadata.hurl -i "$inbound_submission_id"
+    )
     outbound_submission_id=$(echo "$metadata_response" | jq -r '.issue[] | select(.details.text == "outbound submission id") | .diagnostics')
-    cd "$CURRENT_DIR"
 
     transformed_blob_name="receive/flexion.etor-service-sender/$outbound_submission_id.fhir"
     transformed_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_2"
@@ -128,7 +136,7 @@ submit_message() {
     download_from_azurite "$final_blob_name" "$final_file_path"
 }
 
-find $ROOT -type f -name "*$FILE_NAME_SUFFIX_STEP_0" | while read -r file; do
+find "$CDCTI_HOME/examples" -type f -name "*$FILE_NAME_SUFFIX_STEP_0" | while read -r file; do
     echo "-----------------------------------------------------------------------------------------------------------"
     echo "Submitting message: $file"
     submit_message "$file"
