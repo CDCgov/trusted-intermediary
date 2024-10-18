@@ -1,27 +1,41 @@
 #!/bin/bash
 
-# Ensure jq is installed
-if ! command -v jq &>/dev/null; then
-    echo "jq could not be found. Please install jq to proceed."
-    exit
-fi
-
-# Check if az (Azure CLI) is installed
-if ! command -v az &>/dev/null; then
-    echo "Azure CLI (az) could not be found. Please install Azure CLI to proceed."
-    exit
-fi
-
-TIMEOUT=180       # 3 minutes
-RETRY_INTERVAL=10 # Retry every 10 seconds
 CURRENT_DIR=$(pwd)
 RS_HRL_SCRIPT_PATH="$CDCTI_HOME/scripts/hurl/rs"
 TI_HRL_SCRIPT_PATH="$CDCTI_HOME/scripts/hurl/ti"
-AZURITE_CONNECTION_STRING="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://localhost:10000/devstoreaccount1;" # pragma: allowlist secret
 FILE_NAME_SUFFIX_STEP_0="_0_initial_message.hl7"
 FILE_NAME_SUFFIX_STEP_1="_1_hl7_translation.fhir"
 FILE_NAME_SUFFIX_STEP_2="_2_fhir_transformation.fhir"
 FILE_NAME_SUFFIX_STEP_3="_3_hl7_translation_final.hl7"
+
+TIMEOUT=180       # 3 minutes
+RETRY_INTERVAL=10 # Retry every 10 seconds
+
+AZURITE_CONNECTION_STRING="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://localhost:10000/devstoreaccount1;" # pragma: allowlist secret
+
+RS_LOCAL_API="http://localhost:7071"
+TI_LOCAL_API="http://localhost:8080"
+
+LOCAL_APIS=("$RS_LOCAL_API" "$TI_LOCAL_API")
+# Check if the RS and TO local APIs are reachable
+for service in "${LOCAL_APIS[@]}"; do
+    if ! curl -s --head --fail "$service" | grep "200 OK" >/dev/null; then
+        echo "The service at $service is not reachable"
+        exit 1
+    fi
+done
+
+# Check jq is installed
+if ! command -v jq &>/dev/null; then
+    echo "jq could not be found. Please install jq to proceed."
+    exit 1
+fi
+
+# Check az (Azure CLI) is installed
+if ! command -v az &>/dev/null; then
+    echo "Azure CLI (az) could not be found. Please install Azure CLI to proceed."
+    exit 1
+fi
 
 check_submission_status() {
     local submission_id=$1
@@ -37,7 +51,7 @@ check_submission_status() {
         echo -n "  Status: $overall_status"
         if [ "$overall_status" == "Delivered" ]; then
             echo "!"
-            return 0 # Success
+            return 0
         else
             echo ". Retrying in $RETRY_INTERVAL seconds..."
         fi
@@ -47,7 +61,7 @@ check_submission_status() {
         elapsed_time=$((current_time - start_time))
         if [ "$elapsed_time" -ge "$TIMEOUT" ]; then
             echo "  Timeout reached after $elapsed_time seconds. Status is still: $overall_status."
-            return 1 # Timeout
+            return 1
         fi
 
         sleep $RETRY_INTERVAL
