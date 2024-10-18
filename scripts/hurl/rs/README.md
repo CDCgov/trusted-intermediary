@@ -11,7 +11,7 @@ Options:
     -t <CONTENT_TYPE>                   The content type for the message (e.g. 'application/hl7-v2' or 'application/fhir+ndjson') (Default: application/hl7-v2)
     -e [local | staging | production ]  The environment to run the test in (Default: local)
     -c <CLIENT_ID>                      The client id to use (Default: flexion)
-    -s <CLIENT_SENDER>                  The client sender to use (Default: simulated-hospital)
+    -s <CLIENT_SENDER>                  The client sender to use (Default: simulated-sender)
     -x <KEY_PATH>                       The path to the client private key for the environment
     -i <SUBMISSION_ID>                  The submissionId to call the history API with (Required for history API)
     -v                                  Verbose mode
