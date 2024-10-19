@@ -101,17 +101,15 @@ submit_message() {
 
     msh9=$(awk -F'|' '/^MSH/ { print $9 }' "$file")
     if [[ "$msh9" == "ORU^R01^ORU_R01" ]]; then
-        first_leg_receiver="flexion.etor-service-receiver-results"
-        second_leg_receiver="flexion.simulated-hospital"
+        receiver="flexion.simulated-hospital"
     elif [[ "$msh9" == "OML^O21^OML_O21" || "$msh9" == "ORM^O01^ORM_O01" ]]; then
-        first_leg_receiver="flexion.etor-service-receiver-orders"
-        second_leg_receiver="flexion.simulated-lab"
+        receiver="flexion.simulated-lab"
     else
-        echo "Unknown receivers for MSH-9 value '$msh9'. Skipping the message"
+        echo "Unknown receiver for MSH-9 value '$msh9'. Skipping the message"
         return
     fi
 
-    echo "Assuming receivers are '$first_leg_receiver' and '$second_leg_receiver' because of MSH-9 value '$msh9'"
+    echo "Assuming receiver is '$receiver' because of MSH-9 value '$msh9'"
 
     waters_response=$(
         cd "$RS_HRL_SCRIPT_PATH" || exit 1
@@ -126,7 +124,7 @@ submit_message() {
     fi
 
     inbound_submission_id=$(get_sent_report_id_from_history_response "$history_response")
-    translated_blob_name="ready/$first_leg_receiver/$inbound_submission_id.fhir"
+    translated_blob_name="ready/flexion.etor-service-receiver-results/$inbound_submission_id.fhir"
     translated_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_1.fhir"
     download_from_azurite "$translated_blob_name" "$translated_file_path"
 
@@ -147,7 +145,7 @@ submit_message() {
     fi
 
     final_submission_id=$(get_sent_report_id_from_history_response "$history_response")
-    final_blob_name="ready/$second_leg_receiver/$final_submission_id.hl7"
+    final_blob_name="ready/$receiver/$final_submission_id.hl7"
     final_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_3.hl7"
     download_from_azurite "$final_blob_name" "$final_file_path"
 }
