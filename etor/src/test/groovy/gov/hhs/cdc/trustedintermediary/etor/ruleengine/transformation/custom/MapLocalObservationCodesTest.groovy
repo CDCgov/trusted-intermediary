@@ -245,11 +245,9 @@ class MapLocalObservationCodesTest extends Specification {
         initialAccession == transformedAccession
     }
 
-    def "When bad args - missing coding system"() {
-        // getMapFromArgs is fine, but throws a NullPointerException in getMappedCoding call to urlForCodeType
-        // Note: the "code" and "display" can be missing and there is no exception.
+    def "When args are missing coding system, throws a NullPointerException"() {
         given:
-        def exceptionMessage = "Empty coding system"
+        def exceptionMessage = "codingSystem"
         def bundle = createBundleWithObservation("99717-32", "Adrenoleukodystrophy deficiency newborn screening interpretation", true)
         def args = [
             "codingMap": [
@@ -265,11 +263,10 @@ class MapLocalObservationCodesTest extends Specification {
 
         then:
         def exception = thrown(NullPointerException)
-        exception.message == exceptionMessage
+        exception.message.contains(exceptionMessage)
     }
 
-    def "When bad args - codingMap is improperly structured"() {
-        // throws ClassCastException: class java.lang.String cannot be cast to class java.util.Map
+    def "When args codingMap is improperly structured, throws a ClassCastException"() {
         given:
         def bundle = createBundleWithObservation("99717-32", "Adrenoleukodystrophy deficiency newborn screening interpretation", true)
         def args = [
@@ -282,12 +279,12 @@ class MapLocalObservationCodesTest extends Specification {
         transformClass.transform(new HapiFhirResource(bundle), args)
 
         then:
-        0 == 1
+        thrown(ClassCastException)
     }
 
-    def "When bad args - codingMap is not present in the args"() {
-        // throws NullPointerException: Cannot invoke "java.util.Map.entrySet()" because "argsCodingMap" is null
+    def "When args codingMap is not present in the args, throws a NullPointerException"() {
         given:
+        def exceptionMessage = "argsCodingMap"
         def bundle = createBundleWithObservation("99717-32", "Adrenoleukodystrophy deficiency newborn screening interpretation", true)
         def argsMissingCodingSystem = [
             "theCodingMap": "IsNotHere"
@@ -297,19 +294,21 @@ class MapLocalObservationCodesTest extends Specification {
         transformClass.transform(new HapiFhirResource(bundle), argsMissingCodingSystem)
 
         then:
-        0 == 1
+        def exception = thrown(NullPointerException)
+        exception.message.contains(exceptionMessage)
     }
 
-    def "When bad args - args is null"() {
-        // throws NullPointerException: Cannot invoke "java.util.Map.get(Object)" because "args" is null
+    def "When args is null, throws a NullPointerException"() {
         given:
+        def exceptionMessage = "args"
         def bundle = createBundleWithObservation("99717-32", "Adrenoleukodystrophy deficiency newborn screening interpretation", true)
 
         when:
         transformClass.transform(new HapiFhirResource(bundle), null)
 
         then:
-        0 == 1
+        def exception = thrown(NullPointerException)
+        exception.message.contains(exceptionMessage)
     }
 
     Observation getObservationByCode(List<Observation> observationList, String code) {

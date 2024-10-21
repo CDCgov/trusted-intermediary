@@ -84,33 +84,40 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
     private Map<String, IdentifierCode> getMapFromArgs(Map<String, Object> args) {
         var codingMap = new HashMap<String, IdentifierCode>();
 
-        // Should fail if null
-        // TODO: Determine how we want to handle if args is not structured properly and update the
-        // "When bad args" tests to reflect the approach.
+        // Suppressing the unchecked cast warning. The assignment below will throw a
+        // ClassCastException if it fails.
+        @SuppressWarnings("unchecked")
         var argsCodingMap = (Map<String, Map<String, String>>) args.get("codingMap");
 
         for (Map.Entry<String, Map<String, String>> entry : argsCodingMap.entrySet()) {
             var localCode = entry.getKey();
-            var value = entry.getValue();
-            var code = value.get("code");
-            var display = value.get("display");
-            var codingSystem = value.get("codingSystem");
-            if (code == null) {
-                throw new NullPointerException("Empty code");
-            }
-            if (display == null) {
-                throw new NullPointerException("Empty display");
-            }
-            if (codingSystem == null) {
-                throw new NullPointerException("Empty coding system");
-            }
-            var mappedCode =
-                    new IdentifierCode(
-                            value.get("code"), value.get("display"), value.get("codingSystem"));
+            var mappedCode = getIdentifierCode(entry);
 
             codingMap.put(localCode, mappedCode);
         }
 
         return codingMap;
+    }
+
+    private IdentifierCode getIdentifierCode(Map.Entry<String, Map<String, String>> entry) {
+        var code = entry.getValue().get("code");
+        var display = entry.getValue().get("display");
+        var codingSystem = entry.getValue().get("codingSystem");
+
+        if (code == null) {
+            throwNullException("One or more code objects are missing in codingMap");
+        }
+        if (display == null) {
+            throwNullException("One or more display objects are missing in codingMap");
+        }
+        if (codingSystem == null) {
+            throwNullException("One or more codingSystem objects are missing in codingMap");
+        }
+
+        return new IdentifierCode(code, display, codingSystem);
+    }
+
+    private void throwNullException(String message) {
+        throw new NullPointerException(message);
     }
 }
