@@ -41,7 +41,6 @@ resource "azurerm_monitor_activity_log_alert" "azure_service_health_alert" {
     service_health {
       locations = var.service_health_locations
       events    = ["Incident"]
-      services  = ["*"]
     }
   }
 

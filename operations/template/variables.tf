@@ -22,5 +22,5 @@ variable "alert_slack_email" {
 
 variable "service_health_locations" {
   type    = list(string)
-  default = ["East US"]
+  default = ["EastUS"]
 }
