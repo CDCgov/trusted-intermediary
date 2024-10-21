@@ -4,6 +4,7 @@
 
 - [hurl](https://hurl.dev/)
 - [jq](https://jqlang.github.io/jq/)
+- [azure-cli](https://learn.microsoft.com/en-us/cli/azure/)
 - `CDCTI_HOME` environment variable ([see here](../README.md))
 
 ## Available Hurl Scripts
