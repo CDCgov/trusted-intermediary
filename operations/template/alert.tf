@@ -98,7 +98,7 @@ resource "azurerm_monitor_metric_alert" "azure_4XX_alert" {
 
   criteria {
     metric_namespace = "Microsoft.Web/sites"
-    metric_name      = "4XX-Http-Statuses"
+    metric_name      = "Http4xx"
     aggregation      = "Count"
     operator         = "GreaterThanOrEqualTo"
     threshold        = 1
