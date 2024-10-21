@@ -22,6 +22,6 @@
     ```
     Usage: ./update_examples.sh
     ```
-- `local_test_utils.sh`: utility functions for the previous scripts. It has functions to submit requests to RS, check the submission status throughout the whole flow, and downloading snapshots from azurite
+- `message_submission_utils.sh`: utility functions for the previous scripts. It has functions to submit requests to RS, check the submission status throughout the whole flow, and downloading snapshots from azurite
 
 **Note**: these scripts require both RS and TI to be running locally

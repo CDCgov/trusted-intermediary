@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./local_test_utils.sh
+source ./message_submission_utils.sh
 
 check_prerequisites
 
