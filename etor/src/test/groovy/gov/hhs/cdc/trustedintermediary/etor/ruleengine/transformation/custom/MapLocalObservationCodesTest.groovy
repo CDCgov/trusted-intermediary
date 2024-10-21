@@ -6,7 +6,6 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
-import org.apache.commons.lang3.ObjectUtils
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
