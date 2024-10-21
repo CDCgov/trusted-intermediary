@@ -38,13 +38,10 @@ As a _, so that _, I need _.
 - [ ] Code quality tasks completed
   - [ ] Code refactored for clarity and no design/technical debt
   - [ ] Adhere to separation of concerns; code is not tightly coupled, especially to 3rd party dependencies
-  - [ ] Code is reviewed or developed by pair; 1 approval is needed but consider requiring an outside-the-pair reviewer
-  - [ ] Code quality checks passed
-- [ ] Security & Privacy tasks completed
-  - [ ] Security & privacy gates passed
 - [ ] Testing tasks completed
   - [ ] Load tests passed
-  - [ ] Unit test coverage of our code >= 90%
+  - [ ] Additional e2e tests created
+  - [ ] Additional RS e2e assertions created in the `rs-e2e` project for any new transformations.  Includes improvements to the assertion code required to make the new assertions
 - [ ] Build & Deploy tasks completed
   - [ ] Build process updated
   - [ ] API(s) are versioned

@@ -19,3 +19,8 @@ variable "alert_slack_email" {
   nullable  = false
   sensitive = true
 }
+
+variable "service_health_locations" {
+  type    = list(string)
+  default = ["global"]
+}
