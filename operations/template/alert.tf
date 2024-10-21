@@ -121,3 +121,29 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "database_token_expired_a
     ]
   }
 }
+
+resource "azurerm_monitor_metric_alert" "azure_4XX_alert" {
+  count               = local.non_pr_environment ? 1 : 0
+  name                = "cdcti-${var.environment}-azure-http-4XX-alert"
+  resource_group_name = data.azurerm_resource_group.group.name
+  scopes              = [azurerm_storage_account.storage.id]
+  description         = "Action will be triggered when Transactions count is greater than 50."
+
+  criteria {
+    metric_namespace = "Microsoft.Storage/storageAccounts"
+    metric_name      = "Transactions"
+    aggregation      = "Total"
+    operator         = "GreaterThan"
+    threshold        = 50
+
+    dimension {
+      name     = "ApiName"
+      operator = "Include"
+      values   = ["*"]
+    }
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.main.id
+  }
+}
