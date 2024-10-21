@@ -105,19 +105,16 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
         var codingSystem = entry.getValue().get("codingSystem");
 
         if (code == null) {
-            throwNullException("One or more code objects are missing in codingMap");
+            throw new NullPointerException("One or more code objects are missing in codingMap");
         }
         if (display == null) {
-            throwNullException("One or more display objects are missing in codingMap");
+            throw new NullPointerException("One or more display objects are missing in codingMap");
         }
         if (codingSystem == null) {
-            throwNullException("One or more codingSystem objects are missing in codingMap");
+            throw new NullPointerException(
+                    "One or more codingSystem objects are missing in codingMap");
         }
 
         return new IdentifierCode(code, display, codingSystem);
-    }
-
-    private void throwNullException(String message) {
-        throw new NullPointerException(message);
     }
 }
