@@ -39,7 +39,7 @@ resource "azurerm_monitor_activity_log_alert" "azure_service_health_alert" {
     category = "ServiceHealth"
     levels   = ["Error"]
     service_health {
-      locations = "global"
+      locations = ["global"]
       events    = ["Incident"]
     }
   }
