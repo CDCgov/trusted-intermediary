@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
+import org.apache.commons.lang3.ObjectUtils
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
@@ -31,7 +32,7 @@ class MapLocalObservationCodesTest extends Specification {
         def bundle = createBundleWithObservation(initialCode, initialDisplay, true)
 
         when:
-        transformClass.transform(new HapiFhirResource(bundle), null)
+        transformClass.transform(new HapiFhirResource(bundle), getArgs())
 
         then:
         def transformedObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
@@ -69,7 +70,7 @@ class MapLocalObservationCodesTest extends Specification {
 
 
         when:
-        transformClass.transform(new HapiFhirResource(bundle), null)
+        transformClass.transform(new HapiFhirResource(bundle), getArgs())
 
         then:
         1 * mockLogger.logWarning(*_)
@@ -87,7 +88,7 @@ class MapLocalObservationCodesTest extends Specification {
         def originalCodingList = HapiHelper.resourceInBundle(bundle, Observation.class).getCode().getCoding()
 
         when:
-        transformClass.transform(new HapiFhirResource(bundle), null)
+        transformClass.transform(new HapiFhirResource(bundle), getArgs())
 
         then:
         def transformedObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
@@ -109,7 +110,7 @@ class MapLocalObservationCodesTest extends Specification {
         def originalCodingList = HapiHelper.resourceInBundle(bundle, Observation.class).getCode().getCoding()
 
         when:
-        transformClass.transform(new HapiFhirResource(bundle), null)
+        transformClass.transform(new HapiFhirResource(bundle), getArgs())
 
         then:
         def transformedObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
@@ -128,7 +129,7 @@ class MapLocalObservationCodesTest extends Specification {
         def originalCodingList = HapiHelper.resourceInBundle(bundle, Observation.class).getCode().getCoding()
 
         when:
-        transformClass.transform(new HapiFhirResource(bundle), null)
+        transformClass.transform(new HapiFhirResource(bundle), getArgs())
 
         then:
         def transformedObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
@@ -144,7 +145,7 @@ class MapLocalObservationCodesTest extends Specification {
         def originalCodingList = HapiHelper.resourceInBundle(bundle, Observation.class).getCode().getCoding()
 
         when:
-        transformClass.transform(new HapiFhirResource(bundle), null)
+        transformClass.transform(new HapiFhirResource(bundle), getArgs())
 
         then:
         def transformedObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
@@ -160,7 +161,7 @@ class MapLocalObservationCodesTest extends Specification {
         def originalObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
 
         when:
-        transformClass.transform(new HapiFhirResource(bundle), null)
+        transformClass.transform(new HapiFhirResource(bundle), getArgs())
 
         then:
         def transformedObservation = HapiHelper.resourceInBundle(bundle, Observation.class)
@@ -179,7 +180,7 @@ class MapLocalObservationCodesTest extends Specification {
         initialObservations.size() == 114
 
         when:
-        transformClass.transform(new HapiFhirResource(bundle), null)
+        transformClass.transform(new HapiFhirResource(bundle), getArgs())
 
         then:
         def transformedObservations = HapiHelper.resourcesInBundle(bundle, Observation.class).toList()
@@ -242,6 +243,73 @@ class MapLocalObservationCodesTest extends Specification {
         def initialAccession = getObservationByCode(initialObservations, "99717-5")
         def transformedAccession = getObservationByCode(transformedObservations, "99717-5")
         initialAccession == transformedAccession
+    }
+
+    def "When bad args - missing coding system"() {
+        // getMapFromArgs is fine, but throws a NullPointerException in getMappedCoding call to urlForCodeType
+        // Note: the "code" and "display" can be missing and there is no exception.
+        given:
+        def exceptionMessage = "Empty coding system"
+        def bundle = createBundleWithObservation("99717-32", "Adrenoleukodystrophy deficiency newborn screening interpretation", true)
+        def args = [
+            "codingMap": [
+                "99717-32": [
+                    "code"        : "85269-9",
+                    "display"     : "X-linked Adrenoleukodystrophy (X- ALD) newborn screen interpretation",
+                ]
+            ]
+        ]
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), args)
+
+        then:
+        def exception = thrown(NullPointerException)
+        exception.message == exceptionMessage
+    }
+
+    def "When bad args - codingMap is improperly structured"() {
+        // throws ClassCastException: class java.lang.String cannot be cast to class java.util.Map
+        given:
+        def bundle = createBundleWithObservation("99717-32", "Adrenoleukodystrophy deficiency newborn screening interpretation", true)
+        def args = [
+            "codingMap": [
+                "code" : "99717-32"
+            ]
+        ]
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), args)
+
+        then:
+        0 == 1
+    }
+
+    def "When bad args - codingMap is not present in the args"() {
+        // throws NullPointerException: Cannot invoke "java.util.Map.entrySet()" because "argsCodingMap" is null
+        given:
+        def bundle = createBundleWithObservation("99717-32", "Adrenoleukodystrophy deficiency newborn screening interpretation", true)
+        def argsMissingCodingSystem = [
+            "theCodingMap": "IsNotHere"
+        ]
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), argsMissingCodingSystem)
+
+        then:
+        0 == 1
+    }
+
+    def "When bad args - args is null"() {
+        // throws NullPointerException: Cannot invoke "java.util.Map.get(Object)" because "args" is null
+        given:
+        def bundle = createBundleWithObservation("99717-32", "Adrenoleukodystrophy deficiency newborn screening interpretation", true)
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), null)
+
+        then:
+        0 == 1
     }
 
     Observation getObservationByCode(List<Observation> observationList, String code) {
@@ -325,5 +393,32 @@ class MapLocalObservationCodesTest extends Specification {
         coding.addExtension(new Extension(HapiHelper.EXTENSION_CODING_SYSTEM, new StringType(isLocal ? HapiHelper.LOCAL_CODE : HapiHelper.LOINC_CODE)))
 
         return coding
+    }
+
+    def getArgs() {
+        return [
+            "codingMap": [
+                "99717-32": [
+                    "code"        : "85269-9",
+                    "display"     : "X-linked Adrenoleukodystrophy (X- ALD) newborn screen interpretation",
+                    "codingSystem": "LN"
+                ],
+                "99717-33": [
+                    "code"        : "85268-1",
+                    "display"     : "X-linked Adrenoleukodystrophy (X- ALD) newborn screening comment-discussion",
+                    "codingSystem": "LN"
+                ],
+                "99717-34": [
+                    "code"        : "PLT325",
+                    "display"     : "ABCD1 gene mutation found [Identifier] in DBS by Sequencing",
+                    "codingSystem": "PLT"
+                ],
+                "99717-48": [
+                    "code"        : "PLT3258",
+                    "display"     : "IDUA gene mutations found [Identifier] in DBS by Sequencing",
+                    "codingSystem": "PLT"
+                ]
+            ]
+        ]
     }
 }
