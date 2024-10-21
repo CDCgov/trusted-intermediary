@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirHelper
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiFhirResource
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
+import org.apache.commons.lang3.ObjectUtils
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
@@ -248,6 +249,7 @@ class MapLocalObservationCodesTest extends Specification {
         // getMapFromArgs is fine, but throws a NullPointerException in getMappedCoding call to urlForCodeType
         // Note: the "code" and "display" can be missing and there is no exception.
         given:
+        def exceptionMessage = "Empty coding system"
         def bundle = createBundleWithObservation("99717-32", "Adrenoleukodystrophy deficiency newborn screening interpretation", true)
         def args = [
             "codingMap": [
@@ -262,7 +264,8 @@ class MapLocalObservationCodesTest extends Specification {
         transformClass.transform(new HapiFhirResource(bundle), args)
 
         then:
-        0 == 1
+        def exception = thrown(NullPointerException)
+        exception.message == exceptionMessage
     }
 
     def "When bad args - codingMap is improperly structured"() {
