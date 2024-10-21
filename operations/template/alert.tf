@@ -118,3 +118,33 @@ resource "azurerm_monitor_metric_alert" "azure_4XX_alert" {
     ]
   }
 }
+
+resource "azurerm_monitor_metric_alert" "azure_5XX_alert" {
+  count               = local.non_pr_environment ? 1 : 0
+  name                = "cdcti-${var.environment}-azure-http-5XX-alert"
+  resource_group_name = data.azurerm_resource_group.group.name
+  scopes              = [data.azurerm_resource_group.group.id]
+  description         = "Action will be triggered when Http Status Code 5XX is greater than or equal to 1"
+  frequency           = "PT1M" // Checks every 1 minute
+  window_size         = "PT5M" // Every Check, looks back 5 minutes in history
+  //TBD: How frequent do we want this alert and how far do we want it to look back.
+
+  criteria {
+    metric_namespace = "Microsoft.Web/sites"
+    metric_name      = "Http5xx"
+    aggregation      = "Count"
+    operator         = "GreaterThanOrEqual"
+    threshold        = 1
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.notify_slack_email[count.index].id
+  }
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to tags because the CDC sets these automagically
+      tags,
+    ]
+  }
+}
