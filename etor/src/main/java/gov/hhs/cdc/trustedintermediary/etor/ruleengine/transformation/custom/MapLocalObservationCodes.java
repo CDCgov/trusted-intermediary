@@ -92,6 +92,18 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
         for (Map.Entry<String, Map<String, String>> entry : argsCodingMap.entrySet()) {
             var localCode = entry.getKey();
             var value = entry.getValue();
+            var code = value.get("code");
+            var display = value.get("display");
+            var codingSystem = value.get("codingSystem");
+            if (code == null) {
+                throw new NullPointerException("Empty code");
+            }
+            if (display == null) {
+                throw new NullPointerException("Empty display");
+            }
+            if (codingSystem == null) {
+                throw new NullPointerException("Empty coding system");
+            }
             var mappedCode =
                     new IdentifierCode(
                             value.get("code"), value.get("display"), value.get("codingSystem"));
