@@ -95,6 +95,9 @@ resource "azurerm_monitor_metric_alert" "azure_4XX_alert" {
   resource_group_name = data.azurerm_resource_group.group.name
   scopes              = [data.azurerm_resource_group.group.id]
   description         = "Action will be triggered when Http Status Code 4XX is greater than or equal to 1"
+  frequency        = "PT1M" // Checks every 1 minute
+  window_size      = "PT5M" // Every Check, looks back 5 minutes in history
+  //TBD: How frequent do we want this alert and how far do we want it to look back.
 
   criteria {
     metric_namespace = "Microsoft.Web/sites"
@@ -102,9 +105,6 @@ resource "azurerm_monitor_metric_alert" "azure_4XX_alert" {
     aggregation      = "Count"
     operator         = "GreaterThanOrEqualTo"
     threshold        = 1
-    frequency        = "PT1M" // Checks every 1 minute
-    window_size      = "PT5M" // Every Check, looks back 5 minutes in history
-    //TBD: How frequent do we want this alert and how far do we want it to look back.
   }
 
   action {
