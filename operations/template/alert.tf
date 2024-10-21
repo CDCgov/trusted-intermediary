@@ -20,7 +20,7 @@ resource "azurerm_monitor_action_group" "notify_slack_email" {
 resource "azurerm_monitor_activity_log_alert" "azure_service_health_alert" {
   count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti-${var.environment}-azure-status-alert"
-  location            = var.service_health_locations
+  location            = "global"
   resource_group_name = data.azurerm_resource_group.group.name
   scopes              = ["/subscriptions/${data.azurerm_client_config.current.subscription_id}"]
 
@@ -28,7 +28,7 @@ resource "azurerm_monitor_activity_log_alert" "azure_service_health_alert" {
     category = "ServiceHealth"
     levels   = ["Error"]
     service_health {
-      locations = [var.service_health_locations]
+      locations = ["global"]
       events    = ["Incident"]
     }
   }
