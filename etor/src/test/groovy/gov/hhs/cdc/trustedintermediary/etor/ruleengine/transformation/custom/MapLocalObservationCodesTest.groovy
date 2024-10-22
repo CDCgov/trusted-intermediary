@@ -310,6 +310,48 @@ class MapLocalObservationCodesTest extends Specification {
         exception.message.contains(exceptionMessage)
     }
 
+    def "When args are missing code, throws a NullPointerException"() {
+        given:
+        def exceptionMessage = "code"
+        def bundle = createBundleWithObservation("99717-32", "Adrenoleukodystrophy deficiency newborn screening interpretation", true)
+        def args = [
+            "codingMap": [
+                "99717-32": [
+                    "display"     : "X-linked Adrenoleukodystrophy (X- ALD) newborn screen interpretation",
+                    "codingSystem": "LN",
+                ]
+            ]
+        ]
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), args)
+
+        then:
+        def exception = thrown(NullPointerException)
+        exception.message.contains(exceptionMessage)
+    }
+
+    def "When args are missing display, throws a NullPointerException"() {
+        given:
+        def exceptionMessage = "display"
+        def bundle = createBundleWithObservation("99717-32", "Adrenoleukodystrophy deficiency newborn screening interpretation", true)
+        def args = [
+            "codingMap": [
+                "99717-32": [
+                    "code"        : "85269-9",
+                    "codingSystem": "LN",
+                ]
+            ]
+        ]
+
+        when:
+        transformClass.transform(new HapiFhirResource(bundle), args)
+
+        then:
+        def exception = thrown(NullPointerException)
+        exception.message.contains(exceptionMessage)
+    }
+
     Observation getObservationByCode(List<Observation> observationList, String code) {
         return observationList.find {observation -> observation.code?.coding?.find { coding -> coding.code == code}}
     }
