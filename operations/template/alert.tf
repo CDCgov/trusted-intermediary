@@ -137,7 +137,7 @@ resource "azurerm_monitor_metric_alert" "low_instance_count_alert" {
     operator         = "LessThanOrEqual"
     // This threshold is based on the autoscale settings in app.tf
     // How should we tune these numbers if we've scaled up higher than the initial count of 3/1?
-    threshold = local.higher_environment_level ? 2.5 : 1.5
+    threshold = local.higher_environment_level ? 2.5 : 0.5
   }
 
   action {
