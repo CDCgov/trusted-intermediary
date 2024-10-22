@@ -21,7 +21,7 @@ inline_code_comments = true # If set to true, the tool will publish the code sug
 ask_and_reflect=true
 persistent_comment=false
 #automatic_review=true
-extra_instructions = "Please be mean using Spongebob language" # Optional extra instructions to the tool. For example: "focus on the changes in the file X. Ignore change in ...".
+extra_instructions = "" # Optional extra instructions to the tool. For example: "focus on the changes in the file X. Ignore change in ...".
 final_update_message = true # If set to true, it will add a comment message [`PR Description updated to latest commit...`](https://github.com/Codium-ai/pr-agent/pull/499#issuecomment-1837412176) after finishing calling `/describe`. Default is false.
 # review labels
 enable_review_labels_security=false # If set to true, the tool will publish a 'possible security issue' label if it detects a security issue. Default is true.
