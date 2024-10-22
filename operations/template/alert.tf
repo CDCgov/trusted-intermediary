@@ -33,7 +33,7 @@ resource "azurerm_monitor_activity_log_alert" "azure_service_health_alert" {
   name                = "cdcti-${var.environment}-azure-status-alert"
   location            = var.service_health_locations
   resource_group_name = data.azurerm_resource_group.group.name
-  scopes              = [azurerm_container_registry.registry.id]
+  scopes              = ["/subscriptions/${data.azurerm_client_config.current.subscription_id}"]
 
   criteria {
     category = "ServiceHealth"
