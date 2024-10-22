@@ -1,5 +1,5 @@
 resource "azurerm_monitor_action_group" "notify_slack_email" {
-  count               = 1 //local.non_pr_environment ? 1 : 0
+  count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti${var.environment}-actiongroup"
   resource_group_name = data.azurerm_resource_group.group.name
   short_name          = "cdcti-alerts"
@@ -121,7 +121,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "database_token_expired_a
   }
 }
 resource "azurerm_monitor_metric_alert" "low_instance_count_alert" {
-  count               = 1 //local.non_pr_environment ? 1 : 0
+  count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti-${var.environment}-azure-low-instance-count-alert"
   resource_group_name = data.azurerm_resource_group.group.name
   scopes              = [azurerm_monitor_autoscale_setting.api_autoscale.id]
@@ -137,7 +137,7 @@ resource "azurerm_monitor_metric_alert" "low_instance_count_alert" {
     operator         = "LessThanOrEqual"
     // This threshold is based on the autoscale settings in app.tf
     // How should we tune these numbers if we've scaled up higher than the initial count of 3/1?
-    threshold = local.higher_environment_level ? 2.5 : 1.5
+    threshold = local.higher_environment_level ? 2.5 : 0.5
   }
 
   action {
