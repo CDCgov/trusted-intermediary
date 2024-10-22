@@ -124,15 +124,15 @@ resource "azurerm_monitor_metric_alert" "low_instance_count_alert" {
   count               = 1 //local.non_pr_environment ? 1 : 0
   name                = "cdcti-${var.environment}-azure-low-instance-count-alert"
   resource_group_name = data.azurerm_resource_group.group.name
-  scopes              = [azurerm_linux_web_app.api.id]
+  scopes              = [azurerm_monitor_autoscale_setting.api_autoscale.id]
   description         = "Action will be triggered when the instance count is too low"
   frequency           = "PT1M"  // Checks every 1 minute
   window_size         = "PT15M" // Every Check, looks back 15 minutes in history
   //TBD: How frequent do we want this alert and how far do we want it to look back.
 
   criteria {
-    metric_namespace = "Microsoft.Web/sites"
-    metric_name      = "InstanceCount"
+    metric_namespace = "Microsoft.Insights/autoscalesettings"
+    metric_name      = "ObservedCapacity"
     aggregation      = "Average"
     operator         = "LessThanOrEqual"
     // This threshold is based on the autoscale settings in app.tf
