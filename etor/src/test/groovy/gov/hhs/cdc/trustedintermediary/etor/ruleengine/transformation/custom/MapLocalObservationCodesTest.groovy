@@ -246,7 +246,7 @@ class MapLocalObservationCodesTest extends Specification {
 
     def "When args are missing coding system, throws a NullPointerException"() {
         given:
-        def exceptionMessage = "codingSystem"
+        def exceptionMessage = "missing or empty required field codingSystem"
         def bundle = createBundleWithObservation("99717-32", "Adrenoleukodystrophy deficiency newborn screening interpretation", true)
         def args = [
             "codingMap": [
@@ -261,7 +261,7 @@ class MapLocalObservationCodesTest extends Specification {
         transformClass.transform(new HapiFhirResource(bundle), args)
 
         then:
-        def exception = thrown(NullPointerException)
+        def exception = thrown(IllegalArgumentException)
         exception.message.contains(exceptionMessage)
     }
 
@@ -312,7 +312,7 @@ class MapLocalObservationCodesTest extends Specification {
 
     def "When args are missing code, throws a NullPointerException"() {
         given:
-        def exceptionMessage = "code"
+        def exceptionMessage = "missing or empty required field code"
         def bundle = createBundleWithObservation("99717-32", "Adrenoleukodystrophy deficiency newborn screening interpretation", true)
         def args = [
             "codingMap": [
@@ -327,13 +327,13 @@ class MapLocalObservationCodesTest extends Specification {
         transformClass.transform(new HapiFhirResource(bundle), args)
 
         then:
-        def exception = thrown(NullPointerException)
+        def exception = thrown(IllegalArgumentException)
         exception.message.contains(exceptionMessage)
     }
 
     def "When args are missing display, throws a NullPointerException"() {
         given:
-        def exceptionMessage = "display"
+        def exceptionMessage = "missing or empty required field display"
         def bundle = createBundleWithObservation("99717-32", "Adrenoleukodystrophy deficiency newborn screening interpretation", true)
         def args = [
             "codingMap": [
@@ -348,7 +348,7 @@ class MapLocalObservationCodesTest extends Specification {
         transformClass.transform(new HapiFhirResource(bundle), args)
 
         then:
-        def exception = thrown(NullPointerException)
+        def exception = thrown(IllegalArgumentException)
         exception.message.contains(exceptionMessage)
     }
 

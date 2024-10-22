@@ -8,6 +8,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Observation;
@@ -30,30 +31,38 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
         var bundle = (Bundle) resource.getUnderlyingData();
         var observations = HapiHelper.resourcesInBundle(bundle, Observation.class);
 
-        for (Observation obv : observations.toList()) {
-            var codingList = obv.getCode().getCoding();
+        observations
+                .map(Observation::getCode)
+                .map(code -> code.getCoding().stream().findFirst().orElse(null))
+                .filter(Objects::nonNull)
+                .filter(this::isLocalCode)
+                .forEach(coding -> processCoding(bundle, coding, codingMap));
+    }
 
-            if (codingList.size() != 1) {
-                continue;
-            }
+    private boolean isLocalCode(Coding coding) {
+        return HapiHelper.hasDefinedCoding(
+                coding, HapiHelper.EXTENSION_ALT_CODING, HapiHelper.LOCAL_CODE);
+    }
 
-            var coding = codingList.get(0);
-            if (!HapiHelper.hasDefinedCoding(
-                    coding, HapiHelper.EXTENSION_ALT_CODING, HapiHelper.LOCAL_CODE)) {
-                continue;
-            }
+    private void processCoding(
+            Bundle bundle, Coding coding, Map<String, IdentifierCode> codingMap) {
+        IdentifierCode identifier = codingMap.get(coding.getCode());
 
-            var identifier = codingMap.get(coding.getCode());
-            if (identifier == null) {
-                logUnmappedLocalCode(bundle, coding);
-                continue;
-            }
-
-            var mappedCoding = getMappedCoding(identifier);
-
-            // Add the mapped code as the first in the list, ahead of the existing alternate code
-            codingList.add(0, mappedCoding);
+        if (identifier == null) {
+            logUnmappedLocalCode(bundle, coding);
         }
+
+        Coding mappedCoding = getMappedCoding(identifier);
+        coding.addExtension(HapiHelper.EXTENSION_CWE_CODING, mappedCoding);
+        coding.addExtension(
+                HapiHelper.EXTENSION_CODING_SYSTEM, new StringType(identifier.codingSystem()));
+    }
+
+    private String validateField(String field, String fieldName) {
+        if (field == null || field.isBlank()) {
+            throw new IllegalArgumentException("missing or empty required field " + fieldName);
+        }
+        return field;
     }
 
     private void logUnmappedLocalCode(Bundle bundle, Coding coding) {
@@ -100,20 +109,10 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
     }
 
     private IdentifierCode getIdentifierCode(Map.Entry<String, Map<String, String>> entry) {
-        var code = entry.getValue().get("code");
-        var display = entry.getValue().get("display");
-        var codingSystem = entry.getValue().get("codingSystem");
-
-        if (code == null) {
-            throw new NullPointerException("One or more code objects are missing in codingMap");
-        }
-        if (display == null) {
-            throw new NullPointerException("One or more display objects are missing in codingMap");
-        }
-        if (codingSystem == null) {
-            throw new NullPointerException(
-                    "One or more codingSystem objects are missing in codingMap");
-        }
+        var value = entry.getValue();
+        var code = validateField(value.get("code"), "code");
+        var display = validateField(value.get("display"), "display");
+        var codingSystem = validateField(value.get("codingSystem"), "codingSystem");
 
         return new IdentifierCode(code, display, codingSystem);
     }
