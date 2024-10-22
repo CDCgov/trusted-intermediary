@@ -44,8 +44,8 @@ if [ "$1" = "-h" ]; then
     exit 0
 fi
 
-hurl_file="$1" # Assign the first argument to hurl_file
-shift          # Remove the first argument from the list of arguments
+hurl_file=rs/"$1" # Assign the first argument to hurl_file
+shift             # Remove the first argument from the list of arguments
 
 while getopts ':f:r:t:e:c:s:x:i:vh' opt; do
     case "$opt" in
