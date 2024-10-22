@@ -129,7 +129,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "ti-log-errors-alert" {
 
   action {
     action_group  = [azurerm_monitor_action_group.notify_slack_email[count.index].id]
-    email_subject = "TI log errors detected!"
+    email_subject = "${var.environment}: TI log errors detected!"
   }
 
   data_source_id = azurerm_linux_web_app.api.id
