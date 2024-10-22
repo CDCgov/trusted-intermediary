@@ -16,7 +16,7 @@ verbose=""
 submission_id=""
 
 show_help() {
-    echo "Usage: $(basename $0) <HURL_FILE> [OPTIONS]"
+    echo "Usage: $(basename $0) <ENDPOINT_NAME> [OPTIONS]"
     echo
     echo "Options:"
     echo "    -f <REL_PATH>                       The path to the hl7/fhir file to submit, relative the root path (Required for waters API)"
@@ -31,9 +31,9 @@ show_help() {
     echo "    -h                                  Display this help and exit"
 }
 
-# Check if required HURL_FILE is provided
+# Check if required ENDPOINT_NAME is provided
 if [ $# -eq 0 ]; then
-    echo "Error: Missing required argument <HURL_FILE>"
+    echo "Error: Missing required argument <ENDPOINT_NAME>"
     show_help
     exit 1
 fi
@@ -44,8 +44,8 @@ if [ "$1" = "-h" ]; then
     exit 0
 fi
 
-hurl_file=rs/"$1" # Assign the first argument to hurl_file
-shift             # Remove the first argument from the list of arguments
+endpoint_name=rs/"$1".hurl # Assign the first argument to endpoint_name
+shift                      # Remove the first argument from the list of arguments
 
 while getopts ':f:r:t:e:c:s:x:i:vh' opt; do
     case "$opt" in
@@ -127,5 +127,5 @@ hurl \
     --variable jwt=$(jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 -k $client_id.$client_sender -i $client_id.$client_sender -s $client_id.$client_sender -a $host --no-iat -S @$secret) \
     $submission_id \
     $verbose \
-    $hurl_file \
+    $endpoint_name \
     $@

@@ -38,7 +38,7 @@ check_submission_status() {
     start_time=$(date +%s)
 
     while true; do
-        history_response=$(./rs.sh history.hurl -i "$submission_id")
+        history_response=$(./rs.sh history -i "$submission_id")
         overall_status=$(echo "$history_response" | jq -r '.overallStatus')
 
         echo -n "  Status: $overall_status"
@@ -113,7 +113,7 @@ submit_message() {
 
     echo "Assuming receivers are '$first_leg_receiver' and '$second_leg_receiver' because of MSH-9 value '$msh9'"
 
-    waters_response=$(./rs.sh waters.hurl -f "$message_file_name" -r "$message_file_path")
+    waters_response=$(./rs.sh waters -f "$message_file_name" -r "$message_file_path")
     submission_id=$(echo "$waters_response" | jq -r '.id')
 
     echo "[First leg] Checking submission status for ID: $submission_id"
@@ -127,7 +127,7 @@ submit_message() {
     translated_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_1.fhir"
     download_from_azurite "$translated_blob_name" "$translated_file_path"
 
-    metadata_response=$(./ti.sh metadata.hurl -i "$inbound_submission_id")
+    metadata_response=$(./ti.sh metadata -i "$inbound_submission_id")
     outbound_submission_id=$(echo "$metadata_response" | jq -r '.issue[] | select(.details.text == "outbound submission id") | .diagnostics')
 
     transformed_blob_name="receive/flexion.etor-service-sender/$outbound_submission_id.fhir"

@@ -13,7 +13,7 @@ client=report-stream
 verbose=""
 
 show_help() {
-    echo "Usage: $(basename $0) <HURL_FILE> [OPTIONS]"
+    echo "Usage: $(basename $0) <ENDPOINT_NAME> [OPTIONS]"
     echo
     echo "Options:"
     echo "    -f <REL_PATH>         The path to the hl7/fhir file to submit, relative the root path (Required for orders and results APIs)"
@@ -26,9 +26,9 @@ show_help() {
     echo "    -h                    Display this help and exit"
 }
 
-# Check if required HURL_FILE is provided
+# Check if required ENDPOINT_NAME is provided
 if [ $# -eq 0 ]; then
-    echo "Error: Missing required argument <HURL_FILE>"
+    echo "Error: Missing required argument <ENDPOINT_NAME>"
     show_help
     exit 1
 fi
@@ -39,8 +39,8 @@ if [ "$1" = "-h" ]; then
     exit 0
 fi
 
-hurl_file=ti/"$1" # Assign the first argument to hurl_file
-shift             # Remove the first argument from the list of arguments
+endpoint_name=ti/"$1.hurl" # Assign the first argument to endpoint_name
+shift                      # Remove the first argument from the list of arguments
 
 while getopts ':f:r:e:c:j:i:vh' opt; do
     case "$opt" in
@@ -111,5 +111,5 @@ hurl \
     --variable jwt=$jwt \
     $submission_id \
     $verbose \
-    $hurl_file \
+    $endpoint_name \
     $@
