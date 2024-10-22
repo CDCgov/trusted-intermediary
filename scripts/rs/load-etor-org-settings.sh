@@ -39,12 +39,7 @@ fi
 ./prime organization addkey -e $env --public-key $flexion_key --scope "flexion.*.report" --orgName flexion --kid flexion.etor-service-sender --doit
 ./prime organization addkey -e $env --public-key $flexion_key --scope "flexion.*.report" --orgName flexion --kid flexion.simulated-hospital --doit
 ./prime organization addkey -e $env --public-key $flexion_key --scope "flexion.*.report" --orgName flexion --kid flexion.simulated-lab --doit
-
-## AL
-./prime multiple-settings set -s -e $env -i ./settings/STLTs/AL/al-phl.yml
-# ./prime organization addkey -e $env --public-key $al_phl_key --scope "al-phl.*.report" --orgName al-phl --kid al-phl.etor-nbs-results --doit
-./prime multiple-settings set -e $env -s -i ./settings/STLTs/Oracle/oracle-rln.yml
-# ./prime organization addkey -e $env --public-key $oracle_rln_key --scope "oracle-rln.*.report" --orgName oracle-rln --kid oracle-rln.etor-nbs-orders --doit
+./prime organization addkey -e $env --public-key $flexion_key --scope "flexion.*.report" --orgName flexion --kid flexion.simulated-sender --doit
 
 ## CA
 ./prime multiple-settings set -s -e $env -i ./settings/STLTs/CA/ucsd.yml

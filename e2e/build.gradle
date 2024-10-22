@@ -19,10 +19,10 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.0'
 
     //fhir
-    implementation 'ca.uhn.hapi.fhir:hapi-fhir-base:7.4.3'
-    implementation 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:7.4.3'
-    implementation 'ca.uhn.hapi.fhir:hapi-fhir-caching-caffeine:7.4.3'
-    implementation 'ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:7.4.3'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-base:7.4.5'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:7.4.5'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-caching-caffeine:7.4.5'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:7.4.5'
     implementation 'org.fhir:ucum:1.0.8'
 
     testImplementation 'org.apache.groovy:groovy:4.0.23'

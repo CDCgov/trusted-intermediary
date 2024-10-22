@@ -12,7 +12,7 @@ HTTP 200
 [Captures]
 token: jsonpath "$['access_token']"
 
-# curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-hospital' --header 'Authorization: Bearer $token' --data-binary '@/path/to/message.hl7' 'http://localhost:7071/api/waters'
+# curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-sender' --header 'Authorization: Bearer $token' --data-binary '@/path/to/message.hl7' 'http://localhost:7071/api/waters'
 POST {{url}}/api/waters
 Content-Type: {{content-type}}
 Client: {{client-id}}.{{client-sender}}
