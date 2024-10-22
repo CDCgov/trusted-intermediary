@@ -9,10 +9,21 @@ resource "azurerm_monitor_action_group" "notify_slack_email" {
     email_address = var.alert_slack_email
   }
 
+  # Ignore changes to tags because the CDC sets these automagically
   lifecycle {
     ignore_changes = [
-      # Ignore changes to tags because the CDC sets these automagically
-      tags,
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
     ]
   }
 }
@@ -40,10 +51,21 @@ resource "azurerm_monitor_activity_log_alert" "azure_service_health_alert" {
   description = "Alert service(s) appear to be down"
   enabled     = true
 
+  # Ignore changes to tags because the CDC sets these automagically
   lifecycle {
     ignore_changes = [
-      # Ignore changes to tags because the CDC sets these automagically
-      tags,
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
     ]
   }
 }
@@ -82,9 +104,20 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "database_token_expired_a
   }
 
   lifecycle {
+    # Ignore changes to tags because the CDC sets these automagically
     ignore_changes = [
-      # Ignore changes to tags because the CDC sets these automagically
-      tags,
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
     ]
   }
 }
@@ -112,9 +145,20 @@ resource "azurerm_monitor_metric_alert" "azure_4XX_alert" {
   }
 
   lifecycle {
+    # Ignore changes to tags because the CDC sets these automagically
     ignore_changes = [
-      # Ignore changes to tags because the CDC sets these automagically
-      tags,
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
     ]
   }
 }
