@@ -99,7 +99,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "database_token_expired_a
   auto_mitigation_enabled = true
 
   trigger {
-    operator=  "GreaterThan"
+    operator  = "GreaterThan"
     threshold = 1
   }
 
