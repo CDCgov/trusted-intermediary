@@ -10,7 +10,7 @@ locals {
   cdc_domain_environment         = var.environment == "dev" || var.environment == "stg" || var.environment == "prd"
 
   // If the environment looks like pr123, regexall will contain matches. If there are no matches, it's a non-pr env
-  non_pr_environment = length(regexall("pr\\d+", var.environment)) == 0
+  non_pr_environment = length(regexall("^pr\\d+", var.environment)) == 0
 }
 
 data "azurerm_resource_group" "group" {
