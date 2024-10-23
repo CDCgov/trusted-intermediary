@@ -126,7 +126,7 @@ resource "azurerm_monitor_metric_alert" "azure_4XX_alert" {
   count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti-${var.environment}-azure-http-4XX-alert"
   resource_group_name = data.azurerm_resource_group.group.name
-  scopes              = [data.azurerm_resource_group.group.id]
+  scopes              = [azurerm_linux_web_app.api.id]
   description         = "Action will be triggered when Http Status Code 4XX is greater than or equal to 3"
   frequency           = "PT1M" // Checks every 1 minute
   window_size         = "PT1H" // Every Check looks back 1 hour for 4xx errors
