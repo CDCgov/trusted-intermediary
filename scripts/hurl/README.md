@@ -5,6 +5,7 @@
 - [hurl](https://hurl.dev/)
 - [jq](https://jqlang.github.io/jq/)
 - [azure-cli](https://learn.microsoft.com/en-us/cli/azure/)
+- [jwt-cli](https://github.com/mike-engel/jwt-cli)
 - `CDCTI_HOME` environment variable ([see here](../README.md))
 
 ## Available Hurl Scripts
@@ -138,6 +139,6 @@ Get Health info from local environment:
     ```
     ./update_examples.sh
     ```
-- `message_submission_utils.sh`: utility functions for the previous scripts. It has functions to submit requests to RS, check the submission status throughout the whole flow, and downloading snapshots from azurite
+- `utils.sh`: utility functions for the previous scripts. It has functions to submit requests to RS, check the submission status throughout the whole flow, and downloading snapshots from azurite
 
 **Note**: these scripts require both RS and TI to be running locally
