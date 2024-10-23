@@ -86,9 +86,9 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "database_token_expired_a
 
   query = <<-QUERY
       AppServiceConsoleLogs
-      | where ResultDescription has "FATAL: The access token has expired."
-      and TimeGenerated >= ago(30m)
+      | where TimeGenerated >= ago(30m)
       and TimeGenerated <= now()
+      | where ResultDescription has "FATAL: The access token has expired."
       | summarize count()
     QUERY
 
