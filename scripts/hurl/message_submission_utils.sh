@@ -7,22 +7,16 @@ FILE_NAME_SUFFIX_STEP_3="_3_hl7_translation_final"
 
 AZURITE_CONNECTION_STRING="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://localhost:10000/devstoreaccount1;" # pragma: allowlist secret
 
-RS_LOCAL_API="http://localhost:7071"
-TI_LOCAL_API="http://localhost:8080"
+LOCAL_HOST="localhost"
+RS_STG_HOST="staging.prime.cdc.gov"
+RS_PRD_HOST="prime.cdc.gov"
+RS_LOCAL_PORT=7071
+TI_STG_HOST="cdcti-stg-api.azurewebsites.net"
+TI_PRD_HOST="cdcti-prd-api.azurewebsites.net"
+TI_LOCAL_PORT=8080
 
-check_prerequisites() {
-    # Check if the RS and TO local APIs are reachable
-    local apis=("$RS_LOCAL_API" "$TI_LOCAL_API")
-    for service in "${apis[@]}"; do
-        if ! curl -s --head --fail "$service" | grep "200 OK" >/dev/null; then
-            echo "The service at $service is not reachable"
-            exit 1
-        fi
-    done
-
-    # Check required CLI tools
-    local required_commands=("hurl" "jq" "az")
-    for cmd in "${required_commands[@]}"; do
+check_installed_commands() {
+    for cmd in "$@"; do
         if ! command -v "$cmd" &>/dev/null; then
             echo "$cmd could not be found. Please install $cmd to proceed."
             exit 1
@@ -30,7 +24,77 @@ check_prerequisites() {
     done
 }
 
+check_apis() {
+    for service in "$@"; do
+        if ! curl -s --head --fail "$service" | grep "200 OK" >/dev/null; then
+            echo "The service at $service is not reachable"
+            exit 1
+        fi
+    done
+}
+
+check_env_vars() {
+    local env_vars=("$@")
+    for var in "${env_vars[@]}"; do
+        if [ -z "${!var}" ]; then
+            echo "Error: Environment variable '$var' is not set"
+            exit 1
+        fi
+    done
+}
+
+get_endpoint_url() {
+    local type=$1
+    local env=$2
+    local protocol host port
+
+    case "$env" in
+    local)
+        protocol="http"
+        host="$LOCAL_HOST"
+        port=$([ "$type" = "rs" ] && echo "$RS_LOCAL_PORT" || echo "$TI_LOCAL_PORT")
+        ;;
+    staging)
+        protocol="https"
+        host=$([ "$type" = "rs" ] && echo "$RS_STG_HOST" || echo "$TI_STG_HOST")
+        port=443
+        ;;
+    production)
+        protocol="https"
+        host=$([ "$type" = "rs" ] && echo "$RS_PRD_HOST" || echo "$TI_PRD_HOST")
+        port=443
+        ;;
+    *)
+        echo "Error: Invalid environment '$env'"
+        show_help
+        exit 1
+        ;;
+    esac
+
+    echo "$protocol://$host:$port"
+}
+
+generate_jwt() {
+    # requires: jwt-cli
+    local client_id=$1
+    local client_sender=$2
+    local host=$3
+    local secret_path=$4
+
+    jwt encode \
+        --exp='+5min' \
+        --jti "$(uuidgen)" \
+        --alg RS256 \
+        -k "$client_id.$client_sender" \
+        -i "$client_id.$client_sender" \
+        -s "$client_id.$client_sender" \
+        -a "$host" \
+        --no-iat \
+        -S "@$secret_path"
+}
+
 check_submission_status() {
+    # requires: hurl, jq
     local submission_id=$1
     local timeout=180       # 3 minutes
     local retry_interval=10 # Retry every 10 seconds
@@ -62,11 +126,13 @@ check_submission_status() {
 }
 
 extract_submission_id() {
+    # requires: jq
     local history_response=$1
     echo "$history_response" | jq '.destinations[0].sentReports[0].externalName' | sed 's/.*-\([0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}\)-.*/\1/'
 }
 
 download_from_azurite() {
+    # requires: jq, az
     local blob_name=$1
     local file_path=$2
 
@@ -89,6 +155,7 @@ download_from_azurite() {
 }
 
 submit_message() {
+    # requires: hurl, jq, az
     local file=$1
     local message_file_path=$(dirname "$file")
     local message_file_name=$(basename "$file")
