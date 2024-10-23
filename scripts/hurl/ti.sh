@@ -1,115 +1,89 @@
 #!/bin/bash
 
-# Check if $CDCTI_HOME is set
-if [ -z "$CDCTI_HOME" ]; then
-    echo "Error: CDCTI_HOME is not set. Please set this environment variable before running the script."
-    exit 1
-fi
+source ./utils.sh
+
+LOCAL_JWT_PATH="$CDCTI_HOME/mock_credentials/report-stream-valid-token.jwt"
 
 # default values
 env=local
 root=$CDCTI_HOME/examples/
 client=report-stream
-verbose=""
 
-show_help() {
-    echo "Usage: $(basename $0) <ENDPOINT_NAME> [OPTIONS]"
-    echo
-    echo "Options:"
-    echo "    -f <REL_PATH>         The path to the hl7/fhir file to submit, relative the root path (Required for orders and results APIs)"
-    echo "    -i <SUBMISSION_ID>    The submissionId to call the metadata API with (Required for orders, results and metadata API)"
-    echo "    -r <ROOT_PATH>        The root path to the hl7/fhir files (Default: $root)"
-    echo "    -e [local | staging]  The environment to run the test in (Default: $env)"
-    echo "    -c <CLIENT>           The client id to use (Default: $client)"
-    echo "    -j <JWT>              The JWT to use for authentication"
-    echo "    -v                    Verbose mode"
-    echo "    -h                    Display this help and exit"
+show_usage() {
+    cat <<EOF
+Usage: $(basename "$0") <ENDPOINT_NAME> [OPTIONS]
+
+ENDPOINT_NAME:
+    The name of the endpoint to call (required)
+
+Options:
+    -f <REL_PATH>         Path to the hl7/fhir file to submit (Required for orders and results APIs)
+    -i <SUBMISSION_ID>    Submission ID for metadata API (Required for orders, results and metadata API)
+    -r <ROOT_PATH>        Root path to the hl7/fhir files (Default: $root)
+    -e <ENVIRONMENT>      Environment: local|staging (Default: $env)
+    -j <JWT>              JWT token for authentication
+    -v                    Verbose mode
+    -h                    Display this help and exit
+
+Environment Variables:
+    CDCTI_HOME            Base directory for CDC TI repository (Required)
+EOF
 }
 
-# Check if required ENDPOINT_NAME is provided
-if [ $# -eq 0 ]; then
-    echo "Error: Missing required argument <ENDPOINT_NAME>"
-    show_help
-    exit 1
-fi
-
-# Check if first argument is -h
-if [ "$1" = "-h" ]; then
-    show_help
-    exit 0
-fi
-
-endpoint_name=ti/"$1.hurl" # Assign the first argument to endpoint_name
-shift                      # Remove the first argument from the list of arguments
-
-while getopts ':f:r:e:c:j:i:vh' opt; do
-    case "$opt" in
-    f)
-        fpath="$OPTARG"
-        ;;
-    i)
-        submission_id="--variable submissionid=$OPTARG"
-        ;;
-    r)
-        root="$OPTARG"
-        ;;
-    e)
-        env="$OPTARG"
-        ;;
-    c)
-        client="$OPTARG"
-        ;;
-    j)
-        jwt="$OPTARG"
-        ;;
-    v)
-        verbose="--verbose"
-        ;;
-    h)
-        show_help
+parse_arguments() {
+    if [ $# -eq 0 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+        show_usage
         exit 0
-        ;;
-    :)
-        echo -e "Option requires an argument"
-        show_help
-        exit 1
-        ;;
-    ?)
-        echo -e "Invalid command option"
-        show_help
-        exit 1
-        ;;
-    esac
-done
-shift "$(($OPTIND - 1))"
-
-if [ "$env" = "local" ]; then
-    host=localhost
-    url=http://$host:8080
-    if [ -z "$jwt" ] && [ "$client" = "report-stream" ]; then
-        jwt=$(cat "$CDCTI_HOME/mock_credentials/report-stream-valid-token.jwt")
     fi
-elif [ "$env" = "staging" ]; then
-    host=cdcti-stg-api.azurewebsites.net
-    url=https://$host:443
-else
-    echo "Error: Invalid environment $env"
-    show_help
-    exit 1
-fi
 
-if [ -z "$jwt" ]; then
-    echo "Error: Please provide the JWT for $client"
-    exit 1
-fi
+    [ $# -eq 0 ] && fail "Missing required argument <ENDPOINT_NAME>"
+    endpoint_name="ti/$1.hurl"
+    shift # Remove endpoint name from args
 
-hurl \
-    --variable fpath=$fpath \
-    --file-root $root \
-    --variable url=$url \
-    --variable client=$client \
-    --variable jwt=$jwt \
-    $submission_id \
-    $verbose \
-    $endpoint_name \
-    $@
+    while getopts ':f:r:e:j:i:v' opt; do
+        case "$opt" in
+        f) fpath="$OPTARG" ;;
+        i) submission_id="--variable submissionid=$OPTARG" ;;
+        r) root="$OPTARG" ;;
+        e) env="$OPTARG" ;;
+        j) jwt="$OPTARG" ;;
+        v) verbose="--verbose" ;;
+        ?) fail "Invalid option -$OPTARG" ;;
+        esac
+    done
+
+    shift "$(($OPTIND - 1))"
+    remaining_args="$*"
+}
+
+setup_credentials() {
+    if [ -z "$jwt" ] && [ "$client" = "report-stream" ] && [ "$env" = "local" ]; then
+        if [ -f "$LOCAL_JWT_PATH" ]; then
+            jwt=$(cat "$LOCAL_JWT_PATH")
+        else
+            fail "Local JWT file not found at: $LOCAL_JWT_PATH"
+        fi
+    fi
+
+    [ -n "$jwt" ] || fail "Please provide the JWT for $client"
+}
+
+run_hurl_command() {
+    url=$(get_api_url "$env" "ti")
+
+    hurl \
+        --variable "fpath=$fpath" \
+        --file-root "$root" \
+        --variable "url=$url" \
+        --variable "client=$client" \
+        --variable "jwt=$jwt" \
+        ${submission_id:-} \
+        ${verbose:-} \
+        "$endpoint_name" \
+        ${remaining_args:+$remaining_args}
+}
+
+check_env_vars CDCTI_HOME
+parse_arguments "$@"
+setup_credentials
+run_hurl_command

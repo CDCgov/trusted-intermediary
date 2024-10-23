@@ -7,13 +7,17 @@ FILE_NAME_SUFFIX_STEP_3="_3_hl7_translation_final"
 
 AZURITE_CONNECTION_STRING="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://localhost:10000/devstoreaccount1;" # pragma: allowlist secret
 
-LOCAL_HOST="localhost"
-RS_STG_HOST="staging.prime.cdc.gov"
-RS_PRD_HOST="prime.cdc.gov"
-RS_LOCAL_PORT=7071
-TI_STG_HOST="cdcti-stg-api.azurewebsites.net"
-TI_PRD_HOST="cdcti-prd-api.azurewebsites.net"
-TI_LOCAL_PORT=8080
+RS_API_LCL_URL="http://localhost:7071"
+RS_API_STG_URL="https://staging.prime.cdc.gov:443"
+RS_API_PRD_URL="https://prime.cdc.gov:443"
+TI_API_LCL_URL="http://localhost:8080"
+TI_API_STG_URL="https://cdcti-stg-api.azurewebsites.net:443"
+TI_API_PRD_URL="https://cdcti-prd-api.azurewebsites.net:443"
+
+fail() {
+    echo "Error: $1" >&2
+    exit 1
+}
 
 check_installed_commands() {
     for cmd in "$@"; do
@@ -43,52 +47,55 @@ check_env_vars() {
     done
 }
 
-get_endpoint_url() {
-    local type=$1
-    local env=$2
-    local protocol host port
+get_api_url() {
+    local env=$1
+    local type=$2
 
-    case "$env" in
-    local)
-        protocol="http"
-        host="$LOCAL_HOST"
-        port=$([ "$type" = "rs" ] && echo "$RS_LOCAL_PORT" || echo "$TI_LOCAL_PORT")
+    case "$type" in
+    "rs")
+        case "$env" in
+        "local") echo $RS_API_LCL_URL ;;
+        "staging") echo $RS_API_STG_URL ;;
+        "production") echo $RS_API_PRD_URL ;;
+        *)
+            echo "Invalid environment: $env" >&2
+            exit 1
+            ;;
+        esac
         ;;
-    staging)
-        protocol="https"
-        host=$([ "$type" = "rs" ] && echo "$RS_STG_HOST" || echo "$TI_STG_HOST")
-        port=443
-        ;;
-    production)
-        protocol="https"
-        host=$([ "$type" = "rs" ] && echo "$RS_PRD_HOST" || echo "$TI_PRD_HOST")
-        port=443
-        ;;
-    *)
-        echo "Error: Invalid environment '$env'"
-        show_help
-        exit 1
+    "ti")
+        case "$env" in
+        "local") echo $TI_API_LCL_URL ;;
+        "staging") echo $TI_API_STG_URL ;;
+        "production") echo $TI_API_PRD_URL ;;
+        *)
+            echo "Invalid environment: $env" >&2
+            exit 1
+            ;;
+        esac
         ;;
     esac
+}
 
-    echo "$protocol://$host:$port"
+extract_host_from_url() {
+    local url=$1
+    echo "$url" | sed 's|^.*://\([^/:]*\)[:/].*|\1|'
 }
 
 generate_jwt() {
     # requires: jwt-cli
-    local client_id=$1
-    local client_sender=$2
-    local host=$3
-    local secret_path=$4
+    local client=$1
+    local audience=$2
+    local secret_path=$3
 
     jwt encode \
         --exp='+5min' \
         --jti "$(uuidgen)" \
         --alg RS256 \
-        -k "$client_id.$client_sender" \
-        -i "$client_id.$client_sender" \
-        -s "$client_id.$client_sender" \
-        -a "$host" \
+        -k "$client" \
+        -i "$client" \
+        -s "$client" \
+        -a "$audience" \
         --no-iat \
         -S "@$secret_path"
 }
