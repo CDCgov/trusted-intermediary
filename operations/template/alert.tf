@@ -1,5 +1,5 @@
 resource "azurerm_monitor_action_group" "notify_slack_email" {
-  count               = 1 //local.non_pr_environment ? 1 : 0
+  count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti${var.environment}-actiongroup"
   resource_group_name = data.azurerm_resource_group.group.name
   short_name          = "cdcti-alerts"
@@ -121,7 +121,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "database_token_expired_a
   }
 }
 resource "azurerm_monitor_metric_alert" "low_instance_count_alert" {
-  count               = 1 //local.non_pr_environment ? 1 : 0
+  count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti-${var.environment}-azure-low-instance-count-alert"
   resource_group_name = data.azurerm_resource_group.group.name
   scopes              = [azurerm_monitor_autoscale_setting.api_autoscale.id]
