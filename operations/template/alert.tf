@@ -166,11 +166,10 @@ resource "azurerm_monitor_metric_alert" "azure_5XX_alert" {
   count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti-${var.environment}-azure-http-5XX-alert"
   resource_group_name = data.azurerm_resource_group.group.name
-  scopes              = [data.azurerm_resource_group.group.id]
+  scopes              = [azurerm_linux_web_app.api.id]
   description         = "Action will be triggered when Http Status Code 5XX is greater than or equal to 1"
-  frequency           = "PT1M" // Checks every 1 minute
-  window_size         = "PT5M" // Every Check, looks back 5 minutes in history
-  //TBD: How frequent do we want this alert and how far do we want it to look back.
+  frequency           = "PT1M" // Checks every 1 min
+  window_size         = "PT5M" // Every Check looks back 5 min for 4xx errors
 
   criteria {
     metric_namespace = "Microsoft.Web/sites"
@@ -185,9 +184,20 @@ resource "azurerm_monitor_metric_alert" "azure_5XX_alert" {
   }
 
   lifecycle {
+    # Ignore changes to tags because the CDC sets these automagically
     ignore_changes = [
-      # Ignore changes to tags because the CDC sets these automagically
-      tags,
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
     ]
   }
 }
