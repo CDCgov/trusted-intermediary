@@ -27,7 +27,7 @@ An SBOM (a Software Bill of Materials) is a machine-readable inventory document 
 - **Vulnerability Scanning:** With the ability to integrate with tools like [Anchore/Grype](https://github.com/anchore/grype#recommended), one can easily add vulnerability scanning to the process. 
 
 
-- **Format Conversion:** supports integration with Anchore/Syft for SBOM format conversion, providing flexibility to meet different ecosystem requirements
+- **Format Conversion:** supports integration with Anchore/Syft for SBOM format conversion, providing flexibility to meet different ecosystem requirements.
 
 
 
