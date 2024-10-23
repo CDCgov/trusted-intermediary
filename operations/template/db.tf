@@ -24,7 +24,7 @@ resource "azurerm_postgresql_flexible_server" "database" {
 
   maintenance_window { # Sunday at 12:00 UTC which is 7:00 AM EST or 8:00 AM EDT (around the time of our SLA's maintenance window)
     day_of_week  = 0
-    start_hour   = 5
+    start_hour   = 12
     start_minute = 0
   }
 
