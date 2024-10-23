@@ -169,7 +169,7 @@ resource "azurerm_monitor_metric_alert" "azure_5XX_alert" {
   scopes              = [azurerm_linux_web_app.api.id]
   description         = "Action will be triggered when Http Status Code 5XX is greater than or equal to 1"
   frequency           = "PT1M" // Checks every 1 min
-  window_size         = "PT5M" // Every Check looks back 5 min for 4xx errors
+  window_size         = "PT5M" // Every Check looks back 5 min for 5xx errors
 
   criteria {
     metric_namespace = "Microsoft.Web/sites"
