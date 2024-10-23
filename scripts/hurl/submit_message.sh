@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./message_submission_utils.sh
+source ./utils.sh
 
 env="local"
 file=""
