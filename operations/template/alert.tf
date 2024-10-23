@@ -31,7 +31,7 @@ resource "azurerm_monitor_action_group" "notify_slack_email" {
 resource "azurerm_monitor_activity_log_alert" "azure_service_health_alert" {
   count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti-${var.environment}-azure-status-alert"
-  location            = "global"
+  location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
   scopes              = ["/subscriptions/${data.azurerm_client_config.current.subscription_id}"]
 
@@ -136,14 +136,11 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "ti-log-errors-alert" {
   enabled        = true
 
   query = <<-QUERY
-      AppServiceConsoleLogs
-      | where TimeGenerated >= ago(00.001m)
+    AppServiceConsoleLogs
+    | where ResultDescription contains 'Error'
+      and TimeGenerated >= ago(30m)
       and TimeGenerated <= now()
-      | project columnifexists("ResultDescription", 'default_value')
-      | project  JsonResult = parse_json(ResultDescription)
-      | evaluate bag_unpack(JsonResult) : (level:string)
-      | where level in ( 'ERROR' )
-      | summarize count()
+    | summarize count()
     QUERY
 
   severity                = 3
