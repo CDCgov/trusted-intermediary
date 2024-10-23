@@ -28,43 +28,63 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
         var codingMap = getMapFromArgs(args);
 
         var bundle = (Bundle) resource.getUnderlyingData();
+        var msh41Identifier = extractMsh41Identifier(bundle);
+        var messageId = HapiHelper.getMessageControlId(bundle);
         var observations = HapiHelper.resourcesInBundle(bundle, Observation.class);
 
-        for (Observation obv : observations.toList()) {
-            var codingList = obv.getCode().getCoding();
-
-            if (codingList.size() != 1) {
-                continue;
-            }
-
-            var coding = codingList.get(0);
-            if (!HapiHelper.hasDefinedCoding(
-                    coding, HapiHelper.EXTENSION_ALT_CODING, HapiHelper.LOCAL_CODE)) {
-                continue;
-            }
-
-            var identifier = codingMap.get(coding.getCode());
-            if (identifier == null) {
-                logUnmappedLocalCode(bundle, coding);
-                continue;
-            }
-
-            var mappedCoding = getMappedCoding(identifier);
-
-            // Add the mapped code as the first in the list, ahead of the existing alternate code
-            codingList.add(0, mappedCoding);
-        }
+        observations
+                .filter(this::hasValidCoding)
+                .forEach(
+                        observation ->
+                                processCoding(observation, codingMap, msh41Identifier, messageId));
     }
 
-    private void logUnmappedLocalCode(Bundle bundle, Coding coding) {
+    private boolean hasValidCoding(Observation observation) {
+        var codingList = observation.getCode().getCoding();
+        return codingList.size() == 1 && isLocalCode(codingList.get(0));
+    }
+
+    private boolean isLocalCode(Coding coding) {
+        return HapiHelper.hasDefinedCoding(
+                coding, HapiHelper.EXTENSION_ALT_CODING, HapiHelper.LOCAL_CODE);
+    }
+
+    private String extractMsh41Identifier(Bundle bundle) {
         var msh41Identifier = HapiHelper.getMSH4_1Identifier(bundle);
-        var msh41Value = msh41Identifier != null ? msh41Identifier.getValue() : null;
+        return msh41Identifier != null ? msh41Identifier.getValue() : null;
+    }
+
+    private void processCoding(
+            Observation observation,
+            Map<String, IdentifierCode> codingMap,
+            String msh41Identifier,
+            String messageId) {
+        var originalCoding = observation.getCode().getCoding().get(0);
+        IdentifierCode identifier = codingMap.get(originalCoding.getCode());
+
+        if (identifier == null) {
+            logUnmappedLocalCode(originalCoding, msh41Identifier, messageId);
+            return;
+        }
+
+        var mappedCoding = getMappedCoding(identifier);
+        observation.getCode().getCoding().add(0, mappedCoding);
+    }
+
+    private String validateField(String field, String fieldName) {
+        if (field == null || field.isBlank()) {
+            throw new IllegalArgumentException("missing or empty required field " + fieldName);
+        }
+        return field;
+    }
+
+    private void logUnmappedLocalCode(Coding coding, String msh41Identifier, String messageId) {
 
         logger.logWarning(
                 "Unmapped local code detected: '{}', from sender: '{}', message Id: '{}'",
                 coding.getCode(),
-                msh41Value,
-                HapiHelper.getMessageControlId(bundle));
+                msh41Identifier,
+                messageId);
     }
 
     private Coding getMappedCoding(IdentifierCode identifierCode) {
@@ -100,20 +120,10 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
     }
 
     private IdentifierCode getIdentifierCode(Map.Entry<String, Map<String, String>> entry) {
-        var code = entry.getValue().get("code");
-        var display = entry.getValue().get("display");
-        var codingSystem = entry.getValue().get("codingSystem");
-
-        if (code == null) {
-            throw new NullPointerException("One or more code objects are missing in codingMap");
-        }
-        if (display == null) {
-            throw new NullPointerException("One or more display objects are missing in codingMap");
-        }
-        if (codingSystem == null) {
-            throw new NullPointerException(
-                    "One or more codingSystem objects are missing in codingMap");
-        }
+        var value = entry.getValue();
+        var code = validateField(value.get("code"), "code");
+        var display = validateField(value.get("display"), "display");
+        var codingSystem = validateField(value.get("codingSystem"), "codingSystem");
 
         return new IdentifierCode(code, display, codingSystem);
     }
