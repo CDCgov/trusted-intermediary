@@ -137,11 +137,12 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "ti-log-errors-alert" {
 
   query = <<-QUERY
       AppServiceConsoleLogs
-      | where TimeGenerated >= ago(30m)
+      | where TimeGenerated >= ago(00.001m)
       and TimeGenerated <= now()
-      | project JsonResult = parse_json(ResultDescription) | evaluate bag_unpack(JsonResult)
-      | where isnotnull(level)
-      and level in ( 'ERROR' )
+      | project columnifexists("ResultDescription", 'default_value')
+      | project  JsonResult = parse_json(ResultDescription)
+      | evaluate bag_unpack(JsonResult) : (level:string)
+      | where level in ( 'ERROR' )
       | summarize count()
     QUERY
 
