@@ -8,7 +8,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Observation;
@@ -29,14 +28,20 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
         var codingMap = getMapFromArgs(args);
 
         var bundle = (Bundle) resource.getUnderlyingData();
+        var msh41Identifier = extractMsh41Identifier(bundle);
+        var messageId = HapiHelper.getMessageControlId(bundle);
         var observations = HapiHelper.resourcesInBundle(bundle, Observation.class);
 
         observations
-                .map(Observation::getCode)
-                .map(code -> code.getCoding().stream().findFirst().orElse(null))
-                .filter(Objects::nonNull)
-                .filter(this::isLocalCode)
-                .forEach(coding -> processCoding(bundle, coding, codingMap));
+                .filter(this::hasValidCoding)
+                .forEach(
+                        observation ->
+                                processCoding(observation, codingMap, msh41Identifier, messageId));
+    }
+
+    private boolean hasValidCoding(Observation observation) {
+        var codingList = observation.getCode().getCoding();
+        return codingList.size() == 1 && isLocalCode(codingList.get(0));
     }
 
     private boolean isLocalCode(Coding coding) {
@@ -44,18 +49,26 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
                 coding, HapiHelper.EXTENSION_ALT_CODING, HapiHelper.LOCAL_CODE);
     }
 
+    private String extractMsh41Identifier(Bundle bundle) {
+        var msh41Identifier = HapiHelper.getMSH4_1Identifier(bundle);
+        return msh41Identifier != null ? msh41Identifier.getValue() : null;
+    }
+
     private void processCoding(
-            Bundle bundle, Coding coding, Map<String, IdentifierCode> codingMap) {
-        IdentifierCode identifier = codingMap.get(coding.getCode());
+            Observation observation,
+            Map<String, IdentifierCode> codingMap,
+            String msh41Identifier,
+            String messageId) {
+        var originalCoding = observation.getCode().getCoding().get(0);
+        IdentifierCode identifier = codingMap.get(originalCoding.getCode());
 
         if (identifier == null) {
-            logUnmappedLocalCode(bundle, coding);
+            logUnmappedLocalCode(originalCoding, msh41Identifier, messageId);
+            return;
         }
 
-        Coding mappedCoding = getMappedCoding(identifier);
-        coding.addExtension(HapiHelper.EXTENSION_CWE_CODING, mappedCoding);
-        coding.addExtension(
-                HapiHelper.EXTENSION_CODING_SYSTEM, new StringType(identifier.codingSystem()));
+        var mappedCoding = getMappedCoding(identifier);
+        observation.getCode().getCoding().add(0, mappedCoding);
     }
 
     private String validateField(String field, String fieldName) {
@@ -65,15 +78,13 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
         return field;
     }
 
-    private void logUnmappedLocalCode(Bundle bundle, Coding coding) {
-        var msh41Identifier = HapiHelper.getMSH4_1Identifier(bundle);
-        var msh41Value = msh41Identifier != null ? msh41Identifier.getValue() : null;
+    private void logUnmappedLocalCode(Coding coding, String msh41Identifier, String messageId) {
 
         logger.logWarning(
                 "Unmapped local code detected: '{}', from sender: '{}', message Id: '{}'",
                 coding.getCode(),
-                msh41Value,
-                HapiHelper.getMessageControlId(bundle));
+                msh41Identifier,
+                messageId);
     }
 
     private Coding getMappedCoding(IdentifierCode identifierCode) {
