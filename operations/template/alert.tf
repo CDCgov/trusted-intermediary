@@ -177,7 +177,7 @@ resource "azurerm_monitor_metric_alert" "azure_5XX_alert" {
     aggregation      = "Count"
     operator         = "GreaterThanOrEqual"
     threshold        = 1
-   }
+  }
 
   action {
     action_group_id = azurerm_monitor_action_group.notify_slack_email[count.index].id
