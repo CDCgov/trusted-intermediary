@@ -161,7 +161,7 @@ resource "azurerm_monitor_metric_alert" "azure_4XX_alert" {
     ]
   }
 }
-
+  
 resource "azurerm_monitor_metric_alert" "azure_5XX_alert" {
   count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti-${var.environment}-azure-http-5XX-alert"
