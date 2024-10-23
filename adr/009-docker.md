@@ -38,7 +38,7 @@ Docker is an open platform for developing, shipping, and running applications. D
 
 ### Negative
 
-- **Complexity in Orchestration:** managing a large number of containers can introduce complexity, especially without proper orchestration tools like Kubernetes.
+- **Complexity in Orchestration:** managing a large number of containers can introduce complexity, especially without proper orchestration tools.
 
 
 - **Security Considerations:** Containers share the same OS kernel, which can pose security risks if not properly managed (e.g., vulnerability exposure).

@@ -23,16 +23,16 @@ ZAP is a free, open-source penetration testing tool maintained under the umbrell
 
 ### Positive
   
-- Integration Capabilities: ZAP can be integrated into CI/CD pipelines, enabling automated security testing as part of the software development lifecycle.
+- **Integration Capabilities:** ZAP can be integrated into CI/CD pipelines, enabling automated security testing as part of the software development lifecycle.
 
   
-- User-Friendly Interface: ZAP has an easy-to-use interface that simplifies the process of running scans and analyzing results, making it accessible for teams with varying levels of expertise.
+- **User-Friendly Interface:** ZAP has an easy-to-use interface that simplifies the process of running scans and analyzing results, making it accessible for teams with varying levels of expertise.
 
   
-- Comprehensive Reporting: ZAP can generate detailed reports that help identify vulnerabilities and guide remediation efforts, useful for compliance and audits.
+- **Comprehensive Reporting:** ZAP can generate detailed reports that help identify vulnerabilities and guide remediation efforts, useful for compliance and audits.
 
 
-- Community Support: The active community surrounding ZAP provides a wealth of plugins, resources, and support, facilitating easier troubleshooting and best practices sharing.
+- **Community Support:** The active community surrounding ZAP provides a wealth of plugins, resources, and support, facilitating easier troubleshooting and best practices sharing.
 
 ### Negative
 
