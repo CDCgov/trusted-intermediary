@@ -135,7 +135,7 @@ resource "azurerm_monitor_metric_alert" "low_instance_count_alert" {
     metric_name      = "ObservedCapacity"
     aggregation      = "Average"
     operator         = "LessThanOrEqual"
-    threshold        = azurerm_monitor_autoscale_setting.api_autoscale.profile.capacity.default - 0.5
+    threshold        = azurerm_monitor_autoscale_setting.api_autoscale.profile[0].capacity.default - 0.5
   }
 
   action {
