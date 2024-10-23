@@ -28,10 +28,10 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.0'
 
     // hapi fhir
-    api 'ca.uhn.hapi.fhir:hapi-fhir-base:7.4.4'
-    api 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:7.4.4'
-    implementation 'ca.uhn.hapi.fhir:hapi-fhir-caching-caffeine:7.4.4'
-    implementation 'ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:7.4.4'
+    api 'ca.uhn.hapi.fhir:hapi-fhir-base:7.4.5'
+    api 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:7.4.5'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-caching-caffeine:7.4.5'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:7.4.5'
     api 'org.fhir:ucum:1.0.8'
 
     // hapi hl7
