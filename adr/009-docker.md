@@ -6,7 +6,6 @@ Date: 2022-01-04
 
 We will use [Docker](https://docs.docker.com/get-started/overview/) for containerization of our application.
 
-- [Reference](https://docs.docker.com/get-started/overview/)
 
 ## Status
 
