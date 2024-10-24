@@ -34,10 +34,32 @@
         "OBR-2.1 = ORC-2.1",
         "OBR-2.2 = ORC-2.2",
         "OBR-16 = ORC-12",
-        "OBR.count() = 1",
-        "OBX-3.1 = to the mapped code",
-        "OBX-3.2 = to the mapped display",
-        "OBX-3.3 = to the mapped coding system",
+        "OBR.count() = 1"
+      ]
+    },
+    {
+      "name": "UCSD ORU LOINC replacement",
+      "conditions": [
+        "MSH-10 = '004'"
+      ],
+      "rules": [
+        "OBX-3.1 = '85269-9'",
+        "OBX-3.2 = 'X-linked Adrenoleukodystrophy (X- ALD) newborn screen interpretation'",
+        "OBX-3.3 = 'LN'",
+        "OBX-3.4 = input.OBX-3.4",
+        "OBX-3.5 = input.OBX-3.5",
+        "OBX-3.6 = input.OBX-3.6"
+      ]
+    },
+    {
+      "name": "UCSD ORU PLT replacement",
+      "conditions": [
+        "MSH-10 = '005'"
+      ],
+      "rules": [
+        "OBX-3.1 = 'PLT3293",
+        "OBX-3.2 = 'SMN1 exon 7 deletion analysis in DBS by Sequencing'",
+        "OBX-3.3 = 'PLT'",
         "OBX-3.4 = input.OBX-3.4",
         "OBX-3.5 = input.OBX-3.5",
         "OBX-3.6 = input.OBX-3.6"
