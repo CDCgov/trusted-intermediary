@@ -34,7 +34,13 @@
         "OBR-2.1 = ORC-2.1",
         "OBR-2.2 = ORC-2.2",
         "OBR-16 = ORC-12",
-        "OBR.count() = 1"
+        "OBR.count() = 1",
+        "OBX-3.1 = to the mapped code",
+        "OBX-3.2 = to the mapped display",
+        "OBX-3.3 = to the mapped coding system",
+        "OBX-3.4 = input.OBX-3.4",
+        "OBX-3.5 = input.OBX-3.5",
+        "OBX-3.6 = input.OBX-3.6"
       ]
     }
   ]
