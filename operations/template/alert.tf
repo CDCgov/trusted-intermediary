@@ -9,7 +9,7 @@ resource "azurerm_monitor_action_group" "notify_slack_email" {
     email_address = var.alert_slack_email
   }
 
-  #   below tags are managed by CDC
+  # Ignore changes to tags because the CDC sets these automagically
   lifecycle {
     ignore_changes = [
       tags["business_steward"],
@@ -31,7 +31,7 @@ resource "azurerm_monitor_action_group" "notify_slack_email" {
 resource "azurerm_monitor_activity_log_alert" "azure_service_health_alert" {
   count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti-${var.environment}-azure-status-alert"
-  location            = data.azurerm_resource_group.group.location
+  location            = "global"
   resource_group_name = data.azurerm_resource_group.group.name
   scopes              = ["/subscriptions/${data.azurerm_client_config.current.subscription_id}"]
 
@@ -51,6 +51,7 @@ resource "azurerm_monitor_activity_log_alert" "azure_service_health_alert" {
   description = "Alert service(s) appear to be down"
   enabled     = true
 
+  # Ignore changes to tags because the CDC sets these automagically
   lifecycle {
     ignore_changes = [
       tags["business_steward"],
@@ -102,8 +103,8 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "database_token_expired_a
     threshold = 1
   }
 
-  #   below tags are managed by CDC
   lifecycle {
+    # Ignore changes to tags because the CDC sets these automagically
     ignore_changes = [
       tags["business_steward"],
       tags["center"],
@@ -120,6 +121,128 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "database_token_expired_a
     ]
   }
 }
+
+resource "azurerm_monitor_metric_alert" "azure_4XX_alert" {
+  count               = local.non_pr_environment ? 1 : 0
+  name                = "cdcti-${var.environment}-azure-http-4XX-alert"
+  resource_group_name = data.azurerm_resource_group.group.name
+  scopes              = [azurerm_linux_web_app.api.id]
+  description         = "Action will be triggered when Http Status Code 4XX is greater than or equal to 3"
+  frequency           = "PT1M" // Checks every 1 minute
+  window_size         = "PT1H" // Every Check looks back 1 hour for 4xx errors
+
+  criteria {
+    metric_namespace = "Microsoft.Web/sites"
+    metric_name      = "Http4xx"
+    aggregation      = "Count"
+    operator         = "GreaterThanOrEqual"
+    threshold        = 3
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.notify_slack_email[count.index].id
+  }
+
+  lifecycle {
+    # Ignore changes to tags because the CDC sets these automagically
+    ignore_changes = [
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
+    ]
+  }
+}
+
+resource "azurerm_monitor_metric_alert" "azure_5XX_alert" {
+  count               = local.non_pr_environment ? 1 : 0
+  name                = "cdcti-${var.environment}-azure-http-5XX-alert"
+  resource_group_name = data.azurerm_resource_group.group.name
+  scopes              = [azurerm_linux_web_app.api.id]
+  description         = "Action will be triggered when Http Status Code 5XX is greater than or equal to 1"
+  frequency           = "PT1M" // Checks every 1 min
+  window_size         = "PT5M" // Every Check looks back 5 min for 5xx errors
+
+  criteria {
+    metric_namespace = "Microsoft.Web/sites"
+    metric_name      = "Http5xx"
+    aggregation      = "Count"
+    operator         = "GreaterThanOrEqual"
+    threshold        = 1
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.notify_slack_email[count.index].id
+  }
+
+  lifecycle {
+    # Ignore changes to tags because the CDC sets these automagically
+    ignore_changes = [
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
+    ]
+  }
+}
+
+resource "azurerm_monitor_metric_alert" "low_instance_count_alert" {
+  count               = local.non_pr_environment ? 1 : 0
+  name                = "cdcti-${var.environment}-azure-low-instance-count-alert"
+  resource_group_name = data.azurerm_resource_group.group.name
+  scopes              = [azurerm_monitor_autoscale_setting.api_autoscale.id]
+  description         = "The instance count in ${var.environment} is too low"
+  severity            = 2       // warning
+  frequency           = "PT1M"  // Checks every 1 minute
+  window_size         = "PT15M" // Every Check, looks back 15 minutes in history
+
+  criteria {
+    metric_namespace = "Microsoft.Insights/autoscalesettings"
+    metric_name      = "ObservedCapacity"
+    aggregation      = "Average"
+    operator         = "LessThanOrEqual"
+    threshold        = azurerm_monitor_autoscale_setting.api_autoscale.profile[0].capacity[0].default - 0.5
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.notify_slack_email[count.index].id
+  }
+
+  lifecycle {
+    # Ignore changes to tags because the CDC sets these automagically
+    ignore_changes = [
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
+    ]
+  }
+}
+
 resource "azurerm_monitor_scheduled_query_rules_alert" "ti-log-errors-alert" {
   count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti-${var.environment}-log-errors-alert"
