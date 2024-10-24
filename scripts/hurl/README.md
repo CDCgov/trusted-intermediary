@@ -141,9 +141,9 @@ Get Health info from local environment:
 
 `./epic.sh results`
 
-## Submission Scripts
+## High Level Scripts
 
-- `submit_message.sh`: sends a HL7 message to a locally running RS instance. It also grabs the snapshots of the file in azurite after converting to FHIR, after applying transformations in TI, and after converting back to HL7. It copies these files to the same folder where the submitted file is
+- `submit_message.sh`: sends a HL7 message to RS and tracks its status throughout the flow until final delivery. When running locally, it grabs the snapshots of the file in azurite after converting to FHIR, after applying transformations in TI, and after converting back to HL7; and it copies those files to the same folder where the submitted file is. If running in a deployed environment we currently don't have a way to download the files from Azure, but the script will print the relative path for the files in the blob storage container.
     ```
     Usage: ./submit_message.sh -f <message_file.hl7> [-e <environment>]
 
@@ -159,5 +159,3 @@ Get Health info from local environment:
     ./update_examples.sh
     ```
 - `utils.sh`: utility functions for the previous scripts. It has functions to submit requests to RS, check the submission status throughout the whole flow, and downloading snapshots from azurite
-
-**Note**: these scripts require both RS and TI to be running locally
