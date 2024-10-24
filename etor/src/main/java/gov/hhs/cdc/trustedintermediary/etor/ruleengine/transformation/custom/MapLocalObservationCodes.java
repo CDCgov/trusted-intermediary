@@ -28,7 +28,10 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
         var codingMap = getMapFromArgs(args);
 
         var bundle = (Bundle) resource.getUnderlyingData();
-        var msh41Identifier = extractMsh41Identifier(bundle);
+        var msh41Identifier =
+                HapiHelper.getMSH4_1Identifier(bundle) != null
+                        ? HapiHelper.getMSH4_1Identifier(bundle).getValue()
+                        : null;
         var messageId = HapiHelper.getMessageControlId(bundle);
         var observations = HapiHelper.resourcesInBundle(bundle, Observation.class);
 
@@ -47,11 +50,6 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
     private boolean isLocalCode(Coding coding) {
         return HapiHelper.hasDefinedCoding(
                 coding, HapiHelper.EXTENSION_ALT_CODING, HapiHelper.LOCAL_CODE);
-    }
-
-    private String extractMsh41Identifier(Bundle bundle) {
-        var msh41Identifier = HapiHelper.getMSH4_1Identifier(bundle);
-        return msh41Identifier != null ? msh41Identifier.getValue() : null;
     }
 
     private void processCoding(
