@@ -14,6 +14,9 @@ TI_API_LCL_URL="http://localhost:8080"
 TI_API_STG_URL="https://cdcti-stg-api.azurewebsites.net:443"
 TI_API_PRD_URL="https://cdcti-prd-api.azurewebsites.net:443"
 
+TI_LOCAL_PRIVATE_KEY_PATH="$CDCTI_HOME/mock_credentials/organization-trusted-intermediary-private-key-local.pem"
+RS_LOCAL_JWT_PATH="$CDCTI_HOME/mock_credentials/report-stream-valid-token.jwt"
+
 fail() {
     echo "Error: $1" >&2
     exit 1
@@ -100,38 +103,6 @@ generate_jwt() {
         -S "@$secret_path"
 }
 
-check_submission_status() {
-    # requires: hurl, jq
-    local submission_id=$1
-    local timeout=180       # 3 minutes
-    local retry_interval=10 # Retry every 10 seconds
-
-    start_time=$(date +%s)
-
-    while true; do
-        history_response=$(./rs.sh history -i "$submission_id")
-        overall_status=$(echo "$history_response" | jq -r '.overallStatus')
-
-        echo -n "  Status: $overall_status"
-        if [ "$overall_status" == "Delivered" ]; then
-            echo "!"
-            return 0
-        else
-            echo ". Retrying in $retry_interval seconds..."
-        fi
-
-        # Check if the timeout has been reached
-        current_time=$(date +%s)
-        elapsed_time=$((current_time - start_time))
-        if [ "$elapsed_time" -ge "$timeout" ]; then
-            echo "  Timeout reached after $elapsed_time seconds. Status is still: $overall_status."
-            return 1
-        fi
-
-        sleep $retry_interval
-    done
-}
-
 extract_submission_id() {
     # requires: jq
     local history_response=$1
@@ -161,13 +132,54 @@ download_from_azurite() {
     fi
 }
 
+check_submission_status() {
+    # requires: hurl, jq
+    local env=$1
+    local submission_id=$2
+    local private_key=$3
+
+    local timeout=180       # 3 minutes
+    local retry_interval=10 # Retry every 10 seconds
+
+    start_time=$(date +%s)
+
+    while true; do
+        history_response=$(./rs.sh history -i "$submission_id" -e "$env" -x "$private_key")
+        overall_status=$(echo "$history_response" | jq -r '.overallStatus')
+
+        echo -n "  Status: $overall_status"
+        if [ "$overall_status" == "Delivered" ]; then
+            echo "!"
+            return 0
+        else
+            echo ". Retrying in $retry_interval seconds..."
+        fi
+
+        # Check if the timeout has been reached
+        current_time=$(date +%s)
+        elapsed_time=$((current_time - start_time))
+        if [ "$elapsed_time" -ge "$timeout" ]; then
+            echo "  Timeout reached after $elapsed_time seconds. Status is still: $overall_status."
+            return 1
+        fi
+
+        sleep $retry_interval
+    done
+}
+
 submit_message() {
     # requires: hurl, jq, az
-    local file=$1
+    local env=$1
+    local file=$2
+    local private_key=$3
+    local jwt=$4
+
     local message_file_path=$(dirname "$file")
     local message_file_name=$(basename "$file")
     local message_base_name="${message_file_name%.hl7}"
     message_base_name="${message_base_name%"$FILE_NAME_SUFFIX_STEP_0"}"
+
+    echo "Debug: Processing file '$file' in environment '$env'"
 
     msh9=$(awk -F'|' '/^MSH/ { print $9 }' "$file")
     case "$msh9" in
@@ -187,35 +199,45 @@ submit_message() {
 
     echo "Assuming receivers are '$first_leg_receiver' and '$second_leg_receiver' because of MSH-9 value '$msh9'"
 
-    waters_response=$(./rs.sh waters -f "$message_file_name" -r "$message_file_path")
+    waters_response=$(./rs.sh waters -f "$message_file_name" -r "$message_file_path" -e "$env" -x "$private_key")
     submission_id=$(echo "$waters_response" | jq -r '.id')
 
     echo "[First leg] Checking submission status for ID: $submission_id"
-    if ! check_submission_status "$submission_id"; then
+    if ! check_submission_status "$env" "$submission_id" "$private_key"; then
         echo "Failed to deliver the first leg of the message. Skipping the next steps."
         return
     fi
 
     inbound_submission_id=$(extract_submission_id "$history_response")
-    translated_blob_name="ready/$first_leg_receiver/$inbound_submission_id.fhir"
-    translated_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_1.fhir"
-    download_from_azurite "$translated_blob_name" "$translated_file_path"
 
-    metadata_response=$(./ti.sh metadata -i "$inbound_submission_id")
+    if [ "$env" = "local" ]; then
+        translated_blob_name="ready/$first_leg_receiver/$inbound_submission_id.fhir"
+        translated_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_1.fhir"
+        echo "Debug: Downloading translated file in local environment"
+        download_from_azurite "$translated_blob_name" "$translated_file_path"
+    fi
+
+    metadata_response=$(./ti.sh metadata -i "$inbound_submission_id" -e "$env" -j "$jwt")
     outbound_submission_id=$(echo "$metadata_response" | jq -r '.issue[] | select(.details.text == "outbound submission id") | .diagnostics')
 
-    transformed_blob_name="receive/flexion.etor-service-sender/$outbound_submission_id.fhir"
-    transformed_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_2.fhir"
-    download_from_azurite "$transformed_blob_name" "$transformed_file_path"
+    if [ "$env" = "local" ]; then
+        transformed_blob_name="receive/flexion.etor-service-sender/$outbound_submission_id.fhir"
+        transformed_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_2.fhir"
+        echo "Debug: Downloading transformed file in local environment"
+        download_from_azurite "$transformed_blob_name" "$transformed_file_path"
+    fi
 
     echo "[Second leg] Checking submission status for ID: $outbound_submission_id"
-    if ! check_submission_status "$outbound_submission_id"; then
+    if ! check_submission_status "$env" "$outbound_submission_id" "$private_key"; then
         echo "Failed to deliver the second leg of the message. Skipping the next steps."
         return
     fi
 
-    final_submission_id=$(extract_submission_id "$history_response")
-    final_blob_name="ready/$second_leg_receiver/$final_submission_id.hl7"
-    final_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_3.hl7"
-    download_from_azurite "$final_blob_name" "$final_file_path"
+    if [ "$env" = "local" ]; then
+        final_submission_id=$(extract_submission_id "$history_response")
+        final_blob_name="ready/$second_leg_receiver/$final_submission_id.hl7"
+        final_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_3.hl7"
+        echo "Debug: Downloading final file in local environment"
+        download_from_azurite "$final_blob_name" "$final_file_path"
+    fi
 }

@@ -2,8 +2,6 @@
 
 source ./utils.sh
 
-LOCAL_KEY_PATH="$CDCTI_HOME/mock_credentials/organization-trusted-intermediary-private-key-local.pem"
-
 # default values
 env=local
 root=$CDCTI_HOME/examples/
@@ -66,10 +64,10 @@ parse_arguments() {
 
 setup_credentials() {
     if [ -z "$secret" ] && [ "$client_id" = "flexion" ] && [ "$env" = "local" ]; then
-        if [ -f "$LOCAL_KEY_PATH" ]; then
-            secret="$LOCAL_KEY_PATH"
+        if [ -f "$TI_LOCAL_PRIVATE_KEY_PATH" ]; then
+            secret="$TI_LOCAL_PRIVATE_KEY_PATH"
         else
-            fail "Local environment key not found at: $LOCAL_KEY_PATH"
+            fail "Local environment key not found at: $TI_LOCAL_PRIVATE_KEY_PATH"
         fi
     fi
 

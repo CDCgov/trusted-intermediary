@@ -2,8 +2,6 @@
 
 source ./utils.sh
 
-LOCAL_JWT_PATH="$CDCTI_HOME/mock_credentials/report-stream-valid-token.jwt"
-
 # default values
 env=local
 root=$CDCTI_HOME/examples/
@@ -58,10 +56,10 @@ parse_arguments() {
 
 setup_credentials() {
     if [ -z "$jwt" ] && [ "$client" = "report-stream" ] && [ "$env" = "local" ]; then
-        if [ -f "$LOCAL_JWT_PATH" ]; then
-            jwt=$(cat "$LOCAL_JWT_PATH")
+        if [ -f "$RS_LOCAL_JWT_PATH" ]; then
+            jwt=$(cat "$RS_LOCAL_JWT_PATH")
         else
-            fail "Local JWT file not found at: $LOCAL_JWT_PATH"
+            fail "Local JWT file not found at: $RS_LOCAL_JWT_PATH"
         fi
     fi
 
