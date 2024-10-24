@@ -134,7 +134,7 @@ resource "azurerm_monitor_metric_alert" "azure_4XX_alert" {
   criteria {
     metric_namespace = "Microsoft.Web/sites"
     metric_name      = "Http4xx"
-    aggregation      = "Count"
+    aggregation      = "Total"
     operator         = "GreaterThanOrEqual"
     threshold        = 3
   }
@@ -174,7 +174,7 @@ resource "azurerm_monitor_metric_alert" "azure_5XX_alert" {
   criteria {
     metric_namespace = "Microsoft.Web/sites"
     metric_name      = "Http5xx"
-    aggregation      = "Count"
+    aggregation      = "Total"
     operator         = "GreaterThanOrEqual"
     threshold        = 1
   }
