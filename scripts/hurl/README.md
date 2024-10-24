@@ -145,7 +145,7 @@ Get Health info from local environment:
 
 - `submit_message.sh`: sends a HL7 message to a locally running RS instance. It also grabs the snapshots of the file in azurite after converting to FHIR, after applying transformations in TI, and after converting back to HL7. It copies these files to the same folder where the submitted file is
     ```
-    Usage: submit_message.sh -f <message_file.hl7> [-e <environment>]
+    Usage: ./submit_message.sh -f <message_file.hl7> [-e <environment>]
 
     Options:
         -f <FILE>                   Message file path (required)
