@@ -144,8 +144,8 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "ti-log-errors-alert" {
     QUERY
 
   severity                = 3
-  frequency               = 10
-  time_window             = 30
+  frequency               = 5
+  time_window             = 15
   auto_mitigation_enabled = true
 
   trigger {
