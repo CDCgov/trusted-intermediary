@@ -4,7 +4,7 @@ Date: 2022-12-07
 
 ## Decision
 
-In the context of generating a secure modern application, facing the need to monitor application dependencies and generate a reliable SBOM, we decided to use the [CycloneDX Gradle Plugin](https://github.com/CycloneDX/cyclonedx-gradle-plugin#usage) and we chose not to use [Anchore/Syft](https://github.com/anchore/syft#supported-ecosystems) or Snyk FOSSID" for a smoother read.
+In the context of generating a secure modern application, facing the need to monitor application dependencies and generate a reliable SBOM, we decided to use the [CycloneDX Gradle Plugin](https://github.com/CycloneDX/cyclonedx-gradle-plugin#usage) and we chose not to use [Anchore/Syft](https://github.com/anchore/syft#supported-ecosystems) or Snyk FOSSID for a smoother read.
 
 
 ## Status
