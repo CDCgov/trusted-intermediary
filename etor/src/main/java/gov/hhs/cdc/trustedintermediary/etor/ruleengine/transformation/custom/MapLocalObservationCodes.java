@@ -61,7 +61,11 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
         IdentifierCode identifier = codingMap.get(originalCoding.getCode());
 
         if (identifier == null) {
-            logUnmappedLocalCode(originalCoding, msh41Identifier, messageId);
+            logger.logWarning(
+                    "Unmapped local code detected: '{}', from sender: '{}', message Id: '{}'",
+                    originalCoding.getCode(),
+                    msh41Identifier,
+                    messageId);
             return;
         }
 
@@ -74,15 +78,6 @@ public class MapLocalObservationCodes implements CustomFhirTransformation {
             throw new IllegalArgumentException("missing or empty required field " + fieldName);
         }
         return field;
-    }
-
-    private void logUnmappedLocalCode(Coding coding, String msh41Identifier, String messageId) {
-
-        logger.logWarning(
-                "Unmapped local code detected: '{}', from sender: '{}', message Id: '{}'",
-                coding.getCode(),
-                msh41Identifier,
-                messageId);
     }
 
     private Coding getMappedCoding(IdentifierCode identifierCode) {
