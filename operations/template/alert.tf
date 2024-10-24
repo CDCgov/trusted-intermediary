@@ -272,7 +272,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "ti-log-errors-alert" {
   auto_mitigation_enabled = true
 
   trigger {
-    operator  = "GreaterThan"
+    operator  = "GreaterThanOrEqual"
     threshold = 1
   }
 
