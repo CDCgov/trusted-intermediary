@@ -14,8 +14,8 @@ TI_API_LCL_URL="http://localhost:8080"
 TI_API_STG_URL="https://cdcti-stg-api.azurewebsites.net:443"
 TI_API_PRD_URL="https://cdcti-prd-api.azurewebsites.net:443"
 
-TI_LOCAL_PRIVATE_KEY_PATH="$CDCTI_HOME/mock_credentials/organization-trusted-intermediary-private-key-local.pem"
-RS_LOCAL_JWT_PATH="$CDCTI_HOME/mock_credentials/report-stream-valid-token.jwt"
+RS_CLIENT_LOCAL_PRIVATE_KEY_PATH="$CDCTI_HOME/mock_credentials/organization-trusted-intermediary-private-key-local.pem"
+TI_CLIENT_LOCAL_PRIVATE_KEY_PATH="$CDCTI_HOME/mock_credentials/organization-report-stream-private-key-local.pem"
 
 fail() {
     echo "Error: $1" >&2
@@ -144,7 +144,7 @@ check_submission_status() {
     start_time=$(date +%s)
 
     while true; do
-        history_response=$(./rs.sh history -i "$submission_id" -e "$env" -x "$private_key")
+        history_response=$(./rs.sh history -i "$submission_id" -e "$env" -k "$private_key")
         overall_status=$(echo "$history_response" | jq -r '.overallStatus')
 
         echo -n "  Status: $overall_status"
@@ -172,14 +172,13 @@ submit_message() {
     local env=$1
     local file=$2
     local private_key=$3
-    local jwt=$4
+    local public_key=$4
 
-    local message_file_path=$(dirname "$file")
-    local message_file_name=$(basename "$file")
-    local message_base_name="${message_file_name%.hl7}"
+    local message_file_path message_file_name message_base_name
+    message_file_path="$(dirname "${file}")"
+    message_file_name="$(basename "${file}")"
+    message_base_name="${message_file_name%.hl7}"
     message_base_name="${message_base_name%"$FILE_NAME_SUFFIX_STEP_0"}"
-
-    echo "Debug: Processing file '$file' in environment '$env'"
 
     msh9=$(awk -F'|' '/^MSH/ { print $9 }' "$file")
     case "$msh9" in
@@ -199,7 +198,7 @@ submit_message() {
 
     echo "Assuming receivers are '$first_leg_receiver' and '$second_leg_receiver' because of MSH-9 value '$msh9'"
 
-    waters_response=$(./rs.sh waters -f "$message_file_name" -r "$message_file_path" -e "$env" -x "$private_key")
+    waters_response=$(./rs.sh waters -f "$message_file_name" -r "$message_file_path" -e "$env" -k "$private_key")
     submission_id=$(echo "$waters_response" | jq -r '.id')
 
     echo "[First leg] Checking submission status for ID: $submission_id"
@@ -213,17 +212,16 @@ submit_message() {
     if [ "$env" = "local" ]; then
         translated_blob_name="ready/$first_leg_receiver/$inbound_submission_id.fhir"
         translated_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_1.fhir"
-        echo "Debug: Downloading translated file in local environment"
         download_from_azurite "$translated_blob_name" "$translated_file_path"
     fi
 
-    metadata_response=$(./ti.sh metadata -i "$inbound_submission_id" -e "$env" -j "$jwt")
+    echo "[Intermediary] Getting outbound submission ID from TI's metadata API"
+    metadata_response=$(./ti.sh metadata -i "$inbound_submission_id" -e "$env" -k "$public_key")
     outbound_submission_id=$(echo "$metadata_response" | jq -r '.issue[] | select(.details.text == "outbound submission id") | .diagnostics')
 
     if [ "$env" = "local" ]; then
         transformed_blob_name="receive/flexion.etor-service-sender/$outbound_submission_id.fhir"
         transformed_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_2.fhir"
-        echo "Debug: Downloading transformed file in local environment"
         download_from_azurite "$transformed_blob_name" "$transformed_file_path"
     fi
 
@@ -237,7 +235,6 @@ submit_message() {
         final_submission_id=$(extract_submission_id "$history_response")
         final_blob_name="ready/$second_leg_receiver/$final_submission_id.hl7"
         final_file_path="$message_file_path/$message_base_name$FILE_NAME_SUFFIX_STEP_3.hl7"
-        echo "Debug: Downloading final file in local environment"
         download_from_azurite "$final_blob_name" "$final_file_path"
     fi
 }

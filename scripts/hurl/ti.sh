@@ -15,16 +15,17 @@ ENDPOINT_NAME:
     The name of the endpoint to call (required)
 
 Options:
-    -f <REL_PATH>         Path to the hl7/fhir file to submit (Required for orders and results APIs)
-    -i <SUBMISSION_ID>    Submission ID for metadata API (Required for orders, results and metadata API)
-    -r <ROOT_PATH>        Root path to the hl7/fhir files (Default: $root)
-    -e <ENVIRONMENT>      Environment: local|staging (Default: $env)
-    -j <JWT>              JWT token for authentication
-    -v                    Verbose mode
-    -h                    Display this help and exit
+    -f <REL_PATH>       Path to the hl7/fhir file to submit (Required for orders and results APIs)
+    -r <ROOT_PATH>      Root path to the hl7/fhir files (Default: $root)
+    -e <ENVIRONMENT>    Environment: local|staging (Default: $env)
+    -c <CLIENT>         Client ID to create JWT with (Default: $client)
+    -k <KEY_PATH>       Path to the client private key
+    -i <SUBMISSION_ID>  Submission ID for metadata API (Required for orders, results and metadata API)
+    -v                  Verbose mode
+    -h                  Display this help and exit
 
 Environment Variables:
-    CDCTI_HOME            Base directory for CDC TI repository (Required)
+    CDCTI_HOME          Base directory for CDC TI repository (Required)
 EOF
 }
 
@@ -38,13 +39,14 @@ parse_arguments() {
     endpoint_name="ti/$1.hurl"
     shift # Remove endpoint name from args
 
-    while getopts ':f:r:e:j:i:v' opt; do
+    while getopts ':f:r:e:c:k:i:v' opt; do
         case "$opt" in
         f) fpath="$OPTARG" ;;
-        i) submission_id="--variable submissionid=$OPTARG" ;;
         r) root="$OPTARG" ;;
         e) env="$OPTARG" ;;
-        j) jwt="$OPTARG" ;;
+        c) client="$OPTARG" ;;
+        k) private_key="$OPTARG" ;;
+        i) submission_id="--variable submissionid=$OPTARG" ;;
         v) verbose="--verbose" ;;
         ?) fail "Invalid option -$OPTARG" ;;
         esac
@@ -55,26 +57,32 @@ parse_arguments() {
 }
 
 setup_credentials() {
-    if [ -z "$jwt" ] && [ "$client" = "report-stream" ] && [ "$env" = "local" ]; then
-        if [ -f "$RS_LOCAL_JWT_PATH" ]; then
-            jwt=$(cat "$RS_LOCAL_JWT_PATH")
+    if [ -z "$private_key" ] && [ "$client" = "report-stream" ] && [ "$env" = "local" ]; then
+        if [ -f "$TI_CLIENT_LOCAL_PRIVATE_KEY_PATH" ]; then
+            private_key="$TI_CLIENT_LOCAL_PRIVATE_KEY_PATH"
         else
-            fail "Local JWT file not found at: $RS_LOCAL_JWT_PATH"
+            fail "Local environment client private key not found at: $TI_CLIENT_LOCAL_PRIVATE_KEY_PATH"
         fi
     fi
 
-    [ -n "$jwt" ] || fail "Please provide the JWT for $client"
+    if [ "$env" != "local" ]; then
+        [ -z "$private_key" ] && fail "Client private key (-k) is required for non-local environments"
+    fi
+
+    [ ! -f "$private_key" ] && fail "Client private key file not found: $private_key"
 }
 
 run_hurl_command() {
     url=$(get_api_url "$env" "ti")
+    host=$(extract_host_from_url "$url")
+    jwt_token=$(generate_jwt "$client" "$host" "$private_key") || fail "Failed to generate JWT token"
 
     hurl \
         --variable "fpath=$fpath" \
         --file-root "$root" \
         --variable "url=$url" \
         --variable "client=$client" \
-        --variable "jwt=$jwt" \
+        --variable "jwt=$jwt_token" \
         ${submission_id:-} \
         ${verbose:-} \
         "$endpoint_name" \

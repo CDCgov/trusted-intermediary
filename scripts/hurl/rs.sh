@@ -23,7 +23,7 @@ Options:
     -e <ENVIRONMENT>    Environment: local|staging|production (Default: $env)
     -c <CLIENT_ID>      Client ID (Default: $client_id)
     -s <CLIENT_SENDER>  Client sender (Default: $client_sender)
-    -x <KEY_PATH>       Path to the client private key
+    -k <KEY_PATH>       Path to the client private key
     -i <SUBMISSION_ID>  Submission ID for history API
     -v                  Verbose mode
     -h                  Display this help and exit
@@ -43,7 +43,7 @@ parse_arguments() {
     endpoint_name="rs/$1.hurl"
     shift # Remove endpoint name from args
 
-    while getopts ':f:r:t:e:c:s:x:i:v' opt; do
+    while getopts ':f:r:t:e:c:s:k:i:v' opt; do
         case "$opt" in
         f) fpath="$OPTARG" ;;
         r) root="$OPTARG" ;;
@@ -51,7 +51,7 @@ parse_arguments() {
         e) env="$OPTARG" ;;
         c) client_id="$OPTARG" ;;
         s) client_sender="$OPTARG" ;;
-        x) secret="$OPTARG" ;;
+        k) private_key="$OPTARG" ;;
         i) submission_id="--variable submissionid=$OPTARG" ;;
         v) verbose="--verbose" ;;
         ?) fail "Invalid option -$OPTARG" ;;
@@ -63,22 +63,25 @@ parse_arguments() {
 }
 
 setup_credentials() {
-    if [ -z "$secret" ] && [ "$client_id" = "flexion" ] && [ "$env" = "local" ]; then
-        if [ -f "$TI_LOCAL_PRIVATE_KEY_PATH" ]; then
-            secret="$TI_LOCAL_PRIVATE_KEY_PATH"
+    if [ -z "$private_key" ] && [ "$client_id" = "flexion" ] && [ "$env" = "local" ]; then
+        if [ -f "$RS_CLIENT_LOCAL_PRIVATE_KEY_PATH" ]; then
+            private_key="$RS_CLIENT_LOCAL_PRIVATE_KEY_PATH"
         else
-            fail "Local environment key not found at: $TI_LOCAL_PRIVATE_KEY_PATH"
+            fail "Local environment client private key not found at: $RS_CLIENT_LOCAL_PRIVATE_KEY_PATH"
         fi
     fi
 
-    [ -n "$secret" ] || fail "Please provide the private key for $client_id"
-    [ -f "$secret" ] || fail "Private key file not found: $secret"
+    if [ "$env" != "local" ]; then
+        [ -z "$private_key" ] && fail "Client private key (-k) is required for non-local environments"
+    fi
+
+    [ ! -f "$private_key" ] && fail "Client private key file not found: $private_key"
 }
 
 run_hurl_command() {
     url=$(get_api_url "$env" "rs")
     host=$(extract_host_from_url "$url")
-    jwt_token=$(generate_jwt "$client_id.$client_sender" "$host" "$secret") || fail "Failed to generate JWT token"
+    jwt_token=$(generate_jwt "$client_id.$client_sender" "$host" "$private_key") || fail "Failed to generate JWT token"
 
     hurl \
         --variable "fpath=$fpath" \
