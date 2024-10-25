@@ -8,6 +8,7 @@ locals {
   rs_domain_prefix               = "${local.selected_rs_environment_prefix}${length(local.selected_rs_environment_prefix) == 0 ? "" : "."}"
   higher_environment_level       = var.environment == "stg" || var.environment == "prd"
   cdc_domain_environment         = var.environment == "dev" || var.environment == "stg" || var.environment == "prd"
+  cheezburger                    = "cheezburger" // setting something in TF to trigger a PR build
 
   // If the environment looks like pr123, regexall will contain matches. If there are no matches, it's a non-pr env
   non_pr_environment = length(regexall("^pr\\d+", var.environment)) == 0
