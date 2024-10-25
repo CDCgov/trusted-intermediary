@@ -58,4 +58,4 @@ The outcomes of the decision, both positive and negative. This section should ex
 - #13
 - #1247
 
-### Please see [adr-guidelines.md](adr/adr-guidelines.md) before completing.
+### Please see [adr-guidelines.md](adr-guidelines.md) before completing.
