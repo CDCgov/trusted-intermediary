@@ -9,10 +9,10 @@ show_usage() {
 Usage: $(basename "$0") -f <message_file.hl7> [-e <environment>]
 
 Options:
-    -f <FILE>                   Message file path (required)
+    -f <FILE>                   Message file path (Required)
     -e <ENVIRONMENT>            Environment: local|staging|production (Default: $DEFAULT_ENV)
-    -x <RS_CLIENT_PRIVATE_KEY>  Path to the client private key for authentication with RS API
-    -z <TI_CLIENT_PRIVATE_KEY>  Path to the client private key authentication with TI API
+    -x <RS_CLIENT_PRIVATE_KEY>  Path to the client private key for authentication with RS API (Required for non-local environments)
+    -z <TI_CLIENT_PRIVATE_KEY>  Path to the client private key for authentication with TI API (Optional for all environments)
     -h                          Display this help and exit
 EOF
     exit 1
@@ -44,30 +44,21 @@ parse_arguments() {
 }
 
 setup_credentials() {
-    # Set default credentials for local environment
+    # Handle RS client key
     if [ "$env" = "local" ] && [ -z "$rs_client_private_key" ]; then
-        if [ -f "$RS_CLIENT_LOCAL_PRIVATE_KEY_PATH" ]; then
-            rs_client_private_key="$RS_CLIENT_LOCAL_PRIVATE_KEY_PATH"
-        else
-            fail "Local environment RS client private key not found at: $RS_CLIENT_LOCAL_PRIVATE_KEY_PATH"
-        fi
+        rs_client_private_key="$RS_CLIENT_LOCAL_PRIVATE_KEY_PATH"
     fi
 
-    if [ "$env" = "local" ] && [ -z "$ti_client_private_key" ]; then
-        if [ -f "$TI_CLIENT_LOCAL_PRIVATE_KEY_PATH" ]; then
-            ti_client_private_key="$TI_CLIENT_LOCAL_PRIVATE_KEY_PATH"
-        else
-            fail "Local environment TI client private key not found at: $TI_CLIENT_LOCAL_PRIVATE_KEY_PATH"
-        fi
-    fi
-
-    if [ "$env" != "local" ]; then
-        [ -z "$rs_client_private_key" ] && fail "RS client private key (-x) is required for non-local environments"
-        [ -z "$ti_client_private_key" ] && fail "TI client private key (-z) is required for non-local environments"
-    fi
-
+    [ "$env" != "local" ] && [ -z "$rs_client_private_key" ] && fail "RS client private key (-x) is required for non-local environments"
     [ ! -f "$rs_client_private_key" ] && fail "RS client private key file not found: $rs_client_private_key"
-    [ ! -f "$ti_client_private_key" ] && fail "TI client private key file not found: $ti_client_private_key"
+
+    # Handle optional TI client key
+    if [ "$env" = "local" ] && [ -z "$ti_client_private_key" ]; then
+        ti_client_private_key="$TI_CLIENT_LOCAL_PRIVATE_KEY_PATH"
+    fi
+
+    # Only verify TI key if provided
+    [ -n "$ti_client_private_key" ] && [ ! -f "$ti_client_private_key" ] && fail "TI client private key file not found: $ti_client_private_key"
 }
 
 check_installed_commands hurl jq az

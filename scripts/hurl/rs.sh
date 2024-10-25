@@ -23,8 +23,8 @@ Options:
     -e <ENVIRONMENT>    Environment: local|staging|production (Default: $env)
     -c <CLIENT_ID>      Client ID (Default: $client_id)
     -s <CLIENT_SENDER>  Client sender (Default: $client_sender)
-    -k <KEY_PATH>       Path to the client private key
-    -i <SUBMISSION_ID>  Submission ID for history API
+    -k <KEY_PATH>       Path to the client private key (Required for non-local environments)
+    -i <SUBMISSION_ID>  Submission ID for history API (Required for history API)
     -v                  Verbose mode
     -h                  Display this help and exit
 

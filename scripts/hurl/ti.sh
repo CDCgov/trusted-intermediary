@@ -19,7 +19,7 @@ Options:
     -r <ROOT_PATH>      Root path to the hl7/fhir files (Default: $root)
     -e <ENVIRONMENT>    Environment: local|staging (Default: $env)
     -c <CLIENT>         Client ID to create JWT with (Default: $client)
-    -k <KEY_PATH>       Path to the client private key
+    -k <KEY_PATH>       Path to the client private key (Required for non-local environments)
     -i <SUBMISSION_ID>  Submission ID for metadata API (Required for orders, results and metadata API)
     -v                  Verbose mode
     -h                  Display this help and exit

@@ -27,8 +27,8 @@ Options:
     -e <ENVIRONMENT>    Environment: local|staging|production (Default: local)
     -c <CLIENT_ID>      Client ID (Default: flexion)
     -s <CLIENT_SENDER>  Client sender (Default: simulated-sender)
-    -k <KEY_PATH>       Path to the client private key
-    -i <SUBMISSION_ID>  Submission ID for history API
+    -k <KEY_PATH>       Path to the client private key (Required for non-local environments)
+    -i <SUBMISSION_ID>  Submission ID for history API (Required for history API)
     -v                  Verbose mode
     -h                  Display this help and exit
 
@@ -83,7 +83,7 @@ Options:
     -r <ROOT_PATH>      Root path to the hl7/fhir files (Default: /Users/bbogado/Code/Flexion/CDC-TI/trusted-intermediary/examples/)
     -e <ENVIRONMENT>    Environment: local|staging (Default: local)
     -c <CLIENT>         Client ID to create JWT with (Default: report-stream)
-    -k <KEY_PATH>       Path to the client private key
+    -k <KEY_PATH>       Path to the client private key (Required for non-local environments)
     -i <SUBMISSION_ID>  Submission ID for metadata API (Required for orders, results and metadata API)
     -v                  Verbose mode
     -h                  Display this help and exit
@@ -145,13 +145,13 @@ Get Health info from local environment:
 
 - `submit_message.sh`: sends a HL7 message to RS and tracks its status throughout the flow until final delivery. When running locally, it grabs the snapshots of the file in azurite after converting to FHIR, after applying transformations in TI, and after converting back to HL7; and it copies those files to the same folder where the submitted file is. If running in a deployed environment we currently don't have a way to download the files from Azure, but the script will print the relative path for the files in the blob storage container.
     ```
-    Usage: ./submit_message.sh -f <message_file.hl7> [-e <environment>]
+    Usage: submit_message.sh -f <message_file.hl7> [-e <environment>]
 
     Options:
-        -f <FILE>                   Message file path (required)
+        -f <FILE>                   Message file path (Required)
         -e <ENVIRONMENT>            Environment: local|staging|production (Default: )
-        -x <RS_CLIENT_PRIVATE_KEY>  Path to the client private key for authentication with RS API
-        -z <TI_CLIENT_PRIVATE_KEY>  Path to the client private key authentication with TI API
+        -x <RS_CLIENT_PRIVATE_KEY>  Path to the client private key for authentication with RS API (Required for non-local environments)
+        -z <TI_CLIENT_PRIVATE_KEY>  Path to the client private key for authentication with TI API (Optional for all environments)
         -h                          Display this help and exit
     ```
 - `update_examples.sh`: sends all the HL7 files with `_0_initial_message.hl7` suffix in the `/examples` folder to a locally running RS instance. As the previous script, it copies the snapshots at each stage

@@ -185,8 +185,8 @@ submit_message() {
     # requires: hurl, jq, az
     local env=$1
     local file=$2
-    local private_key=$3
-    local public_key=$4
+    local rs_client_private_key=$3
+    local ti_client_private_key=$4
 
     local message_file_path message_file_name message_base_name
     message_file_path="$(dirname "${file}")"
@@ -212,7 +212,7 @@ submit_message() {
 
     echo "Assuming receivers are '$first_leg_receiver' and '$second_leg_receiver' because of MSH-9 value '$msh9'"
 
-    waters_response=$(./rs.sh waters -f "$message_file_name" -r "$message_file_path" -e "$env" -k "$private_key") || {
+    waters_response=$(./rs.sh waters -f "$message_file_name" -r "$message_file_path" -e "$env" -k "$rs_client_private_key") || {
         exit_code=$?
         if [ $exit_code -ne 0 ]; then
             fail "Expected exit code 0 but got $exit_code for RS waters API call"
@@ -221,7 +221,7 @@ submit_message() {
     submission_id=$(echo "$waters_response" | jq -r '.id')
 
     echo "[First leg] Checking submission status for ID: $submission_id"
-    if ! check_submission_status "$env" "$submission_id" "$private_key"; then
+    if ! check_submission_status "$env" "$submission_id" "$rs_client_private_key"; then
         echo "Failed to deliver the first leg of the message. Skipping the next steps."
         return
     fi
@@ -236,18 +236,24 @@ submit_message() {
         echo "  Snapshot for translated message in blob storage at: $translated_blob_name"
     fi
 
-    echo "[Intermediary] Getting outbound submission ID from TI's metadata API"
-    metadata_response=$(./ti.sh metadata -i "$inbound_submission_id" -e "$env" -k "$public_key") || {
-        exit_code=$?
-        if [ $exit_code -ne 0 ]; then
+    echo "[Intermediary] Getting outbound submission ID"
+    if [ -n "$ti_client_private_key" ]; then
+        echo "  Attempting to get outbound submission ID from TI's metadata API..."
+        metadata_response=$(./ti.sh metadata -i "$inbound_submission_id" -e "$env" -k "$ti_client_private_key") || {
             echo "Failed to get metadata for inbound submission ID: $inbound_submission_id"
-            echo -n "Please enter the outbound submission ID manually (you may find it in the TI $env logs): "
-            read -r outbound_submission_id
-            if [ -z "$outbound_submission_id" ]; then
-                fail "No outbound submission ID provided"
-            fi
+            outbound_submission_id=""
+        }
+        if [ -n "$metadata_response" ]; then
+            outbound_submission_id=$(extract_ti_metadata_submission_id "$metadata_response")
         fi
-    }
+    fi
+    if [ -z "$outbound_submission_id" ] || [ "$outbound_submission_id" = "null" ]; then
+        echo -n "  Please enter the outbound submission ID manually (you may find it in the TI $env logs): "
+        read -r outbound_submission_id
+        if [ -z "$outbound_submission_id" ]; then
+            fail "No outbound submission ID provided"
+        fi
+    fi
 
     if [ -z "$outbound_submission_id" ] || [ "$outbound_submission_id" = "null" ]; then
         outbound_submission_id=$(extract_ti_metadata_submission_id "$metadata_response")
@@ -262,7 +268,7 @@ submit_message() {
     fi
 
     echo "[Second leg] Checking submission status for ID: $outbound_submission_id"
-    if ! check_submission_status "$env" "$outbound_submission_id" "$private_key"; then
+    if ! check_submission_status "$env" "$outbound_submission_id" "$rs_client_private_key"; then
         echo "Failed to deliver the second leg of the message. Skipping the next steps."
         return
     fi
