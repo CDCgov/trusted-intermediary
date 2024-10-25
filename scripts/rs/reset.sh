@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 
+CURRENT_DIR=$(pwd)
+
 # This script resets the database and loads the baseline settings.
 # NOTE: Remember to run this script inside the prime-router directory of the prime-reportstream codebase
 
-# Reset database
-../gradlew resetDB
+# Need to CD to the RS codebase local working copy to run the gradlew commands
+cd "$RS_HOME"
 
-# Reload tables
-./prime lookuptables loadall
+./gradlew resetDB
+./gradlew reloadTable
+./gradlew reloadSettings
 
-# Load baseline organization settings
-./prime multiple-settings set -s -i ./settings/organizations.yml
+cd "$CURRENT_DIR"
