@@ -13,19 +13,19 @@ Accepted.
 ## Context
 
 As part of our CI/CD infrastructure, we need notifications when failures occur.
+We chose Azure for alerting because it's built into the infrastructure we're already using,
+which gives us easy access to metrics. We're not currently using an external
+log aggregation system, so Azure alerts were a much lower lift to implement than
+any of the other potential options.
 
-To ensure rapid response to application failures within our CI/CD infrastructure, we require real-time notifications for critical issues. The current alert setup focuses on:
+Alerts are configured in [alert.tf](../operations/template/alert.tf). To reduce
+unhelpful notifications, we have alerts turned off in the PR environments, so they must
+either be tested in `internal` or `dev`, or developers may temporarily turn alerts back on in
+their branch's PR environment.
 
-- **Type:** [Azure Log Search Alerts](https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/alerts-types#log-alerts) for HikariCP connection failures.
-
-
-- **Trigger:** Any logged failures with database connections.
-
-
-- **Configuration:** Alerts are stateful (auto-mitigation); set to `fired` status to reduce noise from frequent or duplicate alerts.
-
-
-- **Notification:** Alerts sent to a Slack channel via email until PagerDuty is operational.
+Alerts are sent to email addresses that forward to Slack channels. As of October 2024,
+production alerts go to `#production-alerts-cdc-trusted-intermediary` and non-prod alerts
+go to `#non-prod-alerts-cdc-trusted-intermediary`.
 
 ## Impact
 
@@ -35,11 +35,16 @@ To ensure rapid response to application failures within our CI/CD infrastructure
 
 ### Negative
 
-- Possible alert fatigue if not fine-tuned
+- Azure's built-in alert options are less robust than some other services - for instance,
+they don't have an option for p50/90/99 latency alert. This means we're more limited in
+what kinds of alerts we can have
+- Navigating from the Azure Slack alerts to the actual logs where issues are occurring
+is unintuitive and requires multiple clicks. Even once you find the right logs,
+Azure logs lack syntax highlighting and can be hard to read.
 
 ### Risks
 
-- None
+- Possible alert fatigue if not fine-tuned
 
 ## Related Issues
 
