@@ -1,5 +1,7 @@
 #!/bin/bash
 
+ORG_SETTINGS_DIR="settings/STLTs"
+
 echo "Updating transport in Flexion org settings file..."
 yq eval '.[0].receivers[] |= (
     select(.name == "simulated-hospital" or .name == "simulated-lab").transport = {
@@ -17,10 +19,10 @@ yq eval '.[0].receivers[] |= (
         .transport.authTokenUrl = "http://host.docker.internal:8080/v1/auth/token" |
         .transport.reportUrl = "http://host.docker.internal:8080/v1/etor/results"
     )
-)' -i settings/STLTs/Flexion/flexion.yml
+)' -i "$ORG_SETTINGS_DIR/Flexion/flexion.yml"
 
 echo "Updating transport in partner org settings files..."
-for file in settings/STLTs/CA/ucsd.yml settings/STLTs/LA/la-ochsner.yml settings/STLTs/LA/la-phl.yml; do
+for file in "$ORG_SETTINGS_DIR/CA/ucsd.yml" "$ORG_SETTINGS_DIR/LA/la-ochsner.yml" "$ORG_SETTINGS_DIR/LA/la-phl.yml"; do
     yq eval '.[0].receivers[] |= select(.name == "etor-nbs-results" or .name == "etor-nbs-orders").transport = {
         "type": "SFTP",
         "host": "sftp",
