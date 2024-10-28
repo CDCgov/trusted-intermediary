@@ -39,8 +39,8 @@ dependencies {
     implementation 'ca.uhn.hapi:hapi-structures-v251:2.5.1'
 
     // Apache Client
-    implementation 'org.apache.httpcomponents.client5:httpclient5:5.4'
-    implementation 'org.apache.httpcomponents.client5:httpclient5-fluent:5.4'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.4.1'
+    implementation 'org.apache.httpcomponents.client5:httpclient5-fluent:5.4.1'
 
     // jjwt
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
