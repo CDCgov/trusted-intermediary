@@ -7,6 +7,7 @@ resource "azurerm_public_ip" "vpn" {
   sku               = "Standard"
   #   below tags are managed by CDC
   lifecycle {
+    create_before_destroy = true
     ignore_changes = [
       tags["business_steward"],
       tags["center"],
