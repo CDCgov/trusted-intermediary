@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source "$CDCTI_HOME/scripts/hurl/utils.sh"
+
 # This script updates the organization settings YAML files in RS to:
 # - use local REST transport settings for Flexion's etor-service-receiver receivers
 # - use local SFTP transport settings for Flexion's simulated-hospital and simulated-lab receivers
@@ -10,6 +12,8 @@
 # - This script should run inside the prime-router directory of the prime-reportstream codebase
 
 ORG_SETTINGS_DIR="settings/STLTs"
+
+check_installed_commands yq
 
 echo "Updating transport in Flexion org settings file..."
 yq eval '.[0].receivers[] |= (
