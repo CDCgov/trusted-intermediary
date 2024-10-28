@@ -1,5 +1,5 @@
-resource "azurerm_public_ip" "vpn" {
-  name                = "vpn-public-ip"
+resource "azurerm_public_ip" "vpn_ip" {
+  name                = "vpn-ip"
   location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
 
@@ -7,7 +7,6 @@ resource "azurerm_public_ip" "vpn" {
   sku               = "Standard"
   #   below tags are managed by CDC
   lifecycle {
-    create_before_destroy = true
     ignore_changes = [
       tags["business_steward"],
       tags["center"],
@@ -38,7 +37,7 @@ resource "azurerm_virtual_network_gateway" "vpn" {
   sku           = "VpnGw1"
 
   ip_configuration {
-    public_ip_address_id          = azurerm_public_ip.vpn.id
+    public_ip_address_id          = azurerm_public_ip.vpn_ip.id
     private_ip_address_allocation = "Dynamic"
     subnet_id                     = azurerm_subnet.vpn.id
   }
