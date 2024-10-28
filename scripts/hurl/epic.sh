@@ -1,6 +1,8 @@
 #!/bin/bash
 
-source ./utils.sh
+[ -z "${CDCTI_HOME}" ] && echo "Error: Environment variable CDCTI_HOME is not set" && exit 1
+source "$CDCTI_HOME/scripts/utils.sh"
+source "$CDCTI_HOME/scripts/hurl/utils.sh"
 
 client=
 audience=https://epicproxy-np.et0502.epichosted.com/FhirProxy/oauth2/token

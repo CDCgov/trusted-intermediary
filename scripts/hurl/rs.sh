@@ -1,6 +1,8 @@
 #!/bin/bash
 
-source ./utils.sh
+[ -z "${CDCTI_HOME}" ] && echo "Error: Environment variable CDCTI_HOME is not set" && exit 1
+source "$CDCTI_HOME/scripts/utils.sh"
+source "$CDCTI_HOME/scripts/hurl/utils.sh"
 
 # default values
 env=local
@@ -97,7 +99,6 @@ run_hurl_command() {
         ${remaining_args:+$remaining_args}
 }
 
-check_env_vars CDCTI_HOME
 parse_arguments "$@"
 setup_credentials
 run_hurl_command

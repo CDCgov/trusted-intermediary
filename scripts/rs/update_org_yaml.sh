@@ -1,6 +1,7 @@
 #!/bin/bash
 
-source "$CDCTI_HOME/scripts/hurl/utils.sh"
+[ -z "${CDCTI_HOME}" ] && echo "Error: Environment variable CDCTI_HOME is not set" && exit 1
+source "$CDCTI_HOME/scripts/utils.sh"
 
 # This script updates the organization settings YAML files in RS to:
 # - use local REST transport settings for Flexion's etor-service-receiver receivers
