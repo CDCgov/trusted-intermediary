@@ -66,10 +66,10 @@ parse_arguments() {
 
 setup_credentials() {
     if [ -z "$private_key" ] && [ "$client_id" = "flexion" ] && [ "$env" = "local" ]; then
-        if [ -f "$RS_CLIENT_LOCAL_PRIVATE_KEY_PATH" ]; then
-            private_key="$RS_CLIENT_LOCAL_PRIVATE_KEY_PATH"
+        if [ -f "$TI_LOCAL_PRIVATE_KEY_PATH" ]; then
+            private_key="$TI_LOCAL_PRIVATE_KEY_PATH"
         else
-            fail "Local environment client private key not found at: $RS_CLIENT_LOCAL_PRIVATE_KEY_PATH"
+            fail "Local environment client private key not found at: $TI_LOCAL_PRIVATE_KEY_PATH"
         fi
     fi
 

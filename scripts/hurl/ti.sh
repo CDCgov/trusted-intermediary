@@ -60,10 +60,10 @@ parse_arguments() {
 
 setup_credentials() {
     if [ -z "$private_key" ] && [ "$client" = "report-stream" ] && [ "$env" = "local" ]; then
-        if [ -f "$TI_CLIENT_LOCAL_PRIVATE_KEY_PATH" ]; then
-            private_key="$TI_CLIENT_LOCAL_PRIVATE_KEY_PATH"
+        if [ -f "$RS_LOCAL_PRIVATE_KEY_PATH" ]; then
+            private_key="$RS_LOCAL_PRIVATE_KEY_PATH"
         else
-            fail "Local environment client private key not found at: $TI_CLIENT_LOCAL_PRIVATE_KEY_PATH"
+            fail "Local environment client private key not found at: $RS_LOCAL_PRIVATE_KEY_PATH"
         fi
     fi
 

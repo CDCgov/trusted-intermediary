@@ -48,7 +48,7 @@ parse_arguments() {
 setup_credentials() {
     # Handle RS client key
     if [ "$env" = "local" ] && [ -z "$rs_client_private_key" ]; then
-        rs_client_private_key="$RS_CLIENT_LOCAL_PRIVATE_KEY_PATH"
+        rs_client_private_key="$TI_LOCAL_PRIVATE_KEY_PATH"
     fi
 
     [ "$env" != "local" ] && [ -z "$rs_client_private_key" ] && fail "RS client private key (-x) is required for non-local environments"
@@ -56,7 +56,7 @@ setup_credentials() {
 
     # Handle optional TI client key
     if [ "$env" = "local" ] && [ -z "$ti_client_private_key" ]; then
-        ti_client_private_key="$TI_CLIENT_LOCAL_PRIVATE_KEY_PATH"
+        ti_client_private_key="$RS_LOCAL_PRIVATE_KEY_PATH"
     fi
 
     # Only verify TI key if provided

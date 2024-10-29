@@ -1,5 +1,16 @@
 #!/bin/bash
 
+load_env() {
+    local env_file=".env"
+    if [[ -f "$env_file" ]]; then
+        source "$env_file"
+    else
+        echo "Warning: .env file not found at $env_file" >&2
+        return 1
+    fi
+}
+load_env || exit 1
+
 fail() {
     echo "Error: $1" >&2
     exit 1

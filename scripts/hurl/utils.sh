@@ -1,22 +1,5 @@
 #!/bin/bash
 
-FILE_NAME_SUFFIX_STEP_0="_0_initial_message"
-FILE_NAME_SUFFIX_STEP_1="_1_hl7_translation"
-FILE_NAME_SUFFIX_STEP_2="_2_fhir_transformation"
-FILE_NAME_SUFFIX_STEP_3="_3_hl7_translation_final"
-
-AZURITE_CONNECTION_STRING="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://localhost:10000/devstoreaccount1;" # pragma: allowlist secret
-
-RS_API_LCL_URL="http://localhost:7071"
-RS_API_STG_URL="https://staging.prime.cdc.gov:443"
-RS_API_PRD_URL="https://prime.cdc.gov:443"
-TI_API_LCL_URL="http://localhost:8080"
-TI_API_STG_URL="https://cdcti-stg-api.azurewebsites.net:443"
-TI_API_PRD_URL="https://cdcti-prd-api.azurewebsites.net:443"
-
-RS_CLIENT_LOCAL_PRIVATE_KEY_PATH="$CDCTI_HOME/mock_credentials/organization-trusted-intermediary-private-key-local.pem"
-TI_CLIENT_LOCAL_PRIVATE_KEY_PATH="$CDCTI_HOME/mock_credentials/organization-report-stream-private-key-local.pem"
-
 get_api_url() {
     local env=$1
     local type=$2
@@ -24,9 +7,9 @@ get_api_url() {
     case "$type" in
     "rs")
         case "$env" in
-        "local") echo $RS_API_LCL_URL ;;
-        "staging") echo $RS_API_STG_URL ;;
-        "production") echo $RS_API_PRD_URL ;;
+        "local") echo $RS_LCL_API_URL ;;
+        "staging") echo $RS_STG_API_URL ;;
+        "production") echo $RS_PRD_API_URL ;;
         *)
             echo "Invalid environment: $env" >&2
             exit 1
@@ -35,9 +18,9 @@ get_api_url() {
         ;;
     "ti")
         case "$env" in
-        "local") echo $TI_API_LCL_URL ;;
-        "staging") echo $TI_API_STG_URL ;;
-        "production") echo $TI_API_PRD_URL ;;
+        "local") echo $TI_LCL_API_URL ;;
+        "staging") echo $TI_STG_API_URL ;;
+        "production") echo $TI_PRD_API_URL ;;
         *)
             echo "Invalid environment: $env" >&2
             exit 1

@@ -13,8 +13,7 @@
 ./prime multiple-settings set -s -i ./settings/STLTs/LA/la-ochsner.yml
 
 # Add public keys for senders
-flexion_key="$CDCTI_HOME/mock_credentials/organization-trusted-intermediary-public-key-local.pem"
-./prime organization addkey --public-key $flexion_key --scope "flexion.*.report" --orgName flexion --kid flexion.etor-service-sender --doit
-./prime organization addkey --public-key $flexion_key --scope "flexion.*.report" --orgName flexion --kid flexion.simulated-hospital --doit
-./prime organization addkey --public-key $flexion_key --scope "flexion.*.report" --orgName flexion --kid flexion.simulated-lab --doit
-./prime organization addkey --public-key $flexion_key --scope "flexion.*.report" --orgName flexion --kid flexion.simulated-sender --doit
+./prime organization addkey --public-key "$TI_LOCAL_PUBLIC_KEY_PATH" --scope "flexion.*.report" --orgName flexion --kid flexion.etor-service-sender --doit
+./prime organization addkey --public-key "$TI_LOCAL_PUBLIC_KEY_PATH" --scope "flexion.*.report" --orgName flexion --kid flexion.simulated-hospital --doit
+./prime organization addkey --public-key "$TI_LOCAL_PUBLIC_KEY_PATH" --scope "flexion.*.report" --orgName flexion --kid flexion.simulated-lab --doit
+./prime organization addkey --public-key "$TI_LOCAL_PUBLIC_KEY_PATH" --scope "flexion.*.report" --orgName flexion --kid flexion.simulated-sender --doit
