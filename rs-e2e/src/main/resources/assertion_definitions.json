@@ -40,7 +40,7 @@
     {
       "name": "CDPH leading zeros",
       "conditions": [
-        "MSH-10 = '004'",
+        "MSH-10 = '004'"
       ],
       "rules": [
         "OBX-5 = '5.100'"
@@ -49,7 +49,7 @@
     {
       "name": "CDPH no leading zeros",
       "conditions": [
-        "MSH-10 = '005'",
+        "MSH-10 = '005'"
       ],
       "rules": [
         "OBX-5 = '0.6500'"
