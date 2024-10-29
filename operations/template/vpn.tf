@@ -34,7 +34,8 @@ resource "azurerm_virtual_network_gateway" "vpn" {
 
   active_active = false
   enable_bgp    = false
-  sku           = "VpnGw1AZ"
+  generation    = "Generation2"
+  sku           = "VpnGw2"
 
   ip_configuration {
     public_ip_address_id          = azurerm_public_ip.vpn_ip.id
