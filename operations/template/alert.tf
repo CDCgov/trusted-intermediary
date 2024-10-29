@@ -260,6 +260,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "ti-log-errors-alert" {
 
   query = <<-QUERY
       AppServiceConsoleLogs
+      | where _ResourceId !contains "pre-live"
       | project columnifexists("ResultDescription", 'default_value')
       | project  JsonResult = parse_json(ResultDescription)
       | evaluate bag_unpack(JsonResult) : (level: string, message: string)
