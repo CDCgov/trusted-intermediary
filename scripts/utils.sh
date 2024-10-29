@@ -45,3 +45,38 @@ check_apis() {
         fi
     done
 }
+
+get_api_url() {
+    local env=$1
+    local type=$2
+
+    case "$type" in
+    "rs")
+        case "$env" in
+        "local") echo $RS_LCL_API_URL ;;
+        "staging") echo $RS_STG_API_URL ;;
+        "production") echo $RS_PRD_API_URL ;;
+        *)
+            echo "Invalid environment: $env" >&2
+            exit 1
+            ;;
+        esac
+        ;;
+    "ti")
+        case "$env" in
+        "local") echo $TI_LCL_API_URL ;;
+        "staging") echo $TI_STG_API_URL ;;
+        "production") echo $TI_PRD_API_URL ;;
+        *)
+            echo "Invalid environment: $env" >&2
+            exit 1
+            ;;
+        esac
+        ;;
+    esac
+}
+
+extract_host_from_url() {
+    local url=$1
+    echo "$url" | sed 's|^.*://\([^/:]*\)[:/].*|\1|'
+}
