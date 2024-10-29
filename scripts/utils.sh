@@ -1,11 +1,13 @@
 #!/bin/bash
 
 load_env() {
-    local env_file=".env"
+    local script_dir env_file
+    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    env_file="${script_dir}/.env"
     if [[ -f "$env_file" ]]; then
         source "$env_file"
     else
-        echo "Warning: .env file not found at $env_file" >&2
+        echo "Error: $env_file file not found" >&2
         return 1
     fi
 }
