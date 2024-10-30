@@ -17,4 +17,4 @@ hurl \
     --file-root "$root" \
     --variable "jwt=$jwt_token" \
     "$CDCTI_HOME"/scripts/epic/results.hurl \
-    $@
+    "$@"

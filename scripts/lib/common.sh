@@ -51,9 +51,9 @@ get_api_url() {
     case "$type" in
     "rs")
         case "$env" in
-        "local") echo $RS_LCL_API_URL ;;
-        "staging") echo $RS_STG_API_URL ;;
-        "production") echo $RS_PRD_API_URL ;;
+        "local") echo "$RS_LCL_API_URL" ;;
+        "staging") echo "$RS_STG_API_URL" ;;
+        "production") echo "$RS_PRD_API_URL" ;;
         *)
             echo "Invalid environment: $env" >&2
             exit 1
@@ -62,9 +62,9 @@ get_api_url() {
         ;;
     "ti")
         case "$env" in
-        "local") echo $TI_LCL_API_URL ;;
-        "staging") echo $TI_STG_API_URL ;;
-        "production") echo $TI_PRD_API_URL ;;
+        "local") echo "$TI_LCL_API_URL" ;;
+        "staging") echo "$TI_STG_API_URL" ;;
+        "production") echo "$TI_PRD_API_URL" ;;
         *)
             echo "Invalid environment: $env" >&2
             exit 1

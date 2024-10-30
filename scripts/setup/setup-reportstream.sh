@@ -44,7 +44,7 @@ yq eval '.[0].receivers[] |= (
 
 echo "Updating local URL and host in transport settings..."
 sed -i '' "s|__TI_API_URL__|${TI_LCL_API_URL}|g" "settings/STLTs/Flexion/flexion.yml"
-sed -i '' "s|__TI_API_HOST__|$(extract_host_from_url ${TI_LCL_API_URL})|g" "settings/STLTs/Flexion/flexion.yml"
+sed -i '' "s|__TI_API_HOST__|$(extract_host_from_url "${TI_LCL_API_URL}")|g" "settings/STLTs/Flexion/flexion.yml"
 
 echo "Updating transport settings in partner org files..."
 for file in "settings/STLTs/CA/ucsd.yml" "settings/STLTs/LA/la-ochsner.yml" "settings/STLTs/LA/la-phl.yml"; do

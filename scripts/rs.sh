@@ -56,7 +56,7 @@ parse_arguments() {
         esac
     done
 
-    shift "$(($OPTIND - 1))"
+    shift "$((OPTIND - 1))"
     remaining_args="$*"
 }
 
@@ -89,8 +89,8 @@ run_hurl_command() {
         --variable "client-id=$client_id" \
         --variable "client-sender=$client_sender" \
         --variable "jwt=$jwt_token" \
-        ${submission_id:-} \
-        ${verbose:-} \
+        "${submission_id:-}" \
+        "${verbose:-}" \
         "$hurl_file_path" \
         ${remaining_args:+$remaining_args}
 }
