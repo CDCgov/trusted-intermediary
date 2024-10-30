@@ -2,7 +2,7 @@
 
 ## Setup
 
-You can either run `start-here.sh` or follow the instructions below to load the environments variables required for these scripts
+Follow the instructions below to load the environments variables required for these scripts
 
 1. Copy `.env.template` to `.env`
     ```
