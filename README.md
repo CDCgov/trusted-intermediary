@@ -348,7 +348,7 @@ with this option enabled.
 3. Run RS with `docker compose up -d`. You may also use `./gradlew quickRun`
 4. Run the RS setup script in this repository: `/scripts/setup/setup-reportstream.sh`
    - Before running the script, make sure to follow the instructions in [/scripts/README.md](/scripts/README.md)
-   - You can verify that the script created the secrets successfully by going to `http://localhost:8200/` in your browser, use the token in `prime-router/.vault/env/.env.local` to authenticate, and then go to `Secrets engines` > `secret/` to check the available secrets
+   - You can verify the script created vault secrets successfully by going to `http://localhost:8200/` in your browser, use the token in `prime-router/.vault/env/.env.local` to authenticate, and then go to `Secrets engines` > `secret/` to check the available secrets
 
 #### Submit request to ReportStream
 
