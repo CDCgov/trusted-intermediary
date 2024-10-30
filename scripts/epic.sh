@@ -17,5 +17,5 @@ hurl \
     --variable "fpath=$fpath" \
     --file-root "$root" \
     --variable "jwt=$jwt_token" \
-    hurl/epic-results.hurl \
+    epic/results.hurl \
     $@

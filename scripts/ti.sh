@@ -38,7 +38,7 @@ parse_arguments() {
     fi
 
     [ $# -eq 0 ] && fail "Missing required argument <ENDPOINT_NAME>"
-    endpoint_name="hurl/ti-$1.hurl"
+    endpoint_name="hurl/ti/$1.hurl"
     shift # Remove endpoint name from args
 
     while getopts ':f:r:e:c:k:i:v' opt; do
