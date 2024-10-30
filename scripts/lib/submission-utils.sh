@@ -50,7 +50,7 @@ check_submission_status() {
     start_time=$(date +%s)
 
     while true; do
-        history_response=$(./rs.sh history -i "$submission_id" -e "$env" -k "$private_key") || {
+        history_response=$("$CDCTI_HOME"/scripts/rs.sh history -i "$submission_id" -e "$env" -k "$private_key") || {
             exit_code=$?
             if [ $exit_code -ne 0 ]; then
                 fail "Expected exit code 0 but got $exit_code for RS history API call"
@@ -109,7 +109,7 @@ submit_message() {
 
     echo "Assuming receivers are '$first_leg_receiver' and '$second_leg_receiver' because of MSH-9 value '$msh9'"
 
-    waters_response=$(./rs.sh waters -f "$message_file_name" -r "$message_file_path" -e "$env" -k "$rs_client_private_key") || {
+    waters_response=$("$CDCTI_HOME"/scripts/rs.sh waters -f "$message_file_name" -r "$message_file_path" -e "$env" -k "$rs_client_private_key") || {
         exit_code=$?
         if [ $exit_code -ne 0 ]; then
             fail "Expected exit code 0 but got $exit_code for RS waters API call"
@@ -136,7 +136,7 @@ submit_message() {
     echo "[Intermediary] Getting outbound submission ID"
     if [ -n "$ti_client_private_key" ]; then
         echo "  Attempting to get outbound submission ID from TI's metadata API..."
-        metadata_response=$(./ti.sh metadata -i "$inbound_submission_id" -e "$env" -k "$ti_client_private_key") || {
+        metadata_response=$("$CDCTI_HOME"/scripts/ti.sh metadata -i "$inbound_submission_id" -e "$env" -k "$ti_client_private_key") || {
             echo "Failed to get metadata for inbound submission ID: $inbound_submission_id"
             outbound_submission_id=""
         }

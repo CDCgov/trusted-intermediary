@@ -41,7 +41,7 @@ parse_arguments() {
     fi
 
     [ $# -eq 0 ] && fail "Missing required argument <ENDPOINT_NAME>"
-    endpoint_name="hurl/rs/$1.hurl"
+    hurl_file_path="$CDCTI_HOME/scripts/hurl/rs/$1.hurl"
     shift # Remove endpoint name from args
 
     while getopts ':f:r:t:e:c:s:k:i:v' opt; do
@@ -94,7 +94,7 @@ run_hurl_command() {
         --variable "jwt=$jwt_token" \
         ${submission_id:-} \
         ${verbose:-} \
-        "$endpoint_name" \
+        "$hurl_file_path" \
         ${remaining_args:+$remaining_args}
 }
 

@@ -16,5 +16,5 @@ hurl \
     --variable "fpath=$fpath" \
     --file-root "$root" \
     --variable "jwt=$jwt_token" \
-    epic/results.hurl \
+    "$CDCTI_HOME"/scripts/epic/results.hurl \
     $@
