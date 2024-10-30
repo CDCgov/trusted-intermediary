@@ -1,0 +1,45 @@
+# See https://github.com/Codium-ai/pr-agent/blob/main/pr_agent/settings/configuration.toml for all possible config options
+# The pr_agent.yml action reads this file from the `main` branch, so changes to this file
+# will not take effect until they are merged into main
+
+[config]
+model="gpt-4" # the OpenAI model you've deployed on Azure (e.g. gpt-3.5-turbo)
+model_turbo="gpt-4" # the OpenAI model you've deployed on Azure (e.g. gpt-3.5-turbo)
+fallback_models=["gpt-4"] # the OpenAI model you've deployed on Azure (e.g. gpt-3.5-turbo)
+
+[github_action_config]
+auto_review = true
+auto_describe = false
+auto_improve = true
+pr_actions = ["opened", "reopened", "ready_for_review", "review_requested"]
+
+[pr_reviewer] # /review #
+# enable/disable features
+# general options
+num_code_suggestions=3 # Number of code suggestions provided by the 'review' tool. Default is 0, meaning no code suggestions will be provided by the `review` tool.
+inline_code_comments = true # If set to true, the tool will publish the code suggestions as comments on the code diff. Default is false. Note that you need to set `num_code_suggestions`>0 to get code suggestions
+ask_and_reflect=true
+persistent_comment=false
+#automatic_review=true
+extra_instructions = "" # Optional extra instructions to the tool. For example: "focus on the changes in the file X. Ignore change in ...".
+final_update_message = true # If set to true, it will add a comment message [`PR Description updated to latest commit...`](https://github.com/Codium-ai/pr-agent/pull/499#issuecomment-1837412176) after finishing calling `/describe`. Default is false.
+# review labels
+enable_review_labels_security=false # If set to true, the tool will publish a 'possible security issue' label if it detects a security issue. Default is true.
+enable_review_labels_effort=false # If set to true, the tool will publish a 'Review effort [1-5]: x' label. Default is true.
+# specific configurations for incremental review (/review -i)
+require_all_thresholds_for_incremental_review=false
+minimal_commits_for_incremental_review=0
+minimal_minutes_for_incremental_review=0
+enable_intro_text=true
+enable_help_text=false # Determines whether to include help text in the PR review. Enabled by default.
+# auto approval
+enable_auto_approval=false # If set to true, the tool will approve the PR when invoked with the 'auto_approve' command. Default is false. This flag can be changed only from a configuration file.
+
+[pr_description] # /describe #
+publish_labels=false
+# describe as comment
+publish_description_as_comment=true
+publish_description_as_comment_persistent=false
+
+[pr_code_suggestions] # /improve #
+persistent_comment=false

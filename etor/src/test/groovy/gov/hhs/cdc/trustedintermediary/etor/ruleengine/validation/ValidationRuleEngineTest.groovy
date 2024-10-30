@@ -1,10 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.validation
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleEngine
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoader
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.RuleLoaderException
+import gov.hhs.cdc.trustedintermediary.ruleengine.RuleEngine
+import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoader
+import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoaderException
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthData
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
 import spock.lang.Specification
@@ -94,7 +94,7 @@ class ValidationRuleEngineTest extends Specification {
         }
 
         when:
-        ruleEngine.runRules(Mock(FhirResource))
+        ruleEngine.runRules(Mock(HealthData))
 
         then:
         1 * mockLogger.logError(_ as String, exception)
@@ -104,7 +104,7 @@ class ValidationRuleEngineTest extends Specification {
         given:
         def failedValidationMessage = "Failed validation message"
         def fullFailedValidationMessage = "Validation failed: " + failedValidationMessage
-        def fhirBundle = Mock(FhirResource)
+        def fhirBundle = Mock(HealthData)
         def invalidRule = Mock(ValidationRule)
         invalidRule.getMessage() >> failedValidationMessage
         invalidRule.shouldRun(fhirBundle) >> true
@@ -141,7 +141,7 @@ class ValidationRuleEngineTest extends Specification {
         mockRuleLoader.loadRules(_ as InputStream, _ as TypeReference) >> { throw exception }
 
         when:
-        ruleEngine.runRules(Mock(FhirResource))
+        ruleEngine.runRules(Mock(HealthData))
 
         then:
         1 * mockLogger.logError(_ as String, exception)

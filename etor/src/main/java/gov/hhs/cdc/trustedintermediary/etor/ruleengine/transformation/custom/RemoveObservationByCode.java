@@ -1,8 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.custom;
 
-import gov.hhs.cdc.trustedintermediary.etor.ruleengine.FhirResource;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.CustomFhirTransformation;
 import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper;
+import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -16,8 +16,8 @@ public class RemoveObservationByCode implements CustomFhirTransformation {
     public static final String CODING_NAME = "codingExtension";
 
     @Override
-    public void transform(FhirResource<?> resource, Map<String, Object> args) {
-        var bundle = (Bundle) resource.getUnderlyingResource();
+    public void transform(HealthData<?> resource, Map<String, Object> args) {
+        var bundle = (Bundle) resource.getUnderlyingData();
         Set<Resource> resourcesToRemove = new HashSet<>();
 
         for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {

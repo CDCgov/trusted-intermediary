@@ -20,7 +20,7 @@ public class HapiMessage implements Message<Bundle> {
     }
 
     @Override
-    public Bundle getUnderlyingResource() {
+    public Bundle getUnderlyingData() {
         return innerResource;
     }
 

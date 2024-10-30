@@ -3,9 +3,11 @@
 This document provides instructions for setting up the environment, running the application, and performing various tasks such as compiling, testing, and contributing to the project.
 
 ## Requirements
+
 Any distribution of the Java 17 JDK.
 
 ## Using and Running
+
 To run the application directly, execute...
 
 ```shell
@@ -17,13 +19,13 @@ This runs the web API on port 8080. The app reads/writes data to a local file (u
 You can view the API documentation at `/openapi`.
 
 ### Generating and using a token
+
 1. Run `brew install mike-engel/jwt-cli/jwt-cli`
 2. Replace `PATH_TO_FILE_ON_YOUR_MACHINE` in this command with the actual path, then run it: `jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256  --no-iat -S @/PATH_TO_FILE_ON_YOUR_MACHINE/trusted-intermediary/mock_credentials/organization-trusted-intermediary-private-key-local.pem`
 3. Copy token from terminal and paste into your postman body with the key `client_assertion`
 4. Add a key to the body with the key `scope` and value of `trusted-intermediary`
 5. Body type should be `x-wwww-form-urlencoded`
 6. You should be able to run the post call against the `v1/auth/token` endpoint to receive a bearer token [to be used in this step](#submit-request-to-reportstream)
-
 
 ## Development
 
@@ -49,19 +51,23 @@ creates a `.env` file in the resource folder with the required configuration
    ```bash
    ./generate_env.sh
    ```
+
 3. If you run TI using Docker rather than Gradle, update the DB and port values in the `.env` file (the alternate values are in comments)
 
 ### Using a local database
+
 Use [docker-compose.postgres.yml](docker-compose.postgres.yml) to run your local DB. In IntelliJ, you can click the play arrow to start it
 
 ![docker-postgres.png](images/docker-postgres.png)
 
 Apply all outstanding migrations:
+
 ```bash
 liquibase update --changelog-file ./etor/databaseMigrations/root.yml --url jdbc:postgresql://localhost:5433/intermediary --username intermediary --password 'changeIT!' --label-filter '!azure'
 ```
 
 If running in Windows, use double quotes instead:
+
 ```shell
 liquibase update --changelog-file ./etor/databaseMigrations/root.yml --url jdbc:postgresql://localhost:5433/intermediary --username intermediary --password "changeIT!" --label-filter "!azure"
 ```
@@ -109,6 +115,11 @@ This will start the API, wait for it to respond, run the end-to-end tests agains
 These tests are located under the `e2e` Gradle sub-project directory.  Like any Gradle project, there are the `main` and `test` directories.
 The `test` directory contains the tests.  The `main` directory contains our custom framework that helps us interact with the API.
 
+#### Automated ReportStream Integration/End-to-End Test
+
+These tests cover the integration between ReportStream and TI. They run automatically every
+weekday via Github actions. See [the rs-e2e readme](rs-e2e/README.md) for more details.
+
 #### Load Testing
 
 Load tests are completed with [Locust.io](https://docs.locust.io/en/stable/installation.html).
@@ -119,6 +130,7 @@ Run the load tests by running...
 
 ./docker-load-execute.sh
 ```
+
 Currently, we are migrating to using Azure. Local load testing is using gradle, however a docker load test is available to mimic the Azure environment settings until the azure migration is complete.
 
 This will run the API for you, so no need to run it manually.
@@ -139,11 +151,12 @@ locust -f ./operations/locustfile.py
 
 The terminal will start a local web interface, and you can enter
 the swarm parameters for the test and the local url where the app is running
-(usually http://localhost:8080).  You can also set time limits for the tests under 'Advanced Settings'.
+(usually `http://localhost:8080`).  You can also set time limits for the tests under 'Advanced Settings'.
 
 ### Debugging
 
 #### Attached JVM Config for IntelliJ
+
 The project comes with an attached remote jvm configuration for debuging the container.
 If you check your remote JVM settings, under `Run/Edit Configurations`,
 you will see the `Debug TI`. If you want to add a new remote JVM configuration, follow the steps below,
@@ -154,6 +167,7 @@ under "**Docker Container Debugging Using Java Debug Wire Protocal**"
 Go into the `Dockerfile` file and change `CMD ["java", "-jar", "app.jar"]` to `CMD ["java", "-agentlib:jdwp=transport=dt_socket,address=*:6006,server=y,suspend=n", "-jar", "app.jar"]`
 
 #### Steps
+
 1. In Intellij, click on Run and select Edit Configurations ![img.png](images/img.png)
 2. Create a new Remote JVM Debug ![img_1.png](images/img_1.png)
 3. Set up the configuration for the remote JVM debug to look like this. ![img_3.png](images/img_2.png)
@@ -162,7 +176,6 @@ Go into the `Dockerfile` file and change `CMD ["java", "-jar", "app.jar"]` to `C
 6. Select Debug (not Attach to Process) ![img_3.png](images/img_3.png)
 7. Select your Docker Debug that you set up in step 3 ![img_4.png](images/img_4.png)
 8. A console window will pop up that will show you that it is connected to Docker, and at that point, you can interact with your container and then step through the code at your breakpoints. ![img_5.png](images/img_5.png)
-
 
 ### Deploying
 
@@ -177,21 +190,27 @@ deployed environment in a _non-CDC_ Azure Entra domain and subscription. See bel
 
 > **Before starting...**
 >
->  Remember to ping the Engineering Channel to make sure someone is not already using the enviroment.
+> Remember to ping the Engineering Channel to make sure someone is not already using the enviroment.
 
 To deploy to the Internal environment...
+
 1. Check with the team that no one is already using it.
 2. [Find the `internal` branch](https://github.com/CDCgov/trusted-intermediary/branches/all?query=internal) and delete
    it inGitHub.
 3. Delete your local `internal` branch if needed.
+
    ```shell
    git branch -D internal
    ```
+
 4. From the branch you want to test, create a new `internal` branch.
+
    ```shell
    git checkout -b internal
    ```
+
 5. Push the branch to GitHub.
+
    ```shell
    git push --set-upstream origin internal
    ```
@@ -306,6 +325,7 @@ CDC including this GitHub page may be subject to applicable federal law, includi
 ### Database
 
 For database documentation: [/docs/database.md](/docs/database.md)
+
 ### Setup with ReportStream
 
 #### CDC-TI Setup
@@ -327,13 +347,11 @@ with this option enabled.
 4. Run the `./cleanslate` script. For more information you can refer to the [ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/docs-deprecated/getting-started/getting-started.md#building-the-baseline)
 5. If attempting to access the metadata endpoint in ReportStream add the variable `ETOR_TI_baseurl="http://host.docker.internal:8080"` to `.prime-router/.vault/env/.env.local` file before building the container
 6. Run RS with `docker compose up --build -d`
-7. Edit `/settings/STLTs/Flexion/flexion.yml` to comment the lines related to staging settings, and uncomment the ones for local settings:
-   - `authTokenUrl`, `reportUrl`, `authHeaders.host` under REST `transport` in `receivers`
-   - `type` and `credentialName` under SFTP `transport` in `receivers`
-8. Run the `./reset.sh` script to reset the database
-9. Run the `./load-etor-org-settings.sh` to apply the ETOR organization settings
-10. Run the `./setup-local-vault.sh` script to set up the local vault secrets
-   - You can verify that the script created the secrets successfully by going to `http://localhost:8200/` in your browser, use the token in `prime-router/.vault/env/.env.local` to authenticate, and then go to `Secrets engines` > `secret/` to check the available secrets
+7. Run the `reset.sh` script to reset the database
+8. Run the `update_org_yaml.sh` script to update the RS organization settings
+9. Run the `load-etor-org-settings.sh` to apply the ETOR organization settings
+10. Run the `setup-local-vault.sh` script to set up the local vault secrets
+    - You can verify that the script created the secrets successfully by going to `http://localhost:8200/` in your browser, use the token in `prime-router/.vault/env/.env.local` to authenticate, and then go to `Secrets engines` > `secret/` to check the available secrets
 
 #### Submit request to ReportStream
 
@@ -342,11 +360,13 @@ with this option enabled.
 ###### Orders
 
 To test sending from a simulated hospital:
+
 ```
 curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-hospital' --header 'Authorization: Bearer dummy_token' --data-binary '@/path/to/orm_message.hl7' 'http://localhost:7071/api/waters'
 ```
 
 To test sending from TI:
+
 ```
 curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.etor-service-sender' --header 'Authorization: Bearer dummy_token' --data-binary '@/path/to/oml_message.fhir' 'http://localhost:7071/api/waters'
 ```
@@ -354,11 +374,13 @@ curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.
 ###### Results
 
 To test sending from a simulated lab:
+
 ```
 curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-lab' --header 'Authorization: Bearer dummy_token' --data-binary '@/path/to/oru_message.hl7' 'http://localhost:7071/api/waters'
 ```
 
 To test sending from TI:
+
 ```
 curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.etor-service-sender' --header 'Authorization: Bearer dummy_token' --data-binary '@/path/to/oru_message.fhir' 'http://localhost:7071/api/waters'
 ```
@@ -368,14 +390,19 @@ After one or two minutes, check that hl7 files have been dropped to `prime-repor
 ##### Staging
 
 In order to submit a request, you'll need to authenticate with ReportStream using JWT auth:
+
 1. Create a JWT for the sender (e.g. `flexion.simulated-hospital`) using the sender's private key, which should be stored in Keybase. You may use [this CLI tool](https://github.com/mike-engel/jwt-cli) to create the JWT:
+
    ```
    jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 -k <sender> -i <sender> -s <sender> -a staging.prime.cdc.gov --no-iat -S @/path/to/sender_private.pem
    ```
+
 2. Use the generated JWT to authenticate with ReportStream and get the token, which will be in the `access_token` response
+
    ```
    curl --header 'Content-Type: application/x-www-form-urlencoded' --data 'scope=flexion.*.report' --data 'client_assertion=<jwt>' --data 'client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer' --data 'grant_type=client_credentials' 'http://localhost:7071/api/token'
    ```
+
 3. Submit an Order or Result using the returned token in the `'Authorization: Bearer <token>'` header
 
 ## DORA Metrics
@@ -419,7 +446,7 @@ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 PARTICULAR PURPOSE. See the Apache Software License for more details.
 
 You should have received a copy of the Apache Software License along with this
-program. If not, see http://www.apache.org/licenses/LICENSE-2.0.html
+program. If not, see <http://www.apache.org/licenses/LICENSE-2.0.html>
 
 The source code forked from other open source projects will inherit its license.
 

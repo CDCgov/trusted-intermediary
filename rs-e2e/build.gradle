@@ -1,0 +1,39 @@
+plugins {
+    id 'java'
+    id 'groovy'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+dependencies {
+    implementation project(':shared')
+    testImplementation testFixtures(project(':shared'))
+
+    //jackson
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.18.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.1'
+
+    // azure
+    implementation 'com.azure:azure-storage-blob:12.28.1'
+
+    // hapi hl7
+    implementation 'ca.uhn.hapi:hapi-base:2.5.1'
+    implementation 'ca.uhn.hapi:hapi-structures-v251:2.5.1'
+
+    testImplementation 'org.apache.groovy:groovy:4.0.23'
+    testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    exclude '**/AutomatedTest.*'
+}
+
+task automatedTest(type: Test) {
+    useJUnitPlatform()
+    include '**/AutomatedTest.*'
+}
