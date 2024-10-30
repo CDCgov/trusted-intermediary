@@ -1,6 +1,6 @@
 # Scripts
 
-## Instructions
+## Setup
 
 You can either run `start-here.sh` or follow the instructions below to load the environments variables required for these scripts
 
@@ -8,7 +8,10 @@ You can either run `start-here.sh` or follow the instructions below to load the 
     ```
     cp .env.template .env
     ```
-2. Edit `.env` and make sure to update at least `CDCTI_HOME` (local path to the `trusted-intermediary` codebase) and `RS_HOME` (local path to the `prime-reportstream` codebase) are set. **Note**: if you don't set `CDCTI_HOME`, none of these scripts will work. Also, please use `$HOME` or the full path to your home directory instead of `~`
+2. Edit `.env` and make sure to update at least:
+   - `CDCTI_HOME`: local path to the `trusted-intermediary` codebase
+   - `RS_HOME`: local path to the `prime-reportstream` codebase
+   - **Note**: if you don't set `CDCTI_HOME`, none of these scripts will work. Also, please use `$HOME` or the full path to your home directory instead of `~`
 3. Export the environment variables in `.env` by running
    ```
    set -a; source .env; set +a
@@ -31,7 +34,7 @@ Sends a HL7 message to RS and tracks its status throughout the flow until final 
 #### Usage
 
 ```
-Usage: submit.sh -f <message_file.hl7> [-e <environment>]
+Usage: ./submit.sh -f <message_file.hl7> [-e <environment>]
 
 Options:
     -f <FILE>                   Message file path (Required)
@@ -69,9 +72,6 @@ Options:
     -i <SUBMISSION_ID>  Submission ID for history API (Required for history API)
     -v                  Verbose mode
     -h                  Display this help and exit
-
-Environment Variables:
-    CDCTI_HOME          Base directory for CDC TI repository (Required)
 ```
 
 #### Examples
@@ -132,9 +132,6 @@ Options:
     -i <SUBMISSION_ID>  Submission ID for metadata API (Required for orders, results and metadata API)
     -v                  Verbose mode
     -h                  Display this help and exit
-
-Environment Variables:
-    CDCTI_HOME          Base directory for CDC TI repository (Required)
 ```
 
 #### Examples
@@ -167,7 +164,7 @@ Authenticate to local environment:
 
 Get OpenAPI docs from local environment:
 ```
-./ti.rs openapi
+./ti.sh openapi
 ```
 
 Get Health info from local environment:
@@ -185,7 +182,7 @@ Submit requests to Epic API endpoints
 
 #### Before running the script
 
-- Add the `client` id to `epic.rs`
+- Add the `client` id to `epic.sh`
 - Update the `secret` variable path
 
 #### Usage
@@ -194,7 +191,7 @@ Submit requests to Epic API endpoints
 
 ### setup/update-examples-snapshots.sh
 
-Sends all the HL7 files with `_0_initial_message.hl7` suffix in the `/examples` folder to a locally running RS instance. As the previous script, it copies the snapshots at each stage
+Sends all the HL7 files with `_0_initial_message.hl7` suffix in the `/examples` folder to a locally running RS instance. As the `submit.sh` script, it downloads the snapshots at each stage. This script is helpful to keep all the message snapshots in the examples folder up to date
 
 #### Requirements
 

@@ -12,7 +12,7 @@ client_sender=simulated-sender
 
 show_usage() {
     cat <<EOF
-Usage: $(basename "$0") <ENDPOINT_NAME> [OPTIONS]
+Usage: ./$(basename "$0") <ENDPOINT_NAME> [OPTIONS]
 
 ENDPOINT_NAME:
     The name of the endpoint to call (required)
@@ -28,9 +28,6 @@ Options:
     -i <SUBMISSION_ID>  Submission ID for history API (Required for history API)
     -v                  Verbose mode
     -h                  Display this help and exit
-
-Environment Variables:
-    CDCTI_HOME          Base directory for CDC TI repository (Required)
 EOF
 }
 
