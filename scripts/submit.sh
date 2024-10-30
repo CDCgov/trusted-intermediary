@@ -1,6 +1,6 @@
 #!/bin/bash
 
-[ -z "${CDCTI_HOME}" ] && echo "Error: Environment variable CDCTI_HOME is not set" && exit 1
+[ -z "${CDCTI_HOME}" ] && echo "Error: Environment variable CDCTI_HOME is not set. Please refer to /scripts/README.md for instructions" && exit 1
 source "$CDCTI_HOME/scripts/lib/common.sh"
 source "$CDCTI_HOME/scripts/lib/submission-utils.sh"
 

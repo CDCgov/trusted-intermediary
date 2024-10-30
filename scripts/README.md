@@ -12,7 +12,7 @@
    source .env
    ```
    **Note**: you may also want to add it to your shell's startup file so you don't need to run it for every terminal session.
-4. Run you script
+4. Run your script
 
 ## Available Scripts
 
@@ -40,6 +40,8 @@ Options:
 ```
 
 ### rs.sh
+
+Submit requests to RS API endpoints
 
 #### Requirements
 
@@ -103,6 +105,8 @@ Checking the history in staging for a submission id
 ```
 
 ### ti.sh
+
+Submit requests to TI API endpoints
 
 #### Requirements
 
@@ -171,6 +175,8 @@ Get Health info from local environment:
 
 ### epic.sh
 
+Submit requests to Epic API endpoints
+
 #### Requirements
 
 - hurl
@@ -220,7 +226,7 @@ Utility functions shared by scripts
 
 ### lib/submission-utils.sh
 
-It has functions to submit requests to RS, check the submission status throughout the whole flow, and downloading snapshots from azurite
+Functions to submit requests to RS, check the submission status throughout the whole flow, and downloading snapshots from azurite
 
 ## References
 
