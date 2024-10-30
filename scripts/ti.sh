@@ -2,7 +2,7 @@
 
 [ -z "${CDCTI_HOME}" ] && echo "Error: Environment variable CDCTI_HOME is not set" && exit 1
 source "$CDCTI_HOME/scripts/utils.sh"
-source "$CDCTI_HOME/scripts/hurl/utils.sh"
+source "$CDCTI_HOME/scripts/helper.sh"
 
 # default values
 env=local
@@ -38,7 +38,7 @@ parse_arguments() {
     fi
 
     [ $# -eq 0 ] && fail "Missing required argument <ENDPOINT_NAME>"
-    endpoint_name="ti/$1.hurl"
+    endpoint_name="hurl/ti-$1.hurl"
     shift # Remove endpoint name from args
 
     while getopts ':f:r:e:c:k:i:v' opt; do
