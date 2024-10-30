@@ -5,7 +5,9 @@ resource "azurerm_monitor_action_group" "notify_slack_email" {
   short_name          = "cdcti-alerts"
 
   email_receiver {
-    name          = "cdcti-flexion-slack-email-receiver"
+    name = "cdcti-flexion-slack-email-receiver"
+    // This variable is set in the `env-deploy.yml` GH action for each environment
+    // We use a different email address/Slack channel for prod and non-prod alerts
     email_address = var.alert_slack_email
   }
 
