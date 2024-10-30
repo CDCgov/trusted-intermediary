@@ -43,7 +43,7 @@ class RemoveObservationRequestsTest extends Specification {
     def "remove all LA Ochsner's OBRs except for the one with OBR-4.1 = '54089-8'"() {
         given:
         def fhirResource = ExamplesHelper.getExampleFhirResource("../LA/002_LA_ORU_R01_ORU_removal_test_file.fhir")
-        def bundle = fhirResource.getUnderlyingResource() as Bundle
+        def bundle = fhirResource.getUnderlyingData() as Bundle
 
         def initialDiagnosticReports = HapiHelper.resourcesInBundle(bundle, DiagnosticReport).toList()
         def initialServiceRequests = HapiHelper.resourcesInBundle(bundle, ServiceRequest).toList()
