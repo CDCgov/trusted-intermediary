@@ -227,7 +227,7 @@ Utility functions shared by scripts
 
 Functions to submit requests to RS, check the submission status throughout the whole flow, and downloading snapshots from azurite
 
-## References
+## Resources
 
 - [hurl](https://hurl.dev/)
 - [jq](https://jqlang.github.io/jq/)

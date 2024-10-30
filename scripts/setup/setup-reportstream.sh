@@ -11,8 +11,6 @@ check_installed_commands yq
 CURRENT_DIR=$(pwd)
 cd "$RS_HOME" || exit
 
-# source "./prime-router/.vault/env/.env.local"
-
 echo "Resetting the database and loading the baseline settings..."
 ./gradlew resetDB
 ./gradlew reloadTable
