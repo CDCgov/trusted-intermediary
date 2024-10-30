@@ -332,7 +332,7 @@ For database documentation: [/docs/database.md](/docs/database.md)
 
 1. Checkout `main` branch for `CDCgov/trusted-intermediary`
 2. Run `./generate_env.sh` to generate `.env` file with required environment variables
-3. Run TI with `./gradlew clean app:run`
+3. Run TI with `./gradlew clean run`
 
 #### ReportStream Setup
 
