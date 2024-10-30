@@ -1,23 +1,5 @@
 #!/bin/bash
 
-generate_jwt() {
-    # requires: jwt-cli
-    local client=$1
-    local audience=$2
-    local secret_path=$3
-
-    jwt encode \
-        --exp='+5min' \
-        --jti "$(uuidgen)" \
-        --alg RS256 \
-        -k "$client" \
-        -i "$client" \
-        -s "$client" \
-        -a "$audience" \
-        --no-iat \
-        -S "@$secret_path"
-}
-
 extract_rs_history_submission_id() {
     # requires: jq
     local history_response=$1

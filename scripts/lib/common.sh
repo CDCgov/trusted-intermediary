@@ -80,3 +80,21 @@ extract_host_from_url() {
     local url=$1
     echo "$url" | sed 's|^.*://\([^/:]*\)[:/].*|\1|'
 }
+
+generate_jwt() {
+    # requires: jwt-cli
+    local client=$1
+    local audience=$2
+    local secret_path=$3
+
+    jwt encode \
+        --exp='+5min' \
+        --jti "$(uuidgen)" \
+        --alg RS256 \
+        -k "$client" \
+        -i "$client" \
+        -s "$client" \
+        -a "$audience" \
+        --no-iat \
+        -S "@$secret_path"
+}
