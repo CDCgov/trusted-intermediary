@@ -346,7 +346,7 @@ with this option enabled.
    - Otherwise run: `./gradlew clean package` in `prime-reportstream` root folder
    - If attempting to access the metadata endpoint in RS add the variable `ETOR_TI_baseurl="http://host.docker.internal:8080"` to `prime-router/.vault/env/.env.local` file before building the container
 3. Run RS with `docker compose up -d`. You may also use `./gradlew quickRun`
-4. Run the RS setup script in this repository: `/scripts/setup-rs.sh`
+4. Run the RS setup script in this repository: `/scripts/setup/setup-reportstream.sh`
    - Before running the script, make sure to follow the instructions in [/scripts/README.md](/scripts/README.md)
    - You can verify that the script created the secrets successfully by going to `http://localhost:8200/` in your browser, use the token in `prime-router/.vault/env/.env.local` to authenticate, and then go to `Secrets engines` > `secret/` to check the available secrets
 
