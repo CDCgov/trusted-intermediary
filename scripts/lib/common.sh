@@ -1,9 +1,7 @@
 #!/bin/bash
 
 load_env() {
-    local script_dir env_file
-    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    env_file="${script_dir}/.env"
+    local env_file="$CDCTI_HOME/scripts/.env"
     if [[ -f "$env_file" ]]; then
         source "$env_file"
     else
