@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 [ -z "${CDCTI_HOME}" ] && echo "Error: Environment variable CDCTI_HOME is not set" && exit 1
-source "$CDCTI_HOME/scripts/utils.sh"
+source "$CDCTI_HOME/scripts/lib/common.sh"
 
 # Check requirements for this script
 check_env_vars RS_HOME
