@@ -149,7 +149,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "azure_4XX_alert" {
     QUERY
 
   severity                = 3
-  frequency               = 1
+  frequency               = 5
   time_window             = 60
   auto_mitigation_enabled = true
 
