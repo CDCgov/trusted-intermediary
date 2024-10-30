@@ -81,8 +81,8 @@ run_hurl_command() {
         --variable "url=$url" \
         --variable "client=$client" \
         --variable "jwt=$jwt_token" \
-        "${submission_id:-}" \
-        "${verbose:-}" \
+        ${submission_id:-} \
+        ${verbose:-} \
         "$hurl_file_path" \
         ${remaining_args:+$remaining_args}
 }
