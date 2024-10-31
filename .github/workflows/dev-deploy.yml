@@ -22,7 +22,7 @@ jobs:
       VPN_CA_CERTIFICATE: ${{ secrets.VPN_CA_CERTIFICATE }}
       VPN_GITHUB_CERTIFICATE: ${{ secrets.VPN_GITHUB_CERTIFICATE}}
       VPN_GITHUB_SECRET_KEY: ${{ secrets.VPN_GITHUB_SECRET_KEY }}
-      TERRAFORM_APPLY_PARAMETERS: -var="alert_slack_email=${{ secrets.ALERT_SLACK_EMAIL }}"
+      TERRAFORM_APPLY_PARAMETERS: -var="alert_slack_email=${{ secrets.NON_PROD_ALERT_SLACK_EMAIL }}"
 
   dev-deploy:
     name: Dev Application Deploy
