@@ -12,7 +12,7 @@ Usage: $(basename "$0") -f <message_file.hl7> [-e <environment>]
 
 Options:
     -f <FILE>                   Message file path (Required)
-    -e <ENVIRONMENT>            Environment: local|staging|production (Default: $DEFAULT_ENV)
+    -e <ENVIRONMENT>            Environment: local|staging|production (Default: $env)
     -x <RS_CLIENT_PRIVATE_KEY>  Path to the client private key for authentication with RS API (Required for non-local environments)
     -z <TI_CLIENT_PRIVATE_KEY>  Path to the client private key for authentication with TI API (Optional for all environments)
     -h                          Display this help and exit
