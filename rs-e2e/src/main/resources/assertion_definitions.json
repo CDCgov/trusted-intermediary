@@ -38,9 +38,27 @@
       ]
     },
     {
-      "name": "UCSD ORU LOINC replacement",
+      "name": "CDPH leading zeros",
       "conditions": [
         "MSH-10 = '004'"
+      ],
+      "rules": [
+        "OBX-5 = '5.100'"
+      ]
+    },
+    {
+      "name": "CDPH no leading zeros",
+      "conditions": [
+        "MSH-10 = '005'"
+      ],
+      "rules": [
+        "OBX-5 = '0.6500'"
+      ]
+    },
+    {
+      "name": "UCSD ORU LOINC replacement",
+      "conditions": [
+        "MSH-10 = '006'"
       ],
       "rules": [
         "OBX-3.1 = '85269-9'",
@@ -54,7 +72,7 @@
     {
       "name": "UCSD ORU PLT replacement",
       "conditions": [
-        "MSH-10 = '005'"
+        "MSH-10 = '007'"
       ],
       "rules": [
         "OBX-3.1 = 'PLT3293",
