@@ -68,10 +68,12 @@ echo "Adding public keys for senders..."
 ./prime organization addkey --public-key "$TI_LOCAL_PUBLIC_KEY_PATH" --scope "flexion.*.report" --orgName flexion --kid flexion.simulated-sender --doit
 
 echo "Adding credentials for receivers..."
-./prime create-credential --type UserPass --user foo --pass pass --persist DEFAULT-SFTP
+export $(xargs <"$RS_HOME/prime-router/.vault/env/.env.local")
 rs_private_key=$(cat "$RS_LOCAL_PRIVATE_KEY_PATH")
+
+./prime create-credential --type UserPass --user foo --pass pass --persist DEFAULT-SFTP
 ./prime create-credential --type UserApiKey --apikey-user flexion --apikey "$rs_private_key" --persist FLEXION--ETOR-SERVICE-RECEIVER-ORDERS
-./prime create-credential --type UserApiKey --apikey-user flexion --apikey "$rs_private_key" --persist FLEXION--ETOR-SERVICE-RECEIVER-RESULTS
+./prime create-credential --type UserApiKey --apikey-user flexion --apikey "$(cat "$RS_LOCAL_PRIVATE_KEY_PATH")" --persist FLEXION--ETOR-SERVICE-RECEIVER-RESULTS
 ./prime create-credential --type UserApiKey --apikey-user ucsd --apikey "$rs_private_key" --persist UCSD--ETOR-NBS-RESULTS
 ./prime create-credential --type UserApiKey --apikey-user la-phl --apikey "$rs_private_key" --persist LA-PHL--ETOR-NBS-ORDERS
 ./prime create-credential --type UserApiKey --apikey-user la-ochsner --apikey "$rs_private_key" --persist LA-OCHSNER--ETOR-NBS-RESULTS
