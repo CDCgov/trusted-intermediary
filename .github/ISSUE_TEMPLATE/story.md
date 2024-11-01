@@ -48,6 +48,8 @@ As a _, so that _, I need _.
   - [ ] Feature toggles created and/or deleted.  Document the feature toggle
   - [ ] Source code is merged to the main branch
 
+**Note**: Please remove any DoD items that are not applicable
+
 ## Research Questions
 - *Optional: Any initial questions for research*
 
