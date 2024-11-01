@@ -6,7 +6,8 @@ source "$CDCTI_HOME/scripts/lib/common.sh"
 # default values
 env=local
 root=$CDCTI_HOME/examples/
-client=report-stream
+content_type=application/fhir+ndjson
+sender=report-stream
 
 show_usage() {
     cat <<EOF
@@ -16,12 +17,13 @@ ENDPOINT_NAME:
     The name of the endpoint to call (required)
 
 Options:
-    -f <REL_PATH>       Path to the hl7/fhir file to submit (Required for orders and results APIs)
-    -r <ROOT_PATH>      Root path to the hl7/fhir files (Default: $root)
+    -f <REL_PATH>       Path to the fhir file to submit (Required for orders and results APIs)
+    -r <ROOT_PATH>      Root path to the fhir files (Default: $root)
     -e <ENVIRONMENT>    Environment: local|staging (Default: $env)
-    -c <CLIENT>         Client ID to create JWT with (Default: $client)
-    -k <KEY_PATH>       Path to the client private key (Required for non-local environments)
+    -k <KEY_PATH>       Path to the sender private key (Required for non-local environments)
     -i <SUBMISSION_ID>  Submission ID for metadata API (Required for orders, results and metadata API)
+    -s <SENDER>         Sender ID to create JWT with (Default: $sender)
+    -t <CONTENT_TYPE>   Content type for the message (Default: $content_type)
     -v                  Verbose mode
     -h                  Display this help and exit
 EOF
@@ -37,14 +39,14 @@ parse_arguments() {
     hurl_file_path="$CDCTI_HOME/scripts/hurl/ti/$1.hurl"
     shift # Remove endpoint name from args
 
-    while getopts ':f:r:e:c:k:i:v' opt; do
+    while getopts ':f:r:e:k:i:s:t:v' opt; do
         case "$opt" in
         f) fpath="$OPTARG" ;;
         r) root="$OPTARG" ;;
         e) env="$OPTARG" ;;
-        c) client="$OPTARG" ;;
         k) private_key="$OPTARG" ;;
         i) submission_id="--variable submissionid=$OPTARG" ;;
+        s) sender="$OPTARG" ;;
         v) verbose="--verbose" ;;
         ?) fail "Invalid option -$OPTARG" ;;
         esac
@@ -55,31 +57,31 @@ parse_arguments() {
 }
 
 setup_credentials() {
-    if [ -z "$private_key" ] && [ "$client" = "report-stream" ] && [ "$env" = "local" ]; then
+    if [ -z "$private_key" ] && [ "$sender" = "report-stream" ] && [ "$env" = "local" ]; then
         if [ -f "$RS_LOCAL_PRIVATE_KEY_PATH" ]; then
             private_key="$RS_LOCAL_PRIVATE_KEY_PATH"
         else
-            fail "Local environment client private key not found at: $RS_LOCAL_PRIVATE_KEY_PATH"
+            fail "Local environment sender private key not found at: $RS_LOCAL_PRIVATE_KEY_PATH"
         fi
     fi
 
     if [ "$env" != "local" ]; then
-        [ -z "$private_key" ] && fail "Client private key (-k) is required for non-local environments"
+        [ -z "$private_key" ] && fail "Sender private key (-k) is required for non-local environments"
     fi
 
-    [ ! -f "$private_key" ] && fail "Client private key file not found: $private_key"
+    [ ! -f "$private_key" ] && fail "Sender private key file not found: $private_key"
 }
 
 run_hurl_command() {
     url=$(get_api_url "$env" "ti")
     host=$(extract_host_from_url "$url")
-    jwt_token=$(generate_jwt "$client" "$host" "$private_key") || fail "Failed to generate JWT token"
+    jwt_token=$(generate_jwt "$sender" "$host" "$private_key") || fail "Failed to generate JWT token"
 
     hurl \
         --variable "fpath=$fpath" \
         --file-root "$root" \
         --variable "url=$url" \
-        --variable "client=$client" \
+        --variable "sender=$sender" \
         --variable "jwt=$jwt_token" \
         ${submission_id:-} \
         ${verbose:-} \
