@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.external.hapi
 
 import ca.uhn.hl7v2.model.Message
+import ca.uhn.hl7v2.HL7Exception
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.rse2e.HL7FileStream
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
@@ -70,7 +71,7 @@ class HapiHL7FileMatcherTest extends Specification {
         file2MshSegment == result[file2Msh10].encode().trim()
     }
 
-    def "should log an error and continue when MSH-10 is empty"() {
+    def "should throw IllegalArgumentException when MSH-10 is empty"() {
         given:
         def msh1to9 = "MSH|^~\\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-lab-id^DNS|20230101010000-0000||ORM^O01^ORM_O01|"
         def msh11to12 = "|T|2.5.1"
@@ -80,23 +81,21 @@ class HapiHL7FileMatcherTest extends Specification {
         def hl7FileStream = new HL7FileStream("file1", inputStream)
 
         when:
-        def result = fileMatcher.mapMessageByControlId([hl7FileStream])
+        fileMatcher.mapMessageByControlId([hl7FileStream])
 
         then:
-        result.size() == 0
-        1 * mockLogger.logError({ it.contains("MSH-10 is empty") })
+        thrown(IllegalArgumentException)
     }
 
-    def "should log an error when not able to parse the file as HL7 message"() {
+    def "should throw HL7Exception when not able to parse the file as HL7 message"() {
         given:
         def inputStream = new ByteArrayInputStream("".bytes)
         def hl7FileStream = new HL7FileStream("badFile", inputStream)
 
         when:
-        def result = fileMatcher.mapMessageByControlId([hl7FileStream])
+        fileMatcher.mapMessageByControlId([hl7FileStream])
 
         then:
-        result.size() == 0
-        1 * mockLogger.logError({ it.contains("An error occurred while parsing the message") }, _ as Exception)
+        thrown(HL7Exception)
     }
 }

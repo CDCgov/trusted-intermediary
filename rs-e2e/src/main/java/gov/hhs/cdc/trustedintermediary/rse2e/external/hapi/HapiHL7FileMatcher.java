@@ -35,7 +35,8 @@ public class HapiHL7FileMatcher {
     }
 
     public Map<Message, Message> matchFiles(
-            List<HL7FileStream> outputFiles, List<HL7FileStream> inputFiles) {
+            List<HL7FileStream> outputFiles, List<HL7FileStream> inputFiles)
+            throws HL7Exception, IOException {
         // We pair up output and input files based on the control ID, which is in MSH-10
         // Any files (either input or output) that don't have a match are logged
         Map<String, Message> inputMap = mapMessageByControlId(inputFiles);
@@ -67,7 +68,8 @@ public class HapiHL7FileMatcher {
         return messageMap;
     }
 
-    public Map<String, Message> mapMessageByControlId(List<HL7FileStream> files) {
+    public Map<String, Message> mapMessageByControlId(List<HL7FileStream> files)
+            throws HL7Exception, IOException {
 
         Map<String, Message> messageMap = new HashMap<>();
 
@@ -75,25 +77,23 @@ public class HapiHL7FileMatcher {
             Parser parser = context.getPipeParser();
 
             for (HL7FileStream hl7FileStream : files) {
+                String fileName = hl7FileStream.fileName();
                 try (InputStream inputStream = hl7FileStream.inputStream()) {
                     String content = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
                     Message message = parser.parse(content);
                     MSH mshSegment = (MSH) message.get("MSH");
                     String msh10 = mshSegment.getMessageControlID().getValue();
                     if (msh10 == null || msh10.isEmpty()) {
-                        logger.logError("MSH-10 is empty for : " + hl7FileStream.fileName());
-                        continue;
+                        throw new IllegalArgumentException(
+                                String.format("MSH-10 is empty for file: %s", fileName));
                     }
                     messageMap.put(msh10, message);
-                } catch (IOException | HL7Exception e) {
-                    logger.logError(
-                            "An error occurred while parsing the message: "
-                                    + hl7FileStream.fileName(),
+                } catch (HL7Exception e) {
+                    throw new HL7Exception(
+                            String.format("Failed to parse HL7 message from file: %s", fileName),
                             e);
                 }
             }
-        } catch (IOException e) {
-            logger.logError("An error occurred while constructing the DefaultHapiContext", e);
         }
 
         return messageMap;
