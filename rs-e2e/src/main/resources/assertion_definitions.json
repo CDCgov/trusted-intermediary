@@ -75,7 +75,7 @@
         "MSH-10 = '007'"
       ],
       "rules": [
-        "OBX-3.1 = 'PLT3293",
+        "OBX-3.1 = 'PLT3293'",
         "OBX-3.2 = 'SMN1 exon 7 deletion analysis in DBS by Sequencing'",
         "OBX-3.3 = 'PLT'",
         "OBX-3.4 = input.OBX-3.4",
