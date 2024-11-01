@@ -1,6 +1,8 @@
 #!/bin/bash
 
-source ./utils.sh
+[ -z "${CDCTI_HOME}" ] && echo "Error: Environment variable CDCTI_HOME is not set. Please refer to /scripts/README.md for instructions" && exit 1
+source "$CDCTI_HOME/scripts/lib/common.sh"
+source "$CDCTI_HOME/scripts/lib/submission-utils.sh"
 
 env="local"
 
@@ -10,7 +12,7 @@ Usage: $(basename "$0") -f <message_file.hl7> [-e <environment>]
 
 Options:
     -f <FILE>                   Message file path (Required)
-    -e <ENVIRONMENT>            Environment: local|staging|production (Default: $DEFAULT_ENV)
+    -e <ENVIRONMENT>            Environment: local|staging|production (Default: $env)
     -x <RS_CLIENT_PRIVATE_KEY>  Path to the client private key for authentication with RS API (Required for non-local environments)
     -z <TI_CLIENT_PRIVATE_KEY>  Path to the client private key for authentication with TI API (Optional for all environments)
     -h                          Display this help and exit
@@ -46,7 +48,7 @@ parse_arguments() {
 setup_credentials() {
     # Handle RS client key
     if [ "$env" = "local" ] && [ -z "$rs_client_private_key" ]; then
-        rs_client_private_key="$RS_CLIENT_LOCAL_PRIVATE_KEY_PATH"
+        rs_client_private_key="$TI_LOCAL_PRIVATE_KEY_PATH"
     fi
 
     [ "$env" != "local" ] && [ -z "$rs_client_private_key" ] && fail "RS client private key (-x) is required for non-local environments"
@@ -54,7 +56,7 @@ setup_credentials() {
 
     # Handle optional TI client key
     if [ "$env" = "local" ] && [ -z "$ti_client_private_key" ]; then
-        ti_client_private_key="$TI_CLIENT_LOCAL_PRIVATE_KEY_PATH"
+        ti_client_private_key="$RS_LOCAL_PRIVATE_KEY_PATH"
     fi
 
     # Only verify TI key if provided

@@ -1,6 +1,7 @@
 #!/bin/bash
 
-source ./utils.sh
+[ -z "${CDCTI_HOME}" ] && echo "Error: Environment variable CDCTI_HOME is not set. Please refer to /scripts/README.md for instructions" && exit 1
+source "$CDCTI_HOME/scripts/lib/common.sh"
 
 # default values
 env=local
@@ -9,7 +10,7 @@ client=report-stream
 
 show_usage() {
     cat <<EOF
-Usage: $(basename "$0") <ENDPOINT_NAME> [OPTIONS]
+Usage: ./$(basename "$0") <ENDPOINT_NAME> [OPTIONS]
 
 ENDPOINT_NAME:
     The name of the endpoint to call (required)
@@ -23,9 +24,6 @@ Options:
     -i <SUBMISSION_ID>  Submission ID for metadata API (Required for orders, results and metadata API)
     -v                  Verbose mode
     -h                  Display this help and exit
-
-Environment Variables:
-    CDCTI_HOME          Base directory for CDC TI repository (Required)
 EOF
 }
 
@@ -36,7 +34,7 @@ parse_arguments() {
     fi
 
     [ $# -eq 0 ] && fail "Missing required argument <ENDPOINT_NAME>"
-    endpoint_name="ti/$1.hurl"
+    hurl_file_path="$CDCTI_HOME/scripts/hurl/ti/$1.hurl"
     shift # Remove endpoint name from args
 
     while getopts ':f:r:e:c:k:i:v' opt; do
@@ -52,16 +50,16 @@ parse_arguments() {
         esac
     done
 
-    shift "$(($OPTIND - 1))"
+    shift "$((OPTIND - 1))"
     remaining_args="$*"
 }
 
 setup_credentials() {
     if [ -z "$private_key" ] && [ "$client" = "report-stream" ] && [ "$env" = "local" ]; then
-        if [ -f "$TI_CLIENT_LOCAL_PRIVATE_KEY_PATH" ]; then
-            private_key="$TI_CLIENT_LOCAL_PRIVATE_KEY_PATH"
+        if [ -f "$RS_LOCAL_PRIVATE_KEY_PATH" ]; then
+            private_key="$RS_LOCAL_PRIVATE_KEY_PATH"
         else
-            fail "Local environment client private key not found at: $TI_CLIENT_LOCAL_PRIVATE_KEY_PATH"
+            fail "Local environment client private key not found at: $RS_LOCAL_PRIVATE_KEY_PATH"
         fi
     fi
 
@@ -85,11 +83,10 @@ run_hurl_command() {
         --variable "jwt=$jwt_token" \
         ${submission_id:-} \
         ${verbose:-} \
-        "$endpoint_name" \
+        "$hurl_file_path" \
         ${remaining_args:+$remaining_args}
 }
 
-check_env_vars CDCTI_HOME
 parse_arguments "$@"
 setup_credentials
 run_hurl_command
