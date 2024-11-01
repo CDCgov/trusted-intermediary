@@ -6,8 +6,8 @@ import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v251.segment.MSH;
 import ca.uhn.hl7v2.parser.Parser;
+import com.google.common.collect.Sets;
 import gov.hhs.cdc.trustedintermediary.rse2e.HL7FileStream;
-import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -15,8 +15,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
-import javax.inject.Inject;
+import java.util.stream.Collectors;
 
 /**
  * The HapiHL7FileMatcher class is responsible for matching input and output HL7 files based on the
@@ -25,8 +26,6 @@ import javax.inject.Inject;
 public class HapiHL7FileMatcher {
 
     private static final HapiHL7FileMatcher INSTANCE = new HapiHL7FileMatcher();
-
-    @Inject Logger logger;
 
     private HapiHL7FileMatcher() {}
 
@@ -42,30 +41,19 @@ public class HapiHL7FileMatcher {
         Map<String, Message> inputMap = mapMessageByControlId(inputFiles);
         Map<String, Message> outputMap = mapMessageByControlId(outputFiles);
 
-        Set<String> unmatchedInputKeys = new HashSet<>(inputMap.keySet());
-        unmatchedInputKeys.removeAll(outputMap.keySet());
-
-        Set<String> unmatchedOutputKeys = new HashSet<>(outputMap.keySet());
-        unmatchedOutputKeys.removeAll(inputMap.keySet());
-
+        Set<String> inputKeys = inputMap.keySet();
+        Set<String> outputKeys = outputMap.keySet();
         Set<String> unmatchedKeys = new HashSet<>();
-        unmatchedKeys.addAll(unmatchedInputKeys);
-        unmatchedKeys.addAll(unmatchedOutputKeys);
+        unmatchedKeys.addAll(Sets.difference(inputKeys, outputKeys)); // in input but not output
+        unmatchedKeys.addAll(Sets.difference(outputKeys, inputKeys)); // in output but not input
 
         if (!unmatchedKeys.isEmpty()) {
-            logger.logError(
-                    "Found no match for the following messages with MSH-10: " + unmatchedKeys);
+            throw new NoSuchElementException(
+                    "Found no match for messages with the following MSH-10 values: "
+                            + unmatchedKeys);
         }
 
-        Map<Message, Message> messageMap = new HashMap<>();
-        inputMap.keySet().retainAll(outputMap.keySet());
-        inputMap.forEach(
-                (key, inputMessage) -> {
-                    Message outputMessage = outputMap.get(key);
-                    messageMap.put(inputMessage, outputMessage);
-                });
-
-        return messageMap;
+        return inputKeys.stream().collect(Collectors.toMap(inputMap::get, outputMap::get));
     }
 
     public Map<String, Message> mapMessageByControlId(List<HL7FileStream> files)
