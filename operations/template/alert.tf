@@ -223,17 +223,16 @@ resource "azurerm_monitor_metric_alert" "ti_memory_alert" {
   resource_group_name = data.azurerm_resource_group.group.name
   description         = "Alert when memory usage is high on CDC TI."
   severity            = 2
-  enabled             = true
   frequency           = "PT5M"
   window_size         = "PT15M"
   scopes              = ["/subscriptions/${data.azurerm_client_config.current.subscription_id}"]
 
-  criteria {
-    metric_name      = "Percentage Memory"
-    metric_namespace = "Microsoft.Compute/virtualMachines"
-    aggregation      = "Average"
-    operator         = "GreaterThan"
-    threshold        = 80
+  dynamic_criteria {
+    metric_name       = "MemoryWorkingSet"
+    metric_namespace  = "Microsoft.Web/sites"
+    aggregation       = "Average"
+    operator          = "GreaterThan"
+    alert_sensitivity = "Medium"
   }
 
   action {
