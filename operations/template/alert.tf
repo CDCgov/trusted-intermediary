@@ -217,19 +217,24 @@ resource "azurerm_monitor_metric_alert" "azure_5XX_alert" {
   }
 }
 
-resource "azurerm_monitor_metric_alertrule" "ti-memory_alert" {
+resource "azurerm_monitor_metric_alert" "ti_memory_alert" {
   count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti-${var.environment}-memory-alert"
   resource_group_name = data.azurerm_resource_group.group.name
-  location            = data.azurerm_resource_group.group.location
   description         = "Alert when memory usage is high on CDC TI."
-  period              = "PT5M"
+  severity            = 2
+  enabled             = true
+  frequency           = "PT5M"
+  window_size         = "PT15M"
+  scopes              = ["/subscriptions/${data.azurerm_client_config.current.subscription_id}"]
 
-  metric_name         = "PercentageMemory"
-  metric_namespace    = "Microsoft.Compute/virtualMachines"
-  operator            = "GreaterThan"
-  threshold           = 80
-
+  criteria {
+    metric_name      = "Percentage Memory"
+    metric_namespace = "Microsoft.Compute/virtualMachines"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = 80
+  }
 
   action {
     action_group_id = azurerm_monitor_action_group.notify_slack_email[count.index].id
