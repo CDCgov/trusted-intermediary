@@ -226,6 +226,7 @@ resource "azurerm_monitor_metric_alert" "ti_memory_alert" {
   frequency           = "PT5M"
   window_size         = "PT15M"
   scopes              = ["/subscriptions/${data.azurerm_client_config.current.subscription_id}"]
+  target_resource_type= "Microsoft.Web/sites"
 
   dynamic_criteria {
     metric_name       = "MemoryWorkingSet"
