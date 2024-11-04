@@ -232,7 +232,7 @@ resource "azurerm_monitor_metric_alert" "ti_memory_alert" {
     metric_namespace  = "Microsoft.Web/sites"
     aggregation       = "Average"
     operator          = "GreaterThan"
-    threshold         = local.higher_environment_level ? "4GB" : "2GB"
+    threshold         = local.higher_environment_level ? 4000000000 : 2000000000 #4gb and 2gb in bytes. This is half what the service plan allows
   }
 
   action {
