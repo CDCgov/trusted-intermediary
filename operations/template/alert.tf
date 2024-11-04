@@ -124,30 +124,43 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "database_token_expired_a
   }
 }
 
-resource "azurerm_monitor_metric_alert" "azure_4XX_alert" {
+resource "azurerm_monitor_scheduled_query_rules_alert" "azure_4XX_alert" {
   count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti-${var.environment}-azure-http-4XX-alert"
+  location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
-  scopes              = [azurerm_linux_web_app.api.id]
-  description         = "Action will be triggered when Http Status Code 4XX is greater than or equal to 3"
-  frequency           = "PT1M" // Checks every 1 minute
-  window_size         = "PT1H" // Every Check looks back 1 hour for 4xx errors
-
-  criteria {
-    metric_namespace = "Microsoft.Web/sites"
-    metric_name      = "Http4xx"
-    aggregation      = "Total"
-    operator         = "GreaterThanOrEqual"
-    threshold        = 3
-  }
 
   action {
-    action_group_id = azurerm_monitor_action_group.notify_slack_email[count.index].id
+    action_group  = [azurerm_monitor_action_group.notify_slack_email[count.index].id]
+    email_subject = "${var.environment}: TI 4xx errors detected!"
+  }
+
+  data_source_id = azurerm_linux_web_app.api.id
+  description    = "Alert when 4xx errors cross threshold"
+  enabled        = true
+
+  query = <<-QUERY
+      AppServiceHTTPLogs |
+      where CsHost !contains "pre-live" |
+      where UserAgent != "AlwaysOn" |
+      where not(CsMethod == "GET" and CsUriStem startswith "/v1/etor/") |  // ignore RS receiver status check that uses GET
+      where not(CsMethod == "GET" and CsUriStem startswith "/admin/") |  // ignore Microsoft hitting non-existent URLs
+      where ScStatus >= 400 and ScStatus < 500
+    QUERY
+
+  severity                = 3
+  frequency               = 5
+  time_window             = 60
+  auto_mitigation_enabled = true
+
+  trigger {
+    operator  = "GreaterThanOrEqual"
+    threshold = 3
   }
 
   lifecycle {
-    # Ignore changes to tags because the CDC sets these automagically
     ignore_changes = [
+      # below tags are managed by CDC
       tags["business_steward"],
       tags["center"],
       tags["environment"],

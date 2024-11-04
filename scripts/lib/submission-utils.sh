@@ -1,108 +1,5 @@
 #!/bin/bash
 
-FILE_NAME_SUFFIX_STEP_0="_0_initial_message"
-FILE_NAME_SUFFIX_STEP_1="_1_hl7_translation"
-FILE_NAME_SUFFIX_STEP_2="_2_fhir_transformation"
-FILE_NAME_SUFFIX_STEP_3="_3_hl7_translation_final"
-
-AZURITE_CONNECTION_STRING="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://localhost:10000/devstoreaccount1;" # pragma: allowlist secret
-
-RS_API_LCL_URL="http://localhost:7071"
-RS_API_STG_URL="https://staging.prime.cdc.gov:443"
-RS_API_PRD_URL="https://prime.cdc.gov:443"
-TI_API_LCL_URL="http://localhost:8080"
-TI_API_STG_URL="https://cdcti-stg-api.azurewebsites.net:443"
-TI_API_PRD_URL="https://cdcti-prd-api.azurewebsites.net:443"
-
-RS_CLIENT_LOCAL_PRIVATE_KEY_PATH="$CDCTI_HOME/mock_credentials/organization-trusted-intermediary-private-key-local.pem"
-TI_CLIENT_LOCAL_PRIVATE_KEY_PATH="$CDCTI_HOME/mock_credentials/organization-report-stream-private-key-local.pem"
-
-fail() {
-    echo "Error: $1" >&2
-    exit 1
-}
-
-check_installed_commands() {
-    for cmd in "$@"; do
-        if ! command -v "$cmd" &>/dev/null; then
-            echo "$cmd could not be found. Please install $cmd to proceed."
-            exit 1
-        fi
-    done
-}
-
-check_apis() {
-    for service in "$@"; do
-        if ! curl -s --head --fail "$service" | grep "200 OK" >/dev/null; then
-            echo "The service at $service is not reachable"
-            exit 1
-        fi
-    done
-}
-
-check_env_vars() {
-    local env_vars=("$@")
-    for var in "${env_vars[@]}"; do
-        if [ -z "${!var}" ]; then
-            echo "Error: Environment variable '$var' is not set"
-            exit 1
-        fi
-    done
-}
-
-get_api_url() {
-    local env=$1
-    local type=$2
-
-    case "$type" in
-    "rs")
-        case "$env" in
-        "local") echo $RS_API_LCL_URL ;;
-        "staging") echo $RS_API_STG_URL ;;
-        "production") echo $RS_API_PRD_URL ;;
-        *)
-            echo "Invalid environment: $env" >&2
-            exit 1
-            ;;
-        esac
-        ;;
-    "ti")
-        case "$env" in
-        "local") echo $TI_API_LCL_URL ;;
-        "staging") echo $TI_API_STG_URL ;;
-        "production") echo $TI_API_PRD_URL ;;
-        *)
-            echo "Invalid environment: $env" >&2
-            exit 1
-            ;;
-        esac
-        ;;
-    esac
-}
-
-extract_host_from_url() {
-    local url=$1
-    echo "$url" | sed 's|^.*://\([^/:]*\)[:/].*|\1|'
-}
-
-generate_jwt() {
-    # requires: jwt-cli
-    local client=$1
-    local audience=$2
-    local secret_path=$3
-
-    jwt encode \
-        --exp='+5min' \
-        --jti "$(uuidgen)" \
-        --alg RS256 \
-        -k "$client" \
-        -i "$client" \
-        -s "$client" \
-        -a "$audience" \
-        --no-iat \
-        -S "@$secret_path"
-}
-
 extract_rs_history_submission_id() {
     # requires: jq
     local history_response=$1
@@ -153,7 +50,7 @@ check_submission_status() {
     start_time=$(date +%s)
 
     while true; do
-        history_response=$(./rs.sh history -i "$submission_id" -e "$env" -k "$private_key") || {
+        history_response=$("$CDCTI_HOME"/scripts/rs.sh history -i "$submission_id" -e "$env" -k "$private_key") || {
             exit_code=$?
             if [ $exit_code -ne 0 ]; then
                 fail "Expected exit code 0 but got $exit_code for RS history API call"
@@ -212,7 +109,7 @@ submit_message() {
 
     echo "Assuming receivers are '$first_leg_receiver' and '$second_leg_receiver' because of MSH-9 value '$msh9'"
 
-    waters_response=$(./rs.sh waters -f "$message_file_name" -r "$message_file_path" -e "$env" -k "$rs_client_private_key") || {
+    waters_response=$("$CDCTI_HOME"/scripts/rs.sh waters -f "$message_file_name" -r "$message_file_path" -e "$env" -k "$rs_client_private_key") || {
         exit_code=$?
         if [ $exit_code -ne 0 ]; then
             fail "Expected exit code 0 but got $exit_code for RS waters API call"
@@ -239,7 +136,7 @@ submit_message() {
     echo "[Intermediary] Getting outbound submission ID"
     if [ -n "$ti_client_private_key" ]; then
         echo "  Attempting to get outbound submission ID from TI's metadata API..."
-        metadata_response=$(./ti.sh metadata -i "$inbound_submission_id" -e "$env" -k "$ti_client_private_key") || {
+        metadata_response=$("$CDCTI_HOME"/scripts/ti.sh metadata -i "$inbound_submission_id" -e "$env" -k "$ti_client_private_key") || {
             echo "Failed to get metadata for inbound submission ID: $inbound_submission_id"
             outbound_submission_id=""
         }
