@@ -1,7 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.external.hapi
 
 import ca.uhn.hl7v2.model.Message
-import ca.uhn.hl7v2.HL7Exception
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.rse2e.HL7FileStream
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
@@ -21,28 +20,75 @@ class HapiHL7FileMatcherTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
     }
 
-    def "should correctly match input and output files and log unmatched files"() {
+    def "should correctly match input and output files"() {
         given:
         def spyFileMatcher = Spy(HapiHL7FileMatcher.getInstance())
-        def fileStream1 = new HL7FileStream("file1", Mock(InputStream))
-        def fileStream2 = new HL7FileStream("file2", Mock(InputStream))
-        def fileStream3 = new HL7FileStream("file3", Mock(InputStream))
-        def mockInputFiles = [fileStream1, fileStream2]
-        def mockOutputFiles = [fileStream2, fileStream3]
+        def mockInputFiles = [
+            new HL7FileStream("inputFileStream1", Mock(InputStream)),
+            new HL7FileStream("inputFileStream2", Mock(InputStream))
+        ]
+        def mockOutputFiles = [
+            new HL7FileStream("outputFileStream1", Mock(InputStream)),
+            new HL7FileStream("outputFileStream2", Mock(InputStream))
+        ]
+        def mockInputMessage1 = Mock(Message)
         def mockInputMessage2 = Mock(Message)
+        def mockOutputMessage1 = Mock(Message)
         def mockOutputMessage2 = Mock(Message)
-        spyFileMatcher.mapMessageByControlId(mockInputFiles) >> [ "1": Mock(Message), "2": mockInputMessage2 ]
-        spyFileMatcher.mapMessageByControlId(mockOutputFiles) >> [ "2": mockOutputMessage2, "3": Mock(Message) ]
+        spyFileMatcher.mapMessageByControlId(mockInputFiles) >> [ "001": mockInputMessage1, "002": mockInputMessage2 ]
+        spyFileMatcher.mapMessageByControlId(mockOutputFiles) >> [ "001": mockOutputMessage1, "002": mockOutputMessage2 ]
 
         when:
+        def result =spyFileMatcher.matchFiles(mockOutputFiles, mockInputFiles)
+
+        then:
+        result.size() == 2
+        result == Map.of(mockInputMessage1, mockOutputMessage1, mockInputMessage2, mockOutputMessage2)
+    }
+
+
+    def "should throw HapiHL7FileMatcherException if didn't find a match for at least one file in either input or output"() {
+        given:
+        def mockInputFiles
+        def mockOutputFiles
+        def spyFileMatcher = Spy(HapiHL7FileMatcher.getInstance())
+
+        when:
+        mockInputFiles = [
+            new HL7FileStream("nonMatchingInputFileStream", Mock(InputStream)),
+            new HL7FileStream("matchingInputFileStream", Mock(InputStream))
+        ]
+        mockOutputFiles = [
+            new HL7FileStream("matchingOutputFileStream", Mock(InputStream))
+        ]
+        spyFileMatcher.mapMessageByControlId(mockInputFiles) >> [ "001": Mock(Message), "002": Mock(Message) ]
+        spyFileMatcher.mapMessageByControlId(mockOutputFiles) >> [ "001": Mock(Message) ]
         spyFileMatcher.matchFiles(mockOutputFiles, mockInputFiles)
 
         then:
-        def exception = thrown(NoSuchElementException)
-        with(exception.getMessage()) {
+        def nonMatchingInputException = thrown(HapiHL7FileMatcherException)
+        with(nonMatchingInputException.getMessage()) {
             contains("Found no match")
-            contains("1")
-            contains("3")
+            contains("002")
+        }
+
+        when:
+        mockInputFiles = [
+            new HL7FileStream("matchingInputFileStream", Mock(InputStream))
+        ]
+        mockOutputFiles = [
+            new HL7FileStream("matchingOutputFileStream", Mock(InputStream)),
+            new HL7FileStream("nonMatchingOutputFileStream", Mock(InputStream))
+        ]
+        spyFileMatcher.mapMessageByControlId(mockInputFiles) >> [ "001": Mock(Message) ]
+        spyFileMatcher.mapMessageByControlId(mockOutputFiles) >> [ "001": Mock(Message), "003": Mock(Message) ]
+        spyFileMatcher.matchFiles(mockOutputFiles, mockInputFiles)
+
+        then:
+        def nonMatchingOutputException = thrown(HapiHL7FileMatcherException)
+        with(nonMatchingOutputException.getMessage()) {
+            contains("Found no match")
+            contains("003")
         }
     }
 
@@ -74,7 +120,7 @@ class HapiHL7FileMatcherTest extends Specification {
         file2MshSegment == result[file2Msh10].encode().trim()
     }
 
-    def "should throw IllegalArgumentException when MSH-10 is empty"() {
+    def "should throw HapiHL7FileMatcherException when MSH-10 is empty"() {
         given:
         def msh1to9 = "MSH|^~\\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-lab-id^DNS|20230101010000-0000||ORM^O01^ORM_O01|"
         def msh11to12 = "|T|2.5.1"
@@ -87,10 +133,10 @@ class HapiHL7FileMatcherTest extends Specification {
         fileMatcher.mapMessageByControlId([hl7FileStream])
 
         then:
-        thrown(IllegalArgumentException)
+        thrown(HapiHL7FileMatcherException)
     }
 
-    def "should throw HL7Exception when not able to parse the file as HL7 message"() {
+    def "should throw HapiHL7FileMatcherException when not able to parse the file as HL7 message"() {
         given:
         def inputStream = new ByteArrayInputStream("".bytes)
         def hl7FileStream = new HL7FileStream("badFile", inputStream)
@@ -99,6 +145,6 @@ class HapiHL7FileMatcherTest extends Specification {
         fileMatcher.mapMessageByControlId([hl7FileStream])
 
         then:
-        thrown(HL7Exception)
+        thrown(HapiHL7FileMatcherException)
     }
 }

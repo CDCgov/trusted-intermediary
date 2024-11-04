@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,7 +34,7 @@ public class HapiHL7FileMatcher {
 
     public Map<Message, Message> matchFiles(
             List<HL7FileStream> outputFiles, List<HL7FileStream> inputFiles)
-            throws HL7Exception, IOException {
+            throws HapiHL7FileMatcherException {
         // We pair up output and input files based on the control ID, which is in MSH-10
         // Any files (either input or output) that don't have a match are logged
         Map<String, Message> inputMap = mapMessageByControlId(inputFiles);
@@ -48,7 +47,7 @@ public class HapiHL7FileMatcher {
         unmatchedKeys.addAll(Sets.difference(outputKeys, inputKeys));
 
         if (!unmatchedKeys.isEmpty()) {
-            throw new NoSuchElementException(
+            throw new HapiHL7FileMatcherException(
                     "Found no match for messages with the following MSH-10 values: "
                             + unmatchedKeys);
         }
@@ -57,7 +56,7 @@ public class HapiHL7FileMatcher {
     }
 
     public Map<String, Message> mapMessageByControlId(List<HL7FileStream> files)
-            throws HL7Exception, IOException {
+            throws HapiHL7FileMatcherException {
 
         Map<String, Message> messageMap = new HashMap<>();
 
@@ -72,16 +71,21 @@ public class HapiHL7FileMatcher {
                     MSH mshSegment = (MSH) message.get("MSH");
                     String msh10 = mshSegment.getMessageControlID().getValue();
                     if (msh10 == null || msh10.isEmpty()) {
-                        throw new IllegalArgumentException(
+                        throw new HapiHL7FileMatcherException(
                                 String.format("MSH-10 is empty for file: %s", fileName));
                     }
                     messageMap.put(msh10, message);
                 } catch (HL7Exception e) {
-                    throw new HL7Exception(
+                    throw new HapiHL7FileMatcherException(
                             String.format("Failed to parse HL7 message from file: %s", fileName),
                             e);
+                } catch (IOException e) {
+                    throw new HapiHL7FileMatcherException(
+                            String.format("Failed to read file: %s", fileName), e);
                 }
             }
+        } catch (IOException e) {
+            throw new HapiHL7FileMatcherException("Failed to close input stream", e);
         }
 
         return messageMap;
