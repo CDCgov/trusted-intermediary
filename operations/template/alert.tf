@@ -221,11 +221,11 @@ resource "azurerm_monitor_metric_alert" "ti_memory_alert" {
   count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti-${var.environment}-memory-alert"
   resource_group_name = data.azurerm_resource_group.group.name
+  scopes              = [azurerm_linux_web_app.api.id]
   description         = "Alert when memory usage is high on CDC TI."
   severity            = 2
   frequency           = "PT5M"
   window_size         = "PT15M"
-  scopes              = [azurerm_linux_web_app.api.id]
 
   dynamic_criteria {
     metric_name       = "MemoryWorkingSet"
