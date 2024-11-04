@@ -217,6 +217,47 @@ resource "azurerm_monitor_metric_alert" "azure_5XX_alert" {
   }
 }
 
+resource "azurerm_monitor_metric_alert" "ti_dynamic_memory_alert" {
+  count               = local.non_pr_environment ? 1 : 0
+  name                = "cdcti-${var.environment}-memory-alert"
+  resource_group_name = data.azurerm_resource_group.group.name
+  scopes              = [azurerm_linux_web_app.api.id]
+  description         = "Alert when memory usage is high on CDC TI."
+  severity            = 2
+  frequency           = "PT5M"
+  window_size         = "PT15M"
+
+  dynamic_criteria {
+    metric_name       = "MemoryWorkingSet"
+    metric_namespace  = "Microsoft.Web/sites"
+    aggregation       = "Average"
+    operator          = "GreaterThan"
+    alert_sensitivity = "Medium"
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.notify_slack_email[count.index].id
+  }
+
+  lifecycle {
+    # Ignore changes to tags because the CDC sets these automagically
+    ignore_changes = [
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
+    ]
+  }
+}
+
 resource "azurerm_monitor_metric_alert" "ti_memory_alert" {
   count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti-${var.environment}-memory-alert"
