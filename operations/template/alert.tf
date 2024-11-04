@@ -227,12 +227,12 @@ resource "azurerm_monitor_metric_alert" "ti_memory_alert" {
   frequency           = "PT5M"
   window_size         = "PT15M"
 
-  dynamic_criteria {
+  criteria {
     metric_name       = "MemoryWorkingSet"
     metric_namespace  = "Microsoft.Web/sites"
     aggregation       = "Average"
     operator          = "GreaterThan"
-    alert_sensitivity = "Medium"
+    threshold         = local.higher_environment_level ? "4GB" : "2GB"
   }
 
   action {
