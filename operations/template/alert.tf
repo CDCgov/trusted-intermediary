@@ -219,7 +219,7 @@ resource "azurerm_monitor_metric_alert" "azure_5XX_alert" {
 
 resource "azurerm_monitor_metric_alert" "ti_dynamic_memory_alert" {
   count               = local.non_pr_environment ? 1 : 0
-  name                = "cdcti-${var.environment}-memory-alert"
+  name                = "cdcti-${var.environment}-dynamic-memory-alert"
   resource_group_name = data.azurerm_resource_group.group.name
   scopes              = [azurerm_linux_web_app.api.id]
   description         = "Alert when memory usage is high on CDC TI."
