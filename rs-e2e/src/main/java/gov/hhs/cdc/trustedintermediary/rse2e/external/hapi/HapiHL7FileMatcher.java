@@ -44,8 +44,8 @@ public class HapiHL7FileMatcher {
         Set<String> inputKeys = inputMap.keySet();
         Set<String> outputKeys = outputMap.keySet();
         Set<String> unmatchedKeys = new HashSet<>();
-        unmatchedKeys.addAll(Sets.difference(inputKeys, outputKeys)); // in input but not output
-        unmatchedKeys.addAll(Sets.difference(outputKeys, inputKeys)); // in output but not input
+        unmatchedKeys.addAll(Sets.difference(inputKeys, outputKeys));
+        unmatchedKeys.addAll(Sets.difference(outputKeys, inputKeys));
 
         if (!unmatchedKeys.isEmpty()) {
             throw new NoSuchElementException(

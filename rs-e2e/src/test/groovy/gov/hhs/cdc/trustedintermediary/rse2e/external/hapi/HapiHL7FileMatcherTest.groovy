@@ -35,12 +35,15 @@ class HapiHL7FileMatcherTest extends Specification {
         spyFileMatcher.mapMessageByControlId(mockOutputFiles) >> [ "2": mockOutputMessage2, "3": Mock(Message) ]
 
         when:
-        def result = spyFileMatcher.matchFiles(mockOutputFiles, mockInputFiles)
+        spyFileMatcher.matchFiles(mockOutputFiles, mockInputFiles)
 
         then:
-        result.size() == 1
-        result == Map.of(mockInputMessage2, mockOutputMessage2)
-        1 * mockLogger.logError({ it.contains("Found no match") && it.contains("1") && it.contains("3") })
+        def exception = thrown(NoSuchElementException)
+        with(exception.getMessage()) {
+            contains("Found no match")
+            contains("1")
+            contains("3")
+        }
     }
 
     def "should map message by control ID"() {
