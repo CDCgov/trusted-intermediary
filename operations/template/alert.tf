@@ -381,6 +381,47 @@ resource "azurerm_monitor_metric_alert" "cpu_alert" {
   }
 }
 
+resource "azurerm_monitor_metric_alert" "database_cpu_alert" {
+  count               = local.non_pr_environment ? 1 : 0
+  name                = "cdcti-${var.environment}-db-cpu-alert"
+  resource_group_name = data.azurerm_resource_group.group.name
+  scopes              = [azurerm_postgresql_flexible_server.database.id]
+  description         = "Alerts when the average CPU usage for the DB is high"
+  severity            = 2
+  frequency           = "PT1M"
+  window_size         = "PT15M"
+
+  criteria {
+    metric_name      = "cpu_percent"
+    metric_namespace = "Microsoft.DBforPostgreSQL/flexibleServers"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = 50
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.notify_slack_email[count.index].id
+  }
+
+  lifecycle {
+    # Ignore changes to tags because the CDC sets these automagically
+    ignore_changes = [
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
+    ]
+  }
+}
+
 resource "azurerm_monitor_metric_alert" "low_instance_count_alert" {
   count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti-${var.environment}-azure-low-instance-count-alert"
