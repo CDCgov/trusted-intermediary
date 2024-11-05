@@ -383,7 +383,7 @@ resource "azurerm_monitor_metric_alert" "cpu_alert" {
 
 resource "azurerm_monitor_metric_alert" "database_cpu_alert" {
   count               = local.non_pr_environment ? 1 : 0
-  name                = "cdcti-${var.environment}-db-cpu-alert"
+  name                = "cdcti-${var.environment}-database-cpu-alert"
   resource_group_name = data.azurerm_resource_group.group.name
   scopes              = [azurerm_postgresql_flexible_server.database.id]
   description         = "Alerts when the average CPU usage for the DB is high"
