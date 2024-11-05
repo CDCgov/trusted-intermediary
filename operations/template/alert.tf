@@ -348,7 +348,7 @@ resource "azurerm_monitor_metric_alert" "cpu_alert" {
   description         = "Alerts when the average CPU usage across the service plan is high"
   severity            = 2
   frequency           = "PT1M"
-  window_size         = "PT10M"
+  window_size         = "PT15M"
 
   criteria {
     metric_name      = "CpuPercentage"
