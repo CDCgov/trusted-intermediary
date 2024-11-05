@@ -258,6 +258,47 @@ resource "azurerm_monitor_metric_alert" "dynamic_memory_alert" {
   }
 }
 
+resource "azurerm_monitor_metric_alert" "database_memory_alert" {
+  count               = local.non_pr_environment ? 1 : 0
+  name                = "cdcti-${var.environment}-database-memory-alert"
+  resource_group_name = data.azurerm_resource_group.group.name
+  scopes              = [azurerm_postgresql_flexible_server.database.id]
+  description         = "Alert for measuring database memory usage."
+  severity            = 2
+  frequency           = "PT5M"
+  window_size         = "PT15M"
+
+  criteria {
+    metric_name      = "memory_percent"
+    metric_namespace = "microsoft.dbforpostresql/flexibleservers"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = local.higher_environment_level ? 50 : 80
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.notify_slack_email[count.index].id
+  }
+
+  lifecycle {
+    # Ignore changes to tags because the CDC sets these automagically
+    ignore_changes = [
+      tags["business_steward"],
+      tags["center"],
+      tags["environment"],
+      tags["escid"],
+      tags["funding_source"],
+      tags["pii_data"],
+      tags["security_compliance"],
+      tags["security_steward"],
+      tags["support_group"],
+      tags["system"],
+      tags["technical_steward"],
+      tags["zone"]
+    ]
+  }
+}
+
 resource "azurerm_monitor_metric_alert" "memory_alert" {
   count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti-${var.environment}-memory-alert"
