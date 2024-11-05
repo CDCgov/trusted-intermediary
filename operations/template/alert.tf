@@ -217,12 +217,12 @@ resource "azurerm_monitor_metric_alert" "azure_5XX_alert" {
   }
 }
 
-resource "azurerm_monitor_metric_alert" "ti_dynamic_memory_alert" {
+resource "azurerm_monitor_metric_alert" "dynamic_memory_alert" {
   count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti-${var.environment}-dynamic-memory-alert"
   resource_group_name = data.azurerm_resource_group.group.name
   scopes              = [azurerm_linux_web_app.api.id]
-  description         = "Alert when memory usage is high on CDC TI."
+  description         = "Monitors memory usage patterns dynamically to identify when usage exceeds acceptable thresholds."
   severity            = 2
   frequency           = "PT5M"
   window_size         = "PT15M"
@@ -258,12 +258,12 @@ resource "azurerm_monitor_metric_alert" "ti_dynamic_memory_alert" {
   }
 }
 
-resource "azurerm_monitor_metric_alert" "ti_memory_alert" {
+resource "azurerm_monitor_metric_alert" "memory_alert" {
   count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti-${var.environment}-memory-alert"
   resource_group_name = data.azurerm_resource_group.group.name
   scopes              = [azurerm_linux_web_app.api.id]
-  description         = "Alert when memory usage is high on CDC TI."
+  description         = "Alerts when memory consumption surpasses configured thresholds, indicating high resource utilization."
   severity            = 2
   frequency           = "PT5M"
   window_size         = "PT15M"
