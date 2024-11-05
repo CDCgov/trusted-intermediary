@@ -270,7 +270,7 @@ resource "azurerm_monitor_metric_alert" "database_memory_alert" {
 
   criteria {
     metric_name      = "memory_percent"
-    metric_namespace = "microsoft.dbforpostresql/flexibleservers"
+    metric_namespace = "Microsoft.DBforPostgreSQL/flexibleServers"
     aggregation      = "Average"
     operator         = "GreaterThan"
     threshold        = local.higher_environment_level ? 50 : 80
