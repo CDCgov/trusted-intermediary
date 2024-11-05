@@ -222,7 +222,7 @@ resource "azurerm_monitor_metric_alert" "dynamic_memory_alert" {
   name                = "cdcti-${var.environment}-dynamic-memory-alert"
   resource_group_name = data.azurerm_resource_group.group.name
   scopes              = [azurerm_linux_web_app.api.id]
-  description         = "Monitors memory usage patterns dynamically to identify when usage exceeds acceptable thresholds."
+  description         = "This alert checks if the backpack is starting to get heavy but does it in a way that keeps watching how much stuff is added. If it gets too full, it lets you know so you can take action before it becomes a problem."
   severity            = 2
   frequency           = "PT5M"
   window_size         = "PT15M"
@@ -263,7 +263,7 @@ resource "azurerm_monitor_metric_alert" "memory_alert" {
   name                = "cdcti-${var.environment}-memory-alert"
   resource_group_name = data.azurerm_resource_group.group.name
   scopes              = [azurerm_linux_web_app.api.id]
-  description         = "Alerts when memory consumption surpasses configured thresholds, indicating high resource utilization."
+  description         = "This alert is like a rule that says, “If the backpack gets more than half full, send a warning!” It’s more straightforward and uses a set amount to decide when to tell you. If the memory being used goes over a certain limit (like half the backpack space), it shouts, “Hey, you’re running out of room!"
   severity            = 2
   frequency           = "PT5M"
   window_size         = "PT15M"
