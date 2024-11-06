@@ -520,7 +520,7 @@ resource "azurerm_monitor_metric_alert" "api-response-time-alert" {
   count               = local.non_pr_environment ? 1 : 0
   name                = "cdcti-${var.environment}-api-response-time-alert"
   resource_group_name = data.azurerm_resource_group.group.name
-  scopes              = [azurerm_service_plan.plan.id]
+  scopes              = [azurerm_linux_web_app.api.id]
   description         = "Alerts when the average API response time across the service plan is high"
   severity            = 2
   frequency           = "PT1M"
