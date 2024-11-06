@@ -515,3 +515,26 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "ti-log-errors-alert" {
     ]
   }
 }
+
+resource "azurerm_monitor_metric_alert" "api-response-time-alert" {
+  count               = 1
+  name                = "cdcti-${var.environment}-api-response-time-alert"
+  resource_group_name = data.azurerm_resource_group.group.name
+  scopes              = [azurerm_service_plan.plan.id]
+  description         = "Alerts when the average API response time across the service plan is high"
+  severity            = 2
+  frequency           = "PT1M"
+  window_size         = "PT15M"
+
+  criteria {
+    metric_name      = "HttpResponseTime"
+    metric_namespace = "microsoft.web/sites"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = 5 # Value is in seconds
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.notify_slack_email[count.index].id
+  }
+}
