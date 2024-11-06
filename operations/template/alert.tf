@@ -528,7 +528,7 @@ resource "azurerm_monitor_metric_alert" "api-response-time-alert" {
 
   criteria {
     metric_name      = "HttpResponseTime"
-    metric_namespace = "microsoft.web/sites"
+    metric_namespace = "Microsoft.Web/serverFarms"
     aggregation      = "Average"
     operator         = "GreaterThan"
     threshold        = 5 # Value is in seconds
