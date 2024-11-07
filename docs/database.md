@@ -81,8 +81,10 @@ To revert changes in the Azure database we use The Github Actions runner.
 2. Select Run workflow
 3. Run the workflow (Example inputs below)
    - Use workflow from: Always Main
-   - Number of migrations to rollback, an integer that is specific to the file input
-   - File with migrations you want to roll back: This should be the file containing the specific sub-file in the `databaseMigrations` directory you want to rollback from EX: `./etor/databaseMigrations/metadata.yml`
+   - Number of migrations to rollback, an integer that is specific to the file input [liquibase-documentation](https://docs.liquibase.com/commands/rollback/rollback-count.html)
+   - File with migrations you want to roll back: This should be the file containing the specific sub-file in the `databaseMigrations` directory 
+     you want to rollback from. Generally you want to pick the root migration because it takes all the migrations into account so the number of 
+     migrations is applied to all the migrations. EX: `./etor/databaseMigrations/root.yml`
    - Azure environment to rollback on: Select the environment you want to see the changes reverted from
 4. Once you have the inputs entered select Run Workflow on the tab and the workflow should start up
 
