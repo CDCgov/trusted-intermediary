@@ -25,7 +25,7 @@ dependencies {
     implementation 'ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:7.4.5'
     implementation 'org.fhir:ucum:1.0.8'
 
-    testImplementation 'org.apache.groovy:groovy:4.0.23'
+    testImplementation 'org.apache.groovy:groovy:4.0.24'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
 }
 
