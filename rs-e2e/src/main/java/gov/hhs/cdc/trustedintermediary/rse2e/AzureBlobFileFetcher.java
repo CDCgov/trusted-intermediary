@@ -21,7 +21,7 @@ public class AzureBlobFileFetcher implements FileFetcher {
     private final BlobContainerClient blobContainerClient;
 
     private AzureBlobFileFetcher() {
-        String azureStorageConnectionName = "automated";
+        String azureStorageContainerName = "automated";
         String azureStorageConnectionString = System.getenv("AZURE_STORAGE_CONNECTION_STRING");
 
         if (azureStorageConnectionString == null || azureStorageConnectionString.isEmpty()) {
@@ -31,8 +31,12 @@ public class AzureBlobFileFetcher implements FileFetcher {
         this.blobContainerClient =
                 new BlobContainerClientBuilder()
                         .connectionString(azureStorageConnectionString)
-                        .containerName(azureStorageConnectionName)
+                        .containerName(azureStorageContainerName)
                         .buildClient();
+
+        AzureBlobOrganizer blobOrganizer =
+                new AzureBlobOrganizer(blobContainerClient, azureStorageContainerName);
+        blobOrganizer.organizeBlobsByDate();
     }
 
     public static FileFetcher getInstance() {
