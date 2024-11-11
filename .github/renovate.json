@@ -36,7 +36,7 @@
         },
         {
             "matchPackageNames": ["com.azure:azure-identity"],
-            "allowedVersions": "!/^1\\.14\\.0$/"
+            "allowedVersions": "!/^1\\.14\\.[0-1]$/"
         }],
     "pinDigests": false
 }
