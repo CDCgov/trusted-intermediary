@@ -168,3 +168,17 @@ databaseChangeLog:
         - dropColumn:
             tableName: metadata
             columnName: receiver
+
+  - changeSet:
+      id: 8
+      author: GilmoreA6
+      labels: test-migration-rollback
+      context: metadata
+      comment: Add columns for testing
+      changes:
+        - addColumn:
+            tableName: metadata
+            columns: # test
+              - column:
+                  name: test_column
+                  type: varchar(427)
