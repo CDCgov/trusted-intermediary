@@ -4,12 +4,22 @@ import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.BlobProperties;
+import com.azure.storage.blob.options.BlobBeginCopyOptions;
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.Map;
 
 public class AzureBlobOrganizer {
 
     private final BlobContainerClient blobContainerClient;
+
+    private static final ZoneId TIME_ZONE = ZoneOffset.UTC;
+
+    protected final Logger logger = ApplicationContext.getImplementation(Logger.class);
 
     public AzureBlobOrganizer(BlobContainerClient blobContainerClient) {
         this.blobContainerClient = blobContainerClient;
@@ -17,27 +27,48 @@ public class AzureBlobOrganizer {
 
     public void organizeAndCleanupBlobsByDate(int retentionDays) {
         for (BlobItem blobItem : blobContainerClient.listBlobs()) {
-            BlobClient blobClient = blobContainerClient.getBlobClient(blobItem.getName());
+            String sourcePath = blobItem.getName();
+            try {
+                BlobClient sourceBlob = blobContainerClient.getBlobClient(sourcePath);
+                BlobProperties sourceProperties = sourceBlob.getProperties();
+                LocalDate sourceCreationDate =
+                        sourceProperties
+                                .getCreationTime()
+                                .toInstant()
+                                .atZone(TIME_ZONE)
+                                .toLocalDate();
 
-            BlobProperties properties = blobClient.getProperties();
-            LocalDate blobDate =
-                    properties.getLastModified().toInstant().atZone(ZoneOffset.UTC).toLocalDate();
+                LocalDate retentionDate = LocalDate.now(TIME_ZONE).minusDays(retentionDays);
+                if (sourceCreationDate.isBefore(retentionDate)) {
+                    sourceBlob.delete();
+                    logger.logInfo("Deleted old blob: {}", sourcePath);
+                    continue;
+                }
 
-            LocalDate retentionDate = LocalDate.now().minusDays(retentionDays);
-            if (blobDate.isBefore(retentionDate)) {
-                blobClient.delete();
-                continue;
+                if (isInDateFolder(sourcePath, sourceCreationDate)) {
+                    continue;
+                }
+
+                String sourceUrl = sourceBlob.getBlobUrl();
+                Map<String, String> sourceMetadata = sourceProperties.getMetadata();
+                BlobBeginCopyOptions copyOptions =
+                        new BlobBeginCopyOptions(sourceUrl).setMetadata(sourceMetadata);
+
+                String destinationPath = createDateBasedPath(sourceCreationDate, sourcePath);
+                BlobClient destinationBlob = blobContainerClient.getBlobClient(destinationPath);
+                destinationBlob.beginCopy(copyOptions).waitForCompletion(Duration.ofSeconds(30));
+
+                if (sourceBlob.getProperties().getBlobSize()
+                        == destinationBlob.getProperties().getBlobSize()) {
+                    sourceBlob.delete();
+                    logger.logInfo("Moved blob {} to {}", sourcePath, destinationPath);
+                } else {
+                    destinationBlob.delete();
+                    logger.logError("Failed to copy blob: " + sourcePath);
+                }
+            } catch (Exception e) {
+                logger.logError("Error processing blob: " + sourcePath, e);
             }
-
-            if (isInDateFolder(blobItem.getName())) {
-                continue;
-            }
-
-            String newPath = createDateBasedPath(blobDate, blobClient.getBlobName());
-            BlobClient destinationBlob = blobContainerClient.getBlobClient(newPath);
-
-            destinationBlob.beginCopy(blobClient.getBlobUrl(), null);
-            blobClient.delete();
         }
     }
 
@@ -47,11 +78,13 @@ public class AzureBlobOrganizer {
                 date.getYear(), date.getMonthValue(), date.getDayOfMonth(), originalName);
     }
 
-    private boolean isInDateFolder(String blobName) {
-        String[] parts = blobName.split("/");
-        return parts.length >= 4
-                && parts[1].matches("\\d{4}")
-                && parts[2].matches("\\d{2}")
-                && parts[3].matches("\\d{2}");
+    private boolean isInDateFolder(String blobPath, LocalDate creationDate) {
+        String expectedPath =
+                String.format(
+                        "%d/%02d/%02d/",
+                        creationDate.getYear(),
+                        creationDate.getMonthValue(),
+                        creationDate.getDayOfMonth());
+        return blobPath.startsWith(expectedPath);
     }
 }

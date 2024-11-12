@@ -21,12 +21,6 @@ class AutomatedTest extends Specification  {
     def mockLogger = Mock(Logger)
 
     def setup() {
-        FileFetcher azureFileFetcher = AzureBlobFileFetcher.getInstance()
-        recentAzureFiles = azureFileFetcher.fetchFiles()
-
-        FileFetcher localFileFetcher = LocalFileFetcher.getInstance()
-        recentLocalFiles = localFileFetcher.fetchFiles()
-
         engine = AssertionRuleEngine.getInstance()
         fileMatcher =  HapiHL7FileMatcher.getInstance()
 
@@ -38,9 +32,14 @@ class AutomatedTest extends Specification  {
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.register(HapiHL7FileMatcher, fileMatcher)
         TestApplicationContext.register(HealthDataExpressionEvaluator, HapiHL7ExpressionEvaluator.getInstance())
-        TestApplicationContext.register(AzureBlobFileFetcher, azureFileFetcher)
         TestApplicationContext.register(LocalFileFetcher, LocalFileFetcher.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
+
+        FileFetcher azureFileFetcher = AzureBlobFileFetcher.getInstance()
+        recentAzureFiles = azureFileFetcher.fetchFiles()
+
+        FileFetcher localFileFetcher = LocalFileFetcher.getInstance()
+        recentLocalFiles = localFileFetcher.fetchFiles()
     }
 
     def cleanup() {
