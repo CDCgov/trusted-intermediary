@@ -23,9 +23,9 @@ public class AzureBlobOrganizer {
 
     public void organizeAndCleanupBlobsByDate(int retentionDays, ZoneId timeZone) {
         for (BlobItem blobItem : blobContainerClient.listBlobs()) {
-            String sourcePath = blobItem.getName();
+            String sourceName = blobItem.getName();
             try {
-                BlobClient sourceBlob = blobContainerClient.getBlobClient(sourcePath);
+                BlobClient sourceBlob = blobContainerClient.getBlobClient(sourceName);
                 BlobProperties sourceProperties = sourceBlob.getProperties();
                 LocalDate sourceCreationDate =
                         sourceProperties
@@ -37,17 +37,17 @@ public class AzureBlobOrganizer {
                 LocalDate retentionDate = LocalDate.now(timeZone).minusDays(retentionDays);
                 if (sourceCreationDate.isBefore(retentionDate)) {
                     sourceBlob.delete();
-                    logger.logInfo("Deleted old blob: {}", sourcePath);
+                    logger.logInfo("Deleted old blob: {}", sourceName);
                     continue;
                 }
 
-                if (AzureBlobHelper.isInDateFolder(sourcePath, sourceCreationDate)) {
+                if (AzureBlobHelper.isInDateFolder(sourceName, sourceCreationDate)) {
                     continue;
                 }
 
-                String destinationPath =
-                        AzureBlobHelper.createDateBasedPath(sourceCreationDate, sourcePath);
-                BlobClient destinationBlob = blobContainerClient.getBlobClient(destinationPath);
+                String destinationName =
+                        AzureBlobHelper.createDateBasedPath(sourceCreationDate, sourceName);
+                BlobClient destinationBlob = blobContainerClient.getBlobClient(destinationName);
                 destinationBlob
                         .beginCopy(sourceBlob.getBlobUrl(), null)
                         .waitForCompletion(Duration.ofSeconds(30));
@@ -55,13 +55,13 @@ public class AzureBlobOrganizer {
                 CopyStatusType copyStatus = destinationBlob.getProperties().getCopyStatus();
                 if (copyStatus == CopyStatusType.SUCCESS) {
                     sourceBlob.delete();
-                    logger.logInfo("Moved blob {} to {}", sourcePath, destinationPath);
+                    logger.logInfo("Moved blob {} to {}", sourceName, destinationName);
                 } else {
                     destinationBlob.delete();
-                    logger.logError("Failed to copy blob: " + sourcePath);
+                    logger.logError("Failed to copy blob: " + sourceName);
                 }
             } catch (Exception e) {
-                logger.logError("Error processing blob: " + sourcePath, e);
+                logger.logError("Error processing blob: " + sourceName, e);
             }
         }
     }
