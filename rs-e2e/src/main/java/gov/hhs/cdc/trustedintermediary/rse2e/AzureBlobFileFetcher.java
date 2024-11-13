@@ -4,7 +4,7 @@ import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobContainerClientBuilder;
 import com.azure.storage.blob.models.BlobItem;
-import com.azure.storage.blob.models.BlobProperties;
+import com.azure.storage.blob.models.ListBlobsOptions;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -50,29 +50,17 @@ public class AzureBlobFileFetcher implements FileFetcher {
 
     @Override
     public List<HL7FileStream> fetchFiles() {
-        List<HL7FileStream> recentFiles = new ArrayList<>();
-        LocalDate mostRecentDay = null;
+        List<HL7FileStream> relevantFiles = new ArrayList<>();
 
-        for (BlobItem blobItem : blobContainerClient.listBlobs()) {
+        LocalDate today = LocalDate.now(TIME_ZONE);
+        String pathPrefix = AzureBlobHelper.buildDatePathPrefix(today);
+        ListBlobsOptions options = new ListBlobsOptions().setPrefix(pathPrefix);
+        for (BlobItem blobItem : blobContainerClient.listBlobs(options, null)) {
             BlobClient blobClient = blobContainerClient.getBlobClient(blobItem.getName());
-            BlobProperties properties = blobClient.getProperties();
-
-            LocalDate blobCreationDate =
-                    properties.getLastModified().toInstant().atZone(TIME_ZONE).toLocalDate();
-
-            if (mostRecentDay != null && blobCreationDate.isBefore(mostRecentDay)) {
-                continue;
-            }
-
-            if (mostRecentDay == null || blobCreationDate.isAfter(mostRecentDay)) {
-                mostRecentDay = blobCreationDate;
-                recentFiles.clear();
-            }
-
-            recentFiles.add(
+            relevantFiles.add(
                     new HL7FileStream(blobClient.getBlobName(), blobClient.openInputStream()));
         }
 
-        return recentFiles;
+        return relevantFiles;
     }
 }
