@@ -6,6 +6,7 @@ import com.azure.storage.blob.BlobContainerClientBuilder;
 import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.BlobProperties;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,12 +17,15 @@ import java.util.List;
  */
 public class AzureBlobFileFetcher implements FileFetcher {
 
-    private static final FileFetcher INSTANCE = new AzureBlobFileFetcher();
-
+    // We're using UTC for now, but we plan to change the timezone to be more realistic to the
+    // working timezones in our teams
+    private static final ZoneId TIME_ZONE = ZoneOffset.UTC;
     private static final int RETENTION_DAYS = 90;
     private static final String CONTAINER_NAME = "automated";
 
     private final BlobContainerClient blobContainerClient;
+
+    private static final FileFetcher INSTANCE = new AzureBlobFileFetcher();
 
     private AzureBlobFileFetcher() {
         String azureStorageConnectionString = System.getenv("AZURE_STORAGE_CONNECTION_STRING");
@@ -37,7 +41,7 @@ public class AzureBlobFileFetcher implements FileFetcher {
                         .buildClient();
 
         AzureBlobOrganizer blobOrganizer = new AzureBlobOrganizer(blobContainerClient);
-        blobOrganizer.organizeAndCleanupBlobsByDate(RETENTION_DAYS);
+        blobOrganizer.organizeAndCleanupBlobsByDate(RETENTION_DAYS, TIME_ZONE);
     }
 
     public static FileFetcher getInstance() {
@@ -53,11 +57,8 @@ public class AzureBlobFileFetcher implements FileFetcher {
             BlobClient blobClient = blobContainerClient.getBlobClient(blobItem.getName());
             BlobProperties properties = blobClient.getProperties();
 
-            // Currently we're doing everything in UTC. If we start uploading files manually and
-            // running this test manually, we may want to revisit this logic and/or the file
-            // structure because midnight UTC is 5pm PDT on the previous day
             LocalDate blobCreationDate =
-                    properties.getLastModified().toInstant().atZone(ZoneOffset.UTC).toLocalDate();
+                    properties.getLastModified().toInstant().atZone(TIME_ZONE).toLocalDate();
 
             if (mostRecentDay != null && blobCreationDate.isBefore(mostRecentDay)) {
                 continue;

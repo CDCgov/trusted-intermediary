@@ -10,13 +10,10 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 
 public class AzureBlobOrganizer {
 
     private final BlobContainerClient blobContainerClient;
-
-    private static final ZoneId TIME_ZONE = ZoneOffset.UTC;
 
     protected final Logger logger = ApplicationContext.getImplementation(Logger.class);
 
@@ -24,7 +21,7 @@ public class AzureBlobOrganizer {
         this.blobContainerClient = blobContainerClient;
     }
 
-    public void organizeAndCleanupBlobsByDate(int retentionDays) {
+    public void organizeAndCleanupBlobsByDate(int retentionDays, ZoneId timeZone) {
         for (BlobItem blobItem : blobContainerClient.listBlobs()) {
             String sourcePath = blobItem.getName();
             try {
@@ -34,10 +31,10 @@ public class AzureBlobOrganizer {
                         sourceProperties
                                 .getCreationTime()
                                 .toInstant()
-                                .atZone(TIME_ZONE)
+                                .atZone(timeZone)
                                 .toLocalDate();
 
-                LocalDate retentionDate = LocalDate.now(TIME_ZONE).minusDays(retentionDays);
+                LocalDate retentionDate = LocalDate.now(timeZone).minusDays(retentionDays);
                 if (sourceCreationDate.isBefore(retentionDate)) {
                     sourceBlob.delete();
                     logger.logInfo("Deleted old blob: {}", sourcePath);
