@@ -4,6 +4,8 @@ import java.time.LocalDate;
 
 public class AzureBlobHelper {
 
+    private AzureBlobHelper() {}
+
     public static String buildDatePathPrefix(LocalDate date) {
         return String.format(
                 "%d/%02d/%02d/", date.getYear(), date.getMonthValue(), date.getDayOfMonth());
