@@ -14,11 +14,11 @@ import spock.lang.Specification
 
 class AutomatedTest extends Specification  {
 
-    List<HL7FileStream> recentAzureFiles
-    List<HL7FileStream> recentLocalFiles
+    List<HL7FileStream> azureFiles
+    List<HL7FileStream> localFiles
     AssertionRuleEngine engine
     HapiHL7FileMatcher fileMatcher
-    def mockLogger = Mock(Logger)
+    Logger mockLogger = Mock(Logger)
 
     def setup() {
         engine = AssertionRuleEngine.getInstance()
@@ -36,21 +36,21 @@ class AutomatedTest extends Specification  {
         TestApplicationContext.injectRegisteredImplementations()
 
         FileFetcher azureFileFetcher = AzureBlobFileFetcher.getInstance()
-        recentAzureFiles = azureFileFetcher.fetchFiles()
+        azureFiles = azureFileFetcher.fetchFiles()
 
         FileFetcher localFileFetcher = LocalFileFetcher.getInstance()
-        recentLocalFiles = localFileFetcher.fetchFiles()
+        localFiles = localFileFetcher.fetchFiles()
     }
 
     def cleanup() {
-        for (HL7FileStream fileStream : recentLocalFiles + recentAzureFiles) {
+        for (HL7FileStream fileStream : localFiles + azureFiles) {
             fileStream.inputStream().close()
         }
     }
 
     def "test defined assertions on relevant messages"() {
         given:
-        def matchedFiles = fileMatcher.matchFiles(recentAzureFiles, recentLocalFiles)
+        def matchedFiles = fileMatcher.matchFiles(azureFiles, localFiles)
 
         when:
         for (messagePair in matchedFiles) {
