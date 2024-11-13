@@ -41,11 +41,12 @@ public class AzureBlobOrganizer {
                     continue;
                 }
 
-                if (isInDateFolder(sourcePath, sourceCreationDate)) {
+                if (AzureBlobHelper.isInDateFolder(sourcePath, sourceCreationDate)) {
                     continue;
                 }
 
-                String destinationPath = createDateBasedPath(sourceCreationDate, sourcePath);
+                String destinationPath =
+                        AzureBlobHelper.createDateBasedPath(sourceCreationDate, sourcePath);
                 BlobClient destinationBlob = blobContainerClient.getBlobClient(destinationPath);
                 destinationBlob
                         .beginCopy(sourceBlob.getBlobUrl(), null)
@@ -63,21 +64,5 @@ public class AzureBlobOrganizer {
                 logger.logError("Error processing blob: " + sourcePath, e);
             }
         }
-    }
-
-    private String createDateBasedPath(LocalDate date, String originalName) {
-        return String.format(
-                "%d/%02d/%02d/%s",
-                date.getYear(), date.getMonthValue(), date.getDayOfMonth(), originalName);
-    }
-
-    private boolean isInDateFolder(String blobPath, LocalDate creationDate) {
-        String expectedPath =
-                String.format(
-                        "%d/%02d/%02d/",
-                        creationDate.getYear(),
-                        creationDate.getMonthValue(),
-                        creationDate.getDayOfMonth());
-        return blobPath.startsWith(expectedPath);
     }
 }
