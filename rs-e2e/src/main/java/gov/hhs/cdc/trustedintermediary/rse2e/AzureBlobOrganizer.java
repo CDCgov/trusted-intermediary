@@ -4,14 +4,13 @@ import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.BlobProperties;
-import com.azure.storage.blob.options.BlobBeginCopyOptions;
+import com.azure.storage.blob.models.CopyStatusType;
 import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.Map;
 
 public class AzureBlobOrganizer {
 
@@ -49,17 +48,14 @@ public class AzureBlobOrganizer {
                     continue;
                 }
 
-                String sourceUrl = sourceBlob.getBlobUrl();
-                Map<String, String> sourceMetadata = sourceProperties.getMetadata();
-                BlobBeginCopyOptions copyOptions =
-                        new BlobBeginCopyOptions(sourceUrl).setMetadata(sourceMetadata);
-
                 String destinationPath = createDateBasedPath(sourceCreationDate, sourcePath);
                 BlobClient destinationBlob = blobContainerClient.getBlobClient(destinationPath);
-                destinationBlob.beginCopy(copyOptions).waitForCompletion(Duration.ofSeconds(30));
+                destinationBlob
+                        .beginCopy(sourceBlob.getBlobUrl(), null)
+                        .waitForCompletion(Duration.ofSeconds(30));
 
-                if (sourceBlob.getProperties().getBlobSize()
-                        == destinationBlob.getProperties().getBlobSize()) {
+                CopyStatusType copyStatus = destinationBlob.getProperties().getCopyStatus();
+                if (copyStatus == CopyStatusType.SUCCESS) {
                     sourceBlob.delete();
                     logger.logInfo("Moved blob {} to {}", sourcePath, destinationPath);
                 } else {
