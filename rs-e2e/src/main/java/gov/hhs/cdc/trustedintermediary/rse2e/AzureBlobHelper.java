@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.rse2e;
 
 import java.time.LocalDate;
 
+/* The AzureBlobHelper is a utility class that provides helper methods for working with Azure Blob Storage. */
 public class AzureBlobHelper {
 
     private AzureBlobHelper() {}

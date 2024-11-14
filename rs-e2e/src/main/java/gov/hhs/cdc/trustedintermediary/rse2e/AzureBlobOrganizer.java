@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
+/* AzureBlobOrganizer is responsible for organizing and cleaning up blobs in an Azure container */
 public class AzureBlobOrganizer {
 
     private final BlobContainerClient blobContainerClient;
