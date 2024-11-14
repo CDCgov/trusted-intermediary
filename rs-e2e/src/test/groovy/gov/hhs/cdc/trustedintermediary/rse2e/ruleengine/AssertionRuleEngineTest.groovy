@@ -1,6 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.ruleengine
 
 import ca.uhn.hl7v2.model.Message
+import gov.hhs.cdc.trustedintermediary.rse2e.external.hapi.HapiHL7Message
 import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoader
 import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoaderException
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
@@ -50,7 +51,7 @@ class AssertionRuleEngineTest extends Specification {
 
         then:
         1 * mockRuleLoader.loadRules(_ as InputStream, _ as TypeReference) >> [mockRule]
-        ruleEngine.rules.size() == 1
+        ruleEngine.getRules().size() == 1
     }
 
     def "ensureRulesLoaded loads rules only once on multiple threads"() {
@@ -100,5 +101,38 @@ class AssertionRuleEngineTest extends Specification {
 
         then:
         1 * mockLogger.logError(_ as String, exception)
+    }
+
+    def "runRules returns nothing when there are no rules"() {
+        when:
+        def result = ruleEngine.runRules(Mock(Message), Mock(Message))
+
+        then:
+        result.isEmpty()
+    }
+
+    def "runRules returns rules that have been run"() {
+        given:
+        def rule = new AssertionRule("testRule", [], [])
+        mockRuleLoader.loadRules(_ as InputStream, _ as TypeReference) >> [rule]
+
+        when:
+        def result = ruleEngine.runRules(Mock(Message), Mock(Message))
+
+        then:
+        result.size() == 1
+        result[0] == rule
+    }
+
+    def "runRules doesn't return rules that shouldn't run"() {
+        given:
+        def rule = new AssertionRule("testRule", ["false"], [])
+        mockRuleLoader.loadRules(_ as InputStream, _ as TypeReference) >> [rule]
+
+        when:
+        def result = ruleEngine.runRules(Mock(Message), Mock(Message))
+
+        then:
+        result.isEmpty()
     }
 }
