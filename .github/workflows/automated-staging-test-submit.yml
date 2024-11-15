@@ -2,7 +2,7 @@ name: Automated Staging Test - Submit Messages
 
 on:
   schedule:
-    - cron: "0 0 * * 2-6"  # Tuesday to Saturday at Midnight UTC
+    - cron: "0 8 * * 2-6"  # Tuesday to Saturday at Midnight PST (8am UTC)
   workflow_dispatch:
 
 jobs:
