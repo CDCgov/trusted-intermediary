@@ -17,8 +17,6 @@ import java.util.List;
  */
 public class AzureBlobFileFetcher implements FileFetcher {
 
-    // We're using UTC for now, but we plan to change the timezone to be more realistic to the
-    // working timezones in our teams
     private static final ZoneId TIME_ZONE = ZoneOffset.UTC;
     private static final int RETENTION_DAYS = 90;
     private static final String CONTAINER_NAME = "automated";
