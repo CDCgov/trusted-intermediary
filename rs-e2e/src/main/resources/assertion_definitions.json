@@ -82,6 +82,15 @@
         "OBX-3.5 = input.OBX-3.5",
         "OBX-3.6 = input.OBX-3.6"
       ]
+    },
+    {
+      "name": "Micro (µ) character is encoded correctly",
+      "conditions": [
+        "MSH-10 = '008'"
+      ],
+      "rules": [
+        "OBX-6 = 'µmol'"
+      ]
     }
   ]
 }
