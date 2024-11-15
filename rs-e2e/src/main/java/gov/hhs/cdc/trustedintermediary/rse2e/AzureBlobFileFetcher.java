@@ -7,6 +7,7 @@ import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.ListBlobsOptions;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,8 +17,8 @@ import java.util.List;
  */
 public class AzureBlobFileFetcher implements FileFetcher {
 
-    // Using Pacific Standard Time Zone as all or most contributors are in the US
-    private static final ZoneId TIME_ZONE = ZoneId.of("America/Los_Angeles");
+    // Using Central Standard Time as all or most contributors are in the US
+    private static final ZoneId TIME_ZONE = ZoneOffset.of("-06:00");
     private static final int RETENTION_DAYS = 90;
     private static final String CONTAINER_NAME = "automated";
 

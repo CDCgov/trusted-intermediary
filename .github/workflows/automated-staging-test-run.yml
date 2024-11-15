@@ -2,7 +2,7 @@ name: Automated Staging Test - Run integration tests
 
 on:
   schedule:
-    - cron: "0 10 * * 2-6"  # Tuesday to Saturday at 2am PST (10am UTC) - two hours after `automated-staging-test-submit` runs
+    - cron: "0 8 * * 2-6"  # Tuesday to Saturday at 2am CST (8am UTC) - two hours after `automated-staging-test-submit` runs
   workflow_dispatch:
 
 jobs:
