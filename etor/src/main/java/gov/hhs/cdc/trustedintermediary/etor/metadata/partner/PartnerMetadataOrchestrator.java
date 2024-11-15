@@ -93,10 +93,10 @@ public class PartnerMetadataOrchestrator {
         partnerMetadataStorage.saveMetadata(updatedPartnerMetadata);
     }
 
-    public void updateMetadataForSentMessage(String receivedSubmissionId, String sentSubmissionId)
+    public void updateMetadataForSentMessage(String receivedSubmissionId, String inboundMessageId)
             throws PartnerMetadataException {
 
-        if (sentSubmissionId == null) {
+        if (inboundMessageId == null) {
             return;
         }
 
@@ -110,12 +110,12 @@ public class PartnerMetadataOrchestrator {
 
         PartnerMetadata partnerMetadata = optionalPartnerMetadata.get();
 
-        if (sentSubmissionId.equals(partnerMetadata.sentSubmissionId())) {
+        if (inboundMessageId.equals(partnerMetadata.inboundMessageId())) {
             return;
         }
 
-        logger.logInfo("Updating metadata with sentSubmissionId: {}", sentSubmissionId);
-        partnerMetadata = partnerMetadata.withSentSubmissionId(sentSubmissionId);
+        logger.logInfo("Updating metadata with inboundMessageId: {}", inboundMessageId);
+        partnerMetadata = partnerMetadata.withInboundMessageId(inboundMessageId);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
@@ -129,11 +129,11 @@ public class PartnerMetadataOrchestrator {
         }
 
         PartnerMetadata partnerMetadata = optionalPartnerMetadata.get();
-        var sentSubmissionId = partnerMetadata.sentSubmissionId();
-        if (metadataIsStale(partnerMetadata) && sentSubmissionId != null) {
+        var inboundMessageId = partnerMetadata.inboundMessageId();
+        if (metadataIsStale(partnerMetadata) && inboundMessageId != null) {
             logger.logInfo(
                     "Receiver name not found in metadata or delivery status still pending, looking up {} from RS history API",
-                    sentSubmissionId);
+                    inboundMessageId);
 
             String rsStatus;
             String rsMessage = "";
@@ -141,7 +141,7 @@ public class PartnerMetadataOrchestrator {
             try {
                 String bearerToken = rsclient.getRsToken();
                 String responseBody =
-                        rsclient.requestHistoryEndpoint(sentSubmissionId, bearerToken);
+                        rsclient.requestHistoryEndpoint(inboundMessageId, bearerToken);
                 var parsedResponseBody = getDataFromReportStream(responseBody);
                 rsStatus = parsedResponseBody[0];
                 rsMessage = parsedResponseBody[1];

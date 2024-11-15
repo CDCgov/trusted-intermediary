@@ -76,12 +76,12 @@ class SendMessageHelperTest extends Specification {
 
     def "saveSentMessageSubmissionId works"() {
         given:
-        def sentSubmissionId = "sentId"
+        def inboundMessageId = "sentId" // TODO - figure out if this value matters
         def receivedSubmissionId = "receivedId"
         mockOrchestrator.updateMetadataForSentMessage(receivedSubmissionId, _ as String) >> { throw new PartnerMetadataException("Error") }
 
         when:
-        SendMessageHelper.getInstance().saveSentMessageSubmissionId(receivedSubmissionId, sentSubmissionId)
+        SendMessageHelper.getInstance().saveSentMessageSubmissionId(receivedSubmissionId, inboundMessageId)
 
         then:
         1 * mockOrchestrator.updateMetadataForSentMessage(_, _)
@@ -100,12 +100,12 @@ class SendMessageHelperTest extends Specification {
 
     def "saveSentMessageSubmissionId should log error and continues when updateMetadataForSentMessage throws error"() {
         given:
-        def sentSubmissionId = "sentId"
+        def inboundMessageId = "sentId" // TODO - figure out if this value matters
         def receivedSubmissionId = "receivedId"
         mockOrchestrator.updateMetadataForSentMessage(receivedSubmissionId, _ as String) >> { throw new PartnerMetadataException("Error") }
 
         when:
-        SendMessageHelper.getInstance().saveSentMessageSubmissionId(receivedSubmissionId, sentSubmissionId)
+        SendMessageHelper.getInstance().saveSentMessageSubmissionId(receivedSubmissionId, inboundMessageId)
 
         then:
         1 * mockLogger.logError(_, _)

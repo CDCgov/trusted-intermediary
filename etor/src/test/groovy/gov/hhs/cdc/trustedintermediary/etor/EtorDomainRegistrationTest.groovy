@@ -212,15 +212,15 @@ class EtorDomainRegistrationTest extends Specification {
         given:
         def expectedStatusCode = 200
         def receivedSubmissionId = "receivedSubmissionId"
-        def sentSubmissionId = "sentSubmissionId"
-        def metadata = new PartnerMetadata(receivedSubmissionId, "hash", PartnerMetadataMessageType.ORDER, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number").withSentSubmissionId(sentSubmissionId)
+        def inboundMessageId = "inboundMessageId"
+        def metadata = new PartnerMetadata(receivedSubmissionId, "hash", PartnerMetadataMessageType.ORDER, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number").withInboundMessageId(inboundMessageId)
         def linkedMessageIds = Set.of(receivedSubmissionId, "Test1", "Test2")
 
         def connector = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, connector)
 
         def request = new DomainRequest()
-        request.setPathParams(["id": sentSubmissionId])
+        request.setPathParams(["id": inboundMessageId])
 
         def mockPartnerMetadataOrchestrator = Mock(PartnerMetadataOrchestrator)
         TestApplicationContext.register(PartnerMetadataOrchestrator, mockPartnerMetadataOrchestrator)
@@ -243,7 +243,7 @@ class EtorDomainRegistrationTest extends Specification {
 
         then:
         actualStatusCode == expectedStatusCode
-        1 * mockPartnerMetadataOrchestrator.getMetadata(sentSubmissionId) >> Optional.ofNullable(metadata)
+        1 * mockPartnerMetadataOrchestrator.getMetadata(inboundMessageId) >> Optional.ofNullable(metadata)
         1 * mockPartnerMetadataOrchestrator.findMessagesIdsToLink(receivedSubmissionId) >> linkedMessageIds
         1 * mockPartnerMetadataConverter.extractPublicMetadataToOperationOutcome(_ as PartnerMetadata, _ as String, linkedMessageIds) >> Mock(FhirMetadata)
         1 * mockResponseHelper.constructOkResponseFromString(_ as String) >> new DomainResponse(expectedStatusCode)

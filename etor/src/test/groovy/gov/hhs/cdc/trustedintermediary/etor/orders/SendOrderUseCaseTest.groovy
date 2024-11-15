@@ -35,7 +35,7 @@ class SendOrderUseCaseTest extends Specification {
     def "send sends successfully"() {
         given:
         def receivedSubmissionId = "receivedId"
-        def sentSubmissionId = "sentId"
+        def inboundMessageId = "sentId"
         def messagesIdsToLink = new HashSet<>(Set.of("messageId1", "messageId2"))
         def mockOrder = new OrderMock(null, null, null, null, null, null, null, null)
 
@@ -46,9 +46,9 @@ class SendOrderUseCaseTest extends Specification {
 
         then:
         1 * mockEngine.runRules(mockOrder)
-        1 * mockSender.send(mockOrder) >> Optional.of(sentSubmissionId)
+        1 * mockSender.send(mockOrder) >> Optional.of(inboundMessageId)
         1 * mockOrchestrator.updateMetadataForReceivedMessage(_ as PartnerMetadata)
-        1 * mockOrchestrator.updateMetadataForSentMessage(receivedSubmissionId, sentSubmissionId)
+        1 * mockOrchestrator.updateMetadataForSentMessage(receivedSubmissionId, inboundMessageId)
         1 * mockOrchestrator.findMessagesIdsToLink(receivedSubmissionId) >> messagesIdsToLink
         1 * mockOrchestrator.linkMessages(messagesIdsToLink + receivedSubmissionId)
     }
@@ -67,7 +67,7 @@ class SendOrderUseCaseTest extends Specification {
 
     def "convertAndSend should log warnings for null receivedSubmissionId"() {
         given:
-        mockSender.send(_) >> Optional.of("sentSubmissionId")
+        mockSender.send(_) >> Optional.of("inboundMessageId")
         TestApplicationContext.injectRegisteredImplementations()
 
         when:

@@ -76,7 +76,7 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
         }
 
         Path metadataFilePath =
-                getFilePath(metadata.receivedSubmissionId() + "-" + metadata.sentSubmissionId());
+                getFilePath(metadata.receivedSubmissionId() + "-" + metadata.inboundMessageId());
         try {
             String content = formatter.convertToJsonString(metadata);
             Files.writeString(metadataFilePath, content);

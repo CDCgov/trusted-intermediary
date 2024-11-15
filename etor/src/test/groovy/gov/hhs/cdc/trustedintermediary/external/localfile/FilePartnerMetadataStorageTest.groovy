@@ -32,8 +32,8 @@ class FilePartnerMetadataStorageTest extends Specification {
     def "save and read metadata successfully"() {
         given:
         def expectedReceivedSubmissionId = "receivedSubmissionId"
-        def expectedSentSubmissionId = "receivedSubmissionId"
-        PartnerMetadata metadata = new PartnerMetadata(expectedReceivedSubmissionId, expectedSentSubmissionId, Instant.parse("2023-12-04T18:51:48.941875Z"), Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd", PartnerMetadataStatus.DELIVERED, null, PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
+        def expectedInboundMessageId = "receivedSubmissionId"
+        PartnerMetadata metadata = new PartnerMetadata(expectedReceivedSubmissionId, expectedInboundMessageId, Instant.parse("2023-12-04T18:51:48.941875Z"), Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd", PartnerMetadataStatus.DELIVERED, null, PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
 
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
@@ -48,7 +48,7 @@ class FilePartnerMetadataStorageTest extends Specification {
 
     def "saveMetadata throws PartnerMetadataException when unable to save file"() {
         given:
-        PartnerMetadata metadata = new PartnerMetadata("receivedSubmissionId", "sentSubmissionId", Instant.now(), Instant.now(), "abcd", PartnerMetadataStatus.DELIVERED, null, PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
+        PartnerMetadata metadata = new PartnerMetadata("receivedSubmissionId", "inboundMessageId", Instant.now(), Instant.now(), "abcd", PartnerMetadataStatus.DELIVERED, null, PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
 
         def mockFormatter = Mock(Formatter)
         mockFormatter.convertToJsonString(_ as PartnerMetadata) >> {throw new FormatterProcessingException("error", new Exception())}
@@ -66,8 +66,8 @@ class FilePartnerMetadataStorageTest extends Specification {
     def "saveMetadata overwrites a file if it had been saved before"() {
         given:
         def expectedReceivedSubmissionId = "receivedSubmissionId"
-        def expectedSentSubmissionId = "sentSubmissionId"
-        PartnerMetadata metadata1 = new PartnerMetadata(expectedReceivedSubmissionId, expectedSentSubmissionId, Instant.parse("2023-12-04T18:51:48.941875Z"), Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd", PartnerMetadataStatus.DELIVERED, null, PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
+        def expectedInboundMessageId = "inboundMessageId"
+        PartnerMetadata metadata1 = new PartnerMetadata(expectedReceivedSubmissionId, expectedInboundMessageId, Instant.parse("2023-12-04T18:51:48.941875Z"), Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd", PartnerMetadataStatus.DELIVERED, null, PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
         PartnerMetadata metadata2 = new PartnerMetadata(expectedReceivedSubmissionId, PartnerMetadataStatus.DELIVERED)
 
 

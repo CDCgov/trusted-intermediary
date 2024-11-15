@@ -37,8 +37,8 @@ public class SendMessageHelper {
         }
     }
 
-    public void saveSentMessageSubmissionId(String receivedSubmissionId, String sentSubmissionId) {
-        if (sentSubmissionId == null || receivedSubmissionId == null) {
+    public void saveSentMessageSubmissionId(String receivedSubmissionId, String inboundMessageId) {
+        if (inboundMessageId == null || receivedSubmissionId == null) {
             logger.logWarning(
                     "Received and/or sent submissionId is null so not saving metadata for sent result");
             return;
@@ -46,13 +46,13 @@ public class SendMessageHelper {
 
         try {
             partnerMetadataOrchestrator.updateMetadataForSentMessage(
-                    receivedSubmissionId, sentSubmissionId);
+                    receivedSubmissionId, inboundMessageId);
         } catch (PartnerMetadataException e) {
             logger.logError(
                     "Unable to update metadata for received submissionId "
                             + receivedSubmissionId
                             + " and sent submissionId "
-                            + sentSubmissionId,
+                            + inboundMessageId,
                     e);
         }
     }

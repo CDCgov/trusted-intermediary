@@ -43,7 +43,7 @@ class SendResultUseCaseTest extends Specification {
 
         then:
         1 * mockEngine.runRules(mockResult)
-        1 * mockSender.send(mockResult) >> Optional.of("sentSubmissionId")
+        1 * mockSender.send(mockResult) >> Optional.of("inboundMessageId")
     }
 
     def "convertAndSend throws exception when send fails"() {
