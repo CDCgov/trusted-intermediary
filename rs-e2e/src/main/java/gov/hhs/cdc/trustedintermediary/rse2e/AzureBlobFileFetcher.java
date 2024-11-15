@@ -28,8 +28,6 @@ public class AzureBlobFileFetcher implements FileFetcher {
     private AzureBlobFileFetcher() {
         String azureStorageConnectionString = System.getenv("AZURE_STORAGE_CONNECTION_STRING");
 
-        var timezone = ZoneId.of("America/Los_Angeles");
-
         if (azureStorageConnectionString == null || azureStorageConnectionString.isEmpty()) {
             throw new IllegalArgumentException(
                     "Environment variable AZURE_STORAGE_CONNECTION_STRING is not set");
