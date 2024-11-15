@@ -7,7 +7,7 @@ import java.time.Instant;
  * The partner-facing metadata.
  *
  * @param receivedSubmissionId The received submission ID.
- * @param inboundMessageId The outbound submission ID.
+ * @param inboundMessageId The inbound submission ID.
  * @param timeReceived The time the message was received.
  * @param timeDelivered The time the message was delivered.
  * @param hash The hash of the message.
