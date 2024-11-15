@@ -9,7 +9,9 @@ import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.inject.Inject;
 
 /**
@@ -58,21 +60,28 @@ public class AssertionRuleEngine {
         }
     }
 
-    public void runRules(Message outputMessage, Message inputMessage) {
+    public List<AssertionRule> getRules() {
+        return assertionRules;
+    }
+
+    public Set<AssertionRule> runRules(Message outputMessage, Message inputMessage) {
         try {
             ensureRulesLoaded();
         } catch (RuleLoaderException e) {
             logger.logError("Failed to load rules definitions", e);
-            return;
+            return Set.of();
         }
 
         HapiHL7Message outputHapiMessage = new HapiHL7Message(outputMessage);
         HapiHL7Message inputHapiMessage = new HapiHL7Message(inputMessage);
 
+        Set<AssertionRule> runRules = new HashSet<>();
         for (AssertionRule rule : assertionRules) {
             if (rule.shouldRun(outputHapiMessage)) {
                 rule.runRule(outputHapiMessage, inputHapiMessage);
+                runRules.add(rule);
             }
         }
+        return runRules;
     }
 }

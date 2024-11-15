@@ -40,6 +40,8 @@ class AutomatedTest extends Specification  {
 
         FileFetcher localFileFetcher = LocalFileFetcher.getInstance()
         localFiles = localFileFetcher.fetchFiles()
+
+        engine.ensureRulesLoaded()
     }
 
     def cleanup() {
@@ -50,16 +52,19 @@ class AutomatedTest extends Specification  {
 
     def "test defined assertions on relevant messages"() {
         given:
+        def rulesToEvaluate = engine.getRules()
         def matchedFiles = fileMatcher.matchFiles(azureFiles, localFiles)
 
         when:
         for (messagePair in matchedFiles) {
             Message inputMessage = messagePair.getKey() as Message
             Message outputMessage = messagePair.getValue() as Message
-            engine.runRules(outputMessage, inputMessage)
+            def evaluatedRules = engine.runRules(outputMessage, inputMessage)
+            rulesToEvaluate.removeAll(evaluatedRules)
         }
 
         then:
+        rulesToEvaluate.collect { it.name }.isEmpty() //Check whether all the rules in the assertions file have been run
         0 * mockLogger.logError(_ as String, _ as Exception)
         0 * mockLogger.logWarning(_ as String)
     }
