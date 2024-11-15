@@ -7,6 +7,8 @@ public class AzureBlobHelper {
 
     private AzureBlobHelper() {}
 
+    // Builds a path prefix for a given date in the format "YYYY/MM/DD/". This is meant to make it
+    // easier for people in the team to find files in the Azure Blob Storage
     public static String buildDatePathPrefix(LocalDate date) {
         return String.format(
                 "%d/%02d/%02d/", date.getYear(), date.getMonthValue(), date.getDayOfMonth());
