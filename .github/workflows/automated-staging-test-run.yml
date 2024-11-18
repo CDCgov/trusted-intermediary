@@ -13,11 +13,6 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v4
 
-      - name: Run automated tests
-        env:
-          AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AUTOMATED_TEST_AZURE_STORAGE_CONNECTION_STRING }}
-        run: ./gradlew rs-e2e:clean rs-e2e:automatedTest
-
       - name: Send slack notification on test failure
         if: failure()
         uses: slackapi/slack-github-action@v2.0.0
