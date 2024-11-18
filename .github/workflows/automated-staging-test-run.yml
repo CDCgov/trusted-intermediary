@@ -4,7 +4,6 @@ on:
   schedule:
     - cron: "0 2 * * 2-6"  # Tuesday to Saturday at 2am UTC - two hours after `automated-staging-test-submit` runs
   workflow_dispatch:
-  pull_request:
 
 jobs:
   test_files:
@@ -26,4 +25,4 @@ jobs:
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           webhook-type: incoming-webhook
           payload: |
-            text: "*Automated Staging Test Failed!*: https://github.com/CDCgov/trusted-intermediary/actions/runs/${{ github.run_id }}"
+            text: "Automated Staging RS Integration Test Failed!: https://github.com/CDCgov/trusted-intermediary/actions/runs/${{ github.run_id }}"
