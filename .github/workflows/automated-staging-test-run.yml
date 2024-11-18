@@ -4,6 +4,7 @@ on:
   schedule:
     - cron: "0 2 * * 2-6"  # Tuesday to Saturday at 2am UTC - two hours after `automated-staging-test-submit` runs
   workflow_dispatch:
+  pull_request:
 
 jobs:
   test_files:
@@ -19,6 +20,7 @@ jobs:
         run: ./gradlew rs-e2e:clean rs-e2e:automatedTest
 
       - name: Send slack notification on test failure
+        if: failure()
         uses: slackapi/slack-github-action@v2.0.0
         with:
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
