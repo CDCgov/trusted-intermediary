@@ -80,7 +80,7 @@ public class PartnerMetadataOrchestrator {
             // write the received submission ID so that the rest of the metadata flow works even if
             // some data is missing
             logger.logWarning(
-                    "Unable to retrieve metadata from RS delivery API, but writing basic metadata entry anyway for received submission ID {}",
+                    "Unable to retrieve metadata from RS delivery API, but writing basic metadata entry anyway for outbound message ID {}",
                     partnerMetadata.outboundMessageId());
             partnerMetadataStorage.saveMetadata(partnerMetadata);
 

@@ -49,9 +49,9 @@ public class SendMessageHelper {
                     outboundMessageId, inboundMessageId);
         } catch (PartnerMetadataException e) {
             logger.logError(
-                    "Unable to update metadata for received submissionId "
+                    "Unable to update metadata for outbound messageId "
                             + outboundMessageId
-                            + " and sent submissionId "
+                            + " and inbound messageId "
                             + inboundMessageId,
                     e);
         }
@@ -81,7 +81,7 @@ public class SendMessageHelper {
             partnerMetadataOrchestrator.linkMessages(messageIdsToLink);
         } catch (PartnerMetadataException | MessageLinkException e) {
             logger.logError(
-                    "Unable to link messages for received submissionId " + outboundMessageId, e);
+                    "Unable to link messages for outbound messageId " + outboundMessageId, e);
         }
     }
 }
