@@ -10,6 +10,7 @@ import javax.inject.Inject;
 public class HashHelper implements SecureHash {
     @Inject Logger logger;
 
+    @Override
     public <T> String generateHash(T input) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-512");
