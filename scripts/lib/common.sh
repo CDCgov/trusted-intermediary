@@ -81,12 +81,10 @@ extract_host_from_url() {
 
 parse_sender_string() {
     local sender_string=$1
-    local -n sender_org_ref=$2
-    local -n sender_name_ref=$3
 
     if [[ "$sender_string" =~ ^([^.]+)\.([^.]+)$ ]]; then
-        sender_org_ref="${BASH_REMATCH[1]}"
-        sender_name_ref="${BASH_REMATCH[2]}"
+        sender_org="${BASH_REMATCH[1]}"
+        sender_name="${BASH_REMATCH[2]}"
         return 0
     else
         echo "Error: Sender string '$sender_string' must be in format 'sender_org.sender_name'" >&2
