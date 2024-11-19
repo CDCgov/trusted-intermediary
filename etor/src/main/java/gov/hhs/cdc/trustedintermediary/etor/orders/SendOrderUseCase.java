@@ -58,10 +58,10 @@ public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
         sendMessageHelper.saveSentMessageSubmissionId(receivedSubmissionId, outboundReportId);
     }
 
-    public String generateHash(final Order<?> order) {
+    public String generateHash(Object obj) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] objBytes = order.toString().getBytes(StandardCharsets.UTF_8);
+            byte[] objBytes = obj.toString().getBytes(StandardCharsets.UTF_8);
             byte[] hashBytes = digest.digest(objBytes);
             return Hex.encodeHexString(hashBytes);
         } catch (NoSuchAlgorithmException e) {
