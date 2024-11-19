@@ -153,9 +153,9 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleOrders(DomainRequest request) {
         return handleMessageRequest(
                 request,
-                receivedSubmissionId -> {
+                outboundMessageId -> {
                     Order<?> orders = orderController.parseOrders(request);
-                    sendOrderUseCase.convertAndSend(orders, receivedSubmissionId);
+                    sendOrderUseCase.convertAndSend(orders, outboundMessageId);
                     return domainResponseHelper.constructOkResponse(new OrderResponse(orders));
                 },
                 "order");
@@ -164,9 +164,9 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleResults(DomainRequest request) {
         return handleMessageRequest(
                 request,
-                receivedSubmissionId -> {
+                outboundMessageId -> {
                     Result<?> results = resultController.parseResults(request);
-                    sendResultUseCase.convertAndSend(results, receivedSubmissionId);
+                    sendResultUseCase.convertAndSend(results, outboundMessageId);
                     return domainResponseHelper.constructOkResponse(new ResultResponse(results));
                 },
                 "results");
@@ -186,8 +186,7 @@ public class EtorDomainRegistration implements DomainConnector {
             var metadata = metadataOptional.get();
 
             Set<String> messageIdsToLink =
-                    partnerMetadataOrchestrator.findMessagesIdsToLink(
-                            metadata.receivedSubmissionId());
+                    partnerMetadataOrchestrator.findMessagesIdsToLink(metadata.outboundMessageId());
 
             FhirMetadata<?> responseObject =
                     partnerMetadataConverter.extractPublicMetadataToOperationOutcome(
@@ -223,12 +222,12 @@ public class EtorDomainRegistration implements DomainConnector {
             DomainRequest request,
             MessageRequestHandler<DomainResponse> requestHandler,
             String messageType) {
-        String receivedSubmissionId = getReceivedSubmissionId(request);
+        String outboundMessageId = getOutboundMessageId(request);
         boolean markMetadataAsFailed = false;
         String errorMessage = "";
 
         try {
-            return requestHandler.handle(receivedSubmissionId);
+            return requestHandler.handle(outboundMessageId);
         } catch (FhirParseException e) {
             errorMessage = "Unable to parse " + messageType + " request";
             logger.logError(errorMessage, e);
@@ -243,7 +242,7 @@ public class EtorDomainRegistration implements DomainConnector {
             if (markMetadataAsFailed) {
                 try {
                     partnerMetadataOrchestrator.setMetadataStatusToFailed(
-                            receivedSubmissionId, errorMessage);
+                            outboundMessageId, errorMessage);
                 } catch (PartnerMetadataException innerE) {
                     logger.logError("Unable to update metadata status", innerE);
                 }
@@ -251,13 +250,13 @@ public class EtorDomainRegistration implements DomainConnector {
         }
     }
 
-    protected String getReceivedSubmissionId(DomainRequest request) {
+    protected String getOutboundMessageId(DomainRequest request) {
 
-        String receivedSubmissionId = request.getHeaders().get("recordid");
-        if (receivedSubmissionId == null || receivedSubmissionId.isEmpty()) {
+        String outboundMessageId = request.getHeaders().get("recordid");
+        if (outboundMessageId == null || outboundMessageId.isEmpty()) {
             logger.logError("Missing required header or empty: RecordId");
             return null;
         }
-        return receivedSubmissionId;
+        return outboundMessageId;
     }
 }

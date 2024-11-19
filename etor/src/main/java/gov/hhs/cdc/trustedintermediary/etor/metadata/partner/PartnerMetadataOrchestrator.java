@@ -45,15 +45,15 @@ public class PartnerMetadataOrchestrator {
             throws PartnerMetadataException {
 
         logger.logInfo(
-                "Looking up sender name and timeReceived from RS delivery API for receivedSubmissionId: {}",
-                partnerMetadata.receivedSubmissionId());
+                "Looking up sender name and timeReceived from RS delivery API for outboundMessageId: {}",
+                partnerMetadata.outboundMessageId());
 
         Instant timeReceived;
         try {
             String bearerToken = rsclient.getRsToken();
             String responseBody =
                     rsclient.requestDeliveryEndpoint(
-                            partnerMetadata.receivedSubmissionId(), bearerToken);
+                            partnerMetadata.outboundMessageId(), bearerToken);
             Map<String, Object> responseObject =
                     formatter.convertJsonToObject(responseBody, new TypeReference<>() {});
 
@@ -81,7 +81,7 @@ public class PartnerMetadataOrchestrator {
             // some data is missing
             logger.logWarning(
                     "Unable to retrieve metadata from RS delivery API, but writing basic metadata entry anyway for received submission ID {}",
-                    partnerMetadata.receivedSubmissionId());
+                    partnerMetadata.outboundMessageId());
             partnerMetadataStorage.saveMetadata(partnerMetadata);
 
             throw new PartnerMetadataException(
@@ -93,7 +93,7 @@ public class PartnerMetadataOrchestrator {
         partnerMetadataStorage.saveMetadata(updatedPartnerMetadata);
     }
 
-    public void updateMetadataForSentMessage(String receivedSubmissionId, String inboundMessageId)
+    public void updateMetadataForSentMessage(String outboundMessageId, String inboundMessageId)
             throws PartnerMetadataException {
 
         if (inboundMessageId == null) {
@@ -101,10 +101,9 @@ public class PartnerMetadataOrchestrator {
         }
 
         Optional<PartnerMetadata> optionalPartnerMetadata =
-                partnerMetadataStorage.readMetadata(receivedSubmissionId);
+                partnerMetadataStorage.readMetadata(outboundMessageId);
         if (optionalPartnerMetadata.isEmpty()) {
-            logger.logWarning(
-                    "Metadata not found for receivedSubmissionId: {}", receivedSubmissionId);
+            logger.logWarning("Metadata not found for outboundMessageId: {}", outboundMessageId);
             return;
         }
 
@@ -119,12 +118,12 @@ public class PartnerMetadataOrchestrator {
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
-    public Optional<PartnerMetadata> getMetadata(String receivedSubmissionId)
+    public Optional<PartnerMetadata> getMetadata(String outboundMessageId)
             throws PartnerMetadataException {
         Optional<PartnerMetadata> optionalPartnerMetadata =
-                partnerMetadataStorage.readMetadata(receivedSubmissionId);
+                partnerMetadataStorage.readMetadata(outboundMessageId);
         if (optionalPartnerMetadata.isEmpty()) {
-            logger.logInfo("Metadata not found for receivedSubmissionId: {}", receivedSubmissionId);
+            logger.logInfo("Metadata not found for outboundMessageId: {}", outboundMessageId);
             return Optional.empty();
         }
 
@@ -206,7 +205,7 @@ public class PartnerMetadataOrchestrator {
         return metadataSet.stream()
                 .collect(
                         Collectors.toMap(
-                                PartnerMetadata::receivedSubmissionId,
+                                PartnerMetadata::outboundMessageId,
                                 metadata -> {
                                     var status = String.valueOf(metadata.deliveryStatus());
                                     var stale = metadataIsStale(metadata);
@@ -221,10 +220,10 @@ public class PartnerMetadataOrchestrator {
                                 }));
     }
 
-    public Set<String> findMessagesIdsToLink(String receivedSubmissionId)
+    public Set<String> findMessagesIdsToLink(String outboundMessageId)
             throws PartnerMetadataException {
 
-        return partnerMetadataStorage.readMetadataForMessageLinking(receivedSubmissionId);
+        return partnerMetadataStorage.readMetadataForMessageLinking(outboundMessageId);
     }
 
     public void linkMessages(Set<String> messageIds) throws MessageLinkException {

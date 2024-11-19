@@ -22,7 +22,7 @@ public class SendMessageHelper {
     private SendMessageHelper() {}
 
     public void savePartnerMetadataForReceivedMessage(PartnerMetadata partnerMetadata) {
-        if (partnerMetadata.receivedSubmissionId() == null) {
+        if (partnerMetadata.outboundMessageId() == null) {
             logger.logWarning(
                     "Received submissionId is null so not saving metadata for received message");
             return;
@@ -31,14 +31,14 @@ public class SendMessageHelper {
             partnerMetadataOrchestrator.updateMetadataForReceivedMessage(partnerMetadata);
         } catch (PartnerMetadataException e) {
             logger.logError(
-                    "Unable to save metadata for receivedSubmissionId "
-                            + partnerMetadata.receivedSubmissionId(),
+                    "Unable to save metadata for outboundMessageId "
+                            + partnerMetadata.outboundMessageId(),
                     e);
         }
     }
 
-    public void saveSentMessageSubmissionId(String receivedSubmissionId, String inboundMessageId) {
-        if (inboundMessageId == null || receivedSubmissionId == null) {
+    public void saveSentMessageSubmissionId(String outboundMessageId, String inboundMessageId) {
+        if (inboundMessageId == null || outboundMessageId == null) {
             logger.logWarning(
                     "Received and/or sent submissionId is null so not saving metadata for sent result");
             return;
@@ -46,42 +46,42 @@ public class SendMessageHelper {
 
         try {
             partnerMetadataOrchestrator.updateMetadataForSentMessage(
-                    receivedSubmissionId, inboundMessageId);
+                    outboundMessageId, inboundMessageId);
         } catch (PartnerMetadataException e) {
             logger.logError(
                     "Unable to update metadata for received submissionId "
-                            + receivedSubmissionId
+                            + outboundMessageId
                             + " and sent submissionId "
                             + inboundMessageId,
                     e);
         }
     }
 
-    public void linkMessage(String receivedSubmissionId) {
-        if (receivedSubmissionId == null) {
+    public void linkMessage(String outboundMessageId) {
+        if (outboundMessageId == null) {
             logger.logWarning("Received submissionId is null so not linking messages");
             return;
         }
 
         try {
             Set<String> messageIdsToLink =
-                    partnerMetadataOrchestrator.findMessagesIdsToLink(receivedSubmissionId);
+                    partnerMetadataOrchestrator.findMessagesIdsToLink(outboundMessageId);
 
             if (messageIdsToLink == null || messageIdsToLink.isEmpty()) {
                 return;
             }
 
-            // Add receivedSubmissionId to complete the list of messageIds to link
-            messageIdsToLink.add(receivedSubmissionId);
+            // Add outboundMessageId to complete the list of messageIds to link
+            messageIdsToLink.add(outboundMessageId);
 
             logger.logInfo(
-                    "Found messages to link for receivedSubmissionId {}: {}",
-                    receivedSubmissionId,
+                    "Found messages to link for outboundMessageId {}: {}",
+                    outboundMessageId,
                     messageIdsToLink);
             partnerMetadataOrchestrator.linkMessages(messageIdsToLink);
         } catch (PartnerMetadataException | MessageLinkException e) {
             logger.logError(
-                    "Unable to link messages for received submissionId " + receivedSubmissionId, e);
+                    "Unable to link messages for received submissionId " + outboundMessageId, e);
         }
     }
 }

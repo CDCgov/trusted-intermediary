@@ -34,7 +34,7 @@ class SendOrderUseCaseTest extends Specification {
 
     def "send sends successfully"() {
         given:
-        def receivedSubmissionId = "receivedId"
+        def outboundMessageId = "receivedId"
         def inboundMessageId = "sentId"
         def messagesIdsToLink = new HashSet<>(Set.of("messageId1", "messageId2"))
         def mockOrder = new OrderMock(null, null, null, null, null, null, null, null)
@@ -42,15 +42,15 @@ class SendOrderUseCaseTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        SendOrderUseCase.getInstance().convertAndSend(mockOrder, receivedSubmissionId)
+        SendOrderUseCase.getInstance().convertAndSend(mockOrder, outboundMessageId)
 
         then:
         1 * mockEngine.runRules(mockOrder)
         1 * mockSender.send(mockOrder) >> Optional.of(inboundMessageId)
         1 * mockOrchestrator.updateMetadataForReceivedMessage(_ as PartnerMetadata)
-        1 * mockOrchestrator.updateMetadataForSentMessage(receivedSubmissionId, inboundMessageId)
-        1 * mockOrchestrator.findMessagesIdsToLink(receivedSubmissionId) >> messagesIdsToLink
-        1 * mockOrchestrator.linkMessages(messagesIdsToLink + receivedSubmissionId)
+        1 * mockOrchestrator.updateMetadataForSentMessage(outboundMessageId, inboundMessageId)
+        1 * mockOrchestrator.findMessagesIdsToLink(outboundMessageId) >> messagesIdsToLink
+        1 * mockOrchestrator.linkMessages(messagesIdsToLink + outboundMessageId)
     }
 
     def "send fails to send"() {
@@ -65,7 +65,7 @@ class SendOrderUseCaseTest extends Specification {
         thrown(UnableToSendMessageException)
     }
 
-    def "convertAndSend should log warnings for null receivedSubmissionId"() {
+    def "convertAndSend should log warnings for null outboundMessageId"() {
         given:
         mockSender.send(_) >> Optional.of("inboundMessageId")
         TestApplicationContext.injectRegisteredImplementations()
@@ -81,18 +81,18 @@ class SendOrderUseCaseTest extends Specification {
     def "convertAndSend logs error and continues when updateMetadataForReceivedOrder throws exception"() {
         given:
         def order = Mock(Order)
-        def receivedSubmissionId = "receivedId"
+        def outboundMessageId = "receivedId"
 
         mockOrchestrator.updateMetadataForReceivedMessage(_ as PartnerMetadata) >> { throw new PartnerMetadataException("Error") }
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        SendOrderUseCase.getInstance().convertAndSend(order, receivedSubmissionId)
+        SendOrderUseCase.getInstance().convertAndSend(order, outboundMessageId)
 
         then:
         1 * mockLogger.logError(_, _)
         1 * mockEngine.runRules(order)
-        1 * mockOrchestrator.findMessagesIdsToLink(receivedSubmissionId) >> Set.of()
+        1 * mockOrchestrator.findMessagesIdsToLink(outboundMessageId) >> Set.of()
         1 * mockSender.send(order) >> Optional.of("sentId")
     }
 

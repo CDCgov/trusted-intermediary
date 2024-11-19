@@ -203,7 +203,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
         return List.of(
                 new DbColumn(
                         METADATA_TABLE_RECEIVED_MESSAGE_ID,
-                        metadata.receivedSubmissionId(),
+                        metadata.outboundMessageId(),
                         false,
                         Types.VARCHAR),
                 new DbColumn("sent_message_id", metadata.inboundMessageId(), true, Types.VARCHAR),

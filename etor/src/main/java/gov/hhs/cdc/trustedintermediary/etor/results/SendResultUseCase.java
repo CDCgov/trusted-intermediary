@@ -27,12 +27,12 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
     }
 
     @Override
-    public void convertAndSend(Result<?> result, String receivedSubmissionId)
+    public void convertAndSend(Result<?> result, String outboundMessageId)
             throws UnableToSendMessageException {
 
         PartnerMetadata partnerMetadata =
                 new PartnerMetadata(
-                        receivedSubmissionId,
+                        outboundMessageId,
                         String.valueOf(result.hashCode()),
                         PartnerMetadataMessageType.RESULT,
                         result.getSendingApplicationDetails(),
@@ -48,8 +48,8 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
         String outboundReportId = sender.send(result).orElse(null);
         logger.logInfo("Sent result reportId: {}", outboundReportId);
 
-        sendMessageHelper.linkMessage(receivedSubmissionId);
+        sendMessageHelper.linkMessage(outboundMessageId);
 
-        sendMessageHelper.saveSentMessageSubmissionId(receivedSubmissionId, outboundReportId);
+        sendMessageHelper.saveSentMessageSubmissionId(outboundMessageId, outboundReportId);
     }
 }

@@ -149,7 +149,7 @@ components:
     ConsolidatedMetadata:
       type: map<string, map<string, object>>
       properties:
-        receivedSubmissionId:
+        outboundMessageId:
           type: string
           properties:
             value:

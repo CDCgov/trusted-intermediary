@@ -26,12 +26,12 @@ public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
     }
 
     @Override
-    public void convertAndSend(final Order<?> order, String receivedSubmissionId)
+    public void convertAndSend(final Order<?> order, String outboundMessageId)
             throws UnableToSendMessageException {
 
         PartnerMetadata partnerMetadata =
                 new PartnerMetadata(
-                        receivedSubmissionId,
+                        outboundMessageId,
                         String.valueOf(order.hashCode()),
                         PartnerMetadataMessageType.ORDER,
                         order.getSendingApplicationDetails(),
@@ -47,8 +47,8 @@ public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
         String outboundReportId = sender.send(order).orElse(null);
         logger.logInfo("Sent order reportId: {}", outboundReportId);
 
-        sendMessageHelper.linkMessage(receivedSubmissionId);
+        sendMessageHelper.linkMessage(outboundMessageId);
 
-        sendMessageHelper.saveSentMessageSubmissionId(receivedSubmissionId, outboundReportId);
+        sendMessageHelper.saveSentMessageSubmissionId(outboundMessageId, outboundReportId);
     }
 }

@@ -9,10 +9,10 @@ public interface PartnerMetadataStorage {
     /**
      * This method will retrieve and return the metadata for the given submissionId, if it exists.
      *
-     * @param receivedSubmissionId The submission Id to read the metadata for.
+     * @param outboundMessageId The outbound id to read the metadata for.
      * @return The metadata, if it exists. Otherwise, an empty Optional.
      */
-    Optional<PartnerMetadata> readMetadata(String receivedSubmissionId)
+    Optional<PartnerMetadata> readMetadata(String outboundMessageId)
             throws PartnerMetadataException;
 
     /**

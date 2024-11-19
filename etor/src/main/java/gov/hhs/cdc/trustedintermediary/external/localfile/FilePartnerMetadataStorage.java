@@ -63,7 +63,7 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
     @Override
     public void saveMetadata(final PartnerMetadata metadata) throws PartnerMetadataException {
         try {
-            Path previousMetadataFilePath = searchFilePath(metadata.receivedSubmissionId());
+            Path previousMetadataFilePath = searchFilePath(metadata.outboundMessageId());
             if (previousMetadataFilePath != null) {
                 // delete the pre-existing metadata file so that we don't find the old file when we
                 // search for a given metadata ID
@@ -71,22 +71,19 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
             }
         } catch (IOException e) {
             throw new PartnerMetadataException(
-                    "Error deleting previous metadata file for " + metadata.receivedSubmissionId(),
-                    e);
+                    "Error deleting previous metadata file for " + metadata.outboundMessageId(), e);
         }
 
         Path metadataFilePath =
-                getFilePath(metadata.receivedSubmissionId() + "-" + metadata.inboundMessageId());
+                getFilePath(metadata.outboundMessageId() + "-" + metadata.inboundMessageId());
         try {
             String content = formatter.convertToJsonString(metadata);
             Files.writeString(metadataFilePath, content);
             logger.logInfo(
-                    "Saved metadata for {} to {}",
-                    metadata.receivedSubmissionId(),
-                    metadataFilePath);
+                    "Saved metadata for {} to {}", metadata.outboundMessageId(), metadataFilePath);
         } catch (IOException | FormatterProcessingException e) {
             throw new PartnerMetadataException(
-                    "Error saving metadata for " + metadata.receivedSubmissionId(), e);
+                    "Error saving metadata for " + metadata.outboundMessageId(), e);
         }
     }
 
@@ -108,7 +105,7 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
     }
 
     @Override
-    public Set<String> readMetadataForMessageLinking(String receivedSubmissionId)
+    public Set<String> readMetadataForMessageLinking(String outboundMessageId)
             throws PartnerMetadataException {
         try {
             Set<PartnerMetadata> existingMetadata = getPartnerMetadata();
@@ -116,15 +113,13 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
                     existingMetadata.stream()
                             .filter(
                                     metadata ->
-                                            metadata.receivedSubmissionId()
-                                                    .equals(receivedSubmissionId))
+                                            metadata.outboundMessageId().equals(outboundMessageId))
                             .findFirst()
                             .orElse(null);
 
             if (match == null) {
                 logger.logWarning(
-                        "Matching metadata not found for receivedSubmissionId: {}",
-                        receivedSubmissionId);
+                        "Matching metadata not found for outboundMessageId: {}", outboundMessageId);
                 return Set.of();
             }
 
@@ -138,13 +133,13 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
                                                             .equals(
                                                                     match
                                                                             .receivingFacilityDetails()))
-                                            && !metadata.receivedSubmissionId()
-                                                    .equals(receivedSubmissionId))
-                    .map(PartnerMetadata::receivedSubmissionId)
+                                            && !metadata.outboundMessageId()
+                                                    .equals(outboundMessageId))
+                    .map(PartnerMetadata::outboundMessageId)
                     .collect(Collectors.toSet());
         } catch (Exception e) {
             throw new PartnerMetadataException(
-                    "Failed reading metadata for submissionId: " + receivedSubmissionId, e);
+                    "Failed reading metadata for submissionId: " + outboundMessageId, e);
         }
     }
 
