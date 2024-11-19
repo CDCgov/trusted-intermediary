@@ -1,15 +1,9 @@
 package gov.hhs.cdc.trustedintermediary.etor.utils.security
-
-import gov.hhs.cdc.trustedintermediary.OrderMock
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.etor.orders.Order
-import gov.hhs.cdc.trustedintermediary.etor.orders.SendOrderUseCase
 import gov.hhs.cdc.trustedintermediary.etor.results.Result
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import spock.lang.Specification
-
-import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
 
 class HashHelperTest extends Specification {
     def mockLogger = Mock(Logger)
