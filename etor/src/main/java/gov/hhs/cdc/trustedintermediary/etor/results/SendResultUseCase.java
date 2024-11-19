@@ -32,12 +32,12 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
     public void convertAndSend(Result<?> result, String receivedSubmissionId)
             throws UnableToSendMessageException {
 
-        String hashedOrder = hashHelper.generateHash(result);
+        String hashedResult = hashHelper.generateHash(result);
 
         PartnerMetadata partnerMetadata =
                 new PartnerMetadata(
                         receivedSubmissionId,
-                        hashedOrder,
+                        hashedResult,
                         PartnerMetadataMessageType.RESULT,
                         result.getSendingApplicationDetails(),
                         result.getSendingFacilityDetails(),
