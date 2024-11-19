@@ -60,13 +60,13 @@ public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
 
     public String generateHash(Object obj) {
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            MessageDigest digest = MessageDigest.getInstance("SHA3-512");
             byte[] objBytes = obj.toString().getBytes(StandardCharsets.UTF_8);
             byte[] hashBytes = digest.digest(objBytes);
             return Hex.encodeHexString(hashBytes);
         } catch (NoSuchAlgorithmException e) {
             logger.logError("Algorithm does not exist!", e);
+            throw new RuntimeException(e);
         }
-        return "";
     }
 }
