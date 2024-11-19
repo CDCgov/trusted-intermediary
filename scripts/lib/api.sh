@@ -7,10 +7,16 @@ show_base_usage() {
     local root=$4
     local content_type=$5
     local sender=$6
-    local sender_helper
 
+    local sender_helper, submission_endpoints, query_endpoints
     if [ "$type" = "rs" ]; then
-        sender_helper=", which must be of type <sender_org>.<sender_name>"
+        sender_helper=", of type <sender_org>.<sender_name>"
+        submission_endpoints="waters endpoint"
+        query_endpoints="history endpoint"
+    elif [ "$type" = "ti" ]; then
+        sender_helper=""
+        submission_endpoints="orders and results endpoints"
+        query_endpoints="orders, results and metadata endpoints"
     fi
 
     cat <<EOF
@@ -21,12 +27,12 @@ ENDPOINT_NAME:
 
 Options:
     -e <ENVIRONMENT>    Environment: local|staging (Default: $env)
-    -f <REL_PATH>       Path to the message file to submit (Required for submission endpoints)
+    -f <REL_PATH>       Path to the message file to submit (Required for $submission_endpoints)
     -r <ROOT_PATH>      Root path to the message files (Default: $root)
     -t <CONTENT_TYPE>   Content type for the message file (Default: $content_type)
     -k <KEY_PATH>       Path to the sender private key (Required for non-local environments)
     -s <SENDER>         Sender ID used for authentication$sender_helper (Default: $sender)
-    -i <SUBMISSION_ID>  Submission ID (Required for metadata/history endpoints)
+    -i <SUBMISSION_ID>  Submission ID (Required for $query_endpoints)
     -v                  Verbose mode
     -h                  Display this help and exit
 EOF

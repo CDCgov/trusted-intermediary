@@ -18,7 +18,7 @@ handle_request() {
         exit 0
     }
 
-    parse_sender_string "$SENDER" sender_org sender_name
+    parse_sender_string "$SENDER"
     setup_base_credentials "$ENVIRONMENT" "$sender_org" "$SENDER_PRIVATE_KEY" "$TI_LOCAL_PRIVATE_KEY_PATH" "flexion"
 
     local url host jwt_token

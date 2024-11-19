@@ -62,13 +62,13 @@ ENDPOINT_NAME:
     The name of the endpoint to call (required)
 
 Options:
-    -f <REL_PATH>       Path to the hl7 file to submit (Required for waters API)
-    -r <ROOT_PATH>      Root path to the hl7 files (Default: /Users/bbogado/Code/Flexion/CDC-TI/trusted-intermediary/examples/)
-    -e <ENVIRONMENT>    Environment: local|staging|production (Default: local)
+    -e <ENVIRONMENT>    Environment: local|staging (Default: local)
+    -f <REL_PATH>       Path to the message file to submit (Required for waters endpoint)
+    -r <ROOT_PATH>      Root path to the message files (Default: /Users/bbogado/Code/Flexion/CDC-TI/trusted-intermediary/examples/)
+    -t <CONTENT_TYPE>   Content type for the message file (Default: application/hl7-v2)
     -k <KEY_PATH>       Path to the sender private key (Required for non-local environments)
-    -i <SUBMISSION_ID>  Submission ID for history API (Required for history API)
-    -s <SENDER>         Sender ID which must be of type <sender_org>.<sender_name> (Default: flexion.simulated-sender)
-    -t <CONTENT_TYPE>   Content type for the message (Default: application/hl7-v2)
+    -s <SENDER>         Sender ID used for authentication, of type <sender_org>.<sender_name> (Default: flexion.simulated-sender)
+    -i <SUBMISSION_ID>  Submission ID (Required for history endpoint)
     -v                  Verbose mode
     -h                  Display this help and exit
 ```
@@ -123,13 +123,13 @@ ENDPOINT_NAME:
     The name of the endpoint to call (required)
 
 Options:
-    -f <REL_PATH>       Path to the fhir file to submit (Required for orders and results APIs)
-    -r <ROOT_PATH>      Root path to the fhir files (Default: /Users/bbogado/Code/Flexion/CDC-TI/trusted-intermediary/examples/)
     -e <ENVIRONMENT>    Environment: local|staging (Default: local)
+    -f <REL_PATH>       Path to the message file to submit (Required for orders and results endpoints)
+    -r <ROOT_PATH>      Root path to the message files (Default: /Users/bbogado/Code/Flexion/CDC-TI/trusted-intermediary/examples/)
+    -t <CONTENT_TYPE>   Content type for the message file (Default: application/fhir+ndjson)
     -k <KEY_PATH>       Path to the sender private key (Required for non-local environments)
-    -i <SUBMISSION_ID>  Submission ID for metadata API (Required for orders, results and metadata API)
-    -s <SENDER>         Sender ID to create JWT with (Default: report-stream)
-    -t <CONTENT_TYPE>   Content type for the message (Default: application/fhir+ndjson)
+    -s <SENDER>         Sender ID used for authentication (Default: report-stream)
+    -i <SUBMISSION_ID>  Submission ID (Required for orders, results and metadata endpoints)
     -v                  Verbose mode
     -h                  Display this help and exit
 ```
