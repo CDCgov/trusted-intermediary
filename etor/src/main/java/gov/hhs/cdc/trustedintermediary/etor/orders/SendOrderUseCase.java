@@ -6,17 +6,15 @@ import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageExceptio
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.TransformationRuleEngine;
+import gov.hhs.cdc.trustedintermediary.etor.utils.security.HashHelper;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import javax.inject.Inject;
-import org.apache.commons.codec.binary.Hex;
 
 /** The overall logic to receive, convert to OML, and subsequently send a lab order. */
 public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
     private static final SendOrderUseCase INSTANCE = new SendOrderUseCase();
+    private final HashHelper hashHelper = new HashHelper();
     @Inject TransformationRuleEngine transformationEngine;
     @Inject OrderSender sender;
     @Inject MetricMetadata metadata;
@@ -33,12 +31,12 @@ public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
     public void convertAndSend(final Order<?> order, String receivedSubmissionId)
             throws UnableToSendMessageException {
 
-        String hash = generateHash(order);
+        String hashedOrder = hashHelper.generateHash(order);
 
         PartnerMetadata partnerMetadata =
                 new PartnerMetadata(
                         receivedSubmissionId,
-                        hash,
+                        hashedOrder,
                         PartnerMetadataMessageType.ORDER,
                         order.getSendingApplicationDetails(),
                         order.getSendingFacilityDetails(),
@@ -56,17 +54,5 @@ public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
         sendMessageHelper.linkMessage(receivedSubmissionId);
 
         sendMessageHelper.saveSentMessageSubmissionId(receivedSubmissionId, outboundReportId);
-    }
-
-    public String generateHash(Object obj) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA3-512");
-            byte[] objBytes = obj.toString().getBytes(StandardCharsets.UTF_8);
-            byte[] hashBytes = digest.digest(objBytes);
-            return Hex.encodeHexString(hashBytes);
-        } catch (NoSuchAlgorithmException e) {
-            logger.logError("Algorithm does not exist!", e);
-            throw new RuntimeException(e);
-        }
     }
 }

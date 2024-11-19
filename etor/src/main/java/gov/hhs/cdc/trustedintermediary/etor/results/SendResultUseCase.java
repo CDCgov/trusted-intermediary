@@ -6,12 +6,14 @@ import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageExceptio
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.TransformationRuleEngine;
+import gov.hhs.cdc.trustedintermediary.etor.utils.security.HashHelper;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import javax.inject.Inject;
 
 /** Use case for converting and sending a lab result message. */
 public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
     private static final SendResultUseCase INSTANCE = new SendResultUseCase();
+    private final HashHelper hashHelper = new HashHelper();
 
     @Inject TransformationRuleEngine transformationEngine;
     @Inject ResultSender sender;
@@ -30,10 +32,12 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
     public void convertAndSend(Result<?> result, String receivedSubmissionId)
             throws UnableToSendMessageException {
 
+        String hashedOrder = hashHelper.generateHash(result);
+
         PartnerMetadata partnerMetadata =
                 new PartnerMetadata(
                         receivedSubmissionId,
-                        String.valueOf(result.hashCode()),
+                        hashedOrder,
                         PartnerMetadataMessageType.RESULT,
                         result.getSendingApplicationDetails(),
                         result.getSendingFacilityDetails(),
