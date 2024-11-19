@@ -128,4 +128,41 @@ class SendOrderUseCaseTest extends Specification {
         1 * mockOrchestrator.findMessagesIdsToLink(_ as String) >> Set.of()
         0 * mockOrchestrator.updateMetadataForSentMessage(_ as String, _ as String)
     }
+
+    def "generateHash generates hash for an object"() {
+        given:
+        def mockOrder = Mock(Order)
+
+        when:
+        String mockHash = SendOrderUseCase.getInstance().generateHash(mockOrder)
+
+        then:
+        mockHash !== ""
+    }
+
+    def "generateHash generates unique hash for the same object"() {
+        given:
+        def mockOrder = Mock(Order)
+        def mockOrder2 = Mock(Order)
+
+        when:
+        String mockHash = SendOrderUseCase.getInstance().generateHash(mockOrder)
+        String mockHash2 = SendOrderUseCase.getInstance().generateHash(mockOrder2)
+
+        then:
+        mockHash !== ""
+        mockHash !== mockHash2
+    }
+
+    // Need to check failure edge case
+    //    def "generateHash logs error when object cannot be hashed"() {
+    //        given:
+    //        def mockOrder = Mock(Order)
+    //
+    //        when:
+    //        String mockHash = SendOrderUseCase.getInstance().generateHash(mockOrder)
+    //
+    //        then:
+    //        mockHash == ""
+    //    }
 }
