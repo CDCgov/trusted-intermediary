@@ -64,7 +64,7 @@ dependencies {
     implementation 'org.postgresql:postgresql:42.7.4'
 
     // hikari connection pool
-    implementation 'com.zaxxer:HikariCP:6.2.0'
+    implementation 'com.zaxxer:HikariCP:6.2.1'
 }
 
 jacocoTestCoverageVerification {
