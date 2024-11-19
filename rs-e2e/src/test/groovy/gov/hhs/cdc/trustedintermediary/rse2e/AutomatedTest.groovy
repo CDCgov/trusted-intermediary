@@ -14,19 +14,13 @@ import spock.lang.Specification
 
 class AutomatedTest extends Specification  {
 
-    List<HL7FileStream> recentAzureFiles
-    List<HL7FileStream> recentLocalFiles
+    List<HL7FileStream> azureFiles
+    List<HL7FileStream> localFiles
     AssertionRuleEngine engine
     HapiHL7FileMatcher fileMatcher
-    def mockLogger = Mock(Logger)
+    Logger mockLogger = Mock(Logger)
 
     def setup() {
-        FileFetcher azureFileFetcher = AzureBlobFileFetcher.getInstance()
-        recentAzureFiles = azureFileFetcher.fetchFiles()
-
-        FileFetcher localFileFetcher = LocalFileFetcher.getInstance()
-        recentLocalFiles = localFileFetcher.fetchFiles()
-
         engine = AssertionRuleEngine.getInstance()
         fileMatcher =  HapiHL7FileMatcher.getInstance()
 
@@ -38,29 +32,39 @@ class AutomatedTest extends Specification  {
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.register(HapiHL7FileMatcher, fileMatcher)
         TestApplicationContext.register(HealthDataExpressionEvaluator, HapiHL7ExpressionEvaluator.getInstance())
-        TestApplicationContext.register(AzureBlobFileFetcher, azureFileFetcher)
         TestApplicationContext.register(LocalFileFetcher, LocalFileFetcher.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
+
+        FileFetcher azureFileFetcher = AzureBlobFileFetcher.getInstance()
+        azureFiles = azureFileFetcher.fetchFiles()
+
+        FileFetcher localFileFetcher = LocalFileFetcher.getInstance()
+        localFiles = localFileFetcher.fetchFiles()
+
+        engine.ensureRulesLoaded()
     }
 
     def cleanup() {
-        for (HL7FileStream fileStream : recentLocalFiles + recentAzureFiles) {
+        for (HL7FileStream fileStream : localFiles + azureFiles) {
             fileStream.inputStream().close()
         }
     }
 
     def "test defined assertions on relevant messages"() {
         given:
-        def matchedFiles = fileMatcher.matchFiles(recentAzureFiles, recentLocalFiles)
+        def rulesToEvaluate = engine.getRules()
+        def matchedFiles = fileMatcher.matchFiles(azureFiles, localFiles)
 
         when:
         for (messagePair in matchedFiles) {
             Message inputMessage = messagePair.getKey() as Message
             Message outputMessage = messagePair.getValue() as Message
-            engine.runRules(outputMessage, inputMessage)
+            def evaluatedRules = engine.runRules(outputMessage, inputMessage)
+            rulesToEvaluate.removeAll(evaluatedRules)
         }
 
         then:
+        rulesToEvaluate.collect { it.name }.isEmpty() //Check whether all the rules in the assertions file have been run
         0 * mockLogger.logError(_ as String, _ as Exception)
         0 * mockLogger.logWarning(_ as String)
     }

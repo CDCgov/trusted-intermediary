@@ -49,13 +49,13 @@ dependencies {
 
     // azure sdk
     implementation 'com.azure:azure-security-keyvault-secrets:4.9.0'
-    implementation 'com.azure:azure-identity:1.13.3'
+    implementation 'com.azure:azure-identity:1.14.2'
 
-    testImplementation 'org.apache.groovy:groovy:4.0.23'
-    testFixturesImplementation 'org.apache.groovy:groovy:4.0.23'
+    testImplementation 'org.apache.groovy:groovy:4.0.24'
+    testFixturesImplementation 'org.apache.groovy:groovy:4.0.24'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
     testFixturesImplementation 'com.openpojo:openpojo:0.9.1'
-    testFixturesImplementation 'nl.jqno.equalsverifier:equalsverifier:3.17.1'
+    testFixturesImplementation 'nl.jqno.equalsverifier:equalsverifier:3.17.3'
 
     // dotenv-java
     implementation 'io.github.cdimascio:dotenv-java:3.0.2'
@@ -64,7 +64,7 @@ dependencies {
     implementation 'org.postgresql:postgresql:42.7.4'
 
     // hikari connection pool
-    implementation 'com.zaxxer:HikariCP:6.0.0'
+    implementation 'com.zaxxer:HikariCP:6.1.0'
 }
 
 jacocoTestCoverageVerification {

@@ -1,0 +1,6 @@
+MSH|^~\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-lab-id^DNS|20230101010000-0000||ORU^R01^ORU_R01|008|N|2.5.1||||||||||
+PID|1||80008836^^^&NPI^MR||CDPHSIX^BOY  MOMSIX^^^^^B|||M||2106-3^White||||||||||||2186-5^Not Hispanic or Latino||N|1
+NK1|1|CDPHSIX|MTH^Mother|132 ST^^SAN DIEGO^CA^92126^USA
+ORC|RE|7181233072^FormNumber||189430284^HospOrdNumber||||||||^ROSEN^REBECCA|||||||||UCSD JACOBS MEDICAL CENTER^^^^^^^^^R797| 2961DR YLLUT^^SAN DIEGO^CA^99999-9999
+OBR|1|7181233072^FormNumber||54089-8^NB Screen Panel Patient AHIC|||202402131546|||||||||^JOHNSON^KATHRYN||||||20240226034304|||F
+OBX|1|NM|47633-3^Glycine [Moles/volume] in Dried blood spot^LN|1|0.5|µmol/L||N|||F|||20240212103049
