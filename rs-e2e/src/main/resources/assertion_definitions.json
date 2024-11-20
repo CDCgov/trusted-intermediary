@@ -98,7 +98,7 @@
         "MSH-10 = '009'"
       ],
       "rules": [
-        "OBX.count() = 2"
+        "OBX.count() = 1"
       ]
     }
   ]
