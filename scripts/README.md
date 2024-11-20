@@ -189,7 +189,7 @@ Submit requests to Epic API endpoints
 
 #### Usage
 
-`./epic.sh results -u https://epicproxy-np.et0502.epichosted.com -k /path/to/ucsd-epic-private-key.pem -s sender_name`
+`./epic.sh results -k /path/to/ucsd-epic-private-key.pem -s sender_name`
 
 ### setup/update-examples-snapshots.sh
 

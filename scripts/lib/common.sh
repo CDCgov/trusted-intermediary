@@ -87,7 +87,8 @@ parse_sender_string() {
         SENDER_NAME="${BASH_REMATCH[2]}"
         return 0
     else
-        echo "Error: Sender string '$sender_string' must be in format 'sender_org.sender_name'" >&2
+        SENDER_ORG="$sender_string"
+        SENDER_NAME=""
         return 1
     fi
 }

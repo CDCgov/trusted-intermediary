@@ -15,6 +15,4 @@ parse_args "epic" "$@" || {
     exit 0
 }
 
-setup_credentials
-
 handle_api_request "epic" "$@"

@@ -48,17 +48,18 @@ parse_args() {
         esac
     done
 
-    shift "$((OPTIND - 1))"
-    REMAINING_ARGS="$*"
-}
+    parse_sender_string "$SENDER"
 
-setup_credentials() {
-    if [ -z "$SENDER_PRIVATE_KEY" ] && [ "$ENVIRONMENT" = "local" ] && [ -f "$DEFAULT_SENDER_PRIVATE_KEY_PATH" ] && [ "$SENDER_ORG" = "$DEFAULT_SENDER_ORG" ]; then
+    if [ -z "$SENDER_PRIVATE_KEY" ] && [ "$ENVIRONMENT" = "local" ] && [ -f "$DEFAULT_SENDER_PRIVATE_KEY_PATH" ] && [ "$SENDER_ORG" = "$DEFAULT_SENDER_PRIVATE_KEY_ORG" ]; then
         SENDER_PRIVATE_KEY="$DEFAULT_SENDER_PRIVATE_KEY_PATH"
     elif [ -z "$SENDER_PRIVATE_KEY" ] && [ "$ENVIRONMENT" != "local" ]; then
         fail "Sender private key (-k) is required for non-local environments"
     fi
+
     [ ! -f "$SENDER_PRIVATE_KEY" ] && fail "Sender private key file not found: $SENDER_PRIVATE_KEY"
+
+    shift "$((OPTIND - 1))"
+    REMAINING_ARGS="$*"
 }
 
 handle_api_request() {
@@ -79,7 +80,6 @@ handle_api_request() {
     )
 
     if [ "$api_type" = "rs" ]; then
-        parse_sender_string "$SENDER"
         vars+=(
             --variable sender-org=$SENDER_ORG
             --variable sender-name=$SENDER_NAME
