@@ -83,8 +83,8 @@ parse_sender_string() {
     local sender_string=$1
 
     if [[ "$sender_string" =~ ^([^.]+)\.([^.]+)$ ]]; then
-        sender_org="${BASH_REMATCH[1]}"
-        sender_name="${BASH_REMATCH[2]}"
+        SENDER_ORG="${BASH_REMATCH[1]}"
+        SENDER_NAME="${BASH_REMATCH[2]}"
         return 0
     else
         echo "Error: Sender string '$sender_string' must be in format 'sender_org.sender_name'" >&2
