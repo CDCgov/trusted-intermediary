@@ -1,19 +1,7 @@
 #!/bin/bash
 
-show_base_usage() {
-    local type=$1
-    local script_name=$2
-
-    local sender_helper, submission_endpoints, query_endpoints
-    if [ "$type" = "rs" ]; then
-        sender_helper=", of type <sender_org>.<sender_name>"
-        submission_endpoints="waters endpoint"
-        query_endpoints="history endpoint"
-    elif [ "$type" = "ti" ]; then
-        sender_helper=""
-        submission_endpoints="orders and results endpoints"
-        query_endpoints="orders, results and metadata endpoints"
-    fi
+show_usage() {
+    local script_name=$1
 
     cat <<EOF
 Usage: ./$script_name <ENDPOINT_NAME> [OPTIONS]
@@ -23,18 +11,19 @@ ENDPOINT_NAME:
 
 Options:
     -e <ENVIRONMENT>    Environment: local|staging (Default: $ENVIRONMENT)
-    -f <REL_PATH>       Path to the message file to submit (Required for $submission_endpoints)
+    -f <REL_PATH>       Path to the message file to submit (Required for submission endpoints)
     -r <ROOT_PATH>      Root path to the message files (Default: $ROOT_PATH)
     -t <CONTENT_TYPE>   Content type for the message file (Default: $CONTENT_TYPE)
     -k <KEY_PATH>       Path to the sender private key (Required for non-local environments)
-    -s <SENDER>         Sender ID used for authentication$sender_helper (Default: $SENDER)
-    -i <SUBMISSION_ID>  Submission ID (Required for $query_endpoints)
+    -s <SENDER>         Sender ID used for authentication (Default: $SENDER)
+    -u <URL>            URL root for the API endpoint (Default: auto-detected)
+    -i <SUBMISSION_ID>  Submission ID (Required for query endpoints)
     -v                  Verbose mode
     -h                  Display this help and exit
 EOF
 }
 
-parse_base_args() {
+parse_args() {
     local type=$1
     shift
 
@@ -44,7 +33,7 @@ parse_base_args() {
     HURL_FILE_PATH="$CDCTI_HOME/scripts/hurl/$type/$1.hurl"
     shift
 
-    while getopts ':e:f:r:t:k:s:i:v' opt; do
+    while getopts ':e:f:r:t:k:s:u:i:v' opt; do
         case "$opt" in
         e) ENVIRONMENT="$OPTARG" ;;
         f) REL_PATH="$OPTARG" ;;
@@ -52,6 +41,7 @@ parse_base_args() {
         t) CONTENT_TYPE="$OPTARG" ;;
         k) SENDER_PRIVATE_KEY="$OPTARG" ;;
         s) SENDER="$OPTARG" ;;
+        u) URL="$OPTARG" ;;
         i) SUBMISSION_ID="$OPTARG" ;;
         v) VERBOSE="--verbose" ;;
         ?) fail "Invalid option -$OPTARG" ;;
@@ -62,7 +52,7 @@ parse_base_args() {
     REMAINING_ARGS="$*"
 }
 
-setup_base_credentials() {
+setup_credentials() {
     if [ -z "$SENDER_PRIVATE_KEY" ] && [ "$ENVIRONMENT" = "local" ] && [ -f "$DEFAULT_SENDER_PRIVATE_KEY_PATH" ] && [ "$SENDER_ORG" = "$DEFAULT_SENDER_ORG" ]; then
         SENDER_PRIVATE_KEY="$DEFAULT_SENDER_PRIVATE_KEY_PATH"
     elif [ -z "$SENDER_PRIVATE_KEY" ] && [ "$ENVIRONMENT" != "local" ]; then
@@ -75,15 +65,15 @@ handle_api_request() {
     local api_type=$1
     shift
 
-    local url host jwt_token
-    url=$(get_api_url "$ENVIRONMENT" "$api_type")
-    host=$(extract_host_from_url "$url")
+    local host jwt_token
+    [ -z "$URL" ] && URL=$(get_api_url "$ENVIRONMENT" "$api_type")
+    host=$(extract_host_from_url "$URL")
     jwt_token=$(generate_jwt "$SENDER" "$host" "$SENDER_PRIVATE_KEY")
 
     local vars=(
         --variable fpath=$REL_PATH
         --file-root $ROOT_PATH
-        --variable url=$url
+        --variable url=$URL
         --variable jwt=$jwt_token
         --variable content-type=$CONTENT_TYPE
     )
@@ -94,7 +84,7 @@ handle_api_request() {
             --variable sender-org=$SENDER_ORG
             --variable sender-name=$SENDER_NAME
         )
-    elif [ "$api_type" = "ti" ]; then
+    else
         vars+=(--variable sender=$SENDER)
     fi
 

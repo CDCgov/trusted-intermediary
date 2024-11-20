@@ -2,19 +2,19 @@
 
 [ -z "${CDCTI_HOME}" ] && echo "Error: Environment variable CDCTI_HOME is not set. Please refer to /scripts/README.md for instructions" && exit 1
 source "$CDCTI_HOME/scripts/lib/common.sh"
+source "$CDCTI_HOME/scripts/lib/api.sh"
 
-sender=
-audience=https://epicproxy-np.et0502.epichosted.com/FhirProxy/oauth2/token
-secret=/path/to/ucsd-epic-private-key.pem
-root=$CDCTI_HOME/examples/CA/
-fpath="$1"
-shift
+# default values
+ENVIRONMENT=staging
+ROOT_PATH=$CDCTI_HOME/examples/CA/
+CONTENT_TYPE=application/hl7-v2
+URL=https://epicproxy-np.et0502.epichosted.com/FhirProxy/oauth2/token
 
-jwt_token=$(generate_jwt "$sender" "$audience" "$secret") || fail "Failed to generate JWT token"
+parse_args "epic" "$@" || {
+    show_usage "$(basename "$0")"
+    exit 0
+}
 
-hurl \
-    --variable "fpath=$fpath" \
-    --file-root "$root" \
-    --variable "jwt=$jwt_token" \
-    "$CDCTI_HOME"/scripts/epic/results.hurl \
-    "$@"
+setup_credentials
+
+handle_api_request "epic" "$@"

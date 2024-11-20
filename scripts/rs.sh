@@ -13,11 +13,11 @@ CONTENT_TYPE=application/hl7-v2
 SENDER_ORG=flexion
 SENDER="$DEFAULT_SENDER_ORG.simulated-sender"
 
-parse_base_args "rs" "$@" || {
-    show_base_usage "rs" "$(basename "$0")"
+parse_args "rs" "$@" || {
+    show_usage "$(basename "$0")"
     exit 0
 }
 
-setup_base_credentials
+setup_credentials
 
 handle_api_request "rs" "$@"

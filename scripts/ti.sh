@@ -13,11 +13,11 @@ CONTENT_TYPE=application/fhir+ndjson
 SENDER_ORG=report-stream
 SENDER=$SENDER_ORG
 
-parse_base_args "ti" "$@" || {
-    show_base_usage "ti" "$(basename "$0")"
+parse_args "ti" "$@" || {
+    show_usage "$(basename "$0")"
     exit 0
 }
 
-setup_base_credentials
+setup_credentials
 
 handle_api_request "ti" "$@"

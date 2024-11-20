@@ -63,12 +63,13 @@ ENDPOINT_NAME:
 
 Options:
     -e <ENVIRONMENT>    Environment: local|staging (Default: local)
-    -f <REL_PATH>       Path to the message file to submit (Required for waters endpoint)
+    -f <REL_PATH>       Path to the message file to submit (Required for submission endpoints)
     -r <ROOT_PATH>      Root path to the message files (Default: /Users/bbogado/Code/Flexion/CDC-TI/trusted-intermediary/examples/)
     -t <CONTENT_TYPE>   Content type for the message file (Default: application/hl7-v2)
     -k <KEY_PATH>       Path to the sender private key (Required for non-local environments)
-    -s <SENDER>         Sender ID used for authentication, of type <sender_org>.<sender_name> (Default: flexion.simulated-sender)
-    -i <SUBMISSION_ID>  Submission ID (Required for history endpoint)
+    -s <SENDER>         Sender ID used for authentication (Default: flexion.simulated-sender)
+    -u <URL>            URL root for the API endpoint (Default: auto-detected)
+    -i <SUBMISSION_ID>  Submission ID (Required for query endpoints)
     -v                  Verbose mode
     -h                  Display this help and exit
 ```
@@ -124,12 +125,13 @@ ENDPOINT_NAME:
 
 Options:
     -e <ENVIRONMENT>    Environment: local|staging (Default: local)
-    -f <REL_PATH>       Path to the message file to submit (Required for orders and results endpoints)
+    -f <REL_PATH>       Path to the message file to submit (Required for submission endpoints)
     -r <ROOT_PATH>      Root path to the message files (Default: /Users/bbogado/Code/Flexion/CDC-TI/trusted-intermediary/examples/)
     -t <CONTENT_TYPE>   Content type for the message file (Default: application/fhir+ndjson)
     -k <KEY_PATH>       Path to the sender private key (Required for non-local environments)
     -s <SENDER>         Sender ID used for authentication (Default: report-stream)
-    -i <SUBMISSION_ID>  Submission ID (Required for orders, results and metadata endpoints)
+    -u <URL>            URL root for the API endpoint (Default: auto-detected)
+    -i <SUBMISSION_ID>  Submission ID (Required for query endpoints)
     -v                  Verbose mode
     -h                  Display this help and exit
 ```
@@ -187,7 +189,7 @@ Submit requests to Epic API endpoints
 
 #### Usage
 
-`./epic.sh results`
+`./epic.sh results -u https://epicproxy-np.et0502.epichosted.com -k /path/to/ucsd-epic-private-key.pem -s sender_name`
 
 ### setup/update-examples-snapshots.sh
 
