@@ -171,15 +171,15 @@ class EtorDomainRegistrationTest extends Specification {
     def "metadata endpoint happy path"() {
         given:
         def expectedStatusCode = 200
-        def receivedSubmissionId = "receivedSubmissionId"
-        def metadata = new PartnerMetadata("receivedSubmissionId", "hash", PartnerMetadataMessageType.ORDER, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
-        def linkedMessageIds = Set.of(receivedSubmissionId, "Test1", "Test2")
+        def inboundReportId = "inboundReportId"
+        def metadata = new PartnerMetadata("inboundReportId", "hash", PartnerMetadataMessageType.ORDER, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number")
+        def linkedMessageIds = Set.of(inboundReportId, "Test1", "Test2")
 
         def connector = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, connector)
 
         def request = new DomainRequest()
-        request.setPathParams(["id": receivedSubmissionId])
+        request.setPathParams(["id": inboundReportId])
 
         def mockPartnerMetadataOrchestrator = Mock(PartnerMetadataOrchestrator)
         TestApplicationContext.register(PartnerMetadataOrchestrator, mockPartnerMetadataOrchestrator)
@@ -202,8 +202,8 @@ class EtorDomainRegistrationTest extends Specification {
 
         then:
         actualStatusCode == expectedStatusCode
-        1 * mockPartnerMetadataOrchestrator.getMetadata(receivedSubmissionId) >> Optional.ofNullable(metadata)
-        1 * mockPartnerMetadataOrchestrator.findMessagesIdsToLink(receivedSubmissionId) >> linkedMessageIds
+        1 * mockPartnerMetadataOrchestrator.getMetadata(inboundReportId) >> Optional.ofNullable(metadata)
+        1 * mockPartnerMetadataOrchestrator.findMessagesIdsToLink(inboundReportId) >> linkedMessageIds
         1 * mockPartnerMetadataConverter.extractPublicMetadataToOperationOutcome(_ as PartnerMetadata, _ as String, linkedMessageIds) >> Mock(FhirMetadata)
         1 * mockResponseHelper.constructOkResponseFromString(_ as String) >> new DomainResponse(expectedStatusCode)
     }
@@ -211,10 +211,10 @@ class EtorDomainRegistrationTest extends Specification {
     def "metadata endpoint returns metadata even when the submitted ID is different from ID used for linking"() {
         given:
         def expectedStatusCode = 200
-        def receivedSubmissionId = "receivedSubmissionId"
+        def inboundReportId = "inboundReportId"
         def sentSubmissionId = "sentSubmissionId"
-        def metadata = new PartnerMetadata(receivedSubmissionId, "hash", PartnerMetadataMessageType.ORDER, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number").withSentSubmissionId(sentSubmissionId)
-        def linkedMessageIds = Set.of(receivedSubmissionId, "Test1", "Test2")
+        def metadata = new PartnerMetadata(inboundReportId, "hash", PartnerMetadataMessageType.ORDER, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number").withSentSubmissionId(sentSubmissionId)
+        def linkedMessageIds = Set.of(inboundReportId, "Test1", "Test2")
 
         def connector = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, connector)
@@ -244,7 +244,7 @@ class EtorDomainRegistrationTest extends Specification {
         then:
         actualStatusCode == expectedStatusCode
         1 * mockPartnerMetadataOrchestrator.getMetadata(sentSubmissionId) >> Optional.ofNullable(metadata)
-        1 * mockPartnerMetadataOrchestrator.findMessagesIdsToLink(receivedSubmissionId) >> linkedMessageIds
+        1 * mockPartnerMetadataOrchestrator.findMessagesIdsToLink(inboundReportId) >> linkedMessageIds
         1 * mockPartnerMetadataConverter.extractPublicMetadataToOperationOutcome(_ as PartnerMetadata, _ as String, linkedMessageIds) >> Mock(FhirMetadata)
         1 * mockResponseHelper.constructOkResponseFromString(_ as String) >> new DomainResponse(expectedStatusCode)
     }
@@ -430,7 +430,7 @@ class EtorDomainRegistrationTest extends Specification {
         2 * mockLogger.logError(_ as String, _ as Exception)
     }
 
-    def "handleMessageRequest logs an error and continues when the receivedSubmissionId is missing or empty because we want to know when our integration with RS is broken"() {
+    def "handleMessageRequest logs an error and continues when the inboundReportId is missing or empty because we want to know when our integration with RS is broken"() {
         given:
         def connector = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, connector)

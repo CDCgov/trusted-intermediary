@@ -82,7 +82,7 @@ public class HapiPartnerMetadataConverter implements PartnerMetadataConverter {
                 .getIssue()
                 .add(
                         createInformationIssueComponent(
-                                "inbound submission id", metadata.receivedSubmissionId()));
+                                "inbound submission id", metadata.inboundReportId()));
 
         return new HapiFhirMetadata(operation);
     }

@@ -9,11 +9,10 @@ public interface PartnerMetadataStorage {
     /**
      * This method will retrieve and return the metadata for the given submissionId, if it exists.
      *
-     * @param receivedSubmissionId The submission Id to read the metadata for.
+     * @param inboundReportId The inbound report id to read the metadata for.
      * @return The metadata, if it exists. Otherwise, an empty Optional.
      */
-    Optional<PartnerMetadata> readMetadata(String receivedSubmissionId)
-            throws PartnerMetadataException;
+    Optional<PartnerMetadata> readMetadata(String inboundReportId) throws PartnerMetadataException;
 
     /**
      * This method will do "upserts". If the record doesn't exist, it is created. If the record

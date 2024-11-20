@@ -34,7 +34,7 @@ class SendOrderUseCaseTest extends Specification {
 
     def "send sends successfully"() {
         given:
-        def receivedSubmissionId = "receivedId"
+        def inboundReportId = "inboundReportId"
         def sentSubmissionId = "sentId"
         def messagesIdsToLink = new HashSet<>(Set.of("messageId1", "messageId2"))
         def mockOrder = new OrderMock(null, null, null, null, null, null, null, null)
@@ -42,15 +42,15 @@ class SendOrderUseCaseTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        SendOrderUseCase.getInstance().convertAndSend(mockOrder, receivedSubmissionId)
+        SendOrderUseCase.getInstance().convertAndSend(mockOrder, inboundReportId)
 
         then:
         1 * mockEngine.runRules(mockOrder)
         1 * mockSender.send(mockOrder) >> Optional.of(sentSubmissionId)
         1 * mockOrchestrator.updateMetadataForReceivedMessage(_ as PartnerMetadata)
-        1 * mockOrchestrator.updateMetadataForSentMessage(receivedSubmissionId, sentSubmissionId)
-        1 * mockOrchestrator.findMessagesIdsToLink(receivedSubmissionId) >> messagesIdsToLink
-        1 * mockOrchestrator.linkMessages(messagesIdsToLink + receivedSubmissionId)
+        1 * mockOrchestrator.updateMetadataForSentMessage(inboundReportId, sentSubmissionId)
+        1 * mockOrchestrator.findMessagesIdsToLink(inboundReportId) >> messagesIdsToLink
+        1 * mockOrchestrator.linkMessages(messagesIdsToLink + inboundReportId)
     }
 
     def "send fails to send"() {
@@ -65,7 +65,7 @@ class SendOrderUseCaseTest extends Specification {
         thrown(UnableToSendMessageException)
     }
 
-    def "convertAndSend should log warnings for null receivedSubmissionId"() {
+    def "convertAndSend should log warnings for null inboundReportId"() {
         given:
         mockSender.send(_) >> Optional.of("sentSubmissionId")
         TestApplicationContext.injectRegisteredImplementations()
@@ -81,18 +81,18 @@ class SendOrderUseCaseTest extends Specification {
     def "convertAndSend logs error and continues when updateMetadataForReceivedOrder throws exception"() {
         given:
         def order = Mock(Order)
-        def receivedSubmissionId = "receivedId"
+        def inboundReportId = "inboundReportId"
 
         mockOrchestrator.updateMetadataForReceivedMessage(_ as PartnerMetadata) >> { throw new PartnerMetadataException("Error") }
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        SendOrderUseCase.getInstance().convertAndSend(order, receivedSubmissionId)
+        SendOrderUseCase.getInstance().convertAndSend(order, inboundReportId)
 
         then:
         1 * mockLogger.logError(_, _)
         1 * mockEngine.runRules(order)
-        1 * mockOrchestrator.findMessagesIdsToLink(receivedSubmissionId) >> Set.of()
+        1 * mockOrchestrator.findMessagesIdsToLink(inboundReportId) >> Set.of()
         1 * mockSender.send(order) >> Optional.of("sentId")
     }
 
@@ -100,11 +100,11 @@ class SendOrderUseCaseTest extends Specification {
         given:
         def order = Mock(Order)
         def partnerMetadataException = new PartnerMetadataException("Error")
-        mockOrchestrator.updateMetadataForSentMessage("receivedId", _) >> { throw  partnerMetadataException}
+        mockOrchestrator.updateMetadataForSentMessage("inboundReportId", _) >> { throw  partnerMetadataException}
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        SendOrderUseCase.getInstance().convertAndSend(order, "receivedId")
+        SendOrderUseCase.getInstance().convertAndSend(order, "inboundReportId")
 
         then:
         1 * mockEngine.runRules(order)
@@ -121,7 +121,7 @@ class SendOrderUseCaseTest extends Specification {
         mockSender.send(_) >> Optional.empty()
 
         when:
-        SendOrderUseCase.getInstance().convertAndSend(mockOrder, "receivedId")
+        SendOrderUseCase.getInstance().convertAndSend(mockOrder, "inboundReportId")
 
         then:
         1 * mockLogger.logWarning(_)
