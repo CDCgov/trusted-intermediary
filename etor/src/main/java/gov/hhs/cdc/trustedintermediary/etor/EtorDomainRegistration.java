@@ -222,7 +222,7 @@ public class EtorDomainRegistration implements DomainConnector {
             DomainRequest request,
             MessageRequestHandler<DomainResponse> requestHandler,
             String messageType) {
-        String inboundReportId = getReceivedSubmissionId(request);
+        String inboundReportId = getInboundReportId(request);
         boolean markMetadataAsFailed = false;
         String errorMessage = "";
 
@@ -250,7 +250,7 @@ public class EtorDomainRegistration implements DomainConnector {
         }
     }
 
-    protected String getReceivedSubmissionId(DomainRequest request) {
+    protected String getInboundReportId(DomainRequest request) {
 
         String inboundReportId = request.getHeaders().get("recordid");
         if (inboundReportId == null || inboundReportId.isEmpty()) {

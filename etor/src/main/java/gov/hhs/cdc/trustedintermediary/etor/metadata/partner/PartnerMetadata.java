@@ -7,7 +7,7 @@ import java.time.Instant;
  * The partner-facing metadata.
  *
  * @param inboundReportId The inbound report ID.
- * @param sentSubmissionId The sent submission ID.
+ * @param outboundReportId The outbound report ID.
  * @param timeReceived The time the message was received.
  * @param timeDelivered The time the message was delivered.
  * @param hash The hash of the message.
@@ -15,7 +15,7 @@ import java.time.Instant;
  */
 public record PartnerMetadata(
         String inboundReportId,
-        String sentSubmissionId,
+        String outboundReportId,
         Instant timeReceived,
         Instant timeDelivered,
         String hash,
@@ -77,10 +77,10 @@ public record PartnerMetadata(
                 null);
     }
 
-    public PartnerMetadata withSentSubmissionId(String sentSubmissionId) {
+    public PartnerMetadata withOutboundReportId(String outboundReportId) {
         return new PartnerMetadata(
                 this.inboundReportId,
-                sentSubmissionId,
+                outboundReportId,
                 this.timeReceived,
                 this.timeDelivered,
                 this.hash,
@@ -97,7 +97,7 @@ public record PartnerMetadata(
     public PartnerMetadata withTimeReceived(Instant timeReceived) {
         return new PartnerMetadata(
                 this.inboundReportId,
-                this.sentSubmissionId,
+                this.outboundReportId,
                 timeReceived,
                 this.timeDelivered,
                 this.hash,
@@ -114,7 +114,7 @@ public record PartnerMetadata(
     public PartnerMetadata withTimeDelivered(Instant timeDelivered) {
         return new PartnerMetadata(
                 this.inboundReportId,
-                this.sentSubmissionId,
+                this.outboundReportId,
                 this.timeReceived,
                 timeDelivered,
                 this.hash,
@@ -131,7 +131,7 @@ public record PartnerMetadata(
     public PartnerMetadata withDeliveryStatus(PartnerMetadataStatus deliveryStatus) {
         return new PartnerMetadata(
                 this.inboundReportId,
-                this.sentSubmissionId,
+                this.outboundReportId,
                 this.timeReceived,
                 this.timeDelivered,
                 this.hash,
@@ -148,7 +148,7 @@ public record PartnerMetadata(
     public PartnerMetadata withFailureMessage(String failureMessage) {
         return new PartnerMetadata(
                 this.inboundReportId,
-                this.sentSubmissionId,
+                this.outboundReportId,
                 this.timeReceived,
                 this.timeDelivered,
                 this.hash,

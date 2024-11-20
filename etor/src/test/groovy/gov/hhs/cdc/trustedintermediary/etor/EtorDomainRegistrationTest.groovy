@@ -212,15 +212,15 @@ class EtorDomainRegistrationTest extends Specification {
         given:
         def expectedStatusCode = 200
         def inboundReportId = "inboundReportId"
-        def sentSubmissionId = "sentSubmissionId"
-        def metadata = new PartnerMetadata(inboundReportId, "hash", PartnerMetadataMessageType.ORDER, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number").withSentSubmissionId(sentSubmissionId)
+        def outboundReportId = "outboundReportId"
+        def metadata = new PartnerMetadata(inboundReportId, "hash", PartnerMetadataMessageType.ORDER, sendingApp, sendingFacility, receivingApp, receivingFacility, "placer_order_number").withOutboundReportId(outboundReportId)
         def linkedMessageIds = Set.of(inboundReportId, "Test1", "Test2")
 
         def connector = new EtorDomainRegistration()
         TestApplicationContext.register(EtorDomainRegistration, connector)
 
         def request = new DomainRequest()
-        request.setPathParams(["id": sentSubmissionId])
+        request.setPathParams(["id": outboundReportId])
 
         def mockPartnerMetadataOrchestrator = Mock(PartnerMetadataOrchestrator)
         TestApplicationContext.register(PartnerMetadataOrchestrator, mockPartnerMetadataOrchestrator)
@@ -243,7 +243,7 @@ class EtorDomainRegistrationTest extends Specification {
 
         then:
         actualStatusCode == expectedStatusCode
-        1 * mockPartnerMetadataOrchestrator.getMetadata(sentSubmissionId) >> Optional.ofNullable(metadata)
+        1 * mockPartnerMetadataOrchestrator.getMetadata(outboundReportId) >> Optional.ofNullable(metadata)
         1 * mockPartnerMetadataOrchestrator.findMessagesIdsToLink(inboundReportId) >> linkedMessageIds
         1 * mockPartnerMetadataConverter.extractPublicMetadataToOperationOutcome(_ as PartnerMetadata, _ as String, linkedMessageIds) >> Mock(FhirMetadata)
         1 * mockResponseHelper.constructOkResponseFromString(_ as String) >> new DomainResponse(expectedStatusCode)

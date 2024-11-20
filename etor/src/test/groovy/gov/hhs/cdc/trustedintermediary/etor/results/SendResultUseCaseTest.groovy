@@ -43,7 +43,7 @@ class SendResultUseCaseTest extends Specification {
 
         then:
         1 * mockEngine.runRules(mockResult)
-        1 * mockSender.send(mockResult) >> Optional.of("sentSubmissionId")
+        1 * mockSender.send(mockResult) >> Optional.of("outboundReportId")
     }
 
     def "convertAndSend throws exception when send fails"() {
@@ -71,14 +71,14 @@ class SendResultUseCaseTest extends Specification {
         then:
         1 * mockLogger.logError(_, _)
         1 * mockEngine.runRules(result)
-        1 * mockSender.send(result) >> Optional.of("sentId")
+        1 * mockSender.send(result) >> Optional.of("outboundReportId")
     }
 
-    def "convertAndSend logs error and continues when updateMetadataForSentMessage throws exception"() {
+    def "convertAndSend logs error and continues when updateMetadataForOutboundMessage throws exception"() {
         given:
         def result = Mock(Result)
         def inboundReportId = "inboundReportId"
-        mockOrchestrator.updateMetadataForSentMessage(inboundReportId, _ as String) >> { throw new PartnerMetadataException("Error") }
+        mockOrchestrator.updateMetadataForOutboundMessage(inboundReportId, _ as String) >> { throw new PartnerMetadataException("Error") }
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -86,7 +86,7 @@ class SendResultUseCaseTest extends Specification {
 
         then:
         1 * mockEngine.runRules(result)
-        1 * mockSender.send(result) >> Optional.of("sentId")
+        1 * mockSender.send(result) >> Optional.of("outboundReportId")
         1 * mockLogger.logError(_, _)
     }
 }

@@ -31,7 +31,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
     def sendingFacilityDetails = new MessageHdDataType("sending_facility_name", "sending_facility_id", "sending_facility_type")
     def receivingAppDetails = new MessageHdDataType("receiving_app_name", "receiving_app_id", "receiving_app_type")
     def receivingFacilityDetails = new MessageHdDataType("receiving_facility_name", "receiving_facility_id", "receiving_facility_type")
-    def mockMetadata = new PartnerMetadata("inboundReportId", "sentSubmissionId", Instant.now(), Instant.now(), "hash", PartnerMetadataStatus.DELIVERED, "failure reason", PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
+    def mockMetadata = new PartnerMetadata("inboundReportId", "outboundReportId", Instant.now(), Instant.now(), "hash", PartnerMetadataStatus.DELIVERED, "failure reason", PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
 
     def setup() {
         TestApplicationContext.reset()
@@ -104,7 +104,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         List<DbColumn> columns =
                 List.of(
                 new DbColumn("inbound_report_id", mockMetadata.inboundReportId(), false, Types.VARCHAR),
-                new DbColumn("sent_message_id", mockMetadata.sentSubmissionId(), true, Types.VARCHAR),
+                new DbColumn("outbound_report_id", mockMetadata.outboundReportId(), true, Types.VARCHAR),
                 new DbColumn("hash_of_message", mockMetadata.hash(), false, Types.VARCHAR),
                 new DbColumn("time_received", Timestamp.from(mockMetadata.timeReceived()),false, Types.TIMESTAMP),
                 new DbColumn("time_delivered", Timestamp.from(mockMetadata.timeDelivered()),true, Types.TIMESTAMP),
@@ -201,7 +201,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         def testMapper = new ObjectMapper()
         def mockMetadata = new PartnerMetadata(
                 "inboundReportId",
-                "sentSubmissionId",
+                "outboundReportId",
                 null,
                 null,
                 "hash",
@@ -218,7 +218,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         List<DbColumn> columns =
                 List.of(
                 new DbColumn("inbound_report_id", mockMetadata.inboundReportId(), false, Types.VARCHAR),
-                new DbColumn("sent_message_id", mockMetadata.sentSubmissionId(), true, Types.VARCHAR),
+                new DbColumn("outbound_report_id", mockMetadata.outboundReportId(), true, Types.VARCHAR),
                 new DbColumn("hash_of_message", mockMetadata.hash(), false, Types.VARCHAR),
                 new DbColumn("time_received", null, false, Types.TIMESTAMP),
                 new DbColumn("time_delivered", null,true, Types.TIMESTAMP),
@@ -301,7 +301,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
     def "partnerMetadataFromResultSet returns partner metadata"() {
         given:
         def inboundReportId = "12345"
-        def sentMessageId = "7890"
+        def outboundReportId = "7890"
         def sender = "DogCow"
         def receiver = "You'll get your just reward"
         Timestamp timestampForMock = Timestamp.from(Instant.parse("2024-01-03T15:45:33.30Z"))
@@ -313,12 +313,12 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         def reason = "It done Goofed"
         def messageType = PartnerMetadataMessageType.RESULT
         def placerOrderNumber = "placer_order_number"
-        def expected = new PartnerMetadata(inboundReportId, sentMessageId, timeReceived, timeDelivered, hash, status, reason, messageType, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, placerOrderNumber)
+        def expected = new PartnerMetadata(inboundReportId, outboundReportId, timeReceived, timeDelivered, hash, status, reason, messageType, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, placerOrderNumber)
 
         def mockResultSet = Mock(ResultSet)
         mockResultSet.next() >> true
         mockResultSet.getString("inbound_report_id") >> inboundReportId
-        mockResultSet.getString("sent_message_id") >> sentMessageId
+        mockResultSet.getString("outbound_report_id") >> outboundReportId
         mockResultSet.getString("sender") >> sender
         mockResultSet.getString("receiver") >> receiver
         mockResultSet.getTimestamp("time_received") >> timestampForMock

@@ -93,10 +93,10 @@ public class PartnerMetadataOrchestrator {
         partnerMetadataStorage.saveMetadata(updatedPartnerMetadata);
     }
 
-    public void updateMetadataForSentMessage(String inboundReportId, String sentSubmissionId)
+    public void updateMetadataForOutboundMessage(String inboundReportId, String outboundReportId)
             throws PartnerMetadataException {
 
-        if (sentSubmissionId == null) {
+        if (outboundReportId == null) {
             return;
         }
 
@@ -109,12 +109,12 @@ public class PartnerMetadataOrchestrator {
 
         PartnerMetadata partnerMetadata = optionalPartnerMetadata.get();
 
-        if (sentSubmissionId.equals(partnerMetadata.sentSubmissionId())) {
+        if (outboundReportId.equals(partnerMetadata.outboundReportId())) {
             return;
         }
 
-        logger.logInfo("Updating metadata with sentSubmissionId: {}", sentSubmissionId);
-        partnerMetadata = partnerMetadata.withSentSubmissionId(sentSubmissionId);
+        logger.logInfo("Updating metadata with outboundReportId: {}", outboundReportId);
+        partnerMetadata = partnerMetadata.withOutboundReportId(outboundReportId);
         partnerMetadataStorage.saveMetadata(partnerMetadata);
     }
 
@@ -128,11 +128,11 @@ public class PartnerMetadataOrchestrator {
         }
 
         PartnerMetadata partnerMetadata = optionalPartnerMetadata.get();
-        var sentSubmissionId = partnerMetadata.sentSubmissionId();
-        if (metadataIsStale(partnerMetadata) && sentSubmissionId != null) {
+        var outboundReportId = partnerMetadata.outboundReportId();
+        if (metadataIsStale(partnerMetadata) && outboundReportId != null) {
             logger.logInfo(
                     "Receiver name not found in metadata or delivery status still pending, looking up {} from RS history API",
-                    sentSubmissionId);
+                    outboundReportId);
 
             String rsStatus;
             String rsMessage = "";
@@ -140,7 +140,7 @@ public class PartnerMetadataOrchestrator {
             try {
                 String bearerToken = rsclient.getRsToken();
                 String responseBody =
-                        rsclient.requestHistoryEndpoint(sentSubmissionId, bearerToken);
+                        rsclient.requestHistoryEndpoint(outboundReportId, bearerToken);
                 var parsedResponseBody = getDataFromReportStream(responseBody);
                 rsStatus = parsedResponseBody[0];
                 rsMessage = parsedResponseBody[1];

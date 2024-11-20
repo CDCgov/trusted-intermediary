@@ -50,6 +50,6 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
 
         sendMessageHelper.linkMessage(inboundReportId);
 
-        sendMessageHelper.saveSentMessageSubmissionId(inboundReportId, outboundReportId);
+        sendMessageHelper.saveReportIds(inboundReportId, outboundReportId);
     }
 }

@@ -37,22 +37,22 @@ public class SendMessageHelper {
         }
     }
 
-    public void saveSentMessageSubmissionId(String inboundReportId, String sentSubmissionId) {
-        if (sentSubmissionId == null || inboundReportId == null) {
+    public void saveReportIds(String inboundReportId, String outboundReportId) {
+        if (outboundReportId == null || inboundReportId == null) {
             logger.logWarning(
-                    "Inbound and/or sent reportId is null so not saving metadata for sent result");
+                    "Inbound and/or outbound reportId is null so not saving metadata for sent result");
             return;
         }
 
         try {
-            partnerMetadataOrchestrator.updateMetadataForSentMessage(
-                    inboundReportId, sentSubmissionId);
+            partnerMetadataOrchestrator.updateMetadataForOutboundMessage(
+                    inboundReportId, outboundReportId);
         } catch (PartnerMetadataException e) {
             logger.logError(
                     "Unable to update metadata for inbound reportId "
                             + inboundReportId
-                            + " and sent submissionId "
-                            + sentSubmissionId,
+                            + " and sent outbound reportId "
+                            + outboundReportId,
                     e);
         }
     }

@@ -51,7 +51,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                                 try {
                                     PreparedStatement statement =
                                             connection.prepareStatement(
-                                                    "SELECT * FROM metadata where inbound_report_id = ? OR sent_message_id = ?");
+                                                    "SELECT * FROM metadata where inbound_report_id = ? OR outbound_report_id = ?");
                                     statement.setString(1, uniqueId);
                                     statement.setString(2, uniqueId);
                                     return statement;
@@ -164,7 +164,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
 
             return new PartnerMetadata(
                     resultSet.getString(METADATA_TABLE_INBOUND_REPORT_ID),
-                    resultSet.getString("sent_message_id"),
+                    resultSet.getString("outbound_report_id"),
                     timeReceived,
                     timeDelivered,
                     resultSet.getString("hash_of_message"),
@@ -206,7 +206,8 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                         metadata.inboundReportId(),
                         false,
                         Types.VARCHAR),
-                new DbColumn("sent_message_id", metadata.sentSubmissionId(), true, Types.VARCHAR),
+                new DbColumn(
+                        "outbound_report_id", metadata.outboundReportId(), true, Types.VARCHAR),
                 new DbColumn("hash_of_message", metadata.hash(), false, Types.VARCHAR),
                 new DbColumn(
                         "time_received",

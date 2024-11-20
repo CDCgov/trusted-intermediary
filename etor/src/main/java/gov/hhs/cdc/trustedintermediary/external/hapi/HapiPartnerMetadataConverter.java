@@ -76,7 +76,7 @@ public class HapiPartnerMetadataConverter implements PartnerMetadataConverter {
                 .getIssue()
                 .add(
                         createInformationIssueComponent(
-                                "outbound submission id", metadata.sentSubmissionId()));
+                                "outbound submission id", metadata.outboundReportId()));
 
         operation
                 .getIssue()
