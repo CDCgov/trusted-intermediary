@@ -5,12 +5,12 @@ source "$CDCTI_HOME/scripts/lib/common.sh"
 source "$CDCTI_HOME/scripts/lib/api.sh"
 
 # default values
-DEFAULT_SENDER_PRIVATE_KEY_ORG=report-stream
-DEFAULT_SENDER_PRIVATE_KEY_PATH="$RS_LOCAL_PRIVATE_KEY_PATH"
 ENVIRONMENT=local
 ROOT_PATH=$CDCTI_HOME/examples/
 CONTENT_TYPE=application/fhir+ndjson
 SENDER=report-stream
+DEFAULT_SENDER_PRIVATE_KEY_ORG=report-stream
+DEFAULT_SENDER_PRIVATE_KEY_PATH="$RS_LOCAL_PRIVATE_KEY_PATH"
 
 parse_args "ti" "$@" || {
     show_usage "$(basename "$0")"

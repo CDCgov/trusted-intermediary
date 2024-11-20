@@ -5,12 +5,12 @@ source "$CDCTI_HOME/scripts/lib/common.sh"
 source "$CDCTI_HOME/scripts/lib/api.sh"
 
 # default values
-DEFAULT_SENDER_PRIVATE_KEY_ORG=flexion
-DEFAULT_SENDER_PRIVATE_KEY_PATH="$TI_LOCAL_PRIVATE_KEY_PATH"
 ENVIRONMENT=local
 ROOT_PATH=$CDCTI_HOME/examples/
 CONTENT_TYPE=application/hl7-v2
 SENDER=flexion.simulated-sender
+DEFAULT_SENDER_PRIVATE_KEY_ORG=flexion
+DEFAULT_SENDER_PRIVATE_KEY_PATH="$TI_LOCAL_PRIVATE_KEY_PATH"
 
 parse_args "rs" "$@" || {
     show_usage "$(basename "$0")"
