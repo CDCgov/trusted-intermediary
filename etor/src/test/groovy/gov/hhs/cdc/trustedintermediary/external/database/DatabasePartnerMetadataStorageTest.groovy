@@ -103,8 +103,8 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         def testMapper = new ObjectMapper()
         List<DbColumn> columns =
                 List.of(
-                new DbColumn("received_message_id", mockMetadata.outboundMessageId(), false, Types.VARCHAR),
-                new DbColumn("sent_message_id", mockMetadata.inboundMessageId(), true, Types.VARCHAR),
+                new DbColumn("outbound_message_id", mockMetadata.outboundMessageId(), false, Types.VARCHAR),
+                new DbColumn("inbound_message_id", mockMetadata.inboundMessageId(), true, Types.VARCHAR),
                 new DbColumn("hash_of_message", mockMetadata.hash(), false, Types.VARCHAR),
                 new DbColumn("time_received", Timestamp.from(mockMetadata.timeReceived()),false, Types.TIMESTAMP),
                 new DbColumn("time_delivered", Timestamp.from(mockMetadata.timeDelivered()),true, Types.TIMESTAMP),
@@ -124,7 +124,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         DatabasePartnerMetadataStorage.getInstance().saveMetadata(mockMetadata)
 
         then:
-        1 * mockDao.upsertData("metadata", columns, "(received_message_id)")
+        1 * mockDao.upsertData("metadata", columns, "(outbound_message_id)")
     }
 
     def "saveMetadata unhappy path works"() {
@@ -217,8 +217,8 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
         List<DbColumn> columns =
                 List.of(
-                new DbColumn("received_message_id", mockMetadata.outboundMessageId(), false, Types.VARCHAR),
-                new DbColumn("sent_message_id", mockMetadata.inboundMessageId(), true, Types.VARCHAR),
+                new DbColumn("outbound_message_id", mockMetadata.outboundMessageId(), false, Types.VARCHAR),
+                new DbColumn("inbound_message_id", mockMetadata.inboundMessageId(), true, Types.VARCHAR),
                 new DbColumn("hash_of_message", mockMetadata.hash(), false, Types.VARCHAR),
                 new DbColumn("time_received", null, false, Types.TIMESTAMP),
                 new DbColumn("time_delivered", null,true, Types.TIMESTAMP),
@@ -238,7 +238,7 @@ class DatabasePartnerMetadataStorageTest extends Specification {
         DatabasePartnerMetadataStorage.getInstance().saveMetadata(mockMetadata)
 
         then:
-        1 * mockDao.upsertData("metadata", columns, "(received_message_id)")
+        1 * mockDao.upsertData("metadata", columns, "(outbound_message_id)")
     }
 
     def "readMetadataForMessageLinking happy path works"() {

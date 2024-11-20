@@ -36,7 +36,7 @@ class SendResultUseCaseTest extends Specification {
     def "convertAndSend works"() {
         given:
         def mockResult = new ResultMock(null, "Mock result", null, null, null, null, null)
-        def outboundMessageId = "receivedId"
+        def outboundMessageId = "outboundId"
 
         when:
         SendResultUseCase.getInstance().convertAndSend(mockResult, outboundMessageId)
@@ -48,7 +48,7 @@ class SendResultUseCaseTest extends Specification {
 
     def "convertAndSend throws exception when send fails"() {
         given:
-        def outboundMessageId = "receivedId"
+        def outboundMessageId = "outboundId"
         mockSender.send(_) >> { throw new UnableToSendMessageException("DogCow", new NullPointerException()) }
 
         when:
@@ -58,11 +58,11 @@ class SendResultUseCaseTest extends Specification {
         thrown(UnableToSendMessageException)
     }
 
-    def "convertAndSend logs error and continues when updateMetadataForReceivedMessage throws exception"() {
+    def "convertAndSend logs error and continues when updateMetadataForOutboundMessage throws exception"() {
         given:
         def result = Mock(Result)
-        def outboundMessageId = "receivedId"
-        mockOrchestrator.updateMetadataForReceivedMessage(_ as PartnerMetadata) >> { throw new PartnerMetadataException("Error") }
+        def outboundMessageId = "outboundId"
+        mockOrchestrator.updateMetadataForOutboundMessage(_ as PartnerMetadata) >> { throw new PartnerMetadataException("Error") }
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -71,14 +71,14 @@ class SendResultUseCaseTest extends Specification {
         then:
         1 * mockLogger.logError(_, _)
         1 * mockEngine.runRules(result)
-        1 * mockSender.send(result) >> Optional.of("sentId")
+        1 * mockSender.send(result) >> Optional.of("inboundId")
     }
 
-    def "convertAndSend logs error and continues when updateMetadataForSentMessage throws exception"() {
+    def "convertAndSend logs error and continues when updateMetadataForInboundMessage throws exception"() {
         given:
         def result = Mock(Result)
-        def outboundMessageId = "receivedId"
-        mockOrchestrator.updateMetadataForSentMessage(outboundMessageId, _ as String) >> { throw new PartnerMetadataException("Error") }
+        def outboundMessageId = "outboundId"
+        mockOrchestrator.updateMetadataForInboundMessage(outboundMessageId, _ as String) >> { throw new PartnerMetadataException("Error") }
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -86,7 +86,7 @@ class SendResultUseCaseTest extends Specification {
 
         then:
         1 * mockEngine.runRules(result)
-        1 * mockSender.send(result) >> Optional.of("sentId")
+        1 * mockSender.send(result) >> Optional.of("inboundId")
         1 * mockLogger.logError(_, _)
     }
 }

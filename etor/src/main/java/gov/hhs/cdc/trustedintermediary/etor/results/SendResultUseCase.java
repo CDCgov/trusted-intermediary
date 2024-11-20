@@ -41,7 +41,7 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
                         result.getReceivingFacilityDetails(),
                         result.getPlacerOrderNumber());
 
-        sendMessageHelper.savePartnerMetadataForReceivedMessage(partnerMetadata);
+        sendMessageHelper.savePartnerMetadataForOutboundMessage(partnerMetadata);
 
         transformationEngine.runRules(result);
 
@@ -50,6 +50,6 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
 
         sendMessageHelper.linkMessage(outboundMessageId);
 
-        sendMessageHelper.saveSentMessageSubmissionId(outboundMessageId, outboundReportId);
+        sendMessageHelper.saveInboundMessageId(outboundMessageId, outboundReportId);
     }
 }

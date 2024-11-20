@@ -73,7 +73,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
     }
 
-    def "updateMetadataForReceivedMessage updates metadata successfully"() {
+    def "updateMetadataForOutboundMessage updates metadata successfully"() {
         given:
 
         TestApplicationContext.register(Formatter, Jackson.getInstance())
@@ -125,7 +125,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
                 )
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(testMetadata)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForOutboundMessage(testMetadata)
 
         then:
         1 * mockClient.getRsToken() >> bearerToken
@@ -133,33 +133,33 @@ class PartnerMetadataOrchestratorTest extends Specification {
         1 * mockPartnerMetadataStorage.saveMetadata(expectedMetadata)
     }
 
-    def "updateMetadataForSentMessage test case when inboundMessageId is null"() {
+    def "updateMetadataForInboundMessage test case when inboundMessageId is null"() {
         when:
         def inboundMessageId = null
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentMessage(outboundMessageId, inboundMessageId)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForInboundMessage(outboundMessageId, inboundMessageId)
 
         then:
         0 * mockPartnerMetadataStorage.readMetadata(outboundMessageId)
     }
 
-    def "updateMetadataForSentMessage test case when PartnerMetadata returns no data"() {
+    def "updateMetadataForInboundMessage test case when PartnerMetadata returns no data"() {
         given:
         mockPartnerMetadataStorage.readMetadata(outboundMessageId) >> Optional.empty()
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentMessage(outboundMessageId, inboundMessageId)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForInboundMessage(outboundMessageId, inboundMessageId)
 
         then:
         0 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata)
     }
 
-    def "updateMetadataForSentMessage ends when inboundMessageId matches the one provided by PartnerMetadata"() {
+    def "updateMetadataForInboundMessage ends when inboundMessageId matches the one provided by PartnerMetadata"() {
         given:
         def optional = Optional.of(new PartnerMetadata(outboundMessageId, inboundMessageId, Instant.now(), null, "", PartnerMetadataStatus.FAILED, null, PartnerMetadataMessageType.RESULT, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber))
         mockPartnerMetadataStorage.readMetadata(outboundMessageId) >> optional
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentMessage(outboundMessageId, inboundMessageId)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForInboundMessage(outboundMessageId, inboundMessageId)
 
         then:
         0 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata)
@@ -178,13 +178,13 @@ class PartnerMetadataOrchestratorTest extends Specification {
         1 * mockPartnerMetadataStorage.readMetadata(outboundMessageId) >> mockMetadata
     }
 
-    def "updateMetadataForReceivedMessage throws PartnerMetadataException on client error"() {
+    def "updateMetadataForOutboundMessage throws PartnerMetadataException on client error"() {
         given:
         mockClient.getRsToken() >> "token"
         mockClient.requestDeliveryEndpoint(_ as String, _ as String) >> { throw new ReportStreamEndpointClientException("Client error", new Exception()) }
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(testMetadata)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForOutboundMessage(testMetadata)
 
         then:
         1 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata) >> { PartnerMetadata metadata ->
@@ -193,7 +193,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         thrown(PartnerMetadataException)
     }
 
-    def "updateMetadataForReceivedMessage throws PartnerMetadataException on formatter error"() {
+    def "updateMetadataForOutboundMessage throws PartnerMetadataException on formatter error"() {
         given:
         def rsDeliveryApiResponse = "{ASDF}"
 
@@ -202,13 +202,13 @@ class PartnerMetadataOrchestratorTest extends Specification {
         mockFormatter.convertJsonToObject(rsDeliveryApiResponse, _ as TypeReference) >> { throw new FormatterProcessingException("Formatter error", new Exception()) }
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(testMetadata)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForOutboundMessage(testMetadata)
 
         then:
         thrown(PartnerMetadataException)
     }
 
-    def "updateMetadataForReceivedMessage throws PartnerMetadataException on formatter error due to unexpected response format"() {
+    def "updateMetadataForOutboundMessage throws PartnerMetadataException on formatter error due to unexpected response format"() {
         given:
         def wrongFormatResponse = "{\"someotherkey\": \"value\"}"
 
@@ -217,13 +217,13 @@ class PartnerMetadataOrchestratorTest extends Specification {
         mockFormatter.convertJsonToObject(wrongFormatResponse, _ as TypeReference) >> [someotherkey: "value"]
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(testMetadata)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForOutboundMessage(testMetadata)
 
         then:
         thrown(PartnerMetadataException)
     }
 
-    def "updateMetadataForReceivedMessage throws PartnerMetadataException due to 0 originalIngestions"() {
+    def "updateMetadataForOutboundMessage throws PartnerMetadataException due to 0 originalIngestions"() {
         given:
         def wrongFormatResponse = "{\"originalIngestion\": []}"
 
@@ -232,13 +232,13 @@ class PartnerMetadataOrchestratorTest extends Specification {
         mockFormatter.convertJsonToObject(wrongFormatResponse, _ as TypeReference) >> [originalIngestion: []]
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(testMetadata)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForOutboundMessage(testMetadata)
 
         then:
         thrown(PartnerMetadataException)
     }
 
-    def "updateMetadataForReceivedMessage throws PartnerMetadataException due to null originalIngestion"() {
+    def "updateMetadataForOutboundMessage throws PartnerMetadataException due to null originalIngestion"() {
         given:
         def wrongFormatResponse = "{\"someOtherKey\": {}}"
 
@@ -247,13 +247,13 @@ class PartnerMetadataOrchestratorTest extends Specification {
         mockFormatter.convertJsonToObject(wrongFormatResponse, _ as TypeReference) >> [someOtherKey:{}]
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(testMetadata)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForOutboundMessage(testMetadata)
 
         then:
         thrown(PartnerMetadataException)
     }
 
-    def "updateMetadataForReceivedMessage throws PartnerMetadataException due to empty originalIngestion"() {
+    def "updateMetadataForOutboundMessage throws PartnerMetadataException due to empty originalIngestion"() {
         given:
         def wrongFormatResponse = "{\"originalIngestion\": {}}"
 
@@ -262,19 +262,19 @@ class PartnerMetadataOrchestratorTest extends Specification {
         mockFormatter.convertJsonToObject(wrongFormatResponse, _ as TypeReference) >> [originalIngestion:[]]
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(testMetadata)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForOutboundMessage(testMetadata)
 
         then:
         thrown(PartnerMetadataException)
     }
 
-    def "updateMetadataForSentMessage updates metadata successfully"() {
+    def "updateMetadataForInboundMessage updates metadata successfully"() {
         given:
         def partnerMetadata = new PartnerMetadata(outboundMessageId, "hash", PartnerMetadataMessageType.ORDER, sendingApp, sendingFacility, receivingApp, receivingFacility, placerOrderNumber)
         def updatedPartnerMetadata = partnerMetadata.withInboundMessageId(inboundMessageId)
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForSentMessage(outboundMessageId, inboundMessageId)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForInboundMessage(outboundMessageId, inboundMessageId)
 
         then:
         1 * mockPartnerMetadataStorage.readMetadata(outboundMessageId) >> Optional.of(partnerMetadata)

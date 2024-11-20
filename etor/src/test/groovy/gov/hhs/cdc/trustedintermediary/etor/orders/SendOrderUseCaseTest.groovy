@@ -34,8 +34,8 @@ class SendOrderUseCaseTest extends Specification {
 
     def "send sends successfully"() {
         given:
-        def outboundMessageId = "receivedId"
-        def inboundMessageId = "sentId"
+        def outboundMessageId = "outboundId"
+        def inboundMessageId = "inboundId"
         def messagesIdsToLink = new HashSet<>(Set.of("messageId1", "messageId2"))
         def mockOrder = new OrderMock(null, null, null, null, null, null, null, null)
 
@@ -47,8 +47,8 @@ class SendOrderUseCaseTest extends Specification {
         then:
         1 * mockEngine.runRules(mockOrder)
         1 * mockSender.send(mockOrder) >> Optional.of(inboundMessageId)
-        1 * mockOrchestrator.updateMetadataForReceivedMessage(_ as PartnerMetadata)
-        1 * mockOrchestrator.updateMetadataForSentMessage(outboundMessageId, inboundMessageId)
+        1 * mockOrchestrator.updateMetadataForOutboundMessage(_ as PartnerMetadata)
+        1 * mockOrchestrator.updateMetadataForInboundMessage(outboundMessageId, inboundMessageId)
         1 * mockOrchestrator.findMessagesIdsToLink(outboundMessageId) >> messagesIdsToLink
         1 * mockOrchestrator.linkMessages(messagesIdsToLink + outboundMessageId)
     }
@@ -75,15 +75,15 @@ class SendOrderUseCaseTest extends Specification {
 
         then:
         3 * mockLogger.logWarning(_)
-        0 * mockOrchestrator.updateMetadataForReceivedMessage(_, _)
+        0 * mockOrchestrator.updateMetadataForOutboundMessage(_, _)
     }
 
     def "convertAndSend logs error and continues when updateMetadataForReceivedOrder throws exception"() {
         given:
         def order = Mock(Order)
-        def outboundMessageId = "receivedId"
+        def outboundMessageId = "outboundId"
 
-        mockOrchestrator.updateMetadataForReceivedMessage(_ as PartnerMetadata) >> { throw new PartnerMetadataException("Error") }
+        mockOrchestrator.updateMetadataForOutboundMessage(_ as PartnerMetadata) >> { throw new PartnerMetadataException("Error") }
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
@@ -93,23 +93,23 @@ class SendOrderUseCaseTest extends Specification {
         1 * mockLogger.logError(_, _)
         1 * mockEngine.runRules(order)
         1 * mockOrchestrator.findMessagesIdsToLink(outboundMessageId) >> Set.of()
-        1 * mockSender.send(order) >> Optional.of("sentId")
+        1 * mockSender.send(order) >> Optional.of("inboundId")
     }
 
     def "convertAndSend logs error and continues when updating the metadata for the sent order throws exception"() {
         given:
         def order = Mock(Order)
         def partnerMetadataException = new PartnerMetadataException("Error")
-        mockOrchestrator.updateMetadataForSentMessage("receivedId", _) >> { throw  partnerMetadataException}
+        mockOrchestrator.updateMetadataForInboundMessage("outboundId", _) >> { throw  partnerMetadataException}
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        SendOrderUseCase.getInstance().convertAndSend(order, "receivedId")
+        SendOrderUseCase.getInstance().convertAndSend(order, "outboundId")
 
         then:
         1 * mockEngine.runRules(order)
         1 * mockOrchestrator.findMessagesIdsToLink(_ as String) >> Set.of()
-        1 * mockSender.send(order) >> Optional.of("sentId")
+        1 * mockSender.send(order) >> Optional.of("inboundId")
         1 * mockLogger.logError(_, partnerMetadataException)
     }
 
@@ -121,11 +121,11 @@ class SendOrderUseCaseTest extends Specification {
         mockSender.send(_) >> Optional.empty()
 
         when:
-        SendOrderUseCase.getInstance().convertAndSend(mockOrder, "receivedId")
+        SendOrderUseCase.getInstance().convertAndSend(mockOrder, "outboundId")
 
         then:
         1 * mockLogger.logWarning(_)
         1 * mockOrchestrator.findMessagesIdsToLink(_ as String) >> Set.of()
-        0 * mockOrchestrator.updateMetadataForSentMessage(_ as String, _ as String)
+        0 * mockOrchestrator.updateMetadataForInboundMessage(_ as String, _ as String)
     }
 }

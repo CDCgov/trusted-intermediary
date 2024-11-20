@@ -41,7 +41,7 @@ public class PartnerMetadataOrchestrator {
 
     private PartnerMetadataOrchestrator() {}
 
-    public void updateMetadataForReceivedMessage(PartnerMetadata partnerMetadata)
+    public void updateMetadataForOutboundMessage(PartnerMetadata partnerMetadata)
             throws PartnerMetadataException {
 
         logger.logInfo(
@@ -93,7 +93,7 @@ public class PartnerMetadataOrchestrator {
         partnerMetadataStorage.saveMetadata(updatedPartnerMetadata);
     }
 
-    public void updateMetadataForSentMessage(String outboundMessageId, String inboundMessageId)
+    public void updateMetadataForInboundMessage(String outboundMessageId, String inboundMessageId)
             throws PartnerMetadataException {
 
         if (inboundMessageId == null) {

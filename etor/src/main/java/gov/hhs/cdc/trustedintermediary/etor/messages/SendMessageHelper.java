@@ -21,14 +21,14 @@ public class SendMessageHelper {
 
     private SendMessageHelper() {}
 
-    public void savePartnerMetadataForReceivedMessage(PartnerMetadata partnerMetadata) {
+    public void savePartnerMetadataForOutboundMessage(PartnerMetadata partnerMetadata) {
         if (partnerMetadata.outboundMessageId() == null) {
             logger.logWarning(
-                    "Received submissionId is null so not saving metadata for received message");
+                    "Outbound messageId is null so not saving metadata for outbound message");
             return;
         }
         try {
-            partnerMetadataOrchestrator.updateMetadataForReceivedMessage(partnerMetadata);
+            partnerMetadataOrchestrator.updateMetadataForOutboundMessage(partnerMetadata);
         } catch (PartnerMetadataException e) {
             logger.logError(
                     "Unable to save metadata for outboundMessageId "
@@ -37,15 +37,15 @@ public class SendMessageHelper {
         }
     }
 
-    public void saveSentMessageSubmissionId(String outboundMessageId, String inboundMessageId) {
+    public void saveInboundMessageId(String outboundMessageId, String inboundMessageId) {
         if (inboundMessageId == null || outboundMessageId == null) {
             logger.logWarning(
-                    "Received and/or sent submissionId is null so not saving metadata for sent result");
+                    "Outbound and/or inbound messageId is null so not saving metadata for sent result");
             return;
         }
 
         try {
-            partnerMetadataOrchestrator.updateMetadataForSentMessage(
+            partnerMetadataOrchestrator.updateMetadataForInboundMessage(
                     outboundMessageId, inboundMessageId);
         } catch (PartnerMetadataException e) {
             logger.logError(
@@ -59,7 +59,7 @@ public class SendMessageHelper {
 
     public void linkMessage(String outboundMessageId) {
         if (outboundMessageId == null) {
-            logger.logWarning("Received submissionId is null so not linking messages");
+            logger.logWarning("Outbound messageId is null so not linking messages");
             return;
         }
 
