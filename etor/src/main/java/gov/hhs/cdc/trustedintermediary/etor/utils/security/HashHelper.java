@@ -13,7 +13,7 @@ public class HashHelper implements SecureHash {
     @Override
     public <T> String generateHash(T input) {
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-512");
+            MessageDigest digest = MessageDigest.getInstance("SHA3-512");
             byte[] objBytes = input.toString().getBytes(StandardCharsets.UTF_8);
             byte[] hashBytes = digest.digest(objBytes);
             return HexFormat.of().formatHex(hashBytes);
