@@ -41,12 +41,12 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
                         result.getReceivingFacilityDetails(),
                         result.getPlacerOrderNumber());
 
-        sendMessageHelper.savePartnerMetadataForReceivedMessage(partnerMetadata);
+        sendMessageHelper.savePartnerMetadataForInboundMessage(partnerMetadata);
 
         transformationEngine.runRules(result);
 
         String outboundReportId = sender.send(result).orElse(null);
-        logger.logInfo("Sent result reportId: {}", outboundReportId);
+        logger.logInfo("Outbound result reportId: {}", outboundReportId);
 
         sendMessageHelper.linkMessage(inboundReportId);
 

@@ -36,15 +36,15 @@ class SendMessageHelperTest extends Specification {
                 receivingFacility,
                 placerOrderNumber)
     }
-    def "savePartnerMetadataForReceivedMessage works"() {
+    def "savePartnerMetadataForInboundMessage works"() {
         when:
-        SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage(partnerMetadata)
+        SendMessageHelper.getInstance().savePartnerMetadataForInboundMessage(partnerMetadata)
 
         then:
-        1 * mockOrchestrator.updateMetadataForReceivedMessage(_)
+        1 * mockOrchestrator.updateMetadataForInboundMessage(_)
     }
 
-    def "savePartnerMetadataForReceivedMessage should log warnings for null inboundReportId"() {
+    def "savePartnerMetadataForInboundMessage should log warnings for null inboundReportId"() {
         when:
         PartnerMetadata warningPartnerMetadata = new PartnerMetadata(
                 null,
@@ -55,20 +55,20 @@ class SendMessageHelperTest extends Specification {
                 receivingApp,
                 receivingFacility,
                 placerOrderNumber)
-        SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage(warningPartnerMetadata)
+        SendMessageHelper.getInstance().savePartnerMetadataForInboundMessage(warningPartnerMetadata)
 
         then:
         1 * mockLogger.logWarning(_)
     }
 
-    def "savePartnerMetadataForReceivedMessage logs error and continues when updateMetadataForReceivedMessage throws error"() {
+    def "savePartnerMetadataForInboundMessage logs error and continues when updateMetadataForInboundMessage throws error"() {
         given:
         def hashCode = new Random().nextInt()
         def messageType = PartnerMetadataMessageType.RESULT
-        mockOrchestrator.updateMetadataForReceivedMessage(partnerMetadata) >> { throw new PartnerMetadataException("Error") }
+        mockOrchestrator.updateMetadataForInboundMessage(partnerMetadata) >> { throw new PartnerMetadataException("Error") }
 
         when:
-        SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage(partnerMetadata)
+        SendMessageHelper.getInstance().savePartnerMetadataForInboundMessage(partnerMetadata)
 
         then:
         1 * mockLogger.logError(_, _)

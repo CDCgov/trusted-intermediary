@@ -47,7 +47,7 @@ class SendOrderUseCaseTest extends Specification {
         then:
         1 * mockEngine.runRules(mockOrder)
         1 * mockSender.send(mockOrder) >> Optional.of(outboundReportId)
-        1 * mockOrchestrator.updateMetadataForReceivedMessage(_ as PartnerMetadata)
+        1 * mockOrchestrator.updateMetadataForInboundMessage(_ as PartnerMetadata)
         1 * mockOrchestrator.updateMetadataForOutboundMessage(inboundReportId, outboundReportId)
         1 * mockOrchestrator.findMessagesIdsToLink(inboundReportId) >> messagesIdsToLink
         1 * mockOrchestrator.linkMessages(messagesIdsToLink + inboundReportId)
@@ -75,7 +75,7 @@ class SendOrderUseCaseTest extends Specification {
 
         then:
         3 * mockLogger.logWarning(_)
-        0 * mockOrchestrator.updateMetadataForReceivedMessage(_, _)
+        0 * mockOrchestrator.updateMetadataForInboundMessage(_, _)
     }
 
     def "convertAndSend logs error and continues when updateMetadataForReceivedOrder throws exception"() {
@@ -83,7 +83,7 @@ class SendOrderUseCaseTest extends Specification {
         def order = Mock(Order)
         def inboundReportId = "inboundReportId"
 
-        mockOrchestrator.updateMetadataForReceivedMessage(_ as PartnerMetadata) >> { throw new PartnerMetadataException("Error") }
+        mockOrchestrator.updateMetadataForInboundMessage(_ as PartnerMetadata) >> { throw new PartnerMetadataException("Error") }
         TestApplicationContext.injectRegisteredImplementations()
 
         when:

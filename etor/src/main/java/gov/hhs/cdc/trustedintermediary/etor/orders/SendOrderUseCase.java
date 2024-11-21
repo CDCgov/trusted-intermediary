@@ -40,7 +40,7 @@ public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
                         order.getReceivingFacilityDetails(),
                         order.getPlacerOrderNumber());
 
-        sendMessageHelper.savePartnerMetadataForReceivedMessage(partnerMetadata);
+        sendMessageHelper.savePartnerMetadataForInboundMessage(partnerMetadata);
 
         transformationEngine.runRules(order);
 

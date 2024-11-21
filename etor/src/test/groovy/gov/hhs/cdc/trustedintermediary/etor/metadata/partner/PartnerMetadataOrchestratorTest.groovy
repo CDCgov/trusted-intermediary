@@ -73,7 +73,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
     }
 
-    def "updateMetadataForReceivedMessage updates metadata successfully"() {
+    def "updateMetadataForInboundMessage updates metadata successfully"() {
         given:
 
         TestApplicationContext.register(Formatter, Jackson.getInstance())
@@ -125,7 +125,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
                 )
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(testMetadata)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForInboundMessage(testMetadata)
 
         then:
         1 * mockClient.getRsToken() >> bearerToken
@@ -178,13 +178,13 @@ class PartnerMetadataOrchestratorTest extends Specification {
         1 * mockPartnerMetadataStorage.readMetadata(inboundReportId) >> mockMetadata
     }
 
-    def "updateMetadataForReceivedMessage throws PartnerMetadataException on client error"() {
+    def "updateMetadataForInboundMessage throws PartnerMetadataException on client error"() {
         given:
         mockClient.getRsToken() >> "token"
         mockClient.requestDeliveryEndpoint(_ as String, _ as String) >> { throw new ReportStreamEndpointClientException("Client error", new Exception()) }
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(testMetadata)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForInboundMessage(testMetadata)
 
         then:
         1 * mockPartnerMetadataStorage.saveMetadata(_ as PartnerMetadata) >> { PartnerMetadata metadata ->
@@ -193,7 +193,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         thrown(PartnerMetadataException)
     }
 
-    def "updateMetadataForReceivedMessage throws PartnerMetadataException on formatter error"() {
+    def "updateMetadataForInboundMessage throws PartnerMetadataException on formatter error"() {
         given:
         def rsDeliveryApiResponse = "{ASDF}"
 
@@ -202,13 +202,13 @@ class PartnerMetadataOrchestratorTest extends Specification {
         mockFormatter.convertJsonToObject(rsDeliveryApiResponse, _ as TypeReference) >> { throw new FormatterProcessingException("Formatter error", new Exception()) }
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(testMetadata)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForInboundMessage(testMetadata)
 
         then:
         thrown(PartnerMetadataException)
     }
 
-    def "updateMetadataForReceivedMessage throws PartnerMetadataException on formatter error due to unexpected response format"() {
+    def "updateMetadataForInboundMessage throws PartnerMetadataException on formatter error due to unexpected response format"() {
         given:
         def wrongFormatResponse = "{\"someotherkey\": \"value\"}"
 
@@ -217,13 +217,13 @@ class PartnerMetadataOrchestratorTest extends Specification {
         mockFormatter.convertJsonToObject(wrongFormatResponse, _ as TypeReference) >> [someotherkey: "value"]
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(testMetadata)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForInboundMessage(testMetadata)
 
         then:
         thrown(PartnerMetadataException)
     }
 
-    def "updateMetadataForReceivedMessage throws PartnerMetadataException due to 0 originalIngestions"() {
+    def "updateMetadataForInboundMessage throws PartnerMetadataException due to 0 originalIngestions"() {
         given:
         def wrongFormatResponse = "{\"originalIngestion\": []}"
 
@@ -232,13 +232,13 @@ class PartnerMetadataOrchestratorTest extends Specification {
         mockFormatter.convertJsonToObject(wrongFormatResponse, _ as TypeReference) >> [originalIngestion: []]
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(testMetadata)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForInboundMessage(testMetadata)
 
         then:
         thrown(PartnerMetadataException)
     }
 
-    def "updateMetadataForReceivedMessage throws PartnerMetadataException due to null originalIngestion"() {
+    def "updateMetadataForInboundMessage throws PartnerMetadataException due to null originalIngestion"() {
         given:
         def wrongFormatResponse = "{\"someOtherKey\": {}}"
 
@@ -247,13 +247,13 @@ class PartnerMetadataOrchestratorTest extends Specification {
         mockFormatter.convertJsonToObject(wrongFormatResponse, _ as TypeReference) >> [someOtherKey:{}]
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(testMetadata)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForInboundMessage(testMetadata)
 
         then:
         thrown(PartnerMetadataException)
     }
 
-    def "updateMetadataForReceivedMessage throws PartnerMetadataException due to empty originalIngestion"() {
+    def "updateMetadataForInboundMessage throws PartnerMetadataException due to empty originalIngestion"() {
         given:
         def wrongFormatResponse = "{\"originalIngestion\": {}}"
 
@@ -262,7 +262,7 @@ class PartnerMetadataOrchestratorTest extends Specification {
         mockFormatter.convertJsonToObject(wrongFormatResponse, _ as TypeReference) >> [originalIngestion:[]]
 
         when:
-        PartnerMetadataOrchestrator.getInstance().updateMetadataForReceivedMessage(testMetadata)
+        PartnerMetadataOrchestrator.getInstance().updateMetadataForInboundMessage(testMetadata)
 
         then:
         thrown(PartnerMetadataException)

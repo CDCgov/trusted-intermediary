@@ -41,7 +41,7 @@ public class PartnerMetadataOrchestrator {
 
     private PartnerMetadataOrchestrator() {}
 
-    public void updateMetadataForReceivedMessage(PartnerMetadata partnerMetadata)
+    public void updateMetadataForInboundMessage(PartnerMetadata partnerMetadata)
             throws PartnerMetadataException {
 
         logger.logInfo(

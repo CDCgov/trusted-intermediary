@@ -58,11 +58,11 @@ class SendResultUseCaseTest extends Specification {
         thrown(UnableToSendMessageException)
     }
 
-    def "convertAndSend logs error and continues when updateMetadataForReceivedMessage throws exception"() {
+    def "convertAndSend logs error and continues when updateMetadataForInboundMessage throws exception"() {
         given:
         def result = Mock(Result)
         def inboundReportId = "inboundReportId"
-        mockOrchestrator.updateMetadataForReceivedMessage(_ as PartnerMetadata) >> { throw new PartnerMetadataException("Error") }
+        mockOrchestrator.updateMetadataForInboundMessage(_ as PartnerMetadata) >> { throw new PartnerMetadataException("Error") }
         TestApplicationContext.injectRegisteredImplementations()
 
         when:

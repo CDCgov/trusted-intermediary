@@ -21,14 +21,14 @@ public class SendMessageHelper {
 
     private SendMessageHelper() {}
 
-    public void savePartnerMetadataForReceivedMessage(PartnerMetadata partnerMetadata) {
+    public void savePartnerMetadataForInboundMessage(PartnerMetadata partnerMetadata) {
         if (partnerMetadata.inboundReportId() == null) {
             logger.logWarning(
                     "Inbound reportId is null so not saving metadata for received message");
             return;
         }
         try {
-            partnerMetadataOrchestrator.updateMetadataForReceivedMessage(partnerMetadata);
+            partnerMetadataOrchestrator.updateMetadataForInboundMessage(partnerMetadata);
         } catch (PartnerMetadataException e) {
             logger.logError(
                     "Unable to save metadata for inboundReportId "
