@@ -251,7 +251,7 @@ public class EtorDomainRegistration implements DomainConnector {
     }
 
     protected String getInboundReportId(DomainRequest request) {
-
+        // recordid is the inbound report id
         String inboundReportId = request.getHeaders().get("recordid");
         if (inboundReportId == null || inboundReportId.isEmpty()) {
             logger.logError("Missing required header or empty: RecordId");
