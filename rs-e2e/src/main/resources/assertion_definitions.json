@@ -93,11 +93,12 @@
       ]
     },
     {
-      "name": "UCSD ORU remove OBX when OBX-3.4 is 99717-5",
+      "name": "UCSD ORU remove OBX when OBX-3.4 is local code 99717-5",
       "conditions": [
         "MSH-10 = '009'"
       ],
       "rules": [
+        "OBX-3.1 = '57721-3'",
         "OBX.count() = 1"
       ]
     }
