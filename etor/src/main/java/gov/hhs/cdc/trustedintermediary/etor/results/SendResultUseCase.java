@@ -46,7 +46,7 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
         transformationEngine.runRules(result);
 
         String outboundReportId = sender.send(result).orElse(null);
-        logger.logInfo("Outbound result reportId: {}", outboundReportId);
+        logger.logInfo("Outbound result outboundReportId: {}", outboundReportId);
 
         sendMessageHelper.linkMessage(inboundReportId);
 

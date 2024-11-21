@@ -136,7 +136,7 @@ public class FilePartnerMetadataStorage implements PartnerMetadataStorage {
                     .collect(Collectors.toSet());
         } catch (Exception e) {
             throw new PartnerMetadataException(
-                    "Failed reading metadata for inbound reportId: " + inboundReportId, e);
+                    "Failed reading metadata for inboundReportId: " + inboundReportId, e);
         }
     }
 
