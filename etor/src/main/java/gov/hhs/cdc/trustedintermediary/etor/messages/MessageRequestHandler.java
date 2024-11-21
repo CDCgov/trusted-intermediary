@@ -12,7 +12,7 @@ public interface MessageRequestHandler<T> {
     /**
      * Parses the request, converts and sends the message
      *
-     * @param inboundReportId the ID for the report returned from ReportStream
+     * @param inboundReportId the report id created by ReportStream and sent to us in the request
      * @return the response
      * @throws FhirParseException if there is an error parsing the FHIR data
      * @throws UnableToSendMessageException if there is an error sending the message
