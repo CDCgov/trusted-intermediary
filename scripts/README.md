@@ -39,8 +39,8 @@ Usage: ./submit.sh -f <message_file.hl7> [-e <environment>]
 Options:
     -f <FILE>                   Message file path (Required)
     -e <ENVIRONMENT>            Environment: local|staging|production (Default: local)
-    -x <RS_CLIENT_PRIVATE_KEY>  Path to the client private key for authentication with RS API (Required for non-local environments)
-    -z <TI_CLIENT_PRIVATE_KEY>  Path to the client private key for authentication with TI API (Optional for all environments)
+    -x <RS_SENDER_PRIVATE_KEY>  Path to the sender private key for authentication with RS API (Required for non-local environments)
+    -z <TI_SENDER_PRIVATE_KEY>  Path to the sender private key for authentication with TI API (Optional for all environments)
     -h                          Display this help and exit
 ```
 
@@ -62,14 +62,14 @@ ENDPOINT_NAME:
     The name of the endpoint to call (required)
 
 Options:
-    -f <REL_PATH>       Path to the hl7/fhir file to submit (Required for waters API)
-    -r <ROOT_PATH>      Root path to the hl7/fhir files (Default: /Users/bbogado/Code/Flexion/CDC-TI/trusted-intermediary/examples/)
-    -t <CONTENT_TYPE>   Content type for the message (Default: application/hl7-v2)
-    -e <ENVIRONMENT>    Environment: local|staging|production (Default: local)
-    -c <CLIENT_ID>      Client ID (Default: flexion)
-    -s <CLIENT_SENDER>  Client sender (Default: simulated-sender)
-    -k <KEY_PATH>       Path to the client private key (Required for non-local environments)
-    -i <SUBMISSION_ID>  Submission ID for history API (Required for history API)
+    -e <ENVIRONMENT>    Environment: local|staging (Default: local)
+    -f <REL_PATH>       Path to the message file to submit (Required for submission endpoints)
+    -r <ROOT_PATH>      Root path to the message files (Default: /Users/bbogado/Code/Flexion/CDC-TI/trusted-intermediary/examples/)
+    -t <CONTENT_TYPE>   Content type for the message file (Default: application/hl7-v2)
+    -k <KEY_PATH>       Path to the sender private key (Required for non-local environments)
+    -s <SENDER>         Sender ID used for authentication (Default: flexion.simulated-sender)
+    -u <URL>            URL root for the API endpoint (Default: auto-detected)
+    -i <SUBMISSION_ID>  Submission ID (Required for query endpoints)
     -v                  Verbose mode
     -h                  Display this help and exit
 ```
@@ -91,7 +91,7 @@ Sending a result to local environment
 Sending an order to staging
 
 ```
-./rs.sh waters -f Test/Orders/003_AL_ORM_O01_NBS_Fully_Populated_0_initial_message.hl7 -e staging -k /path/to/client/staging/private/key
+./rs.sh waters -f Test/Orders/003_AL_ORM_O01_NBS_Fully_Populated_0_initial_message.hl7 -e staging -k /path/to/sender/staging/private/key
 ```
 
 Checking the history in local environment for a submission id
@@ -103,7 +103,7 @@ Checking the history in local environment for a submission id
 Checking the history in staging for a submission id
 
 ```
-./rs.sh history -i 100 -e staging -k /path/to/client/staging/private/key
+./rs.sh history -i 100 -e staging -k /path/to/sender/staging/private/key
 ```
 
 ### ti.sh
@@ -124,12 +124,14 @@ ENDPOINT_NAME:
     The name of the endpoint to call (required)
 
 Options:
-    -f <REL_PATH>       Path to the hl7/fhir file to submit (Required for orders and results APIs)
-    -r <ROOT_PATH>      Root path to the hl7/fhir files (Default: /Users/bbogado/Code/Flexion/CDC-TI/trusted-intermediary/examples/)
     -e <ENVIRONMENT>    Environment: local|staging (Default: local)
-    -c <CLIENT>         Client ID to create JWT with (Default: report-stream)
-    -k <KEY_PATH>       Path to the client private key (Required for non-local environments)
-    -i <SUBMISSION_ID>  Submission ID for metadata API (Required for orders, results and metadata API)
+    -f <REL_PATH>       Path to the message file to submit (Required for submission endpoints)
+    -r <ROOT_PATH>      Root path to the message files (Default: /Users/bbogado/Code/Flexion/CDC-TI/trusted-intermediary/examples/)
+    -t <CONTENT_TYPE>   Content type for the message file (Default: application/fhir+ndjson)
+    -k <KEY_PATH>       Path to the sender private key (Required for non-local environments)
+    -s <SENDER>         Sender ID used for authentication (Default: report-stream)
+    -u <URL>            URL root for the API endpoint (Default: auto-detected)
+    -i <SUBMISSION_ID>  Submission ID (Required for query endpoints)
     -v                  Verbose mode
     -h                  Display this help and exit
 ```
@@ -143,7 +145,7 @@ Submit an order to local environment:
 
 Submit an order to staging:
 ```
-./ti.sh orders -f Test/Orders/003_AL_ORM_O01_NBS_Fully_Populated_0_initial_message.hl7 -e staging -k /path/to/client/staging/private/key
+./ti.sh orders -f Test/Orders/003_AL_ORM_O01_NBS_Fully_Populated_0_initial_message.hl7 -e staging -k /path/to/sender/staging/private/key
 
 ```
 
@@ -172,9 +174,9 @@ Get Health info from local environment:
 ./ti.sh health
 ```
 
-### epic.sh
+### ucsd.sh
 
-Submit requests to Epic API endpoints
+Submit requests to UCSD API endpoints
 
 #### Requirements
 
@@ -182,12 +184,12 @@ Submit requests to Epic API endpoints
 
 #### Before running the script
 
-- Add the `client` id to `epic.sh`
+- Add the `sender` id to `ucsd.sh`
 - Update the `secret` variable path
 
 #### Usage
 
-`./epic.sh results`
+`./ucsd.sh results -k /path/to/ucsd-ucsd-private-key.pem -s sender_name`
 
 ### setup/update-examples-snapshots.sh
 
