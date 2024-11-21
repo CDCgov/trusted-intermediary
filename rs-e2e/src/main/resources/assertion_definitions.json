@@ -33,7 +33,7 @@
         "ORC-21.10 = MSH-6",
         "OBR-2.1 = ORC-2.1",
         "OBR-2.2 = ORC-2.2",
-        "OBR-16 = ORC-12",
+        "OBR-16 = input.ORC-12",
         "OBR.count() = 1"
       ]
     },
@@ -90,6 +90,16 @@
       ],
       "rules": [
         "OBX-6 = 'µmol/L'"
+      ]
+    },
+    {
+      "name": "UCSD ORU remove OBX when OBX-3.4 is local code 99717-5",
+      "conditions": [
+        "MSH-10 = '009'"
+      ],
+      "rules": [
+        "OBX-3.1 = '57721-3'",
+        "OBX.count() = 1"
       ]
     }
   ]

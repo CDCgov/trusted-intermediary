@@ -79,9 +79,23 @@ extract_host_from_url() {
     echo "$url" | sed 's|^.*://\([^/:]*\)[:/].*|\1|'
 }
 
+parse_sender_string() {
+    local sender_string=$1
+
+    if [[ "$sender_string" =~ ^([^.]+)\.([^.]+)$ ]]; then
+        SENDER_ORG="${BASH_REMATCH[1]}"
+        SENDER_NAME="${BASH_REMATCH[2]}"
+        return 0
+    else
+        SENDER_ORG="$sender_string"
+        SENDER_NAME=""
+        return 1
+    fi
+}
+
 generate_jwt() {
     # requires: jwt-cli
-    local client=$1
+    local sender=$1
     local audience=$2
     local secret_path=$3
 
@@ -89,9 +103,9 @@ generate_jwt() {
         --exp='+5min' \
         --jti "$(uuidgen)" \
         --alg RS256 \
-        -k "$client" \
-        -i "$client" \
-        -s "$client" \
+        -k "$sender" \
+        -i "$sender" \
+        -s "$sender" \
         -a "$audience" \
         --no-iat \
         -S "@$secret_path"
