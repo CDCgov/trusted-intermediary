@@ -174,9 +174,9 @@ Get Health info from local environment:
 ./ti.sh health
 ```
 
-### epic.sh
+### ucsd.sh
 
-Submit requests to Epic API endpoints
+Submit requests to UCSD API endpoints
 
 #### Requirements
 
@@ -184,12 +184,12 @@ Submit requests to Epic API endpoints
 
 #### Before running the script
 
-- Add the `sender` id to `epic.sh`
+- Add the `sender` id to `ucsd.sh`
 - Update the `secret` variable path
 
 #### Usage
 
-`./epic.sh results -k /path/to/ucsd-epic-private-key.pem -s sender_name`
+`./ucsd.sh results -k /path/to/ucsd-ucsd-private-key.pem -s sender_name`
 
 ### setup/update-examples-snapshots.sh
 
