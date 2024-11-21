@@ -51,7 +51,7 @@ public class SendMessageHelper {
             logger.logError(
                     "Unable to update metadata for inboundReportId "
                             + inboundReportId
-                            + " and sent outboundReportId "
+                            + " and outboundReportId "
                             + outboundReportId,
                     e);
         }
