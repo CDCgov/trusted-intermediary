@@ -37,7 +37,7 @@ public class SendMessageHelper {
         }
     }
 
-    public void saveReportIds(String inboundReportId, String outboundReportId) {
+    public void saveOutboundReportId(String inboundReportId, String outboundReportId) {
         if (outboundReportId == null || inboundReportId == null) {
             logger.logWarning(
                     "Inbound and/or outboundReportId is null so not saving metadata for sent result");

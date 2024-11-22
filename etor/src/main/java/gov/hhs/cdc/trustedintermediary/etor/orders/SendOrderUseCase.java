@@ -49,6 +49,6 @@ public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
 
         sendMessageHelper.linkMessage(inboundReportId);
 
-        sendMessageHelper.saveReportIds(inboundReportId, outboundReportId);
+        sendMessageHelper.saveOutboundReportId(inboundReportId, outboundReportId);
     }
 }
