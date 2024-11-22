@@ -13,14 +13,23 @@ Information on how to set up the sample files evaluated by the tests can be foun
 
 ## Running the tests
 
-- Automatically - these are scheduled to run every weekday
-- Manually via Github
-  - Run the [automated-staging-test-submit](/.github/workflows/automated-staging-test-submit.yml) action
-  - Wait for RS and TI to finish processing files
-  - Run the [automated-staging-test-run](/.github/workflows/automated-staging-test-run.yml) action
-- Locally
-  - Set the `AZURE_STORAGE_CONNECTION_STRING` environment variable to the [value in Keybase](keybase://team/cdc_ti/service_keys/TI/staging/azure-storage-connection-string-for-automated-rs-e2e-tests.txt)
-  - Run the tests with `./gradlew rs-e2e:clean rs-e2e:automatedTest`
+### Automatically
+
+There are two scheduled tasks that run every weekday around midnight EST:
+- [automated-staging-test-submit](/.github/workflows/automated-staging-test-submit.yml) submits the messages in `/examples/Test/Automated`
+- [automated-staging-test-run](/.github/workflows/automated-staging-test-run.yml) triggers a couple of hours later and runs the Automated Tests on the input files in `/examples/Test/Automated` and the output files in the Azure storage container.
+
+### Locally
+
+- Set the `AZURE_STORAGE_CONNECTION_STRING` environment variable to the [value in Keybase](keybase://team/cdc_ti/service_keys/TI/staging/azure-storage-connection-string-for-automated-rs-e2e-tests.txt)
+- Run the tests:
+  - `./gradlew rs-e2e:clean rs-e2e:automatedTest`
+  - From IntelliJ:
+
+### Manually via Github
+- Run the [automated-staging-test-submit](/.github/workflows/automated-staging-test-submit.yml) action
+- Wait for RS and TI to finish processing files
+- Run the [automated-staging-test-run](/.github/workflows/automated-staging-test-run.yml) action
 
 ## Assertions Definition
 
