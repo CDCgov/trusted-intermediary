@@ -1,7 +1,3 @@
-data "azuread_service_principal" "principal" {
-  object_id = data.azurerm_client_config.current.object_id
-}
-
 resource "azurerm_postgresql_flexible_server" "database" {
   name                  = "cdcti-${var.environment}-database"
   resource_group_name   = data.azurerm_resource_group.group.name
