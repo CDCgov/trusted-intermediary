@@ -13,7 +13,6 @@ import javax.inject.Inject;
 /** Use case for converting and sending a lab result message. */
 public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
     private static final SendResultUseCase INSTANCE = new SendResultUseCase();
-    private final HashHelper hashHelper = new HashHelper();
 
     @Inject TransformationRuleEngine transformationEngine;
     @Inject ResultSender sender;
@@ -21,6 +20,8 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
     @Inject SendMessageHelper sendMessageHelper;
 
     @Inject Logger logger;
+
+    @Inject HashHelper hashHelper;
 
     private SendResultUseCase() {}
 

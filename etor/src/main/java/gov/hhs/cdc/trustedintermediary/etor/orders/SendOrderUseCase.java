@@ -14,12 +14,12 @@ import javax.inject.Inject;
 /** The overall logic to receive, convert to OML, and subsequently send a lab order. */
 public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
     private static final SendOrderUseCase INSTANCE = new SendOrderUseCase();
-    private final HashHelper hashHelper = new HashHelper();
     @Inject TransformationRuleEngine transformationEngine;
     @Inject OrderSender sender;
     @Inject MetricMetadata metadata;
     @Inject SendMessageHelper sendMessageHelper;
     @Inject Logger logger;
+    @Inject HashHelper hashHelper;
 
     private SendOrderUseCase() {}
 

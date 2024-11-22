@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnector;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainConnectorConstructionException;
 import gov.hhs.cdc.trustedintermediary.domainconnector.DomainResponseHelper;
 import gov.hhs.cdc.trustedintermediary.domainconnector.UnableToReadOpenApiSpecificationException;
+import gov.hhs.cdc.trustedintermediary.etor.utils.security.HashHelper;
 import gov.hhs.cdc.trustedintermediary.external.apache.ApacheClient;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureDatabaseCredentialsProvider;
 import gov.hhs.cdc.trustedintermediary.external.azure.AzureSecrets;
@@ -85,6 +86,7 @@ public class App {
         ApplicationContext.register(YamlCombiner.class, Jackson.getInstance());
         ApplicationContext.register(OpenApi.class, OpenApi.getInstance());
         ApplicationContext.register(HttpClient.class, ApacheClient.getInstance());
+        ApplicationContext.register(HashHelper.class, HashHelper.getInstance());
         ApplicationContext.register(AuthEngine.class, JjwtEngine.getInstance());
         ApplicationContext.register(Cache.class, KeyCache.getInstance());
         ApplicationContext.register(DomainResponseHelper.class, DomainResponseHelper.getInstance());
