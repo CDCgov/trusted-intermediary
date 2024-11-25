@@ -18,7 +18,7 @@ Information on how to set up the sample files evaluated by the tests can be foun
 There are two scheduled tasks that run every weekday around midnight EST:
 
 - [Automated Staging Test - Submit Messages](https://github.com/CDCgov/trusted-intermediary/actions/workflows/automated-staging-test-submit.yml) submits the messages in `/examples/Test/Automated`
-- [Automated Staging Test - Run integration tests](https://github.com/CDCgov/trusted-intermediary/actions/workflows/automated-staging-test-run.yml) triggers a couple of hours later and runs the Automated Tests on the input files in `/examples/Test/Automated` and the output files in the Azure storage container.
+- [Automated Staging Test - Run integration tests](https://github.com/CDCgov/trusted-intermediary/actions/workflows/automated-staging-test-run.yml) triggers a couple of hours later and runs the Automated Tests on the input files in `/examples/Test/Automated` and the output files in the `automated` container for the `cdctiautomatedstg` Azure storage account.
 
 ### Manually from your local machine
 
