@@ -5,7 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
-public class HashHelper implements SecureHash {
+public class HashHelper {
 
     private static final HashHelper INSTANCE = new HashHelper();
 
@@ -13,7 +13,6 @@ public class HashHelper implements SecureHash {
         return INSTANCE;
     }
 
-    @Override
     public String generateHash(Object input) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA3-512");
