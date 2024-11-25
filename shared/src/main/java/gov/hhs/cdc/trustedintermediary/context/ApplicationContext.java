@@ -56,7 +56,7 @@ public class ApplicationContext {
         injectRegisteredImplementations(false);
     }
 
-    protected static void injectRegisteredImplementations(boolean skipMissingImplementations) {
+    public static void injectRegisteredImplementations(boolean skipMissingImplementations) {
         var fields = Reflection.getFieldsAnnotatedWith(Inject.class);
 
         fields.forEach(field -> injectIntoField(field, skipMissingImplementations));
