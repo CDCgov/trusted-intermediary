@@ -7,4 +7,3 @@ services:
     ports:
       - "8080:8080" # default api endpoint port
       - "6006:6006" # Java debug port
-    platform: linux/amd64
