@@ -62,6 +62,24 @@ public class ApplicationContext {
         fields.forEach(field -> injectIntoField(field, skipMissingImplementations));
     }
 
+    private static void injectIntoField(
+            Field field, Object instance, boolean skipMissingImplementations) {
+        var fieldType = field.getType();
+
+        Object fieldImplementation = getFieldImplementation(fieldType, skipMissingImplementations);
+        if (fieldImplementation == null) {
+            return;
+        }
+
+        field.trySetAccessible();
+        try {
+            field.set(instance, fieldImplementation);
+        } catch (IllegalAccessException | IllegalArgumentException exception) {
+            throw new IllegalArgumentException(
+                    "unable to inject " + fieldType + " into " + instance.getClass(), exception);
+        }
+    }
+
     private static void injectIntoField(Field field, boolean skipMissingImplementations) {
         var fieldType = field.getType();
         var declaringClass = field.getDeclaringClass();
