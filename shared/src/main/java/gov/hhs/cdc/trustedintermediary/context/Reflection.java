@@ -28,7 +28,6 @@ class Reflection {
     }
 
     public static Set<Field> getFieldsAnnotatedWith(Class<?> annotation) {
-        // todo: return non-singleton classes that use the inject annotation
         return REFLECTIONS.get(FieldsAnnotated.with(annotation).as(Field.class));
     }
 
