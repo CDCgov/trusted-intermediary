@@ -6,6 +6,7 @@ import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageExceptio
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataMessageType;
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.TransformationRuleEngine;
+import gov.hhs.cdc.trustedintermediary.etor.utils.security.HashHelper;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import javax.inject.Inject;
@@ -18,6 +19,7 @@ public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
     @Inject MetricMetadata metadata;
     @Inject SendMessageHelper sendMessageHelper;
     @Inject Logger logger;
+    @Inject HashHelper hashHelper;
 
     private SendOrderUseCase() {}
 
@@ -29,10 +31,12 @@ public class SendOrderUseCase implements SendMessageUseCase<Order<?>> {
     public void convertAndSend(final Order<?> order, String receivedSubmissionId)
             throws UnableToSendMessageException {
 
+        String hashedOrder = hashHelper.generateHash(order);
+
         PartnerMetadata partnerMetadata =
                 new PartnerMetadata(
                         receivedSubmissionId,
-                        String.valueOf(order.hashCode()),
+                        hashedOrder,
                         PartnerMetadataMessageType.ORDER,
                         order.getSendingApplicationDetails(),
                         order.getSendingFacilityDetails(),
