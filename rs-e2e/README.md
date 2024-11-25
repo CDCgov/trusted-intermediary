@@ -17,8 +17,8 @@ Information on how to set up the sample files evaluated by the tests can be foun
 
 There are two scheduled tasks that run every weekday around midnight EST:
 
-- [automated-staging-test-submit](/.github/workflows/automated-staging-test-submit.yml) submits the messages in `/examples/Test/Automated`
-- [automated-staging-test-run](/.github/workflows/automated-staging-test-run.yml) triggers a couple of hours later and runs the Automated Tests on the input files in `/examples/Test/Automated` and the output files in the Azure storage container.
+- [Automated Staging Test - Submit Messages](https://github.com/CDCgov/trusted-intermediary/actions/workflows/automated-staging-test-submit.yml) submits the messages in `/examples/Test/Automated`
+- [Automated Staging Test - Run integration tests](https://github.com/CDCgov/trusted-intermediary/actions/workflows/automated-staging-test-run.yml) triggers a couple of hours later and runs the Automated Tests on the input files in `/examples/Test/Automated` and the output files in the Azure storage container.
 
 ### Manually from your local machine
 
@@ -26,19 +26,19 @@ When running locally, we usually run the tests from either the command line usin
 
 From the command line:
 
-1. Set the `AZURE_STORAGE_CONNECTION_STRING` environment variable to the [value in Keybase](keybase://team/cdc_ti/service_keys/TI/staging/azure-storage-connection-string-for-automated-rs-e2e-tests.txt)
+1. Set the `AZURE_STORAGE_CONNECTION_STRING` environment variable in your shell to the [value in Keybase](keybase://team/cdc_ti/service_keys/TI/staging/azure-storage-connection-string-for-automated-rs-e2e-tests.txt)
 2. Run: `./gradlew rs-e2e:clean rs-e2e:automatedTest`
 
 From IntelliJ:
 
-1.Set `AZURE_STORAGE_CONNECTION_STRING` environment variable in the IntelliJ test run configuration (instructions on how to do that [here](https://stackoverflow.com/a/32761503))
+1. Set `AZURE_STORAGE_CONNECTION_STRING` environment variable in the IntelliJ test run configuration (instructions on how to do that [here](https://stackoverflow.com/a/32761503)) to the [value in Keybase](keybase://team/cdc_ti/service_keys/TI/staging/azure-storage-connection-string-for-automated-rs-e2e-tests.txt)
 2. Go to `rs-e2e/src/test/groovy/gov/hhs/cdc/trustedintermediary/rse2e/AutomatedTest.groovy` and either run or debug `AutomatedTest` as you normally would from IntelliJ
 
 ### Manually via Github
 
-1. Run the [Automated Staging Test - Submit Messages](/.github/workflows/automated-staging-test-submit.yml) action
+1. Run the [Automated Staging Test - Submit Messages](https://github.com/CDCgov/trusted-intermediary/actions/workflows/automated-staging-test-submit.yml) action
 2. Wait for RS and TI to finish processing files
-3. Run the [Automated Staging Test - Run integration tests](/.github/workflows/automated-staging-test-run.yml) action
+3. Run the [Automated Staging Test - Run integration tests](https://github.com/CDCgov/trusted-intermediary/actions/workflows/automated-staging-test-run.yml) action
 
 #### Testing a branch
 
