@@ -22,16 +22,16 @@ There are two scheduled tasks that run every weekday around midnight EST:
 
 ### Manually from your local machine
 
-When running locally, we usually run the tests from either the command line using gradle, or from IntelliJ. Please note that even though you are running the test from your local machine, the test will need to connect to the Azure container to pull the output files to apply the assertions on. For this reason, you will need to set the environment variable to authenticate the connection to Azure.
+When running locally, we usually run the tests from either the command line using gradle, or from IntelliJ. Please note that even though you are running the test from your local machine, the test will need to connect to the Azure container to pull the output files to apply the assertions on. For this reason, you will need to set the `AZURE_STORAGE_CONNECTION_STRING` environment variable to authenticate the connection to Azure. You can find the value for `AZURE_STORAGE_CONNECTION_STRING` in Keybase (keybase://team/cdc_ti/service_keys/TI/staging/azure-storage-connection-string-for-automated-rs-e2e-tests.txt).
 
 From the command line:
 
-1. Set the `AZURE_STORAGE_CONNECTION_STRING` environment variable in your shell to the [value in Keybase](keybase://team/cdc_ti/service_keys/TI/staging/azure-storage-connection-string-for-automated-rs-e2e-tests.txt)
+1. Set the `AZURE_STORAGE_CONNECTION_STRING` environment variable in your shell
 2. Run: `./gradlew rs-e2e:clean rs-e2e:automatedTest`
 
 From IntelliJ:
 
-1. Set `AZURE_STORAGE_CONNECTION_STRING` environment variable in the IntelliJ test run configuration (instructions on how to do that [here](https://stackoverflow.com/a/32761503)) to the [value in Keybase](keybase://team/cdc_ti/service_keys/TI/staging/azure-storage-connection-string-for-automated-rs-e2e-tests.txt)
+1. Set `AZURE_STORAGE_CONNECTION_STRING` environment variable in the IntelliJ test run configuration (instructions on how to do that [here](https://stackoverflow.com/a/32761503))
 2. Go to `rs-e2e/src/test/groovy/gov/hhs/cdc/trustedintermediary/rse2e/AutomatedTest.groovy` and either run or debug `AutomatedTest` as you normally would from IntelliJ
 
 ### Manually via Github
