@@ -62,6 +62,12 @@ public class ApplicationContext {
         fields.forEach(field -> injectIntoField(field, skipMissingImplementations));
     }
 
+    public static void injectIntoNonSingleton(Object instance) {
+        var fields = Reflection.getFieldsAnnotatedWithInstance(instance.getClass(), Inject.class);
+
+        fields.forEach(field -> injectIntoField(field, instance, false));
+    }
+
     private static void injectIntoField(
             Field field, Object instance, boolean skipMissingImplementations) {
         var fieldType = field.getType();
