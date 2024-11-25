@@ -50,6 +50,8 @@ If you have added new assertion rules to the [assertion_definitions.json](/rs-e2
 
 Instead of running the `Run integration tests` action, you could also test it from your local machine by following the steps in the previous section.
 
+**Note**: when testing a branch with new assertions, it's recommended to make sure the assertions fail as a gut check.
+
 ## Assertions Definition
 
 The assertions for the integration tests are defined in the
