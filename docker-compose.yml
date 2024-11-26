@@ -3,8 +3,7 @@ services:
   router:
     build: .
     environment:
-      REPORT_STREAM_URL_PREFIX: http://localhost:7071
+      REPORT_STREAM_URL_PREFIX: http://host.docker.internal:7071
     ports:
       - "8080:8080" # default api endpoint port
       - "6006:6006" # Java debug port
-    platform: linux/amd64
