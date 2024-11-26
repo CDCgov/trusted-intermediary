@@ -16,7 +16,6 @@ jobs:
       - name: Run automated tests
         env:
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AUTOMATED_TEST_AZURE_STORAGE_CONNECTION_STRING }}
-          ORG_GRADLE_CONSOLE: plain
         run: ./gradlew rs-e2e:clean rs-e2e:automatedTest
 
       # - name: Send slack notification on test failure
