@@ -101,6 +101,16 @@
         "OBX-3.1 = '57721-3'",
         "OBX.count() = 1"
       ]
+    },
+    {
+      "name": "LADPH ORU requirements",
+      "conditions": [
+        "MSH-10 = '010'"
+      ],
+      "rules": [
+        "OBR.count() = 1",
+        "OBR-4.1 = '54089-8'"
+      ]
     }
   ]
 }
