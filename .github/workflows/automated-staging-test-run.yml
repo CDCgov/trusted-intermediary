@@ -18,11 +18,11 @@ jobs:
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AUTOMATED_TEST_AZURE_STORAGE_CONNECTION_STRING }}
         run: ./gradlew rs-e2e:clean rs-e2e:automatedTest
 
-      # - name: Send slack notification on test failure
-      #   if: failure()
-      #   uses: slackapi/slack-github-action@v2.0.0
-      #   with:
-      #     webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
-      #     webhook-type: incoming-webhook
-      #     payload: |
-      #       text: "Automated Staging RS Integration Test Failed!: https://github.com/CDCgov/trusted-intermediary/actions/runs/${{ github.run_id }}"
+      - name: Send slack notification on test failure
+        if: failure()
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            text: "Automated Staging RS Integration Test Failed!: https://github.com/CDCgov/trusted-intermediary/actions/runs/${{ github.run_id }}"
