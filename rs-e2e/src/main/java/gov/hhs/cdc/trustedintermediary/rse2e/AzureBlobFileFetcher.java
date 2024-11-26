@@ -4,24 +4,29 @@ import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobContainerClientBuilder;
 import com.azure.storage.blob.models.BlobItem;
-import com.azure.storage.blob.models.BlobProperties;
+import com.azure.storage.blob.models.ListBlobsOptions;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * The AzureBlobFileFetcher class implements the {@link FileFetcher FileFetcher} interface and
- * fetches files from an Azure Blob Storage container.
+ * retrieves files from an Azure Blob Storage container.
  */
 public class AzureBlobFileFetcher implements FileFetcher {
 
-    private static final FileFetcher INSTANCE = new AzureBlobFileFetcher();
+    // Using Eastern Standard Time as all or most contributors are in the US
+    private static final ZoneId TIME_ZONE = ZoneOffset.of("-05:00");
+    private static final int RETENTION_DAYS = 90;
+    private static final String CONTAINER_NAME = "automated";
 
     private final BlobContainerClient blobContainerClient;
 
+    private static final FileFetcher INSTANCE = new AzureBlobFileFetcher();
+
     private AzureBlobFileFetcher() {
-        String azureStorageConnectionName = "automated";
         String azureStorageConnectionString = System.getenv("AZURE_STORAGE_CONNECTION_STRING");
 
         if (azureStorageConnectionString == null || azureStorageConnectionString.isEmpty()) {
@@ -31,8 +36,11 @@ public class AzureBlobFileFetcher implements FileFetcher {
         this.blobContainerClient =
                 new BlobContainerClientBuilder()
                         .connectionString(azureStorageConnectionString)
-                        .containerName(azureStorageConnectionName)
+                        .containerName(CONTAINER_NAME)
                         .buildClient();
+
+        AzureBlobOrganizer blobOrganizer = new AzureBlobOrganizer(blobContainerClient);
+        blobOrganizer.organizeAndCleanupBlobsByDate(RETENTION_DAYS, TIME_ZONE);
     }
 
     public static FileFetcher getInstance() {
@@ -41,33 +49,17 @@ public class AzureBlobFileFetcher implements FileFetcher {
 
     @Override
     public List<HL7FileStream> fetchFiles() {
-        List<HL7FileStream> recentFiles = new ArrayList<>();
-        LocalDate mostRecentDay = null;
+        List<HL7FileStream> relevantFiles = new ArrayList<>();
 
-        for (BlobItem blobItem : blobContainerClient.listBlobs()) {
+        LocalDate today = LocalDate.now(TIME_ZONE);
+        String pathPrefix = AzureBlobHelper.buildDatePathPrefix(today);
+        ListBlobsOptions options = new ListBlobsOptions().setPrefix(pathPrefix);
+        for (BlobItem blobItem : blobContainerClient.listBlobs(options, null)) {
             BlobClient blobClient = blobContainerClient.getBlobClient(blobItem.getName());
-            BlobProperties properties = blobClient.getProperties();
-
-            // Currently we're doing everything in UTC. If we start uploading files manually and
-            // running
-            // this test manually, we may want to revisit this logic and/or the file structure
-            // because midnight UTC is 5pm PDT on the previous day
-            LocalDate blobCreationDate =
-                    properties.getLastModified().toInstant().atZone(ZoneOffset.UTC).toLocalDate();
-
-            if (mostRecentDay != null && blobCreationDate.isBefore(mostRecentDay)) {
-                continue;
-            }
-
-            if (mostRecentDay == null || blobCreationDate.isAfter(mostRecentDay)) {
-                mostRecentDay = blobCreationDate;
-                recentFiles.clear();
-            }
-
-            recentFiles.add(
+            relevantFiles.add(
                     new HL7FileStream(blobClient.getBlobName(), blobClient.openInputStream()));
         }
 
-        return recentFiles;
+        return relevantFiles;
     }
 }

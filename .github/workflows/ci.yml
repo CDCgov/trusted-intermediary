@@ -117,7 +117,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run Db migration
-        uses: liquibase-github-actions/update@v4.29.2
+        uses: liquibase-github-actions/update@v4.30.0
         with:
           changelogFile: ./etor/databaseMigrations/root.yml
           url: "jdbc:postgresql://postgres:5432/testdb"

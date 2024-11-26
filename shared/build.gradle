@@ -28,10 +28,10 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.1'
 
     // hapi fhir
-    api 'ca.uhn.hapi.fhir:hapi-fhir-base:7.4.5'
-    api 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:7.4.5'
-    implementation 'ca.uhn.hapi.fhir:hapi-fhir-caching-caffeine:7.4.5'
-    implementation 'ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:7.4.5'
+    api 'ca.uhn.hapi.fhir:hapi-fhir-base:7.6.0'
+    api 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:7.6.0'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-caching-caffeine:7.6.0'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:7.6.0'
     api 'org.fhir:ucum:1.0.8'
 
     // hapi hl7
@@ -49,13 +49,13 @@ dependencies {
 
     // azure sdk
     implementation 'com.azure:azure-security-keyvault-secrets:4.9.0'
-    implementation 'com.azure:azure-identity:1.13.3'
+    implementation 'com.azure:azure-identity:1.14.2'
 
-    testImplementation 'org.apache.groovy:groovy:4.0.23'
-    testFixturesImplementation 'org.apache.groovy:groovy:4.0.23'
+    testImplementation 'org.apache.groovy:groovy:4.0.24'
+    testFixturesImplementation 'org.apache.groovy:groovy:4.0.24'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
     testFixturesImplementation 'com.openpojo:openpojo:0.9.1'
-    testFixturesImplementation 'nl.jqno.equalsverifier:equalsverifier:3.17.1'
+    testFixturesImplementation 'nl.jqno.equalsverifier:equalsverifier:3.17.3'
 
     // dotenv-java
     implementation 'io.github.cdimascio:dotenv-java:3.0.2'
@@ -64,7 +64,7 @@ dependencies {
     implementation 'org.postgresql:postgresql:42.7.4'
 
     // hikari connection pool
-    implementation 'com.zaxxer:HikariCP:6.0.0'
+    implementation 'com.zaxxer:HikariCP:6.2.1'
 }
 
 jacocoTestCoverageVerification {
