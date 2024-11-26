@@ -8,6 +8,28 @@ import java.nio.file.Paths
 
 class ApplicationContextTest extends Specification {
 
+    interface TestingInterface {
+        void test()
+    }
+
+    static class DogCow implements TestingInterface {
+
+        @Override
+        void test() {
+            print("test()")
+        }
+    }
+
+    static class DogCowTwo implements TestingInterface {
+
+        @Override
+        void test() {
+            print("testTwo()")
+        }
+    }
+    def DOGCOW = new DogCow()
+    def DOGCOWTWO = new DogCowTwo()
+
     def setup() {
         TestApplicationContext.reset()
     }
@@ -19,6 +41,18 @@ class ApplicationContextTest extends Specification {
 
         expect:
         result == ApplicationContext.getImplementation(String.class)
+    }
+
+    def "implementors retrieval test"() {
+        setup:
+        def dogCow = DOGCOW
+        def dogCowTwo = DOGCOWTWO
+        def implementors = new HashSet()
+        implementors.add(DogCow)
+        implementors.add(DogCowTwo)
+
+        expect:
+        implementors == ApplicationContext.getImplementors(TestingInterface)
     }
 
     def "implementation injection test"() {
