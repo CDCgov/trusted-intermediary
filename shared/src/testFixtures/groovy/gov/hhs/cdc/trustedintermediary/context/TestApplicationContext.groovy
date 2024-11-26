@@ -19,8 +19,8 @@ class TestApplicationContext extends ApplicationContext {
         TEST_ENV_VARS.clear()
     }
 
-    def static injectRegisteredImplementations() {
-        skipMissingImplementations = true
+    def static injectRegisteredImplementations(def skip = true) {
+        skipMissingImplementations = skip
         doInjectRegisteredImplementations()
     }
 
