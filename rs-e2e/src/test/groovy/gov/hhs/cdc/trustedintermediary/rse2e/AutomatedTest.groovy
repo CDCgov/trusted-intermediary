@@ -19,6 +19,7 @@ class AutomatedTest extends Specification  {
     AssertionRuleEngine engine
     HapiHL7FileMatcher fileMatcher
     Logger mockLogger = Mock(Logger)
+    List<String> loggedWarnings = []
 
     def setup() {
         engine = AssertionRuleEngine.getInstance()
@@ -34,6 +35,10 @@ class AutomatedTest extends Specification  {
         TestApplicationContext.register(HealthDataExpressionEvaluator, HapiHL7ExpressionEvaluator.getInstance())
         TestApplicationContext.register(LocalFileFetcher, LocalFileFetcher.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
+
+        mockLogger.logWarning(_ as String, _ as Object) >> { String msg, Object args ->
+            loggedWarnings << msg
+        }
 
         FileFetcher azureFileFetcher = AzureBlobFileFetcher.getInstance()
         azureFiles = azureFileFetcher.fetchFiles()
@@ -66,6 +71,8 @@ class AutomatedTest extends Specification  {
         then:
         rulesToEvaluate.collect { it.name }.isEmpty() //Check whether all the rules in the assertions file have been run
         0 * mockLogger.logError(_ as String, _ as Exception)
-        0 * mockLogger.logWarning(_ as String)
+        if (!loggedWarnings.isEmpty()) {
+            throw new AssertionError("Unexpected warnings were logged:\n- ${loggedWarnings.join('\n- ')}")
+        }
     }
 }
