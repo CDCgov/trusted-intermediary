@@ -5,16 +5,14 @@ source "$CDCTI_HOME/scripts/lib/common.sh"
 source "$CDCTI_HOME/scripts/lib/api.sh"
 
 # default values
-ENVIRONMENT=local
-ROOT_PATH=$CDCTI_HOME/examples/
+ENVIRONMENT=staging
+ROOT_PATH=$CDCTI_HOME/examples/CA/
 CONTENT_TYPE=application/hl7-v2
-SENDER=flexion.simulated-sender
-DEFAULT_SENDER_PRIVATE_KEY_ORG=flexion
-DEFAULT_SENDER_PRIVATE_KEY_PATH="$TI_LOCAL_PRIVATE_KEY_PATH"
+URL=https://epicproxy-np.et0502.epichosted.com/FhirProxy/oauth2/token
 
-parse_args "rs" "$@" || {
+parse_args "ucsd" "$@" || {
     show_usage "$(basename "$0")"
     exit 0
 }
 
-handle_api_request "rs" "$@"
+handle_api_request "ucsd" "$@"

@@ -17,4 +17,5 @@ data "azurerm_resource_group" "group" {
   name = "csels-rsti-${var.environment}-moderate-rg"
 }
 
+# See here for explanation: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config.html
 data "azurerm_client_config" "current" {}
