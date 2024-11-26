@@ -9,6 +9,7 @@ import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadata
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataException
 import gov.hhs.cdc.trustedintermediary.etor.metadata.partner.PartnerMetadataOrchestrator
 import gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation.TransformationRuleEngine
+import gov.hhs.cdc.trustedintermediary.etor.utils.security.HashHelper
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import spock.lang.Specification
@@ -30,6 +31,7 @@ class SendResultUseCaseTest extends Specification {
         TestApplicationContext.register(TransformationRuleEngine, mockEngine)
         TestApplicationContext.register(ResultSender, mockSender)
         TestApplicationContext.register(Logger, mockLogger)
+        TestApplicationContext.register(HashHelper, HashHelper.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
     }
 

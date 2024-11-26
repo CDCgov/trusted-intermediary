@@ -13,14 +13,44 @@ Information on how to set up the sample files evaluated by the tests can be foun
 
 ## Running the tests
 
-- Automatically - these are scheduled to run every weekday
-- Manually via Github
-  - Run the [automated-staging-test-submit](/.github/workflows/automated-staging-test-submit.yml) action
-  - Wait for RS and TI to finish processing files
-  - Run the [automated-staging-test-run](/.github/workflows/automated-staging-test-run.yml) action
-- Locally
-  - Set the `AZURE_STORAGE_CONNECTION_STRING` environment variable to the [value in Keybase](keybase://team/cdc_ti/service_keys/TI/staging/azure-storage-connection-string-for-automated-rs-e2e-tests.txt)
-  - Run the tests with `./gradlew rs-e2e:clean rs-e2e:automatedTest`
+### Automatically
+
+There are two scheduled tasks that run every weekday around midnight EST:
+
+- [Automated Staging Test - Submit Messages](https://github.com/CDCgov/trusted-intermediary/actions/workflows/automated-staging-test-submit.yml) submits the messages in `/examples/Test/Automated`
+- [Automated Staging Test - Run integration tests](https://github.com/CDCgov/trusted-intermediary/actions/workflows/automated-staging-test-run.yml) triggers a couple of hours later and runs the Automated Tests on the input files in `/examples/Test/Automated` and the output files in the `automated` container for the `cdctiautomatedstg` Azure storage account.
+
+### Manually from your local machine
+
+When running locally, we usually run the tests from either the command line using gradle, or from IntelliJ. Please note that even though you are running the test from your local machine, the test will need to connect to the Azure container to pull the output files to apply the assertions on. For this reason, you will need to set the `AZURE_STORAGE_CONNECTION_STRING` environment variable to authenticate the connection to Azure. You can find the value for `AZURE_STORAGE_CONNECTION_STRING` in Keybase (keybase://team/cdc_ti/service_keys/TI/staging/azure-storage-connection-string-for-automated-rs-e2e-tests.txt).
+
+From the command line:
+
+1. Set the `AZURE_STORAGE_CONNECTION_STRING` environment variable in your shell
+2. Run: `./gradlew rs-e2e:clean rs-e2e:automatedTest`
+
+From IntelliJ:
+
+1. Set `AZURE_STORAGE_CONNECTION_STRING` environment variable in the IntelliJ test run configuration (instructions on how to do that [here](https://stackoverflow.com/a/32761503))
+2. Go to `rs-e2e/src/test/groovy/gov/hhs/cdc/trustedintermediary/rse2e/AutomatedTest.groovy` and either run or debug `AutomatedTest` as you normally would from IntelliJ
+
+### Manually via Github
+
+1. Run the [Automated Staging Test - Submit Messages](https://github.com/CDCgov/trusted-intermediary/actions/workflows/automated-staging-test-submit.yml) action
+2. Wait for RS and TI to finish processing files
+3. Run the [Automated Staging Test - Run integration tests](https://github.com/CDCgov/trusted-intermediary/actions/workflows/automated-staging-test-run.yml) action
+
+#### Testing a branch
+
+If you have added new files to `/examples/Test/Automated` in your branch/PR, before running the `Automated Staging Test - Submit Messages` action in step 1, select the branch you're working on as shown in the screenshot below. This will make sure to include your new file(s) when submitting the messages.
+
+![Run Workflow from branch](../images/run_workflow_from_branch.png)
+
+If you have added new assertion rules to the [assertion_definitions.json](/rs-e2e/src/main/resources/assertion_definitions.json) file, you should do the same for step 3 and select your branch when running the `Automated Staging Test - Run integration tests` action.
+
+Instead of running the `Run integration tests` action, you could also test it from your local machine by following the steps in the previous section.
+
+**Note**: when testing a branch with new assertions, it's recommended to make sure the assertions fail as a gut check.
 
 ## Assertions Definition
 
