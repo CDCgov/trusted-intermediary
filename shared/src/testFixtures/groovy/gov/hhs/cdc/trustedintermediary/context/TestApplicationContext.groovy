@@ -20,7 +20,8 @@ class TestApplicationContext extends ApplicationContext {
     }
 
     def static injectRegisteredImplementations() {
-        injectRegisteredImplementations(true)
+        skipMissingImplementations = true
+        doInjectRegisteredImplementations()
     }
 
     def static addEnvironmentVariable(String key, String value) {
