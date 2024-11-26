@@ -36,4 +36,13 @@ tasks.named('test') {
 task automatedTest(type: Test) {
     useJUnitPlatform()
     include '**/AutomatedTest.*'
+
+    testLogging {
+        events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+        exceptionFormat 'full'
+        showExceptions true
+        showCauses true
+        showStackTraces true
+        showStandardStreams true
+    }
 }
