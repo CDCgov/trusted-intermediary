@@ -38,11 +38,7 @@ task automatedTest(type: Test) {
     include '**/AutomatedTest.*'
 
     testLogging {
-        // events 'failed'
-        exceptionFormat 'full'
-        // showExceptions true
-        // showCauses true
         showStackTraces true
-        // showStandardStreams true
+        exceptionFormat 'full'
     }
 }
