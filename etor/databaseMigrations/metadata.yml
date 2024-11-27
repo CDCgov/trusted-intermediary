@@ -168,29 +168,3 @@ databaseChangeLog:
         - dropColumn:
             tableName: metadata
             columnName: receiver
-
-  - changeSet:
-      id: 8
-      author: pluckyswan
-      labels: update-metadata-table
-      context: metadata
-      comment: update metadata table to rename column sent_message_id to outbound_report_id
-      changes:
-        - renameColumn:
-            columnDataType: varchar(40)
-            oldColumnName: sent_message_id
-            newColumnName: outbound_report_id
-            tableName: metadata
-
-  - changeSet:
-      id: 9
-      author: pluckyswan
-      labels: update-metadata-table
-      context: metadata
-      comment: update metadata table to rename column received_message_id to inbound_report_id
-      changes:
-        - renameColumn:
-            columnDataType: varchar(40)
-            oldColumnName: received_message_id
-            newColumnName: inbound_report_id
-            tableName: metadata

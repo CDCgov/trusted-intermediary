@@ -27,8 +27,6 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
     private static final DatabasePartnerMetadataStorage INSTANCE =
             new DatabasePartnerMetadataStorage();
 
-    private static final String METADATA_TABLE_INBOUND_REPORT_ID = "inbound_report_id";
-
     @Inject DbDao dao;
 
     @Inject Logger logger;
@@ -51,7 +49,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                                 try {
                                     PreparedStatement statement =
                                             connection.prepareStatement(
-                                                    "SELECT * FROM metadata where inbound_report_id = ? OR outbound_report_id = ?");
+                                                    "SELECT * FROM metadata where received_message_id = ? OR sent_message_id = ?");
                                     statement.setString(1, uniqueId);
                                     statement.setString(2, uniqueId);
                                     return statement;
@@ -73,7 +71,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
 
         try {
             List<DbColumn> columns = createDbColumnsFromMetadata(metadata);
-            dao.upsertData("metadata", columns, "(" + METADATA_TABLE_INBOUND_REPORT_ID + ")");
+            dao.upsertData("metadata", columns, "(received_message_id)");
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error saving metadata", e);
         } catch (FormatterProcessingException e) {
@@ -122,14 +120,14 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                                     PreparedStatement statement =
                                             connection.prepareStatement(
                                                     """
-                                    SELECT m2.inbound_report_id
+                                    SELECT m2.received_message_id
                                     FROM metadata m1
                                     JOIN metadata m2
                                         ON m1.placer_order_number = m2.placer_order_number
                                             AND (m1.sending_facility_details = m2.sending_facility_details
                                                 OR m1.sending_facility_details = m2.receiving_facility_details)
-                                            AND m1.inbound_report_id <> m2.inbound_report_id
-                                    WHERE m1.inbound_report_id = ?;
+                                            AND m1.received_message_id <> m2.received_message_id
+                                    WHERE m1.received_message_id = ?;
                                     """);
                                     // -- LIMIT 50 This is a potential fix for load test failures
                                     // since they link all the ids together;
@@ -163,7 +161,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
             }
 
             return new PartnerMetadata(
-                    resultSet.getString(METADATA_TABLE_INBOUND_REPORT_ID),
+                    resultSet.getString("inbound_report_id"),
                     resultSet.getString("outbound_report_id"),
                     timeReceived,
                     timeDelivered,
@@ -192,7 +190,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
     String idsFromResult(ResultSet resultSet) {
 
         try {
-            return resultSet.getString(METADATA_TABLE_INBOUND_REPORT_ID);
+            return resultSet.getString("received_message_id");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -202,12 +200,8 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
             throws FormatterProcessingException {
         return List.of(
                 new DbColumn(
-                        METADATA_TABLE_INBOUND_REPORT_ID,
-                        metadata.inboundReportId(),
-                        false,
-                        Types.VARCHAR),
-                new DbColumn(
-                        "outbound_report_id", metadata.outboundReportId(), true, Types.VARCHAR),
+                        "received_message_id", metadata.inboundReportId(), false, Types.VARCHAR),
+                new DbColumn("sent_message_id", metadata.outboundReportId(), true, Types.VARCHAR),
                 new DbColumn("hash_of_message", metadata.hash(), false, Types.VARCHAR),
                 new DbColumn(
                         "time_received",
