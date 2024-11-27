@@ -46,12 +46,12 @@ resource "azurerm_storage_account_customer_managed_key" "storage_storage_account
 
 resource "azurerm_storage_container" "metadata" {
   name                  = "metadata"
-  storage_account_name  = azurerm_storage_account.storage.name
+  storage_account_id    = azurerm_storage_account.storage.id
   container_access_type = "private"
 }
 
 resource "azurerm_role_assignment" "allow_api_read_write" {
-  scope                = azurerm_storage_container.metadata.resource_manager_id
+  scope                = azurerm_storage_container.metadata.id
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azurerm_linux_web_app.api.identity.0.principal_id
 }
