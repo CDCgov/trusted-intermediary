@@ -105,7 +105,7 @@ resource "azurerm_storage_account_customer_managed_key" "automated_storage_stora
 
 resource "azurerm_storage_container" "automated_container" {
   name                  = "automated"
-  storage_account_name  = azurerm_storage_account.automated_storage.name
+  storage_account_id    = azurerm_storage_account.automated_storage.id
   container_access_type = "private"
 }
 
