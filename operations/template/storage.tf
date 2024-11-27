@@ -110,7 +110,7 @@ resource "azurerm_storage_container" "automated_container" {
 }
 
 resource "azurerm_role_assignment" "allow_automated_test_read_write" {
-  scope                = azurerm_storage_container.automated_container.resource_manager_id
+  scope                = azurerm_storage_container.automated_container.id
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = var.deployer_id
 }
