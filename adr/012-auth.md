@@ -51,10 +51,11 @@ This form of AuthN/AuthZ goes through multiple steps.
 ### Negative
 
 - **Complexity:** Adding AuthN/AuthZ layers increases the complexity of the system, which can lead to higher development and maintenance costs.
-  
+
 
 - **Performance Overhead:** Authentication and authorization checks can introduce latency, especially in distributed systems where tokens need to be validated at every request.
   
+
 - **Misconfiguration:** Incorrect configuration of scopes, permissions, or roles could inadvertently allow unauthorized access to sensitive data.
 
 
@@ -64,13 +65,13 @@ This form of AuthN/AuthZ goes through multiple steps.
 
 
 - **Security Vulnerabilities:** Weak implementation can introduce vulnerabilities like token theft, replay attacks, or misconfigured access policies that expose sensitive resources.
-  
+
 
 - **Token Expiration and Revocation:** Improper handling of token expiration and revocation could result in unauthorized access or frustrated users if tokens expire too quickly.
   
-  
+
 - **Regulatory Compliance Risk:** Failing to meet security and privacy regulations (e.g., encrypting tokens, securely storing user credentials) could lead to legal penalties.
-  
+
 
 - **System Downtime:** If the authentication server fails or is slow to respond, it could bring down the entire API, making the application unavailable.
 
