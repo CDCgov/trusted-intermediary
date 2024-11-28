@@ -13,6 +13,19 @@ Accepted
 ## Context
 Connection pooling is vital to the project for many reasons including resource management and conservation, performance improvement, latency reduction, scalability, and most importantly here managing connections.
 
+## Impact
+
+### Positive
+
+-
+
+### Negative
+
+-
+
+### Risks
+
+-
 
 ### Related Issues
 
