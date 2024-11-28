@@ -169,7 +169,7 @@
     },
     {
       "name": "ucsdOruUpdateUniversalServiceIdentifier",
-      "description": "Overrides the values of Name of Coding System (OBR-4.3) and Alternate Identifier (OBR-4.4) in Universal Type Code (OBR-4)",
+      "description": "Updates the coding system name (OBR-4.3) for ORU orders to the expected value",
       "message": "",
       "conditions": [
         "Bundle.entry.resource.ofType(MessageHeader).destination.receiver.resolve().identifier.where(extension.value = 'HD.1').value in ('R797' | 'R508')",
@@ -197,7 +197,75 @@
       "rules": [
         {
           "name": "MapLocalObservationCodes",
-          "args": {}
+          "args": {
+            "codingMap" : {
+              "99717-6": {
+                "code": "53340-6",
+                "display": "17-Hydroxyprogesterone [Moles/volume] in DBS",
+                "codingSystem": "LN"
+              },
+              "99717-32": {
+                "code": "85269-9",
+                "display": "X-linked Adrenoleukodystrophy (X- ALD) newborn screen interpretation",
+                "codingSystem": "LN"
+              },
+              "99717-33": {
+                "code": "85268-1",
+                "display": "X-linked Adrenoleukodystrophy (X- ALD) newborn screening comment-discussion",
+                "codingSystem": "LN"
+              },
+              "99717-34": {
+                "code": "PLT325",
+                "display": "ABCD1 gene mutation found [Identifier] in DBS by Sequencing",
+                "codingSystem": "PLT"
+              },
+              "99717-35": {
+                "code": "PLT3289",
+                "display": "CFTR gene mutation found [Interpretation] in DBS by Sequencing",
+                "codingSystem": "PLT"
+              },
+              "99717-36": {
+                "code": "PLT3290",
+                "display": "CFTR gene variant found [Identifier] in DBS by Sequencing comments/discussion",
+                "codingSystem": "PLT"
+              },
+              "99717-44": {
+                "code": "PLT3291",
+                "display": "IDUA gene variant analysis in DBS by Sequencing comments/discussion",
+                "codingSystem": "PLT"
+              },
+              "99717-46": {
+                "code": "PLT3292",
+                "display": "GAA gene variant analysis in DBS by Sequencing comments/discussion",
+                "codingSystem": "PLT"
+              },
+              "99717-47": {
+                "code": "PLT3252",
+                "display": "GAA gene mutation found [Identifier] in DBS by Sequencing",
+                "codingSystem": "PLT"
+              },
+              "99717-48": {
+                "code": "PLT3258",
+                "display": "IDUA gene mutations found [Identifier] in DBS by Sequencing",
+                "codingSystem": "PLT"
+              },
+              "99717-49": {
+                "code": "76030-6",
+                "display": "IDS gene full mutation analysis in Blood or Tissue by Sequencing",
+                "codingSystem": "LN"
+              },
+              "99717-50": {
+                "code": "PLT3294",
+                "display": "IDS gene mutations found [Identifier] in Dried Bloodspot by Molecular genetics method",
+                "codingSystem": "PLT"
+              },
+              "99717-60": {
+                "code": "PLT3293",
+                "display": "SMN1 exon 7 deletion analysis in DBS by Sequencing",
+                "codingSystem": "PLT"
+              }
+            }
+          }
         }
       ]
     },

@@ -1,7 +1,3 @@
-data "azuread_service_principal" "principal" {
-  object_id = data.azurerm_client_config.current.object_id
-}
-
 resource "azurerm_postgresql_flexible_server" "database" {
   name                  = "cdcti-${var.environment}-database"
   resource_group_name   = data.azurerm_resource_group.group.name
@@ -20,6 +16,12 @@ resource "azurerm_postgresql_flexible_server" "database" {
     password_auth_enabled         = "false"
     active_directory_auth_enabled = "true"
     tenant_id                     = data.azurerm_client_config.current.tenant_id
+  }
+
+  maintenance_window { # Sunday at 12:00 UTC which is 7:00 AM EST or 8:00 AM EDT (around the time of our SLA's maintenance window)
+    day_of_week  = 0
+    start_hour   = 12
+    start_minute = 0
   }
 
   depends_on = [azurerm_private_dns_zone_virtual_network_link.db_network_link]

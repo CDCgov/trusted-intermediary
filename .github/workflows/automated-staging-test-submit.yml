@@ -2,7 +2,7 @@ name: Automated Staging Test - Submit Messages
 
 on:
   schedule:
-    - cron: "0 0 * * 2-6"  # Tuesday to Saturday at Midnight UTC
+    - cron: "0 5 * * 2-6"  # Tuesday to Saturday at Midnight EST (5am UTC)
   workflow_dispatch:
 
 jobs:
@@ -23,7 +23,7 @@ jobs:
 
       - name: Write private key to file
         run: |
-          echo "${{ secrets.AUTOMATED_STAGING_RS_INTEGRATION_PRIVATE_KEY }}" > /tmp/staging_private_key.pem
+          echo "${{ secrets.SIMULATED_SENDER_STAGING_PRIVATE_KEY }}" > /tmp/staging_private_key.pem
           chmod 600 /tmp/staging_private_key.pem
 
       - name: Send HL7 sample messages to staging RS
