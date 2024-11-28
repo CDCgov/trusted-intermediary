@@ -52,6 +52,37 @@ testing individual classes and methods.
 This subproject must not depend on any of the other subprojects.  It is kept isolated on purpose so that the tests can't
 be "poisoned" by the implementation.
 
+
+## Impact
+
+### Positive
+
+- **Scalability:** New plugins or features can be added without modifying the core subprojects (app and shared). 
+
+
+- **Maintainability:** Clear separation of responsibilities reduces complexity. 
+
+
+- **Testability:** Isolated testing at both subproject and system levels ensures robust verification.
+
+### Negative
+
+- **Initial Overhead:** Setting up the modular structure requires more effort compared to a monolithic approach.
+
+
+- **Learning Curve:** New developers may need time to understand the modular setup and plugin architecture.
+
+
+### Risks
+
+- **Inter-Subproject Dependencies:** Improper management could lead to accidental coupling between subprojects, reducing modularity. 
+
+
+- **Under-utilization of Shared Components:** If shared becomes a dumping ground for unrelated utilities, it could introduce unnecessary complexity. 
+
+
+- **Plugin Overhead:** Excessive plugin fragmentation may complicate management and integration.
+
 ### Related Issues
 
 _None_.
