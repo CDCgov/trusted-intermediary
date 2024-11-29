@@ -22,10 +22,10 @@ dependencies {
     implementation 'net.logstash.logback:logstash-logback-encoder:8.0'
 
     //jackson
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.18.1'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.18.2'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.1'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.1'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.1'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2'
 
     // hapi fhir
     api 'ca.uhn.hapi.fhir:hapi-fhir-base:7.6.0'
