@@ -35,8 +35,8 @@ class HapiHL7FileMatcherTest extends Specification {
         def mockInputMessage2 = Mock(Message)
         def mockOutputMessage1 = Mock(Message)
         def mockOutputMessage2 = Mock(Message)
-        spyFileMatcher.mapMessageByControlId(mockInputFiles) >> [ "001": mockInputMessage1, "002": mockInputMessage2 ]
-        spyFileMatcher.mapMessageByControlId(mockOutputFiles) >> [ "001": mockOutputMessage1, "002": mockOutputMessage2 ]
+        spyFileMatcher.parseAndMapMessageByControlId(mockInputFiles) >> ["001": mockInputMessage1, "002": mockInputMessage2 ]
+        spyFileMatcher.parseAndMapMessageByControlId(mockOutputFiles) >> ["001": mockOutputMessage1, "002": mockOutputMessage2 ]
 
         when:
         def result =spyFileMatcher.matchFiles(mockOutputFiles, mockInputFiles)
@@ -61,8 +61,8 @@ class HapiHL7FileMatcherTest extends Specification {
         mockOutputFiles = [
             new HL7FileStream("matchingOutputFileStream", Mock(InputStream))
         ]
-        spyFileMatcher.mapMessageByControlId(mockInputFiles) >> [ "001": Mock(Message), "002": Mock(Message) ]
-        spyFileMatcher.mapMessageByControlId(mockOutputFiles) >> [ "001": Mock(Message) ]
+        spyFileMatcher.parseAndMapMessageByControlId(mockInputFiles) >> ["001": Mock(Message), "002": Mock(Message) ]
+        spyFileMatcher.parseAndMapMessageByControlId(mockOutputFiles) >> ["001": Mock(Message) ]
         spyFileMatcher.matchFiles(mockOutputFiles, mockInputFiles)
 
         then:
@@ -80,8 +80,8 @@ class HapiHL7FileMatcherTest extends Specification {
             new HL7FileStream("matchingOutputFileStream", Mock(InputStream)),
             new HL7FileStream("nonMatchingOutputFileStream", Mock(InputStream))
         ]
-        spyFileMatcher.mapMessageByControlId(mockInputFiles) >> [ "001": Mock(Message) ]
-        spyFileMatcher.mapMessageByControlId(mockOutputFiles) >> [ "001": Mock(Message), "003": Mock(Message) ]
+        spyFileMatcher.parseAndMapMessageByControlId(mockInputFiles) >> ["001": Mock(Message) ]
+        spyFileMatcher.parseAndMapMessageByControlId(mockOutputFiles) >> ["001": Mock(Message), "003": Mock(Message) ]
         spyFileMatcher.matchFiles(mockOutputFiles, mockInputFiles)
 
         then:
@@ -110,7 +110,7 @@ class HapiHL7FileMatcherTest extends Specification {
         ]
 
         when:
-        def result = fileMatcher.mapMessageByControlId(mockFiles)
+        def result = fileMatcher.parseAndMapMessageByControlId(mockFiles)
 
         then:
         result.size() == 2
@@ -130,7 +130,7 @@ class HapiHL7FileMatcherTest extends Specification {
         def hl7FileStream = new HL7FileStream("file1", inputStream)
 
         when:
-        fileMatcher.mapMessageByControlId([hl7FileStream])
+        fileMatcher.parseAndMapMessageByControlId([hl7FileStream])
 
         then:
         thrown(HapiHL7FileMatcherException)
@@ -142,7 +142,7 @@ class HapiHL7FileMatcherTest extends Specification {
         def hl7FileStream = new HL7FileStream("badFile", inputStream)
 
         when:
-        fileMatcher.mapMessageByControlId([hl7FileStream])
+        fileMatcher.parseAndMapMessageByControlId([hl7FileStream])
 
         then:
         thrown(HapiHL7FileMatcherException)

@@ -65,9 +65,9 @@ class AutomatedTest extends Specification  {
 
         when:
         for (messagePair in matchedFiles) {
-            Message inputMessage = messagePair.getKey() as Message
-            Message outputMessage = messagePair.getValue() as Message
-            def evaluatedRules = engine.runRules(outputMessage, inputMessage)
+            def inputMessage = messagePair.getKey()
+            def outputMessage = messagePair.getValue()
+            def evaluatedRules = engine.runRules(inputMessage, outputMessage)
             rulesToEvaluate.removeAll(evaluatedRules)
         }
 
