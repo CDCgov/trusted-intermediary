@@ -33,10 +33,7 @@
                 "org.apache.httpcomponents.client5:httpclient5-fluent"
             ],
             "allowedVersions": "!/^5\\.3$/"
-        },
-        {
-            "matchPackageNames": ["com.azure:azure-identity"],
-            "allowedVersions": "!/^1\\.14\\.[0-1]$/"
-        }],
+        }
+    ],
     "pinDigests": false
 }
