@@ -23,11 +23,7 @@ public class HapiHL7Message implements HealthData<Message> {
     }
 
     @Override
-    public String getName() {
-        return underlyingData.getName();
-    }
-
-    public String getMessageIdentifier() {
+    public String getIdentifier() {
         try {
             MSH mshSegment = (MSH) underlyingData.get("MSH");
             return mshSegment.getMessageControlID().getValue();

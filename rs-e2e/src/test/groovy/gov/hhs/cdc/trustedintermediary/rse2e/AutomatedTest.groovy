@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.rse2e
 
-import ca.uhn.hl7v2.model.Message
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.rse2e.external.hapi.HapiHL7FileMatcher
 import gov.hhs.cdc.trustedintermediary.rse2e.external.hapi.HapiHL7ExpressionEvaluator

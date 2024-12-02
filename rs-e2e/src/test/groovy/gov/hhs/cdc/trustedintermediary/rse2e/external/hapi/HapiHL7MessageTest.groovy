@@ -24,7 +24,7 @@ class HapiHL7MessageTest extends Specification {
         def hl7Message = new HapiHL7Message(message)
 
         when:
-        def name = hl7Message.getName()
+        def name = hl7Message.getIdentifier()
 
         then:
         name == expectedName

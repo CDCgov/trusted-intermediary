@@ -68,7 +68,7 @@ public class HapiHL7FileMatcher {
                     String content = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
                     Message message = parser.parse(content);
                     HapiHL7Message hapiHL7Message = new HapiHL7Message(message);
-                    String msh10 = hapiHL7Message.getMessageIdentifier();
+                    String msh10 = hapiHL7Message.getIdentifier();
                     if (msh10 == null || msh10.isEmpty()) {
                         throw new HapiHL7FileMatcherException(
                                 String.format("MSH-10 is empty for file: %s", fileName));

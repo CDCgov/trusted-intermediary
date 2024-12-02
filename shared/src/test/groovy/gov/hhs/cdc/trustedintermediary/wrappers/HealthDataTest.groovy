@@ -8,7 +8,7 @@ class HealthDataTest extends Specification {
         def healthData = new IntegerHealthData(1)
 
         when:
-        def actual = healthData.getName()
+        def actual = healthData.getIdentifier()
 
         then:
         actual == ""
