@@ -1,4 +1,4 @@
-# CDC Trusted Intermediary
+# CDC TI
 
 This document provides instructions for setting up the environment, running the application, and performing various tasks such as compiling, testing, and contributing to the project.
 
