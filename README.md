@@ -39,6 +39,7 @@ This document provides comprehensive instructions for setting up, running, and c
 ## Requirements
 
 - **Java**: Any distribution of Java 17 JDK.
+- [Docker](https://www.docker.com/) or [Podman](https://podman.io/)
 
 ---
 
@@ -63,12 +64,18 @@ API documentation is available at `/openapi`.
 
 To contribute to development, install:
 
-- [Pre-Commit](https://pre-commit.com)
+
 - [Locust.io](https://docs.locust.io/en/stable/installation.html)
 - [Python](https://docs.python-guide.org/starting/installation/)
 - [Terraform](https://www.terraform.io)
 - [Liquibase](https://www.liquibase.com/download)
-- [Docker](https://www.docker.com/)
+
+#### Pre-commit
+- [Pre-Commit](https://pre-commit.com)
+
+Install pre-commit hooks by running:
+
+`pre-commit install`
 
 ### Environment Setup
 
@@ -149,14 +156,6 @@ Set up Azure and GitHub for new environments by creating required resources, con
 ### Interacting with Deployed Environments
 
 For environments with firewall restrictions, add your IP to the allowlist using the Azure portal. Remove it once done.
-
----
-
-## Pre-Commit Hooks
-
-Install pre-commit hooks by running:
-
-`pre-commit install`
 
 ---
 
