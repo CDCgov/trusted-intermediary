@@ -8,6 +8,7 @@ This document provides comprehensive instructions for setting up, running, and c
 
 1. [Requirements](#requirements)
 1. [Running the Application](#running-the-application)
+   - [Generating and Using a Token](#generating-and-using-a-token)
 1. [Development Guide](#development-guide)
    - [Additional Requirements](#additional-requirements)
    - [Environment Setup](#environment-setup)
@@ -22,7 +23,6 @@ This document provides comprehensive instructions for setting up, running, and c
    - [Environments](#environments)
    - [Initial Azure and GitHub Configuration](#initial-azure-and-github-configuration)
    - [Interacting with Deployed Environments](#interacting-with-deployed-environments)
-1. [Pre-Commit Hooks](#pre-commit-hooks)
 1. [Contributing](#contributing)
 1. [Setup with ReportStream](#setup-with-reportstream)
 1. [DORA Metrics](#dora-metrics)
@@ -45,7 +45,7 @@ This document provides comprehensive instructions for setting up, running, and c
 
 ## Running the Application
 
-To run the application, use the command:
+Run the application with:
 
 `./gradlew clean run`
 
@@ -56,14 +56,24 @@ To run the application, use the command:
 
 API documentation is available at `/openapi`.
 
+### Generating and Using a Token
+
+1. Install JWT CLI:
+   `brew install mike-engel/jwt-cli/jwt-cli`
+2. Generate a JWT token: Replace `PATH_TO_FILE_ON_YOUR_MACHINE` with the correct path and run:
+   `jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 --no-iat -S @/PATH_TO_FILE_ON_YOUR_MACHINE/trusted-intermediary/mock_credentials/organization-trusted-intermediary-private-key-local.pem`
+3. Copy the generated token.
+4. Use the token in Postman:
+   - Add a key `client_assertion` with the token as its value.
+   - Add another key `scope` with the value `trusted-intermediary`.
+   - Set body type to `x-www-form-urlencoded`.
+5. Make a POST request to the `/v1/auth/token` endpoint to retrieve a bearer token.
+
 ---
 
 ## Development Guide
 
 ### Additional Requirements
-
-To contribute to development, install:
-
 
 - [Locust.io](https://docs.locust.io/en/stable/installation.html)
 - [Python](https://docs.python-guide.org/starting/installation/)
@@ -87,12 +97,14 @@ For Docker users, update `.env` values for database and port configuration as ne
 
 ### Using a Local Database
 
-1. Use `docker-compose.yml` to start the local database.
-2. Apply migrations using `liquibase` with appropriate configuration for your platform (single vs. double quotes as needed).
+1. Start the database using `docker-compose.yml`.
+2. Apply migrations using Liquibase with appropriate configuration for your platform.
+
+---
 
 ### Compiling
 
-Build the application by running:
+Build the application:
 
 `./gradlew shadowJar`
 
@@ -114,18 +126,20 @@ Run end-to-end tests:
 
 `./gradlew e2e:clean e2e:test`
 
-To automate testing:
+Automate testing with:
 
 `./e2e-execute.sh`
 
 ### Load Testing
 
-Run load tests using Locust:
+Run load tests using Locust. If you are already running the API, stop it before running the load tests; otherwise, the cleanup steps won't work:
 
 - `./gradle-load-execute.sh`
 - `./docker-load-execute.sh`
 
-For interactive mode, use:
+The load tests spin up (and clean up) a local test database on port 5434 that should not interfere with the local dev database.
+
+For interactive mode:
 
 `locust -f ./operations/locustfile.py`
 
@@ -136,7 +150,7 @@ For interactive mode, use:
 ### IntelliJ JVM Debugging
 
 - A pre-configured `Debug TI` remote JVM configuration is available.
-- To use Java Debug Wire Protocol (JDWP), modify the `Dockerfile` to include the required options.
+- To use Java Debug Wire Protocol (JDWP), modify the Dockerfile as needed.
 
 ---
 
