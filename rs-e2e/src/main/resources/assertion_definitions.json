@@ -103,7 +103,7 @@
       ]
     },
     {
-      "name": "LADPH ORU requirements",
+      "name": "LA-Oschner OBR flattening",
       "conditions": [
         "MSH-10 = '010'"
       ],
