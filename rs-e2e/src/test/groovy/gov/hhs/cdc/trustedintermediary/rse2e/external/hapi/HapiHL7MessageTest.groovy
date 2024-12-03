@@ -3,7 +3,6 @@ package gov.hhs.cdc.trustedintermediary.rse2e.external.hapi
 import ca.uhn.hl7v2.model.Message
 import ca.uhn.hl7v2.model.v251.message.ORU_R01
 import ca.uhn.hl7v2.model.v251.segment.MSH
-import org.hl7.fhir.r4.model.Bundle
 import spock.lang.Specification
 
 class HapiHL7MessageTest extends Specification {
