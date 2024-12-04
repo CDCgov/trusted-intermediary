@@ -52,8 +52,16 @@ As part of having CI/CD pipelines we need tooling inside of the project to allow
 - **Version Drift:** If environments are not consistently updated with migrations, discrepancies could arise between development, staging, and production. 
 
 
-- **GitHub Action Reliability:** Relying on prebuilt GitHub Actions introduces a dependency on external tools, which may have compatibility or update issues over time.
+- **GitHub Action Reliability:** Relying on prebuilt GitHub Actions introduces a dependency on external tools, which may have compatibility or update issues over time. 
 
+
+- **Changelog Structure Issues:**
+
+  - Referencing `metadata.received_message_id` in the `message_link` table creates dependencies that may complicate schema migrations. 
+
+  - Changes to the metadata table structure, such as renaming or modifying the `received_message_id` column, require careful coordination with the `message_link` table to prevent breaking changes. 
+  
+  - Liquibase changelog design must ensure that migrations are properly ordered and modular to accommodate these dependencies.
 
 ### Related Issues
 
