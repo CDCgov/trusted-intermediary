@@ -31,6 +31,7 @@ As part of having CI/CD pipelines we need tooling inside of the project to allow
 
 - **Flexibility:** Liquibase supports a wide range of databases and migration formats, making it adaptable for future needs.
 
+
 ### Negative
 
 - **Learning Curve:** Teams unfamiliar with Liquibase may require time to learn its configuration and scripting syntax.
@@ -49,11 +50,13 @@ As part of having CI/CD pipelines we need tooling inside of the project to allow
 - **Rollback Limitations:** Not all changes (e.g., destructive data operations) can be automatically rolled back, requiring careful planning for such scenarios. 
 
 
-- **Version Drift:** If environments are not consistently updated with migrations, discrepancies could arise between development, staging, and production. 
+- **Version Drift:** If environments are not consistently updated with migrations, discrepancies could arise between development, staging, and production.
 
 
 - **GitHub Action Reliability:** Relying on prebuilt GitHub Actions introduces a dependency on external tools, which may have compatibility or update issues over time.
 
+
+- **Changelog Structure and Dependencies:** A poorly structured changelog can create challenges in managing references between tables. For example, if the `message_link` table references the `received_message_id` column in the `metadata` table, structural changes in `metadata` could require significant changes to the migrations, increasing complexity. This risk can make future schema modifications or rollbacks harder to implement without breaking dependencies https://docs.liquibase.com/start/design-liquibase-project.html.
 
 ### Related Issues
 
