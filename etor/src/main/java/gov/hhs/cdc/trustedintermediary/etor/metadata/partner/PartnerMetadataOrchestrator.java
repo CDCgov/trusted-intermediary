@@ -167,18 +167,18 @@ public class PartnerMetadataOrchestrator {
         return Optional.of(partnerMetadata);
     }
 
-    public void setMetadataStatusToFailed(String submissionId, String errorMessage)
+    public void setMetadataStatusToFailed(String inboundReportId, String errorMessage)
             throws PartnerMetadataException {
-        if (submissionId == null) {
+        if (inboundReportId == null) {
             return;
         }
 
         Optional<PartnerMetadata> optionalPartnerMetadata =
-                partnerMetadataStorage.readMetadata(submissionId);
+                partnerMetadataStorage.readMetadata(inboundReportId);
         PartnerMetadata partnerMetadata;
         if (optionalPartnerMetadata.isEmpty()) {
             // there wasn't any metadata given the submission ID, so make one with the status
-            partnerMetadata = new PartnerMetadata(submissionId, PartnerMetadataStatus.FAILED);
+            partnerMetadata = new PartnerMetadata(inboundReportId, PartnerMetadataStatus.FAILED);
         } else {
             partnerMetadata = optionalPartnerMetadata.get();
             if (partnerMetadata.deliveryStatus().equals(PartnerMetadataStatus.FAILED)) {
@@ -187,9 +187,9 @@ public class PartnerMetadataOrchestrator {
         }
 
         logger.logInfo(
-                "Updating metadata delivery status {} with submissionId: {}",
+                "Updating metadata delivery status {} with inboundReportId: {}",
                 PartnerMetadataStatus.FAILED,
-                submissionId);
+                inboundReportId);
         partnerMetadata =
                 partnerMetadata
                         .withDeliveryStatus(PartnerMetadataStatus.FAILED)

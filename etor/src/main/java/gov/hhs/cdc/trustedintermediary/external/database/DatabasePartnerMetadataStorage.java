@@ -108,7 +108,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
     }
 
     @Override
-    public Set<String> readMetadataForMessageLinking(String submissionId)
+    public Set<String> readMetadataForMessageLinking(String inboundReportId)
             throws PartnerMetadataException {
 
         Set<String> metadataSet;
@@ -131,7 +131,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                                     """);
                                     // -- LIMIT 50 This is a potential fix for load test failures
                                     // since they link all the ids together;
-                                    statement.setString(1, submissionId);
+                                    statement.setString(1, inboundReportId);
                                     return statement;
                                 } catch (SQLException e) {
                                     throw new RuntimeException(e);

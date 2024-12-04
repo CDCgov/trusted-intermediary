@@ -92,12 +92,12 @@ class FilePartnerMetadataStorageTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         //write something to the hard drive so that the `readMetadata` in the when gets pass the file existence check
-        def submissionId = "asljfaskljgalsjgjlas"
-        PartnerMetadata metadata = new PartnerMetadata(submissionId, null, null, null, null, null, null, null, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
+        def inboundReportId = "asljfaskljgalsjgjlas"
+        PartnerMetadata metadata = new PartnerMetadata(inboundReportId, null, null, null, null, null, null, null, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
         FilePartnerMetadataStorage.getInstance().saveMetadata(metadata)
 
         when:
-        FilePartnerMetadataStorage.getInstance().readMetadata(submissionId)
+        FilePartnerMetadataStorage.getInstance().readMetadata(inboundReportId)
 
         then:
         thrown(PartnerMetadataException)
@@ -178,12 +178,12 @@ class FilePartnerMetadataStorageTest extends Specification {
         TestApplicationContext.register(Formatter, mockFormatter)
         TestApplicationContext.injectRegisteredImplementations()
 
-        def submissionId = "submissionId"
-        PartnerMetadata metadata = new PartnerMetadata(submissionId, null, null, null, null, null, null, null, null, null, null, null, null)
+        def inboundReportId = "inboundReportId"
+        PartnerMetadata metadata = new PartnerMetadata(inboundReportId, null, null, null, null, null, null, null, null, null, null, null, null)
         FilePartnerMetadataStorage.getInstance().saveMetadata(metadata)
 
         when:
-        FilePartnerMetadataStorage.getInstance().readMetadataForMessageLinking("submissionId")
+        FilePartnerMetadataStorage.getInstance().readMetadataForMessageLinking("inboundReportId")
 
         then:
         thrown(PartnerMetadataException)

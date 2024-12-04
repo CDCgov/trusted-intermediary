@@ -109,14 +109,14 @@ public class ReportStreamEndpointClient implements RSEndpointClient {
     }
 
     @Override
-    public String requestHistoryEndpoint(String submissionId, String bearerToken)
+    public String requestHistoryEndpoint(String outboundReportId, String bearerToken)
             throws ReportStreamEndpointClientException {
         logger.logInfo("Requesting history API from ReportStream");
 
         Map<String, String> headers = Map.of("Authorization", "Bearer " + bearerToken);
 
         try {
-            String url = RS_HISTORY_API_URL.replace("{id}", submissionId);
+            String url = RS_HISTORY_API_URL.replace("{id}", outboundReportId);
             return client.get(url, headers);
         } catch (HttpClientException e) {
             throw new ReportStreamEndpointClientException(

@@ -7,7 +7,8 @@ import java.util.Set;
 public interface PartnerMetadataStorage {
 
     /**
-     * This method will retrieve and return the metadata for the given submissionId, if it exists.
+     * This method will retrieve and return the metadata for the given inboundReportId, if it
+     * exists.
      *
      * @param inboundReportId The inbound report id to read the metadata for.
      * @return The metadata, if it exists. Otherwise, an empty Optional.
@@ -30,5 +31,6 @@ public interface PartnerMetadataStorage {
      */
     Set<PartnerMetadata> readMetadataForSender(String sender) throws PartnerMetadataException;
 
-    Set<String> readMetadataForMessageLinking(String submissionId) throws PartnerMetadataException;
+    Set<String> readMetadataForMessageLinking(String inboundReportId)
+            throws PartnerMetadataException;
 }
