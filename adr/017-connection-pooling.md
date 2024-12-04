@@ -50,7 +50,9 @@ Connection pooling is vital to the project for many reasons including resource m
 ### Risks
 
 - **Connection Leaks:** Improperly handled connections could lead to resource exhaustion, affecting application stability. 
-- Incorrect Configuration: Poorly tuned settings may result in underutilized or overburdened pools. 
+
+
+- **Incorrect Configuration:** Poorly tuned settings may result in underutilized or overburdened pools. 
 
 
 - **Driver Compatibility:** Potential issues with certain database drivers if not thoroughly tested. 
