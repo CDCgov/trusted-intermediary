@@ -20,6 +20,7 @@ Postgres is an open-source, relational, SQL database. It provides a proven and r
 
 ### Positive
 
+
 - **Reliable Data Storage:** Ensures that project data is safely persisted across application restarts. 
 
 
@@ -31,16 +32,16 @@ Postgres is an open-source, relational, SQL database. It provides a proven and r
 
 ### Negative
 
-- **Operational Complexity:** Requires database administration, including backups, updates, and scaling.
 
+**Backup and Restore Challenges:** Large databases can make backups and restores resource-intensive and time-consuming, impacting operational readiness during failures.
 
-- **Resource Usage:** Postgres can consume significant memory and CPU resources, especially under high load.
+**Cost of High Availability:** Achieving high availability (e.g., via replication, clustering) may require additional infrastructure, tools, and management, leading to increased operational costs.
 
-
-- **Learning Curve:** Developers or operators unfamiliar with Postgres may require training.
+**Security Management Overhead:** Properly securing a Postgres instance, including managing user permissions, network access, and encryption, requires dedicated effort. Misconfigurations could lead to vulnerabilities.
 
 
 ### Risks
+
 
 - **Data Integrity Risks:** Poorly managed schema migrations or incorrect configurations could lead to data loss or corruption.
 
