@@ -46,7 +46,7 @@ public class AssertionRule extends Rule<String> {
                                     + "': "
                                     + assertion
                                     + " ("
-                                    + outputData.getName()
+                                    + outputData.getIdentifier()
                                     + ")");
                 }
             } catch (Exception e) {
