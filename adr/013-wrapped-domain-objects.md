@@ -60,4 +60,8 @@ You can see an example of this in [Order.java](../etor/src/main/java/gov/hhs/cdc
 ### Related Issues
 
 - #79
-- [ADR 5 - Option-enabling Architecture (OeA)](./005-oea.md)
+- [ADR 005 - Option-enabling Architecture (OeA)](./005-oea.md)
+
+### Additional References
+
+- [Flexion Case Study](https://flexion.us/ustc-dawson-case-study/)
