@@ -317,8 +317,8 @@ class DatabasePartnerMetadataStorageTest extends Specification {
 
         def mockResultSet = Mock(ResultSet)
         mockResultSet.next() >> true
-        mockResultSet.getString("inbound_report_id") >> inboundReportId
-        mockResultSet.getString("outbound_report_id") >> outboundReportId
+        mockResultSet.getString("received_message_id") >> inboundReportId
+        mockResultSet.getString("sent_message_id") >> outboundReportId
         mockResultSet.getString("sender") >> sender
         mockResultSet.getString("receiver") >> receiver
         mockResultSet.getTimestamp("time_received") >> timestampForMock

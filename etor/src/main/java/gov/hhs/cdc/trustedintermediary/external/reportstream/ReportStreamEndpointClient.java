@@ -125,7 +125,7 @@ public class ReportStreamEndpointClient implements RSEndpointClient {
     }
 
     @Override
-    public String requestDeliveryEndpoint(String reportId, String bearerToken)
+    public String requestDeliveryEndpoint(String inboundReportId, String bearerToken)
             throws ReportStreamEndpointClientException {
         logger.logInfo("Requesting delivery API from ReportStream");
 
