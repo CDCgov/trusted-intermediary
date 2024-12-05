@@ -56,7 +56,7 @@ creates a `.env` file in the resource folder with the required configuration
 
 ### Using a local database
 
-Use [docker-compose.postgres.yml](docker-compose.postgres.yml) to run your local DB. In IntelliJ, you can click the play arrow to start it
+Use [docker-compose.yml](docker-compose.yml) to run your local DB. In IntelliJ, you can click the play arrow to start it
 
 ![docker-postgres.png](images/docker-postgres.png)
 
@@ -466,3 +466,8 @@ Please refer to [CDC's Template Repository](https://github.com/CDCgov/template)
 for more information about [contributing to this repository](https://github.com/CDCgov/template/blob/master/CONTRIBUTING.md),
 [public domain notices and disclaimers](https://github.com/CDCgov/template/blob/master/DISCLAIMER.md),
 and [code of conduct](https://github.com/CDCgov/template/blob/master/code-of-conduct.md).
+
+### Troubleshooting
+
+Error: copier: stat: "/app/build/libs/app-all.jar": no such file or directory
+Solution: Run ./gradlew shadowjar first

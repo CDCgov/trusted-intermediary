@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.rse2e
 
-import ca.uhn.hl7v2.model.Message
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.rse2e.external.hapi.HapiHL7FileMatcher
 import gov.hhs.cdc.trustedintermediary.rse2e.external.hapi.HapiHL7ExpressionEvaluator
@@ -65,8 +64,8 @@ class AutomatedTest extends Specification  {
 
         when:
         for (messagePair in matchedFiles) {
-            Message inputMessage = messagePair.getKey() as Message
-            Message outputMessage = messagePair.getValue() as Message
+            def inputMessage = messagePair.getKey()
+            def outputMessage = messagePair.getValue()
             def evaluatedRules = engine.runRules(outputMessage, inputMessage)
             rulesToEvaluate.removeAll(evaluatedRules)
         }
