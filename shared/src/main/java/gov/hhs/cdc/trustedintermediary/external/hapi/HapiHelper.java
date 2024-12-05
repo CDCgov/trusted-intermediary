@@ -288,9 +288,7 @@ public class HapiHelper {
         setCX5Value(identifier, value);
     }
 
-    public static void removePID3_5Value(Bundle bundle) {
-        Identifier patientIdentifier = getPID3Identifier(bundle);
-
+    public static void removePID3_5Value(Identifier patientIdentifier) {
         if (patientIdentifier == null) {
             return;
         }
