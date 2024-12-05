@@ -288,6 +288,31 @@ public class HapiHelper {
         setCX5Value(identifier, value);
     }
 
+    public static void removePID3_5Value(Bundle bundle) {
+        Identifier patientIdentifier = getPID3Identifier(bundle);
+
+        if (patientIdentifier == null) {
+            return;
+        }
+
+        if (patientIdentifier.hasExtension(HapiHelper.EXTENSION_CX_IDENTIFIER_URL)) {
+            patientIdentifier
+                    .getExtensionByUrl(HapiHelper.EXTENSION_CX_IDENTIFIER_URL)
+                    .removeExtension(HapiHelper.EXTENSION_CX5_URL);
+        }
+
+        // The cx-identifier extension can be removed if it has no more sub-extensions
+        if (patientIdentifier
+                .getExtensionByUrl(HapiHelper.EXTENSION_CX_IDENTIFIER_URL)
+                .getExtension()
+                .isEmpty()) {
+            patientIdentifier.removeExtension(HapiHelper.EXTENSION_CX_IDENTIFIER_URL);
+        }
+
+        // The PID-3.5 also appears in the type coding
+        patientIdentifier.setType(null);
+    }
+
     // PID-5 - Patient Name
     public static Extension getPID5Extension(Bundle bundle) {
         Patient patient = getPIDPatient(bundle);
