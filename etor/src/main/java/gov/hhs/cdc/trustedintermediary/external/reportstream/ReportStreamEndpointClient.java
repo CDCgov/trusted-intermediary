@@ -132,7 +132,7 @@ public class ReportStreamEndpointClient implements RSEndpointClient {
         Map<String, String> headers = Map.of("Authorization", "Bearer " + bearerToken);
 
         try {
-            String url = RS_DELIVERY_API_URL.replace("{id}", reportId);
+            String url = RS_DELIVERY_API_URL.replace("{id}", inboundReportId);
             return client.get(url, headers);
         } catch (HttpClientException e) {
             throw new ReportStreamEndpointClientException(
