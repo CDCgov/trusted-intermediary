@@ -28,6 +28,35 @@ Accepted.
 
 This naming convention applies to all locations where our keys are stored.  Previously, we didn't have a consistent naming convention across all our locations which caused confusion on which key was to be used in which context and environment.
 
+
+## Impact
+
+
+### Positive
+
+- **Clarity and Consistency:** Standardized naming ensures keys are easily identifiable and reduces misconfigurations.
+
+
+- **Improved Operations:** Teams will spend less time resolving key-related issues.
+
+
+- **Scalability:** As more organizations integrate, the naming convention will simplify management and avoid duplication.
+
+### Negative
+
+- **Migration Effort:** Renaming existing keys and updating references in systems may require a one-time effort.
+
+
+### Risks
+
+- **Human Error in Implementation:** Incorrectly applying the naming convention during key creation or migration could lead to confusion or outages.
+
+
+- **Lack of Enforcement:** Without clear processes or automation, teams might unintentionally deviate from the convention.
+
+
+- **Backward Compatibility:** Older systems or scripts may fail if they rely on the previous key names.
+
 ### Related Issues
 
 - #584
