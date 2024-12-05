@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.context
 
-import gov.hhs.cdc.trustedintermediary.ruleengine.RuleEngine
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import spock.lang.Specification
 
@@ -203,6 +202,25 @@ class ApplicationContextTest extends Specification {
 
         cleanup:
         Files.deleteIfExists(directoryPath)
+    }
+
+    def "registering an unsupported injection class"() {
+        given:
+        def injectedValue = "DogCow"
+        def injectionInstantiation = new InjectionDeclaringClass()
+
+        TestApplicationContext.register(List.class, injectionInstantiation)
+        // notice above that I'm registering the injectionInstantiation object as a List class.
+        // injectionInstantiation is of class InjectionDeclaringClass,
+        // and InjectionDeclaringClass doesn't implement List (it only implements AFieldInterface).
+        TestApplicationContext.register(String.class, injectedValue)
+
+        when:
+        TestApplicationContext.injectRegisteredImplementations()
+        injectionInstantiation.getAField()
+
+        then:
+        thrown(NullPointerException)
     }
 
     class InjectionDeclaringClass {
