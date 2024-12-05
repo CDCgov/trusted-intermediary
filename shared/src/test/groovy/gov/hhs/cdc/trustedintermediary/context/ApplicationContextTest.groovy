@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.context
 
+import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import spock.lang.Specification
 
 import javax.inject.Inject
@@ -10,6 +11,12 @@ class ApplicationContextTest extends Specification {
 
     interface TestingInterface {
         void test()
+    }
+
+    class NonSingletonClazz {
+        @Inject
+        Logger logger
+        void test() {}
     }
 
     static class DogCow implements TestingInterface {
@@ -53,6 +60,36 @@ class ApplicationContextTest extends Specification {
 
         expect:
         implementors == ApplicationContext.getImplementors(TestingInterface)
+    }
+
+    def "injectIntoNonSingleton unhappy path"() {
+        given:
+        def nonSingletonClass = new NonSingletonClazz()
+        def object = new Object()
+        ApplicationContext.register(Logger, object)
+        when:
+        ApplicationContext.injectIntoNonSingleton(nonSingletonClass)
+        then:
+        thrown(IllegalArgumentException)
+    }
+
+    def "injectIntoNonSingleton unhappy path when fieldImplementation runs into an error"() {
+        given:
+        def nonSingletonClass = new NonSingletonClazz()
+        when:
+        ApplicationContext.injectIntoNonSingleton(nonSingletonClass)
+        then:
+        thrown(IllegalArgumentException)
+    }
+
+    def "injectIntoNonSingleton unhappy path when fieldImplementation is null"() {
+        given:
+        def nonSingletonClass = new NonSingletonClazz()
+        when:
+        ApplicationContext.skipMissingImplementations = true
+        ApplicationContext.injectIntoNonSingleton(nonSingletonClass)
+        then:
+        noExceptionThrown()
     }
 
     def "implementation injection test"() {
@@ -165,6 +202,25 @@ class ApplicationContextTest extends Specification {
 
         cleanup:
         Files.deleteIfExists(directoryPath)
+    }
+
+    def "registering an unsupported injection class"() {
+        given:
+        def injectedValue = "DogCow"
+        def injectionInstantiation = new InjectionDeclaringClass()
+
+        TestApplicationContext.register(List.class, injectionInstantiation)
+        // notice above that I'm registering the injectionInstantiation object as a List class.
+        // injectionInstantiation is of class InjectionDeclaringClass,
+        // and InjectionDeclaringClass doesn't implement List (it only implements AFieldInterface).
+        TestApplicationContext.register(String.class, injectedValue)
+
+        when:
+        TestApplicationContext.injectRegisteredImplementations()
+        injectionInstantiation.getAField()
+
+        then:
+        thrown(NullPointerException)
     }
 
     class InjectionDeclaringClass {
