@@ -108,9 +108,6 @@ public class ApplicationContext {
 
         Object declaringClassImplementation =
                 getDeclaringClassImplementation(declaringClassesToTry);
-        if (declaringClassImplementation == null) {
-            return;
-        }
 
         field.trySetAccessible();
 
