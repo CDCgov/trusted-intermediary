@@ -22,6 +22,6 @@ public class RemovePatientIdentifiers implements CustomFhirTransformation {
             return;
         }
         patientIdentifier.setAssigner(null);
-        HapiHelper.removePID3_5Value(bundle);
+        HapiHelper.removePID3_5Value(patientIdentifier);
     }
 }
