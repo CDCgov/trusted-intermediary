@@ -3,8 +3,11 @@ package gov.hhs.cdc.trustedintermediary.context;
 import static org.reflections.scanners.Scanners.FieldsAnnotated;
 import static org.reflections.scanners.Scanners.SubTypes;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.reflections.Reflections;
 
 /**
@@ -26,5 +29,11 @@ class Reflection {
 
     public static Set<Field> getFieldsAnnotatedWith(Class<?> annotation) {
         return REFLECTIONS.get(FieldsAnnotated.with(annotation).as(Field.class));
+    }
+
+    public static Set<Field> getFieldsAnnotatedWithInstance(Class<?> clazz, Class<?> annotation) {
+        return Arrays.stream(clazz.getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(annotation.asSubclass(Annotation.class)))
+                .collect(Collectors.toSet());
     }
 }
