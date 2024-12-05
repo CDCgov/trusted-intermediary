@@ -69,7 +69,7 @@ class RemoveObservationRequestsTest extends Specification {
         HapiHelper.getOBR4_1Value(sr) == obr4_1
     }
 
-    def "remove all CA USCD's OBRs except for the one with OBR-4.1 = '54089-8'"() {
+    def "remove all CA UCSD's OBRs except for the one with OBR-4.1 = '54089-8'"() {
         given:
         def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/002_CA_ORU_R01_initial_translation.fhir")
         def bundle = fhirResource.getUnderlyingData() as Bundle
