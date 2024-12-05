@@ -17,25 +17,11 @@ public class RemovePatientIdentifiers implements CustomFhirTransformation {
     public void transform(HealthData<?> resource, Map<String, Object> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingData();
 
-        Identifier identifier = HapiHelper.getPID3Identifier(bundle);
-        if (identifier == null) {
+        Identifier patientIdentifier = HapiHelper.getPID3Identifier(bundle);
+        if (patientIdentifier == null) {
             return;
         }
-        identifier.setAssigner(null);
-
-        if (identifier.hasExtension(HapiHelper.EXTENSION_CX_IDENTIFIER_URL)) {
-            identifier
-                    .getExtensionByUrl(HapiHelper.EXTENSION_CX_IDENTIFIER_URL)
-                    .removeExtension(HapiHelper.EXTENSION_CX5_URL);
-        }
-
-        if (identifier
-                .getExtensionByUrl(HapiHelper.EXTENSION_CX_IDENTIFIER_URL)
-                .getExtension()
-                .isEmpty()) {
-            identifier.removeExtension(HapiHelper.EXTENSION_CX_IDENTIFIER_URL);
-        }
-
-        identifier.setType(null);
+        patientIdentifier.setAssigner(null);
+        HapiHelper.removePID3_5Value(bundle);
     }
 }
