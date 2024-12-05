@@ -70,7 +70,7 @@ public class MockRSEndpointClient implements RSEndpointClient {
     }
 
     @Override
-    public String requestDeliveryEndpoint(String reportId, String bearerToken)
+    public String requestDeliveryEndpoint(String inboundReportId, String bearerToken)
             throws ReportStreamEndpointClientException {
         return """
             {
