@@ -30,14 +30,14 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
     }
 
     @Override
-    public void convertAndSend(Result<?> result, String receivedSubmissionId)
+    public void convertAndSend(Result<?> result, String inboundReportId)
             throws UnableToSendMessageException {
 
         String hashedResult = hashHelper.generateHash(result);
 
         PartnerMetadata partnerMetadata =
                 new PartnerMetadata(
-                        receivedSubmissionId,
+                        inboundReportId,
                         hashedResult,
                         PartnerMetadataMessageType.RESULT,
                         result.getSendingApplicationDetails(),
@@ -46,15 +46,15 @@ public class SendResultUseCase implements SendMessageUseCase<Result<?>> {
                         result.getReceivingFacilityDetails(),
                         result.getPlacerOrderNumber());
 
-        sendMessageHelper.savePartnerMetadataForReceivedMessage(partnerMetadata);
+        sendMessageHelper.savePartnerMetadataForInboundMessage(partnerMetadata);
 
         transformationEngine.runRules(result);
 
         String outboundReportId = sender.send(result).orElse(null);
-        logger.logInfo("Sent result reportId: {}", outboundReportId);
+        logger.logInfo("Sent result outboundReportId: {}", outboundReportId);
 
-        sendMessageHelper.linkMessage(receivedSubmissionId);
+        sendMessageHelper.linkMessage(inboundReportId);
 
-        sendMessageHelper.saveSentMessageSubmissionId(receivedSubmissionId, outboundReportId);
+        sendMessageHelper.saveOutboundReportId(inboundReportId, outboundReportId);
     }
 }

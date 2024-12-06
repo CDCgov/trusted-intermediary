@@ -36,13 +36,13 @@ class HapiMetadataConverterTest extends Specification {
         def messageType =  PartnerMetadataMessageType.ORDER
         def messageIds = Set.of("TestId")
         PartnerMetadata metadata = new PartnerMetadata(
-                "receivedSubmissionId", "sentSubmissionId", time, time, hash, PartnerMetadataStatus.DELIVERED, failureReason, messageType, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
+                "inboundReportId", "outboundReportId", time, time, hash, PartnerMetadataStatus.DELIVERED, failureReason, messageType, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
 
         when:
-        def result = HapiPartnerMetadataConverter.getInstance().extractPublicMetadataToOperationOutcome(metadata, "receivedSubmissionId", messageIds).getUnderlyingOutcome() as OperationOutcome
+        def result = HapiPartnerMetadataConverter.getInstance().extractPublicMetadataToOperationOutcome(metadata, "inboundReportId", messageIds).getUnderlyingOutcome() as OperationOutcome
 
         then:
-        result.getId() == "receivedSubmissionId"
+        result.getId() == "inboundReportId"
         result.getIssue().get(0).diagnostics == messageIds.toString()
         result.getIssue().get(1).diagnostics == sendingFacilityId
         result.getIssue().get(2).diagnostics == receivingFacilityId
@@ -52,7 +52,7 @@ class HapiMetadataConverterTest extends Specification {
         result.getIssue().get(6).diagnostics == PartnerMetadataStatus.DELIVERED.toString()
         result.getIssue().get(7).diagnostics == failureReason
         result.getIssue().get(8).diagnostics == messageType.toString()
-        result.getIssue().get(9).diagnostics == "sentSubmissionId"
-        result.getIssue().get(10).diagnostics == "receivedSubmissionId"
+        result.getIssue().get(9).diagnostics == "outboundReportId"
+        result.getIssue().get(10).diagnostics == "inboundReportId"
     }
 }
