@@ -268,6 +268,9 @@ public class HapiHelper {
             return null;
         }
         Organization organization = (Organization) identifier.getAssigner().getResource();
+        if (organization == null) {
+            return null;
+        }
         return organization.getIdentifierFirstRep();
     }
 
@@ -523,13 +526,16 @@ public class HapiHelper {
     }
 
     // OBR16 - Ordering Provider
-
-    // OBR16 -
     public static void setOBR16WithPractitioner(
-            Extension obr16Extension, PractitionerRole practitionerRole) {
-        if (practitionerRole == null) {
+            Extension obrExtension, PractitionerRole practitionerRole) {
+        if (practitionerRole == null || !practitionerRole.getPractitioner().hasReference()) {
             return;
         }
+
+        Extension obr16Extension =
+                HapiHelper.ensureSubExtensionExists(
+                        obrExtension, HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString());
+
         obr16Extension.setValue(practitionerRole.getPractitioner());
     }
 
