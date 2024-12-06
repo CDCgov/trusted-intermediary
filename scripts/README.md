@@ -26,7 +26,7 @@
 - [Resources](#resources)
 
 ## Setup
-
+<details open>
 Follow the instructions below to load the environments variables required for these scripts
 
 1. Copy `.env.template` to `.env`
@@ -43,6 +43,7 @@ Follow the instructions below to load the environments variables required for th
    ```
    **Note**: you may also want to add it to your shell's startup file so you don't need to run it for every terminal session.
 4. Run your script
+</details>
 
 ## Available_Scripts
 
