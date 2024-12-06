@@ -480,8 +480,8 @@ class HapiHelperTest extends Specification {
     // PID-3.5 - Removing Identifier Type Code
     def "null patientIdentifier remains null"() {
         when:
-        Identifier patientIdentfier = null
-        HapiHelper.removePID3_5Value(patientIdentfier)
+        Identifier patientIdentifier = null
+        HapiHelper.removePID3_5Value(patientIdentifier)
 
         then:
         patientIdentifier == null
@@ -893,21 +893,19 @@ class HapiHelperTest extends Specification {
 
     def "setOBR16WithPractitioner sets the expected value on an extension"() {
         given:
-        def ext = new Extension()
+        Extension obrExtension = new Extension()
         def role = new PractitionerRole()
         def practitioner = new Practitioner()
         practitioner.setId("test123")
         def ref = new Reference(practitioner.getId())
         role.setPractitioner(ref)
 
-        expect:
-        ext.getValue() == null
-
         when:
-        HapiHelper.setOBR16WithPractitioner(ext, role)
+        HapiHelper.setOBR16WithPractitioner(obrExtension, role)
 
         then:
-        ext.getValue().getReference() == "test123"
+        def obr16Extension = obrExtension.getExtensionByUrl(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString())
+        obr16Extension.getValue().getReference() == "test123"
     }
 
     def "setOBR16WithPractitioner does nothing if the provided PractitionerRole is null"() {
@@ -922,7 +920,8 @@ class HapiHelperTest extends Specification {
         HapiHelper.setOBR16WithPractitioner(ext, role)
 
         then:
-        ext.getValue() == null
+        def obr16Extension = ext.getExtensionByUrl(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString())
+        obr16Extension == null
     }
 
     def "urlForCodeType should return expected values"() {

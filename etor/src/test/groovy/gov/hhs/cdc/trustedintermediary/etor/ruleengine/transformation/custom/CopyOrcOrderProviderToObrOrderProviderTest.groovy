@@ -7,6 +7,7 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DiagnosticReport
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ServiceRequest
@@ -214,6 +215,7 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
     }
 
     void evaluateObr16IsNull(ServiceRequest serviceRequest) {
+        assert getObr16Extension(serviceRequest) == null
         assert getObr16ExtensionPractitioner(serviceRequest) == null
     }
 
@@ -235,12 +237,17 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         assert codingSystem == null || codingSystem[0]?.code == expectedIdentifierTypeCode
     }
 
+    Extension getObr16Extension(serviceRequest) {
+        def obrExtension =  serviceRequest.getExtensionByUrl(HapiHelper.EXTENSION_OBR_URL)
+        def obr16Extension = obrExtension.getExtensionByUrl(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString())
+        return obr16Extension
+    }
+
     Practitioner getObr16ExtensionPractitioner (serviceRequest) {
         def resource
         try {
-            def extensionByUrl1 =  serviceRequest.getExtensionByUrl(HapiHelper.EXTENSION_OBR_URL)
-            def extensionByUrl2 = extensionByUrl1.getExtensionByUrl(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString())
-            def value = extensionByUrl2.value
+            def obr16Extension = getObr16Extension(serviceRequest)
+            def value = obr16Extension.value
             resource = value.getResource()
             return resource
         } catch(Exception ignored) {
