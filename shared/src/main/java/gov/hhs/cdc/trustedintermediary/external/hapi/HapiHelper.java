@@ -307,7 +307,7 @@ public class HapiHelper {
             patientIdentifier.removeExtension(HapiHelper.EXTENSION_CX_IDENTIFIER_URL);
         }
 
-        // The PID-3.5 also appears in the type coding
+        // The PID-3.5 value also appears in the type coding
         patientIdentifier.setType(null);
     }
 

@@ -477,6 +477,36 @@ class HapiHelperTest extends Specification {
         HapiFhirHelper.getPID3_5Value(bundle) == pid3_5
     }
 
+    // PID-3.5 - Removing Identifier Type Code
+    def "null patientIdentifier remains null"() {
+        when:
+        Identifier patientIdentfier = null
+        HapiHelper.removePID3_5Value(patientIdentfier)
+
+        then:
+        patientIdentifier == null
+    }
+
+    def "removing of the patient assigning identifier clears extensions and type coding"() {
+        given:
+        def pid3_5 = "pid3_5"
+        def bundle = new Bundle()
+        def patientIdentifier = new Identifier()
+
+        HapiFhirHelper.createPIDPatient(bundle)
+        HapiFhirHelper.setPID3Identifier(bundle, patientIdentifier)
+        HapiHelper.setPID3_5Value(bundle, pid3_5)
+
+        patientIdentifier.type.addCoding(new Coding(code: pid3_5))
+
+        when:
+        HapiHelper.removePID3_5Value(patientIdentifier)
+
+        then:
+        patientIdentifier.extension.isEmpty()
+        patientIdentifier.type.isEmpty()
+    }
+
     // PID-5 - Patient Name
     def "patient name methods work as expected"() {
         given:
