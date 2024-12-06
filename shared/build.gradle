@@ -22,10 +22,10 @@ dependencies {
     implementation 'net.logstash.logback:logstash-logback-encoder:8.0'
 
     //jackson
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.18.1'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.1'
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.1'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.1'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.18.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2'
 
     // hapi fhir
     api 'ca.uhn.hapi.fhir:hapi-fhir-base:7.6.0'
@@ -48,14 +48,14 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 
     // azure sdk
-    implementation 'com.azure:azure-security-keyvault-secrets:4.9.0'
+    implementation 'com.azure:azure-security-keyvault-secrets:4.9.1'
     implementation 'com.azure:azure-identity:1.14.2'
 
     testImplementation 'org.apache.groovy:groovy:4.0.24'
     testFixturesImplementation 'org.apache.groovy:groovy:4.0.24'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
     testFixturesImplementation 'com.openpojo:openpojo:0.9.1'
-    testFixturesImplementation 'nl.jqno.equalsverifier:equalsverifier:3.17.3'
+    testFixturesImplementation 'nl.jqno.equalsverifier:equalsverifier:3.17.5'
 
     // dotenv-java
     implementation 'io.github.cdimascio:dotenv-java:3.0.2'

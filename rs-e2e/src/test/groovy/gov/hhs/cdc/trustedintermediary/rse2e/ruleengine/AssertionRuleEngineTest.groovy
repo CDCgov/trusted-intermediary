@@ -85,7 +85,7 @@ class AssertionRuleEngineTest extends Specification {
         }
 
         when:
-        ruleEngine.runRules(Mock(Message), Mock(Message))
+        ruleEngine.runRules(Mock(HapiHL7Message), Mock(HapiHL7Message))
 
         then:
         1 * mockLogger.logError(_ as String, exception)
@@ -97,7 +97,7 @@ class AssertionRuleEngineTest extends Specification {
         mockRuleLoader.loadRules(_ as InputStream, _ as TypeReference) >> { throw exception }
 
         when:
-        ruleEngine.runRules(Mock(Message), Mock(Message))
+        ruleEngine.runRules(Mock(HapiHL7Message), Mock(HapiHL7Message))
 
         then:
         1 * mockLogger.logError(_ as String, exception)
@@ -105,7 +105,7 @@ class AssertionRuleEngineTest extends Specification {
 
     def "runRules returns nothing when there are no rules"() {
         when:
-        def result = ruleEngine.runRules(Mock(Message), Mock(Message))
+        def result = ruleEngine.runRules(Mock(HapiHL7Message), Mock(HapiHL7Message))
 
         then:
         result.isEmpty()
@@ -117,7 +117,7 @@ class AssertionRuleEngineTest extends Specification {
         mockRuleLoader.loadRules(_ as InputStream, _ as TypeReference) >> [rule]
 
         when:
-        def result = ruleEngine.runRules(Mock(Message), Mock(Message))
+        def result = ruleEngine.runRules(Mock(HapiHL7Message), Mock(HapiHL7Message))
 
         then:
         result.size() == 1
@@ -130,7 +130,7 @@ class AssertionRuleEngineTest extends Specification {
         mockRuleLoader.loadRules(_ as InputStream, _ as TypeReference) >> [rule]
 
         when:
-        def result = ruleEngine.runRules(Mock(Message), Mock(Message))
+        def result = ruleEngine.runRules(Mock(HapiHL7Message), Mock(HapiHL7Message))
 
         then:
         result.isEmpty()
