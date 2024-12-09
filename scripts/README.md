@@ -27,7 +27,8 @@
 
 ## Setup
 <details open>
-Follow the instructions below to load the environments variables required for these scripts
+Follow the instructions below to load the environments variables required for these scripts.
+ReportStream and Trusted Intermediary must be running locally before running any scripts.
 
 1. Copy `.env.template` to `.env`
     ```
@@ -235,7 +236,7 @@ Sends all the HL7 files with `_0_initial_message.hl7` suffix in the `/examples` 
 
 ### setup/setup-reportstream.sh
 
-Setup script for ReportStream
+Setup script for ReportStream.
 
 #### Requirements
 
