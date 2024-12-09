@@ -108,6 +108,9 @@ public class ApplicationContext {
 
         Object declaringClassImplementation =
                 getDeclaringClassImplementation(declaringClassesToTry);
+        if (declaringClassImplementation == null) {
+            System.err.println("No class implementation found");
+        }
 
         field.trySetAccessible();
 
