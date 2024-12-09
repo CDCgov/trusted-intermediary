@@ -12,10 +12,10 @@ public interface MessageRequestHandler<T> {
     /**
      * Parses the request, converts and sends the message
      *
-     * @param receivedSubmissionId the ID for the submission returned from ReportStream
+     * @param inboundReportId the report id created by ReportStream and sent to us in the request
      * @return the response
      * @throws FhirParseException if there is an error parsing the FHIR data
      * @throws UnableToSendMessageException if there is an error sending the message
      */
-    T handle(String receivedSubmissionId) throws FhirParseException, UnableToSendMessageException;
+    T handle(String inboundReportId) throws FhirParseException, UnableToSendMessageException;
 }

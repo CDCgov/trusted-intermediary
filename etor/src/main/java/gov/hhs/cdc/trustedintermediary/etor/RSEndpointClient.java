@@ -13,9 +13,9 @@ public interface RSEndpointClient {
     String requestWatersEndpoint(String body, String bearerToken)
             throws ReportStreamEndpointClientException;
 
-    String requestHistoryEndpoint(String submissionId, String bearerToken)
+    String requestHistoryEndpoint(String outboundReportId, String bearerToken)
             throws ReportStreamEndpointClientException;
 
-    String requestDeliveryEndpoint(String reportId, String bearerToken)
+    String requestDeliveryEndpoint(String inboundReportId, String bearerToken)
             throws ReportStreamEndpointClientException;
 }
