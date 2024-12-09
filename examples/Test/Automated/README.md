@@ -15,3 +15,4 @@ The files are required to:
   - If it's a sample file for UCSD, which has transformation that will overwrite `MSH-6.2`, the HL7 is required to have the prefix `AUTOMATEDTEST-` in `MSH-10` as a workaround - there is special routing in ReportStream to handle this
 - Each file must have a unique value in `MSH-10`. We use this value to match the input and output files, so if it's not unique, we won't be able to match the files correctly
   - We format `MSH-10` based on the file index, like `001` (or `AUTOMATEDTEST-001` for UCSD)
+- `MSH-11` needs to have a value of `N`
