@@ -1,8 +1,34 @@
-# Scripts
+- [Setup](#setup)
+- [Available\_Scripts](#available_scripts)
+  - [submit.sh](#submitsh)
+    - [Requirements](#requirements)
+    - [Usage](#usage)
+  - [rs.sh](#rssh)
+    - [Requirements](#requirements-1)
+    - [Usage](#usage-1)
+    - [Examples](#examples)
+  - [ti.sh](#tish)
+    - [Requirements](#requirements-2)
+    - [Usage](#usage-2)
+    - [Examples](#examples-1)
+  - [ucsd.sh](#ucsdsh)
+    - [Requirements](#requirements-3)
+    - [Before running the script](#before-running-the-script)
+    - [Usage](#usage-3)
+  - [setup/update-examples-snapshots.sh](#setupupdate-examples-snapshotssh)
+    - [Requirements](#requirements-4)
+    - [Usage](#usage-4)
+  - [setup/setup-reportstream.sh](#setupsetup-reportstreamsh)
+    - [Requirements](#requirements-5)
+    - [Usage](#usage-5)
+  - [lib/common.sh](#libcommonsh)
+  - [lib/submission-utils.sh](#libsubmission-utilssh)
+- [Resources](#resources)
 
 ## Setup
-
-Follow the instructions below to load the environments variables required for these scripts
+<details open>
+Follow the instructions below to load the environments variables required for these scripts.
+ReportStream and Trusted Intermediary must be running locally before running any scripts.
 
 1. Copy `.env.template` to `.env`
     ```
@@ -18,8 +44,9 @@ Follow the instructions below to load the environments variables required for th
    ```
    **Note**: you may also want to add it to your shell's startup file so you don't need to run it for every terminal session.
 4. Run your script
+</details>
 
-## Available Scripts
+## Available_Scripts
 
 ### submit.sh
 
@@ -209,7 +236,7 @@ Sends all the HL7 files with `_0_initial_message.hl7` suffix in the `/examples` 
 
 ### setup/setup-reportstream.sh
 
-Setup script for ReportStream
+Setup script for ReportStream.
 
 #### Requirements
 
