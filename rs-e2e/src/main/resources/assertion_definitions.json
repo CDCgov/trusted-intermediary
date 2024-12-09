@@ -115,11 +115,10 @@
     {
       "name": "NTE segment mapping",
       "conditions": [
-        "MSH-10 = 'Q1960841872T2476960690'"
+        "MSH-10 = '011'"
       ],
       "rules": [
         "NTE-3 = 'note 1'",
-        "NTE-3 = 'note 2'",
         "NTE.count() = 2"
       ]
     }
