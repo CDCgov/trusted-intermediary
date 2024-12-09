@@ -119,7 +119,7 @@
       ],
       "rules": [
         "NTE-3 = 'note 1'",
-        "NTE.count() = 1"
+        "NTE.count() = 2"
       ]
     }
   ]
