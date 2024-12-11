@@ -17,6 +17,8 @@ echo "Resetting the database and loading the baseline settings..."
 ./gradlew reloadSettings
 
 # Update RS Configuration for the TI API based on docker or gradle
+# PS: Logic to determine to use gradle vs docker needs updating
+# The logic needs to check if BOTH TI and RS are running in docker, otherwise it should use localhost:8080
 LOCAL_DOCKER_IMAGE_NAME=$(docker ps --filter "name=trusted-intermediary-router-1" | grep trusted-intermediary-router-1)
 if [[ ! -z $LOCAL_DOCKER_IMAGE_NAME ]]; then
   ti_api_url=${TI_LCL_API_URL}
@@ -50,7 +52,7 @@ yq eval '.[0].receivers[] |= (
 
 echo "Updating local URL and host in transport settings..."
 sed -i '' "s|__TI_API_URL__|${ti_api_url}|g" "settings/STLTs/Flexion/flexion.yml"
-sed -i '' "s|__TI_API_HOST__|$(extract_host_from_url "${TI_DOCKER_LCL_API_URL_RS_CONFIG}")|g" "settings/STLTs/Flexion/flexion.yml"
+sed -i '' "s|__TI_API_HOST__|$(extract_host_from_url "${ti_api_url}")|g" "settings/STLTs/Flexion/flexion.yml"
 
 echo "Updating transport settings in partner org files..."
 for file in "settings/STLTs/CA/ucsd.yml" "settings/STLTs/LA/la-ochsner.yml" "settings/STLTs/LA/la-phl.yml"; do
