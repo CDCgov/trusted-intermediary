@@ -13,7 +13,7 @@ cd "$RS_HOME" || exit
 
 echo "Resetting the database and loading the baseline settings..."
 ./gradlew resetDB
-./gradlew reloadTable
+./gradlew reloadTables
 ./gradlew reloadSettings
 
 # Update RS Configuration for the TI API based on docker or gradle
