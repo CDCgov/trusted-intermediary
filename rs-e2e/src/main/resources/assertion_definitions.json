@@ -118,7 +118,7 @@
         "MSH-10 = '011'"
       ],
       "rules": [
-        "NTE-3 = 'note 1'",
+        "NTE-3 = input.NTE-3",
         "NTE.count() = 2"
       ]
     }
