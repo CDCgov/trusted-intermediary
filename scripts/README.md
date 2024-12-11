@@ -1,5 +1,5 @@
 - [Setup](#setup)
-- [Available\_Scripts](#available_scripts)
+- [Available Scripts](#available-scripts)
   - [submit.sh](#submitsh)
     - [Requirements](#requirements)
     - [Usage](#usage)
@@ -22,11 +22,10 @@
     - [Requirements](#requirements-5)
     - [Usage](#usage-5)
   - [lib/common.sh](#libcommonsh)
-  - [lib/submission-utils.sh](#libsubmission-utilssh)
+    - [lib/submission-utils.sh](#libsubmission-utilssh)
 - [Resources](#resources)
 
 ## Setup
-<details open>
 Follow the instructions below to load the environments variables required for these scripts.
 ReportStream and Trusted Intermediary must be running locally before running any scripts.
 
@@ -44,9 +43,8 @@ ReportStream and Trusted Intermediary must be running locally before running any
    ```
    **Note**: you may also want to add it to your shell's startup file so you don't need to run it for every terminal session.
 4. Run your script
-</details>
 
-## Available_Scripts
+## Available Scripts
 
 ### submit.sh
 
