@@ -13,7 +13,7 @@ cd "$RS_HOME" || exit
 
 echo "Resetting the database and loading the baseline settings..."
 ./gradlew resetDB
-./gradlew reloadTable
+./gradlew reloadTables
 ./gradlew reloadSettings
 
 # Need to CD to prime-router to run the prime CLI
