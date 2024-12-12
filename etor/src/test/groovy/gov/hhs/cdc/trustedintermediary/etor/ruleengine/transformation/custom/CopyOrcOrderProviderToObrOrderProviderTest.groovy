@@ -244,16 +244,11 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
     }
 
     Practitioner getObr16ExtensionPractitioner (serviceRequest) {
-        def resource
-        try {
-            def obr16Extension = getObr16Extension(serviceRequest)
-            def value = obr16Extension.value
-            resource = value.getResource()
-            return resource
-        } catch(Exception ignored) {
-            resource = null
-            return resource
+        def obr16Extension = getObr16Extension(serviceRequest)
+        if (obr16Extension == null) {
+            return null
         }
+        return obr16Extension.value.getResource()
     }
 
     Practitioner getOrc12ExtensionPractitioner(Bundle bundle) {
