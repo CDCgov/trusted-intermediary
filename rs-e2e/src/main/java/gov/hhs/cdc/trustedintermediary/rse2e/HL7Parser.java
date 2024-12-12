@@ -9,17 +9,8 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class HL7Parser {
-
-    private static final HL7Parser INSTANCE = new HL7Parser();
-
-    private static final String NEWLINE_REGEX = "\\r?\\n|\\r";
-    private static final char DEFAULT_FIELD_SEPARATOR = '|';
-
-    private HL7Parser() {}
-
-    public static HL7Parser getInstance() {
-        return INSTANCE;
-    }
+    protected static final String NEWLINE_REGEX = "\\r?\\n|\\r";
+    protected static final char DEFAULT_FIELD_SEPARATOR = '|';
 
     public static HL7Message parse(String content) {
         Map<String, List<String>> segments = new HashMap<>();
