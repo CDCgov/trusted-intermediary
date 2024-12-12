@@ -101,10 +101,10 @@ public class ApplicationContext {
         declaringClassesToTry.add(declaringClass);
         declaringClassesToTry.addAll(Arrays.asList(declaringClass.getInterfaces()));
 
-        Object fieldImplementation = getFieldImplementation(fieldType);
-        if (fieldImplementation == null) {
-            return;
-        }
+        //        Object fieldImplementation = getFieldImplementation(fieldType);
+        //        if (fieldImplementation == null) {
+        //            return;
+        //        }
 
         Object declaringClassImplementation =
                 getDeclaringClassImplementation(declaringClassesToTry);
@@ -112,14 +112,17 @@ public class ApplicationContext {
             return;
         }
 
-        field.trySetAccessible();
+        injectIntoField(field, declaringClassImplementation);
 
-        try {
-            field.set(declaringClassImplementation, fieldImplementation);
-        } catch (IllegalAccessException | IllegalArgumentException exception) {
-            throw new IllegalArgumentException(
-                    "Unable to inject " + fieldType + " into " + declaringClass, exception);
-        }
+        //        field.trySetAccessible();
+
+        //        try {
+        //            field.set(declaringClassImplementation, fieldImplementation);
+        //        } catch (IllegalAccessException | IllegalArgumentException exception) {
+        //            throw new IllegalArgumentException(
+        //                    "Unable to inject " + fieldType + " into " + declaringClass,
+        // exception);
+        //        }
     }
 
     private static Object getFieldImplementation(Class<?> fieldType) {
