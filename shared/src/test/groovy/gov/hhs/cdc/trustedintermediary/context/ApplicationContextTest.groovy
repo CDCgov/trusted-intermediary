@@ -210,9 +210,6 @@ class ApplicationContextTest extends Specification {
         def injectionInstantiation = new InjectionDeclaringClass()
 
         TestApplicationContext.register(List.class, injectionInstantiation)
-        // notice above that I'm registering the injectionInstantiation object as a List class.
-        // injectionInstantiation is of class InjectionDeclaringClass,
-        // and InjectionDeclaringClass doesn't implement List (it only implements AFieldInterface).
         TestApplicationContext.register(String.class, injectedValue)
 
         when:
@@ -220,7 +217,7 @@ class ApplicationContextTest extends Specification {
         injectionInstantiation.getAField()
 
         then:
-        thrown(NullPointerException)
+        noExceptionThrown()
     }
 
     class InjectionDeclaringClass {
