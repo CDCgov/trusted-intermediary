@@ -26,10 +26,18 @@ class HL7MessageTest extends Specification {
         def expectedIdentifier = "0001"
         def segments = [
             MSH: [
-                "MSH|^~\\&|Epic^1.2.840.114350.1.13.145.2.7.2.695071^ISO\n"
-            ],
-            PID: [
-                "PID|1||11102779^^^CR^MR||SMITH^BB SARAH^^^^^L\n"
+                "|",
+                "^~\\&",
+                "SISGDSP",
+                "SISGDSP",
+                "SISHIERECEIVER^11223344^L,M,N",
+                "^^L,M,N",
+                "20230706093730",
+                "",
+                "ORU^R01^ORU_R01",
+                "0001",
+                "D",
+                "2.5.1"
             ]
         ]
 
