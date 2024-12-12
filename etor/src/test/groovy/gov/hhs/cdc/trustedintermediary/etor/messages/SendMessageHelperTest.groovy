@@ -27,7 +27,7 @@ class SendMessageHelperTest extends Specification {
         TestApplicationContext.register(Logger, mockLogger)
         TestApplicationContext.injectRegisteredImplementations()
         partnerMetadata = new PartnerMetadata(
-                "receivedId",
+                "inboundReportId",
                 new Random().nextInt().toString(),
                 PartnerMetadataMessageType.RESULT,
                 sendingApp,
@@ -36,15 +36,15 @@ class SendMessageHelperTest extends Specification {
                 receivingFacility,
                 placerOrderNumber)
     }
-    def "savePartnerMetadataForReceivedMessage works"() {
+    def "savePartnerMetadataForInboundMessage works"() {
         when:
-        SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage(partnerMetadata)
+        SendMessageHelper.getInstance().savePartnerMetadataForInboundMessage(partnerMetadata)
 
         then:
-        1 * mockOrchestrator.updateMetadataForReceivedMessage(_)
+        1 * mockOrchestrator.updateMetadataForInboundMessage(_)
     }
 
-    def "savePartnerMetadataForReceivedMessage should log warnings for null receivedSubmissionId"() {
+    def "savePartnerMetadataForInboundMessage should log warnings for null inboundReportId"() {
         when:
         PartnerMetadata warningPartnerMetadata = new PartnerMetadata(
                 null,
@@ -55,57 +55,57 @@ class SendMessageHelperTest extends Specification {
                 receivingApp,
                 receivingFacility,
                 placerOrderNumber)
-        SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage(warningPartnerMetadata)
+        SendMessageHelper.getInstance().savePartnerMetadataForInboundMessage(warningPartnerMetadata)
 
         then:
         1 * mockLogger.logWarning(_)
     }
 
-    def "savePartnerMetadataForReceivedMessage logs error and continues when updateMetadataForReceivedMessage throws error"() {
+    def "savePartnerMetadataForInboundMessage logs error and continues when updateMetadataForInboundMessage throws error"() {
         given:
         def hashCode = new Random().nextInt()
         def messageType = PartnerMetadataMessageType.RESULT
-        mockOrchestrator.updateMetadataForReceivedMessage(partnerMetadata) >> { throw new PartnerMetadataException("Error") }
+        mockOrchestrator.updateMetadataForInboundMessage(partnerMetadata) >> { throw new PartnerMetadataException("Error") }
 
         when:
-        SendMessageHelper.getInstance().savePartnerMetadataForReceivedMessage(partnerMetadata)
+        SendMessageHelper.getInstance().savePartnerMetadataForInboundMessage(partnerMetadata)
 
         then:
         1 * mockLogger.logError(_, _)
     }
 
-    def "saveSentMessageSubmissionId works"() {
+    def "saveOutboundReportId works"() {
         given:
-        def sentSubmissionId = "sentId"
-        def receivedSubmissionId = "receivedId"
-        mockOrchestrator.updateMetadataForSentMessage(receivedSubmissionId, _ as String) >> { throw new PartnerMetadataException("Error") }
+        def outboundReportId = "outboundReportId"
+        def inboundReportId = "inboundReportId"
+        mockOrchestrator.updateMetadataForOutboundMessage(inboundReportId, _ as String) >> { throw new PartnerMetadataException("Error") }
 
         when:
-        SendMessageHelper.getInstance().saveSentMessageSubmissionId(receivedSubmissionId, sentSubmissionId)
+        SendMessageHelper.getInstance().saveOutboundReportId(inboundReportId, outboundReportId)
 
         then:
-        1 * mockOrchestrator.updateMetadataForSentMessage(_, _)
+        1 * mockOrchestrator.updateMetadataForOutboundMessage(_, _)
     }
 
-    def "saveSentMessageSubmissionId should log warnings for null receivedSubmissionId"() {
+    def saveOutboundReportId() {
         given:
-        def receivedSubmissionId = "receivedId"
+        def inboundReportId = "inboundReportId"
 
         when:
-        SendMessageHelper.getInstance().saveSentMessageSubmissionId(null, receivedSubmissionId)
+        SendMessageHelper.getInstance().saveOutboundReportId(null, inboundReportId)
 
         then:
         1 * mockLogger.logWarning(_)
     }
 
-    def "saveSentMessageSubmissionId should log error and continues when updateMetadataForSentMessage throws error"() {
+    def "saveOutboundReportId should log error and continues when updateMetadataForOutboundMessage throws error"() {
         given:
-        def sentSubmissionId = "sentId"
-        def receivedSubmissionId = "receivedId"
-        mockOrchestrator.updateMetadataForSentMessage(receivedSubmissionId, _ as String) >> { throw new PartnerMetadataException("Error") }
+        def outboundReportId = "outboundReportId"
+        def inboundReportId = "inboundReportId"
+        mockOrchestrator.updateMetadataForOutboundMessage(inboundReportId, _ as String) >> { throw new PartnerMetadataException("Error") }
 
         when:
-        SendMessageHelper.getInstance().saveSentMessageSubmissionId(receivedSubmissionId, sentSubmissionId)
+        SendMessageHelper.getInstance().saveOutboundReportId(inboundReportId, outboundReportId)
 
         then:
         1 * mockLogger.logError(_, _)
