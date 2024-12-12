@@ -1,8 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.external.hapi
 
+import gov.hhs.cdc.trustedintermediary.rse2e.HL7Message
 import ca.uhn.hl7v2.model.Message
-import ca.uhn.hl7v2.model.Segment
-import ca.uhn.hl7v2.parser.PipeParser
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthData
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import spock.lang.Specification
@@ -13,8 +12,7 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
 
     char hl7FieldSeparator = '|'
     String hl7FieldEncodingCharacters = "^~\\&"
-    Message mshMessage
-    Segment mshSegment
+    HL7Message mshMessage
     String mshSegmentText
 
     def setup() {
@@ -23,9 +21,25 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
         TestApplicationContext.register(HapiHL7ExpressionEvaluator, evaluator)
 
         mshSegmentText = "MSH|^~\\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-lab-id^DNS|20230101010000-0000||ORM^O01^ORM_O01|111111|T|2.5.1"
-        def pipeParser = new PipeParser()
-        mshMessage = pipeParser.parse(mshSegmentText)
-        mshSegment = (Segment) mshMessage.get("MSH")
+
+        def segments = [
+            MSH: [
+                "|",
+                "^~\\&",
+                "Sender Application^sender.test.com^DNS",
+                "Sender Facility^0.0.0.0.0.0.0.0^ISO",
+                "Receiver Application^0.0.0.0.0.0.0.0^ISO",
+                "Receiver Facility^simulated-lab-id^DNS",
+                "20230101010000-0000",
+                "",
+                "ORM^O01^ORM_O01",
+                "111111",
+                "T",
+                "2.5.1"
+            ]
+        ]
+
+        mshMessage = new HL7Message(segments, "|^~\\&" as Map<String, Character>)
 
         TestApplicationContext.injectRegisteredImplementations()
     }
