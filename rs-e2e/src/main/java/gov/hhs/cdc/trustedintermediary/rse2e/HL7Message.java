@@ -12,18 +12,12 @@ import java.util.regex.Pattern;
 public class HL7Message implements HealthData<HL7Message> {
 
     private final Map<String, List<String>> segments;
-    private final Map<String, Character> delimiters;
-    private final Character escapeCharacter;
+    private final Map<String, Character> encodingCharacters;
 
-    public HL7Message(Map<String, List<String>> segments, char[] encodingCharacters) {
+    public HL7Message(
+            Map<String, List<String>> segments, Map<String, Character> encodingCharacters) {
         this.segments = segments;
-        this.delimiters =
-                Map.of(
-                        "field", HL7Parser.DEFAULT_FIELD_SEPARATOR,
-                        "component", encodingCharacters[0],
-                        "repetition", encodingCharacters[1],
-                        "subcomponent", encodingCharacters[3]);
-        this.escapeCharacter = encodingCharacters[2];
+        this.encodingCharacters = encodingCharacters;
     }
 
     public List<String> getSegment(String segment) {
@@ -54,11 +48,11 @@ public class HL7Message implements HealthData<HL7Message> {
     }
 
     public char getEscapeCharacter() {
-        return this.escapeCharacter;
+        return this.encodingCharacters.get("escape");
     }
 
     public char getDelimiter(String type) {
-        return this.delimiters.get(type);
+        return this.encodingCharacters.get(type);
     }
 
     public char[] getOrderedLevelDelimiters() {
