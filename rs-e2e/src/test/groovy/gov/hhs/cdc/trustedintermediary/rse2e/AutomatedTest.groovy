@@ -1,9 +1,11 @@
 package gov.hhs.cdc.trustedintermediary.rse2e
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
+import gov.hhs.cdc.trustedintermediary.rse2e.external.azure.AzureBlobFileFetcher
 import gov.hhs.cdc.trustedintermediary.rse2e.external.hapi.HapiHL7FileMatcher
 import gov.hhs.cdc.trustedintermediary.rse2e.external.hapi.HapiHL7ExpressionEvaluator
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
+import gov.hhs.cdc.trustedintermediary.rse2e.external.localfile.LocalFileFetcher
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
