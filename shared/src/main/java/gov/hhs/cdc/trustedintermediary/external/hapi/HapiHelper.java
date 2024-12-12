@@ -334,6 +334,13 @@ public class HapiHelper {
     }
 
     public static void removePID5_7Value(Bundle bundle) {
+        Patient patient = HapiHelper.getPIDPatient(bundle);
+        if (patient == null) {
+            return;
+        }
+        HumanName patientName = patient.getNameFirstRep();
+        patientName.setUse(null);
+
         Extension pid5Extension = HapiHelper.getPID5Extension(bundle);
         if (pid5Extension == null) {
             return;
@@ -342,9 +349,6 @@ public class HapiHelper {
         if (xpn7Extension != null) {
             pid5Extension.removeExtension(HapiHelper.EXTENSION_XPN7_URL);
         }
-
-        HumanName patientName = HapiHelper.getPIDPatient(bundle).getNameFirstRep();
-        patientName.setUse(null);
     }
 
     // ORC - Common Order
