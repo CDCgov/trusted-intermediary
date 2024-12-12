@@ -20,7 +20,7 @@ class RemovePatientNameTypeCodeTest extends Specification {
         transformClass = new RemovePatientNameTypeCode()
     }
 
-    def "remove PID.5-7 from Bundle"() {
+    def "remove PID.5-7 from Bundle - old"() {
         given:
         def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/002_CA_ORU_R01_initial_translation.fhir")
         def bundle = fhirResource.getUnderlyingData() as Bundle
@@ -34,6 +34,30 @@ class RemovePatientNameTypeCodeTest extends Specification {
 
         then:
         HapiFhirHelper.getPID5_7Value(bundle) == null
+    }
+
+    def "remove PID.5-7 from Bundle"() {
+        given:
+        def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/002_CA_ORU_R01_initial_translation.fhir")
+        def bundle = fhirResource.getUnderlyingData() as Bundle
+        def pid_5_initial = HapiHelper.getPID5Extension(bundle)
+        def xpn_7_initial = pid_5_initial.getExtensionByUrl(HapiHelper.EXTENSION_XPN7_URL)
+        def patientName = HapiHelper.getPIDPatient(bundle).getNameFirstRep()
+        def patientNameUse = patientName.getUse()
+
+        expect:
+        xpn_7_initial != null
+        patientNameUse.toString() == "OFFICIAL"
+
+        when:
+        transformClass.transform(fhirResource, null)
+
+        then:
+        def pid_5_transformed = HapiHelper.getPID5Extension(bundle)
+        def xpn_7_transformed = pid_5_transformed.getExtensionByUrl(HapiHelper.EXTENSION_XPN7_URL)
+        xpn_7_transformed == null
+
+        !patientName.hasUse()
     }
 
     def "don't throw exception if patient resource not present"() {
