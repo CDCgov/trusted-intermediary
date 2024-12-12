@@ -101,6 +101,26 @@
         "OBX-3.1 = '57721-3'",
         "OBX.count() = 1"
       ]
+    },
+    {
+      "name": "LA-Oschner OBR flattening",
+      "conditions": [
+        "MSH-10 = '010'"
+      ],
+      "rules": [
+        "OBR.count() = 1",
+        "OBR-4.1 = '54089-8'"
+      ]
+    },
+    {
+      "name": "NTE segment mapping",
+      "conditions": [
+        "MSH-10 = '011'"
+      ],
+      "rules": [
+        "NTE-3 = input.NTE-3",
+        "NTE.count() = 2"
+      ]
     }
   ]
 }

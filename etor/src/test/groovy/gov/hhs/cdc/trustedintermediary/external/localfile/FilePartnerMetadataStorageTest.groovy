@@ -31,16 +31,16 @@ class FilePartnerMetadataStorageTest extends Specification {
 
     def "save and read metadata successfully"() {
         given:
-        def expectedReceivedSubmissionId = "receivedSubmissionId"
-        def expectedSentSubmissionId = "receivedSubmissionId"
-        PartnerMetadata metadata = new PartnerMetadata(expectedReceivedSubmissionId, expectedSentSubmissionId, Instant.parse("2023-12-04T18:51:48.941875Z"), Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd", PartnerMetadataStatus.DELIVERED, null, PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
+        def expectedInboundReportId = "inboundReportId"
+        def expectedOutboundReportId = "outboundReportId"
+        PartnerMetadata metadata = new PartnerMetadata(expectedInboundReportId, expectedOutboundReportId, Instant.parse("2023-12-04T18:51:48.941875Z"), Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd", PartnerMetadataStatus.DELIVERED, null, PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
 
         TestApplicationContext.register(Formatter, Jackson.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
         FilePartnerMetadataStorage.getInstance().saveMetadata(metadata)
-        def actualMetadata = FilePartnerMetadataStorage.getInstance().readMetadata(expectedReceivedSubmissionId)
+        def actualMetadata = FilePartnerMetadataStorage.getInstance().readMetadata(expectedInboundReportId)
 
         then:
         actualMetadata.get() == metadata
@@ -48,7 +48,7 @@ class FilePartnerMetadataStorageTest extends Specification {
 
     def "saveMetadata throws PartnerMetadataException when unable to save file"() {
         given:
-        PartnerMetadata metadata = new PartnerMetadata("receivedSubmissionId", "sentSubmissionId", Instant.now(), Instant.now(), "abcd", PartnerMetadataStatus.DELIVERED, null, PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
+        PartnerMetadata metadata = new PartnerMetadata("inboundReportId", "outboundReportId", Instant.now(), Instant.now(), "abcd", PartnerMetadataStatus.DELIVERED, null, PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
 
         def mockFormatter = Mock(Formatter)
         mockFormatter.convertToJsonString(_ as PartnerMetadata) >> {throw new FormatterProcessingException("error", new Exception())}
@@ -65,10 +65,10 @@ class FilePartnerMetadataStorageTest extends Specification {
 
     def "saveMetadata overwrites a file if it had been saved before"() {
         given:
-        def expectedReceivedSubmissionId = "receivedSubmissionId"
-        def expectedSentSubmissionId = "sentSubmissionId"
-        PartnerMetadata metadata1 = new PartnerMetadata(expectedReceivedSubmissionId, expectedSentSubmissionId, Instant.parse("2023-12-04T18:51:48.941875Z"), Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd", PartnerMetadataStatus.DELIVERED, null, PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
-        PartnerMetadata metadata2 = new PartnerMetadata(expectedReceivedSubmissionId, PartnerMetadataStatus.DELIVERED)
+        def expectedInboundReportId = "inboundReportId"
+        def expectedOutboundReportId = "outboundReportId"
+        PartnerMetadata metadata1 = new PartnerMetadata(expectedInboundReportId, expectedOutboundReportId, Instant.parse("2023-12-04T18:51:48.941875Z"), Instant.parse("2023-12-04T18:51:48.941875Z"), "abcd", PartnerMetadataStatus.DELIVERED, null, PartnerMetadataMessageType.ORDER, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
+        PartnerMetadata metadata2 = new PartnerMetadata(expectedInboundReportId, PartnerMetadataStatus.DELIVERED)
 
 
         TestApplicationContext.register(Formatter, Jackson.getInstance())
@@ -77,7 +77,7 @@ class FilePartnerMetadataStorageTest extends Specification {
         when:
         FilePartnerMetadataStorage.getInstance().saveMetadata(metadata1)
         FilePartnerMetadataStorage.getInstance().saveMetadata(metadata2)
-        def actualMetadata = FilePartnerMetadataStorage.getInstance().readMetadata(expectedReceivedSubmissionId)
+        def actualMetadata = FilePartnerMetadataStorage.getInstance().readMetadata(expectedInboundReportId)
 
         then:
         actualMetadata.get() == metadata2
@@ -92,12 +92,12 @@ class FilePartnerMetadataStorageTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         //write something to the hard drive so that the `readMetadata` in the when gets pass the file existence check
-        def submissionId = "asljfaskljgalsjgjlas"
-        PartnerMetadata metadata = new PartnerMetadata(submissionId, null, null, null, null, null, null, null, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
+        def inboundReportId = "asljfaskljgalsjgjlas"
+        PartnerMetadata metadata = new PartnerMetadata(inboundReportId, null, null, null, null, null, null, null, sendingAppDetails, sendingFacilityDetails, receivingAppDetails, receivingFacilityDetails, "placer_order_number")
         FilePartnerMetadataStorage.getInstance().saveMetadata(metadata)
 
         when:
-        FilePartnerMetadataStorage.getInstance().readMetadata(submissionId)
+        FilePartnerMetadataStorage.getInstance().readMetadata(inboundReportId)
 
         then:
         thrown(PartnerMetadataException)
@@ -134,32 +134,32 @@ class FilePartnerMetadataStorageTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        def receivedSubmissionId1 = "receivedSubmissionId1"
+        def inboundReportId1 = "inboundReportId1"
         def matchingPlacerOrderNumber1 = "placerOrderNumber1"
         def matchingSendingFacilityDetails1 = new MessageHdDataType("sending_facility_name1", "sending_facility_id1", "sending_facility_type1")
-        def matchingSendingFacilityDetailsMetadata1 = new PartnerMetadata(receivedSubmissionId1, null, null, null, null, null, null, null, null, matchingSendingFacilityDetails1, null, new MessageHdDataType(null, null, null), matchingPlacerOrderNumber1)
+        def matchingSendingFacilityDetailsMetadata1 = new PartnerMetadata(inboundReportId1, null, null, null, null, null, null, null, null, matchingSendingFacilityDetails1, null, new MessageHdDataType(null, null, null), matchingPlacerOrderNumber1)
         def otherMatchingSendingFacilityDetailsMetadata1 = new PartnerMetadata("1", null, null, null, null, null, null, null, null, matchingSendingFacilityDetails1, null, new MessageHdDataType(null, null, null), matchingPlacerOrderNumber1)
         FilePartnerMetadataStorage.getInstance().saveMetadata(matchingSendingFacilityDetailsMetadata1)
         FilePartnerMetadataStorage.getInstance().saveMetadata(otherMatchingSendingFacilityDetailsMetadata1)
-        def metadataSetWithMatchingSendingFacilityDetails = FilePartnerMetadataStorage.getInstance().readMetadataForMessageLinking(receivedSubmissionId1)
+        def metadataSetWithMatchingSendingFacilityDetails = FilePartnerMetadataStorage.getInstance().readMetadataForMessageLinking(inboundReportId1)
 
         then:
-        metadataSetWithMatchingSendingFacilityDetails.contains(otherMatchingSendingFacilityDetailsMetadata1.receivedSubmissionId())
-        !metadataSetWithMatchingSendingFacilityDetails.contains(matchingSendingFacilityDetailsMetadata1.receivedSubmissionId())
+        metadataSetWithMatchingSendingFacilityDetails.contains(otherMatchingSendingFacilityDetailsMetadata1.inboundReportId())
+        !metadataSetWithMatchingSendingFacilityDetails.contains(matchingSendingFacilityDetailsMetadata1.inboundReportId())
 
         when:
-        def receivedSubmissionId2 = "receivedSubmissionId2"
+        def inboundReportId2 = "inboundReportId2"
         def matchingPlacerOrderNumber2 = "placerOrderNumber2"
         def matchingSendingFacilityDetails2 = new MessageHdDataType("sending_facility_name2", "sending_facility_id2", "sending_facility_type2")
-        def matchingSendingFacilityDetailsMetadata2 = new PartnerMetadata(receivedSubmissionId2, null, null, null, null, null, null, null, null, matchingSendingFacilityDetails2, null, new MessageHdDataType(null, null, null), matchingPlacerOrderNumber2)
+        def matchingSendingFacilityDetailsMetadata2 = new PartnerMetadata(inboundReportId2, null, null, null, null, null, null, null, null, matchingSendingFacilityDetails2, null, new MessageHdDataType(null, null, null), matchingPlacerOrderNumber2)
         def matchingReceivingFacilityDetailsMetadata2 = new PartnerMetadata("2", null, null, null, null, null, null, null, null, new MessageHdDataType(null, null, null), null, matchingSendingFacilityDetails2, matchingPlacerOrderNumber2)
         FilePartnerMetadataStorage.getInstance().saveMetadata(matchingSendingFacilityDetailsMetadata2)
         FilePartnerMetadataStorage.getInstance().saveMetadata(matchingReceivingFacilityDetailsMetadata2)
-        def metadataSetWithMatchingSendingAndReceivingFacilityDetails = FilePartnerMetadataStorage.getInstance().readMetadataForMessageLinking(receivedSubmissionId2)
+        def metadataSetWithMatchingSendingAndReceivingFacilityDetails = FilePartnerMetadataStorage.getInstance().readMetadataForMessageLinking(inboundReportId2)
 
         then:
-        metadataSetWithMatchingSendingAndReceivingFacilityDetails.contains(matchingReceivingFacilityDetailsMetadata2.receivedSubmissionId())
-        !metadataSetWithMatchingSendingAndReceivingFacilityDetails.contains(matchingSendingFacilityDetailsMetadata2.receivedSubmissionId())
+        metadataSetWithMatchingSendingAndReceivingFacilityDetails.contains(matchingReceivingFacilityDetailsMetadata2.inboundReportId())
+        !metadataSetWithMatchingSendingAndReceivingFacilityDetails.contains(matchingSendingFacilityDetailsMetadata2.inboundReportId())
     }
 
     def "readMetadataForMessageLinking returns an empty set when no metadata is found"() {
@@ -178,12 +178,12 @@ class FilePartnerMetadataStorageTest extends Specification {
         TestApplicationContext.register(Formatter, mockFormatter)
         TestApplicationContext.injectRegisteredImplementations()
 
-        def submissionId = "submissionId"
-        PartnerMetadata metadata = new PartnerMetadata(submissionId, null, null, null, null, null, null, null, null, null, null, null, null)
+        def inboundReportId = "inboundReportId"
+        PartnerMetadata metadata = new PartnerMetadata(inboundReportId, null, null, null, null, null, null, null, null, null, null, null, null)
         FilePartnerMetadataStorage.getInstance().saveMetadata(metadata)
 
         when:
-        FilePartnerMetadataStorage.getInstance().readMetadataForMessageLinking("submissionId")
+        FilePartnerMetadataStorage.getInstance().readMetadataForMessageLinking("inboundReportId")
 
         then:
         thrown(PartnerMetadataException)

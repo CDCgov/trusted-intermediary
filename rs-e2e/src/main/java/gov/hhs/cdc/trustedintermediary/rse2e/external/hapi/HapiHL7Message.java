@@ -1,6 +1,8 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.external.hapi;
 
+import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
+import ca.uhn.hl7v2.model.v251.segment.MSH;
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
 
 /**
@@ -21,7 +23,12 @@ public class HapiHL7Message implements HealthData<Message> {
     }
 
     @Override
-    public String getName() {
-        return underlyingData.getName();
+    public String getIdentifier() {
+        try {
+            MSH mshSegment = (MSH) underlyingData.get("MSH");
+            return mshSegment.getMessageControlID().getValue();
+        } catch (HL7Exception e) {
+            return null;
+        }
     }
 }
