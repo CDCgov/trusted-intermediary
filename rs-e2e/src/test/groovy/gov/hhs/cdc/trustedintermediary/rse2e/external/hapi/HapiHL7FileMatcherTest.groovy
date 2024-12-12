@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.rse2e.external.hapi
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.rse2e.HL7FileStream
+import gov.hhs.cdc.trustedintermediary.rse2e.HL7Message
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import spock.lang.Specification
 
@@ -30,10 +31,10 @@ class HapiHL7FileMatcherTest extends Specification {
             new HL7FileStream("outputFileStream1", Mock(InputStream)),
             new HL7FileStream("outputFileStream2", Mock(InputStream))
         ]
-        def mockInputMessage1 = Mock(HapiHL7Message)
-        def mockInputMessage2 = Mock(HapiHL7Message)
-        def mockOutputMessage1 = Mock(HapiHL7Message)
-        def mockOutputMessage2 = Mock(HapiHL7Message)
+        def mockInputMessage1 = Mock(HL7Message)
+        def mockInputMessage2 = Mock(HL7Message)
+        def mockOutputMessage1 = Mock(HL7Message)
+        def mockOutputMessage2 = Mock(HL7Message)
         spyFileMatcher.parseAndMapMessageByControlId(mockInputFiles) >> ["001": mockInputMessage1, "002": mockInputMessage2 ]
         spyFileMatcher.parseAndMapMessageByControlId(mockOutputFiles) >> ["001": mockOutputMessage1, "002": mockOutputMessage2 ]
 
@@ -60,8 +61,8 @@ class HapiHL7FileMatcherTest extends Specification {
         mockOutputFiles = [
             new HL7FileStream("matchingOutputFileStream", Mock(InputStream))
         ]
-        spyFileMatcher.parseAndMapMessageByControlId(mockInputFiles) >> ["001": Mock(HapiHL7Message), "002": Mock(HapiHL7Message) ]
-        spyFileMatcher.parseAndMapMessageByControlId(mockOutputFiles) >> ["001": Mock(HapiHL7Message) ]
+        spyFileMatcher.parseAndMapMessageByControlId(mockInputFiles) >> ["001": Mock(HL7Message), "002": Mock(HL7Message) ]
+        spyFileMatcher.parseAndMapMessageByControlId(mockOutputFiles) >> ["001": Mock(HL7Message) ]
         spyFileMatcher.matchFiles(mockOutputFiles, mockInputFiles)
 
         then:
@@ -79,8 +80,8 @@ class HapiHL7FileMatcherTest extends Specification {
             new HL7FileStream("matchingOutputFileStream", Mock(InputStream)),
             new HL7FileStream("nonMatchingOutputFileStream", Mock(InputStream))
         ]
-        spyFileMatcher.parseAndMapMessageByControlId(mockInputFiles) >> ["001": Mock(HapiHL7Message) ]
-        spyFileMatcher.parseAndMapMessageByControlId(mockOutputFiles) >> ["001": Mock(HapiHL7Message), "003": Mock(HapiHL7Message) ]
+        spyFileMatcher.parseAndMapMessageByControlId(mockInputFiles) >> ["001": Mock(HL7Message) ]
+        spyFileMatcher.parseAndMapMessageByControlId(mockOutputFiles) >> ["001": Mock(HL7Message), "003": Mock(HL7Message) ]
         spyFileMatcher.matchFiles(mockOutputFiles, mockInputFiles)
 
         then:

@@ -56,6 +56,7 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
         String rightOperand =
                 matcher.group(3); // e.g. MSH-5.1, input.MSH-5.1, 'EPIC', ('EPIC', 'CERNER'), 2
 
+        // TODO: replace with our own Message implementation
         Message outputMessage = (Message) data[0].getUnderlyingData();
         Message inputMessage = (data.length > 1) ? (Message) data[1].getUnderlyingData() : null;
 
