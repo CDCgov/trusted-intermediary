@@ -16,9 +16,12 @@ OBX|1|ST|57723-9^Unique bar code number of Current sample^LN||123456||||||F|||20
 
         when:
         HL7Message message = HL7Parser.parse(content)
-        String value = message.getValue("PID", 3, 4)
 
         then:
-        value == "Baptist East"
+        message.getValue("PID", 3, 0) == null
+        message.getValue("PID", 3, 1) == "1300974"
+        message.getValue("PID", 3, 4) == "Baptist East"
+        message.getValue("PID", 3, 5) == "MR"
+        message.getValue("PID", 3, 6) == null
     }
 }

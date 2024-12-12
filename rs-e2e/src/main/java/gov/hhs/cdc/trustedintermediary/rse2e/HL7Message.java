@@ -31,15 +31,15 @@ public class HL7Message implements HealthData<HL7Message> {
 
         String value = fields.get(indices[0] - 1);
         for (int i = 1; i < indices.length; i++) {
-            value = splitAndGet(value, delimiters[i - 1], indices[i]);
-            if (value == null) return null;
+            char levelDelimiter = delimiters[i - 1];
+            int index = indices[i] - 1;
+            String[] parts = value.split(Pattern.quote(String.valueOf(levelDelimiter)));
+            if (index < 0 || index >= parts.length) {
+                return null;
+            }
+            value = parts[index];
         }
         return value;
-    }
-
-    private String splitAndGet(String value, char delimiter, int index) {
-        String[] parts = value.split(Pattern.quote(String.valueOf(delimiter)));
-        return index <= parts.length ? parts[index - 1] : null;
     }
 
     @Override
