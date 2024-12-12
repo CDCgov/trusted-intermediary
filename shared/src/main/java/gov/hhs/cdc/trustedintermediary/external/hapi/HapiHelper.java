@@ -296,22 +296,22 @@ public class HapiHelper {
             return;
         }
 
-        if (patientIdentifier.hasExtension(HapiHelper.EXTENSION_CX_IDENTIFIER_URL)) {
-            patientIdentifier
-                    .getExtensionByUrl(HapiHelper.EXTENSION_CX_IDENTIFIER_URL)
-                    .removeExtension(HapiHelper.EXTENSION_CX5_URL);
+        patientIdentifier.setType(null);
+
+        Extension cxExtension =
+                patientIdentifier.getExtensionByUrl(HapiHelper.EXTENSION_CX_IDENTIFIER_URL);
+        if (cxExtension == null) {
+            return;
+        }
+
+        if (cxExtension.hasExtension(HapiHelper.EXTENSION_CX5_URL)) {
+            cxExtension.removeExtension(HapiHelper.EXTENSION_CX5_URL);
         }
 
         // The cx-identifier extension can be removed if it has no more sub-extensions
-        if (patientIdentifier
-                .getExtensionByUrl(HapiHelper.EXTENSION_CX_IDENTIFIER_URL)
-                .getExtension()
-                .isEmpty()) {
+        if (cxExtension.getExtension().isEmpty()) {
             patientIdentifier.removeExtension(HapiHelper.EXTENSION_CX_IDENTIFIER_URL);
         }
-
-        // The PID-3.5 value also appears in the type coding
-        patientIdentifier.setType(null);
     }
 
     // PID-5 - Patient Name
