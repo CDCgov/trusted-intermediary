@@ -29,5 +29,6 @@ OBX|1|ST|57723-9^Unique bar code number of Current sample^LN||123456||||||F|||20
         message.getValue("PID", 40, 4, 2) == "LRI_NDBS_COMPONENT"
         message.getValue("PID", 40, 4, 3) == null
         message.getValue("NK1", 33, 4, 1, 1) == "Medicaid"
+        message.getValue("NK1", 33, 4, 1, 1, 1) == null
     }
 }

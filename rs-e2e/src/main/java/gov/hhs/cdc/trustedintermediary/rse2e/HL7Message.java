@@ -39,6 +39,9 @@ public class HL7Message implements HealthData<HL7Message> {
         char[] levelDelimiters = this.getOrderedLevelDelimiters();
         String value = fields.get(indices[0] - 1);
         for (int i = 1; i < indices.length; i++) {
+            if (i >= levelDelimiters.length) {
+                return null;
+            }
             char levelDelimiter = levelDelimiters[i];
             int index = indices[i] - 1;
             String[] parts = value.split(Pattern.quote(String.valueOf(levelDelimiter)));
