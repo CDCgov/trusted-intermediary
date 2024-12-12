@@ -479,12 +479,28 @@ class HapiHelperTest extends Specification {
 
     // PID-3.5 - Removing Identifier Type Code
     def "null patientIdentifier remains null"() {
-        when:
+        given:
         Identifier patientIdentifier = null
+
+        when:
         HapiHelper.removePID3_5Value(patientIdentifier)
 
         then:
         patientIdentifier == null
+    }
+
+    def "patientIdentifier with no extensions leaves extensions as-is"() {
+        given:
+        Identifier patientIdentifier = new Identifier()
+
+        expect:
+        !patientIdentifier.hasExtension()
+
+        when:
+        HapiHelper.removePID3_5Value(patientIdentifier)
+
+        then:
+        !patientIdentifier.hasExtension()
     }
 
     def "removing of the patient assigning identifier clears extensions and type coding"() {
@@ -560,6 +576,45 @@ class HapiHelperTest extends Specification {
         HapiHelper.getPID5Extension(bundle) != null
         HapiFhirHelper.getPID5_7Value(bundle) == null
     }
+
+    // PID-5.7 - Removing Name Type Code
+    def "bundle without patient remains empty"() {
+        given:
+        def bundle = new Bundle()
+
+        when:
+        HapiHelper.removePID5_7Value(bundle)
+
+        then:
+        bundle.getEntry().size() == 0
+    }
+
+    def "bundle with patient but no extensions remains empty"() {
+        given:
+        def bundle = new Bundle()
+        HapiFhirHelper.createPIDPatient(bundle)
+
+        when:
+        HapiHelper.removePID5_7Value(bundle)
+
+        then:
+        HapiHelper.getPID5Extension(bundle) == null
+    }
+
+    def "bundle with patient and pid5 extensions but no xpn7 extension remains empty"() {
+        given:
+        def bundle = new Bundle()
+        HapiFhirHelper.createPIDPatient(bundle)
+        HapiFhirHelper.setPID5Extension(bundle)
+
+        when:
+        HapiHelper.removePID5_7Value(bundle)
+
+        then:
+        Extension pid5Extension = HapiHelper.getPID5Extension(bundle)
+        !pid5Extension.hasExtension()
+    }
+
 
     // ORC-2 - Placer Order Number
     def "orc-2.1 methods work as expected"() {
