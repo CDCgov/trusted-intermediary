@@ -23,7 +23,7 @@ class HL7ExpressionEvaluatorTest extends Specification {
 
         def segments = [
             MSH: [
-                "MSH|^~\\&|Epic^1.2.840.114350.1.13.145.2.7.2.695071^ISO\n"
+                "MSH|^~\\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-lab-id^DNS|20230101010000-0000||ORM^O01^ORM_O01|111111|T|2.5.1\n"
             ],
             PID: [
                 "PID|1||11102779^^^CR^MR||SMITH^BB SARAH^^^^^L\n"
@@ -261,7 +261,7 @@ class HL7ExpressionEvaluatorTest extends Specification {
     def "getLiteralOrFieldValue returns field value when field is specified"() {
         given:
         def operand = "MSH-3"
-        def inputMessage = Mock(Message)
+        def inputMessage = Mock(HL7Message)
         def msh3 = "Sender Application^sender.test.com^DNS"
 
         when:
