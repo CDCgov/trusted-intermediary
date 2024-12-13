@@ -43,6 +43,27 @@ public class HL7Parser {
         return new HL7Message(segments, encodingCharacters);
     }
 
+    public static String parseAndGetValue(List<String> fields, char[] delimiters, int... indices) {
+        if (fields == null || indices[0] > fields.size()) {
+            return null;
+        }
+
+        String value = fields.get(indices[0] - 1);
+        for (int i = 1; i < indices.length; i++) {
+            if (i >= delimiters.length) {
+                return null;
+            }
+            char levelDelimiter = delimiters[i];
+            int index = indices[i] - 1;
+            String[] parts = value.split(Pattern.quote(String.valueOf(levelDelimiter)));
+            if (index < 0 || index >= parts.length) {
+                return null;
+            }
+            value = parts[index];
+        }
+        return value;
+    }
+
     private static Map<String, Character> getEncodingCharacters(String encodingCharactersField) {
         char[] encodingCharacters = DEFAULT_ENCODING_CHARACTERS;
         if (encodingCharactersField != null && !encodingCharactersField.isEmpty()) {
