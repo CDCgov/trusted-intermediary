@@ -64,7 +64,7 @@ public class HL7Parser {
         return value;
     }
 
-    private static Map<String, Character> getEncodingCharacters(String encodingCharactersField) {
+    public static Map<String, Character> getEncodingCharacters(String encodingCharactersField) {
         char[] encodingCharacters = DEFAULT_ENCODING_CHARACTERS;
         if (encodingCharactersField != null && !encodingCharactersField.isEmpty()) {
             encodingCharacters = encodingCharactersField.toCharArray();

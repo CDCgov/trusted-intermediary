@@ -55,4 +55,21 @@ public class HL7Message implements HealthData<HL7Message> {
     public String getIdentifier() {
         return getValue("MSH", 10);
     }
+
+    @Override
+    public String toString() {
+        return String.join("\n", segments.entrySet().stream().map(this::formatSegment).toList());
+    }
+
+    private String formatSegment(Map.Entry<String, List<String>> entry) {
+        String name = entry.getKey();
+        List<String> fields = entry.getValue();
+        String fieldSeparator = String.valueOf(getEncodingCharacter("field"));
+
+        return name
+                + (name.equals("MSH") ? fields.get(0) : fieldSeparator)
+                + String.join(
+                        fieldSeparator,
+                        name.equals("MSH") ? fields.subList(1, fields.size()) : fields);
+    }
 }

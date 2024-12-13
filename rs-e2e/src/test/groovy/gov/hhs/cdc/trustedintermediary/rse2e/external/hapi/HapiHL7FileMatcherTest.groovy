@@ -118,8 +118,8 @@ class HapiHL7FileMatcherTest extends Specification {
         def message2 = result[file2Msh10]
         message1 != null
         message2 != null
-        file1MshSegment == message1.getUnderlyingData().encode().trim()
-        file2MshSegment == message2.getUnderlyingData().encode().trim()
+        file1MshSegment == message1.getUnderlyingData().toString()
+        file2MshSegment == message2.getUnderlyingData().toString()
     }
 
     def "should throw HapiHL7FileMatcherException when MSH-10 is empty"() {

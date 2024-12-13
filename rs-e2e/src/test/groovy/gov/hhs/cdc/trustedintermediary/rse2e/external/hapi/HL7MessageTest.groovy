@@ -1,9 +1,11 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.external.hapi
 
+import gov.hhs.cdc.trustedintermediary.rse2e.HL7Parser
 import gov.hhs.cdc.trustedintermediary.rse2e.HL7Message
 import spock.lang.Specification
 
 class HL7MessageTest extends Specification {
+    def encodingChars = HL7Parser.getEncodingCharacters("|^~\\&")
 
     def "getUnderlyingData should correctly return itself"() {
         given:
@@ -15,7 +17,7 @@ class HL7MessageTest extends Specification {
                 "PID|1||11102779^^^CR^MR||SMITH^BB SARAH^^^^^L\n"
             ]
         ]
-        def hl7Message = new HL7Message(segments as Map<String, List<String>>, "|^~\\&" as char[])
+        def hl7Message = new HL7Message(segments as Map<String, List<String>>, encodingChars)
 
         expect:
         hl7Message.getUnderlyingData() == hl7Message
@@ -42,7 +44,7 @@ class HL7MessageTest extends Specification {
         ]
 
         and:
-        def hl7Message = new HL7Message(segments, "|^~\\&" as char[])
+        def hl7Message = new HL7Message(segments, encodingChars)
 
         when:
         def name = hl7Message.getIdentifier()
