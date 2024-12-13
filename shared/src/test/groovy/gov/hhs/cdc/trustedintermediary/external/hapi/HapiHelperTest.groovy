@@ -523,6 +523,27 @@ class HapiHelperTest extends Specification {
         patientIdentifier.type.isEmpty()
     }
 
+    def "removing patient identifier with non-cx5 url extension doesnt clears extensions"() {
+        given:
+        def bundle = new Bundle()
+        def patientIdentifier = new Identifier()
+
+        HapiFhirHelper.createPIDPatient(bundle)
+        HapiFhirHelper.setPID3Identifier(bundle, patientIdentifier)
+        patientIdentifier.addExtension().setUrl(HapiHelper.EXTENSION_CX_IDENTIFIER_URL);
+        patientIdentifier
+                .getExtensionByUrl(HapiHelper.EXTENSION_CX_IDENTIFIER_URL)
+                .addExtension()
+                .setUrl(HapiHelper.EXTENSION_XON10_URL);
+
+        when:
+        HapiHelper.removePID3_5Value(patientIdentifier)
+
+        then:
+        patientIdentifier.hasExtension()
+    }
+
+
     // PID-5 - Patient Name
     def "patient name methods work as expected"() {
         given:
