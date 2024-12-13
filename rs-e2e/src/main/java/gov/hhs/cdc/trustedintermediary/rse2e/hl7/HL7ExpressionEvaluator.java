@@ -109,6 +109,22 @@ public class HL7ExpressionEvaluator implements HealthDataExpressionEvaluator {
     }
 
     protected boolean evaluateCollectionCount(
+            HL7Message message, String segmentName, String rightOperand, String operator) {
+        try {
+            int count = message.getSegmentCount(segmentName);
+            int rightValue = Integer.parseInt(rightOperand);
+            return evaluateEquality(count, rightValue, operator);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(
+                    "Error evaluating collection count. Segment: "
+                            + segmentName
+                            + ", count: "
+                            + rightOperand,
+                    e);
+        }
+    }
+
+    protected boolean evaluateCollectionCount(
             Message message, String segmentName, String rightOperand, String operator) {
         try {
             int count = countSegments(message.encode(), segmentName);
