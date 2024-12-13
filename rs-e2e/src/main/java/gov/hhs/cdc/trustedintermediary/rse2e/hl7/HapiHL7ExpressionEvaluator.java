@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.rse2e.external.hapi;
+package gov.hhs.cdc.trustedintermediary.rse2e.hl7;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;

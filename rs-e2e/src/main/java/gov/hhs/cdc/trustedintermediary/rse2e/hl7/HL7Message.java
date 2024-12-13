@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.rse2e;
+package gov.hhs.cdc.trustedintermediary.rse2e.hl7;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
 import java.util.List;

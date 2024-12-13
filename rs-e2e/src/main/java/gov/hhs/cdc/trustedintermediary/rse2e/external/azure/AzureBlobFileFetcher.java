@@ -6,7 +6,7 @@ import com.azure.storage.blob.BlobContainerClientBuilder;
 import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.ListBlobsOptions;
 import gov.hhs.cdc.trustedintermediary.rse2e.FileFetcher;
-import gov.hhs.cdc.trustedintermediary.rse2e.HL7FileStream;
+import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HL7FileStream;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZoneOffset;

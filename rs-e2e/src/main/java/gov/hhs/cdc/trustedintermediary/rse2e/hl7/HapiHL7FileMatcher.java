@@ -1,9 +1,6 @@
-package gov.hhs.cdc.trustedintermediary.rse2e.external.hapi;
+package gov.hhs.cdc.trustedintermediary.rse2e.hl7;
 
 import com.google.common.collect.Sets;
-import gov.hhs.cdc.trustedintermediary.rse2e.HL7FileStream;
-import gov.hhs.cdc.trustedintermediary.rse2e.HL7Message;
-import gov.hhs.cdc.trustedintermediary.rse2e.HL7Parser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;

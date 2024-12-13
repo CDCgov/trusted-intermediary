@@ -1,7 +1,6 @@
-package gov.hhs.cdc.trustedintermediary.rse2e.external.hapi
+package gov.hhs.cdc.trustedintermediary.rse2e.hl7
 
-import gov.hhs.cdc.trustedintermediary.rse2e.HL7Parser
-import gov.hhs.cdc.trustedintermediary.rse2e.HL7Message
+
 import spock.lang.Specification
 
 class HL7MessageTest extends Specification {

@@ -1,8 +1,6 @@
-package gov.hhs.cdc.trustedintermediary.rse2e.external.hapi
+package gov.hhs.cdc.trustedintermediary.rse2e.hl7
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
-import gov.hhs.cdc.trustedintermediary.rse2e.HL7FileStream
-import gov.hhs.cdc.trustedintermediary.rse2e.HL7Message
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import spock.lang.Specification
 

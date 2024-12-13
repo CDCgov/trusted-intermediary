@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.rse2e.external.hapi;
+package gov.hhs.cdc.trustedintermediary.rse2e.hl7;
 
 /**
  * The HapiHL7FileMatcherException class is responsible for handling exceptions that occur in the

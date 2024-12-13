@@ -1,7 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.ruleengine
 
 
-import gov.hhs.cdc.trustedintermediary.rse2e.HL7Message
+import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HL7Message
 import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoader
 import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoaderException
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext

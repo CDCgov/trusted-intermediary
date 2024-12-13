@@ -1,6 +1,6 @@
-package gov.hhs.cdc.trustedintermediary.rse2e.external.hapi
+package gov.hhs.cdc.trustedintermediary.rse2e.hl7
 
-import gov.hhs.cdc.trustedintermediary.rse2e.HL7Message
+
 import ca.uhn.hl7v2.model.Message
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthData
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
