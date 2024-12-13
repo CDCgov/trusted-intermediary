@@ -530,11 +530,11 @@ class HapiHelperTest extends Specification {
 
         HapiFhirHelper.createPIDPatient(bundle)
         HapiFhirHelper.setPID3Identifier(bundle, patientIdentifier)
-        patientIdentifier.addExtension().setUrl(HapiHelper.EXTENSION_CX_IDENTIFIER_URL);
+        patientIdentifier.addExtension().setUrl(HapiHelper.EXTENSION_CX_IDENTIFIER_URL)
         patientIdentifier
                 .getExtensionByUrl(HapiHelper.EXTENSION_CX_IDENTIFIER_URL)
                 .addExtension()
-                .setUrl(HapiHelper.EXTENSION_XON10_URL);
+                .setUrl(HapiHelper.EXTENSION_XON10_URL)
 
         when:
         HapiHelper.removePID3_5Value(patientIdentifier)
