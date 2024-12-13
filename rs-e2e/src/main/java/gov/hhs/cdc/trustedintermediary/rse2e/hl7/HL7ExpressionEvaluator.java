@@ -1,7 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.hl7;
 
-import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.Message;
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator;
 import java.util.Arrays;
@@ -21,7 +19,6 @@ public class HL7ExpressionEvaluator implements HealthDataExpressionEvaluator {
 
     private static final HL7ExpressionEvaluator INSTANCE = new HL7ExpressionEvaluator();
 
-    private static final String NEWLINE_REGEX = "\\r?\\n|\\r";
     private static final Pattern OPERATION_PATTERN =
             Pattern.compile("^(\\S+)\\s*(=|!=|in)\\s*(.+)$");
     private static final Pattern HL7_COUNT_PATTERN = Pattern.compile("(\\S+)\\.count\\(\\)");
@@ -30,7 +27,6 @@ public class HL7ExpressionEvaluator implements HealthDataExpressionEvaluator {
             Pattern.compile("\\(([^)]+)\\)");
     private static final Pattern MESSAGE_SOURCE_PATTERN =
             Pattern.compile("(input|output)?\\.?(\\S+)");
-    private static final Pattern HL7_FIELD_NAME_PATTERN = Pattern.compile("(\\w+)(?:-(\\S+))?");
 
     private HL7ExpressionEvaluator() {}
 
@@ -56,9 +52,8 @@ public class HL7ExpressionEvaluator implements HealthDataExpressionEvaluator {
         String rightOperand =
                 matcher.group(3); // e.g. MSH-5.1, input.MSH-5.1, 'EPIC', ('EPIC', 'CERNER'), 2
 
-        // TODO: replace with our own Message implementation
-        Message outputMessage = (Message) data[0].getUnderlyingData();
-        Message inputMessage = (data.length > 1) ? (Message) data[1].getUnderlyingData() : null;
+        HL7Message outputMessage = (HL7Message) data[0];
+        HL7Message inputMessage = (data.length > 1) ? (HL7Message) data[1] : null;
 
         // matches a count operation (e.g. OBR.count())
         Matcher hl7CountMatcher = HL7_COUNT_PATTERN.matcher(leftOperand);
@@ -124,35 +119,8 @@ public class HL7ExpressionEvaluator implements HealthDataExpressionEvaluator {
         }
     }
 
-    @Deprecated // this guy should be gone by the time this branch is ready to merge
-    protected boolean evaluateCollectionCount(
-            Message message, String segmentName, String rightOperand, String operator) {
-        try {
-            int count = countSegments(message.encode(), segmentName);
-            int rightValue = Integer.parseInt(rightOperand);
-            return evaluateEquality(count, rightValue, operator);
-        } catch (HL7Exception | NumberFormatException e) {
-            throw new IllegalArgumentException(
-                    "Error evaluating collection count. Segment: "
-                            + segmentName
-                            + ", count: "
-                            + rightOperand,
-                    e);
-        }
-    }
-
     protected String getLiteralOrFieldValue(
             HL7Message outputMessage, HL7Message inputMessage, String operand) {
-        Matcher literalValueMatcher = LITERAL_VALUE_PATTERN.matcher(operand);
-        if (literalValueMatcher.matches()) {
-            return literalValueMatcher.group(1);
-        }
-        return getFieldValue(outputMessage, inputMessage, operand);
-    }
-
-    @Deprecated // this guy should be gone by the time this branch is ready to merge
-    protected String getLiteralOrFieldValue(
-            Message outputMessage, Message inputMessage, String operand) {
         Matcher literalValueMatcher = LITERAL_VALUE_PATTERN.matcher(operand);
         if (literalValueMatcher.matches()) {
             return literalValueMatcher.group(1);
@@ -168,128 +136,13 @@ public class HL7ExpressionEvaluator implements HealthDataExpressionEvaluator {
         }
 
         String fileSource = messageSourceMatcher.group(1);
-        String fieldNameWithoutFileSource = messageSourceMatcher.group(2);
         HL7Message message = getMessageBySource(fileSource, inputMessage, outputMessage);
 
-        try {
-            String messageString = message.encode();
-            char fieldSeparator = message.getFieldSeparatorValue();
-            String encodingCharacters = message.getEncodingCharactersValue();
-            return getSegmentFieldValue(
-                    messageString, fieldNameWithoutFileSource, fieldSeparator, encodingCharacters);
-        } catch (HL7Exception | NumberFormatException e) {
-            throw new IllegalArgumentException(
-                    "Failed to extract field value for: " + fieldName, e);
-        }
-    }
-
-    @Deprecated // this guy should be gone by the time this branch is ready to merge
-    protected String getFieldValue(Message outputMessage, Message inputMessage, String fieldName) {
-        Matcher messageSourceMatcher = MESSAGE_SOURCE_PATTERN.matcher(fieldName);
-        if (!messageSourceMatcher.matches()) {
-            throw new IllegalArgumentException("Invalid field name format: " + fieldName);
-        }
-
-        String fileSource = messageSourceMatcher.group(1);
-        String fieldNameWithoutFileSource = messageSourceMatcher.group(2);
-        Message message = getMessageBySource(fileSource, inputMessage, outputMessage);
-
-        try {
-            String messageString = message.encode();
-            char fieldSeparator = message.getFieldSeparatorValue();
-            String encodingCharacters = message.getEncodingCharactersValue();
-            return getSegmentFieldValue(
-                    messageString, fieldNameWithoutFileSource, fieldSeparator, encodingCharacters);
-        } catch (HL7Exception | NumberFormatException e) {
-            throw new IllegalArgumentException(
-                    "Failed to extract field value for: " + fieldName, e);
-        }
-    }
-
-    // We decided to implement our own simple HL7 parser as the Hapi library was not adequate for
-    // our needs.
-    protected static String getSegmentFieldValue(
-            String hl7Message, String fieldName, char fieldSeparator, String encodingCharacters) {
-        Matcher hl7FieldNameMatcher = HL7_FIELD_NAME_PATTERN.matcher(fieldName);
-        if (!hl7FieldNameMatcher.matches()) {
-            throw new IllegalArgumentException("Invalid HL7 field format: " + fieldName);
-        }
-
-        String segmentName = hl7FieldNameMatcher.group(1);
-        String segmentFieldIndex = hl7FieldNameMatcher.group(2);
-
-        String[] lines = hl7Message.split(NEWLINE_REGEX);
-        for (String line : lines) {
-            if (!line.startsWith(segmentName)) {
-                continue;
-            }
-
-            if (segmentFieldIndex == null) {
-                return line;
-            }
-
-            String[] fields = line.split(Pattern.quote(String.valueOf(fieldSeparator)));
-            String[] indexParts = segmentFieldIndex.split("\\.");
-
-            try {
-                int fieldPos = Integer.parseInt(indexParts[0]);
-
-                if (segmentName.equals("MSH")) {
-                    fieldPos--;
-                }
-
-                if (fieldPos < 0 || fieldPos >= fields.length) {
-                    throw new IllegalArgumentException(
-                            "Invalid field index (out of bounds): " + segmentFieldIndex);
-                }
-
-                String field = fields[fieldPos];
-
-                if (indexParts.length == 1 || field.isEmpty()) {
-                    return field;
-                }
-
-                int subFieldEncodingCharactersIndex = indexParts.length - 2;
-                if (subFieldEncodingCharactersIndex >= encodingCharacters.length()) {
-                    throw new IllegalArgumentException(
-                            "Invalid subfield index (out of bounds): " + segmentFieldIndex);
-                }
-                char subfieldSeparator = encodingCharacters.charAt(subFieldEncodingCharactersIndex);
-                String[] subfields = field.split(Pattern.quote(String.valueOf(subfieldSeparator)));
-                int subFieldPos = Integer.parseInt(indexParts[1]) - 1;
-                return subFieldPos >= 0 && subFieldPos < subfields.length
-                        ? subfields[subFieldPos]
-                        : "";
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException(
-                        "Invalid field index formatting: " + segmentFieldIndex, e);
-            }
-        }
-
-        return null;
-    }
-
-    protected static int countSegments(String hl7Message, String segmentName) {
-        return (int)
-                Arrays.stream(hl7Message.split(NEWLINE_REGEX))
-                        .filter(line -> line.startsWith(segmentName))
-                        .count();
+        return message.getValue(fieldName);
     }
 
     protected HL7Message getMessageBySource(
             String source, HL7Message inputMessage, HL7Message outputMessage) {
-        if ("input".equals(source)) {
-            if (inputMessage == null) {
-                throw new IllegalArgumentException("Input message is null for: " + source);
-            }
-            return inputMessage;
-        }
-        return outputMessage;
-    }
-
-    @Deprecated // this guy should be gone by the time this branch is ready to merge
-    protected Message getMessageBySource(
-            String source, Message inputMessage, Message outputMessage) {
         if ("input".equals(source)) {
             if (inputMessage == null) {
                 throw new IllegalArgumentException("Input message is null for: " + source);

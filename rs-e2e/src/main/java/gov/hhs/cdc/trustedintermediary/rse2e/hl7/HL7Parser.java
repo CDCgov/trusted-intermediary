@@ -29,6 +29,7 @@ public class HL7Parser {
     protected static final String SUBCOMPONENT_DELIMITER_NAME = "subcomponent";
     protected static final String MSH_SEGMENT_NAME = "MSH";
     protected static final String DEFAULT_SEGMENT_DELIMITER = "\n";
+    protected static final Pattern HL7_FIELD_NAME_PATTERN = Pattern.compile("(\\w+)(?:-(\\S+))?");
 
     public static HL7Message parse(String content) {
         Map<String, List<String>> segments = new HashMap<>();
@@ -58,13 +59,13 @@ public class HL7Parser {
         String value = fields.get(indices[0] - 1);
         for (int i = 1; i < indices.length; i++) {
             if (i >= delimiters.length) {
-                return null;
+                throw new IllegalArgumentException("Invalid delimiter index (out of bounds): " + i);
             }
             char levelDelimiter = delimiters[i];
             int index = indices[i] - 1;
             String[] parts = value.split(Pattern.quote(String.valueOf(levelDelimiter)));
             if (index < 0 || index >= parts.length) {
-                return null;
+                throw new IllegalArgumentException("Invalid field index (out of bounds): " + index);
             }
             value = parts[index];
         }

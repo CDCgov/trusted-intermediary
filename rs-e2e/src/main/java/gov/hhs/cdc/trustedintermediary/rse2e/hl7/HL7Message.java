@@ -1,8 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.hl7;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 /**
  * Represents a HAPI HL7 message that implements the HealthData interface. This class provides a
@@ -29,6 +31,19 @@ public class HL7Message implements HealthData<HL7Message> {
             return matches.size();
         }
         return 0;
+    }
+
+    public String getValue(String hl7Path) {
+        Matcher hl7FieldNameMatcher = HL7Parser.HL7_FIELD_NAME_PATTERN.matcher(hl7Path);
+        if (!hl7FieldNameMatcher.matches()) {
+            throw new IllegalArgumentException("Invalid HL7 path format: " + hl7Path);
+        }
+
+        String segmentName = hl7FieldNameMatcher.group(1);
+        String segmentFieldIndex = hl7FieldNameMatcher.group(2);
+        int[] indexParts =
+                Arrays.stream(segmentFieldIndex.split("\\.")).mapToInt(Integer::parseInt).toArray();
+        return getValue(segmentName, indexParts);
     }
 
     public String getValue(String segmentName, int... indices) {
