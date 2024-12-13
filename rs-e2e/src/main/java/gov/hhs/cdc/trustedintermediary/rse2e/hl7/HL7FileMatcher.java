@@ -64,11 +64,6 @@ public class HL7FileMatcher {
                             String.format("MSH-10 is empty for file: %s", fileName));
                 }
                 messageMap.put(msh10, message);
-                //                } catch (HL7Exception e) {
-                //                    throw new HapiHL7FileMatcherException(
-                //                            String.format("Failed to parse HL7 message from file:
-                // %s", fileName),
-                //                            e);
             } catch (IOException e) {
                 throw new HL7FileMatcherException(
                         String.format("Failed to read file: %s", fileName), e);

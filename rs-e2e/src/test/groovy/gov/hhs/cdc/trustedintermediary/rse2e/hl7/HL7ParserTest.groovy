@@ -5,7 +5,7 @@ import spock.lang.Specification
 
 class HL7ParserTest extends Specification {
 
-    def "test defined assertions on relevant messages"() {
+    def "getValue returns the expected value given the segment name and indices"() {
         given:
         def content = """MSH|^~\\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^automated-staging-test-receiver-id^DNS|20230101010000-0000||ORM^O01^ORM_O01|001|N|2.5.1||||||||||
 PID|1||1300974^^^Baptist East^MR||ONE^TESTCASE||202402210152-0500|F^Female^HL70001||2106-3^White^HL70005|1234 GPCS WAY^^MONTGOMERY^Alabama^36117^USA^home^^Montgomery|||||||2227600015||||N^Not Hispanic or Latino^HL70189|||1|||||||||||||||LRI_NG_FRN_PROFILE^^2.16.840.1.113883.9.195.3.4^ISO~LRI_NDBS_COMPONENT^^2.16.840.1.113883.9.195.3.6^ISO~LAB_PRN_Component^^2.16.840.1.113883.9.81^ISO~LAB_TO_COMPONENT^^2.16.840.1.113883.9.22^ISO|

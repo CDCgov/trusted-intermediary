@@ -33,7 +33,7 @@ public class HL7Parser {
 
     public static HL7Message parse(String content) {
         Map<String, List<String>> segments = new HashMap<>();
-        Map<String, Character> encodingCharacters = new HashMap<>();
+        String encodingCharactersField = null;
         String[] lines = content.split(NEWLINE_REGEX);
         for (String line : lines) {
             if (line.trim().isEmpty()) continue;
@@ -42,13 +42,13 @@ public class HL7Parser {
             List<String> segmentFields =
                     new ArrayList<>(Arrays.asList(fields).subList(1, fields.length));
             if (Objects.equals(segmentName, MSH_SEGMENT_NAME)) {
-                encodingCharacters = getEncodingCharacters(fields[1]);
+                encodingCharactersField = fields[1];
                 segmentFields.add(0, String.valueOf(DEFAULT_FIELD_DELIMITER));
             }
             segments.put(segmentName, segmentFields);
         }
 
-        return new HL7Message(segments, encodingCharacters);
+        return new HL7Message(segments, getEncodingCharacters(encodingCharactersField));
     }
 
     public static String parseAndGetValue(List<String> fields, char[] delimiters, int... indices) {
@@ -59,13 +59,13 @@ public class HL7Parser {
         String value = fields.get(indices[0] - 1);
         for (int i = 1; i < indices.length; i++) {
             if (i >= delimiters.length) {
-                throw new IllegalArgumentException("Invalid delimiter index (out of bounds): " + i);
+                return null;
             }
             char levelDelimiter = delimiters[i];
             int index = indices[i] - 1;
             String[] parts = value.split(Pattern.quote(String.valueOf(levelDelimiter)));
             if (index < 0 || index >= parts.length) {
-                throw new IllegalArgumentException("Invalid field index (out of bounds): " + index);
+                return null;
             }
             value = parts[index];
         }
