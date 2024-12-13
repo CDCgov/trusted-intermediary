@@ -24,23 +24,19 @@ class RemovePatientNameTypeCodeTest extends Specification {
         given:
         def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/007_CA_ORU_R01_CDPH_produced_UCSD2024-07-11-16-02-17-749_1_hl7_translation.fhir")
         def bundle = fhirResource.getUnderlyingData() as Bundle
-        def pid_5_initial = HapiHelper.getPID5Extension(bundle)
-        def xpn_7_initial = pid_5_initial.getExtensionByUrl(HapiHelper.EXTENSION_XPN7_URL)
+        def pid5Extension = HapiHelper.getPID5Extension(bundle)
         def patientName = HapiHelper.getPIDPatient(bundle).getNameFirstRep()
         def patientNameUse = patientName.getUse()
 
         expect:
-        xpn_7_initial != null
+        pid5Extension.getExtensionByUrl(HapiHelper.EXTENSION_XPN7_URL) != null
         patientNameUse.toString() == "OFFICIAL"
 
         when:
         transformClass.transform(fhirResource, null)
 
         then:
-        def pid_5_transformed = HapiHelper.getPID5Extension(bundle)
-        def xpn_7_transformed = pid_5_transformed.getExtensionByUrl(HapiHelper.EXTENSION_XPN7_URL)
-        xpn_7_transformed == null
-
+        pid5Extension.getExtensionByUrl(HapiHelper.EXTENSION_XPN7_URL) == null
         !patientName.hasUse()
     }
 
