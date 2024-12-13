@@ -16,16 +16,15 @@ echo "Resetting the database and loading the baseline settings..."
 ./gradlew reloadTables
 ./gradlew reloadSettings
 
-# Update RS Configuration for the TI API based on docker or gradle
 # If either TI or RS are not running in docker, then use a gradle hosted URL
-LOCAL_DOCKER_IMAGE_NAME=$(docker ps --filter "name=trusted-intermediary-router-1" | grep trusted-intermediary-router-1)
-LOCAL_RS_DOCKER_IMAGE_NAME=$(docker ps --filter "name=prime-router-prime_dev-1" | grep prime-router-prime_dev-1)
-if [[ -z $LOCAL_DOCKER_IMAGE_NAME || -z $LOCAL_RS_DOCKER_IMAGE_NAME ]]; then
+local_ti_docker_image_name=$(docker ps --filter "name=trusted-intermediary-router-1" | grep trusted-intermediary-router-1)
+local_rs_docker_image_name=$(docker ps --filter "name=prime-router-prime_dev-1" | grep prime-router-prime_dev-1)
+if [[ -z $local_ti_docker_image_name || -z $local_rs_docker_image_name ]]; then
   ti_api_url=${TI_LCL_API_URL}
-  echo "Gradle instance detected, ReportStream transport will use ${TI_LCL_API_URL}..."
+  echo "No docker instances detected, ReportStream transport will use ${TI_LCL_API_URL}..."
 else
-  ti_api_url=${TI_DOCKER_LCL_API_URL_RS_CONFIG}
-  echo "Docker instances detected, ReportStream transport will use ${TI_DOCKER_LCL_API_URL_RS_CONFIG}..."
+  ti_api_url=${TI_LCL_API_URL_RS_CONFIG}
+  echo "Docker instances detected, ReportStream transport will use ${TI_LCL_API_URL_RS_CONFIG}..."
 fi
 
 # Need to CD to prime-router to run the prime CLI

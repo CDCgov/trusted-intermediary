@@ -26,6 +26,7 @@
 - [Resources](#resources)
 
 ## Setup
+The steps to set up TT and RS locally are in [setup locally section in the main README.md ](../README.md#setup-with-reportstream).
 Follow the instructions below to load the environments variables required for these scripts.
 ReportStream and Trusted Intermediary must be running locally before running any scripts.
 
