@@ -27,8 +27,6 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
     private static final DatabasePartnerMetadataStorage INSTANCE =
             new DatabasePartnerMetadataStorage();
 
-    private static final String METADATA_TABLE_RECEIVED_MESSAGE_ID = "received_message_id";
-
     @Inject DbDao dao;
 
     @Inject Logger logger;
@@ -73,7 +71,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
 
         try {
             List<DbColumn> columns = createDbColumnsFromMetadata(metadata);
-            dao.upsertData("metadata", columns, "(" + METADATA_TABLE_RECEIVED_MESSAGE_ID + ")");
+            dao.upsertData("metadata", columns, "(received_message_id)");
         } catch (SQLException e) {
             throw new PartnerMetadataException("Error saving metadata", e);
         } catch (FormatterProcessingException e) {
@@ -110,7 +108,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
     }
 
     @Override
-    public Set<String> readMetadataForMessageLinking(String submissionId)
+    public Set<String> readMetadataForMessageLinking(String inboundReportId)
             throws PartnerMetadataException {
 
         Set<String> metadataSet;
@@ -133,7 +131,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
                                     """);
                                     // -- LIMIT 50 This is a potential fix for load test failures
                                     // since they link all the ids together;
-                                    statement.setString(1, submissionId);
+                                    statement.setString(1, inboundReportId);
                                     return statement;
                                 } catch (SQLException e) {
                                     throw new RuntimeException(e);
@@ -163,7 +161,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
             }
 
             return new PartnerMetadata(
-                    resultSet.getString(METADATA_TABLE_RECEIVED_MESSAGE_ID),
+                    resultSet.getString("received_message_id"),
                     resultSet.getString("sent_message_id"),
                     timeReceived,
                     timeDelivered,
@@ -192,7 +190,7 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
     String idsFromResult(ResultSet resultSet) {
 
         try {
-            return resultSet.getString(METADATA_TABLE_RECEIVED_MESSAGE_ID);
+            return resultSet.getString("received_message_id");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -202,11 +200,8 @@ public class DatabasePartnerMetadataStorage implements PartnerMetadataStorage {
             throws FormatterProcessingException {
         return List.of(
                 new DbColumn(
-                        METADATA_TABLE_RECEIVED_MESSAGE_ID,
-                        metadata.receivedSubmissionId(),
-                        false,
-                        Types.VARCHAR),
-                new DbColumn("sent_message_id", metadata.sentSubmissionId(), true, Types.VARCHAR),
+                        "received_message_id", metadata.inboundReportId(), false, Types.VARCHAR),
+                new DbColumn("sent_message_id", metadata.outboundReportId(), true, Types.VARCHAR),
                 new DbColumn("hash_of_message", metadata.hash(), false, Types.VARCHAR),
                 new DbColumn(
                         "time_received",

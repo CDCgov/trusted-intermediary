@@ -31,6 +31,8 @@ public class ApplicationContext {
     protected static final Map<String, String> TEST_ENV_VARS = new ConcurrentHashMap<>();
     protected static final Set<Object> IMPLEMENTATIONS = new HashSet<>();
 
+    protected static boolean skipMissingImplementations = false;
+
     protected ApplicationContext() {}
 
     public static void register(Class<?> clazz, Object implementation) {
@@ -53,17 +55,39 @@ public class ApplicationContext {
     }
 
     public static void injectRegisteredImplementations() {
-        injectRegisteredImplementations(false);
+        doInjectRegisteredImplementations();
     }
 
-    protected static void injectRegisteredImplementations(boolean skipMissingImplementations) {
+    protected static void doInjectRegisteredImplementations() {
         var fields = Reflection.getFieldsAnnotatedWith(Inject.class);
 
-        fields.forEach(field -> injectIntoField(field, skipMissingImplementations));
+        fields.forEach(ApplicationContext::injectIntoField);
     }
 
-    private static void injectIntoField(Field field, boolean skipMissingImplementations) {
+    public static void injectIntoNonSingleton(Object instance) {
+        var fields = Reflection.getFieldsAnnotatedWithInstance(instance.getClass(), Inject.class);
+
+        fields.forEach(field -> injectIntoField(field, instance));
+    }
+
+    private static void injectIntoField(Field field, Object instance) {
         var fieldType = field.getType();
+
+        Object fieldImplementation = getFieldImplementation(fieldType);
+        if (fieldImplementation == null) {
+            return;
+        }
+
+        field.trySetAccessible();
+        try {
+            field.set(instance, fieldImplementation);
+        } catch (IllegalAccessException | IllegalArgumentException exception) {
+            throw new IllegalArgumentException(
+                    "unable to inject " + fieldType + " into " + instance.getClass(), exception);
+        }
+    }
+
+    private static void injectIntoField(Field field) {
         var declaringClass = field.getDeclaringClass();
 
         if (!IMPLEMENTATIONS.contains(declaringClass)) {
@@ -76,29 +100,16 @@ public class ApplicationContext {
         declaringClassesToTry.add(declaringClass);
         declaringClassesToTry.addAll(Arrays.asList(declaringClass.getInterfaces()));
 
-        Object fieldImplementation = getFieldImplementation(fieldType, skipMissingImplementations);
-        if (fieldImplementation == null) {
-            return;
-        }
-
         Object declaringClassImplementation =
-                getDeclaringClassImplementation(declaringClassesToTry, skipMissingImplementations);
+                getDeclaringClassImplementation(declaringClassesToTry);
         if (declaringClassImplementation == null) {
             return;
         }
 
-        field.trySetAccessible();
-
-        try {
-            field.set(declaringClassImplementation, fieldImplementation);
-        } catch (IllegalAccessException | IllegalArgumentException exception) {
-            throw new IllegalArgumentException(
-                    "Unable to inject " + fieldType + " into " + declaringClass, exception);
-        }
+        injectIntoField(field, declaringClassImplementation);
     }
 
-    private static Object getFieldImplementation(
-            Class<?> fieldType, boolean skipMissingImplementations) {
+    private static Object getFieldImplementation(Class<?> fieldType) {
         Object fieldImplementation;
 
         try {
@@ -116,8 +127,7 @@ public class ApplicationContext {
         return fieldImplementation;
     }
 
-    private static Object getDeclaringClassImplementation(
-            List<Class<?>> declaringClassesToTry, boolean skipMissingImplementations) {
+    private static Object getDeclaringClassImplementation(List<Class<?>> declaringClassesToTry) {
         Object declaringClassImplementation =
                 declaringClassesToTry.stream()
                         .map(
