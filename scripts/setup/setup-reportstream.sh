@@ -16,6 +16,17 @@ echo "Resetting the database and loading the baseline settings..."
 ./gradlew reloadTables
 ./gradlew reloadSettings
 
+# If either TI or RS are not running in docker, then use a gradle hosted URL
+local_ti_docker_image_name=$(docker ps --filter "name=trusted-intermediary-router-1" | grep trusted-intermediary-router-1)
+local_rs_docker_image_name=$(docker ps --filter "name=prime-router-prime_dev-1" | grep prime-router-prime_dev-1)
+if [[ -z $local_ti_docker_image_name || -z $local_rs_docker_image_name ]]; then
+  ti_api_url=${TI_LCL_API_URL}
+  echo "No docker instances detected, ReportStream transport will use ${TI_LCL_API_URL}..."
+else
+  ti_api_url=${TI_LCL_API_URL_RS_CONFIG}
+  echo "Docker instances detected, ReportStream transport will use ${TI_LCL_API_URL_RS_CONFIG}..."
+fi
+
 # Need to CD to prime-router to run the prime CLI
 cd "prime-router" || exit
 
@@ -41,8 +52,8 @@ yq eval '.[0].receivers[] |= (
 )' -i "settings/STLTs/Flexion/flexion.yml"
 
 echo "Updating local URL and host in transport settings..."
-sed -i '' "s|__TI_API_URL__|${TI_LCL_API_URL}|g" "settings/STLTs/Flexion/flexion.yml"
-sed -i '' "s|__TI_API_HOST__|$(extract_host_from_url "${TI_LCL_API_URL}")|g" "settings/STLTs/Flexion/flexion.yml"
+sed -i '' "s|__TI_API_URL__|${ti_api_url}|g" "settings/STLTs/Flexion/flexion.yml"
+sed -i '' "s|__TI_API_HOST__|$(extract_host_from_url "${ti_api_url}")|g" "settings/STLTs/Flexion/flexion.yml"
 
 echo "Updating transport settings in partner org files..."
 for file in "settings/STLTs/CA/ucsd.yml" "settings/STLTs/LA/la-ochsner.yml" "settings/STLTs/LA/la-phl.yml"; do
