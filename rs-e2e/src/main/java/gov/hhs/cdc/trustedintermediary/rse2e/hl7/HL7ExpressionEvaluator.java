@@ -124,6 +124,7 @@ public class HL7ExpressionEvaluator implements HealthDataExpressionEvaluator {
         }
     }
 
+    @Deprecated // this guy should be gone by the time this branch is ready to merge
     protected boolean evaluateCollectionCount(
             Message message, String segmentName, String rightOperand, String operator) {
         try {
@@ -141,6 +142,16 @@ public class HL7ExpressionEvaluator implements HealthDataExpressionEvaluator {
     }
 
     protected String getLiteralOrFieldValue(
+            HL7Message outputMessage, HL7Message inputMessage, String operand) {
+        Matcher literalValueMatcher = LITERAL_VALUE_PATTERN.matcher(operand);
+        if (literalValueMatcher.matches()) {
+            return literalValueMatcher.group(1);
+        }
+        return getFieldValue(outputMessage, inputMessage, operand);
+    }
+
+    @Deprecated // this guy should be gone by the time this branch is ready to merge
+    protected String getLiteralOrFieldValue(
             Message outputMessage, Message inputMessage, String operand) {
         Matcher literalValueMatcher = LITERAL_VALUE_PATTERN.matcher(operand);
         if (literalValueMatcher.matches()) {
@@ -149,6 +160,30 @@ public class HL7ExpressionEvaluator implements HealthDataExpressionEvaluator {
         return getFieldValue(outputMessage, inputMessage, operand);
     }
 
+    protected String getFieldValue(
+            HL7Message outputMessage, HL7Message inputMessage, String fieldName) {
+        Matcher messageSourceMatcher = MESSAGE_SOURCE_PATTERN.matcher(fieldName);
+        if (!messageSourceMatcher.matches()) {
+            throw new IllegalArgumentException("Invalid field name format: " + fieldName);
+        }
+
+        String fileSource = messageSourceMatcher.group(1);
+        String fieldNameWithoutFileSource = messageSourceMatcher.group(2);
+        HL7Message message = getMessageBySource(fileSource, inputMessage, outputMessage);
+
+        try {
+            String messageString = message.encode();
+            char fieldSeparator = message.getFieldSeparatorValue();
+            String encodingCharacters = message.getEncodingCharactersValue();
+            return getSegmentFieldValue(
+                    messageString, fieldNameWithoutFileSource, fieldSeparator, encodingCharacters);
+        } catch (HL7Exception | NumberFormatException e) {
+            throw new IllegalArgumentException(
+                    "Failed to extract field value for: " + fieldName, e);
+        }
+    }
+
+    @Deprecated // this guy should be gone by the time this branch is ready to merge
     protected String getFieldValue(Message outputMessage, Message inputMessage, String fieldName) {
         Matcher messageSourceMatcher = MESSAGE_SOURCE_PATTERN.matcher(fieldName);
         if (!messageSourceMatcher.matches()) {
@@ -241,6 +276,18 @@ public class HL7ExpressionEvaluator implements HealthDataExpressionEvaluator {
                         .count();
     }
 
+    protected HL7Message getMessageBySource(
+            String source, HL7Message inputMessage, HL7Message outputMessage) {
+        if ("input".equals(source)) {
+            if (inputMessage == null) {
+                throw new IllegalArgumentException("Input message is null for: " + source);
+            }
+            return inputMessage;
+        }
+        return outputMessage;
+    }
+
+    @Deprecated // this guy should be gone by the time this branch is ready to merge
     protected Message getMessageBySource(
             String source, Message inputMessage, Message outputMessage) {
         if ("input".equals(source)) {
