@@ -34,15 +34,15 @@ public class HL7Message implements HealthData<HL7Message> {
     }
 
     public char getEscapeCharacter() {
-        return getEncodingCharacter("escape");
+        return getEncodingCharacter(HL7Parser.ESCAPE_CHARACTER_NAME);
     }
 
     public char[] getOrderedLevelDelimiters() {
         return new char[] {
-            getEncodingCharacter("field"),
-            getEncodingCharacter("component"),
-            getEncodingCharacter("repetition"),
-            getEncodingCharacter("subcomponent")
+            getEncodingCharacter(HL7Parser.FIELD_DELIMITER_NAME),
+            getEncodingCharacter(HL7Parser.COMPONENT_DELIMITER_NAME),
+            getEncodingCharacter(HL7Parser.REPETITION_DELIMITER_NAME),
+            getEncodingCharacter(HL7Parser.SUBCOMPONENT_DELIMITER_NAME)
         };
     }
 
@@ -53,23 +53,28 @@ public class HL7Message implements HealthData<HL7Message> {
 
     @Override
     public String getIdentifier() {
-        return getValue("MSH", 10);
+        return getValue(HL7Parser.MSH_SEGMENT_NAME, 10);
     }
 
     @Override
     public String toString() {
-        return String.join("\n", segments.entrySet().stream().map(this::formatSegment).toList());
+        return String.join(
+                HL7Parser.DEFAULT_SEGMENT_DELIMITER,
+                segments.entrySet().stream().map(this::formatSegment).toList());
     }
 
     private String formatSegment(Map.Entry<String, List<String>> entry) {
         String name = entry.getKey();
         List<String> fields = entry.getValue();
-        String fieldSeparator = String.valueOf(getEncodingCharacter("field"));
+        String fieldSeparator =
+                String.valueOf(getEncodingCharacter(HL7Parser.FIELD_DELIMITER_NAME));
 
         return name
-                + (name.equals("MSH") ? fields.get(0) : fieldSeparator)
+                + (name.equals(HL7Parser.MSH_SEGMENT_NAME) ? fields.get(0) : fieldSeparator)
                 + String.join(
                         fieldSeparator,
-                        name.equals("MSH") ? fields.subList(1, fields.size()) : fields);
+                        name.equals(HL7Parser.MSH_SEGMENT_NAME)
+                                ? fields.subList(1, fields.size())
+                                : fields);
     }
 }
