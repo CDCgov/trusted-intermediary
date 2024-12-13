@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.hl7
 
-
 import ca.uhn.hl7v2.model.Message
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthData
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
@@ -24,18 +23,10 @@ class HL7ExpressionEvaluatorTest extends Specification {
 
         def segments = [
             MSH: [
-                "|",
-                "^~\\&",
-                "Sender Application^sender.test.com^DNS",
-                "Sender Facility^0.0.0.0.0.0.0.0^ISO",
-                "Receiver Application^0.0.0.0.0.0.0.0^ISO",
-                "Receiver Facility^simulated-lab-id^DNS",
-                "20230101010000-0000",
-                "",
-                "ORM^O01^ORM_O01",
-                "111111",
-                "T",
-                "2.5.1"
+                "MSH|^~\\&|Epic^1.2.840.114350.1.13.145.2.7.2.695071^ISO\n"
+            ],
+            PID: [
+                "PID|1||11102779^^^CR^MR||SMITH^BB SARAH^^^^^L\n"
             ]
         ]
 

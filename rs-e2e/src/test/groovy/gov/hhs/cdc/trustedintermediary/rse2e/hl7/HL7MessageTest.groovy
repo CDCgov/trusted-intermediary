@@ -1,6 +1,5 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.hl7
 
-
 import spock.lang.Specification
 
 class HL7MessageTest extends Specification {
