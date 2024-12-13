@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
  * `field.count() = value`, etc. The field can be a literal value (e.g. 'EPIC') or a field reference
  * (e.g. MSH-5.1, input.MSH-5.1).
  */
-public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator {
+public class HL7ExpressionEvaluator implements HealthDataExpressionEvaluator {
 
-    private static final HapiHL7ExpressionEvaluator INSTANCE = new HapiHL7ExpressionEvaluator();
+    private static final HL7ExpressionEvaluator INSTANCE = new HL7ExpressionEvaluator();
 
     private static final String NEWLINE_REGEX = "\\r?\\n|\\r";
     private static final Pattern OPERATION_PATTERN =
@@ -32,9 +32,9 @@ public class HapiHL7ExpressionEvaluator implements HealthDataExpressionEvaluator
             Pattern.compile("(input|output)?\\.?(\\S+)");
     private static final Pattern HL7_FIELD_NAME_PATTERN = Pattern.compile("(\\w+)(?:-(\\S+))?");
 
-    private HapiHL7ExpressionEvaluator() {}
+    private HL7ExpressionEvaluator() {}
 
-    public static HapiHL7ExpressionEvaluator getInstance() {
+    public static HL7ExpressionEvaluator getInstance() {
         return INSTANCE;
     }
 

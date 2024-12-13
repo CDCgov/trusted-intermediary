@@ -4,7 +4,7 @@ import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoader
 import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoaderException
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
-import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HapiHL7ExpressionEvaluator
+import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HL7ExpressionEvaluator
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.TypeReference
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator
@@ -23,7 +23,7 @@ class RuleLoaderTest extends Specification {
         TestApplicationContext.init()
         TestApplicationContext.register(RuleLoader, RuleLoader.getInstance())
         TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.register(HealthDataExpressionEvaluator, HapiHL7ExpressionEvaluator.getInstance())
+        TestApplicationContext.register(HealthDataExpressionEvaluator, HL7ExpressionEvaluator.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
         tempFile = Files.createTempFile("test_validation_definition", ".json")

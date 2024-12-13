@@ -6,9 +6,9 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HealthData
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import spock.lang.Specification
 
-class HapiHL7ExpressionEvaluatorTest extends Specification {
+class HL7ExpressionEvaluatorTest extends Specification {
 
-    def evaluator = HapiHL7ExpressionEvaluator.getInstance()
+    def evaluator = HL7ExpressionEvaluator.getInstance()
 
     char hl7FieldSeparator = '|'
     String hl7FieldEncodingCharacters = "^~\\&"
@@ -18,7 +18,7 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
-        TestApplicationContext.register(HapiHL7ExpressionEvaluator, evaluator)
+        TestApplicationContext.register(HL7ExpressionEvaluator, evaluator)
 
         mshSegmentText = "MSH|^~\\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-lab-id^DNS|20230101010000-0000||ORM^O01^ORM_O01|111111|T|2.5.1"
 
@@ -46,7 +46,7 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
 
     def "evaluateExpression returns boolean when evaluating valid assertions"() {
         given:
-        def spyEvaluator = Spy(HapiHL7ExpressionEvaluator.getInstance())
+        def spyEvaluator = Spy(HL7ExpressionEvaluator.getInstance())
         spyEvaluator.getLiteralOrFieldValue(_ as Message, _ as Message, _ as String) >> "mockedValue"
         spyEvaluator.evaluateEquality(_ as String, _ as String, _ as String) >> true
         spyEvaluator.evaluateMembership(_ as String, _ as String) >> true
@@ -77,7 +77,7 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
 
     def "evaluateExpression allows null input message when no assertions use input"() {
         given:
-        def spyEvaluator = Spy(HapiHL7ExpressionEvaluator.getInstance())
+        def spyEvaluator = Spy(HL7ExpressionEvaluator.getInstance())
         spyEvaluator.getLiteralOrFieldValue(_ as Message, null, _ as String) >> "mockedValue"
         spyEvaluator.evaluateEquality(_ as String, _ as String, _ as String) >> true
         spyEvaluator.evaluateMembership(_ as String, _ as String) >> true

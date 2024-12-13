@@ -3,8 +3,8 @@ package gov.hhs.cdc.trustedintermediary.rse2e
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.rse2e.external.azure.AzureBlobFileFetcher
 import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HL7FileStream
-import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HapiHL7FileMatcher
-import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HapiHL7ExpressionEvaluator
+import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HL7FileMatcher
+import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HL7ExpressionEvaluator
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.rse2e.external.localfile.LocalFileFetcher
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator
@@ -19,13 +19,13 @@ class AutomatedTest extends Specification  {
     List<HL7FileStream> azureFiles
     List<HL7FileStream> localFiles
     AssertionRuleEngine engine
-    HapiHL7FileMatcher fileMatcher
+    HL7FileMatcher fileMatcher
     Logger mockLogger = Mock(Logger)
     List<String> loggedErrorsAndWarnings = []
 
     def setup() {
         engine = AssertionRuleEngine.getInstance()
-        fileMatcher =  HapiHL7FileMatcher.getInstance()
+        fileMatcher =  HL7FileMatcher.getInstance()
 
         TestApplicationContext.reset()
         TestApplicationContext.init()
@@ -33,8 +33,8 @@ class AutomatedTest extends Specification  {
         TestApplicationContext.register(RuleLoader, RuleLoader.getInstance())
         TestApplicationContext.register(Logger, mockLogger)
         TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.register(HapiHL7FileMatcher, fileMatcher)
-        TestApplicationContext.register(HealthDataExpressionEvaluator, HapiHL7ExpressionEvaluator.getInstance())
+        TestApplicationContext.register(HL7FileMatcher, fileMatcher)
+        TestApplicationContext.register(HealthDataExpressionEvaluator, HL7ExpressionEvaluator.getInstance())
         TestApplicationContext.register(LocalFileFetcher, LocalFileFetcher.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 

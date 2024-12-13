@@ -4,23 +4,23 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import spock.lang.Specification
 
-class HapiHL7FileMatcherTest extends Specification {
+class HL7FileMatcherTest extends Specification {
 
     def mockLogger = Mock(Logger)
-    def fileMatcher = HapiHL7FileMatcher.getInstance()
+    def fileMatcher = HL7FileMatcher.getInstance()
 
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(Logger, mockLogger)
-        TestApplicationContext.register(HapiHL7FileMatcher, fileMatcher)
+        TestApplicationContext.register(HL7FileMatcher, fileMatcher)
 
         TestApplicationContext.injectRegisteredImplementations()
     }
 
     def "should correctly match input and output files"() {
         given:
-        def spyFileMatcher = Spy(HapiHL7FileMatcher.getInstance())
+        def spyFileMatcher = Spy(HL7FileMatcher.getInstance())
         def mockInputFiles = [
             new HL7FileStream("inputFileStream1", Mock(InputStream)),
             new HL7FileStream("inputFileStream2", Mock(InputStream))
@@ -49,7 +49,7 @@ class HapiHL7FileMatcherTest extends Specification {
         given:
         def mockInputFiles
         def mockOutputFiles
-        def spyFileMatcher = Spy(HapiHL7FileMatcher.getInstance())
+        def spyFileMatcher = Spy(HL7FileMatcher.getInstance())
 
         when:
         mockInputFiles = [
@@ -64,7 +64,7 @@ class HapiHL7FileMatcherTest extends Specification {
         spyFileMatcher.matchFiles(mockOutputFiles, mockInputFiles)
 
         then:
-        def nonMatchingInputException = thrown(HapiHL7FileMatcherException)
+        def nonMatchingInputException = thrown(HL7FileMatcherException)
         with(nonMatchingInputException.getMessage()) {
             contains("Found no match")
             contains("002")
@@ -83,7 +83,7 @@ class HapiHL7FileMatcherTest extends Specification {
         spyFileMatcher.matchFiles(mockOutputFiles, mockInputFiles)
 
         then:
-        def nonMatchingOutputException = thrown(HapiHL7FileMatcherException)
+        def nonMatchingOutputException = thrown(HL7FileMatcherException)
         with(nonMatchingOutputException.getMessage()) {
             contains("Found no match")
             contains("003")
@@ -133,7 +133,7 @@ class HapiHL7FileMatcherTest extends Specification {
         fileMatcher.parseAndMapMessageByControlId([hl7FileStream])
 
         then:
-        thrown(HapiHL7FileMatcherException)
+        thrown(HL7FileMatcherException)
     }
 
     def "should throw HapiHL7FileMatcherException when not able to parse the file as HL7 message"() {
@@ -145,6 +145,6 @@ class HapiHL7FileMatcherTest extends Specification {
         fileMatcher.parseAndMapMessageByControlId([hl7FileStream])
 
         then:
-        thrown(HapiHL7FileMatcherException)
+        thrown(HL7FileMatcherException)
     }
 }

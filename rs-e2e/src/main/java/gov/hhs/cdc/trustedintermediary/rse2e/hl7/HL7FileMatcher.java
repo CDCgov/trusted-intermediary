@@ -15,19 +15,19 @@ import java.util.stream.Collectors;
  * The HapiHL7FileMatcher class is responsible for matching input and output HL7 files based on the
  * control ID (MSH-10).
  */
-public class HapiHL7FileMatcher {
+public class HL7FileMatcher {
 
-    private static final HapiHL7FileMatcher INSTANCE = new HapiHL7FileMatcher();
+    private static final HL7FileMatcher INSTANCE = new HL7FileMatcher();
 
-    private HapiHL7FileMatcher() {}
+    private HL7FileMatcher() {}
 
-    public static HapiHL7FileMatcher getInstance() {
+    public static HL7FileMatcher getInstance() {
         return INSTANCE;
     }
 
     public Map<HL7Message, HL7Message> matchFiles(
             List<HL7FileStream> outputFiles, List<HL7FileStream> inputFiles)
-            throws HapiHL7FileMatcherException {
+            throws HL7FileMatcherException {
         // We pair up output and input files based on the control ID, which is in MSH-10
         // Any files (either input or output) that don't have a match are logged
         Map<String, HL7Message> inputMap = parseAndMapMessageByControlId(inputFiles);
@@ -40,7 +40,7 @@ public class HapiHL7FileMatcher {
         unmatchedKeys.addAll(Sets.difference(outputKeys, inputKeys));
 
         if (!unmatchedKeys.isEmpty()) {
-            throw new HapiHL7FileMatcherException(
+            throw new HL7FileMatcherException(
                     "Found no match for messages with the following MSH-10 values: "
                             + unmatchedKeys);
         }
@@ -49,7 +49,7 @@ public class HapiHL7FileMatcher {
     }
 
     public Map<String, HL7Message> parseAndMapMessageByControlId(List<HL7FileStream> files)
-            throws HapiHL7FileMatcherException {
+            throws HL7FileMatcherException {
 
         Map<String, HL7Message> messageMap = new HashMap<>();
 
@@ -60,7 +60,7 @@ public class HapiHL7FileMatcher {
                 HL7Message message = HL7Parser.parse(content);
                 String msh10 = message.getIdentifier();
                 if (msh10 == null || msh10.isEmpty()) {
-                    throw new HapiHL7FileMatcherException(
+                    throw new HL7FileMatcherException(
                             String.format("MSH-10 is empty for file: %s", fileName));
                 }
                 messageMap.put(msh10, message);
@@ -70,7 +70,7 @@ public class HapiHL7FileMatcher {
                 // %s", fileName),
                 //                            e);
             } catch (IOException e) {
-                throw new HapiHL7FileMatcherException(
+                throw new HL7FileMatcherException(
                         String.format("Failed to read file: %s", fileName), e);
             }
         }

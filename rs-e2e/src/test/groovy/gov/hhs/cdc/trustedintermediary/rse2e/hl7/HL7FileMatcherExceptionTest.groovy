@@ -3,7 +3,7 @@ package gov.hhs.cdc.trustedintermediary.rse2e.hl7
 
 import spock.lang.Specification
 
-class HapiHL7FileMatcherExceptionTest  extends Specification {
+class HL7FileMatcherExceptionTest extends Specification {
 
     def "two param constructor works"() {
         given:
@@ -11,7 +11,7 @@ class HapiHL7FileMatcherExceptionTest  extends Specification {
         def cause = new NullPointerException()
 
         when:
-        def exception = new HapiHL7FileMatcherException(message, cause)
+        def exception = new HL7FileMatcherException(message, cause)
 
         then:
         exception.getMessage() == message
@@ -23,7 +23,7 @@ class HapiHL7FileMatcherExceptionTest  extends Specification {
         def message = "something blew up!"
 
         when:
-        def exception = new HapiHL7FileMatcherException(message)
+        def exception = new HL7FileMatcherException(message)
 
         then:
         exception.getMessage() == message
