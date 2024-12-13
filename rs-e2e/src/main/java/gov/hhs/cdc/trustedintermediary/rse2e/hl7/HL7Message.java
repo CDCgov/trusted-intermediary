@@ -23,6 +23,14 @@ public class HL7Message implements HealthData<HL7Message> {
         return segments.get(name);
     }
 
+    public int getSegmentCount(String name) {
+        var matches = getSegmentFields(name);
+        if (matches != null) {
+            return matches.size();
+        }
+        return 0;
+    }
+
     public String getValue(String segmentName, int... indices) {
         List<String> fields = getSegmentFields(segmentName);
         char[] levelDelimiters = this.getOrderedLevelDelimiters();
