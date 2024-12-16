@@ -275,11 +275,20 @@ public class HapiHelper {
     }
 
     public static void setPID3_4Value(Bundle bundle, String value) {
-        Identifier identifier = getPID3_4Identifier(bundle);
-        if (identifier == null) {
+        if (value == null) {
+            Identifier pid3Identifier = getPID3Identifier(bundle);
+            if (pid3Identifier == null) {
+                return;
+            }
+            pid3Identifier.setAssigner(null);
             return;
         }
-        identifier.setValue(value);
+
+        Identifier pid3_4Identifier = getPID3_4Identifier(bundle);
+        if (pid3_4Identifier == null) {
+            return;
+        }
+        pid3_4Identifier.setValue(value);
     }
 
     // PID-3.5 - Identifier Type Code
@@ -291,7 +300,8 @@ public class HapiHelper {
         setCX5Value(identifier, value);
     }
 
-    public static void removePID3_5Value(Identifier patientIdentifier) {
+    public static void removePID3_5Value(Bundle bundle) {
+        Identifier patientIdentifier = HapiHelper.getPID3Identifier(bundle);
         if (patientIdentifier == null) {
             return;
         }
