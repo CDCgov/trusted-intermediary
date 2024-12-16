@@ -430,30 +430,58 @@ class HapiHelperTest extends Specification {
     }
 
     // PID-3.4 - Assigning Authority
-    def "patient assigning authority methods work as expected"() {
+    def "getPID3_4Identifier returns null when bundle is empty"() {
         given:
-        def pid3_4 = "pid3_4"
-
-        when:
         def bundle = new Bundle()
 
-        then:
+        expect:
         HapiHelper.getPID3_4Identifier(bundle) == null
+    }
+
+    def "setPID3_4Value does not modify bundle without PID-3 identifier"() {
+        given:
+        def pid3_4Value = "pid3_4"
+        def bundle = new Bundle()
 
         when:
-        HapiHelper.setPID3_4Value(bundle, pid3_4)
+        HapiHelper.setPID3_4Value(bundle, pid3_4Value)
 
         then:
         HapiFhirHelper.getPID3_4Value(bundle) == null
+    }
 
-        when:
+    def "setPID3_4Value updates correctly when patient has a PID-3 identifier"() {
+        given:
+        def pid3_4Value = "pid3_4"
+        def bundle = new Bundle()
         HapiFhirHelper.createPIDPatient(bundle)
         HapiFhirHelper.setPID3Identifier(bundle, new Identifier())
         HapiFhirHelper.setPID3_4Identifier(bundle, new Identifier())
-        HapiHelper.setPID3_4Value(bundle, pid3_4)
+
+        when:
+        HapiHelper.setPID3_4Value(bundle, pid3_4Value)
 
         then:
-        HapiFhirHelper.getPID3_4Value(bundle) == pid3_4
+        HapiFhirHelper.getPID3_4Value(bundle) == pid3_4Value
+    }
+
+    def "setPID3_4Value updates correctly when patient has a PID-3 identifier and the new value is null"() {
+        given:
+        def bundle = new Bundle()
+        HapiFhirHelper.createPIDPatient(bundle)
+
+        def pid3Identifier = new Identifier()
+        HapiFhirHelper.setPID3Identifier(bundle, pid3Identifier)
+
+        def pid3_4Value = "pid3_4"
+        HapiFhirHelper.setPID3_4Identifier(bundle, new Identifier())
+        HapiHelper.setPID3_4Value(bundle, pid3_4Value)
+
+        when:
+        HapiHelper.setPID3_4Value(bundle, null)
+
+        then:
+        !pid3Identifier.hasAssigner()
     }
 
     // PID-3.5 - Assigning Identifier Type Code
@@ -478,26 +506,28 @@ class HapiHelperTest extends Specification {
     }
 
     // PID-3.5 - Removing Identifier Type Code
-    def "null patientIdentifier remains null"() {
+    def "Bundle with no patient identifier does not change"() {
         given:
-        Identifier patientIdentifier = null
+        Bundle bundle = new Bundle()
 
         when:
-        HapiHelper.removePID3_5Value(patientIdentifier)
+        HapiHelper.removePID3_5Value(bundle)
 
         then:
-        patientIdentifier == null
+        !bundle.hasEntry()
     }
 
     def "patientIdentifier with no extensions leaves extensions as-is"() {
         given:
+        Bundle bundle = new Bundle()
         Identifier patientIdentifier = new Identifier()
+        HapiFhirHelper.setPID3Identifier(bundle, patientIdentifier)
 
         expect:
         !patientIdentifier.hasExtension()
 
         when:
-        HapiHelper.removePID3_5Value(patientIdentifier)
+        HapiHelper.removePID3_5Value(bundle)
 
         then:
         !patientIdentifier.hasExtension()
@@ -516,14 +546,14 @@ class HapiHelperTest extends Specification {
         patientIdentifier.type.addCoding(new Coding(code: pid3_5))
 
         when:
-        HapiHelper.removePID3_5Value(patientIdentifier)
+        HapiHelper.removePID3_5Value(bundle)
 
         then:
         patientIdentifier.extension.isEmpty()
         patientIdentifier.type.isEmpty()
     }
 
-    def "removing patient identifier with non-cx5 url extension doesnt clears extensions"() {
+    def "removing patient identifier with non-cx5 url extension does not clear extensions"() {
         given:
         def bundle = new Bundle()
         def patientIdentifier = new Identifier()
@@ -537,7 +567,7 @@ class HapiHelperTest extends Specification {
                 .setUrl(HapiHelper.EXTENSION_XON10_URL)
 
         when:
-        HapiHelper.removePID3_5Value(patientIdentifier)
+        HapiHelper.removePID3_5Value(bundle)
 
         then:
         patientIdentifier.hasExtension()
