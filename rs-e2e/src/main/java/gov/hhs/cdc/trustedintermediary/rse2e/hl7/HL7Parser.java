@@ -2,7 +2,6 @@ package gov.hhs.cdc.trustedintermediary.rse2e.hl7;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -32,7 +31,7 @@ public class HL7Parser {
     protected static final Pattern HL7_FIELD_NAME_PATTERN = Pattern.compile("(\\w+)(?:-(\\S+))?");
 
     public static HL7Message parse(String content) {
-        Map<String, List<String>> segments = new HashMap<>();
+        List<HL7Segment> segments = new ArrayList<>();
         String encodingCharactersField = null;
         String[] lines = content.split(NEWLINE_REGEX);
         for (String line : lines) {
@@ -45,7 +44,7 @@ public class HL7Parser {
                 encodingCharactersField = fields[1];
                 segmentFields.add(0, String.valueOf(DEFAULT_FIELD_DELIMITER));
             }
-            segments.put(segmentName, segmentFields);
+            segments.add(new HL7Segment(segmentName, segmentFields));
         }
 
         return new HL7Message(segments, getEncodingCharacters(encodingCharactersField));

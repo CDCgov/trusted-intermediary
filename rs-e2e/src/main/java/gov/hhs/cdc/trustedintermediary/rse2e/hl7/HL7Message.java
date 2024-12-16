@@ -12,25 +12,36 @@ import java.util.regex.Matcher;
  */
 public class HL7Message implements HealthData<HL7Message> {
 
-    private final Map<String, List<String>> segments;
+    private final List<HL7Segment> segments;
     private final Map<String, Character> encodingCharacters;
 
-    public HL7Message(
-            Map<String, List<String>> segments, Map<String, Character> encodingCharacters) {
+    HL7Message(List<HL7Segment> segments, Map<String, Character> encodingCharacters) {
         this.segments = segments;
         this.encodingCharacters = encodingCharacters;
     }
 
+    public List<HL7Segment> getSegments(String name) {
+        return segments.stream().filter(segment -> segment.name().equals(name)).toList();
+    }
+
+    public HL7Segment getSegment(String name, int index) {
+        return getSegments(name).get(index);
+    }
+
+    public HL7Segment getSegment(String name) {
+        return getSegments(name).get(0);
+    }
+
+    public List<String> getSegmentFields(String name, int index) {
+        return getSegment(name, index).fields();
+    }
+
     public List<String> getSegmentFields(String name) {
-        return segments.get(name);
+        return getSegment(name, 0).fields();
     }
 
     public int getSegmentCount(String name) {
-        var matches = getSegmentFields(name);
-        if (matches != null) {
-            return matches.size();
-        }
-        return 0;
+        return getSegments(name).size();
     }
 
     public String getValue(String hl7Path) {
@@ -83,21 +94,19 @@ public class HL7Message implements HealthData<HL7Message> {
     public String toString() {
         return String.join(
                 HL7Parser.DEFAULT_SEGMENT_DELIMITER,
-                segments.entrySet().stream().map(this::formatSegment).toList());
+                segments.stream().map(this::segmentToString).toList());
     }
 
-    private String formatSegment(Map.Entry<String, List<String>> entry) {
-        String name = entry.getKey();
-        List<String> fields = entry.getValue();
+    private String segmentToString(HL7Segment segment) {
         String fieldSeparator =
                 String.valueOf(getEncodingCharacter(HL7Parser.FIELD_DELIMITER_NAME));
 
-        return name
-                + (name.equals(HL7Parser.MSH_SEGMENT_NAME) ? fields.get(0) : fieldSeparator)
-                + String.join(
-                        fieldSeparator,
-                        name.equals(HL7Parser.MSH_SEGMENT_NAME)
-                                ? fields.subList(1, fields.size())
-                                : fields);
+        if (segment.name().equals(HL7Parser.MSH_SEGMENT_NAME)) {
+            return segment.name()
+                    + segment.fields().get(0)
+                    + String.join(
+                            fieldSeparator, segment.fields().subList(1, segment.fields().size()));
+        }
+        return segment.name() + fieldSeparator + String.join(fieldSeparator, segment.fields());
     }
 }

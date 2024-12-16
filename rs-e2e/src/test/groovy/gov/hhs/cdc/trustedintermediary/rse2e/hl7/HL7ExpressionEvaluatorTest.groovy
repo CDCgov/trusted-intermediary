@@ -7,28 +7,19 @@ import spock.lang.Specification
 class HL7ExpressionEvaluatorTest extends Specification {
 
     def evaluator = HL7ExpressionEvaluator.getInstance()
-    def encodingChars = HL7Parser.getEncodingCharacters("|^~\\&")
 
-    HL7Message mshMessage
-    String mshSegmentText
+    HL7Message hl7Message
+    String messageContent
 
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(HL7ExpressionEvaluator, evaluator)
 
-        mshSegmentText = "MSH|^~\\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-lab-id^DNS|20230101010000-0000||ORM^O01^ORM_O01|111111|T|2.5.1"
-
-        def segments = [
-            MSH: [
-                "MSH|^~\\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-lab-id^DNS|20230101010000-0000||ORM^O01^ORM_O01|111111|T|2.5.1\n"
-            ],
-            PID: [
-                "PID|1||11102779^^^CR^MR||SMITH^BB SARAH^^^^^L\n"
-            ]
-        ]
-
-        mshMessage = new HL7Message(segments as Map<String, List<String>>, encodingChars)
+        messageContent = """MSH|^~\\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-lab-id^DNS|20230101010000-0000||ORM^O01^ORM_O01|111111|T|2.5.1
+PID|1||11102779^^^CR^MR||SMITH^BB SARAH^^^^^L
+"""
+        hl7Message = HL7Parser.parse(messageContent)
 
         TestApplicationContext.injectRegisteredImplementations()
     }
@@ -191,7 +182,7 @@ class HL7ExpressionEvaluatorTest extends Specification {
         def operator = "="
 
         when:
-        def result = evaluator.evaluateCollectionCount(mshMessage, segmentName, rightOperand, operator)
+        def result = evaluator.evaluateCollectionCount(hl7Message, segmentName, rightOperand, operator)
 
         then:
         result
@@ -204,7 +195,7 @@ class HL7ExpressionEvaluatorTest extends Specification {
         def operator = "="
 
         when:
-        def result = evaluator.evaluateCollectionCount(mshMessage, segmentName, rightOperand, operator)
+        def result = evaluator.evaluateCollectionCount(hl7Message, segmentName, rightOperand, operator)
 
         then:
         !result
@@ -217,7 +208,7 @@ class HL7ExpressionEvaluatorTest extends Specification {
         def operator = "="
 
         when:
-        evaluator.evaluateCollectionCount(mshMessage, segmentName, rightOperand, operator)
+        evaluator.evaluateCollectionCount(hl7Message, segmentName, rightOperand, operator)
 
         then:
         def e = thrown(IllegalArgumentException)
@@ -231,7 +222,7 @@ class HL7ExpressionEvaluatorTest extends Specification {
         def operator = "="
 
         when:
-        def result = evaluator.evaluateCollectionCount(mshMessage, segmentName, rightOperand, operator)
+        def result = evaluator.evaluateCollectionCount(hl7Message, segmentName, rightOperand, operator)
 
         then:
         !result
@@ -257,7 +248,7 @@ class HL7ExpressionEvaluatorTest extends Specification {
         def msh3 = "Sender Application^sender.test.com^DNS"
 
         when:
-        def result = evaluator.getLiteralOrFieldValue(mshMessage, inputMessage, operand)
+        def result = evaluator.getLiteralOrFieldValue(hl7Message, inputMessage, operand)
 
         then:
         result == msh3
@@ -270,7 +261,7 @@ class HL7ExpressionEvaluatorTest extends Specification {
         def inputMessage = Mock(HL7Message)
 
         when:
-        def result = evaluator.getFieldValue(mshMessage, inputMessage, fieldName)
+        def result = evaluator.getFieldValue(hl7Message, inputMessage, fieldName)
 
         then:
         result == msh3
@@ -282,7 +273,7 @@ class HL7ExpressionEvaluatorTest extends Specification {
         def inputMessage = Mock(HL7Message)
 
         when:
-        evaluator.getFieldValue(mshMessage, inputMessage, fieldName)
+        evaluator.getFieldValue(hl7Message, inputMessage, fieldName)
 
         then:
         def e = thrown(IllegalArgumentException)
@@ -295,7 +286,7 @@ class HL7ExpressionEvaluatorTest extends Specification {
         def inputMessage = Mock(HL7Message)
 
         when:
-        evaluator.getFieldValue(mshMessage, inputMessage, fieldName)
+        evaluator.getFieldValue(hl7Message, inputMessage, fieldName)
 
         then:
         def e = thrown(IllegalArgumentException)
