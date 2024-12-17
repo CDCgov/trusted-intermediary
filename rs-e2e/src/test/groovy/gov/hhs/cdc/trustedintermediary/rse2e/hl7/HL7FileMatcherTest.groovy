@@ -147,4 +147,18 @@ class HL7FileMatcherTest extends Specification {
         then:
         thrown(HL7FileMatcherException)
     }
+
+    def "should throw HL7FileMatcherException when unable to load a file to parse and map"() {
+        def inputStream = Mock(ByteArrayInputStream)
+        inputStream.readAllBytes() >> {
+            throw new IOException("")
+        }
+        def hl7FileStream = new HL7FileStream("file1", inputStream)
+
+        when:
+        fileMatcher.parseAndMapMessageByControlId([hl7FileStream])
+
+        then:
+        thrown(HL7FileMatcherException)
+    }
 }
