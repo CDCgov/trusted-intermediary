@@ -122,7 +122,7 @@ def test_start(environment):
 @events.quitting.add_listener
 def assert_stats(environment):
     if in_azure:
-        # don't evaluate this in Azure because we want the locust process to succeed
+        # don't evaluate this in Azure because we want the locust process to succeed and Azure does its own test criteria checking
         return
 
     if environment.stats.total.fail_ratio > 0.01:
@@ -139,6 +139,9 @@ def get_auth_request_body():
     # set up the sample request body for the auth endpoint
     # using a valid test token found in the mock_credentials directory
 
+    # TODO - notes/clarification on 2 different creds, plus expiration date of jwt
+    # TODO - do we want to TF the tests? If yes which envs? In CDC envs, may need to adjust IP allow list on app. Also set as private endpoints in test config?
+    # TODO - currently in Azure we're specifying a version for the key vault item (so if it gets updated, we'll be referencing an old version) - do we want to change this?
     if in_azure:
         auth_token = os.getenv("trusted-intermediary-valid-token-jwt")
     else:
