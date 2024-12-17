@@ -18,6 +18,7 @@ import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.PractitionerRole;
+import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ServiceRequest;
 import org.hl7.fhir.r4.model.StringType;
@@ -301,26 +302,25 @@ public class HapiHelper {
     }
 
     public static void removePID3_5Value(Bundle bundle) {
-        Identifier patientIdentifier = HapiHelper.getPID3Identifier(bundle);
+        Identifier patientIdentifier = getPID3Identifier(bundle);
         if (patientIdentifier == null) {
             return;
         }
 
         patientIdentifier.setType(null);
 
-        Extension cxExtension =
-                patientIdentifier.getExtensionByUrl(HapiHelper.EXTENSION_CX_IDENTIFIER_URL);
+        Extension cxExtension = patientIdentifier.getExtensionByUrl(EXTENSION_CX_IDENTIFIER_URL);
         if (cxExtension == null) {
             return;
         }
 
-        if (cxExtension.hasExtension(HapiHelper.EXTENSION_CX5_URL)) {
-            cxExtension.removeExtension(HapiHelper.EXTENSION_CX5_URL);
+        if (cxExtension.hasExtension(EXTENSION_CX5_URL)) {
+            cxExtension.removeExtension(EXTENSION_CX5_URL);
         }
 
         // The cx-identifier extension can be removed if it has no more sub-extensions
         if (cxExtension.getExtension().isEmpty()) {
-            patientIdentifier.removeExtension(HapiHelper.EXTENSION_CX_IDENTIFIER_URL);
+            patientIdentifier.removeExtension(EXTENSION_CX_IDENTIFIER_URL);
         }
     }
 
@@ -331,33 +331,31 @@ public class HapiHelper {
             return null;
         }
         HumanName name = patient.getNameFirstRep();
-        return name.getExtensionByUrl(HapiHelper.EXTENSION_XPN_HUMAN_NAME_URL);
+        return name.getExtensionByUrl(EXTENSION_XPN_HUMAN_NAME_URL);
     }
 
     public static void setPID5_7ExtensionValue(Bundle bundle, String value) {
         Extension extension = getPID5Extension(bundle);
-        if (extension != null && extension.hasExtension(HapiHelper.EXTENSION_XPN7_URL)) {
-            extension
-                    .getExtensionByUrl(HapiHelper.EXTENSION_XPN7_URL)
-                    .setValue(new StringType(value));
+        if (extension != null && extension.hasExtension(EXTENSION_XPN7_URL)) {
+            extension.getExtensionByUrl(EXTENSION_XPN7_URL).setValue(new StringType(value));
         }
     }
 
     public static void removePID5_7Value(Bundle bundle) {
-        Patient patient = HapiHelper.getPIDPatient(bundle);
+        Patient patient = getPIDPatient(bundle);
         if (patient == null) {
             return;
         }
         HumanName patientName = patient.getNameFirstRep();
         patientName.setUse(null);
 
-        Extension pid5Extension = HapiHelper.getPID5Extension(bundle);
+        Extension pid5Extension = getPID5Extension(bundle);
         if (pid5Extension == null) {
             return;
         }
-        Extension xpn7Extension = pid5Extension.getExtensionByUrl(HapiHelper.EXTENSION_XPN7_URL);
+        Extension xpn7Extension = pid5Extension.getExtensionByUrl(EXTENSION_XPN7_URL);
         if (xpn7Extension != null) {
-            pid5Extension.removeExtension(HapiHelper.EXTENSION_XPN7_URL);
+            pid5Extension.removeExtension(EXTENSION_XPN7_URL);
         }
     }
 
@@ -561,18 +559,31 @@ public class HapiHelper {
         }
 
         Extension obr16Extension =
-                HapiHelper.ensureSubExtensionExists(
-                        obrExtension, HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString());
+                ensureSubExtensionExists(obrExtension, EXTENSION_OBR16_DATA_TYPE.toString());
 
         obr16Extension.setValue(practitionerRole.getPractitioner());
     }
 
     public static Extension getObr16Extension(ServiceRequest serviceRequest) {
-        Extension obrExtension = serviceRequest.getExtensionByUrl(HapiHelper.EXTENSION_OBR_URL);
+        Extension obrExtension = serviceRequest.getExtensionByUrl(EXTENSION_OBR_URL);
         if (obrExtension == null) {
             return null;
         }
-        return obrExtension.getExtensionByUrl(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString());
+        return obrExtension.getExtensionByUrl(EXTENSION_OBR16_DATA_TYPE.toString());
+    }
+
+    public static Practitioner getObr16ExtensionPractitioner(ServiceRequest serviceRequest) {
+        Extension obr16Extension = getObr16Extension(serviceRequest);
+        if (obr16Extension == null || obr16Extension.getValue() == null) {
+            return null;
+        }
+
+        if (obr16Extension.getValue() instanceof Reference reference) {
+            if (reference.getResource() instanceof Practitioner practitioner) {
+                return practitioner;
+            }
+        }
+        return null;
     }
 
     /**
@@ -743,9 +754,9 @@ public class HapiHelper {
 
     public static String urlForCodeType(String code) {
         return switch (code) {
-            case HapiHelper.LOINC_CODE -> HapiHelper.LOINC_URL;
-            case HapiHelper.PLT_CODE -> null;
-            default -> HapiHelper.LOCAL_CODE_URL;
+            case LOINC_CODE -> LOINC_URL;
+            case PLT_CODE -> null;
+            default -> LOCAL_CODE_URL;
         };
     }
 
@@ -760,22 +771,19 @@ public class HapiHelper {
      */
     public static boolean hasDefinedCoding(
             Coding coding, String codingExt, String codingSystemExt) {
-        var codingExtMatch =
-                hasMatchingCodingExtension(coding, HapiHelper.EXTENSION_CWE_CODING, codingExt);
+        var codingExtMatch = hasMatchingCodingExtension(coding, EXTENSION_CWE_CODING, codingExt);
         var codingSystemExtMatch =
-                hasMatchingCodingExtension(
-                        coding, HapiHelper.EXTENSION_CODING_SYSTEM, codingSystemExt);
+                hasMatchingCodingExtension(coding, EXTENSION_CODING_SYSTEM, codingSystemExt);
         return codingExtMatch && codingSystemExtMatch;
     }
 
     private static boolean hasMatchingCodingExtension(
             Coding coding, String extensionUrl, String valueToMatch) {
-        if (!HapiHelper.hasCodingExtensionWithUrl(coding, extensionUrl)) {
+        if (!hasCodingExtensionWithUrl(coding, extensionUrl)) {
             return false;
         }
 
-        var extensionValue =
-                HapiHelper.getCodingExtensionByUrl(coding, extensionUrl).getValue().toString();
+        var extensionValue = getCodingExtensionByUrl(coding, extensionUrl).getValue().toString();
         return Objects.equals(valueToMatch, extensionValue);
     }
 
