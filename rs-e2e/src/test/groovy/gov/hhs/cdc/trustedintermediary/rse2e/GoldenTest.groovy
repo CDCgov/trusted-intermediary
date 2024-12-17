@@ -16,8 +16,9 @@ import java.nio.file.Path
 
 class GoldenTest extends Specification {
 
-    def beforeFileJsonFileString = Files.readString(Path.of("../examples/Test/Automated/golden_before.fhir"))
-    def afterFileJsonFileString = Files.readString(Path.of("../examples/Test/Automated/golden_after.fhir"))
+    def beforeFileJsonFileString = Files.readString(Path.of("../examples/Test/Automated/golden_actual.hl7"))
+    def afterFileJsonFileString = Files.readString(Path.of("../examples/Test/Automated/golden_expected.hl7"))
+
 
     List<HL7FileStream> azureFiles // output
     List<HL7FileStream> localFiles // input
@@ -48,22 +49,22 @@ class GoldenTest extends Specification {
             loggedErrorsAndWarnings << msg
         }
 
-        FileFetcher azureFileFetcher = AzureBlobFileFetcher.getInstance()
-        azureFiles = azureFileFetcher.fetchFiles()
+        //      FileFetcher azureFileFetcher = AzureBlobFileFetcher.getInstance()
+        //      azureFiles = azureFileFetcher.fetchFiles()
 
-        FileFetcher localFileFetcher = LocalFileFetcher.getInstance()
-        localFiles = localFileFetcher.fetchFiles()
+        //      FileFetcher localFileFetcher = LocalFileFetcher.getInstance()
+        //      localFiles = localFileFetcher.fetchFiles()
 
         engine.ensureRulesLoaded() // we don't want this because it uses the hardcoded assertion_definition.json OR we want to modify that method
     }
 
     def cleanup() {
-        for (HL7FileStream fileStream : localFiles + azureFiles) {
-            fileStream.inputStream().close()
-        }
+        //  for (HL7FileStream fileStream : localFiles + azureFiles) {
+        //     fileStream.inputStream().close()
+        //}
     }
 
-    def "Golden Test"() {
+    def "Compare files"() {
         // notes:
         // Use workflow to sendoff the file (happens via Github Action)
 
@@ -75,5 +76,14 @@ class GoldenTest extends Specification {
 
         // compare with known good file
         // def matchedFiles = fileMatcher.matchFiles(azureFiles, localFiles)
+
+        given:
+
+
+        when:
+        def filesAreIdentical = beforeFileJsonFileString == afterFileJsonFileString
+
+        then:
+        assert filesAreIdentical, "test"
     }
 }
