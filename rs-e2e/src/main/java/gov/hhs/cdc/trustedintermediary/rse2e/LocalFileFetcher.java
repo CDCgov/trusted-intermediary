@@ -15,7 +15,7 @@ import java.util.stream.Stream;
  */
 public class LocalFileFetcher implements FileFetcher {
 
-    private static final String FILES_PATH = "../examples/Test/Automated/";
+    private static String files_path = "../examples/Test/Automated/";
     private static final String EXTENSION = "hl7";
 
     private static final FileFetcher INSTANCE = new LocalFileFetcher();
@@ -27,8 +27,13 @@ public class LocalFileFetcher implements FileFetcher {
     }
 
     @Override
-    public List<HL7FileStream> fetchFiles() {
-        try (Stream<Path> stream = Files.walk(Paths.get(FILES_PATH))) {
+    public List<HL7FileStream> fetchFiles(boolean isAutomatedTest) {
+        if (!isAutomatedTest) {
+            // there might be problems with this as file_path is static; I'd need to do some more
+            // digging to be sure
+            files_path = "../examples/Test/Automated/Golden/";
+        }
+        try (Stream<Path> stream = Files.walk(Paths.get(files_path))) {
             return stream.filter(Files::isRegularFile)
                     .filter(path -> path.toString().endsWith(EXTENSION))
                     .map(

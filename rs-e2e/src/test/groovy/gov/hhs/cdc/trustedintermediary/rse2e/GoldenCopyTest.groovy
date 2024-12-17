@@ -11,17 +11,14 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import spock.lang.Specification
 
-import java.nio.file.Files
-import java.nio.file.Path
-
 class GoldenCopyTest extends Specification {
 
     List<HL7FileStream> azureFiles
     List<HL7FileStream> localFiles
-    AssertionRuleEngine engine
     HapiHL7FileMatcher fileMatcher
     Logger mockLogger = Mock(Logger)
     List<String> loggedErrorsAndWarnings = []
+    List<HapiHL7Message> failedFiles = []
 
     def setup() {
         fileMatcher =  HapiHL7FileMatcher.getInstance()
@@ -44,10 +41,10 @@ class GoldenCopyTest extends Specification {
         }
 
         FileFetcher azureFileFetcher = AzureBlobFileFetcher.getInstance()
-        azureFiles = azureFileFetcher.fetchFiles()
+        azureFiles = azureFileFetcher.fetchFiles(false)
 
         FileFetcher localFileFetcher = LocalFileFetcher.getInstance()
-        localFiles = localFileFetcher.fetchFiles()
+        localFiles = localFileFetcher.fetchFiles(false)
     }
 
     def cleanup() {
@@ -66,36 +63,26 @@ class GoldenCopyTest extends Specification {
         // If we do use the rules engine, see if its possible to compare the whole file as a rule rather than individual segments
         // Update Automated Test README
 
-        // compare with known good file
-        // def matchedFiles = fileMatcher.matchFiles(azureFiles, localFiles)
+        //         Add a sub folder to /Golden for inputFile - this is so we can get the actual output, we won't use this
+        //        Add a sub folder to /Golden for expectedFileOutput - this is 'hard-coded' and shouldnt change
+        //         make sure to update folder paths in workflow
 
         given:
         def matchedFiles = fileMatcher.matchFiles(azureFiles, localFiles)
 
         when:
-        for (messagePair in matchedFiles) {
-            def inputMessage = messagePair.getKey()
-            def outputMessage = messagePair.getValue()
-            //            def evaluatedRules = engine.runRules(outputMessage, inputMessage)
-            //            rulesToEvaluate.removeAll(evaluatedRules)
+        for (filePair in matchedFiles) {
+            def actualFile = filePair.getKey()
+            def expectedFile = filePair.getValue()
+            if (!actualFile.equals(expectedFile)) {
+                failedFiles.add(expectedFile)
+            }
         }
 
         then:
-        rulesToEvaluate.collect { it.name }.isEmpty() //Check whether all the rules in the assertions file have been run
+        assertTrue(failedFiles.isEmpty())
         if (!loggedErrorsAndWarnings.isEmpty()) {
             throw new AssertionError("Unexpected errors and/or warnings were logged:\n- ${loggedErrorsAndWarnings.join('\n- ')}")
         }
-
-
-        given:
-        def beforeFileJsonFileString = Files.readString(Path.of("../examples/Test/Automated/golden_actual.hl7"))
-        def afterFileJsonFileString = Files.readString(Path.of("../examples/Test/Automated/golden_expected.hl7"))
-
-
-        when:
-        def filesAreIdentical = beforeFileJsonFileString == afterFileJsonFileString
-
-        then:
-        assert filesAreIdentical, "test"
     }
 }

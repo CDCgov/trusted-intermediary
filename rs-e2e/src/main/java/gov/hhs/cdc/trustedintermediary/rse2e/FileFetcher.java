@@ -7,5 +7,5 @@ import java.util.List;
  * of this interface should provide a way to retrieve a list of HL7FileStream objects.
  */
 public interface FileFetcher {
-    List<HL7FileStream> fetchFiles();
+    List<HL7FileStream> fetchFiles(boolean isAutomatedTest);
 }
