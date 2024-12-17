@@ -879,6 +879,86 @@ class HapiHelperTest extends Specification {
         result == null
     }
 
+    def "getObr16ExtensionPractitioner should return null when ServiceRequest has no OBR-16 extension"() {
+        given:
+        def serviceRequest = new ServiceRequest()
+
+        when:
+        def result = HapiHelper.getObr16ExtensionPractitioner(serviceRequest)
+
+        then:
+        result == null
+    }
+
+    def "getObr16ExtensionPractitioner should return null when OBR-16 extension value is null"() {
+        given:
+        def serviceRequest = new ServiceRequest()
+        def obrExtension = new Extension(HapiHelper.EXTENSION_OBR_URL)
+        def obr16Extension = new Extension(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString())
+        obrExtension.addExtension(obr16Extension)
+        serviceRequest.addExtension(obrExtension)
+
+        when:
+        def result = HapiHelper.getObr16ExtensionPractitioner(serviceRequest)
+
+        then:
+        result == null
+    }
+
+    def "getObr16ExtensionPractitioner should return null when OBR16 extension value is not a Reference"() {
+        given:
+        def serviceRequest = new ServiceRequest()
+        def obrExtension = new Extension(HapiHelper.EXTENSION_OBR_URL)
+        def obr16Extension = new Extension(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString())
+        obr16Extension.setValue(new StringType("Not a Reference"))
+        obrExtension.addExtension(obr16Extension)
+        serviceRequest.addExtension(obrExtension)
+
+        when:
+        def result = HapiHelper.getObr16ExtensionPractitioner(serviceRequest)
+
+        then:
+        result == null
+    }
+
+    def "getObr16ExtensionPractitioner should return null when Reference does not contain Practitioner"() {
+        given:
+        def serviceRequest = new ServiceRequest()
+        def reference = new Reference()
+        def obrExtension = new Extension(HapiHelper.EXTENSION_OBR_URL)
+        def obr16Extension = new Extension(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString())
+        obr16Extension.setValue(reference)
+        obrExtension.addExtension(obr16Extension)
+        serviceRequest.addExtension(obrExtension)
+
+        when:
+        def result = HapiHelper.getObr16ExtensionPractitioner(serviceRequest)
+
+        then:
+        result == null
+    }
+
+    def "getObr16ExtensionPractitioner should return Practitioner when Reference contains Practitioner"() {
+        given:
+        def serviceRequest = new ServiceRequest()
+        def obrExtension = new Extension(HapiHelper.EXTENSION_OBR_URL)
+        def obr16Extension = new Extension(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString())
+        obrExtension.addExtension(obr16Extension)
+        serviceRequest.addExtension(obrExtension)
+
+        def practitioner = new Practitioner()
+        def practitionerRole = new PractitionerRole()
+        practitionerRole.setPractitioner(new Reference("Practitioner/123").setResource(practitioner) as Reference)
+
+        HapiHelper.setOBR16WithPractitioner(obrExtension, practitionerRole)
+
+        when:
+        def result = HapiHelper.getObr16ExtensionPractitioner(serviceRequest)
+
+        then:
+        result == practitioner
+    }
+
     def "ensureExtensionExists returns extension if it exists"() {
         given:
         def serviceRequest = new ServiceRequest()
