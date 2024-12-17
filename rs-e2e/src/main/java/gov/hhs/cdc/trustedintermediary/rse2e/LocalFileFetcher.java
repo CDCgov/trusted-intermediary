@@ -29,8 +29,6 @@ public class LocalFileFetcher implements FileFetcher {
     @Override
     public List<HL7FileStream> fetchFiles(boolean isAutomatedTest) {
         if (!isAutomatedTest) {
-            // there might be problems with this as file_path is static; I'd need to do some more
-            // digging to be sure
             files_path = "../examples/Test/Automated/Golden/";
         }
         try (Stream<Path> stream = Files.walk(Paths.get(files_path))) {
