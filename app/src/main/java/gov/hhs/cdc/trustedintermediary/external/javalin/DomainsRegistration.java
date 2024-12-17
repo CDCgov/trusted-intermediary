@@ -122,6 +122,8 @@ public class DomainsRegistration {
     static Handler createHandler(
             Function<DomainRequest, DomainResponse> handler, boolean isProtected) {
         return (Context ctx) -> {
+            ApplicationContext.clearThreadRegistrations();
+
             LOGGER.logInfo(ctx.method().name() + " " + ctx.url());
 
             var request = javalinContextToDomainRequest(ctx);

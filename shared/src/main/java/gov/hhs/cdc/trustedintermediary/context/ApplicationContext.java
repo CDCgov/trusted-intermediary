@@ -13,6 +13,7 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,8 @@ import javax.inject.Inject;
 public class ApplicationContext {
 
     protected static final Map<Class<?>, Object> OBJECT_MAP = new ConcurrentHashMap<>();
+    protected static final InheritableThreadLocal<Map<Class<?>, Object>> THREAD_OBJECT_MAP =
+            new InheritableThreadLocal<>();
     protected static final Map<String, String> TEST_ENV_VARS = new ConcurrentHashMap<>();
     protected static final Set<Object> IMPLEMENTATIONS = new HashSet<>();
 
@@ -40,7 +43,28 @@ public class ApplicationContext {
         IMPLEMENTATIONS.add(implementation.getClass());
     }
 
+    public static void registerForThread(Class<?> clazz, Object implementation) {
+        Map<Class<?>, Object> threadObjectMap = THREAD_OBJECT_MAP.get();
+        if (threadObjectMap == null) {
+            threadObjectMap = new HashMap<>();
+        }
+
+        threadObjectMap.put(clazz, implementation);
+
+        THREAD_OBJECT_MAP.set(threadObjectMap);
+    }
+
+    public static void clearThreadRegistrations() {
+        THREAD_OBJECT_MAP.remove();
+    }
+
     public static <T> T getImplementation(Class<T> clazz) {
+        // check the thread local map first
+        Map<Class<?>, Object> threadObjectMap = THREAD_OBJECT_MAP.get();
+        if (threadObjectMap != null && threadObjectMap.containsKey(clazz)) {
+            return (T) threadObjectMap.get(clazz);
+        }
+
         T object = (T) OBJECT_MAP.get(clazz);
 
         if (object == null) {

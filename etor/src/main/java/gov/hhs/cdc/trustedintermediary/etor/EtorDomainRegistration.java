@@ -134,6 +134,7 @@ public class EtorDomainRegistration implements DomainConnector {
                     MessageLinkStorage.class, FileMessageLinkStorage.getInstance());
         }
 
+        // these are default implementations
         if (ApplicationContext.isPropertyPresent("REPORT_STREAM_URL_PREFIX")) {
             ApplicationContext.register(
                     RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
@@ -225,6 +226,12 @@ public class EtorDomainRegistration implements DomainConnector {
         String inboundReportId = getInboundReportId(request);
         boolean markMetadataAsFailed = false;
         String errorMessage = "";
+
+        if ("True".equals(request.getHeaders().get("Load-Test"))
+                && ApplicationContext.isPropertyPresent("REPORT_STREAM_URL_PREFIX")) {
+            ApplicationContext.registerForThread(
+                    RSEndpointClient.class, MockRSEndpointClient.getInstance());
+        }
 
         try {
             return requestHandler.handle(inboundReportId);
