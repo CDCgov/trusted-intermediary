@@ -120,7 +120,7 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         evaluateOrc12Values(bundle, EXPECTED_NPI, EXPECTED_FIRST_NAME, EXPECTED_LAST_NAME, EXPECTED_NAME_TYPE_CODE, EXPECTED_IDENTIFIER_TYPE_CODE)
 
         // OBR16 should not exist initially
-        def obr16Practitioner = getObr16ExtensionPractitioner(serviceRequest)
+        def obr16Practitioner = HapiHelper.getObr16ExtensionPractitioner(serviceRequest)
         obr16Practitioner == null
 
         when:
@@ -216,7 +216,7 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
 
     void evaluateObr16IsNull(ServiceRequest serviceRequest) {
         assert HapiHelper.getObr16Extension(serviceRequest) == null
-        assert getObr16ExtensionPractitioner(serviceRequest) == null
+        assert HapiHelper.getObr16ExtensionPractitioner(serviceRequest) == null
     }
 
     void evaluateObr16Values(
@@ -226,7 +226,7 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
             String expectedLastName,
             String expectedNameTypeCode,
             String expectedIdentifierTypeCode) {
-        def practitioner = getObr16ExtensionPractitioner(serviceRequest)
+        def practitioner = HapiHelper.getObr16ExtensionPractitioner(serviceRequest)
         def xcnExtension = practitioner.getExtensionByUrl(PRACTITIONER_EXTENSION_URL)
 
         assert practitioner.identifier[0]?.value == expectedNpi
@@ -235,14 +235,6 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         assert xcnExtension.getExtensionByUrl("XCN.10")?.value?.toString() == expectedNameTypeCode
         def codingSystem = practitioner.identifier[0]?.type?.coding
         assert codingSystem == null || codingSystem[0]?.code == expectedIdentifierTypeCode
-    }
-
-    Practitioner getObr16ExtensionPractitioner (serviceRequest) {
-        def obr16Extension = HapiHelper.getObr16Extension(serviceRequest)
-        if (obr16Extension == null) {
-            return null
-        }
-        return obr16Extension.value.getResource()
     }
 
     Practitioner getOrc12ExtensionPractitioner(Bundle bundle) {
