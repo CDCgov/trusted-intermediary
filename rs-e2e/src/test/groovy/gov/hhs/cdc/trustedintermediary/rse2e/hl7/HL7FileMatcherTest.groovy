@@ -45,7 +45,7 @@ class HL7FileMatcherTest extends Specification {
     }
 
 
-    def "should throw HapiHL7FileMatcherException if didn't find a match for at least one file in either input or output"() {
+    def "should throw HL7FileMatcherException if didn't find a match for at least one file in either input or output"() {
         given:
         def mockInputFiles
         def mockOutputFiles
@@ -120,7 +120,7 @@ class HL7FileMatcherTest extends Specification {
         file2MshSegment == message2.getUnderlyingData().toString()
     }
 
-    def "should throw HapiHL7FileMatcherException when MSH-10 is empty"() {
+    def "should throw HL7FileMatcherException when MSH-10 is empty"() {
         given:
         def msh1to9 = "MSH|^~\\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-lab-id^DNS|20230101010000-0000||ORM^O01^ORM_O01|"
         def msh11to12 = "|T|2.5.1"
@@ -136,7 +136,7 @@ class HL7FileMatcherTest extends Specification {
         thrown(HL7FileMatcherException)
     }
 
-    def "should throw HapiHL7FileMatcherException when not able to parse the file as HL7 message"() {
+    def "should throw HL7FileMatcherException when not able to parse the file as HL7 message"() {
         given:
         def inputStream = new ByteArrayInputStream("".bytes)
         def hl7FileStream = new HL7FileStream("badFile", inputStream)

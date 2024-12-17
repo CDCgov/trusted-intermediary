@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 /**
- * Represents a HAPI HL7 message that implements the HealthData interface. This class provides a
- * wrapper around the HAPI Message object.
+ * Represents a HL7 message that implements the HealthData interface and adds methods to access the
+ * HL7 data
  */
 public class HL7Message implements HealthData<HL7Message> {
 

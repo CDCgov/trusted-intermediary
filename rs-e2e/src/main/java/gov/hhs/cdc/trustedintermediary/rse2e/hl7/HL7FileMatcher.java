@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * The HapiHL7FileMatcher class is responsible for matching input and output HL7 files based on the
+ * The HL7FileMatcher class is responsible for matching input and output HL7 files based on the
  * control ID (MSH-10).
  */
 public class HL7FileMatcher {
