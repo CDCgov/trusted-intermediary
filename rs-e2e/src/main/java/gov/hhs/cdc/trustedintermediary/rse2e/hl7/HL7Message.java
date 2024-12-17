@@ -20,6 +20,10 @@ public class HL7Message implements HealthData<HL7Message> {
         this.encodingCharacters = encodingCharacters;
     }
 
+    public List<HL7Segment> getSegments() {
+        return segments;
+    }
+
     public List<HL7Segment> getSegments(String name) {
         return segments.stream().filter(segment -> segment.name().equals(name)).toList();
     }
@@ -59,8 +63,8 @@ public class HL7Message implements HealthData<HL7Message> {
 
     public String getValue(String segmentName, int... indices) throws HL7MessageException {
         List<String> fields = getSegment(segmentName).fields();
-        char[] levelDelimiters = this.getOrderedLevelDelimiters();
-        return HL7Parser.parseAndGetValue(fields, levelDelimiters, indices);
+        char[] segmentDelimiters = this.getOrderedSegmentDelimiters();
+        return HL7Parser.parseAndGetValue(fields, segmentDelimiters, indices);
     }
 
     public char getEncodingCharacter(String type) {
@@ -71,7 +75,7 @@ public class HL7Message implements HealthData<HL7Message> {
         return getEncodingCharacter(HL7Parser.ESCAPE_CHARACTER_NAME);
     }
 
-    public char[] getOrderedLevelDelimiters() {
+    public char[] getOrderedSegmentDelimiters() {
         return new char[] {
             getEncodingCharacter(HL7Parser.FIELD_DELIMITER_NAME),
             getEncodingCharacter(HL7Parser.COMPONENT_DELIMITER_NAME),
