@@ -42,3 +42,13 @@ task automatedTest(type: Test) {
         exceptionFormat 'full'
     }
 }
+
+task goldenCopyTest(type: Test) {
+    useJUnitPlatform()
+    include '**/GoldenCopyTest.*'
+
+    testLogging {
+        showStackTraces true
+        exceptionFormat 'full'
+    }
+}
