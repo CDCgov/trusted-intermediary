@@ -839,6 +839,46 @@ class HapiHelperTest extends Specification {
         HapiHelper.getOBR4_1Value(sr) == null
     }
 
+    // OBR-16 - Ordering Provider
+    def "getObr16Extension returns the extension if present"() {
+        given:
+        def serviceRequest = new ServiceRequest()
+        def obrExtension = new Extension(HapiHelper.EXTENSION_OBR_URL)
+        def obr16Extension = new Extension(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString())
+        obrExtension.addExtension(obr16Extension)
+        serviceRequest.addExtension(obrExtension)
+
+        when:
+        def result = HapiHelper.getObr16Extension(serviceRequest)
+
+        then:
+        result == obr16Extension
+    }
+
+    def "getObr16Extension returns null when no OBR extension is present"() {
+        given:
+        def serviceRequest = new ServiceRequest()
+
+        when:
+        def result = HapiHelper.getObr16Extension(serviceRequest)
+
+        then:
+        result == null
+    }
+
+    def "getObr16Extension returns null when OBR extension does not contain OBR-16"() {
+        given:
+        def serviceRequest = new ServiceRequest()
+        def obrExtension = new Extension(HapiHelper.EXTENSION_OBR_URL)
+        serviceRequest.addExtension(obrExtension)
+
+        when:
+        def result = HapiHelper.getObr16Extension(serviceRequest)
+
+        then:
+        result == null
+    }
+
     def "ensureExtensionExists returns extension if it exists"() {
         given:
         def serviceRequest = new ServiceRequest()
