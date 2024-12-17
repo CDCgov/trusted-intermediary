@@ -275,8 +275,7 @@ PID|1||11102779^^^CR^MR||SMITH^BB SARAH^^^^^L"""
         evaluator.getFieldValue(hl7Message, inputMessage, fieldName)
 
         then:
-        def e = thrown(IllegalArgumentException)
-        e.getCause().getClass() == NumberFormatException
+        thrown(IllegalArgumentException)
     }
 
     def "getFieldValue throws exception for empty field name"() {

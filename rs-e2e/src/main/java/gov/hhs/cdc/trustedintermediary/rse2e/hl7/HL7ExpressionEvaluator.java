@@ -138,7 +138,11 @@ public class HL7ExpressionEvaluator implements HealthDataExpressionEvaluator {
         String fileSource = messageSourceMatcher.group(1);
         HL7Message message = getMessageBySource(fileSource, inputMessage, outputMessage);
 
-        return message.getValue(fieldName);
+        try {
+            return message.getValue(fieldName);
+        } catch (HL7MessageException e) {
+            return null;
+        }
     }
 
     protected HL7Message getMessageBySource(

@@ -28,7 +28,8 @@ public class HL7Parser {
     protected static final String SUBCOMPONENT_DELIMITER_NAME = "subcomponent";
     protected static final String MSH_SEGMENT_NAME = "MSH";
     protected static final String DEFAULT_SEGMENT_DELIMITER = "\n";
-    protected static final Pattern HL7_FIELD_NAME_PATTERN = Pattern.compile("(\\w+)(?:-(\\S+))?");
+    protected static final Pattern HL7_FIELD_NAME_PATTERN =
+            Pattern.compile("(\\w+)-(\\d+(?:\\.\\d+)*)");
 
     public static HL7Message parse(String content) {
         List<HL7Segment> segments = new ArrayList<>();
@@ -47,7 +48,7 @@ public class HL7Parser {
             segments.add(new HL7Segment(segmentName, segmentFields));
         }
 
-        return new HL7Message(segments, getEncodingCharacters(encodingCharactersField));
+        return new HL7Message(segments, getEncodingCharacterMap(encodingCharactersField));
     }
 
     public static String parseAndGetValue(List<String> fields, char[] delimiters, int... indices) {
@@ -71,7 +72,7 @@ public class HL7Parser {
         return value;
     }
 
-    public static Map<String, Character> getEncodingCharacters(String encodingCharactersField) {
+    public static Map<String, Character> getEncodingCharacterMap(String encodingCharactersField) {
         char[] encodingCharacters = DEFAULT_ENCODING_CHARACTERS;
         if (encodingCharactersField != null && !encodingCharactersField.isEmpty()) {
             encodingCharacters = encodingCharactersField.toCharArray();
