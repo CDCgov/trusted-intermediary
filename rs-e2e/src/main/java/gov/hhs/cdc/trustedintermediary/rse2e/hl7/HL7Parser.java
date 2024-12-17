@@ -81,10 +81,7 @@ public class HL7Parser {
 
         return Map.of(
                 FIELD_DELIMITER_NAME, HL7Parser.DEFAULT_FIELD_DELIMITER,
-                COMPONENT_DELIMITER_NAME,
-                        encodingCharacters.length > 0
-                                ? encodingCharacters[0]
-                                : HL7Parser.DEFAULT_COMPONENT_DELIMITER,
+                COMPONENT_DELIMITER_NAME, HL7Parser.DEFAULT_COMPONENT_DELIMITER,
                 REPETITION_DELIMITER_NAME,
                         encodingCharacters.length > 1
                                 ? encodingCharacters[1]

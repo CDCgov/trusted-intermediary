@@ -71,4 +71,36 @@ OBX|1|ST|57723-9^Unique bar code number of Current sample^LN||123456||||||F|||20
         then:
         out == null
     }
+
+    def "getEncodingCharacterMap uses default definitions when encoding characters are not available"() {
+        when:
+        def out = HL7Parser.getEncodingCharacterMap("tes")
+
+        then:
+        out.size() > 0
+    }
+
+    def "getEncodingCharacterMap uses default definitions if the encoding characters are blank"() {
+        when:
+        def out = HL7Parser.getEncodingCharacterMap(" ")
+
+        then:
+        out.size() > 0
+    }
+
+    def "getEncodingCharacterMap uses default definitions if the encoding characters are whitespace"() {
+        when:
+        def out = HL7Parser.getEncodingCharacterMap("")
+
+        then:
+        out.size() > 0
+    }
+
+    def "getEncodingCharacterMap uses default definitions if the encoding characters are null"() {
+        when:
+        def out = HL7Parser.getEncodingCharacterMap(null)
+
+        then:
+        out.size() > 0
+    }
 }
