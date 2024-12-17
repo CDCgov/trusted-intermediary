@@ -14,26 +14,20 @@ import spock.lang.Specification
 import java.nio.file.Files
 import java.nio.file.Path
 
-class GoldenTest extends Specification {
+class GoldenCopyTest extends Specification {
 
-    def beforeFileJsonFileString = Files.readString(Path.of("../examples/Test/Automated/golden_actual.hl7"))
-    def afterFileJsonFileString = Files.readString(Path.of("../examples/Test/Automated/golden_expected.hl7"))
-
-
-    List<HL7FileStream> azureFiles // output
-    List<HL7FileStream> localFiles // input
+    List<HL7FileStream> azureFiles
+    List<HL7FileStream> localFiles
     AssertionRuleEngine engine
     HapiHL7FileMatcher fileMatcher
     Logger mockLogger = Mock(Logger)
     List<String> loggedErrorsAndWarnings = []
 
     def setup() {
-        engine = AssertionRuleEngine.getInstance()
         fileMatcher =  HapiHL7FileMatcher.getInstance()
 
         TestApplicationContext.reset()
         TestApplicationContext.init()
-        TestApplicationContext.register(AssertionRuleEngine, engine)
         TestApplicationContext.register(RuleLoader, RuleLoader.getInstance())
         TestApplicationContext.register(Logger, mockLogger)
         TestApplicationContext.register(Formatter, Jackson.getInstance())
@@ -49,19 +43,17 @@ class GoldenTest extends Specification {
             loggedErrorsAndWarnings << msg
         }
 
-        //      FileFetcher azureFileFetcher = AzureBlobFileFetcher.getInstance()
-        //      azureFiles = azureFileFetcher.fetchFiles()
+        FileFetcher azureFileFetcher = AzureBlobFileFetcher.getInstance()
+        azureFiles = azureFileFetcher.fetchFiles()
 
-        //      FileFetcher localFileFetcher = LocalFileFetcher.getInstance()
-        //      localFiles = localFileFetcher.fetchFiles()
-
-        engine.ensureRulesLoaded() // we don't want this because it uses the hardcoded assertion_definition.json OR we want to modify that method
+        FileFetcher localFileFetcher = LocalFileFetcher.getInstance()
+        localFiles = localFileFetcher.fetchFiles()
     }
 
     def cleanup() {
-        //  for (HL7FileStream fileStream : localFiles + azureFiles) {
-        //     fileStream.inputStream().close()
-        //}
+        for (HL7FileStream fileStream : localFiles + azureFiles) {
+            fileStream.inputStream().close()
+        }
     }
 
     def "Compare files"() {
@@ -78,6 +70,26 @@ class GoldenTest extends Specification {
         // def matchedFiles = fileMatcher.matchFiles(azureFiles, localFiles)
 
         given:
+        def matchedFiles = fileMatcher.matchFiles(azureFiles, localFiles)
+
+        when:
+        for (messagePair in matchedFiles) {
+            def inputMessage = messagePair.getKey()
+            def outputMessage = messagePair.getValue()
+            //            def evaluatedRules = engine.runRules(outputMessage, inputMessage)
+            //            rulesToEvaluate.removeAll(evaluatedRules)
+        }
+
+        then:
+        rulesToEvaluate.collect { it.name }.isEmpty() //Check whether all the rules in the assertions file have been run
+        if (!loggedErrorsAndWarnings.isEmpty()) {
+            throw new AssertionError("Unexpected errors and/or warnings were logged:\n- ${loggedErrorsAndWarnings.join('\n- ')}")
+        }
+
+
+        given:
+        def beforeFileJsonFileString = Files.readString(Path.of("../examples/Test/Automated/golden_actual.hl7"))
+        def afterFileJsonFileString = Files.readString(Path.of("../examples/Test/Automated/golden_expected.hl7"))
 
 
         when:

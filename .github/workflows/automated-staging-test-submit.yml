@@ -7,10 +7,11 @@ on:
     inputs:
       name:
         type: choice
-        description: Type of staging test
+        description: Type of Staging Test
+        default: Automated Staging Test
         options:
-          - automated-staging-test
-          - golden-copy-staging-test
+          - Automated Staging Test
+          - Golden Copy Staging Test
 
 jobs:
   send_files:
@@ -52,6 +53,10 @@ jobs:
                     "$host/api/token" | jq -r ".access_token")
 
             file_path=Automated/*.hl7
+            if [ ${{ github.event.inputs.name }} = "Golden Copy Staging Test" ]; then
+               file_path=Automated/Golden/*.hl7
+            fi
+
             for file in $(pwd)/examples/Test/$(file_path); do
                 echo "Sending $file"
                 curl \
