@@ -53,7 +53,7 @@ public class HL7Parser {
     }
 
     public static String parseAndGetValue(List<String> fields, char[] delimiters, int... indices) {
-        if (fields == null || indices[0] > fields.size()) {
+        if (fields == null || fields.isEmpty() || indices[0] > fields.size()) {
             return null;
         }
 

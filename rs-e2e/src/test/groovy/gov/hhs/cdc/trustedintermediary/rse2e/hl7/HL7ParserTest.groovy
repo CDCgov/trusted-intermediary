@@ -32,4 +32,43 @@ OBX|1|ST|57723-9^Unique bar code number of Current sample^LN||123456||||||F|||20
         message.getValue("NK1", 33, 4, 1, 1) == "Medicaid"
         message.getValue("NK1", 33, 4, 1, 1, 1) == null
     }
+
+    def "parseAndGetValue returns null if a null list of fields is given"() {
+        given:
+        def nullList = null
+        def delimiters = ['|']
+
+        when:
+        def out = HL7Parser.parseAndGetValue(nullList, delimiters as char[])
+
+        then:
+        out == null
+    }
+
+    def "parseAndGetValue returns null if an empty list of fields is given"() {
+        given:
+        def emptyList = []
+        def delimiters = ['|']
+
+        when:
+        def out = HL7Parser.parseAndGetValue(emptyList, delimiters as char[])
+
+        then:
+        out == null
+    }
+
+    def "parseAndGetValue returns null if the indices are pointing outside the expected range"() {
+        given:
+        def emptyList = [
+            "MSH|fakeValues",
+            "OBR|fakeValues"
+        ]
+        def delimiters = ['|']
+
+        when:
+        def out = HL7Parser.parseAndGetValue(emptyList, delimiters as char[], 10, 20)
+
+        then:
+        out == null
+    }
 }
