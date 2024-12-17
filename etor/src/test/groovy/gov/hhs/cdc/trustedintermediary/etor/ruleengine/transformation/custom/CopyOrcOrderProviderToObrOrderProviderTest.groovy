@@ -215,7 +215,7 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
     }
 
     void evaluateObr16IsNull(ServiceRequest serviceRequest) {
-        assert getObr16Extension(serviceRequest) == null
+        assert HapiHelper.getObr16Extension(serviceRequest) == null
         assert getObr16ExtensionPractitioner(serviceRequest) == null
     }
 
@@ -237,14 +237,8 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         assert codingSystem == null || codingSystem[0]?.code == expectedIdentifierTypeCode
     }
 
-    Extension getObr16Extension(serviceRequest) {
-        def obrExtension =  serviceRequest.getExtensionByUrl(HapiHelper.EXTENSION_OBR_URL)
-        def obr16Extension = obrExtension.getExtensionByUrl(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString())
-        return obr16Extension
-    }
-
     Practitioner getObr16ExtensionPractitioner (serviceRequest) {
-        def obr16Extension = getObr16Extension(serviceRequest)
+        def obr16Extension = HapiHelper.getObr16Extension(serviceRequest)
         if (obr16Extension == null) {
             return null
         }

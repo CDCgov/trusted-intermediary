@@ -567,6 +567,14 @@ public class HapiHelper {
         obr16Extension.setValue(practitionerRole.getPractitioner());
     }
 
+    public static Extension getObr16Extension(ServiceRequest serviceRequest) {
+        Extension obrExtension = serviceRequest.getExtensionByUrl(HapiHelper.EXTENSION_OBR_URL);
+        if (obrExtension == null) {
+            return null;
+        }
+        return obrExtension.getExtensionByUrl(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString());
+    }
+
     /**
      * Ensures that the extension exists for a given serviceRequest. If the extension does not
      * exist, it will create it.
