@@ -5,32 +5,124 @@ import spock.lang.Specification
 
 class HL7ParserTest extends Specification {
 
-    def "getValue returns the expected value given the segment name and indices"() {
+    def "parse should handle basic HL7 message"() {
         given:
-        def content = """MSH|^~\\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^automated-staging-test-receiver-id^DNS|20230101010000-0000||ORM^O01^ORM_O01|001|N|2.5.1||||||||||
-PID|1||1300974^^^Baptist East^MR||ONE^TESTCASE||202402210152-0500|F^Female^HL70001||2106-3^White^HL70005|1234 GPCS WAY^^MONTGOMERY^Alabama^36117^USA^home^^Montgomery|||||||2227600015||||N^Not Hispanic or Latino^HL70189|||1|||||||||||||||LRI_NG_FRN_PROFILE^^2.16.840.1.113883.9.195.3.4^ISO~LRI_NDBS_COMPONENT^^2.16.840.1.113883.9.195.3.6^ISO~LAB_PRN_Component^^2.16.840.1.113883.9.81^ISO~LAB_TO_COMPONENT^^2.16.840.1.113883.9.22^ISO|
-NK1|1|ONE^MOMFIRST|MTH^Mother^HL70063||^^^^^804^5693861||||||||||||||||||||||||||||123456789^^^Medicaid&2.16.840.1.113883.4.446&ISO^MD||||000-00-0000^^^ssn&2.16.840.1.113883.4.1&ISO^SS
-ORC|NW|4560411583^ORDERID||||||||||12345^^^^^^^^NPI&2.16.840.1.113883.4.6&ISO^L|||||||||
-OBR|1|4560411583^ORDERID||54089-8^Newborn screening panel AHIC^LN|||202402221854-0500|||||||||12345^^^^^^^^NPI&2.16.840.1.113883.4.6&ISO^L||||||||
-OBX|1|ST|57723-9^Unique bar code number of Current sample^LN||123456||||||F|||202402221854-0500
-"""
+        def content = """MSH|^~\\&|sending_app|sending_facility
+PID|||12345||Doe^John||19800101|M"""
 
         when:
-        HL7Message message = HL7Parser.parse(content)
+        def message = HL7Parser.parse(content)
+        def segments = message.getSegments()
 
         then:
-        message.getValue("PID", 3) == "1300974^^^Baptist East^MR"
-        message.getValue("PID", 3, 0) == null
-        message.getValue("PID", 3, 1) == "1300974"
-        message.getValue("PID", 3, 2) == ""
-        message.getValue("PID", 3, 4) == "Baptist East"
-        message.getValue("PID", 3, 5) == "MR"
-        message.getValue("PID", 3, 6) == null
-        message.getValue("PID", 40, 4, 1) == "ISO"
-        message.getValue("PID", 40, 4, 2) == "LRI_NDBS_COMPONENT"
-        message.getValue("PID", 40, 4, 3) == null
-        message.getValue("NK1", 33, 4, 1, 1) == "Medicaid"
-        message.getValue("NK1", 33, 4, 1, 1, 1) == null
+        segments.size() == 2
+        segments[0].name() == "MSH"
+        segments[0].fields().size() == 4
+        segments[0].fields().get(0) == "|"
+        segments[0].fields().get(1) == "^~\\&"
+        segments[1].name() == "PID"
+        segments[1].fields().size() == 8
+        segments[1].fields().get(2) == "12345"
+        segments[1].fields().get(4) == "Doe^John"
+    }
+
+    def "parse should handle empty lines in message"() {
+        given:
+        def content = """MSH|^~\\&|sending_app
+
+PID|||12345"""
+
+        when:
+        def result = HL7Parser.parse(content)
+
+        then:
+        result.getSegments().size() == 2
+    }
+
+    def "parse should preserve empty fields"() {
+        given:
+        def content = "MSH|^~\\&|sending_app||sending_facility"
+
+        when:
+        def result = HL7Parser.parse(content)
+
+        then:
+        result.getSegments().get(0).fields().get(3) == ""
+    }
+
+    def "parseAndGetValue should handle different field levels"() {
+        given:
+        def fields = [
+            "value1",
+            "component1^component2",
+            "rep1~rep2^",
+            "comp1^~sub1&sub2"
+        ]
+        def delimiters = ['|', '^', '~', '&'] as char[]
+
+        when:
+        def result = HL7Parser.parseAndGetValue(fields, delimiters, indices as int[])
+
+        then:
+        result == expectedValue
+
+        where:
+        scenario           | indices      | expectedValue
+        "simple field"     | [1]          | "value1"
+        "component"        | [2, 2]       | "component2"
+        "repetition"       | [3, 1, 2]    | "rep2"
+        "subcomponent"     | [4, 2, 2, 2]    | "sub2"
+        "invalid index"    | [5]          | null
+    }
+
+    def "parseAndGetValue should handle null inputs"() {
+        when:
+        def result = HL7Parser.parseAndGetValue(null, [] as char[], 1)
+
+        then:
+        result == null
+    }
+
+    def "getEncodingCharacterMap should use defaults when no encoding characters provided"() {
+        when:
+        def encodingChars = HL7Parser.getEncodingCharacterMap(null)
+
+        then:
+        encodingChars["field"] == '|' as char
+        encodingChars["component"] == '^' as char
+        encodingChars["repetition"] == '~' as char
+        encodingChars["escape"] == '\\' as char
+        encodingChars["subcomponent"] == '&' as char
+    }
+
+    def "getEncodingCharacterMap should use default character when one is missing"() {
+        given:
+        def customEncodingChars = "_"
+
+        when:
+        def encodingChars = HL7Parser.getEncodingCharacterMap(customEncodingChars)
+
+        then:
+        encodingChars["field"] == '|' as char
+        encodingChars["component"] == '_' as char
+        encodingChars["repetition"] == '~' as char
+        encodingChars["escape"] == '\\' as char
+        encodingChars["subcomponent"] == '&' as char
+    }
+
+    def "getEncodingCharacterMap should use custom encoding characters when provided"() {
+        given:
+        def customEncodingChars = "@#+_"
+
+        when:
+        def result = HL7Parser.getEncodingCharacterMap(customEncodingChars)
+
+        then:
+        result["field"] == '|' as char
+        result["component"] == '@' as char
+        result["repetition"] == '#' as char
+        result["escape"] == '+' as char
+        result["subcomponent"] == '_' as char
     }
 
     def "parseAndGetValue returns null if a null list of fields is given"() {

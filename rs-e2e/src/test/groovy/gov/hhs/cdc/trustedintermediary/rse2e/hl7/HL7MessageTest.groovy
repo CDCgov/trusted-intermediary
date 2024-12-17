@@ -42,6 +42,11 @@ OBX|2|NM|||3122||||||F|||202402221854-0500||"""
         actualSegment.fields().get(0) == "2"
     }
 
+    def "getSegments returns all segments if no called with no arguments"() {
+        expect:
+        message.getSegments().size() == 7
+    }
+
     def "getSegmentCount returns the expected number of segments"() {
         expect:
         message.getSegmentCount("MSH") == 1
@@ -101,6 +106,6 @@ OBX|2|NM|||3122||||||F|||202402221854-0500||"""
 
     def "getEscapeCharacter should return the escape character"() {
         expect:
-        message.getEscapeCharacter() == '\\'
+        message.getEscapeCharacter() == '\\' as char
     }
 }

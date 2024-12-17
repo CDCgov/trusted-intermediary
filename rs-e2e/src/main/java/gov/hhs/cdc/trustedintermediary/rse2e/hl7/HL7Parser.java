@@ -62,9 +62,9 @@ public class HL7Parser {
             if (i >= delimiters.length) {
                 return null;
             }
-            char levelDelimiter = delimiters[i];
+            char segmentDelimiter = delimiters[i];
             int index = indices[i] - 1;
-            String[] parts = value.split(Pattern.quote(String.valueOf(levelDelimiter)));
+            String[] parts = value.split(Pattern.quote(String.valueOf(segmentDelimiter)));
             if (index < 0 || index >= parts.length) {
                 return null;
             }
@@ -81,10 +81,7 @@ public class HL7Parser {
 
         return Map.of(
                 FIELD_DELIMITER_NAME, HL7Parser.DEFAULT_FIELD_DELIMITER,
-                COMPONENT_DELIMITER_NAME,
-                        encodingCharacters.length > 0
-                                ? encodingCharacters[0]
-                                : HL7Parser.DEFAULT_COMPONENT_DELIMITER,
+                COMPONENT_DELIMITER_NAME, encodingCharacters[0],
                 REPETITION_DELIMITER_NAME,
                         encodingCharacters.length > 1
                                 ? encodingCharacters[1]
