@@ -4,6 +4,13 @@ on:
   schedule:
     - cron: "0 5 * * 2-6"  # Tuesday to Saturday at Midnight EST (5am UTC)
   workflow_dispatch:
+    inputs:
+      name:
+        type: choice
+        description: Type of staging test
+        options:
+          - automated-staging-test
+          - golden-copy-staging-test
 
 jobs:
   send_files:
@@ -44,7 +51,8 @@ jobs:
                     --silent \
                     "$host/api/token" | jq -r ".access_token")
 
-            for file in $(pwd)/examples/Test/Automated/*.hl7; do
+            file_path=Automated/*.hl7
+            for file in $(pwd)/examples/Test/$(file_path); do
                 echo "Sending $file"
                 curl \
                     --header "Content-Type: application/hl7-v2" \
