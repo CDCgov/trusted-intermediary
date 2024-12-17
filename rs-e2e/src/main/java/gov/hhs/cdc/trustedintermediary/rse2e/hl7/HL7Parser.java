@@ -37,7 +37,8 @@ public class HL7Parser {
         String[] lines = content.split(NEWLINE_REGEX);
         for (String line : lines) {
             if (line.trim().isEmpty()) continue;
-            String[] fields = line.split(Pattern.quote(String.valueOf(DEFAULT_FIELD_DELIMITER)));
+            String[] fields =
+                    line.split(Pattern.quote(String.valueOf(DEFAULT_FIELD_DELIMITER)), -1);
             String segmentName = fields[0];
             List<String> segmentFields =
                     new ArrayList<>(Arrays.asList(fields).subList(1, fields.length));

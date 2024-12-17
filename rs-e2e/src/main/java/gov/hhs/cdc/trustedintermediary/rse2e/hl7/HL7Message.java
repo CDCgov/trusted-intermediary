@@ -24,6 +24,10 @@ public class HL7Message implements HealthData<HL7Message> {
         return segments.stream().filter(segment -> segment.name().equals(name)).toList();
     }
 
+    public int getSegmentCount(String name) {
+        return getSegments(name).size();
+    }
+
     public boolean hasSegment(String name, int index) {
         return getSegmentCount(name) > index;
     }
@@ -40,18 +44,6 @@ public class HL7Message implements HealthData<HL7Message> {
         return getSegment(name, 0);
     }
 
-    public List<String> getSegmentFields(String name, int index) throws HL7MessageException {
-        return getSegment(name, index).fields();
-    }
-
-    public List<String> getSegmentFields(String name) throws HL7MessageException {
-        return getSegment(name, 0).fields();
-    }
-
-    public int getSegmentCount(String name) {
-        return getSegments(name).size();
-    }
-
     public String getValue(String hl7Path) throws HL7MessageException {
         Matcher hl7FieldNameMatcher = HL7Parser.HL7_FIELD_NAME_PATTERN.matcher(hl7Path);
         if (!hl7FieldNameMatcher.matches()) {
@@ -66,7 +58,7 @@ public class HL7Message implements HealthData<HL7Message> {
     }
 
     public String getValue(String segmentName, int... indices) throws HL7MessageException {
-        List<String> fields = getSegmentFields(segmentName);
+        List<String> fields = getSegment(segmentName).fields();
         char[] levelDelimiters = this.getOrderedLevelDelimiters();
         return HL7Parser.parseAndGetValue(fields, levelDelimiters, indices);
     }
