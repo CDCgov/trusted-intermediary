@@ -551,7 +551,7 @@ public class HapiHelper {
         return getCWE1Value(cc.getCoding().get(0));
     }
 
-    // OBR16 - Ordering Provider
+    // OBR-16 - Ordering Provider
     public static void setOBR16WithPractitioner(
             Extension obrExtension, PractitionerRole practitionerRole) {
         if (practitionerRole == null || !practitionerRole.getPractitioner().hasReference()) {
@@ -578,11 +578,39 @@ public class HapiHelper {
             return null;
         }
 
-        if (obr16Extension.getValue() instanceof Reference reference) {
-            if (reference.getResource() instanceof Practitioner practitioner) {
-                return practitioner;
-            }
+        if (obr16Extension.getValue() instanceof Reference reference
+                && reference.getResource() instanceof Practitioner practitioner) {
+            return practitioner;
         }
+        return null;
+    }
+
+    // ORC-12 - Ordering Provider
+    public static Practitioner getOrc12ExtensionPractitioner(Bundle bundle) {
+        DiagnosticReport diagnosticReport = getDiagnosticReport(bundle);
+        if (diagnosticReport == null) return null;
+
+        ServiceRequest serviceRequest = getServiceRequest(diagnosticReport);
+        if (serviceRequest == null) return null;
+
+        Extension orcExtension = serviceRequest.getExtensionByUrl(EXTENSION_ORC_URL);
+        if (orcExtension == null) return null;
+
+        Extension orc12Extension = orcExtension.getExtensionByUrl(EXTENSION_ORC12_URL);
+        if (orc12Extension == null) return null;
+
+        Reference practitionerReference = (Reference) orc12Extension.getValue();
+        if (practitionerReference == null) return null;
+
+        String practitionerUrl = practitionerReference.getReference();
+        if (practitionerUrl == null) return null;
+
+        for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
+            if (Objects.equals(entry.getFullUrl(), practitionerUrl)
+                    && entry.getResource() instanceof Practitioner practitioner)
+                return practitioner;
+        }
+
         return null;
     }
 
