@@ -54,7 +54,7 @@ jobs:
 
             file_path=Automated/*.hl7
             if [ ${{ github.event.inputs.name }} = "Golden Copy Staging Test" ]; then
-               file_path=Automated/Golden/*.hl7
+               file_path=Automated/GoldenCopy/Input/*.hl7
             fi
 
             for file in $(pwd)/examples/Test/$(file_path); do
