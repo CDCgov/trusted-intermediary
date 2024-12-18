@@ -83,20 +83,27 @@ OBX|2|NM|||3122||||||F|||202402221854-0500||"""
         message.getValue("PID", 40, 4, 1) == message.getValue("PID-40.4.1")
         message.getValue("NK1", 33, 4, 1, 1) == message.getValue("NK1-33.4.1.1")
         message.getValue("PID-3") == "1300974^^^Baptist East^MR"
-        message.getValue("PID-3.0") == null
+        message.getValue("PID-3.0") == ""
         message.getValue("PID-3.1") == "1300974"
         message.getValue("PID-3.2") == ""
         message.getValue("PID-3.4") == "Baptist East"
         message.getValue("PID-3.5") == "MR"
-        message.getValue("PID-3.6") == null
+        message.getValue("PID-3.6") == ""
         message.getValue("PID-40.4.1") == "ISO"
         message.getValue("PID-40.4.2") == "LRI_NDBS_COMPONENT"
-        message.getValue("PID-40.4.3") == null
+        message.getValue("PID-40.4.3") == ""
         message.getValue("NK1-33.4.1.1") == "Medicaid"
-        message.getValue("NK1-33.4.1.1.1") == null
     }
 
-    def "getValue should throws an HL7MessageException when the segment is not found"() {
+    def "getValue should throws an exception when the hl7 field index has too many sublevels"() {
+        when:
+        message.getValue("NK1-33.4.1.1.1")
+
+        then:
+        thrown(HL7ParserException)
+    }
+
+    def "getValue should throws an exception when the segment is not found"() {
         when:
         message.getValue("ZZZ", 1)
 

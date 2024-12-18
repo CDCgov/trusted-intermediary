@@ -71,16 +71,16 @@ PID|||12345"""
         "simple field"     | [1]          | "value1"
         "component"        | [2, 2]       | "component2"
         "repetition"       | [3, 1, 2]    | "rep2"
-        "subcomponent"     | [4, 2, 2, 2]    | "sub2"
-        "invalid index"    | [5]          | null
+        "subcomponent"     | [4, 2, 2, 2] | "sub2"
+        "invalid index"    | [5]          | ""
     }
 
-    def "parseAndGetValue should handle null inputs"() {
+    def "parseAndGetValue returns an empty string when inputs are null"() {
         when:
         def result = HL7Parser.parseAndGetValue(null, [] as char[], 1)
 
         then:
-        result == null
+        result == ""
     }
 
     def "getEncodingCharacterMap should use defaults when no encoding characters provided"() {
@@ -125,7 +125,7 @@ PID|||12345"""
         result["subcomponent"] == '_' as char
     }
 
-    def "parseAndGetValue returns null if a null list of fields is given"() {
+    def "parseAndGetValue returns an empty string if a null list of fields is given"() {
         given:
         def nullList = null
         def delimiters = ['|']
@@ -134,10 +134,10 @@ PID|||12345"""
         def out = HL7Parser.parseAndGetValue(nullList, delimiters as char[])
 
         then:
-        out == null
+        out == ""
     }
 
-    def "parseAndGetValue returns null if an empty list of fields is given"() {
+    def "parseAndGetValue returns an empty string if an empty list of fields is given"() {
         given:
         def emptyList = []
         def delimiters = ['|']
@@ -146,10 +146,10 @@ PID|||12345"""
         def out = HL7Parser.parseAndGetValue(emptyList, delimiters as char[])
 
         then:
-        out == null
+        out == ""
     }
 
-    def "parseAndGetValue returns null if the indices are pointing outside the expected range"() {
+    def "parseAndGetValue returns an empty string if the indices are pointing outside the expected range"() {
         given:
         def emptyList = [
             "MSH|fakeValues",
@@ -161,7 +161,7 @@ PID|||12345"""
         def out = HL7Parser.parseAndGetValue(emptyList, delimiters as char[], 10, 20)
 
         then:
-        out == null
+        out == ""
     }
 
     def "getEncodingCharacterMap uses default definitions when encoding characters are not available"() {

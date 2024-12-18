@@ -56,19 +56,19 @@ public class HL7Parser {
 
     public static String parseAndGetValue(List<String> fields, char[] delimiters, int... indices) {
         if (fields == null || fields.isEmpty() || indices[0] > fields.size()) {
-            return null;
+            return "";
         }
 
         String value = fields.get(indices[0] - 1);
         for (int i = 1; i < indices.length; i++) {
             if (i >= delimiters.length) {
-                return null;
+                throw new HL7ParserException("Invalid HL7 path: too many sub-levels provided");
             }
             char segmentDelimiter = delimiters[i];
             int index = indices[i] - 1;
             String[] parts = value.split(Pattern.quote(String.valueOf(segmentDelimiter)));
             if (index < 0 || index >= parts.length) {
-                return null;
+                return "";
             }
             value = parts[index];
         }
