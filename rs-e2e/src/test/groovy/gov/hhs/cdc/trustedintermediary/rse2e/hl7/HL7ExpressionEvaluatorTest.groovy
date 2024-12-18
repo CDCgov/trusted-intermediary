@@ -253,6 +253,18 @@ PID|1||11102779^^^CR^MR||SMITH^BB SARAH^^^^^L"""
         result == msh3
     }
 
+    def "getLiteralOrFieldValue returns null when there's an exception getting the value"() {
+        given:
+        def operand = "invalidField"
+        def inputMessage = Mock(HL7Message)
+
+        when:
+        def result = evaluator.getLiteralOrFieldValue(hl7Message, inputMessage, operand)
+
+        then:
+        result == null
+    }
+
     def "getFieldValue returns specified field value"() {
         given:
         def fieldName = "MSH-3"
@@ -266,16 +278,16 @@ PID|1||11102779^^^CR^MR||SMITH^BB SARAH^^^^^L"""
         result == msh3
     }
 
-    def "getFieldValue throws exception for non numeric field index"() {
+    def "getFieldValue returns null for non numeric field index"() {
         given:
         def fieldName = "MSH-three"
         def inputMessage = Mock(HL7Message)
 
         when:
-        evaluator.getFieldValue(hl7Message, inputMessage, fieldName)
+        def result = evaluator.getFieldValue(hl7Message, inputMessage, fieldName)
 
         then:
-        thrown(IllegalArgumentException)
+        result == null
     }
 
     def "getFieldValue throws exception for empty field name"() {

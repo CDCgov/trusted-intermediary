@@ -51,7 +51,7 @@ public class HL7Message implements HealthData<HL7Message> {
     public String getValue(String hl7Path) throws HL7MessageException {
         Matcher hl7FieldNameMatcher = HL7Parser.HL7_FIELD_NAME_PATTERN.matcher(hl7Path);
         if (!hl7FieldNameMatcher.matches()) {
-            throw new IllegalArgumentException("Invalid HL7 path format: " + hl7Path);
+            throw new HL7MessageException("Invalid HL7 path format: " + hl7Path);
         }
 
         String segmentName = hl7FieldNameMatcher.group(1);
