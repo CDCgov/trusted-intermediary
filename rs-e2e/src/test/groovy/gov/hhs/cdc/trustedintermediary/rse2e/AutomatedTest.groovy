@@ -43,10 +43,10 @@ class AutomatedTest extends Specification  {
         }
 
         FileFetcher azureFileFetcher = AzureBlobFileFetcher.getInstance()
-        azureFiles = azureFileFetcher.fetchFiles(true)
+        azureFiles = azureFileFetcher.fetchFiles()
 
         FileFetcher localFileFetcher = LocalFileFetcher.getInstance()
-        localFiles = localFileFetcher.fetchFiles(true)
+        localFiles = localFileFetcher.fetchFiles()
 
         engine.ensureRulesLoaded()
     }

@@ -4,7 +4,7 @@ import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
 import gov.hhs.cdc.trustedintermediary.rse2e.external.hapi.HapiHL7ExpressionEvaluator
 import gov.hhs.cdc.trustedintermediary.rse2e.external.hapi.HapiHL7FileMatcher
-import gov.hhs.cdc.trustedintermediary.rse2e.ruleengine.AssertionRuleEngine
+import gov.hhs.cdc.trustedintermediary.rse2e.external.hapi.HapiHL7Message
 import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoader
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
@@ -41,10 +41,10 @@ class GoldenCopyTest extends Specification {
         }
 
         FileFetcher azureFileFetcher = AzureBlobFileFetcher.getInstance()
-        azureFiles = azureFileFetcher.fetchFiles(false)
+        azureFiles = azureFileFetcher.fetchFiles()
 
         FileFetcher localFileFetcher = LocalFileFetcher.getInstance()
-        localFiles = localFileFetcher.fetchFiles(false)
+        localFiles = localFileFetcher.fetchFiles()
     }
 
     def cleanup() {
@@ -54,18 +54,9 @@ class GoldenCopyTest extends Specification {
     }
 
     def "Compare files"() {
-        // notes:
-        // Use workflow to sendoff the file (happens via Github Action)
-
-        // Call the automated-staging-test-submit workflow. Prob use a variable for the path of the folder unless we add to same folder.
-        // Call the automated-staging-test-run workflow. It shouldn't matter if it grabs all Azure files, we can use the MSH-10 to narrow it down like assertion_rules or use something else
-        // Modify the Rules Engine or create a different one
-        // If we do use the rules engine, see if its possible to compare the whole file as a rule rather than individual segments
         // Update Automated Test README
-
-        //         Add a sub folder to /Golden for inputFile - this is so we can get the actual output, we won't use this
-        //        Add a sub folder to /Golden for expectedFileOutput - this is 'hard-coded' and shouldnt change
-        //         make sure to update folder paths in workflow
+        // Currently reusing automated staging test workflows but we might need to pivot for cron schedule
+        // Get golden copy and input
 
         given:
         def matchedFiles = fileMatcher.matchFiles(azureFiles, localFiles)
@@ -80,7 +71,7 @@ class GoldenCopyTest extends Specification {
         }
 
         then:
-        assertTrue(failedFiles.isEmpty())
+        assert failedFiles.isEmpty()
         if (!loggedErrorsAndWarnings.isEmpty()) {
             throw new AssertionError("Unexpected errors and/or warnings were logged:\n- ${loggedErrorsAndWarnings.join('\n- ')}")
         }
