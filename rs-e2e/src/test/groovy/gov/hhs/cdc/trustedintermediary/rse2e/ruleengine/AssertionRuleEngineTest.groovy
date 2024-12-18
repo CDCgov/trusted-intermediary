@@ -1,7 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.ruleengine
 
-import ca.uhn.hl7v2.model.Message
-import gov.hhs.cdc.trustedintermediary.rse2e.external.hapi.HapiHL7Message
+
+import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HL7Message
 import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoader
 import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoaderException
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
@@ -85,7 +85,7 @@ class AssertionRuleEngineTest extends Specification {
         }
 
         when:
-        ruleEngine.runRules(Mock(HapiHL7Message), Mock(HapiHL7Message))
+        ruleEngine.runRules(Mock(HL7Message), Mock(HL7Message))
 
         then:
         1 * mockLogger.logError(_ as String, exception)
@@ -97,7 +97,7 @@ class AssertionRuleEngineTest extends Specification {
         mockRuleLoader.loadRules(_ as InputStream, _ as TypeReference) >> { throw exception }
 
         when:
-        ruleEngine.runRules(Mock(HapiHL7Message), Mock(HapiHL7Message))
+        ruleEngine.runRules(Mock(HL7Message), Mock(HL7Message))
 
         then:
         1 * mockLogger.logError(_ as String, exception)
@@ -105,7 +105,7 @@ class AssertionRuleEngineTest extends Specification {
 
     def "runRules returns nothing when there are no rules"() {
         when:
-        def result = ruleEngine.runRules(Mock(HapiHL7Message), Mock(HapiHL7Message))
+        def result = ruleEngine.runRules(Mock(HL7Message), Mock(HL7Message))
 
         then:
         result.isEmpty()
@@ -117,7 +117,7 @@ class AssertionRuleEngineTest extends Specification {
         mockRuleLoader.loadRules(_ as InputStream, _ as TypeReference) >> [rule]
 
         when:
-        def result = ruleEngine.runRules(Mock(HapiHL7Message), Mock(HapiHL7Message))
+        def result = ruleEngine.runRules(Mock(HL7Message), Mock(HL7Message))
 
         then:
         result.size() == 1
@@ -130,7 +130,7 @@ class AssertionRuleEngineTest extends Specification {
         mockRuleLoader.loadRules(_ as InputStream, _ as TypeReference) >> [rule]
 
         when:
-        def result = ruleEngine.runRules(Mock(HapiHL7Message), Mock(HapiHL7Message))
+        def result = ruleEngine.runRules(Mock(HL7Message), Mock(HL7Message))
 
         then:
         result.isEmpty()
