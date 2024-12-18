@@ -7,9 +7,6 @@ import gov.hhs.cdc.trustedintermediary.external.hapi.HapiHelper
 import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DiagnosticReport
-import org.hl7.fhir.r4.model.Extension
-import org.hl7.fhir.r4.model.Practitioner
-import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ServiceRequest
 import spock.lang.Specification
 
