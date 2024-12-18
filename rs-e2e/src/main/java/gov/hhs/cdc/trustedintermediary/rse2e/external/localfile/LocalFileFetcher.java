@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -45,7 +44,7 @@ public class LocalFileFetcher implements FileFetcher {
                                     throw new RuntimeException("Error opening file: " + p, e);
                                 }
                             })
-                    .collect(Collectors.toList());
+                    .toList();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -31,6 +31,8 @@ public class HL7Parser {
     protected static final Pattern HL7_FIELD_NAME_PATTERN =
             Pattern.compile("(\\w+)-(\\d+(?:\\.\\d+)*)");
 
+    private HL7Parser() {}
+
     public static HL7Message parse(String content) {
         List<HL7Segment> segments = new ArrayList<>();
         String encodingCharactersField = null;
