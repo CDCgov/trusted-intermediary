@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DiagnosticReport
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.MessageHeader
@@ -430,30 +431,58 @@ class HapiHelperTest extends Specification {
     }
 
     // PID-3.4 - Assigning Authority
-    def "patient assigning authority methods work as expected"() {
+    def "getPID3_4Identifier returns null when bundle is empty"() {
         given:
-        def pid3_4 = "pid3_4"
-
-        when:
         def bundle = new Bundle()
 
-        then:
+        expect:
         HapiHelper.getPID3_4Identifier(bundle) == null
+    }
+
+    def "setPID3_4Value does not modify bundle without PID-3 identifier"() {
+        given:
+        def pid3_4Value = "pid3_4"
+        def bundle = new Bundle()
 
         when:
-        HapiHelper.setPID3_4Value(bundle, pid3_4)
+        HapiHelper.setPID3_4Value(bundle, pid3_4Value)
 
         then:
         HapiFhirHelper.getPID3_4Value(bundle) == null
+    }
 
-        when:
+    def "setPID3_4Value updates correctly when patient has a PID-3 identifier"() {
+        given:
+        def pid3_4Value = "pid3_4"
+        def bundle = new Bundle()
         HapiFhirHelper.createPIDPatient(bundle)
         HapiFhirHelper.setPID3Identifier(bundle, new Identifier())
         HapiFhirHelper.setPID3_4Identifier(bundle, new Identifier())
-        HapiHelper.setPID3_4Value(bundle, pid3_4)
+
+        when:
+        HapiHelper.setPID3_4Value(bundle, pid3_4Value)
 
         then:
-        HapiFhirHelper.getPID3_4Value(bundle) == pid3_4
+        HapiFhirHelper.getPID3_4Value(bundle) == pid3_4Value
+    }
+
+    def "setPID3_4Value updates correctly when patient has a PID-3 identifier and the new value is null"() {
+        given:
+        def bundle = new Bundle()
+        HapiFhirHelper.createPIDPatient(bundle)
+
+        def pid3Identifier = new Identifier()
+        HapiFhirHelper.setPID3Identifier(bundle, pid3Identifier)
+
+        def pid3_4Value = "pid3_4"
+        HapiFhirHelper.setPID3_4Identifier(bundle, new Identifier())
+        HapiHelper.setPID3_4Value(bundle, pid3_4Value)
+
+        when:
+        HapiHelper.setPID3_4Value(bundle, null)
+
+        then:
+        !pid3Identifier.hasAssigner()
     }
 
     // PID-3.5 - Assigning Identifier Type Code
@@ -476,6 +505,75 @@ class HapiHelperTest extends Specification {
         then:
         HapiFhirHelper.getPID3_5Value(bundle) == pid3_5
     }
+
+    // PID-3.5 - Removing Identifier Type Code
+    def "Bundle with no patient identifier does not change"() {
+        given:
+        Bundle bundle = new Bundle()
+
+        when:
+        HapiHelper.removePID3_5Value(bundle)
+
+        then:
+        !bundle.hasEntry()
+    }
+
+    def "patientIdentifier with no extensions leaves extensions as-is"() {
+        given:
+        Bundle bundle = new Bundle()
+        Identifier patientIdentifier = new Identifier()
+        HapiFhirHelper.setPID3Identifier(bundle, patientIdentifier)
+
+        expect:
+        !patientIdentifier.hasExtension()
+
+        when:
+        HapiHelper.removePID3_5Value(bundle)
+
+        then:
+        !patientIdentifier.hasExtension()
+    }
+
+    def "removing of the patient assigning identifier clears extensions and type coding"() {
+        given:
+        def pid3_5 = "pid3_5"
+        def bundle = new Bundle()
+        def patientIdentifier = new Identifier()
+
+        HapiFhirHelper.createPIDPatient(bundle)
+        HapiFhirHelper.setPID3Identifier(bundle, patientIdentifier)
+        HapiHelper.setPID3_5Value(bundle, pid3_5)
+
+        patientIdentifier.type.addCoding(new Coding(code: pid3_5))
+
+        when:
+        HapiHelper.removePID3_5Value(bundle)
+
+        then:
+        patientIdentifier.extension.isEmpty()
+        patientIdentifier.type.isEmpty()
+    }
+
+    def "removing patient identifier with non-cx5 url extension does not clear extensions"() {
+        given:
+        def bundle = new Bundle()
+        def patientIdentifier = new Identifier()
+
+        HapiFhirHelper.createPIDPatient(bundle)
+        HapiFhirHelper.setPID3Identifier(bundle, patientIdentifier)
+        patientIdentifier.addExtension().setUrl(HapiHelper.EXTENSION_CX_IDENTIFIER_URL)
+        patientIdentifier
+                .getExtensionByUrl(HapiHelper.EXTENSION_CX_IDENTIFIER_URL)
+                .addExtension()
+                .setUrl(HapiHelper.EXTENSION_XON10_URL)
+
+        when:
+        HapiHelper.removePID3_5Value(bundle)
+
+        then:
+        patientIdentifier.hasExtension()
+    }
+
 
     // PID-5 - Patient Name
     def "patient name methods work as expected"() {
@@ -530,6 +628,45 @@ class HapiHelperTest extends Specification {
         HapiHelper.getPID5Extension(bundle) != null
         HapiFhirHelper.getPID5_7Value(bundle) == null
     }
+
+    // PID-5.7 - Removing Name Type Code
+    def "bundle without patient remains empty"() {
+        given:
+        def bundle = new Bundle()
+
+        when:
+        HapiHelper.removePID5_7Value(bundle)
+
+        then:
+        bundle.getEntry().size() == 0
+    }
+
+    def "bundle with patient but no extensions remains empty"() {
+        given:
+        def bundle = new Bundle()
+        HapiFhirHelper.createPIDPatient(bundle)
+
+        when:
+        HapiHelper.removePID5_7Value(bundle)
+
+        then:
+        HapiHelper.getPID5Extension(bundle) == null
+    }
+
+    def "bundle with patient and pid5 extensions but no xpn7 extension remains empty"() {
+        given:
+        def bundle = new Bundle()
+        HapiFhirHelper.createPIDPatient(bundle)
+        HapiFhirHelper.setPID5Extension(bundle)
+
+        when:
+        HapiHelper.removePID5_7Value(bundle)
+
+        then:
+        Extension pid5Extension = HapiHelper.getPID5Extension(bundle)
+        !pid5Extension.hasExtension()
+    }
+
 
     // ORC-2 - Placer Order Number
     def "orc-2.1 methods work as expected"() {
@@ -703,6 +840,220 @@ class HapiHelperTest extends Specification {
         HapiHelper.getOBR4_1Value(sr) == null
     }
 
+    // OBR-16 - Ordering Provider
+    def "getObr16Extension returns the extension if present"() {
+        given:
+        def serviceRequest = new ServiceRequest()
+        def obrExtension = new Extension(HapiHelper.EXTENSION_OBR_URL)
+        def obr16Extension = new Extension(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString())
+        obrExtension.addExtension(obr16Extension)
+        serviceRequest.addExtension(obrExtension)
+
+        when:
+        def result = HapiHelper.getObr16Extension(serviceRequest)
+
+        then:
+        result == obr16Extension
+    }
+
+    def "getObr16Extension returns null when no OBR extension is present"() {
+        given:
+        def serviceRequest = new ServiceRequest()
+
+        when:
+        def result = HapiHelper.getObr16Extension(serviceRequest)
+
+        then:
+        result == null
+    }
+
+    def "getObr16Extension returns null when OBR extension does not contain OBR-16"() {
+        given:
+        def serviceRequest = new ServiceRequest()
+        def obrExtension = new Extension(HapiHelper.EXTENSION_OBR_URL)
+        serviceRequest.addExtension(obrExtension)
+
+        when:
+        def result = HapiHelper.getObr16Extension(serviceRequest)
+
+        then:
+        result == null
+    }
+
+    def "getObr16ExtensionPractitioner should return null when ServiceRequest has no OBR-16 extension"() {
+        given:
+        def serviceRequest = new ServiceRequest()
+
+        when:
+        def result = HapiHelper.getObr16ExtensionPractitioner(serviceRequest)
+
+        then:
+        result == null
+    }
+
+    def "getObr16ExtensionPractitioner should return null when OBR-16 extension value is null"() {
+        given:
+        def serviceRequest = new ServiceRequest()
+        def obrExtension = new Extension(HapiHelper.EXTENSION_OBR_URL)
+        def obr16Extension = new Extension(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString())
+        obrExtension.addExtension(obr16Extension)
+        serviceRequest.addExtension(obrExtension)
+
+        when:
+        def result = HapiHelper.getObr16ExtensionPractitioner(serviceRequest)
+
+        then:
+        result == null
+    }
+
+    def "getObr16ExtensionPractitioner should return null when OBR16 extension value is not a Reference"() {
+        given:
+        def serviceRequest = new ServiceRequest()
+        def obrExtension = new Extension(HapiHelper.EXTENSION_OBR_URL)
+        def obr16Extension = new Extension(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString())
+        obr16Extension.setValue(new StringType("Not a Reference"))
+        obrExtension.addExtension(obr16Extension)
+        serviceRequest.addExtension(obrExtension)
+
+        when:
+        def result = HapiHelper.getObr16ExtensionPractitioner(serviceRequest)
+
+        then:
+        result == null
+    }
+
+    def "getObr16ExtensionPractitioner should return null when Reference does not contain Practitioner"() {
+        given:
+        def serviceRequest = new ServiceRequest()
+        def reference = new Reference()
+        def obrExtension = new Extension(HapiHelper.EXTENSION_OBR_URL)
+        def obr16Extension = new Extension(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString())
+        obr16Extension.setValue(reference)
+        obrExtension.addExtension(obr16Extension)
+        serviceRequest.addExtension(obrExtension)
+
+        when:
+        def result = HapiHelper.getObr16ExtensionPractitioner(serviceRequest)
+
+        then:
+        result == null
+    }
+
+    def "getObr16ExtensionPractitioner should return Practitioner when Reference contains Practitioner"() {
+        given:
+        def serviceRequest = new ServiceRequest()
+        def obrExtension = new Extension(HapiHelper.EXTENSION_OBR_URL)
+        def obr16Extension = new Extension(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString())
+        obrExtension.addExtension(obr16Extension)
+        serviceRequest.addExtension(obrExtension)
+
+        def practitioner = new Practitioner()
+        def practitionerRole = new PractitionerRole()
+        practitionerRole.setPractitioner(new Reference("Practitioner/123").setResource(practitioner) as Reference)
+
+        HapiHelper.setOBR16WithPractitioner(obrExtension, practitionerRole)
+
+        when:
+        def result = HapiHelper.getObr16ExtensionPractitioner(serviceRequest)
+
+        then:
+        result == practitioner
+    }
+
+    // ORC-12 - Ordering Provider
+    def "getOrc12ExtensionPractitioner should return null when bundle has no DiagnosticReport"() {
+        given:
+        def bundle = new Bundle()
+
+        when:
+        def result = HapiHelper.getOrc12ExtensionPractitioner(bundle)
+
+        then:
+        result == null
+    }
+
+    def "getOrc12ExtensionPractitioner should return null when DiagnosticReport has no ServiceRequest"() {
+        given:
+        def bundle = new Bundle()
+        HapiFhirHelper.createDiagnosticReport(bundle)
+
+        when:
+        def result = HapiHelper.getOrc12ExtensionPractitioner(bundle)
+
+        then:
+        result == null
+    }
+
+    def "getOrc12ExtensionPractitioner should return null when ServiceRequest has no ORC extension"() {
+        given:
+        def bundle = new Bundle()
+        def diagnosticReport = HapiFhirHelper.createDiagnosticReport(bundle)
+        HapiFhirHelper.createBasedOnServiceRequest(diagnosticReport)
+
+        when:
+        def result = HapiHelper.getOrc12ExtensionPractitioner(bundle)
+
+        then:
+        result == null
+    }
+
+    def "getOrc12ExtensionPractitioner should return null when ORC extension has no ORC-12 extension"() {
+        given:
+        def bundle = new Bundle()
+        def diagnosticReport = HapiFhirHelper.createDiagnosticReport(bundle)
+        def serviceRequest = HapiFhirHelper.createBasedOnServiceRequest(diagnosticReport)
+        serviceRequest.addExtension(new Extension().setUrl(HapiHelper.EXTENSION_ORC_URL))
+
+        when:
+        def result = HapiHelper.getOrc12ExtensionPractitioner(bundle)
+
+        then:
+        result == null
+    }
+
+    def "should return null when ORC12 extension has no Practitioner reference"() {
+        given:
+        def bundle = new Bundle()
+        def diagnosticReport = HapiFhirHelper.createDiagnosticReport(bundle)
+        def serviceRequest = HapiFhirHelper.createBasedOnServiceRequest(diagnosticReport)
+
+        def orcExtension = new Extension().setUrl(HapiHelper.EXTENSION_ORC_URL)
+        def orc12Extension = new Extension().setUrl(HapiHelper.EXTENSION_ORC12_URL)
+        orcExtension.addExtension(orc12Extension)
+        serviceRequest.addExtension(orcExtension)
+
+        when:
+        def result = HapiHelper.getOrc12ExtensionPractitioner(bundle)
+
+        then:
+        result == null
+    }
+
+    def "should return Practitioner when all conditions are met"() {
+        given:
+        def bundle = new Bundle()
+        def diagnosticReport = HapiFhirHelper.createDiagnosticReport(bundle)
+        def serviceRequest = HapiFhirHelper.createBasedOnServiceRequest(diagnosticReport)
+
+        def orcExtension = new Extension().setUrl(HapiHelper.EXTENSION_ORC_URL)
+        def orc12Extension = new Extension().setUrl(HapiHelper.EXTENSION_ORC12_URL)
+
+        def practitioner = new Practitioner()
+        def practitionerId = "Practitioner/123"
+        def practitionerReference = new Reference().setReference(practitionerId)
+
+        orc12Extension.setValue(practitionerReference)
+        orcExtension.addExtension(orc12Extension)
+        serviceRequest.addExtension(orcExtension)
+        bundle.addEntry(new Bundle.BundleEntryComponent().setFullUrl(practitionerId).setResource(practitioner))
+
+        when:
+        def result = HapiHelper.getOrc12ExtensionPractitioner(bundle)
+
+        then:
+        result == practitioner
+    }
+
     def "ensureExtensionExists returns extension if it exists"() {
         given:
         def serviceRequest = new ServiceRequest()
@@ -863,21 +1214,19 @@ class HapiHelperTest extends Specification {
 
     def "setOBR16WithPractitioner sets the expected value on an extension"() {
         given:
-        def ext = new Extension()
+        Extension obrExtension = new Extension()
         def role = new PractitionerRole()
         def practitioner = new Practitioner()
         practitioner.setId("test123")
         def ref = new Reference(practitioner.getId())
         role.setPractitioner(ref)
 
-        expect:
-        ext.getValue() == null
-
         when:
-        HapiHelper.setOBR16WithPractitioner(ext, role)
+        HapiHelper.setOBR16WithPractitioner(obrExtension, role)
 
         then:
-        ext.getValue().getReference() == "test123"
+        def obr16Extension = obrExtension.getExtensionByUrl(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString())
+        obr16Extension.getValue().getReference() == "test123"
     }
 
     def "setOBR16WithPractitioner does nothing if the provided PractitionerRole is null"() {
@@ -892,7 +1241,8 @@ class HapiHelperTest extends Specification {
         HapiHelper.setOBR16WithPractitioner(ext, role)
 
         then:
-        ext.getValue() == null
+        def obr16Extension = ext.getExtensionByUrl(HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString())
+        obr16Extension == null
     }
 
     def "urlForCodeType should return expected values"() {
