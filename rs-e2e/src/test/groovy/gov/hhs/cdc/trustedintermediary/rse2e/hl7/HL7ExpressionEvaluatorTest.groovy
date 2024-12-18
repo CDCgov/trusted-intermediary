@@ -77,7 +77,7 @@ PID|1||11102779^^^CR^MR||SMITH^BB SARAH^^^^^L"""
         evaluator.evaluateExpression("invalid format", Mock(HealthData))
 
         then:
-        def e = thrown(IllegalArgumentException)
+        def e = thrown(HL7ParserException)
         e.getMessage().contains("Invalid statement format")
     }
 
@@ -86,7 +86,7 @@ PID|1||11102779^^^CR^MR||SMITH^BB SARAH^^^^^L"""
         evaluator.evaluateExpression("'EPIC' = 'EPIC'", Mock(HealthData), Mock(HealthData), Mock(HealthData))
 
         then:
-        def e = thrown(IllegalArgumentException)
+        def e = thrown(HL7ParserException)
         e.getMessage().contains("Expected two messages")
     }
 
@@ -98,7 +98,7 @@ PID|1||11102779^^^CR^MR||SMITH^BB SARAH^^^^^L"""
         evaluator.evaluateExpression(condition, Mock(HealthData))
 
         then:
-        def e = thrown(IllegalArgumentException)
+        def e = thrown(HL7ParserException)
         e.getMessage().contains("Invalid statement format")
     }
 
@@ -139,7 +139,7 @@ PID|1||11102779^^^CR^MR||SMITH^BB SARAH^^^^^L"""
         evaluator.evaluateEquality("left", "right", unknownOperator)
 
         then:
-        def e = thrown(IllegalArgumentException)
+        def e = thrown(HL7ParserException)
         e.getMessage().contains("Unknown operator")
     }
 
@@ -170,7 +170,7 @@ PID|1||11102779^^^CR^MR||SMITH^BB SARAH^^^^^L"""
         evaluator.evaluateMembership("value", invalidSet)
 
         then:
-        def e = thrown(IllegalArgumentException)
+        def e = thrown(HL7ParserException)
         e.getMessage().contains("Invalid collection format")
     }
 
@@ -210,7 +210,7 @@ PID|1||11102779^^^CR^MR||SMITH^BB SARAH^^^^^L"""
         evaluator.evaluateCollectionCount(hl7Message, segmentName, rightOperand, operator)
 
         then:
-        def e = thrown(IllegalArgumentException)
+        def e = thrown(HL7ParserException)
         e.getCause().getClass() == NumberFormatException
     }
 
@@ -299,7 +299,7 @@ PID|1||11102779^^^CR^MR||SMITH^BB SARAH^^^^^L"""
         evaluator.getFieldValue(hl7Message, inputMessage, fieldName)
 
         then:
-        def e = thrown(IllegalArgumentException)
+        def e = thrown(HL7ParserException)
         e.getMessage().contains("Invalid field name format")
     }
 
@@ -352,7 +352,7 @@ PID|1||11102779^^^CR^MR||SMITH^BB SARAH^^^^^L"""
         evaluator.getMessageBySource(source, inputMessage, outputMessage)
 
         then:
-        def e = thrown(IllegalArgumentException)
+        def e = thrown(HL7ParserException)
         e.getMessage().contains("Input message is null for")
     }
 }

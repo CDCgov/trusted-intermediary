@@ -37,14 +37,13 @@ public class HL7ExpressionEvaluator implements HealthDataExpressionEvaluator {
     @Override
     public final boolean evaluateExpression(String expression, HealthData<?>... data) {
         if (data.length > 2) {
-            throw new IllegalArgumentException(
-                    "Expected two messages, but received: " + data.length);
+            throw new HL7ParserException("Expected two messages, but received: " + data.length);
         }
 
         Matcher matcher = OPERATION_PATTERN.matcher(expression);
 
         if (!matcher.matches()) {
-            throw new IllegalArgumentException("Invalid statement format.");
+            throw new HL7ParserException("Invalid statement format.");
         }
 
         String leftOperand = matcher.group(1); // e.g. MSH-5.1, input.MSH-5.1, 'EPIC', OBR.count()
@@ -86,14 +85,14 @@ public class HL7ExpressionEvaluator implements HealthDataExpressionEvaluator {
         } else if (operator.equals("!=")) {
             return !leftValue.equals(rightValue);
         }
-        throw new IllegalArgumentException("Unknown operator: " + operator);
+        throw new HL7ParserException("Unknown operator: " + operator);
     }
 
     protected boolean evaluateMembership(String leftValue, String rightOperand) {
         Matcher literalValueCollectionMatcher =
                 LITERAL_VALUE_COLLECTION_PATTERN.matcher(rightOperand);
         if (!literalValueCollectionMatcher.matches()) {
-            throw new IllegalArgumentException("Invalid collection format: " + rightOperand);
+            throw new HL7ParserException("Invalid collection format: " + rightOperand);
         }
         String arrayString = literalValueCollectionMatcher.group(1);
         Set<String> values =
@@ -110,7 +109,7 @@ public class HL7ExpressionEvaluator implements HealthDataExpressionEvaluator {
             int rightValue = Integer.parseInt(rightOperand);
             return evaluateEquality(count, rightValue, operator);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(
+            throw new HL7ParserException(
                     "Error evaluating collection count. Segment: "
                             + segmentName
                             + ", count: "
@@ -132,14 +131,15 @@ public class HL7ExpressionEvaluator implements HealthDataExpressionEvaluator {
             HL7Message outputMessage, HL7Message inputMessage, String fieldName) {
         Matcher messageSourceMatcher = MESSAGE_SOURCE_PATTERN.matcher(fieldName);
         if (!messageSourceMatcher.matches()) {
-            throw new IllegalArgumentException("Invalid field name format: " + fieldName);
+            throw new HL7ParserException("Invalid field name format: " + fieldName);
         }
 
         String fileSource = messageSourceMatcher.group(1);
+        String hl7Path = messageSourceMatcher.group(2);
         HL7Message message = getMessageBySource(fileSource, inputMessage, outputMessage);
 
         try {
-            return message.getValue(fieldName);
+            return message.getValue(hl7Path);
         } catch (HL7MessageException e) {
             return null;
         }
@@ -149,7 +149,7 @@ public class HL7ExpressionEvaluator implements HealthDataExpressionEvaluator {
             String source, HL7Message inputMessage, HL7Message outputMessage) {
         if ("input".equals(source)) {
             if (inputMessage == null) {
-                throw new IllegalArgumentException("Input message is null for: " + source);
+                throw new HL7ParserException("Input message is null for: " + source);
             }
             return inputMessage;
         }
