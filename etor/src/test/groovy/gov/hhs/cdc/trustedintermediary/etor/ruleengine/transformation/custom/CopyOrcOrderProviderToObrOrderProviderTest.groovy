@@ -192,7 +192,7 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
     }
 
     void evaluateOrc12IsNull(Bundle bundle) {
-        assert getOrc12ExtensionPractitioner(bundle) == null
+        assert HapiHelper.getOrc12ExtensionPractitioner(bundle) == null
     }
 
     void evaluateOrc12Values(
@@ -202,7 +202,7 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
             String expectedLastName,
             String expectedNameTypeCode,
             String expectedIdentifierTypeCode) {
-        def practitioner = getOrc12ExtensionPractitioner(bundle)
+        def practitioner = HapiHelper.getOrc12ExtensionPractitioner(bundle)
         def xcnExtension = practitioner.getExtensionByUrl(PRACTITIONER_EXTENSION_URL)
 
         assert practitioner.identifier[0]?.value == expectedNpi
@@ -235,27 +235,5 @@ class CopyOrcOrderProviderToObrOrderProviderTest extends Specification{
         assert xcnExtension.getExtensionByUrl("XCN.10")?.value?.toString() == expectedNameTypeCode
         def codingSystem = practitioner.identifier[0]?.type?.coding
         assert codingSystem == null || codingSystem[0]?.code == expectedIdentifierTypeCode
-    }
-
-    Practitioner getOrc12ExtensionPractitioner(Bundle bundle) {
-        def diagnosticReport = HapiHelper.getDiagnosticReport(bundle)
-        def serviceRequest = HapiHelper.getServiceRequest(diagnosticReport)
-
-        def orcExtension = serviceRequest.getExtensionByUrl(HapiHelper.EXTENSION_ORC_URL)
-        def orc12Extension = orcExtension.getExtensionByUrl(HapiHelper.EXTENSION_ORC12_URL)
-
-        if (orc12Extension == null) {
-            return null
-        }
-
-        def practitionerReference = (Reference) orc12Extension.getValue()
-        def practitionerUrl = practitionerReference.getReference()
-
-        for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-            if (Objects.equals(entry.getFullUrl(), practitionerUrl) && entry.getResource() instanceof Practitioner)
-                return (Practitioner) entry.getResource()
-        }
-
-        return null
     }
 }

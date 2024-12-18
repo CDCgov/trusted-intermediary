@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.external.hapi
 
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DiagnosticReport
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.MessageHeader
@@ -954,6 +955,100 @@ class HapiHelperTest extends Specification {
 
         when:
         def result = HapiHelper.getObr16ExtensionPractitioner(serviceRequest)
+
+        then:
+        result == practitioner
+    }
+
+    // ORC-12 - Ordering Provider
+    def "getOrc12ExtensionPractitioner should return null when bundle has no DiagnosticReport"() {
+        given:
+        def bundle = new Bundle()
+
+        when:
+        def result = HapiHelper.getOrc12ExtensionPractitioner(bundle)
+
+        then:
+        result == null
+    }
+
+    def "getOrc12ExtensionPractitioner should return null when DiagnosticReport has no ServiceRequest"() {
+        given:
+        def bundle = new Bundle()
+        HapiFhirHelper.createDiagnosticReport(bundle)
+
+        when:
+        def result = HapiHelper.getOrc12ExtensionPractitioner(bundle)
+
+        then:
+        result == null
+    }
+
+    def "getOrc12ExtensionPractitioner should return null when ServiceRequest has no ORC extension"() {
+        given:
+        def bundle = new Bundle()
+        def diagnosticReport = HapiFhirHelper.createDiagnosticReport(bundle)
+        HapiFhirHelper.createBasedOnServiceRequest(diagnosticReport)
+
+        when:
+        def result = HapiHelper.getOrc12ExtensionPractitioner(bundle)
+
+        then:
+        result == null
+    }
+
+    def "getOrc12ExtensionPractitioner should return null when ORC extension has no ORC-12 extension"() {
+        given:
+        def bundle = new Bundle()
+        def diagnosticReport = HapiFhirHelper.createDiagnosticReport(bundle)
+        def serviceRequest = HapiFhirHelper.createBasedOnServiceRequest(diagnosticReport)
+        serviceRequest.addExtension(new Extension().setUrl(HapiHelper.EXTENSION_ORC_URL))
+
+        when:
+        def result = HapiHelper.getOrc12ExtensionPractitioner(bundle)
+
+        then:
+        result == null
+    }
+
+    def "should return null when ORC12 extension has no Practitioner reference"() {
+        given:
+        def bundle = new Bundle()
+        def diagnosticReport = HapiFhirHelper.createDiagnosticReport(bundle)
+        def serviceRequest = HapiFhirHelper.createBasedOnServiceRequest(diagnosticReport)
+
+        def orcExtension = new Extension().setUrl(HapiHelper.EXTENSION_ORC_URL)
+        def orc12Extension = new Extension().setUrl(HapiHelper.EXTENSION_ORC12_URL)
+        orcExtension.addExtension(orc12Extension)
+        serviceRequest.addExtension(orcExtension)
+
+        when:
+        def result = HapiHelper.getOrc12ExtensionPractitioner(bundle)
+
+        then:
+        result == null
+    }
+
+    def "should return Practitioner when all conditions are met"() {
+        given:
+        def bundle = new Bundle()
+        def diagnosticReport = HapiFhirHelper.createDiagnosticReport(bundle)
+        def serviceRequest = HapiFhirHelper.createBasedOnServiceRequest(diagnosticReport)
+
+        def orcExtension = new Extension().setUrl(HapiHelper.EXTENSION_ORC_URL)
+        def orc12Extension = new Extension().setUrl(HapiHelper.EXTENSION_ORC12_URL)
+
+        def practitioner = new Practitioner()
+        def practitionerId = "Practitioner/123"
+        def practitionerReference = new Reference().setReference(practitionerId)
+
+        orc12Extension.setValue(practitionerReference)
+        orcExtension.addExtension(orc12Extension)
+        serviceRequest.addExtension(orcExtension)
+        bundle.addEntry(new Bundle.BundleEntryComponent().setFullUrl(practitionerId).setResource(practitioner))
+
+        when:
+        def result = HapiHelper.getOrc12ExtensionPractitioner(bundle)
 
         then:
         result == practitioner
