@@ -14,8 +14,6 @@ import java.util.stream.Stream;
  * represents a file fetcher that fetches files from the local file system.
  */
 public class LocalFileFetcher implements FileFetcher {
-
-    private static String files_path = "../examples/Test/Automated/";
     private static final String EXTENSION = "hl7";
 
     private static final FileFetcher INSTANCE = new LocalFileFetcher();
@@ -27,9 +25,10 @@ public class LocalFileFetcher implements FileFetcher {
     }
 
     @Override
-    public List<HL7FileStream> fetchFiles(boolean isAutomatedTest) {
-        if (!isAutomatedTest) {
-            files_path = "../examples/Test/Automated/Golden/";
+    public List<HL7FileStream> fetchFiles() {
+        String files_path = System.getenv("LOCAL_FILE_PATH");
+        if (files_path == null || files_path.isEmpty()) {
+            throw new IllegalArgumentException("Environment variable LOCAL_FILE_PATH is not set");
         }
         try (Stream<Path> stream = Files.walk(Paths.get(files_path))) {
             return stream.filter(Files::isRegularFile)

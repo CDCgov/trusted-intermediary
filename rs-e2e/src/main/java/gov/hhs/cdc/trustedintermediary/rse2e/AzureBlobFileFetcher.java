@@ -48,7 +48,7 @@ public class AzureBlobFileFetcher implements FileFetcher {
     }
 
     @Override
-    public List<HL7FileStream> fetchFiles(boolean isAutomated) {
+    public List<HL7FileStream> fetchFiles() {
         List<HL7FileStream> relevantFiles = new ArrayList<>();
 
         LocalDate today = LocalDate.now(TIME_ZONE);
