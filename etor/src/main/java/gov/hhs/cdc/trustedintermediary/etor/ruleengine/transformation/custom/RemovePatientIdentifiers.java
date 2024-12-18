@@ -15,7 +15,8 @@ public class RemovePatientIdentifiers implements CustomFhirTransformation {
     @Override
     public void transform(HealthData<?> resource, Map<String, Object> args) {
         Bundle bundle = (Bundle) resource.getUnderlyingData();
-        HapiHelper.setPID3_4Value(bundle, ""); // remove PID.3-4
-        HapiHelper.setPID3_5Value(bundle, ""); // remove PID.3-5
+
+        HapiHelper.setPID3_4Value(bundle, null);
+        HapiHelper.removePID3_5Value(bundle);
     }
 }

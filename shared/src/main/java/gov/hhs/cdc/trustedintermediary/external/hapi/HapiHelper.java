@@ -18,6 +18,7 @@ import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.PractitionerRole;
+import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ServiceRequest;
 import org.hl7.fhir.r4.model.StringType;
@@ -268,15 +269,27 @@ public class HapiHelper {
             return null;
         }
         Organization organization = (Organization) identifier.getAssigner().getResource();
+        if (organization == null) {
+            return null;
+        }
         return organization.getIdentifierFirstRep();
     }
 
     public static void setPID3_4Value(Bundle bundle, String value) {
-        Identifier identifier = getPID3_4Identifier(bundle);
-        if (identifier == null) {
+        if (value == null) {
+            Identifier pid3Identifier = getPID3Identifier(bundle);
+            if (pid3Identifier == null) {
+                return;
+            }
+            pid3Identifier.setAssigner(null);
             return;
         }
-        identifier.setValue(value);
+
+        Identifier pid3_4Identifier = getPID3_4Identifier(bundle);
+        if (pid3_4Identifier == null) {
+            return;
+        }
+        pid3_4Identifier.setValue(value);
     }
 
     // PID-3.5 - Identifier Type Code
@@ -288,6 +301,29 @@ public class HapiHelper {
         setCX5Value(identifier, value);
     }
 
+    public static void removePID3_5Value(Bundle bundle) {
+        Identifier patientIdentifier = getPID3Identifier(bundle);
+        if (patientIdentifier == null) {
+            return;
+        }
+
+        patientIdentifier.setType(null);
+
+        Extension cxExtension = patientIdentifier.getExtensionByUrl(EXTENSION_CX_IDENTIFIER_URL);
+        if (cxExtension == null) {
+            return;
+        }
+
+        if (cxExtension.hasExtension(EXTENSION_CX5_URL)) {
+            cxExtension.removeExtension(EXTENSION_CX5_URL);
+        }
+
+        // The cx-identifier extension can be removed if it has no more sub-extensions
+        if (cxExtension.getExtension().isEmpty()) {
+            patientIdentifier.removeExtension(EXTENSION_CX_IDENTIFIER_URL);
+        }
+    }
+
     // PID-5 - Patient Name
     public static Extension getPID5Extension(Bundle bundle) {
         Patient patient = getPIDPatient(bundle);
@@ -295,15 +331,31 @@ public class HapiHelper {
             return null;
         }
         HumanName name = patient.getNameFirstRep();
-        return name.getExtensionByUrl(HapiHelper.EXTENSION_XPN_HUMAN_NAME_URL);
+        return name.getExtensionByUrl(EXTENSION_XPN_HUMAN_NAME_URL);
     }
 
     public static void setPID5_7ExtensionValue(Bundle bundle, String value) {
         Extension extension = getPID5Extension(bundle);
-        if (extension != null && extension.hasExtension(HapiHelper.EXTENSION_XPN7_URL)) {
-            extension
-                    .getExtensionByUrl(HapiHelper.EXTENSION_XPN7_URL)
-                    .setValue(new StringType(value));
+        if (extension != null && extension.hasExtension(EXTENSION_XPN7_URL)) {
+            extension.getExtensionByUrl(EXTENSION_XPN7_URL).setValue(new StringType(value));
+        }
+    }
+
+    public static void removePID5_7Value(Bundle bundle) {
+        Patient patient = getPIDPatient(bundle);
+        if (patient == null) {
+            return;
+        }
+        HumanName patientName = patient.getNameFirstRep();
+        patientName.setUse(null);
+
+        Extension pid5Extension = getPID5Extension(bundle);
+        if (pid5Extension == null) {
+            return;
+        }
+        Extension xpn7Extension = pid5Extension.getExtensionByUrl(EXTENSION_XPN7_URL);
+        if (xpn7Extension != null) {
+            pid5Extension.removeExtension(EXTENSION_XPN7_URL);
         }
     }
 
@@ -499,15 +551,67 @@ public class HapiHelper {
         return getCWE1Value(cc.getCoding().get(0));
     }
 
-    // OBR16 - Ordering Provider
-
-    // OBR16 -
+    // OBR-16 - Ordering Provider
     public static void setOBR16WithPractitioner(
-            Extension obr16Extension, PractitionerRole practitionerRole) {
-        if (practitionerRole == null) {
+            Extension obrExtension, PractitionerRole practitionerRole) {
+        if (practitionerRole == null || !practitionerRole.getPractitioner().hasReference()) {
             return;
         }
+
+        Extension obr16Extension =
+                ensureSubExtensionExists(obrExtension, EXTENSION_OBR16_DATA_TYPE.toString());
+
         obr16Extension.setValue(practitionerRole.getPractitioner());
+    }
+
+    public static Extension getObr16Extension(ServiceRequest serviceRequest) {
+        Extension obrExtension = serviceRequest.getExtensionByUrl(EXTENSION_OBR_URL);
+        if (obrExtension == null) {
+            return null;
+        }
+        return obrExtension.getExtensionByUrl(EXTENSION_OBR16_DATA_TYPE.toString());
+    }
+
+    public static Practitioner getObr16ExtensionPractitioner(ServiceRequest serviceRequest) {
+        Extension obr16Extension = getObr16Extension(serviceRequest);
+        if (obr16Extension == null || obr16Extension.getValue() == null) {
+            return null;
+        }
+
+        if (obr16Extension.getValue() instanceof Reference reference
+                && reference.getResource() instanceof Practitioner practitioner) {
+            return practitioner;
+        }
+        return null;
+    }
+
+    // ORC-12 - Ordering Provider
+    public static Practitioner getOrc12ExtensionPractitioner(Bundle bundle) {
+        DiagnosticReport diagnosticReport = getDiagnosticReport(bundle);
+        if (diagnosticReport == null) return null;
+
+        ServiceRequest serviceRequest = getServiceRequest(diagnosticReport);
+        if (serviceRequest == null) return null;
+
+        Extension orcExtension = serviceRequest.getExtensionByUrl(EXTENSION_ORC_URL);
+        if (orcExtension == null) return null;
+
+        Extension orc12Extension = orcExtension.getExtensionByUrl(EXTENSION_ORC12_URL);
+        if (orc12Extension == null) return null;
+
+        Reference practitionerReference = (Reference) orc12Extension.getValue();
+        if (practitionerReference == null) return null;
+
+        String practitionerUrl = practitionerReference.getReference();
+        if (practitionerUrl == null) return null;
+
+        for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
+            if (Objects.equals(entry.getFullUrl(), practitionerUrl)
+                    && entry.getResource() instanceof Practitioner practitioner)
+                return practitioner;
+        }
+
+        return null;
     }
 
     /**
@@ -678,9 +782,9 @@ public class HapiHelper {
 
     public static String urlForCodeType(String code) {
         return switch (code) {
-            case HapiHelper.LOINC_CODE -> HapiHelper.LOINC_URL;
-            case HapiHelper.PLT_CODE -> null;
-            default -> HapiHelper.LOCAL_CODE_URL;
+            case LOINC_CODE -> LOINC_URL;
+            case PLT_CODE -> null;
+            default -> LOCAL_CODE_URL;
         };
     }
 
@@ -695,22 +799,19 @@ public class HapiHelper {
      */
     public static boolean hasDefinedCoding(
             Coding coding, String codingExt, String codingSystemExt) {
-        var codingExtMatch =
-                hasMatchingCodingExtension(coding, HapiHelper.EXTENSION_CWE_CODING, codingExt);
+        var codingExtMatch = hasMatchingCodingExtension(coding, EXTENSION_CWE_CODING, codingExt);
         var codingSystemExtMatch =
-                hasMatchingCodingExtension(
-                        coding, HapiHelper.EXTENSION_CODING_SYSTEM, codingSystemExt);
+                hasMatchingCodingExtension(coding, EXTENSION_CODING_SYSTEM, codingSystemExt);
         return codingExtMatch && codingSystemExtMatch;
     }
 
     private static boolean hasMatchingCodingExtension(
             Coding coding, String extensionUrl, String valueToMatch) {
-        if (!HapiHelper.hasCodingExtensionWithUrl(coding, extensionUrl)) {
+        if (!hasCodingExtensionWithUrl(coding, extensionUrl)) {
             return false;
         }
 
-        var extensionValue =
-                HapiHelper.getCodingExtensionByUrl(coding, extensionUrl).getValue().toString();
+        var extensionValue = getCodingExtensionByUrl(coding, extensionUrl).getValue().toString();
         return Objects.equals(valueToMatch, extensionValue);
     }
 
