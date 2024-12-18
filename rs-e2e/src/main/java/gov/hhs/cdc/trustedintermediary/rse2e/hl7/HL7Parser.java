@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+/** The HL7Parser class is responsible for parsing HL7 messages and extracting values from them. */
 public class HL7Parser {
     private static final String NEWLINE_REGEX = "\\r?\\n|\\r";
     private static final char DEFAULT_FIELD_DELIMITER = '|';
