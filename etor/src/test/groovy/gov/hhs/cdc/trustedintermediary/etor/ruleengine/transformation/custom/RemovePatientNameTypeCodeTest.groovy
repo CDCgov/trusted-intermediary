@@ -20,25 +20,9 @@ class RemovePatientNameTypeCodeTest extends Specification {
         transformClass = new RemovePatientNameTypeCode()
     }
 
-    def "remove PID.5-7 from Bundle - old"() {
-        given:
-        def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/002_CA_ORU_R01_initial_translation.fhir")
-        def bundle = fhirResource.getUnderlyingData() as Bundle
-        def pid5_7 = HapiFhirHelper.getPID5_7Value(bundle)
-
-        expect:
-        pid5_7 != null
-
-        when:
-        transformClass.transform(fhirResource, null)
-
-        then:
-        HapiFhirHelper.getPID5_7Value(bundle) == null
-    }
-
     def "remove PID.5-7 from Bundle"() {
         given:
-        def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/002_CA_ORU_R01_initial_translation.fhir")
+        def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/007_CA_ORU_R01_CDPH_produced_UCSD2024-07-11-16-02-17-749_1_hl7_translation.fhir")
         def bundle = fhirResource.getUnderlyingData() as Bundle
         def pid_5_initial = HapiHelper.getPID5Extension(bundle)
         def xpn_7_initial = pid_5_initial.getExtensionByUrl(HapiHelper.EXTENSION_XPN7_URL)
