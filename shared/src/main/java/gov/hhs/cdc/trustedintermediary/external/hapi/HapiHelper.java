@@ -820,8 +820,8 @@ public class HapiHelper {
      *
      * @param codeToMatch The code to look for.
      * @param codingExtToMatch Name of coding extension (e.g. "coding", "alt-coding")
-     * @param codingSystemToMatch Name of coding system to look for (e.g. Local code "L", LOINC,
-     *     "LN"...)
+     * @param codingSystemToMatch Name of coding system to look for (e.g. Local code "L", LOINC
+     *     "LN", ...)
      * @return True if the Coding is present in the observation, else false
      */
     public static boolean hasMatchingCoding(
