@@ -36,37 +36,37 @@ jobs:
 
       - name: Send HL7 sample messages to staging RS
         run: |
-            host=https://staging.prime.cdc.gov:443
-            client_id=flexion
-            client_sender=simulated-sender
-            jwt=$(jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 \
-                -k $client_id.$client_sender -i $client_id.$client_sender \
-                -s $client_id.$client_sender -a $host --no-iat -S @/tmp/staging_private_key.pem)
+          host=https://staging.prime.cdc.gov:443
+          client_id=flexion
+          client_sender=simulated-sender
+          jwt=$(jwt encode --exp='+5min' --jti $(uuidgen) --alg RS256 \
+              -k $client_id.$client_sender -i $client_id.$client_sender \
+              -s $client_id.$client_sender -a $host --no-iat -S @/tmp/staging_private_key.pem)
 
-            token=$(curl \
-                    --header "Content-Type: application/x-www-form-urlencoded" \
-                    --data "scope=$client_id.*.report" \
-                    --data "client_assertion=$jwt" \
-                    --data "client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer" \
-                    --data "grant_type=client_credentials" \
-                    --silent \
-                    "$host/api/token" | jq -r ".access_token")
+          token=$(curl \
+                  --header "Content-Type: application/x-www-form-urlencoded" \
+                  --data "scope=$client_id.*.report" \
+                  --data "client_assertion=$jwt" \
+                  --data "client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer" \
+                  --data "grant_type=client_credentials" \
+                  --silent \
+                  "$host/api/token" | jq -r ".access_token")
 
-            file_path="Automated/*.hl7"
-            if [ ${{ github.event.inputs.name }} = "Golden Copy Staging Test" ]; then
-               file_path="GoldenCopy/Input/*.hl7"
-            fi
+          file_path="Automated/*.hl7"
+          if [ ${{ github.event.inputs.name }} == "Golden Copy Staging Test" ]; then
+              file_path="GoldenCopy/Input/*.hl7"
+          fi
 
-            for file in $(pwd)/examples/Test/${{ file_path }}; do
-                echo "Sending $file"
-                curl \
-                    --header "Content-Type: application/hl7-v2" \
-                    --header "Client: $client_id.$client_sender" \
-                    --header "Authorization: Bearer $token" \
-                    --data-binary "@$file" \
-                    --silent \
-                    "$host/api/waters"
-            done
+          for file in $(pwd)/examples/Test/${{ file_path }}; do
+              echo "Sending $file"
+              curl \
+                  --header "Content-Type: application/hl7-v2" \
+                  --header "Client: $client_id.$client_sender" \
+                  --header "Authorization: Bearer $token" \
+                  --data-binary "@$file" \
+                  --silent \
+                  "$host/api/waters"
+          done
 
       - name: Clean up private key
         if: always()
