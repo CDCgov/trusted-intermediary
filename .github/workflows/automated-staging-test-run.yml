@@ -34,13 +34,14 @@ jobs:
           echo "test_type=$test_type" >> $GITHUB_OUTPUT
           echo "title=$title" >> $GITHUB_OUTPUT
           echo "file_path=$file_path" >> $GITHUB_OUTPUT
+        id: getVariableType
 
       - name: Run automated tests
         env:
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AUTOMATED_TEST_AZURE_STORAGE_CONNECTION_STRING }}
-          LOCAL_FILE_PATH: ${{ steps.getFunctionList.outputs.file_path }}
+          LOCAL_FILE_PATH: ${{ steps.getVariableType.outputs.file_path }}
         run: |
-          ./gradlew rs-e2e:clean rs-e2e:${{ steps.getFunctionList.outputs.test_type }}
+          ./gradlew rs-e2e:clean rs-e2e:${{ steps.getVariableType.outputs.test_type }}
           done
 
       - name: Send slack notification on test failure
@@ -50,4 +51,4 @@ jobs:
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           webhook-type: incoming-webhook
           payload: |
-            text: "${{ steps.getFunctionList.outputs.title }} Staging RS Integration Test Failed!: https://github.com/CDCgov/trusted-intermediary/actions/runs/${{ github.run_id }}"
+            text: "${{ steps.getVariableType.outputs.title }} Staging RS Integration Test Failed!: https://github.com/CDCgov/trusted-intermediary/actions/runs/${{ github.run_id }}"
