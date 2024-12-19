@@ -151,6 +151,7 @@ public class ReportStreamEndpointClient implements RSEndpointClient {
 
     @Override
     public String getRsToken() throws ReportStreamEndpointClientException {
+        logger.logInfo("#########  {[{[{[{[{[REAL IMPLEMENTATION]}]}]}]}]} #########");
         logger.logInfo("Looking up ReportStream token");
 
         var token = cache.get(RS_TOKEN_CACHE_ID);

@@ -52,6 +52,8 @@ public class ApplicationContext {
         threadObjectMap.put(clazz, implementation);
 
         THREAD_OBJECT_MAP.set(threadObjectMap);
+
+        injectIntoNonSingleton(implementation);
     }
 
     public static void clearThreadRegistrations() {

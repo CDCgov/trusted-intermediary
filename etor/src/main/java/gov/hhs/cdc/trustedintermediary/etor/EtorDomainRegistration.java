@@ -227,7 +227,7 @@ public class EtorDomainRegistration implements DomainConnector {
         boolean markMetadataAsFailed = false;
         String errorMessage = "";
 
-        if ("True".equals(request.getHeaders().get("Load-Test"))
+        if ("True".equals(request.getHeaders().get("load-test"))
                 && ApplicationContext.isPropertyPresent("REPORT_STREAM_URL_PREFIX")) {
             ApplicationContext.registerForThread(
                     RSEndpointClient.class, MockRSEndpointClient.getInstance());
