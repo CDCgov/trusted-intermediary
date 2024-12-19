@@ -53,7 +53,7 @@ jobs:
                   "$host/api/token" | jq -r ".access_token")
 
           file_path=Automated/*.hl7
-          if [ ${{ github.event.inputs.name }} == "Golden Copy Staging Test" ]; then
+          if [ "${{ github.event.inputs.name }}" == "Golden Copy Staging Test" ]; then
               file_path=GoldenCopy/Input/*.hl7
           fi
 
