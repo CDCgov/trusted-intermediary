@@ -6,7 +6,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Bundle;
 
-/** Removes Name Type Code (PID-5.7) from Patient Name (PID-5). */
+/** Removes Name Type Code (PID-5.7) from Patient Name (PID-5) */
 public class RemovePatientNameTypeCode implements CustomFhirTransformation {
 
     @Override
