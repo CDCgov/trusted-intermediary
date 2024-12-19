@@ -54,7 +54,6 @@ class GoldenCopyTest extends Specification {
     }
 
     def "Compare files"() {
-        // Update Automated Test README
         // Currently reusing automated staging test workflows but we might need to pivot for cron schedule
         // Get golden copy and input
 

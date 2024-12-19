@@ -30,7 +30,7 @@ jobs:
           else
             test_type=goldenCopyTest
             title=Golden Copy
-            file_path=../examples/Test/Automated/GoldenCopy/Expected/
+            file_path=../examples/Test/GoldenCopy/Expected/
           fi
           echo "test_type=test_type" >> $GITHUB_OUTPUT
           echo "title=$title" >> $GITHUB_OUTPUT
