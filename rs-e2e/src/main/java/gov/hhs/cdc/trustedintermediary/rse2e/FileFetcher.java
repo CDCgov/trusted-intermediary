@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.rse2e;
 
+import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HL7FileStream;
 import java.util.List;
 
 /**
