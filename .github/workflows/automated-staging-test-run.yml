@@ -23,13 +23,13 @@ jobs:
 
       - name: Determine variable type
         run: |
-          test_type="automatedTest"
-          title="Automated"
-          file_path="../examples/Test/Automated/"
-          if [ ${{ github.event.inputs.name }} = "Golden Copy Staging Test" ]; then
-            test_type="goldenCopyTest"
-            title="Golden Copy"
-            file_path="../examples/Test/GoldenCopy/Expected/"
+          test_type=automatedTest
+          title=Automated
+          file_path=../examples/Test/Automated/
+          if [ "${{ github.event.inputs.name }}" == "Golden Copy Staging Test" ]; then
+            test_type=goldenCopyTest
+            title=Golden Copy
+            file_path=../examples/Test/GoldenCopy/Expected/
           fi
           echo "test_type=$test_type" >> $GITHUB_OUTPUT
           echo "title=$title" >> $GITHUB_OUTPUT
@@ -41,7 +41,7 @@ jobs:
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AUTOMATED_TEST_AZURE_STORAGE_CONNECTION_STRING }}
           LOCAL_FILE_PATH: ${{ steps.getFunctionList.outputs.file_path }}
         run: |
-          ./gradlew rs-e2e:clean rs-e2e:${{ test_type }}
+          ./gradlew rs-e2e:clean rs-e2e:${{ steps.getFunctionList.outputs.test_type }}
           done
 
       - name: Send slack notification on test failure
