@@ -34,7 +34,6 @@ jobs:
           echo "test_type=$test_type" >> $GITHUB_OUTPUT
           echo "title=$title" >> $GITHUB_OUTPUT
           echo "file_path=$file_path" >> $GITHUB_OUTPUT
-          done
 
       - name: Run automated tests
         env:
