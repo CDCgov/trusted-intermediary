@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.ruleengine.transformation;
 
+import gov.hhs.cdc.trustedintermediary.ruleengine.Rule;
 import gov.hhs.cdc.trustedintermediary.ruleengine.RuleEngine;
 import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoader;
 import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoaderException;
@@ -14,11 +15,12 @@ import java.util.List;
 import javax.inject.Inject;
 
 /** Implements the RuleEngine interface. It represents a rule engine for transformations. */
-public class TransformationRuleEngine implements RuleEngine {
+// Generisize both engines with `Class<>`
+public class TransformationRuleEngine<T extends Rule<T>, S extends Rule<T>> implements RuleEngine {
     private String ruleDefinitionsFileName;
     final List<TransformationRule> rules = new ArrayList<>();
     volatile boolean rulesLoaded = false;
-    private static final TransformationRuleEngine INSTANCE = new TransformationRuleEngine();
+    //    private static final TransformationRuleEngine INSTANCE = new TransformationRuleEngine();
 
     @Inject Logger logger;
     @Inject RuleLoader ruleLoader;
