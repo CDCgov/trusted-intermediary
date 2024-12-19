@@ -24,13 +24,13 @@ jobs:
       - name: Determine variable type
         run: |
           if [ ${{ github.event.inputs.name }} = "Automated Staging Test" ]; then
-            test_type=automatedTest
-            title=Automated
-            file_path=../examples/Test/Automated/
+            test_type="automatedTest"
+            title="Automated"
+            file_path="../examples/Test/Automated/"
           else
-            test_type=goldenCopyTest
-            title=Golden Copy
-            file_path=../examples/Test/GoldenCopy/Expected/
+            test_type="goldenCopyTest"
+            title="Golden Copy"
+            file_path="../examples/Test/GoldenCopy/Expected/"
           fi
           echo "test_type=test_type" >> $GITHUB_OUTPUT
           echo "title=$title" >> $GITHUB_OUTPUT
