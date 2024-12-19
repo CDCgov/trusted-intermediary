@@ -55,7 +55,6 @@ class GoldenCopyTest extends Specification {
 
     def "Compare files"() {
         // Currently reusing automated staging test workflows but we might need to pivot for cron schedule
-        // Get golden copy for 006
 
         given:
         def matchedFiles = fileMatcher.matchFiles(azureFiles, localFiles)

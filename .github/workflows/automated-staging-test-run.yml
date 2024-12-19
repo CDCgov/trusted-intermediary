@@ -28,7 +28,7 @@ jobs:
           file_path=../examples/Test/Automated/
           if [ "${{ github.event.inputs.name }}" == "Golden Copy Staging Test" ]; then
             test_type=goldenCopyTest
-            title=Golden Copy
+            title="Golden Copy"
             file_path=../examples/Test/GoldenCopy/Expected/
           fi
           echo "test_type=$test_type" >> $GITHUB_OUTPUT
