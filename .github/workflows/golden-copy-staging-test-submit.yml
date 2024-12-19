@@ -1,8 +1,9 @@
-name: Automated Staging Test - Submit Messages
+name: Golden Copy Staging Test - Submit Messages
 
 on:
   schedule:
-    - cron: "0 5 * * 2-6"  # Tuesday to Saturday at Midnight EST (5am UTC)
+    - cron: "0 5 * * 2-6"
+  workflow_dispatch:
 
 jobs:
   send_files:
@@ -12,4 +13,4 @@ jobs:
       - name: Call staging-test-submit.yml
         uses: .github/workflows/staging-test-submit-reusable.yml
         with:
-          FILE_PATH: 'Automated/*.hl7'
+          FILE_PATH: 'GoldenCopy/Input/*.hl7'

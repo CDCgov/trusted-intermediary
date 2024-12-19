@@ -1,4 +1,4 @@
-name: Automated Staging Test - Run integration tests
+name: Golden Copy Staging Test - Run integration tests
 
 on:
   schedule:
@@ -12,6 +12,6 @@ jobs:
       - name: Call staging-test-run.yml
         uses: .github/workflows/staging-test-run-reusable.yml
         with:
-          FILE_PATH: '../examples/Test/Automated/'
-          NAME: 'Automated'
-          TEST_TYPE: 'automatedTest'
+          FILE_PATH: '../examples/Test/GoldenCopy/Expected/'
+          NAME: 'Golden Copy'
+          TEST_TYPE: 'goldenCopyTest'
