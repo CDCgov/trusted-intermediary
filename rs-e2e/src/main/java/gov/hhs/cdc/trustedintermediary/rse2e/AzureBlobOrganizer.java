@@ -46,13 +46,20 @@ public class AzureBlobOrganizer {
                     continue;
                 }
 
+                // TODO - separate the content by golden or automated so it can be distinguished
+                // when its pulled down
+                //  modify destinationName to be test folder specific
+                //  possibly read blob and modify parseAndMapMessageByControlId or use its parts to
+                // get a different MSH header like getIdentifier
+                // possibly use a different receiver and filter on that
+
                 String destinationName =
                         AzureBlobHelper.createDateBasedPath(sourceCreationDate, sourceName);
+
                 BlobClient destinationBlob = blobContainerClient.getBlobClient(destinationName);
                 destinationBlob
                         .beginCopy(sourceBlob.getBlobUrl(), null)
                         .waitForCompletion(Duration.ofSeconds(30));
-
                 CopyStatusType copyStatus = destinationBlob.getProperties().getCopyStatus();
                 if (copyStatus == CopyStatusType.SUCCESS) {
                     sourceBlob.delete();
