@@ -1,10 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.hl7;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
 
 /**
  * Represents a HL7 message that implements the HealthData interface and adds methods to access the
@@ -13,19 +10,46 @@ import java.util.regex.Matcher;
 public class HL7Message implements HealthData<HL7Message> {
 
     private final List<HL7Segment> segments;
-    private final Map<String, Character> encodingCharacters;
+    private final HL7Encoding encoding;
 
-    HL7Message(List<HL7Segment> segments, Map<String, Character> encodingCharacters) {
+    HL7Message(List<HL7Segment> segments, HL7Encoding encoding) {
         this.segments = segments;
-        this.encodingCharacters = encodingCharacters;
+        this.encoding = encoding;
+    }
+
+    @Override
+    public HL7Message getUnderlyingData() {
+        return this;
+    }
+
+    @Override
+    public String getIdentifier() {
+        try {
+            return getValue("MSH-10");
+        } catch (HL7MessageException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return String.join(
+                HL7Encoding.DEFAULT_SEGMENT_DELIMITER,
+                getSegments().stream()
+                        .map(segment -> HL7Parser.segmentToString(segment, this.encoding))
+                        .toList());
     }
 
     public List<HL7Segment> getSegments() {
-        return segments;
+        return this.segments;
+    }
+
+    public HL7Encoding getEncoding() {
+        return this.encoding;
     }
 
     public List<HL7Segment> getSegments(String name) {
-        return segments.stream().filter(segment -> segment.name().equals(name)).toList();
+        return this.segments.stream().filter(segment -> segment.name().equals(name)).toList();
     }
 
     public int getSegmentCount(String name) {
@@ -48,73 +72,10 @@ public class HL7Message implements HealthData<HL7Message> {
         return getSegment(name, 0);
     }
 
-    public String getValue(String hl7Path) throws HL7MessageException {
-        Matcher hl7FieldNameMatcher = HL7Parser.HL7_FIELD_NAME_PATTERN.matcher(hl7Path);
-        if (!hl7FieldNameMatcher.matches()) {
-            throw new HL7MessageException("Invalid HL7 path format: " + hl7Path);
-        }
-
-        String segmentName = hl7FieldNameMatcher.group(1);
-        String segmentFieldIndex = hl7FieldNameMatcher.group(2);
-        int[] indexParts =
-                Arrays.stream(segmentFieldIndex.split("\\.")).mapToInt(Integer::parseInt).toArray();
-        return getValue(segmentName, indexParts);
-    }
-
-    public String getValue(String segmentName, int... indices) throws HL7MessageException {
-        List<String> fields = getSegment(segmentName).fields();
-        char[] segmentDelimiters = this.getOrderedSegmentDelimiters();
-        return HL7Parser.parseAndGetValue(fields, segmentDelimiters, indices);
-    }
-
-    public char getEncodingCharacter(String type) {
-        return this.encodingCharacters.get(type);
-    }
-
-    public char getEscapeCharacter() {
-        return getEncodingCharacter(HL7Parser.ESCAPE_CHARACTER_NAME);
-    }
-
-    public char[] getOrderedSegmentDelimiters() {
-        return new char[] {
-            getEncodingCharacter(HL7Parser.FIELD_DELIMITER_NAME),
-            getEncodingCharacter(HL7Parser.COMPONENT_DELIMITER_NAME),
-            getEncodingCharacter(HL7Parser.REPETITION_DELIMITER_NAME),
-            getEncodingCharacter(HL7Parser.SUBCOMPONENT_DELIMITER_NAME)
-        };
-    }
-
-    @Override
-    public HL7Message getUnderlyingData() {
-        return this;
-    }
-
-    @Override
-    public String getIdentifier() {
-        try {
-            return getValue(HL7Parser.MSH_SEGMENT_NAME, 10);
-        } catch (HL7MessageException e) {
-            return null;
-        }
-    }
-
-    @Override
-    public String toString() {
-        return String.join(
-                HL7Parser.DEFAULT_SEGMENT_DELIMITER,
-                segments.stream().map(this::segmentToString).toList());
-    }
-
-    private String segmentToString(HL7Segment segment) {
-        String fieldSeparator =
-                String.valueOf(getEncodingCharacter(HL7Parser.FIELD_DELIMITER_NAME));
-
-        if (segment.name().equals(HL7Parser.MSH_SEGMENT_NAME)) {
-            return segment.name()
-                    + segment.fields().get(0)
-                    + String.join(
-                            fieldSeparator, segment.fields().subList(1, segment.fields().size()));
-        }
-        return segment.name() + fieldSeparator + String.join(fieldSeparator, segment.fields());
+    public String getValue(String path) throws HL7MessageException {
+        HL7Path hl7Path = HL7Parser.parsePath(path);
+        List<String> fields = getSegment(hl7Path.segmentName()).fields();
+        char[] segmentDelimiters = this.encoding.getOrderedDelimiters();
+        return HL7Parser.parseFieldValue(hl7Path, fields, segmentDelimiters);
     }
 }

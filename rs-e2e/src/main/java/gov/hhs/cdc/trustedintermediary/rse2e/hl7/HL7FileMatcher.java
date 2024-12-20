@@ -57,7 +57,7 @@ public class HL7FileMatcher {
             String fileName = hl7FileStream.fileName();
             try (InputStream inputStream = hl7FileStream.inputStream()) {
                 String content = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-                HL7Message message = HL7Parser.parse(content);
+                HL7Message message = HL7Parser.parseMessage(content);
                 String msh10 = message.getIdentifier();
                 if (msh10 == null || msh10.isEmpty()) {
                     throw new HL7FileMatcherException(

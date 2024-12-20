@@ -3,59 +3,42 @@ package gov.hhs.cdc.trustedintermediary.rse2e.hl7;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** The HL7Parser class is responsible for parsing HL7 messages and extracting values from them. */
 public class HL7Parser {
-    private static final String NEWLINE_REGEX = "\\r?\\n|\\r";
-    private static final char DEFAULT_FIELD_DELIMITER = '|';
-    private static final char DEFAULT_COMPONENT_DELIMITER = '^';
-    private static final char DEFAULT_REPETITION_DELIMITER = '~';
-    private static final char DEFAULT_ESCAPE_CHARACTER = '\\';
-    private static final char DEFAULT_SUBCOMPONENT_DELIMITER = '&';
-    private static final char[] DEFAULT_ENCODING_CHARACTERS =
-            new char[] {
-                DEFAULT_COMPONENT_DELIMITER,
-                DEFAULT_REPETITION_DELIMITER,
-                DEFAULT_ESCAPE_CHARACTER,
-                DEFAULT_SUBCOMPONENT_DELIMITER
-            };
-    protected static final String FIELD_DELIMITER_NAME = "field";
-    protected static final String COMPONENT_DELIMITER_NAME = "component";
-    protected static final String REPETITION_DELIMITER_NAME = "repetition";
-    protected static final String ESCAPE_CHARACTER_NAME = "escape";
-    protected static final String SUBCOMPONENT_DELIMITER_NAME = "subcomponent";
-    protected static final String MSH_SEGMENT_NAME = "MSH";
-    protected static final String DEFAULT_SEGMENT_DELIMITER = "\n";
-    protected static final Pattern HL7_FIELD_NAME_PATTERN =
-            Pattern.compile("(\\w+)-(\\d+(?:\\.\\d+)*)");
+    static final String MSH_SEGMENT_NAME = "MSH";
+    static final String NEWLINE_REGEX = "\\r?\\n|\\r";
+    static final Pattern HL7_FIELD_NAME_PATTERN = Pattern.compile("(\\w+)-(\\d+(?:\\.\\d+)*)");
 
     private HL7Parser() {}
 
-    public static HL7Message parse(String content) {
+    public static HL7Message parseMessage(String content) {
         List<HL7Segment> segments = new ArrayList<>();
         String encodingCharactersField = null;
         String[] lines = content.split(NEWLINE_REGEX);
         for (String line : lines) {
             if (line.trim().isEmpty()) continue;
             String[] fields =
-                    line.split(Pattern.quote(String.valueOf(DEFAULT_FIELD_DELIMITER)), -1);
+                    line.split(
+                            Pattern.quote(String.valueOf(HL7Encoding.DEFAULT_FIELD_DELIMITER)), -1);
             String segmentName = fields[0];
             List<String> segmentFields =
                     new ArrayList<>(Arrays.asList(fields).subList(1, fields.length));
             if (Objects.equals(segmentName, MSH_SEGMENT_NAME)) {
                 encodingCharactersField = fields[1];
-                segmentFields.add(0, String.valueOf(DEFAULT_FIELD_DELIMITER));
+                segmentFields.add(0, String.valueOf(HL7Encoding.DEFAULT_FIELD_DELIMITER));
             }
             segments.add(new HL7Segment(segmentName, segmentFields));
         }
 
-        return new HL7Message(segments, getEncodingCharacterMap(encodingCharactersField));
+        return new HL7Message(segments, HL7Encoding.fromEncodingField(encodingCharactersField));
     }
 
-    public static String parseAndGetValue(List<String> fields, char[] delimiters, int... indices) {
+    public static String parseFieldValue(HL7Path hl7Path, List<String> fields, char[] delimiters) {
+        int[] indices = hl7Path.indices();
         if (fields == null || fields.isEmpty() || indices[0] > fields.size()) {
             return "";
         }
@@ -76,26 +59,28 @@ public class HL7Parser {
         return value;
     }
 
-    public static Map<String, Character> getEncodingCharacterMap(String encodingCharactersField) {
-        char[] encodingCharacters = DEFAULT_ENCODING_CHARACTERS;
-        if (encodingCharactersField != null && !encodingCharactersField.isEmpty()) {
-            encodingCharacters = encodingCharactersField.toCharArray();
+    public static HL7Path parsePath(String path) {
+        Matcher matcher = HL7_FIELD_NAME_PATTERN.matcher(path);
+        if (!matcher.matches()) {
+            throw new HL7ParserException("Invalid HL7 path format: " + path);
         }
 
-        return Map.of(
-                FIELD_DELIMITER_NAME, HL7Parser.DEFAULT_FIELD_DELIMITER,
-                COMPONENT_DELIMITER_NAME, encodingCharacters[0],
-                REPETITION_DELIMITER_NAME,
-                        encodingCharacters.length > 1
-                                ? encodingCharacters[1]
-                                : HL7Parser.DEFAULT_REPETITION_DELIMITER,
-                ESCAPE_CHARACTER_NAME,
-                        encodingCharacters.length > 2
-                                ? encodingCharacters[2]
-                                : HL7Parser.DEFAULT_ESCAPE_CHARACTER,
-                SUBCOMPONENT_DELIMITER_NAME,
-                        encodingCharacters.length > 3
-                                ? encodingCharacters[3]
-                                : HL7Parser.DEFAULT_SUBCOMPONENT_DELIMITER);
+        String segmentName = matcher.group(1);
+        int[] indices =
+                Arrays.stream(matcher.group(2).split("\\.")).mapToInt(Integer::parseInt).toArray();
+
+        return new HL7Path(segmentName, indices);
+    }
+
+    public static String segmentToString(HL7Segment segment, HL7Encoding encoding) {
+        String fieldSeparator = String.valueOf(encoding.getFieldDelimiter());
+
+        if (segment.name().equals(MSH_SEGMENT_NAME)) {
+            return segment.name()
+                    + segment.fields().get(0)
+                    + String.join(
+                            fieldSeparator, segment.fields().subList(1, segment.fields().size()));
+        }
+        return segment.name() + fieldSeparator + String.join(fieldSeparator, segment.fields());
     }
 }

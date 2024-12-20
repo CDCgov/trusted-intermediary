@@ -15,7 +15,7 @@ ORC|NW|4560411583^ORDERID||||||||||12345^^^^^^^^NPI&2.16.840.1.113883.4.6&ISO^L|
 OBR|1|4560411583^ORDERID||54089-8^Newborn screening panel AHIC^LN|||202402221854-0500|||||||||12345^^^^^^^^NPI&2.16.840.1.113883.4.6&ISO^L||||||||
 OBX|1|ST|57723-9^Unique bar code number of Current sample^LN||123456||||||F|||202402221854-0500
 OBX|2|NM|||3122||||||F|||202402221854-0500||"""
-        message = HL7Parser.parse(messageContent)
+        message = HL7Parser.parseMessage(messageContent)
     }
 
     def "getUnderlyingData should correctly return itself"() {

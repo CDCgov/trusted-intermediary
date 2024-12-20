@@ -18,7 +18,7 @@ class HL7ExpressionEvaluatorTest extends Specification {
 
         messageContent = """MSH|^~\\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-lab-id^DNS|20230101010000-0000||ORM^O01^ORM_O01|111111|T|2.5.1
 PID|1||11102779^^^CR^MR||SMITH^BB SARAH^^^^^L"""
-        hl7Message = HL7Parser.parse(messageContent)
+        hl7Message = HL7Parser.parseMessage(messageContent)
 
         TestApplicationContext.injectRegisteredImplementations()
     }

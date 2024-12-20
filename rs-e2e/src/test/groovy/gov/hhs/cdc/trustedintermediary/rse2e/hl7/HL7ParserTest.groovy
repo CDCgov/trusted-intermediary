@@ -11,7 +11,7 @@ class HL7ParserTest extends Specification {
 PID|||12345||Doe^John||19800101|M"""
 
         when:
-        def message = HL7Parser.parse(content)
+        def message = HL7Parser.parseMessage(content)
         def segments = message.getSegments()
 
         then:
@@ -33,7 +33,7 @@ PID|||12345||Doe^John||19800101|M"""
 PID|||12345"""
 
         when:
-        def result = HL7Parser.parse(content)
+        def result = HL7Parser.parseMessage(content)
 
         then:
         result.getSegments().size() == 2
@@ -44,13 +44,13 @@ PID|||12345"""
         def content = "MSH|^~\\&|sending_app||sending_facility"
 
         when:
-        def result = HL7Parser.parse(content)
+        def result = HL7Parser.parseMessage(content)
 
         then:
         result.getSegments().get(0).fields().get(3) == ""
     }
 
-    def "parseAndGetValue should handle different field levels"() {
+    def "parseFieldValue should handle different field levels"() {
         given:
         def fields = [
             "value1",
@@ -61,7 +61,7 @@ PID|||12345"""
         def delimiters = ['|', '^', '~', '&'] as char[]
 
         when:
-        def result = HL7Parser.parseAndGetValue(fields, delimiters, indices as int[])
+        def result = HL7Parser.parseFieldValue(fields, delimiters, indices as int[])
 
         then:
         result == expectedValue
@@ -75,9 +75,9 @@ PID|||12345"""
         "invalid index"    | [5]          | ""
     }
 
-    def "parseAndGetValue returns an empty string when inputs are null"() {
+    def "parseFieldValue returns an empty string when inputs are null"() {
         when:
-        def result = HL7Parser.parseAndGetValue(null, [] as char[], 1)
+        def result = HL7Parser.parseFieldValue(null, [] as char[], 1)
 
         then:
         result == ""
@@ -125,31 +125,31 @@ PID|||12345"""
         result["subcomponent"] == '_' as char
     }
 
-    def "parseAndGetValue returns an empty string if a null list of fields is given"() {
+    def "parseFieldValue returns an empty string if a null list of fields is given"() {
         given:
         def nullList = null
         def delimiters = ['|']
 
         when:
-        def out = HL7Parser.parseAndGetValue(nullList, delimiters as char[])
+        def out = HL7Parser.parseFieldValue(nullList, delimiters as char[])
 
         then:
         out == ""
     }
 
-    def "parseAndGetValue returns an empty string if an empty list of fields is given"() {
+    def "parseFieldValue returns an empty string if an empty list of fields is given"() {
         given:
         def emptyList = []
         def delimiters = ['|']
 
         when:
-        def out = HL7Parser.parseAndGetValue(emptyList, delimiters as char[])
+        def out = HL7Parser.parseFieldValue(emptyList, delimiters as char[])
 
         then:
         out == ""
     }
 
-    def "parseAndGetValue returns an empty string if the indices are pointing outside the expected range"() {
+    def "parseFieldValue returns an empty string if the indices are pointing outside the expected range"() {
         given:
         def emptyList = [
             "MSH|fakeValues",
@@ -158,7 +158,7 @@ PID|||12345"""
         def delimiters = ['|']
 
         when:
-        def out = HL7Parser.parseAndGetValue(emptyList, delimiters as char[], 10, 20)
+        def out = HL7Parser.parseFieldValue(emptyList, delimiters as char[], 10, 20)
 
         then:
         out == ""
