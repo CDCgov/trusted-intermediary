@@ -47,14 +47,17 @@ public class AzureBlobOrganizer {
                 }
 
                 // TODO - separate the content by golden or automated so it can be distinguished
-                // when its pulled down
-                //  modify destinationName to be test folder specific
-                //  possibly read blob and modify parseAndMapMessageByControlId or use its parts to
-                // get a different MSH header like getIdentifier
+                // when its pulled down and modify destinationName to be test folder specific
                 // possibly use a different receiver and filter on that
 
+                String testTypeAndSourceName = "Automated/" + sourceName;
+                if (sourceBlob.getBlobName().contains("golden")) {
+                    testTypeAndSourceName = "GoldenCopy/" + sourceName;
+                }
+
                 String destinationName =
-                        AzureBlobHelper.createDateBasedPath(sourceCreationDate, sourceName);
+                        AzureBlobHelper.createDateBasedPath(
+                                sourceCreationDate, testTypeAndSourceName);
 
                 BlobClient destinationBlob = blobContainerClient.getBlobClient(destinationName);
                 destinationBlob
