@@ -1,12 +1,13 @@
-package gov.hhs.cdc.trustedintermediary.rse2e;
+package gov.hhs.cdc.trustedintermediary.rse2e.external.localfile;
 
+import gov.hhs.cdc.trustedintermediary.rse2e.FileFetcher;
+import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HL7FileStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -43,7 +44,7 @@ public class LocalFileFetcher implements FileFetcher {
                                     throw new RuntimeException("Error opening file: " + p, e);
                                 }
                             })
-                    .collect(Collectors.toList());
+                    .toList();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
