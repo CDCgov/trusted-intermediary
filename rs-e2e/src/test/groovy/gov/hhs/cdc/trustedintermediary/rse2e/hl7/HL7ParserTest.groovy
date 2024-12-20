@@ -52,31 +52,22 @@ PID|||12345"""
 
     def "parseMessageFieldValue should handle different field levels"() {
         given:
-        def message = HL7Parser.parseMessage("""delimiters
-"""
-                )
-        def fields = [
-            "value1",
-            "component1^component2",
-            "rep1~rep2^",
-            "comp1^~sub1&sub2"
-        ]
-        def delimiters = ['|', '^', '~', '&'] as char[]
+        def message = HL7Parser.parseMessage("TST|value1|component1^component2|rep1~rep2^|comp1^~sub1&sub2")
 
         when:
         def hl7Path = HL7Parser.parsePath(path)
-        def result = HL7Parser.parseMessageFieldValue(hl7Path, fields, delimiters)
+        def result = HL7Parser.parseMessageFieldValue(message, hl7Path)
 
         then:
         result == expectedValue
 
         where:
-        scenario           | path      | expectedValue
-        "simple field"     | [1]          | "value1"
-        "component"        | [2, 2]       | "component2"
-        "repetition"       | [3, 1, 2]    | "rep2"
-        "subcomponent"     | [4, 2, 2, 2] | "sub2"
-        "invalid index"    | [5]          | ""
+        scenario           | path          | expectedValue
+        "simple field"     | "TST-1"       | "value1"
+        "component"        | "TST-2.2"     | "component2"
+        "repetition"       | "TST-3.1.2"   | "rep2"
+        "subcomponent"     | "TST-4.2.2.2" | "sub2"
+        "invalid index"    | "TST-5"       | ""
     }
 
     def "parseMessageFieldValue returns an empty string when inputs are null"() {
@@ -93,7 +84,7 @@ PID|||12345"""
         def message = HL7Parser.parseMessage("")
 
         when:
-        def out = HL7Parser.parseMessageFieldValue(hl7Path, message)
+        def out = HL7Parser.parseMessageFieldValue(message, hl7Path)
 
         then:
         out == ""
@@ -104,7 +95,7 @@ PID|||12345"""
         def hl7Path = HL7Parser.parsePath("")
 
         when:
-        def out = HL7Parser.parseMessageFieldValue(hl7Path, _ as HL7Message)
+        def out = HL7Parser.parseMessageFieldValue(_ as HL7Message, hl7Path)
 
         then:
         out == ""
@@ -116,7 +107,7 @@ PID|||12345"""
         def hl7Path = HL7Parser.parsePath("MSH-3")
 
         when:
-        def out = HL7Parser.parseMessageFieldValue(hl7Path, message)
+        def out = HL7Parser.parseMessageFieldValue(message, hl7Path)
 
         then:
         out == ""

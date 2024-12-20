@@ -37,7 +37,7 @@ public class HL7Parser {
         return new HL7Message(segments, HL7Encoding.fromEncodingField(encodingCharactersField));
     }
 
-    public static String parseMessageFieldValue(HL7Path hl7Path, HL7Message message)
+    public static String parseMessageFieldValue(HL7Message message, HL7Path hl7Path)
             throws HL7MessageException {
         if (hl7Path == null || hl7Path.indices().length == 0) {
             return "";
