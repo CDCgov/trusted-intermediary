@@ -4,11 +4,9 @@ import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
 import gov.hhs.cdc.trustedintermediary.wrappers.AuthEngine;
 import gov.hhs.cdc.trustedintermediary.wrappers.Cache;
-import gov.hhs.cdc.trustedintermediary.wrappers.HapiFhir;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClient;
 import gov.hhs.cdc.trustedintermediary.wrappers.HttpClientException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
-import gov.hhs.cdc.trustedintermediary.wrappers.MetricMetadata;
 import gov.hhs.cdc.trustedintermediary.wrappers.SecretRetrievalException;
 import gov.hhs.cdc.trustedintermediary.wrappers.Secrets;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
@@ -45,12 +43,9 @@ public class ReportStreamEndpointClient implements RSEndpointClient {
     @Inject private HttpClient client;
     @Inject private AuthEngine jwt;
     @Inject private Formatter formatter;
-    @Inject private HapiFhir fhir;
     @Inject private Logger logger;
     @Inject private Secrets secrets;
     @Inject private Cache cache;
-
-    @Inject MetricMetadata metadata;
 
     private static final ReportStreamEndpointClient INSTANCE = new ReportStreamEndpointClient();
 
@@ -156,6 +151,7 @@ public class ReportStreamEndpointClient implements RSEndpointClient {
 
     @Override
     public String getRsToken() throws ReportStreamEndpointClientException {
+        logger.logInfo("#########  {[{[{[{[{[REAL IMPLEMENTATION]}]}]}]}]} #########");
         logger.logInfo("Looking up ReportStream token");
 
         var token = cache.get(RS_TOKEN_CACHE_ID);

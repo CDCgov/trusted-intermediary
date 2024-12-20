@@ -4,6 +4,7 @@ import time
 import urllib.parse
 import urllib.request
 import uuid
+import os
 
 from locust import FastHttpUser, between, events, task
 from locust.runners import MasterRunner
@@ -18,6 +19,8 @@ CONSOLIDATED_ENDPOINT = "/v1/etor/metadata/summary"
 order_request_body = None
 result_request_body = None
 auth_request_body = None
+
+in_azure = os.getenv('TEST_RUN_NAME') is not None
 
 
 class SampleUser(FastHttpUser):
@@ -118,6 +121,10 @@ def test_start(environment):
 
 @events.quitting.add_listener
 def assert_stats(environment):
+    if in_azure:
+        # don't evaluate this in Azure because we want the locust process to succeed and Azure does its own test criteria checking
+        return
+
     if environment.stats.total.fail_ratio > 0.01:
         logging.error("Test failed due to failure ratio > 1%")
         environment.process_exit_code = 1
@@ -131,22 +138,38 @@ def assert_stats(environment):
 def get_auth_request_body():
     # set up the sample request body for the auth endpoint
     # using a valid test token found in the mock_credentials directory
-    auth_scope = "report-stream"
-    with open("mock_credentials/report-stream-valid-token.jwt") as f:
-        auth_token = f.read()
+
+    # TODO - notes/clarification on 2 different creds, plus expiration date of jwt
+    # TODO - do we want to TF the tests? If yes which envs? In CDC envs, may need to adjust IP allow list on app. Also set as private endpoints in test config?
+    # TODO - currently in Azure we're specifying a version for the key vault item (so if it gets updated, we'll be referencing an old version) - do we want to change this?
+    if in_azure:
+        auth_token = os.getenv("trusted-intermediary-valid-token-jwt")
+    else:
+        with open("mock_credentials/trusted-intermediary-valid-token.jwt") as f:
+            auth_token = f.read()
+
     params = urllib.parse.urlencode(
-        {"scope": auth_scope, "client_assertion": auth_token.strip()}
+        {"scope": "trusted-intermediary", "client_assertion": auth_token.strip()}
     )
+
     return params.encode("utf-8")
 
 
 def get_order_fhir_message():
     # read the sample request body for the orders endpoint
-    with open("examples/Test/e2e/orders/002_ORM_O01_short.fhir", "r") as f:
+    file_path = "002_ORM_O01_short.fhir"
+    if not in_azure:
+        file_path = "examples/Test/e2e/orders/" + file_path
+
+    with open(file_path, "r") as f:
         return f.read()
 
 
 def get_result_fhir_message():
     # read the sample request body for the results endpoint
-    with open("examples/Test/e2e/results/001_ORU_R01_short.fhir", "r") as f:
+    file_path = "001_ORU_R01_short.fhir"
+    if not in_azure:
+        file_path = "examples/Test/e2e/results/" + file_path
+
+    with open(file_path, "r") as f:
         return f.read()

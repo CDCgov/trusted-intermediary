@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.external.reportstream;
 
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
 import gov.hhs.cdc.trustedintermediary.etor.messages.UnableToSendMessageException;
 import gov.hhs.cdc.trustedintermediary.etor.metadata.EtorMetadataStep;
@@ -17,7 +18,7 @@ import javax.inject.Inject;
 public class ReportStreamSenderHelper {
     private static final ReportStreamSenderHelper INSTANCE = new ReportStreamSenderHelper();
 
-    @Inject RSEndpointClient rsclient;
+    //    @Inject RSEndpointClient rsclient;
     @Inject Formatter formatter;
     @Inject Logger logger;
     @Inject MetricMetadata metadata;
@@ -41,6 +42,9 @@ public class ReportStreamSenderHelper {
     protected Optional<String> sendToReportStream(
             String body, String fhirResourceId, PartnerMetadataMessageType messageType)
             throws UnableToSendMessageException {
+
+        RSEndpointClient rsclient = ApplicationContext.getImplementation(RSEndpointClient.class);
+
         String bearerToken;
         String rsResponseBody;
 
