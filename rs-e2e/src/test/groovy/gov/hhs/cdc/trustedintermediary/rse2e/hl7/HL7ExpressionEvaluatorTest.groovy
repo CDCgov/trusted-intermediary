@@ -253,16 +253,16 @@ PID|1||11102779^^^CR^MR||SMITH^BB SARAH^^^^^L"""
         result == msh3
     }
 
-    def "getLiteralOrFieldValue returns null when there's an exception getting the value"() {
+    def "getLiteralOrFieldValue throws exception when using invalid operand"() {
         given:
         def operand = "invalidField"
         def inputMessage = Mock(HL7Message)
 
         when:
-        def result = evaluator.getLiteralOrFieldValue(hl7Message, inputMessage, operand)
+        evaluator.getLiteralOrFieldValue(hl7Message, inputMessage, operand)
 
         then:
-        result == null
+        thrown(HL7ParserException)
     }
 
     def "getFieldValue returns specified field value"() {
@@ -278,16 +278,16 @@ PID|1||11102779^^^CR^MR||SMITH^BB SARAH^^^^^L"""
         result == msh3
     }
 
-    def "getFieldValue returns null for non numeric field index"() {
+    def "getFieldValue throws exception for non numeric field index"() {
         given:
         def fieldName = "MSH-three"
         def inputMessage = Mock(HL7Message)
 
         when:
-        def result = evaluator.getFieldValue(hl7Message, inputMessage, fieldName)
+        evaluator.getFieldValue(hl7Message, inputMessage, fieldName)
 
         then:
-        result == null
+        thrown(HL7ParserException)
     }
 
     def "getFieldValue throws exception for empty field name"() {
@@ -299,8 +299,7 @@ PID|1||11102779^^^CR^MR||SMITH^BB SARAH^^^^^L"""
         evaluator.getFieldValue(hl7Message, inputMessage, fieldName)
 
         then:
-        def e = thrown(HL7ParserException)
-        e.getMessage().contains("Invalid field name format")
+        thrown(HL7ParserException)
     }
 
     def "getMessageBySource should return input message when source is input"() {

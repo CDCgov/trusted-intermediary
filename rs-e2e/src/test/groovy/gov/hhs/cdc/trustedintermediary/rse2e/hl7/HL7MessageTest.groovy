@@ -78,10 +78,6 @@ OBX|2|NM|||3122||||||F|||202402221854-0500||"""
 
     def "getValue returns the expected value given the segment name and indices"() {
         expect:
-        message.getValue("PID", 3) == message.getValue("PID-3")
-        message.getValue("PID", 3, 0) == message.getValue("PID-3.0")
-        message.getValue("PID", 40, 4, 1) == message.getValue("PID-40.4.1")
-        message.getValue("NK1", 33, 4, 1, 1) == message.getValue("NK1-33.4.1.1")
         message.getValue("PID-3") == "1300974^^^Baptist East^MR"
         message.getValue("PID-3.0") == ""
         message.getValue("PID-3.1") == "1300974"
@@ -105,14 +101,15 @@ OBX|2|NM|||3122||||||F|||202402221854-0500||"""
 
     def "getValue should throws an exception when the segment is not found"() {
         when:
-        message.getValue("ZZZ", 1)
+        message.getValue("ZZZ-1")
 
         then:
         thrown(HL7MessageException)
     }
 
+    // TODO: move to HL7EncodingTest
     def "getEscapeCharacter should return the escape character"() {
         expect:
-        message.getEscapeCharacter() == '\\' as char
+        message.getEncoding().getEscapeCharacter() == '\\' as char
     }
 }

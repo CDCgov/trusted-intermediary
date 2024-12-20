@@ -37,8 +37,16 @@ public class HL7Parser {
         return new HL7Message(segments, HL7Encoding.fromEncodingField(encodingCharactersField));
     }
 
-    public static String parseFieldValue(HL7Path hl7Path, List<String> fields, char[] delimiters) {
+    public static String parseMessageFieldValue(HL7Path hl7Path, HL7Message message)
+            throws HL7MessageException {
+        if (hl7Path == null || hl7Path.indices().length == 0) {
+            return "";
+        }
+
         int[] indices = hl7Path.indices();
+        List<String> fields = message.getSegment(hl7Path.segmentName()).fields();
+        char[] delimiters = message.getEncoding().getOrderedDelimiters();
+
         if (fields == null || fields.isEmpty() || indices[0] > fields.size()) {
             return "";
         }

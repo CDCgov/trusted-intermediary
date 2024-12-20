@@ -74,8 +74,6 @@ public class HL7Message implements HealthData<HL7Message> {
 
     public String getValue(String path) throws HL7MessageException {
         HL7Path hl7Path = HL7Parser.parsePath(path);
-        List<String> fields = getSegment(hl7Path.segmentName()).fields();
-        char[] segmentDelimiters = this.encoding.getOrderedDelimiters();
-        return HL7Parser.parseFieldValue(hl7Path, fields, segmentDelimiters);
+        return HL7Parser.parseMessageFieldValue(hl7Path, this);
     }
 }

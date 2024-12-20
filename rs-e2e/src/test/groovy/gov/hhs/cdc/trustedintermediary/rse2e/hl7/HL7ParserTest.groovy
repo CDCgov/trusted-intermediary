@@ -5,7 +5,7 @@ import spock.lang.Specification
 
 class HL7ParserTest extends Specification {
 
-    def "parse should handle basic HL7 message"() {
+    def "parseMessage should handle basic HL7 message"() {
         given:
         def content = """MSH|^~\\&|sending_app|sending_facility
 PID|||12345||Doe^John||19800101|M"""
@@ -26,7 +26,7 @@ PID|||12345||Doe^John||19800101|M"""
         segments[1].fields().get(4) == "Doe^John"
     }
 
-    def "parse should handle empty lines in message"() {
+    def "parseMessage should handle empty lines in message"() {
         given:
         def content = """MSH|^~\\&|sending_app
 
@@ -39,7 +39,7 @@ PID|||12345"""
         result.getSegments().size() == 2
     }
 
-    def "parse should preserve empty fields"() {
+    def "parseMessage should preserve empty fields"() {
         given:
         def content = "MSH|^~\\&|sending_app||sending_facility"
 
@@ -50,8 +50,11 @@ PID|||12345"""
         result.getSegments().get(0).fields().get(3) == ""
     }
 
-    def "parseFieldValue should handle different field levels"() {
+    def "parseMessageFieldValue should handle different field levels"() {
         given:
+        def message = HL7Parser.parseMessage("""delimiters
+"""
+                )
         def fields = [
             "value1",
             "component1^component2",
@@ -61,13 +64,14 @@ PID|||12345"""
         def delimiters = ['|', '^', '~', '&'] as char[]
 
         when:
-        def result = HL7Parser.parseFieldValue(fields, delimiters, indices as int[])
+        def hl7Path = HL7Parser.parsePath(path)
+        def result = HL7Parser.parseMessageFieldValue(hl7Path, fields, delimiters)
 
         then:
         result == expectedValue
 
         where:
-        scenario           | indices      | expectedValue
+        scenario           | path      | expectedValue
         "simple field"     | [1]          | "value1"
         "component"        | [2, 2]       | "component2"
         "repetition"       | [3, 1, 2]    | "rep2"
@@ -75,124 +79,46 @@ PID|||12345"""
         "invalid index"    | [5]          | ""
     }
 
-    def "parseFieldValue returns an empty string when inputs are null"() {
+    def "parseMessageFieldValue returns an empty string when inputs are null"() {
         when:
-        def result = HL7Parser.parseFieldValue(null, [] as char[], 1)
+        def result = HL7Parser.parseMessageFieldValue(null, null)
 
         then:
         result == ""
     }
 
-    def "getEncodingCharacterMap should use defaults when no encoding characters provided"() {
-        when:
-        def encodingChars = HL7Parser.getEncodingCharacterMap(null)
-
-        then:
-        encodingChars["field"] == '|' as char
-        encodingChars["component"] == '^' as char
-        encodingChars["repetition"] == '~' as char
-        encodingChars["escape"] == '\\' as char
-        encodingChars["subcomponent"] == '&' as char
-    }
-
-    def "getEncodingCharacterMap should use default character when one is missing"() {
+    def "parseMessageFieldValue returns an empty string if an empty message is given"() {
         given:
-        def customEncodingChars = "_"
+        def hl7Path = HL7Parser.parsePath("MSH-3")
+        def message = HL7Parser.parseMessage("")
 
         when:
-        def encodingChars = HL7Parser.getEncodingCharacterMap(customEncodingChars)
-
-        then:
-        encodingChars["field"] == '|' as char
-        encodingChars["component"] == '_' as char
-        encodingChars["repetition"] == '~' as char
-        encodingChars["escape"] == '\\' as char
-        encodingChars["subcomponent"] == '&' as char
-    }
-
-    def "getEncodingCharacterMap should use custom encoding characters when provided"() {
-        given:
-        def customEncodingChars = "@#+_"
-
-        when:
-        def result = HL7Parser.getEncodingCharacterMap(customEncodingChars)
-
-        then:
-        result["field"] == '|' as char
-        result["component"] == '@' as char
-        result["repetition"] == '#' as char
-        result["escape"] == '+' as char
-        result["subcomponent"] == '_' as char
-    }
-
-    def "parseFieldValue returns an empty string if a null list of fields is given"() {
-        given:
-        def nullList = null
-        def delimiters = ['|']
-
-        when:
-        def out = HL7Parser.parseFieldValue(nullList, delimiters as char[])
+        def out = HL7Parser.parseMessageFieldValue(hl7Path, message)
 
         then:
         out == ""
     }
 
-    def "parseFieldValue returns an empty string if an empty list of fields is given"() {
+    def "parseMessageFieldValue returns an empty string if an empty hl7 path is given"() {
         given:
-        def emptyList = []
-        def delimiters = ['|']
+        def hl7Path = HL7Parser.parsePath("")
 
         when:
-        def out = HL7Parser.parseFieldValue(emptyList, delimiters as char[])
+        def out = HL7Parser.parseMessageFieldValue(hl7Path, _ as HL7Message)
 
         then:
         out == ""
     }
 
-    def "parseFieldValue returns an empty string if the indices are pointing outside the expected range"() {
+    def "parseMessageFieldValue returns an empty string if the indices in hl7 path are pointing outside the expected range"() {
         given:
-        def emptyList = [
-            "MSH|fakeValues",
-            "OBR|fakeValues"
-        ]
-        def delimiters = ['|']
+        def message = HL7Parser.parseMessage("MSH|fakeValues\nOBR|fakeValues")
+        def hl7Path = HL7Parser.parsePath("MSH-3")
 
         when:
-        def out = HL7Parser.parseFieldValue(emptyList, delimiters as char[], 10, 20)
+        def out = HL7Parser.parseMessageFieldValue(hl7Path, message)
 
         then:
         out == ""
-    }
-
-    def "getEncodingCharacterMap uses default definitions when encoding characters are not available"() {
-        when:
-        def out = HL7Parser.getEncodingCharacterMap("tes")
-
-        then:
-        out.size() > 0
-    }
-
-    def "getEncodingCharacterMap uses default definitions if the encoding characters are blank"() {
-        when:
-        def out = HL7Parser.getEncodingCharacterMap(" ")
-
-        then:
-        out.size() > 0
-    }
-
-    def "getEncodingCharacterMap uses default definitions if the encoding characters are whitespace"() {
-        when:
-        def out = HL7Parser.getEncodingCharacterMap("")
-
-        then:
-        out.size() > 0
-    }
-
-    def "getEncodingCharacterMap uses default definitions if the encoding characters are null"() {
-        when:
-        def out = HL7Parser.getEncodingCharacterMap(null)
-
-        then:
-        out.size() > 0
     }
 }
