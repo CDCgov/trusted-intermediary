@@ -1,4 +1,4 @@
-name: Staging Test - Submit Messages
+name: Automated Staging Test - Submit Messages
 
 on:
   schedule:
@@ -45,14 +45,14 @@ jobs:
                   "$host/api/token" | jq -r ".access_token")
 
           for file in $(pwd)/examples/Test/Automated/**/*.hl7; do
-            echo "Sending $file"
-            curl \
-                --header "Content-Type: application/hl7-v2" \
-                --header "Client: $client_id.$client_sender" \
-                --header "Authorization: Bearer $token" \
-                --data-binary "@$file" \
-                --silent \
-                "$host/api/waters"
+              echo "Sending $file"
+              curl \
+                  --header "Content-Type: application/hl7-v2" \
+                  --header "Client: $client_id.$client_sender" \
+                  --header "Authorization: Bearer $token" \
+                  --data-binary "@$file" \
+                  --silent \
+                  "$host/api/waters"
           done
 
       - name: Clean up private key
