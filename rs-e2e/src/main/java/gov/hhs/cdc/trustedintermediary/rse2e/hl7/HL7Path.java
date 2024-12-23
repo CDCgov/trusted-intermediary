@@ -5,6 +5,8 @@ import java.util.Objects;
 
 /** The HL7Path class represents a path to a specific field in an HL7 message. */
 public record HL7Path(String segmentName, int[] indices) {
+
+    // Need to override equals, hashCode, and toString to handle array comparison
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
