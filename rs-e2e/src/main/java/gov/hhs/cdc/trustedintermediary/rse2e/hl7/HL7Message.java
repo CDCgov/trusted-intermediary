@@ -1,7 +1,10 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.hl7;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
@@ -9,6 +12,9 @@ import java.util.regex.Pattern;
  * HL7 data
  */
 public class HL7Message implements HealthData<HL7Message> {
+
+    static final String MSH_SEGMENT_NAME = "MSH";
+    static final String NEWLINE_REGEX = "\\r?\\n|\\r";
 
     private final List<HL7Segment> segments;
     private final HL7Encoding encoding;
@@ -37,8 +43,30 @@ public class HL7Message implements HealthData<HL7Message> {
         return String.join(
                 HL7Encoding.DEFAULT_SEGMENT_DELIMITER,
                 getSegments().stream()
-                        .map(segment -> HL7Parser.segmentToString(segment, this.encoding))
+                        .map(segment -> segmentToString(segment, this.encoding))
                         .toList());
+    }
+
+    public static HL7Message parse(String content) {
+        List<HL7Segment> segments = new ArrayList<>();
+        String encodingCharactersField = null;
+        String[] lines = content.split(NEWLINE_REGEX);
+        for (String line : lines) {
+            if (line.trim().isEmpty()) continue;
+            String[] fields =
+                    line.split(
+                            Pattern.quote(String.valueOf(HL7Encoding.DEFAULT_FIELD_DELIMITER)), -1);
+            String segmentName = fields[0];
+            List<String> segmentFields =
+                    new ArrayList<>(Arrays.asList(fields).subList(1, fields.length));
+            if (Objects.equals(segmentName, MSH_SEGMENT_NAME)) {
+                encodingCharactersField = fields[1];
+                segmentFields.add(0, String.valueOf(HL7Encoding.DEFAULT_FIELD_DELIMITER));
+            }
+            segments.add(new HL7Segment(segmentName, segmentFields));
+        }
+
+        return new HL7Message(segments, HL7Encoding.fromEncodingField(encodingCharactersField));
     }
 
     public List<HL7Segment> getSegments() {
@@ -97,5 +125,17 @@ public class HL7Message implements HealthData<HL7Message> {
             value = parts[index];
         }
         return value;
+    }
+
+    protected static String segmentToString(HL7Segment segment, HL7Encoding encoding) {
+        String fieldSeparator = String.valueOf(encoding.getFieldDelimiter());
+
+        if (segment.name().equals(MSH_SEGMENT_NAME)) {
+            return segment.name()
+                    + segment.fields().get(0)
+                    + String.join(
+                            fieldSeparator, segment.fields().subList(1, segment.fields().size()));
+        }
+        return segment.name() + fieldSeparator + String.join(fieldSeparator, segment.fields());
     }
 }

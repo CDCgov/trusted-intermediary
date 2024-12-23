@@ -15,7 +15,52 @@ ORC|NW|4560411583^ORDERID||||||||||12345^^^^^^^^NPI&2.16.840.1.113883.4.6&ISO^L|
 OBR|1|4560411583^ORDERID||54089-8^Newborn screening panel AHIC^LN|||202402221854-0500|||||||||12345^^^^^^^^NPI&2.16.840.1.113883.4.6&ISO^L||||||||
 OBX|1|ST|57723-9^Unique bar code number of Current sample^LN||123456||||||F|||202402221854-0500
 OBX|2|NM|||3122||||||F|||202402221854-0500||"""
-        message = HL7Parser.parseMessage(messageContent)
+        message = HL7Message.parse(messageContent)
+    }
+
+    def "parse should handle basic HL7 message"() {
+        given:
+        def content = """MSH|^~\\&|sending_app|sending_facility
+PID|||12345||Doe^John||19800101|M"""
+
+        when:
+        def message = HL7Message.parse(content)
+        def segments = message.getSegments()
+
+        then:
+        segments.size() == 2
+        segments[0].name() == "MSH"
+        segments[0].fields().size() == 4
+        segments[0].fields().get(0) == "|"
+        segments[0].fields().get(1) == "^~\\&"
+        segments[1].name() == "PID"
+        segments[1].fields().size() == 8
+        segments[1].fields().get(2) == "12345"
+        segments[1].fields().get(4) == "Doe^John"
+    }
+
+    def "parse should handle empty lines in message"() {
+        given:
+        def content = """MSH|^~\\&|sending_app
+
+PID|||12345"""
+
+        when:
+        def result = HL7Message.parse(content)
+
+        then:
+        result.getSegments().size() == 2
+    }
+
+    def "parse should preserve empty fields"() {
+        given:
+        def content = "MSH|^~\\&|sending_app||sending_facility"
+
+        when:
+        def result = HL7Message.parse(content)
+
+        then:
+        result.getSegments().get(0).fields().get(3) == ""
     }
 
     def "getUnderlyingData should correctly return itself"() {
