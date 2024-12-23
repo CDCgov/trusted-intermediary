@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.rse2e.hl7;
 
 import java.util.Map;
 
+/** The HL7Encoding class represents the encoding characters used in an HL7 message. */
 public record HL7Encoding(Map<String, Character> characters) {
     public static final String DEFAULT_SEGMENT_DELIMITER = "\n";
     public static final char DEFAULT_FIELD_DELIMITER = '|';
