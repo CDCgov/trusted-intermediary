@@ -38,9 +38,9 @@ public class HL7Parser {
     }
 
     public static String parseMessageFieldValue(HL7Message message, HL7Path hl7Path)
-            throws HL7MessageException {
-        if (hl7Path == null || hl7Path.indices().length == 0) {
-            return "";
+            throws HL7ParserException, HL7MessageException {
+        if (hl7Path == null || hl7Path.indices().length == 0 || message == null) {
+            throw new HL7ParserException("Invalid HL7 path: message or path is null or empty");
         }
 
         int[] indices = hl7Path.indices();

@@ -70,12 +70,26 @@ PID|||12345"""
         "invalid index"    | "TST-5"       | ""
     }
 
-    def "parseMessageFieldValue returns an empty string when inputs are null"() {
+    def "parseMessageFieldValue returns an exception when either or both inputs are null"() {
         when:
-        def result = HL7Parser.parseMessageFieldValue(null, null)
+        HL7Parser.parseMessageFieldValue(null, null)
 
         then:
-        result == ""
+        thrown(HL7ParserException)
+
+        when:
+        def hl7Path = HL7Parser.parsePath("MSH-3")
+        HL7Parser.parseMessageFieldValue(null, hl7Path)
+
+        then:
+        thrown(HL7ParserException)
+
+        when:
+        def message = HL7Parser.parseMessage("MSH|fakeValues")
+        HL7Parser.parseMessageFieldValue(message, null)
+
+        then:
+        thrown(HL7ParserException)
     }
 
     def "parseMessageFieldValue returns an empty string if an empty message is given"() {
