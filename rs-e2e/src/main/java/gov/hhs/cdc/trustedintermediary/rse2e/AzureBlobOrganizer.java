@@ -51,7 +51,7 @@ public class AzureBlobOrganizer {
                 // possibly use a different receiver and filter on that
 
                 String testTypeAndSourceName = "Automated/" + sourceName;
-                if (sourceBlob.getBlobName().contains("golden")) {
+                if (sourceBlob.getBlobName().contains("GOLDEN-COPY")) {
                     testTypeAndSourceName = "GoldenCopy/" + sourceName;
                 }
 
