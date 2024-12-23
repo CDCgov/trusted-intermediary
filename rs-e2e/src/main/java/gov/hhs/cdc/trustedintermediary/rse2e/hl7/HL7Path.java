@@ -13,4 +13,14 @@ public record HL7Path(String segmentName, int[] indices) {
         return (Objects.equals(segmentName, hl7Path.segmentName))
                 && Arrays.equals(indices, hl7Path.indices);
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(segmentName, Arrays.hashCode(indices));
+    }
+
+    @Override
+    public String toString() {
+        return "HL7Path[segmentName=" + segmentName + ", indices=" + Arrays.toString(indices) + "]";
+    }
 }
