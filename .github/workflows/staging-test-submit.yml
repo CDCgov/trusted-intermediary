@@ -1,15 +1,14 @@
 name: Staging Test - Submit Messages
 
 on:
-  workflow_call:
-    inputs:
-      FILE_PATH:
-        required: true
-        type: string
-        description: File path location to submit
+  schedule:
+    - cron: "0 5 * * 2-6"  # Tuesday to Saturday at Midnight EST (5am UTC)
+  workflow_dispatch:
 
 jobs:
   send_files:
+    runs-on: ubuntu-latest
+
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
@@ -45,7 +44,9 @@ jobs:
                   --silent \
                   "$host/api/token" | jq -r ".access_token")
 
-          for file in $(pwd)/examples/Test/${{ github.event.inputs.FILE_PATH }}; do
+          sendFiles () {
+            folder_path=$1
+            for file in "$(pwd)/examples/Test/$folder_path"; do
               echo "Sending $file"
               curl \
                   --header "Content-Type: application/hl7-v2" \
@@ -54,11 +55,12 @@ jobs:
                   --data-binary "@$file" \
                   --silent \
                   "$host/api/waters"
-          done
+            done
+          }
+          sendFiles "'Automated/*.hl7'"
+          sendFiles "'GoldenCopy/Input/*.hl7'"
 
       - name: Clean up private key
         if: always()
         run: |
           rm -f /tmp/staging_private_key.pem
-
-    runs-on:
