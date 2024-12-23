@@ -28,6 +28,7 @@ jobs:
 
       - name: Send HL7 sample messages to staging RS
         run: |
+          shopt -s globstar
           host=https://staging.prime.cdc.gov:443
           client_id=flexion
           client_sender=simulated-sender
@@ -44,7 +45,7 @@ jobs:
                   --silent \
                   "$host/api/token" | jq -r ".access_token")
 
-          for file in $(pwd)/examples/Test/Automated/**/*/*.hl7; do
+          for file in $(pwd)/examples/Test/Automated/**/*.hl7; do
               echo "Sending $file"
               curl \
                   --header "Content-Type: application/hl7-v2" \
