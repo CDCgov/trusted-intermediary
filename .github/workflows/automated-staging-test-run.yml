@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Call staging-test-run.yml
-        uses: ./.github/workflows/staging-test-run-reusable.yml
+        uses: ./.github/workflows/staging-test-run_reusable.yml
         with:
           FILE_PATH: '../examples/Test/Automated/'
           NAME: 'Automated'

@@ -2,7 +2,7 @@ name: Golden Copy Staging Test - Run integration tests
 
 on:
   schedule:
-    - cron: "0 7 * * 2-6"  # Tuesday to Saturday at 2am EST (7am UTC) - two hours after `automated-staging-test-submit` runs
+    - cron: "10 7 * * 2-6"  # Tuesday to Saturday at 2am EST (7:10am UTC) - two hours after `automated-staging-test-submit` runs
   workflow_dispatch:
 
 jobs:
@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Call staging-test-run.yml
-        uses: ./.github/workflows/staging-test-run-reusable.yml
+        uses: ./.github/workflows/staging-test-run_reusable.yml
         with:
           FILE_PATH: '../examples/Test/GoldenCopy/Expected/'
           NAME: 'Golden Copy'
