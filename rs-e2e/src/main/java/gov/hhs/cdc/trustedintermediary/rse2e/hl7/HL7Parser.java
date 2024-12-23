@@ -37,36 +37,6 @@ public class HL7Parser {
         return new HL7Message(segments, HL7Encoding.fromEncodingField(encodingCharactersField));
     }
 
-    public static String parseMessageFieldValue(HL7Message message, HL7Path hl7Path)
-            throws HL7ParserException, HL7MessageException {
-        if (hl7Path == null || hl7Path.indices().length == 0 || message == null) {
-            throw new HL7ParserException("Invalid HL7 path: message or path is null or empty");
-        }
-
-        int[] indices = hl7Path.indices();
-        List<String> fields = message.getSegment(hl7Path.segmentName()).fields();
-        char[] delimiters = message.getEncoding().getOrderedDelimiters();
-
-        if (indices[0] > fields.size()) {
-            return "";
-        }
-
-        String value = fields.get(indices[0] - 1);
-        for (int i = 1; i < indices.length; i++) {
-            if (i >= delimiters.length) {
-                throw new HL7ParserException("Invalid HL7 path: too many sub-levels provided");
-            }
-            char segmentDelimiter = delimiters[i];
-            int index = indices[i] - 1;
-            String[] parts = value.split(Pattern.quote(String.valueOf(segmentDelimiter)));
-            if (index < 0 || index >= parts.length) {
-                return "";
-            }
-            value = parts[index];
-        }
-        return value;
-    }
-
     public static HL7Path parsePath(String path) {
         Matcher matcher = HL7_FIELD_NAME_PATTERN.matcher(path);
         if (!matcher.matches()) {

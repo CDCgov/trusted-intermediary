@@ -2,6 +2,7 @@ package gov.hhs.cdc.trustedintermediary.rse2e.hl7;
 
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthData;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Represents a HL7 message that implements the HealthData interface and adds methods to access the
@@ -74,6 +75,27 @@ public class HL7Message implements HealthData<HL7Message> {
 
     public String getValue(String path) throws HL7MessageException {
         HL7Path hl7Path = HL7Parser.parsePath(path);
-        return HL7Parser.parseMessageFieldValue(this, hl7Path);
+        int[] indices = hl7Path.indices();
+        List<String> fields = this.getSegment(hl7Path.segmentName()).fields();
+        char[] delimiters = this.getEncoding().getOrderedDelimiters();
+
+        if (indices[0] > fields.size()) {
+            return "";
+        }
+
+        String value = fields.get(indices[0] - 1);
+        for (int i = 1; i < indices.length; i++) {
+            if (i >= delimiters.length) {
+                throw new HL7ParserException("Invalid HL7 path: too many sub-levels provided");
+            }
+            char segmentDelimiter = delimiters[i];
+            int index = indices[i] - 1;
+            String[] parts = value.split(Pattern.quote(String.valueOf(segmentDelimiter)));
+            if (index < 0 || index >= parts.length) {
+                return "";
+            }
+            value = parts[index];
+        }
+        return value;
     }
 }

@@ -89,6 +89,7 @@ OBX|2|NM|||3122||||||F|||202402221854-0500||"""
         message.getValue("PID-40.4.2") == "LRI_NDBS_COMPONENT"
         message.getValue("PID-40.4.3") == ""
         message.getValue("NK1-33.4.1.1") == "Medicaid"
+        message.getValue("PID-99") == ""
     }
 
     def "getValue should throws an exception when the hl7 field index has too many sublevels"() {
@@ -105,11 +106,5 @@ OBX|2|NM|||3122||||||F|||202402221854-0500||"""
 
         then:
         thrown(HL7MessageException)
-    }
-
-    // TODO: move to HL7EncodingTest
-    def "getEscapeCharacter should return the escape character"() {
-        expect:
-        message.getEncoding().getEscapeCharacter() == '\\' as char
     }
 }
