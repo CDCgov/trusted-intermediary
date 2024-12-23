@@ -10,6 +10,6 @@ jobs:
 
     steps:
       - name: Call staging-test-submit.yml
-        uses: .github/workflows/staging-test-submit-reusable.yml
+        uses: ./.github/workflows/staging-test-submit-reusable.yml
         with:
           FILE_PATH: 'Automated/*.hl7'
