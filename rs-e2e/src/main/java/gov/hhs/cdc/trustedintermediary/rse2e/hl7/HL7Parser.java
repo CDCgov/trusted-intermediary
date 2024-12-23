@@ -47,7 +47,7 @@ public class HL7Parser {
         List<String> fields = message.getSegment(hl7Path.segmentName()).fields();
         char[] delimiters = message.getEncoding().getOrderedDelimiters();
 
-        if (fields == null || fields.isEmpty() || indices[0] > fields.size()) {
+        if (indices[0] > fields.size()) {
             return "";
         }
 
