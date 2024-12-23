@@ -3,6 +3,7 @@ name: Automated Staging Test - Submit Messages
 on:
   schedule:
     - cron: "0 5 * * 2-6"  # Tuesday to Saturday at Midnight EST (5am UTC)
+  workflow_dispatch:
 
 jobs:
   send_files:
