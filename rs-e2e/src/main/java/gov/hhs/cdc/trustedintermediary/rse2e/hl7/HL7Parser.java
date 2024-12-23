@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** The HL7Parser class is responsible for parsing HL7 messages and extracting values from them. */
 public class HL7Parser {
     static final String MSH_SEGMENT_NAME = "MSH";
     static final String NEWLINE_REGEX = "\\r?\\n|\\r";
-    static final Pattern HL7_FIELD_NAME_PATTERN = Pattern.compile("(\\w+)-(\\d+(?:\\.\\d+)*)");
 
     private HL7Parser() {}
 
@@ -35,19 +33,6 @@ public class HL7Parser {
         }
 
         return new HL7Message(segments, HL7Encoding.fromEncodingField(encodingCharactersField));
-    }
-
-    public static HL7Path parsePath(String path) {
-        Matcher matcher = HL7_FIELD_NAME_PATTERN.matcher(path);
-        if (!matcher.matches()) {
-            throw new HL7ParserException("Invalid HL7 path format: " + path);
-        }
-
-        String segmentName = matcher.group(1);
-        int[] indices =
-                Arrays.stream(matcher.group(2).split("\\.")).mapToInt(Integer::parseInt).toArray();
-
-        return new HL7Path(segmentName, indices);
     }
 
     public static String segmentToString(HL7Segment segment, HL7Encoding encoding) {
