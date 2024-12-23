@@ -70,15 +70,9 @@ PID|||12345"""
         "invalid index"    | "TST-5"       | ""
     }
 
-    def "parseMessageFieldValue returns an exception when either or both inputs are null"() {
+    def "parseMessageFieldValue returns an exception when hl7 path argument is empty or null"() {
         when:
-        HL7Parser.parseMessageFieldValue(null, null)
-
-        then:
-        thrown(HL7ParserException)
-
-        when:
-        def hl7Path = HL7Parser.parsePath("MSH-3")
+        def hl7Path = HL7Parser.parsePath("")
         HL7Parser.parseMessageFieldValue(null, hl7Path)
 
         then:
@@ -92,7 +86,22 @@ PID|||12345"""
         thrown(HL7ParserException)
     }
 
-    def "parseMessageFieldValue returns an empty string if an empty message is given"() {
+    def "parseMessageFieldValue returns an exception when message argument is null"() {
+        when:
+        HL7Parser.parseMessageFieldValue(null, null)
+
+        then:
+        thrown(HL7ParserException)
+
+        when:
+        def hl7Path = HL7Parser.parsePath("MSH-3")
+        HL7Parser.parseMessageFieldValue(null, hl7Path)
+
+        then:
+        thrown(HL7ParserException)
+    }
+
+    def "parseMessageFieldValue returns an exception when message argument is empty"() {
         given:
         def hl7Path = HL7Parser.parsePath("MSH-3")
         def message = HL7Parser.parseMessage("")
@@ -101,18 +110,7 @@ PID|||12345"""
         def out = HL7Parser.parseMessageFieldValue(message, hl7Path)
 
         then:
-        out == ""
-    }
-
-    def "parseMessageFieldValue returns an empty string if an empty hl7 path is given"() {
-        given:
-        def hl7Path = HL7Parser.parsePath("")
-
-        when:
-        def out = HL7Parser.parseMessageFieldValue(_ as HL7Message, hl7Path)
-
-        then:
-        out == ""
+        thrown(HL7MessageException)
     }
 
     def "parseMessageFieldValue returns an empty string if the indices in hl7 path are pointing outside the expected range"() {
