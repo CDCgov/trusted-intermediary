@@ -44,21 +44,16 @@ jobs:
                   --silent \
                   "$host/api/token" | jq -r ".access_token")
 
-          sendFiles () {
-            folder_path=$1
-            for file in "$(pwd)/examples/Test/$folder_path"; do
-              echo "Sending $file"
-              curl \
-                  --header "Content-Type: application/hl7-v2" \
-                  --header "Client: $client_id.$client_sender" \
-                  --header "Authorization: Bearer $token" \
-                  --data-binary "@$file" \
-                  --silent \
-                  "$host/api/waters"
-            done
-          }
-          sendFiles "'Automated/*.hl7'"
-          sendFiles "'GoldenCopy/Input/*.hl7'"
+          for file in $(pwd)/examples/Test/Automated/**/*.hl7; do
+            echo "Sending $file"
+            curl \
+                --header "Content-Type: application/hl7-v2" \
+                --header "Client: $client_id.$client_sender" \
+                --header "Authorization: Bearer $token" \
+                --data-binary "@$file" \
+                --silent \
+                "$host/api/waters"
+          done
 
       - name: Clean up private key
         if: always()
