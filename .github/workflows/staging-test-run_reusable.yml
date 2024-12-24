@@ -27,10 +27,9 @@ jobs:
       - name: Run automated tests
         env:
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AUTOMATED_TEST_AZURE_STORAGE_CONNECTION_STRING }}
-          LOCAL_FILE_PATH: ${{ github.event.inputs.FILE_PATH }}
+          LOCAL_FILE_PATH: ${{ inputs.FILE_PATH }}
         run: |
-          ./gradlew rs-e2e:clean rs-e2e:${{ github.event.inputs.TEST_TYPE }}
-          done
+          ./gradlew rs-e2e:clean rs-e2e:${{ inputs.TEST_TYPE }}
 
       - name: Send slack notification on test failure
         if: failure()
@@ -39,4 +38,4 @@ jobs:
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           webhook-type: incoming-webhook
           payload: |
-            text: "${{ github.event.inputs.NAME }} Staging RS Integration Test Failed!: https://github.com/CDCgov/trusted-intermediary/actions/runs/${{ github.run_id }}"
+            text: "${{ inputs.NAME }} Staging RS Integration Test Failed!: https://github.com/CDCgov/trusted-intermediary/actions/runs/${{ github.run_id }}"
