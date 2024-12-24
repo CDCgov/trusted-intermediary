@@ -17,7 +17,7 @@ on:
         type: string
         description: The path to local files
         required: true
-        default: '../examples/Test/Automated/'
+        default: '../examples/Test/Automated/Assertion/'
     secrets:
         AUTOMATED_TEST_AZURE_STORAGE_CONNECTION_STRING:
           required: true

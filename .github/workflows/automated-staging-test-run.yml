@@ -9,7 +9,7 @@ jobs:
   call-staging-test-run:
     uses: ./.github/workflows/staging-test-run_reusable.yml
     with:
-      FILE_PATH: '../examples/Test/Automated/'
+      FILE_PATH: '../examples/Test/Automated/Assertion/'
       NAME: 'Automated'
       TEST_TYPE: 'automatedTest'
     secrets: inherit # pragma: allowlist secret
