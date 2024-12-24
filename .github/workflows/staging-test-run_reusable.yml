@@ -7,14 +7,17 @@ on:
         type: string
         description: The e2e test to run
         required: true
+        default: 'automatedTest'
       NAME:
         type: string
         description: The name of test
         required: true
+        default: 'Automated'
       FILE_PATH:
         type: string
         description: The path to local files
         required: true
+        default: '../examples/Test/Automated/'
 
 jobs:
   test_files:
