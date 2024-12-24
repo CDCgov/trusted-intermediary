@@ -6,13 +6,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  send_files:
+  test_files:
     runs-on: ubuntu-latest
 
     steps:
       - name: Call staging-test-run.yml
         uses: ./.github/workflows/staging-test-run_reusable.yml
         with:
-          FILE_PATH: '../examples/Test/GoldenCopy/Expected/'
+          FILE_PATH: '../examples/Test/Automated/GoldenCopy/Expected/'
           NAME: 'Golden Copy'
           TEST_TYPE: 'goldenCopyTest'

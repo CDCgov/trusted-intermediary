@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  send_files:
+  test_files:
     runs-on: ubuntu-latest
 
     steps:
