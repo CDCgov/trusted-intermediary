@@ -47,12 +47,25 @@ public class AzureBlobFileFetcher implements FileFetcher {
         return INSTANCE;
     }
 
+    //  TODO - we need to modify the guts to only grab the golden or automated path
     @Override
     public List<HL7FileStream> fetchFiles() {
+        String files_path = System.getenv("LOCAL_FILE_PATH");
+        if (files_path == null || files_path.isEmpty()) {
+            throw new IllegalArgumentException("Environment variable LOCAL_FILE_PATH is not set");
+        }
+
         List<HL7FileStream> relevantFiles = new ArrayList<>();
 
         LocalDate today = LocalDate.now(TIME_ZONE);
-        String pathPrefix = AzureBlobHelper.buildDatePathPrefix(today);
+        String datePrefix = AzureBlobHelper.buildDatePathPrefix(today);
+
+        // TODO - update base on AzureBlobOrganizer
+        String pathPrefix = datePrefix + "Automated/";
+        if (files_path.contains("GoldenCopy")) {
+            pathPrefix += datePrefix + "GoldenCopy/";
+        }
+
         ListBlobsOptions options = new ListBlobsOptions().setPrefix(pathPrefix);
         for (BlobItem blobItem : blobContainerClient.listBlobs(options, null)) {
             BlobClient blobClient = blobContainerClient.getBlobClient(blobItem.getName());
