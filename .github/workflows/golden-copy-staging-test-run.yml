@@ -12,3 +12,4 @@ jobs:
       FILE_PATH: '../examples/Test/Automated/GoldenCopy/Expected/'
       NAME: 'Golden Copy'
       TEST_TYPE: 'goldenCopyTest'
+    secrets: inherit # pragma: allowlist secret

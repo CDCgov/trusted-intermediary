@@ -18,6 +18,11 @@ on:
         description: The path to local files
         required: true
         default: '../examples/Test/Automated/'
+    secrets:
+        AUTOMATED_TEST_AZURE_STORAGE_CONNECTION_STRING:
+          required: true
+        SLACK_WEBHOOK_URL:
+          required: true
 
 jobs:
   test_files:

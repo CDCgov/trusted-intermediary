@@ -12,3 +12,4 @@ jobs:
       FILE_PATH: '../examples/Test/Automated/'
       NAME: 'Automated'
       TEST_TYPE: 'automatedTest'
+    secrets: inherit # pragma: allowlist secret
