@@ -33,7 +33,6 @@ import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool;
 import gov.hhs.cdc.trustedintermediary.wrappers.database.DatabaseCredentialsProvider;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import io.javalin.Javalin;
-import io.javalin.plugin.bundled.CorsPluginConfig;
 import java.util.Set;
 
 /** Creates the starting point of our API. Handles the registration of the domains. */
@@ -50,7 +49,11 @@ public class App {
                                     config.http.maxRequestSize = MAX_REQUEST_SIZE;
                                     config.bundledPlugins.enableCors(
                                             cors -> {
-                                                cors.addRule(CorsPluginConfig.CorsRule::anyHost);
+                                                cors.addRule(
+                                                        it -> {
+                                                            it.allowCredentials = true;
+                                                            it.anyHost();
+                                                        });
                                             });
                                 })
                         .start(PORT);
