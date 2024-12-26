@@ -44,22 +44,16 @@ public class App {
 
     public static void main(String[] args) {
         var app =
-                Javalin.create(
-                                config -> {
-                                    config.http.maxRequestSize = MAX_REQUEST_SIZE;
-                                    config.bundledPlugins.enableCors(
-                                            cors -> {
-                                                cors.addRule(
-                                                        it -> {
-                                                            it.allowHost("localhost");
-                                                        });
-                                            });
-                                })
-                        .start(PORT);
+                Javalin.create(config -> config.http.maxRequestSize = MAX_REQUEST_SIZE).start(PORT);
 
         // apply this security header to all responses, but allow it to be overwritten by a specific
         // endpoint by using `before` if needed
-        app.before(ctx -> ctx.header("X-Content-Type-Options", "nosniff"));
+        app.before(
+                ctx -> {
+                    ctx.header("X-Content-Type-Options", "nosniff");
+                    // Fix for https://www.zaproxy.org/docs/alerts/90004
+                    ctx.header("Cross-Origin-Opener-Policy", "same-origin");
+                });
 
         try {
             app.get(HEALTH_API_ENDPOINT, ctx -> ctx.result("Operational"));
