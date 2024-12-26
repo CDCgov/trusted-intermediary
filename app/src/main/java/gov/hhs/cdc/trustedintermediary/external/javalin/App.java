@@ -52,6 +52,7 @@ public class App {
                 ctx -> {
                     ctx.header("X-Content-Type-Options", "nosniff");
                     // Fix for https://www.zaproxy.org/docs/alerts/90004
+                    ctx.header("Cross-Origin-Resource-Policy", "same-origin");
                 });
 
         try {
