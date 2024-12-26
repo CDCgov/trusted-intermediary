@@ -51,10 +51,7 @@ public class App {
                                             cors -> {
                                                 cors.addRule(
                                                         it -> {
-                                                            it.allowCredentials = true;
-                                                            it.allowHost("http://localhost:8080");
-                                                            it.allowHost("http://127.0.0.1:8080");
-                                                            it.allowHost("http://172.17.0.1:8080");
+                                                            it.allowHost("localhost");
                                                         });
                                             });
                                 })
