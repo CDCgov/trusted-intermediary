@@ -48,7 +48,14 @@ public class App {
 
         // apply this security header to all responses, but allow it to be overwritten by a specific
         // endpoint by using `before` if needed
-        app.before(ctx -> ctx.header("X-Content-Type-Options", "nosniff"));
+        app.before(
+                ctx -> {
+                    ctx.header("X-Content-Type-Options", "nosniff");
+                    // Fix for https://www.zaproxy.org/docs/alerts/90004
+                    ctx.header("Cross-Origin-Resource-Policy", "same-origin");
+                    ctx.header("Cross-Origin-Opener-Policy", "same-origin");
+                    ctx.header("Cross-Origin-Embedder-Policy", "require-corp");
+                });
 
         try {
             app.get(HEALTH_API_ENDPOINT, ctx -> ctx.result("Operational"));
