@@ -20,10 +20,10 @@ class HL7PathTest extends Specification {
         def path3 = new HL7Path("MSH", [1, 3] as int[])
 
         expect:
-        path1 == path2
-        path1 != path3
-        path1 != null
-        path1 == path1
+        path1.equals(path2)
+        !path1.equals(path3)
+        !path1.equals(null)
+        path1.equals(path1)
     }
 
     def "equals should handle different segment names"() {
@@ -32,7 +32,7 @@ class HL7PathTest extends Specification {
         def path2 = new HL7Path(segment2, [1, 2] as int[])
 
         expect:
-        (path1 == path2) == expectedResult
+        (path1.equals(path2)) == expectedResult
 
         where:
         scenario          | segment1 | segment2 | expectedResult

@@ -26,8 +26,7 @@ public record HL7Path(String segmentName, int[] indices) {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        HL7Path hl7Path = (HL7Path) o;
+        if (!(o instanceof HL7Path hl7Path)) return false;
         return (Objects.equals(segmentName, hl7Path.segmentName))
                 && Arrays.equals(indices, hl7Path.indices);
     }
