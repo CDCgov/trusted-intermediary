@@ -33,6 +33,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.database.ConnectionPool;
 import gov.hhs.cdc.trustedintermediary.wrappers.database.DatabaseCredentialsProvider;
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter;
 import io.javalin.Javalin;
+import io.javalin.plugin.bundled.CorsPluginConfig;
 import java.util.Set;
 
 /** Creates the starting point of our API. Handles the registration of the domains. */
@@ -44,16 +45,19 @@ public class App {
 
     public static void main(String[] args) {
         var app =
-                Javalin.create(config -> config.http.maxRequestSize = MAX_REQUEST_SIZE).start(PORT);
+                Javalin.create(
+                                config -> {
+                                    config.http.maxRequestSize = MAX_REQUEST_SIZE;
+                                    config.bundledPlugins.enableCors(
+                                            cors -> {
+                                                cors.addRule(CorsPluginConfig.CorsRule::anyHost);
+                                            });
+                                })
+                        .start(PORT);
 
         // apply this security header to all responses, but allow it to be overwritten by a specific
         // endpoint by using `before` if needed
-        app.before(
-                ctx -> {
-                    ctx.header("X-Content-Type-Options", "nosniff");
-                    // Fix for https://www.zaproxy.org/docs/alerts/90004
-                    ctx.header("Cross-Origin-Resource-Policy", "same-origin");
-                });
+        app.before(ctx -> ctx.header("X-Content-Type-Options", "nosniff"));
 
         try {
             app.get(HEALTH_API_ENDPOINT, ctx -> ctx.result("Operational"));
