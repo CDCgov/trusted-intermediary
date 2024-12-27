@@ -1,8 +1,34 @@
-# Scripts
+- [Setup](#setup)
+- [Available Scripts](#available-scripts)
+  - [submit.sh](#submitsh)
+    - [Requirements](#requirements)
+    - [Usage](#usage)
+  - [rs.sh](#rssh)
+    - [Requirements](#requirements-1)
+    - [Usage](#usage-1)
+    - [Examples](#examples)
+  - [ti.sh](#tish)
+    - [Requirements](#requirements-2)
+    - [Usage](#usage-2)
+    - [Examples](#examples-1)
+  - [ucsd.sh](#ucsdsh)
+    - [Requirements](#requirements-3)
+    - [Before running the script](#before-running-the-script)
+    - [Usage](#usage-3)
+  - [setup/update-examples-snapshots.sh](#setupupdate-examples-snapshotssh)
+    - [Requirements](#requirements-4)
+    - [Usage](#usage-4)
+  - [setup/setup-reportstream.sh](#setupsetup-reportstreamsh)
+    - [Requirements](#requirements-5)
+    - [Usage](#usage-5)
+  - [lib/common.sh](#libcommonsh)
+    - [lib/submission-utils.sh](#libsubmission-utilssh)
+- [Resources](#resources)
 
 ## Setup
-
-Follow the instructions below to load the environments variables required for these scripts
+The steps to set up TT and RS locally are in [setup locally section in the main README.md ](../README.md#setup-with-reportstream).
+Follow the instructions below to load the environments variables required for these scripts.
+ReportStream and Trusted Intermediary must be running locally before running any scripts.
 
 1. Copy `.env.template` to `.env`
     ```
@@ -209,7 +235,7 @@ Sends all the HL7 files with `_0_initial_message.hl7` suffix in the `/examples` 
 
 ### setup/setup-reportstream.sh
 
-Setup script for ReportStream
+Setup script for ReportStream.
 
 #### Requirements
 

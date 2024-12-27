@@ -21,67 +21,66 @@ public class SendMessageHelper {
 
     private SendMessageHelper() {}
 
-    public void savePartnerMetadataForReceivedMessage(PartnerMetadata partnerMetadata) {
-        if (partnerMetadata.receivedSubmissionId() == null) {
+    public void savePartnerMetadataForInboundMessage(PartnerMetadata partnerMetadata) {
+        if (partnerMetadata.inboundReportId() == null) {
             logger.logWarning(
-                    "Received submissionId is null so not saving metadata for received message");
+                    "inboundReportId is null so not saving metadata for received message");
             return;
         }
         try {
-            partnerMetadataOrchestrator.updateMetadataForReceivedMessage(partnerMetadata);
+            partnerMetadataOrchestrator.updateMetadataForInboundMessage(partnerMetadata);
         } catch (PartnerMetadataException e) {
             logger.logError(
-                    "Unable to save metadata for receivedSubmissionId "
-                            + partnerMetadata.receivedSubmissionId(),
+                    "Unable to save metadata for inboundReportId "
+                            + partnerMetadata.inboundReportId(),
                     e);
         }
     }
 
-    public void saveSentMessageSubmissionId(String receivedSubmissionId, String sentSubmissionId) {
-        if (sentSubmissionId == null || receivedSubmissionId == null) {
+    public void saveOutboundReportId(String inboundReportId, String outboundReportId) {
+        if (outboundReportId == null || inboundReportId == null) {
             logger.logWarning(
-                    "Received and/or sent submissionId is null so not saving metadata for sent result");
+                    "inboundReportId and/or outboundReportId is null so not saving metadata for sent result");
             return;
         }
 
         try {
-            partnerMetadataOrchestrator.updateMetadataForSentMessage(
-                    receivedSubmissionId, sentSubmissionId);
+            partnerMetadataOrchestrator.updateMetadataForOutboundMessage(
+                    inboundReportId, outboundReportId);
         } catch (PartnerMetadataException e) {
             logger.logError(
-                    "Unable to update metadata for received submissionId "
-                            + receivedSubmissionId
-                            + " and sent submissionId "
-                            + sentSubmissionId,
+                    "Unable to update metadata for inboundReportId "
+                            + inboundReportId
+                            + " and outboundReportId "
+                            + outboundReportId,
                     e);
         }
     }
 
-    public void linkMessage(String receivedSubmissionId) {
-        if (receivedSubmissionId == null) {
-            logger.logWarning("Received submissionId is null so not linking messages");
+    public void linkMessage(String inboundReportId) {
+        if (inboundReportId == null) {
+            logger.logWarning("inboundReportId is null so not linking messages");
             return;
         }
 
         try {
             Set<String> messageIdsToLink =
-                    partnerMetadataOrchestrator.findMessagesIdsToLink(receivedSubmissionId);
+                    partnerMetadataOrchestrator.findMessagesIdsToLink(inboundReportId);
 
             if (messageIdsToLink == null || messageIdsToLink.isEmpty()) {
                 return;
             }
 
-            // Add receivedSubmissionId to complete the list of messageIds to link
-            messageIdsToLink.add(receivedSubmissionId);
+            // Add inboundReportId to complete the list of messageIds to link
+            messageIdsToLink.add(inboundReportId);
 
             logger.logInfo(
-                    "Found messages to link for receivedSubmissionId {}: {}",
-                    receivedSubmissionId,
+                    "Found messages to link for inboundReportId {}: {}",
+                    inboundReportId,
                     messageIdsToLink);
             partnerMetadataOrchestrator.linkMessages(messageIdsToLink);
         } catch (PartnerMetadataException | MessageLinkException e) {
-            logger.logError(
-                    "Unable to link messages for received submissionId " + receivedSubmissionId, e);
+            logger.logError("Unable to link messages for inboundReportId " + inboundReportId, e);
         }
     }
 }

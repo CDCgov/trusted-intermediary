@@ -23,12 +23,12 @@ dependencies {
     implementation project(':etor')
     testImplementation testFixtures(project(':shared'))
 
-    implementation 'io.javalin:javalin:6.3.0'
+    implementation 'io.javalin:javalin:6.4.0'
 
     testImplementation 'org.apache.groovy:groovy:4.0.24'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
     testImplementation 'com.openpojo:openpojo:0.9.1'
-    testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.17.5'
+    testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.18'
 }
 
 jacocoTestCoverageVerification {

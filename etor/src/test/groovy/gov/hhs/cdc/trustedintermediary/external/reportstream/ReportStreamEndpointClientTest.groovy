@@ -82,8 +82,8 @@ class ReportStreamEndpointClientTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        ReportStreamEndpointClient.getInstance().requestHistoryEndpoint("submission_id_1", "fake token")
-        ReportStreamEndpointClient.getInstance().requestHistoryEndpoint("submission_id_2", "fake token")
+        ReportStreamEndpointClient.getInstance().requestHistoryEndpoint("report_id_1", "fake token")
+        ReportStreamEndpointClient.getInstance().requestHistoryEndpoint("report_id_2", "fake token")
 
         then:
         2 * mockClient.get(_ as String, _ as Map<String, String>) >> "200"
@@ -97,7 +97,7 @@ class ReportStreamEndpointClientTest extends Specification {
         TestApplicationContext.injectRegisteredImplementations()
 
         when:
-        ReportStreamEndpointClient.getInstance().requestHistoryEndpoint("submission_id", "fake token")
+        ReportStreamEndpointClient.getInstance().requestHistoryEndpoint("report_id", "fake token")
 
         then:
         thrown(ReportStreamEndpointClientException)
