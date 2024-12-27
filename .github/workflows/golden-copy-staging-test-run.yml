@@ -1,6 +1,7 @@
 name: Golden Copy Staging Test - Run integration tests
 
 on:
+  pull_request:
   schedule:
     - cron: "10 7 * * 2-6"  # Tuesday to Saturday at 2am EST (7:10am UTC) - two hours after `automated-staging-test-submit` runs
   workflow_dispatch:
