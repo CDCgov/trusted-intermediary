@@ -17,3 +17,8 @@ The files are required to:
     - We format `MSH-10` based on the file index, like `001` (or `AUTOMATEDTEST-001` for UCSD)
 - `MSH-11` needs to have a value of `N`
 - `MSH-3` needs to be `GOLDEN-COPY`
+
+Setup Environment Variable:
+- In generate_env.sh:
+  - Change `LOCAL_FILE_PATH` to actual /Input path
+  - Run generate_env.sh
