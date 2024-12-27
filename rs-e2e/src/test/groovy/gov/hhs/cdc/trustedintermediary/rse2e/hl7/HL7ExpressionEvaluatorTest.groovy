@@ -290,6 +290,18 @@ PID|1||11102779^^^CR^MR||SMITH^BB SARAH^^^^^L"""
         thrown(HL7ParserException)
     }
 
+    def "getFieldValue returns null for fields that don't exist"() {
+        given:
+        def fieldName = "ZZZ-1"
+        def inputMessage = Mock(HL7Message)
+
+        when:
+        def result = evaluator.getFieldValue(hl7Message, inputMessage, fieldName)
+
+        then:
+        result == null
+    }
+
     def "getFieldValue throws exception for empty field name"() {
         given:
         def fieldName = ""
