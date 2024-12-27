@@ -33,10 +33,10 @@ class RemovePatientIdentifierTest extends Specification {
 
         when:
         transformClass.transform(fhirResource, null)
-        def actualPid3_4 = HapiFhirHelper.getPID3_4Value(bundle)
-        def actualPid3_5 = HapiFhirHelper.getPID3_5Value(bundle)
 
         then:
+        def actualPid3_4 = HapiFhirHelper.getPID3_4Value(bundle)
+        def actualPid3_5 = HapiFhirHelper.getPID3_5Value(bundle)
         actualPid3_4 == null || actualPid3_4.isEmpty()
         actualPid3_5 == null || actualPid3_5.isEmpty()
     }

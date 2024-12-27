@@ -22,18 +22,22 @@ class RemovePatientNameTypeCodeTest extends Specification {
 
     def "remove PID.5-7 from Bundle"() {
         given:
-        def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/002_CA_ORU_R01_initial_translation.fhir")
+        def fhirResource = ExamplesHelper.getExampleFhirResource("../CA/007_CA_ORU_R01_CDPH_produced_UCSD2024-07-11-16-02-17-749_1_hl7_translation.fhir")
         def bundle = fhirResource.getUnderlyingData() as Bundle
-        def pid5_7 = HapiFhirHelper.getPID5_7Value(bundle)
+        def pid5Extension = HapiHelper.getPID5Extension(bundle)
+        def patientName = HapiHelper.getPIDPatient(bundle).getNameFirstRep()
+        def patientNameUse = patientName.getUse()
 
         expect:
-        pid5_7 != null
+        pid5Extension.getExtensionByUrl(HapiHelper.EXTENSION_XPN7_URL) != null
+        patientNameUse.toString() == "OFFICIAL"
 
         when:
         transformClass.transform(fhirResource, null)
 
         then:
-        HapiFhirHelper.getPID5_7Value(bundle) == null
+        pid5Extension.getExtensionByUrl(HapiHelper.EXTENSION_XPN7_URL) == null
+        !patientName.hasUse()
     }
 
     def "don't throw exception if patient resource not present"() {

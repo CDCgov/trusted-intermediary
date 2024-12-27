@@ -50,7 +50,7 @@ public class MockRSEndpointClient implements RSEndpointClient {
     }
 
     @Override
-    public String requestHistoryEndpoint(String submissionId, String bearerToken) {
+    public String requestHistoryEndpoint(String outboundReportId, String bearerToken) {
         return """
                 {
                     "timestamp" : "2020-01-01T00:00:00.000Z",
@@ -70,7 +70,7 @@ public class MockRSEndpointClient implements RSEndpointClient {
     }
 
     @Override
-    public String requestDeliveryEndpoint(String reportId, String bearerToken)
+    public String requestDeliveryEndpoint(String inboundReportId, String bearerToken)
             throws ReportStreamEndpointClientException {
         return """
             {
