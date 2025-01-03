@@ -18,7 +18,6 @@ import javax.inject.Inject;
 public class ReportStreamSenderHelper {
     private static final ReportStreamSenderHelper INSTANCE = new ReportStreamSenderHelper();
 
-    //    @Inject RSEndpointClient rsclient;
     @Inject Formatter formatter;
     @Inject Logger logger;
     @Inject MetricMetadata metadata;

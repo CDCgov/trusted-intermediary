@@ -53,6 +53,10 @@ public class ApplicationContext {
 
         THREAD_OBJECT_MAP.set(threadObjectMap);
 
+        // The implementation may never have had anything injected into it
+        // (e.g. it wasn't part of the bootstrapping implementations registered into the
+        // ApplicationContext),
+        // so inject into the implementation now.
         injectIntoNonSingleton(implementation);
     }
 

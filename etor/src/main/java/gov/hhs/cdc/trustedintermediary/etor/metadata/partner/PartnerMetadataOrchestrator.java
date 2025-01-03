@@ -32,7 +32,6 @@ public class PartnerMetadataOrchestrator {
 
     @Inject PartnerMetadataStorage partnerMetadataStorage;
     @Inject MessageLinkStorage messageLinkStorage;
-    //    @Inject RSEndpointClient rsclient;
     @Inject Formatter formatter;
     @Inject Logger logger;
 
