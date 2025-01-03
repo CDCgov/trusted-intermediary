@@ -44,6 +44,7 @@ public class PartnerMetadataOrchestrator {
     public void updateMetadataForInboundMessage(PartnerMetadata partnerMetadata)
             throws PartnerMetadataException {
 
+        // can't @Inject because the implementation can be different for this specific thread
         RSEndpointClient rsclient = ApplicationContext.getImplementation(RSEndpointClient.class);
 
         logger.logInfo(
@@ -133,6 +134,7 @@ public class PartnerMetadataOrchestrator {
         var outboundReportId = partnerMetadata.outboundReportId();
         if (metadataIsStale(partnerMetadata) && outboundReportId != null) {
 
+            // can't @Inject because the implementation can be different for this specific thread
             RSEndpointClient rsclient =
                     ApplicationContext.getImplementation(RSEndpointClient.class);
 

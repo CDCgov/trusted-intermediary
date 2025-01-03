@@ -42,6 +42,7 @@ public class ReportStreamSenderHelper {
             String body, String fhirResourceId, PartnerMetadataMessageType messageType)
             throws UnableToSendMessageException {
 
+        // can't @Inject because the implementation can be different for this specific thread
         RSEndpointClient rsclient = ApplicationContext.getImplementation(RSEndpointClient.class);
 
         String bearerToken;

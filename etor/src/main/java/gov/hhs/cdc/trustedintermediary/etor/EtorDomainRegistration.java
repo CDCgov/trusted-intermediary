@@ -134,7 +134,6 @@ public class EtorDomainRegistration implements DomainConnector {
                     MessageLinkStorage.class, FileMessageLinkStorage.getInstance());
         }
 
-        // these are default implementations
         if (ApplicationContext.isPropertyPresent("REPORT_STREAM_URL_PREFIX")) {
             ApplicationContext.register(
                     RSEndpointClient.class, ReportStreamEndpointClient.getInstance());
@@ -176,6 +175,8 @@ public class EtorDomainRegistration implements DomainConnector {
     DomainResponse handleMetadata(DomainRequest request) {
         if (Boolean.parseBoolean(request.getHeaders().get("load-test"))
                 && ApplicationContext.isPropertyPresent("REPORT_STREAM_URL_PREFIX")) {
+            // register the mock RS endpoint for this HTTP request because we don't want to call RS
+            // for real when doing a load test.
             ApplicationContext.registerForThread(
                     RSEndpointClient.class, MockRSEndpointClient.getInstance());
         }
@@ -235,6 +236,8 @@ public class EtorDomainRegistration implements DomainConnector {
 
         if (Boolean.parseBoolean(request.getHeaders().get("load-test"))
                 && ApplicationContext.isPropertyPresent("REPORT_STREAM_URL_PREFIX")) {
+            // register the mock RS endpoint for this HTTP request because we don't want to call RS
+            // for real when doing a load test.
             ApplicationContext.registerForThread(
                     RSEndpointClient.class, MockRSEndpointClient.getInstance());
         }
