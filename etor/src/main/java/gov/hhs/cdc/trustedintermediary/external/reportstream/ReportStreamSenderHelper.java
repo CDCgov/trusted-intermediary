@@ -18,7 +18,6 @@ import javax.inject.Inject;
 public class ReportStreamSenderHelper {
     private static final ReportStreamSenderHelper INSTANCE = new ReportStreamSenderHelper();
 
-    //    @Inject RSEndpointClient rsclient;
     @Inject Formatter formatter;
     @Inject Logger logger;
     @Inject MetricMetadata metadata;
@@ -43,6 +42,7 @@ public class ReportStreamSenderHelper {
             String body, String fhirResourceId, PartnerMetadataMessageType messageType)
             throws UnableToSendMessageException {
 
+        // can't @Inject because the implementation can be different for this specific thread
         RSEndpointClient rsclient = ApplicationContext.getImplementation(RSEndpointClient.class);
 
         String bearerToken;

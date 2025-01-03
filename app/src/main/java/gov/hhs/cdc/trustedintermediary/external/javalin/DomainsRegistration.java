@@ -122,7 +122,9 @@ public class DomainsRegistration {
     static Handler createHandler(
             Function<DomainRequest, DomainResponse> handler, boolean isProtected) {
         return (Context ctx) -> {
-            ApplicationContext.clearThreadRegistrations();
+            ApplicationContext
+                    .clearThreadRegistrations(); // clear this thread's specific registrations from
+            // its previous use
 
             LOGGER.logInfo(ctx.method().name() + " " + ctx.url());
 

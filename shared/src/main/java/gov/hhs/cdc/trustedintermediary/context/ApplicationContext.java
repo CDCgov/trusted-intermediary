@@ -43,6 +43,10 @@ public class ApplicationContext {
         IMPLEMENTATIONS.add(implementation.getClass());
     }
 
+    /**
+     * Registers an implementation for a class _only_ for the current executing thread (which
+     * currently is one-to-one with an HTTP request).
+     */
     public static void registerForThread(Class<?> clazz, Object implementation) {
         Map<Class<?>, Object> threadObjectMap = THREAD_OBJECT_MAP.get();
         if (threadObjectMap == null) {
@@ -53,9 +57,14 @@ public class ApplicationContext {
 
         THREAD_OBJECT_MAP.set(threadObjectMap);
 
+        // The implementation may never have had anything injected into it
+        // (e.g. it wasn't part of the bootstrapping implementations registered into the
+        // ApplicationContext),
+        // so inject into the implementation now.
         injectIntoNonSingleton(implementation);
     }
 
+    /** Removes the stored implementations for the current thread that calls this method. */
     public static void clearThreadRegistrations() {
         THREAD_OBJECT_MAP.remove();
     }

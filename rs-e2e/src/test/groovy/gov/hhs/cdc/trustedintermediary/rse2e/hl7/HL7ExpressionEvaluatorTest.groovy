@@ -1,46 +1,36 @@
-package gov.hhs.cdc.trustedintermediary.rse2e.external.hapi
+package gov.hhs.cdc.trustedintermediary.rse2e.hl7
 
-import ca.uhn.hl7v2.model.Message
-import ca.uhn.hl7v2.model.Segment
-import ca.uhn.hl7v2.parser.PipeParser
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthData
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import spock.lang.Specification
 
-class HapiHL7ExpressionEvaluatorTest extends Specification {
+class HL7ExpressionEvaluatorTest extends Specification {
 
-    def evaluator = HapiHL7ExpressionEvaluator.getInstance()
+    def evaluator = HL7ExpressionEvaluator.getInstance()
 
-    char hl7FieldSeparator = '|'
-    String hl7FieldEncodingCharacters = "^~\\&"
-    Message mshMessage
-    Segment mshSegment
-    String mshSegmentText
+    HL7Message hl7Message
+    String messageContent
 
     def setup() {
         TestApplicationContext.reset()
         TestApplicationContext.init()
-        TestApplicationContext.register(HapiHL7ExpressionEvaluator, evaluator)
+        TestApplicationContext.register(HL7ExpressionEvaluator, evaluator)
 
-        mshSegmentText = "MSH|^~\\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-lab-id^DNS|20230101010000-0000||ORM^O01^ORM_O01|111111|T|2.5.1"
-        def pipeParser = new PipeParser()
-        mshMessage = pipeParser.parse(mshSegmentText)
-        mshSegment = (Segment) mshMessage.get("MSH")
+        messageContent = """MSH|^~\\&|Sender Application^sender.test.com^DNS|Sender Facility^0.0.0.0.0.0.0.0^ISO|Receiver Application^0.0.0.0.0.0.0.0^ISO|Receiver Facility^simulated-lab-id^DNS|20230101010000-0000||ORM^O01^ORM_O01|111111|T|2.5.1
+PID|1||11102779^^^CR^MR||SMITH^BB SARAH^^^^^L"""
+        hl7Message = HL7Message.parse(messageContent)
 
         TestApplicationContext.injectRegisteredImplementations()
     }
 
     def "evaluateExpression returns boolean when evaluating valid assertions"() {
         given:
-        def spyEvaluator = Spy(HapiHL7ExpressionEvaluator.getInstance())
-        spyEvaluator.getLiteralOrFieldValue(_ as Message, _ as Message, _ as String) >> "mockedValue"
+        def spyEvaluator = Spy(HL7ExpressionEvaluator.getInstance())
+        spyEvaluator.getLiteralOrFieldValue(_ as HL7Message, _ as HL7Message, _ as String) >> "mockedValue"
         spyEvaluator.evaluateEquality(_ as String, _ as String, _ as String) >> true
         spyEvaluator.evaluateMembership(_ as String, _ as String) >> true
-        spyEvaluator.evaluateCollectionCount(_ as Message, _ as String, _ as String, _ as String) >> true
-
-        def healthData = Mock(HealthData) {
-            getUnderlyingData() >> Mock(Message)
-        }
+        spyEvaluator.evaluateCollectionCount(_ as HL7Message, _ as String, _ as String, _ as String) >> true
+        def healthData = Mock(HL7Message)
 
         expect:
         spyEvaluator.evaluateExpression(assertion, healthData, healthData)
@@ -63,15 +53,12 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
 
     def "evaluateExpression allows null input message when no assertions use input"() {
         given:
-        def spyEvaluator = Spy(HapiHL7ExpressionEvaluator.getInstance())
-        spyEvaluator.getLiteralOrFieldValue(_ as Message, null, _ as String) >> "mockedValue"
+        def spyEvaluator = Spy(HL7ExpressionEvaluator.getInstance())
+        spyEvaluator.getLiteralOrFieldValue(_ as HL7Message, null, _ as String) >> "mockedValue"
         spyEvaluator.evaluateEquality(_ as String, _ as String, _ as String) >> true
         spyEvaluator.evaluateMembership(_ as String, _ as String) >> true
-        spyEvaluator.evaluateCollectionCount(_ as Message, _ as String, _ as String, _ as String) >> true
-
-        def healthData = Mock(HealthData) {
-            getUnderlyingData() >> Mock(Message)
-        }
+        spyEvaluator.evaluateCollectionCount(_ as HL7Message, _ as String, _ as String, _ as String) >> true
+        def healthData = Mock(HL7Message)
 
         expect:
         spyEvaluator.evaluateExpression(assertion, healthData)
@@ -90,7 +77,7 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
         evaluator.evaluateExpression("invalid format", Mock(HealthData))
 
         then:
-        def e = thrown(IllegalArgumentException)
+        def e = thrown(HL7ParserException)
         e.getMessage().contains("Invalid statement format")
     }
 
@@ -99,7 +86,7 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
         evaluator.evaluateExpression("'EPIC' = 'EPIC'", Mock(HealthData), Mock(HealthData), Mock(HealthData))
 
         then:
-        def e = thrown(IllegalArgumentException)
+        def e = thrown(HL7ParserException)
         e.getMessage().contains("Expected two messages")
     }
 
@@ -111,7 +98,7 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
         evaluator.evaluateExpression(condition, Mock(HealthData))
 
         then:
-        def e = thrown(IllegalArgumentException)
+        def e = thrown(HL7ParserException)
         e.getMessage().contains("Invalid statement format")
     }
 
@@ -152,7 +139,7 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
         evaluator.evaluateEquality("left", "right", unknownOperator)
 
         then:
-        def e = thrown(IllegalArgumentException)
+        def e = thrown(HL7ParserException)
         e.getMessage().contains("Unknown operator")
     }
 
@@ -183,7 +170,7 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
         evaluator.evaluateMembership("value", invalidSet)
 
         then:
-        def e = thrown(IllegalArgumentException)
+        def e = thrown(HL7ParserException)
         e.getMessage().contains("Invalid collection format")
     }
 
@@ -194,7 +181,7 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
         def operator = "="
 
         when:
-        def result = evaluator.evaluateCollectionCount(mshMessage, segmentName, rightOperand, operator)
+        def result = evaluator.evaluateCollectionCount(hl7Message, segmentName, rightOperand, operator)
 
         then:
         result
@@ -207,7 +194,7 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
         def operator = "="
 
         when:
-        def result = evaluator.evaluateCollectionCount(mshMessage, segmentName, rightOperand, operator)
+        def result = evaluator.evaluateCollectionCount(hl7Message, segmentName, rightOperand, operator)
 
         then:
         !result
@@ -220,10 +207,10 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
         def operator = "="
 
         when:
-        evaluator.evaluateCollectionCount(mshMessage, segmentName, rightOperand, operator)
+        evaluator.evaluateCollectionCount(hl7Message, segmentName, rightOperand, operator)
 
         then:
-        def e = thrown(IllegalArgumentException)
+        def e = thrown(HL7ParserException)
         e.getCause().getClass() == NumberFormatException
     }
 
@@ -234,7 +221,7 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
         def operator = "="
 
         when:
-        def result = evaluator.evaluateCollectionCount(mshMessage, segmentName, rightOperand, operator)
+        def result = evaluator.evaluateCollectionCount(hl7Message, segmentName, rightOperand, operator)
 
         then:
         !result
@@ -243,8 +230,8 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
     def "getLiteralOrFieldValue returns literal value when literal is specified"() {
         given:
         def operand = "'Epic'"
-        def inputMessage = Mock(Message)
-        def outputMessage = Mock(Message)
+        def inputMessage = Mock(HL7Message)
+        def outputMessage = Mock(HL7Message)
 
         when:
         def result = evaluator.getLiteralOrFieldValue(outputMessage, inputMessage, operand)
@@ -256,24 +243,36 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
     def "getLiteralOrFieldValue returns field value when field is specified"() {
         given:
         def operand = "MSH-3"
-        def inputMessage = Mock(Message)
+        def inputMessage = Mock(HL7Message)
         def msh3 = "Sender Application^sender.test.com^DNS"
 
         when:
-        def result = evaluator.getLiteralOrFieldValue(mshMessage, inputMessage, operand)
+        def result = evaluator.getLiteralOrFieldValue(hl7Message, inputMessage, operand)
 
         then:
         result == msh3
+    }
+
+    def "getLiteralOrFieldValue throws exception when using invalid operand"() {
+        given:
+        def operand = "invalidField"
+        def inputMessage = Mock(HL7Message)
+
+        when:
+        evaluator.getLiteralOrFieldValue(hl7Message, inputMessage, operand)
+
+        then:
+        thrown(HL7ParserException)
     }
 
     def "getFieldValue returns specified field value"() {
         given:
         def fieldName = "MSH-3"
         def msh3 = "Sender Application^sender.test.com^DNS"
-        def inputMessage = Mock(Message)
+        def inputMessage = Mock(HL7Message)
 
         when:
-        def result = evaluator.getFieldValue(mshMessage, inputMessage, fieldName)
+        def result = evaluator.getFieldValue(hl7Message, inputMessage, fieldName)
 
         then:
         result == msh3
@@ -282,138 +281,44 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
     def "getFieldValue throws exception for non numeric field index"() {
         given:
         def fieldName = "MSH-three"
-        def inputMessage = Mock(Message)
+        def inputMessage = Mock(HL7Message)
 
         when:
-        evaluator.getFieldValue(mshMessage, inputMessage, fieldName)
+        evaluator.getFieldValue(hl7Message, inputMessage, fieldName)
 
         then:
-        def e = thrown(IllegalArgumentException)
-        e.getCause().getClass() == NumberFormatException
+        thrown(HL7ParserException)
     }
 
-    def "getFieldValue throws exception for empty field name"() {
+    def "getFieldValue returns null for fields that don't exist"() {
         given:
-        def fieldName = ""
-        def inputMessage = Mock(Message)
+        def fieldName = "ZZZ-1"
+        def inputMessage = Mock(HL7Message)
 
         when:
-        evaluator.getFieldValue(mshMessage, inputMessage, fieldName)
-
-        then:
-        def e = thrown(IllegalArgumentException)
-        e.getMessage().contains("Invalid field name format")
-    }
-
-    def "getSegmentFieldValue should return segment when field components indicate segment"() {
-        given:
-        def fieldName = "MSH"
-
-        when:
-        def result = evaluator.getSegmentFieldValue(mshSegmentText, fieldName, hl7FieldSeparator, hl7FieldEncodingCharacters)
-
-        then:
-        result == mshSegmentText
-    }
-
-    def "getSegmentFieldValue should return field when field components indicate field"() {
-        given:
-        def fieldName = "MSH-3"
-        def msh3 = "Sender Application^sender.test.com^DNS"
-
-        when:
-        def result = evaluator.getSegmentFieldValue(mshSegmentText, fieldName, hl7FieldSeparator, hl7FieldEncodingCharacters)
-
-        then:
-        result == msh3
-    }
-
-    def "getSegmentFieldValue should return subfield when field components indicate subfield"() {
-        given:
-        def fieldName = "MSH-3.2"
-        def msh32 = "sender.test.com"
-
-        when:
-        def result = evaluator.getSegmentFieldValue(mshSegmentText, fieldName, hl7FieldSeparator, hl7FieldEncodingCharacters)
-
-        then:
-        result == msh32
-    }
-
-    def "getSegmentFieldValue should return empty string when field components indicate subfield but subfield not present"() {
-        given:
-        def fieldName = "MSH-3.4"
-
-        when:
-        def result = evaluator.getSegmentFieldValue(mshSegmentText, fieldName, hl7FieldSeparator, hl7FieldEncodingCharacters)
-
-        then:
-        result == ""
-    }
-
-    def "getSegmentFieldValue returns null when looking for segment that isn't in message"() {
-        given:
-        def fieldName = "OBX"
-
-        when:
-        def result = evaluator.getSegmentFieldValue(mshSegmentText, fieldName, hl7FieldSeparator, hl7FieldEncodingCharacters)
+        def result = evaluator.getFieldValue(hl7Message, inputMessage, fieldName)
 
         then:
         result == null
     }
 
-    def "getSegmentFieldValue throws exception when field name is invalid"() {
+    def "getFieldValue throws exception for empty field name"() {
         given:
-        def fieldName = "MSH-"
+        def fieldName = ""
+        def inputMessage = Mock(HL7Message)
 
         when:
-        evaluator.getSegmentFieldValue(mshSegmentText, fieldName, hl7FieldSeparator, hl7FieldEncodingCharacters)
+        evaluator.getFieldValue(hl7Message, inputMessage, fieldName)
 
         then:
-        def e = thrown(IllegalArgumentException)
-        e.getMessage().contains("Invalid HL7 field format: ")
-    }
-
-    def "getSegmentFieldValue throws exception when field index is out of bounds"() {
-        given:
-        def fieldName = "MSH-99"
-
-        when:
-        evaluator.getSegmentFieldValue(mshSegmentText, fieldName, hl7FieldSeparator, hl7FieldEncodingCharacters)
-
-        then:
-        def e = thrown(IllegalArgumentException)
-        e.getMessage().contains("Invalid field index (out of bounds)")
-    }
-
-    def "getSegmentFieldValue throws exception when there are too many subfield levels"() {
-        given:
-        def fieldName = "MSH-3.3.3.3.3.3"
-
-        when:
-        evaluator.getSegmentFieldValue(mshSegmentText, fieldName, hl7FieldSeparator, hl7FieldEncodingCharacters)
-
-        then:
-        def e = thrown(IllegalArgumentException)
-        e.getMessage().contains("Invalid subfield index (out of bounds)")
-    }
-
-    def "getSegmentFieldValue returns empty string when sub-field index is out of bounds"() {
-        given:
-        def fieldName = "MSH-3.99"
-
-        when:
-        def result = evaluator.getSegmentFieldValue(mshSegmentText, fieldName, hl7FieldSeparator, hl7FieldEncodingCharacters)
-
-        then:
-        result == ""
+        thrown(HL7ParserException)
     }
 
     def "getMessageBySource should return input message when source is input"() {
         given:
         def source = "input"
-        def inputMessage = Mock(Message)
-        def outputMessage = Mock(Message)
+        def inputMessage = Mock(HL7Message)
+        def outputMessage = Mock(HL7Message)
 
         when:
         def result = evaluator.getMessageBySource(source, inputMessage, outputMessage)
@@ -425,8 +330,8 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
     def "getMessageBySource should return output message when source is not input"() {
         given:
         def source = "output"
-        def inputMessage = Mock(Message)
-        def outputMessage = Mock(Message)
+        def inputMessage = Mock(HL7Message)
+        def outputMessage = Mock(HL7Message)
 
         when:
         def result = evaluator.getMessageBySource(source, inputMessage, outputMessage)
@@ -438,8 +343,8 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
     def "getMessageBySource should return output message when source is empty"() {
         given:
         def source = ""
-        def inputMessage = Mock(Message)
-        def outputMessage = Mock(Message)
+        def inputMessage = Mock(HL7Message)
+        def outputMessage = Mock(HL7Message)
 
         when:
         def result = evaluator.getMessageBySource(source, inputMessage, outputMessage)
@@ -452,13 +357,13 @@ class HapiHL7ExpressionEvaluatorTest extends Specification {
         given:
         def source = "input"
         def inputMessage = null
-        def outputMessage = Mock(Message)
+        def outputMessage = Mock(HL7Message)
 
         when:
         evaluator.getMessageBySource(source, inputMessage, outputMessage)
 
         then:
-        def e = thrown(IllegalArgumentException)
+        def e = thrown(HL7ParserException)
         e.getMessage().contains("Input message is null for")
     }
 }
