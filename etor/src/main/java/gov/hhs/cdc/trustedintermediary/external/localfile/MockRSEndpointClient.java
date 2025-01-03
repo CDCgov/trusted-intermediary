@@ -30,7 +30,6 @@ public class MockRSEndpointClient implements RSEndpointClient {
 
     @Override
     public String getRsToken() {
-        logger.logInfo("!!!!!!!!! WE ARE IN THE MOCK IMPLEMENTATION !!!!!!!!!");
         return "token";
     }
 
