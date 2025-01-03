@@ -2,34 +2,37 @@ package gov.hhs.cdc.trustedintermediary.rse2e
 
 import gov.hhs.cdc.trustedintermediary.context.TestApplicationContext
 import gov.hhs.cdc.trustedintermediary.external.jackson.Jackson
-import gov.hhs.cdc.trustedintermediary.rse2e.external.hapi.HapiHL7ExpressionEvaluator
-import gov.hhs.cdc.trustedintermediary.rse2e.external.hapi.HapiHL7FileMatcher
-import gov.hhs.cdc.trustedintermediary.rse2e.external.hapi.HapiHL7Message
+import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HL7FileMatcher
+import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HL7FileStream
+import gov.hhs.cdc.trustedintermediary.rse2e.external.localfile.LocalFileFetcher
+import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HL7ExpressionEvaluator
+import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HL7Message
 import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoader
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
 import gov.hhs.cdc.trustedintermediary.wrappers.formatter.Formatter
 import spock.lang.Specification
+import gov.hhs.cdc.trustedintermediary.rse2e.external.azure.AzureBlobFileFetcher
 
 class GoldenCopyTest extends Specification {
 
     List<HL7FileStream> azureFiles
     List<HL7FileStream> localFiles
-    HapiHL7FileMatcher fileMatcher
+    HL7FileMatcher fileMatcher
     Logger mockLogger = Mock(Logger)
     List<String> loggedErrorsAndWarnings = []
-    List<HapiHL7Message> failedFiles = []
+    List<HL7Message> failedFiles = []
 
     def setup() {
-        fileMatcher =  HapiHL7FileMatcher.getInstance()
+        fileMatcher =  HL7FileMatcher.getInstance()
 
         TestApplicationContext.reset()
         TestApplicationContext.init()
         TestApplicationContext.register(RuleLoader, RuleLoader.getInstance())
         TestApplicationContext.register(Logger, mockLogger)
         TestApplicationContext.register(Formatter, Jackson.getInstance())
-        TestApplicationContext.register(HapiHL7FileMatcher, fileMatcher)
-        TestApplicationContext.register(HealthDataExpressionEvaluator, HapiHL7ExpressionEvaluator.getInstance())
+        TestApplicationContext.register(HL7FileMatcher, fileMatcher)
+        TestApplicationContext.register(HealthDataExpressionEvaluator, HL7ExpressionEvaluator.getInstance())
         TestApplicationContext.register(LocalFileFetcher, LocalFileFetcher.getInstance())
         TestApplicationContext.injectRegisteredImplementations()
 
