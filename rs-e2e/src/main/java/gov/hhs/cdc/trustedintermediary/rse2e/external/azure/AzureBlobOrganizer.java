@@ -1,4 +1,4 @@
-package gov.hhs.cdc.trustedintermediary.rse2e;
+package gov.hhs.cdc.trustedintermediary.rse2e.external.azure;
 
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;

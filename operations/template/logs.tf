@@ -47,14 +47,24 @@ resource "azurerm_log_analytics_query_pack" "application_logs_pack" {
   }
 }
 
-resource "azurerm_log_analytics_query_pack_query" "application_logs" {
-  display_name = "TI's Raw Application Logs"
-  description  = "View all TI's application logs in a structured format"
+resource "azurerm_log_analytics_query_pack_query" "live_application_logs" {
+  display_name = "TI's Live Slot Raw Application Logs"
+  description  = "View all TI's live slot application logs in a structured format"
 
   query_pack_id = azurerm_log_analytics_query_pack.application_logs_pack.id
   categories    = ["applications"]
 
-  body = "AppServiceConsoleLogs | project JsonResult = parse_json(ResultDescription) | evaluate bag_unpack(JsonResult) | project-reorder ['@timestamp'], level, message"
+  body = "AppServiceConsoleLogs | where _ResourceId !contains 'pre-live' | project JsonResult = parse_json(ResultDescription) | evaluate bag_unpack(JsonResult) | project-reorder ['@timestamp'], level, message"
+}
+
+resource "azurerm_log_analytics_query_pack_query" "prelive_application_logs" {
+  display_name = "TI's Pre-Live Slot Raw Application Logs"
+  description  = "View all TI's pre-live slot application logs in a structured format"
+
+  query_pack_id = azurerm_log_analytics_query_pack.application_logs_pack.id
+  categories    = ["applications"]
+
+  body = "AppServiceConsoleLogs | where _ResourceId contains 'pre-live' | project JsonResult = parse_json(ResultDescription) | evaluate bag_unpack(JsonResult) | project-reorder ['@timestamp'], level, message"
 }
 
 resource "azurerm_log_analytics_query_pack_query" "application_error_logs" {

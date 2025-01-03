@@ -1,4 +1,5 @@
-package gov.hhs.cdc.trustedintermediary.rse2e
+package gov.hhs.cdc.trustedintermediary.rse2e.external.azure
+
 
 import spock.lang.Specification
 

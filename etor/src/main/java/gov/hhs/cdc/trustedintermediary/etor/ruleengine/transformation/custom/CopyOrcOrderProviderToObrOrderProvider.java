@@ -28,16 +28,8 @@ public class CopyOrcOrderProviderToObrOrderProvider implements CustomFhirTransfo
             return;
         }
 
-        // Extract or create the OBR-16 extension from the ServiceRequest
         Extension obrExtension =
                 HapiHelper.ensureExtensionExists(serviceRequest, HapiHelper.EXTENSION_OBR_URL);
-
-        // Extract or create the OBR-16 data type extension
-        Extension obr16Extension =
-                HapiHelper.ensureSubExtensionExists(
-                        obrExtension, HapiHelper.EXTENSION_OBR16_DATA_TYPE.toString());
-
-        // Set the ORC-12 Practitioner in the OBR-16 extension
-        HapiHelper.setOBR16WithPractitioner(obr16Extension, practitionerRole);
+        HapiHelper.setOBR16WithPractitioner(obrExtension, practitionerRole);
     }
 }
