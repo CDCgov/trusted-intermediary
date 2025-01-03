@@ -72,6 +72,7 @@ class SampleUser(FastHttpUser):
             headers={
                 "Authorization": self.access_token,
                 "RecordId": self.submission_id,
+                "Load-Test": "True",
             },
             data=message.replace("{{placer_order_id}}", poi),
         )
