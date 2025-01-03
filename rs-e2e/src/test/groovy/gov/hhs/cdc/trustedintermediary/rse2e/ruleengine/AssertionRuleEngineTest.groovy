@@ -41,7 +41,7 @@ class AssertionRuleEngineTest extends Specification {
         ruleEngine.getRules().size() == 1
     }
 
-    def "ensureRulesLoaded loads rules  only once by default"() {
+    def "ensureRulesLoaded loads rules only once by default"() {
         given:
         mockRuleLoader.loadRules(_ as InputStream, _ as TypeReference) >> [mockRule]
 
