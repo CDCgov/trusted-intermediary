@@ -72,7 +72,7 @@ class SampleUser(FastHttpUser):
             headers={
                 "Authorization": self.access_token,
                 "RecordId": self.submission_id,
-                "Load-Test": "True",
+                "Load-Test": "true",
             },
             data=message.replace("{{placer_order_id}}", poi),
         )
@@ -92,7 +92,10 @@ class SampleUser(FastHttpUser):
         if self.message_api_called:
             self.client.get(
                 f"{METADATA_ENDPOINT}/{self.submission_id}",
-                headers={"Authorization": self.access_token},
+                headers={
+                    "Authorization": self.access_token,
+                    "Load-Test": "true",
+                },
                 name=f"{METADATA_ENDPOINT}/{{id}}",
             )
 
