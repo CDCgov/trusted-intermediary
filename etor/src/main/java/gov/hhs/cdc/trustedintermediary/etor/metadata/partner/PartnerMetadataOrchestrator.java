@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.etor.metadata.partner;
 
+import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.etor.RSEndpointClient;
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLink;
 import gov.hhs.cdc.trustedintermediary.etor.messagelink.MessageLinkException;
@@ -31,7 +32,6 @@ public class PartnerMetadataOrchestrator {
 
     @Inject PartnerMetadataStorage partnerMetadataStorage;
     @Inject MessageLinkStorage messageLinkStorage;
-    @Inject RSEndpointClient rsclient;
     @Inject Formatter formatter;
     @Inject Logger logger;
 
@@ -43,6 +43,9 @@ public class PartnerMetadataOrchestrator {
 
     public void updateMetadataForInboundMessage(PartnerMetadata partnerMetadata)
             throws PartnerMetadataException {
+
+        // can't @Inject because the implementation can be different for this specific thread
+        RSEndpointClient rsclient = ApplicationContext.getImplementation(RSEndpointClient.class);
 
         logger.logInfo(
                 "Looking up sender name and timeReceived from RS delivery API for inboundReportId: {}",
@@ -130,6 +133,11 @@ public class PartnerMetadataOrchestrator {
         PartnerMetadata partnerMetadata = optionalPartnerMetadata.get();
         var outboundReportId = partnerMetadata.outboundReportId();
         if (metadataIsStale(partnerMetadata) && outboundReportId != null) {
+
+            // can't @Inject because the implementation can be different for this specific thread
+            RSEndpointClient rsclient =
+                    ApplicationContext.getImplementation(RSEndpointClient.class);
+
             logger.logInfo(
                     "Receiver name not found in metadata or delivery status still pending, looking up {} from RS history API",
                     outboundReportId);
