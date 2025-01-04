@@ -19,6 +19,9 @@ jobs:
   loadtest:
     name: Load Test
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
       # Checkout the repository
@@ -33,7 +36,8 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      # Run the Azure Load Test
+
+        # Run the Azure Load Test
       - name: Run Load Test
         run: |
           az load test-run create \
