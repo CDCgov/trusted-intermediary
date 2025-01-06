@@ -46,6 +46,7 @@ jobs:
       - name: Run Load Test
         run: |
           az load test-run create \
+            --resource-group "csels-rsti-internal-moderate-rg" \
             --load-test-resource "jeff-load-test" \
             --test-id "9020b745-5fc4-4284-8803-04076ea09650" \
             --test-run-id "run_"`date +"%Y%m%d%_H%M%S"`
