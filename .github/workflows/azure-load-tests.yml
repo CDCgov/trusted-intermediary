@@ -7,13 +7,15 @@ on:
   #schedule:
 
     #- cron: "0 0 * * 1"
-  workflow_dispatch:
-    inputs:
-      rollbackCount:
-        description: 'Number of migrations to rollback'
-        required: true
-        default: # of rollback you require in the file input
 
+  workflow_call:
+    secrets:
+      AZURE_CLIENT_ID:
+        required: true
+      AZURE_TENANT_ID:
+        required: true
+      AZURE_SUBSCRIPTION_ID:
+        required: true
 
 jobs:
   loadtest:
