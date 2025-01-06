@@ -24,6 +24,8 @@ jobs:
     permissions:
       id-token: write
       contents: read
+    env:
+      ARM_USE_OIDC: true
 
     steps:
       # Checkout the repository
