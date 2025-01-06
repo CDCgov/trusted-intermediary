@@ -20,12 +20,13 @@ on:
 jobs:
   loadtest:
     name: Load Test
+    environment:
+      name: internal
+
     runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
-    env:
-      ARM_USE_OIDC: true
 
     steps:
       # Checkout the repository
