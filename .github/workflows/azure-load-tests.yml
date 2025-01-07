@@ -5,8 +5,8 @@ on:
     branches:
       - azure-load-tests
   workflow_dispatch:
-  #schedule:
-  #- cron: "0 0 * * 1"
+  schedule:
+    - cron: "0 0 * * 1"
 
   workflow_call:
     secrets:
@@ -42,13 +42,11 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
         # Run the Azure Load Test
-      - name: Run Load Test On Push
+      - name: Run Load Test
         run: |
           az load test-run create \
             --resource-group "csels-rsti-internal-moderate-rg" \
-            --load-test-resource "load-testing-internal" \
+            --load-test-resource "jeff-load-test" \
             --test-id "9020b745-5fc4-4284-8803-04076ea09650" \
-            --test-run-id "run_"`date +"%Y%m%d%_H%M%S"`
-
-        
-        
+            --test-run-id "run_"`date +"%Y%m%d%_H%M%S"` \
+            --description "Run by Github Action"

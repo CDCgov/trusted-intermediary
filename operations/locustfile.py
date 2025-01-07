@@ -144,7 +144,6 @@ def get_auth_request_body():
     # using a valid test token found in the mock_credentials directory
 
     # TODO - notes/clarification on 2 different creds, plus expiration date of jwt
-    # TODO - do we want to TF the tests? If yes which envs? In CDC envs, may need to adjust IP allow list on app. Also set as private endpoints in test config?
     # TODO - currently in Azure we're specifying a version for the key vault item (so if it gets updated, we'll be referencing an old version) - do we want to change this?
     if in_azure:
         auth_token = os.getenv("trusted-intermediary-valid-token-jwt")
