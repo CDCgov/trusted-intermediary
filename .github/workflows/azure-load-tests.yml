@@ -4,20 +4,9 @@ on:
   push:
     branches:
       - azure-load-tests
-  #schedule:
-
-    #- cron: "0 0 * * 1"
-
   workflow_dispatch:
-    inputs:
-      load-test-name:
-        required: true
-        type: string
-        description: name of load test that is run
-      test-id:
-        required: true
-        type: string
-        description: test id for load test
+  #schedule:
+  #- cron: "0 0 * * 1"
 
   workflow_call:
     secrets:
@@ -52,26 +41,14 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-
         # Run the Azure Load Test
       - name: Run Load Test On Push
-        if: github.event_name == 'push'
         run: |
           az load test-run create \
             --resource-group "csels-rsti-internal-moderate-rg" \
             --load-test-resource "load-testing-internal" \
             --test-id "9020b745-5fc4-4284-8803-04076ea09650" \
             --test-run-id "run_"`date +"%Y%m%d%_H%M%S"`
-            # Run the Azure Load Test
 
-      - name: Trigger Load Test
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          az load test-run create \
-            --resource-group "csels-rsti-internal-moderate-rg" \
-            --load-test-resource "${{ github.event.inputs.load-test-name }}" \
-            --test-id "${{ github.event.inputs.test-id }}" \
-            --test-run-id "run_"`date +"%Y%m%d%_H%M%S"`
-        
         
         
