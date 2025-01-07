@@ -30,7 +30,7 @@ public class LocalFileFetcher implements FileFetcher {
         String rse2ELocalInputFilePath = System.getenv("RSE2E_LOCAL_INPUT_FILE_PATH");
         if (rse2ELocalInputFilePath == null || rse2ELocalInputFilePath.isEmpty()) {
             throw new IllegalArgumentException(
-                    "Environment variable RSE2E_LOCAL_INPUT_FILE_PATH is not set");
+                    "Environment variable RSE2E_LOCAL_INPUT_FILE_PATH is not set in local file fetcher.");
         }
         try (Stream<Path> stream = Files.walk(Paths.get(rse2ELocalInputFilePath))) {
             return stream.filter(Files::isRegularFile)

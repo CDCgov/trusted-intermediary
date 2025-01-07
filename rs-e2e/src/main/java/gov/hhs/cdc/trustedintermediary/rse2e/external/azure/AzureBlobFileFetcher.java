@@ -55,7 +55,7 @@ public class AzureBlobFileFetcher implements FileFetcher {
         String rse2ELocalInputFilePath = System.getenv("RSE2E_LOCAL_INPUT_FILE_PATH");
         if (rse2ELocalInputFilePath == null || rse2ELocalInputFilePath.isEmpty()) {
             throw new IllegalArgumentException(
-                    "Environment variable RSE2E_LOCAL_INPUT_FILE_PATH is not set");
+                    "Environment variable RSE2E_LOCAL_INPUT_FILE_PATH is not set in azure file fetcher.");
         }
 
         List<HL7FileStream> relevantFiles = new ArrayList<>();
@@ -64,9 +64,9 @@ public class AzureBlobFileFetcher implements FileFetcher {
         String datePrefix = AzureBlobHelper.buildDatePathPrefix(today);
 
         // TODO - update base on AzureBlobOrganizer
-        String pathPrefix = datePrefix + "Automated/";
+        String pathPrefix = datePrefix + "/Automated/";
         if (rse2ELocalInputFilePath.contains("GoldenCopy")) {
-            pathPrefix += datePrefix + "GoldenCopy/";
+            pathPrefix += datePrefix + "/GoldenCopy/";
         }
 
         ListBlobsOptions options = new ListBlobsOptions().setPrefix(pathPrefix);
