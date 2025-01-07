@@ -52,8 +52,8 @@ public class AzureBlobFileFetcher implements FileFetcher {
     //  TODO - we need to modify the guts to only grab the golden or automated path
     @Override
     public List<HL7FileStream> fetchFiles() {
-        String files_path = System.getenv("RSE2E_LOCAL_INPUT_FILE_PATH");
-        if (files_path == null || files_path.isEmpty()) {
+        String rse2ELocalInputFilePath = System.getenv("RSE2E_LOCAL_INPUT_FILE_PATH");
+        if (rse2ELocalInputFilePath == null || rse2ELocalInputFilePath.isEmpty()) {
             throw new IllegalArgumentException(
                     "Environment variable RSE2E_LOCAL_INPUT_FILE_PATH is not set");
         }
@@ -65,7 +65,7 @@ public class AzureBlobFileFetcher implements FileFetcher {
 
         // TODO - update base on AzureBlobOrganizer
         String pathPrefix = datePrefix + "Automated/";
-        if (files_path.contains("GoldenCopy")) {
+        if (rse2ELocalInputFilePath.contains("GoldenCopy")) {
             pathPrefix += datePrefix + "GoldenCopy/";
         }
 
