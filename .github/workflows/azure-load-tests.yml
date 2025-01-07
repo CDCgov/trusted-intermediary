@@ -1,12 +1,9 @@
 name: Azure Load Tests
 
 on:
-  push:
-    branches:
-      - azure-load-tests
   workflow_dispatch:
   schedule:
-    - cron: "0 0 * * 1"
+    - cron: "0 0 * * 2" # Midnight UTC on Tuesdays
 
   workflow_call:
     secrets:
