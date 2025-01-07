@@ -52,9 +52,10 @@ public class AzureBlobFileFetcher implements FileFetcher {
     //  TODO - we need to modify the guts to only grab the golden or automated path
     @Override
     public List<HL7FileStream> fetchFiles() {
-        String files_path = System.getenv("LOCAL_FILE_PATH");
+        String files_path = System.getenv("RSE2E_LOCAL_INPUT_FILE_PATH");
         if (files_path == null || files_path.isEmpty()) {
-            throw new IllegalArgumentException("Environment variable LOCAL_FILE_PATH is not set");
+            throw new IllegalArgumentException(
+                    "Environment variable RSE2E_LOCAL_INPUT_FILE_PATH is not set");
         }
 
         List<HL7FileStream> relevantFiles = new ArrayList<>();

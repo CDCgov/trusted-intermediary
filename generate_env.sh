@@ -15,7 +15,7 @@ DB_NAME=intermediary
 DB_USER=intermediary
 DB_PASS=changeIT!
 DB_SSL=require
-LOCAL_FILE_PATH=~/trusted-intermediary/examples/Test/Automated/Assertion"
+RSE2E_LOCAL_INPUT_FILE_PATH=~/trusted-intermediary/examples/Test/Automated/Assertion"
 
 # Get directory of script file
 script_dir="$(dirname "$0")"

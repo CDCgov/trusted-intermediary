@@ -13,7 +13,7 @@ on:
         description: The name of test
         required: true
         default: 'Automated'
-      FILE_PATH:
+      RSE2E_LOCAL_INPUT_FILE_PATH:
         type: string
         description: The path to local files
         required: true
@@ -35,7 +35,7 @@ jobs:
       - name: Run automated tests
         env:
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AUTOMATED_TEST_AZURE_STORAGE_CONNECTION_STRING }}
-          LOCAL_FILE_PATH: ${{ inputs.FILE_PATH }}
+          RSE2E_LOCAL_INPUT_FILE_PATH: ${{ inputs.RSE2E_LOCAL_INPUT_FILE_PATH }}
         run: |
           ./gradlew rs-e2e:clean rs-e2e:${{ inputs.TEST_TYPE }}
 

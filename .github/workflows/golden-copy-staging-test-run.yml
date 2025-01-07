@@ -10,7 +10,7 @@ jobs:
   call-staging-test-run:
     uses: ./.github/workflows/staging-test-run_reusable.yml
     with:
-      FILE_PATH: '../examples/Test/Automated/GoldenCopy/Expected/'
+      RSE2E_LOCAL_INPUT_FILE_PATH: '../examples/Test/Automated/GoldenCopy/Expected/'
       NAME: 'Golden Copy'
       TEST_TYPE: 'goldenCopyTest'
     secrets: inherit # pragma: allowlist secret

@@ -27,11 +27,12 @@ public class LocalFileFetcher implements FileFetcher {
 
     @Override
     public List<HL7FileStream> fetchFiles() {
-        String files_path = System.getenv("LOCAL_FILE_PATH");
-        if (files_path == null || files_path.isEmpty()) {
-            throw new IllegalArgumentException("Environment variable LOCAL_FILE_PATH is not set");
+        String rse2ELocalInputFilePath = System.getenv("RSE2E_LOCAL_INPUT_FILE_PATH");
+        if (rse2ELocalInputFilePath == null || rse2ELocalInputFilePath.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Environment variable RSE2E_LOCAL_INPUT_FILE_PATH is not set");
         }
-        try (Stream<Path> stream = Files.walk(Paths.get(files_path))) {
+        try (Stream<Path> stream = Files.walk(Paths.get(rse2ELocalInputFilePath))) {
             return stream.filter(Files::isRegularFile)
                     .filter(path -> path.toString().endsWith(EXTENSION))
                     .map(

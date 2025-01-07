@@ -20,5 +20,5 @@ The files are required to:
 
 Setup Environment Variable:
 - In generate_env.sh:
-  - Change `LOCAL_FILE_PATH` to actual /Input path
+  - Change `RSE2E_LOCAL_INPUT_FILE_PATH` to actual /Input path
   - Run generate_env.sh
