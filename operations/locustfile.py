@@ -140,11 +140,9 @@ def assert_stats(environment):
 
 
 def get_auth_request_body():
-    # set up the sample request body for the auth endpoint
-    # using a valid test token found in the mock_credentials directory
-
-    # TODO - notes/clarification on 2 different creds, plus expiration date of jwt
-    # TODO - currently in Azure we're specifying a version for the key vault item (so if it gets updated, we'll be referencing an old version) - do we want to change this?
+    # Set up the sample request body for the auth endpoint
+    # using a valid test token. For local testing, the jwt is found in the mock_credentials directory.
+    # For deployed load tests, the jwt is stored in Azure Key Vault. This jwt expires in December 2029
     if in_azure:
         auth_token = os.getenv("trusted-intermediary-valid-token-jwt")
     else:
