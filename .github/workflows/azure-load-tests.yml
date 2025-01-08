@@ -26,11 +26,9 @@ jobs:
       contents: read
 
     steps:
-      # Checkout the repository
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      # Login to Azure using the CLI
       - name: Login via Azure CLI
         uses: azure/login@v2
         with:
@@ -38,7 +36,6 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-        # Run the Azure Load Test
       - name: Run Load Test
         run: |
           az load test-run create \
