@@ -49,7 +49,6 @@ public class AzureBlobFileFetcher implements FileFetcher {
         return INSTANCE;
     }
 
-    //  TODO - we need to modify the guts to only grab the golden or automated path
     @Override
     public List<HL7FileStream> fetchFiles() {
         String rse2ELocalInputFilePath = System.getenv("RSE2E_LOCAL_INPUT_FILE_PATH");
@@ -63,7 +62,6 @@ public class AzureBlobFileFetcher implements FileFetcher {
         LocalDate today = LocalDate.now(TIME_ZONE);
         String datePrefix = AzureBlobHelper.buildDatePathPrefix(today);
 
-        // TODO - update base on AzureBlobOrganizer
         String pathPrefix = datePrefix + "Automated/";
         if (rse2ELocalInputFilePath.contains("GoldenCopy")) {
             pathPrefix = datePrefix + "GoldenCopy/";
