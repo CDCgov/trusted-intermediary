@@ -12,5 +12,5 @@ jobs:
     with:
       RSE2E_LOCAL_INPUT_FILE_PATH: '../examples/Test/Automated/GoldenCopy/Expected/'
       NAME: 'Golden Copy'
-      TEST_TYPE: 'goldenCopyTest'
+      TEST_TYPE: 'test golden copy files on actual files'
     secrets: inherit # pragma: allowlist secret

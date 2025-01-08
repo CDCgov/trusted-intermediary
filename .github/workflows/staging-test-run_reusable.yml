@@ -37,7 +37,7 @@ jobs:
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AUTOMATED_TEST_AZURE_STORAGE_CONNECTION_STRING }}
           RSE2E_LOCAL_INPUT_FILE_PATH: ${{ inputs.RSE2E_LOCAL_INPUT_FILE_PATH }}
         run: |
-          ./gradlew rs-e2e:clean rs-e2e:${{ inputs.TEST_TYPE }}
+          ./gradlew rs-e2e:clean rs-e2e:automatedTest --tests="gov.hhs.cdc.trustedintermediary.rse2e.AutomatedTest.${{inputs.TEST_TYPE}}"
 
       - name: Send slack notification on test failure
         if: failure()

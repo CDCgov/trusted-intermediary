@@ -27,22 +27,11 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
     exclude '**/AutomatedTest.*'
-    exclude '**/GoldenCopyTest.*'
 }
 
 task automatedTest(type: Test) {
     useJUnitPlatform()
     include '**/AutomatedTest.*'
-
-    testLogging {
-        showStackTraces true
-        exceptionFormat 'full'
-    }
-}
-
-task goldenCopyTest(type: Test) {
-    useJUnitPlatform()
-    include '**/GoldenCopyTest.*'
 
     testLogging {
         showStackTraces true

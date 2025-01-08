@@ -11,5 +11,5 @@ jobs:
     with:
       RSE2E_LOCAL_INPUT_FILE_PATH: '../examples/Test/Automated/Assertion/'
       NAME: 'Automated'
-      TEST_TYPE: 'automatedTest'
+      TEST_TYPE: 'test defined assertions on relevant messages'
     secrets: inherit # pragma: allowlist secret

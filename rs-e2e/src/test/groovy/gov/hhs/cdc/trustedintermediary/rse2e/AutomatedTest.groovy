@@ -22,6 +22,8 @@ class AutomatedTest extends Specification  {
     HL7FileMatcher fileMatcher
     Logger mockLogger = Mock(Logger)
     List<String> loggedErrorsAndWarnings = []
+    List<String> failedFiles = []
+
 
     def setup() {
         engine = AssertionRuleEngine.getInstance()
@@ -75,6 +77,26 @@ class AutomatedTest extends Specification  {
 
         then:
         rulesToEvaluate.collect { it.name }.isEmpty() //Check whether all the rules in the assertions file have been run
+        if (!loggedErrorsAndWarnings.isEmpty()) {
+            throw new AssertionError("Unexpected errors and/or warnings were logged:\n- ${loggedErrorsAndWarnings.join('\n- ')}")
+        }
+    }
+
+    def "test golden copy files on actual files"() {
+        given:
+        def matchedFiles = fileMatcher.matchFiles(azureFiles, localFiles)
+
+        when:
+        for (filePair in matchedFiles) {
+            def actualFile = filePair.getKey()
+            def expectedFile = filePair.getValue()
+            if (actualFile.toString() != expectedFile.toString()) {
+                failedFiles.add(expectedFile.getIdentifier())
+            }
+        }
+
+        then:
+        assert failedFiles.isEmpty()
         if (!loggedErrorsAndWarnings.isEmpty()) {
             throw new AssertionError("Unexpected errors and/or warnings were logged:\n- ${loggedErrorsAndWarnings.join('\n- ')}")
         }
