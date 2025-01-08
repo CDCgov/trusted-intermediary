@@ -6,7 +6,6 @@ import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HL7FileMatcher
 import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HL7FileStream
 import gov.hhs.cdc.trustedintermediary.rse2e.external.localfile.LocalFileFetcher
 import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HL7ExpressionEvaluator
-import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HL7Message
 import gov.hhs.cdc.trustedintermediary.ruleengine.RuleLoader
 import gov.hhs.cdc.trustedintermediary.wrappers.HealthDataExpressionEvaluator
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger
@@ -68,10 +67,6 @@ class GoldenCopyTest extends Specification {
             def expectedFile = filePair.getValue()
             if (actualFile.toString() != expectedFile.toString()) {
                 failedFiles.add(expectedFile.getIdentifier())
-                System.out.println("This guy didnt match: " + expectedFile.getIdentifier())
-            }
-            else {
-                System.out.println("This guy matched: " + expectedFile.getIdentifier())
             }
         }
 
