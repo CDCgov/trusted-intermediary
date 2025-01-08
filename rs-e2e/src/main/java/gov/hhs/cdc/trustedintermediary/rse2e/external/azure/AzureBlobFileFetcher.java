@@ -64,9 +64,9 @@ public class AzureBlobFileFetcher implements FileFetcher {
         String datePrefix = AzureBlobHelper.buildDatePathPrefix(today);
 
         // TODO - update base on AzureBlobOrganizer
-        String pathPrefix = datePrefix + "/Automated/";
+        String pathPrefix = datePrefix + "Automated/";
         if (rse2ELocalInputFilePath.contains("GoldenCopy")) {
-            pathPrefix += datePrefix + "/GoldenCopy/";
+            pathPrefix = datePrefix + "GoldenCopy/";
         }
 
         ListBlobsOptions options = new ListBlobsOptions().setPrefix(pathPrefix);

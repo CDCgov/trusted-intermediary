@@ -21,7 +21,7 @@ class GoldenCopyTest extends Specification {
     HL7FileMatcher fileMatcher
     Logger mockLogger = Mock(Logger)
     List<String> loggedErrorsAndWarnings = []
-    List<HL7Message> failedFiles = []
+    List<String> failedFiles = []
 
     def setup() {
         fileMatcher =  HL7FileMatcher.getInstance()
@@ -66,8 +66,12 @@ class GoldenCopyTest extends Specification {
         for (filePair in matchedFiles) {
             def actualFile = filePair.getKey()
             def expectedFile = filePair.getValue()
-            if (!actualFile.equals(expectedFile)) {
-                failedFiles.add(expectedFile)
+            if (actualFile.toString() != expectedFile.toString()) {
+                failedFiles.add(expectedFile.getIdentifier())
+                System.out.println("This guy didnt match: " + expectedFile.getIdentifier())
+            }
+            else {
+                System.out.println("This guy matched: " + expectedFile.getIdentifier())
             }
         }
 
