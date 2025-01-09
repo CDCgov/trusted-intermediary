@@ -14,6 +14,8 @@ import java.time.ZoneId;
 /* AzureBlobOrganizer is responsible for organizing and cleaning up blobs in an Azure container */
 public class AzureBlobOrganizer {
 
+    public static final String GOLDEN_COPY = "GoldenCopy/";
+    public static final String AUTOMATED = "Automated/";
     private final BlobContainerClient blobContainerClient;
 
     protected final Logger logger = ApplicationContext.getImplementation(Logger.class);
@@ -22,7 +24,16 @@ public class AzureBlobOrganizer {
         this.blobContainerClient = blobContainerClient;
     }
 
+    //    private void deleteOldBlobs(String testType, ZoneId timeZone) {
+    //        String destinationName = LocalDate.now(timeZone) + testType;
+    //        if (blobContainerClient.getBlobClient(destinationName).exists()) {
+    //            blobContainerClient.getBlobClient(destinationName).delete();
+    //        }
+    //    }
+
     public void organizeAndCleanupBlobsByDate(int retentionDays, ZoneId timeZone) {
+        //        deleteOldBlobs(GOLDEN_COPY, timeZone);
+        //        deleteOldBlobs(AUTOMATED, timeZone);
         for (BlobItem blobItem : blobContainerClient.listBlobs()) {
             String sourceName = blobItem.getName();
             try {
@@ -46,9 +57,9 @@ public class AzureBlobOrganizer {
                     continue;
                 }
 
-                String testTypeAndSourceName = "Automated/" + sourceName;
+                String testTypeAndSourceName = AUTOMATED + sourceName;
                 if (sourceBlob.getBlobName().contains("GOLDEN-COPY")) {
-                    testTypeAndSourceName = "GoldenCopy/" + sourceName;
+                    testTypeAndSourceName = GOLDEN_COPY + sourceName;
                 }
 
                 String destinationName =
