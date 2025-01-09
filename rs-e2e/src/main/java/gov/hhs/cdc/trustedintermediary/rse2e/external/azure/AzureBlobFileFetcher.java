@@ -5,6 +5,7 @@ import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobContainerClientBuilder;
 import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.ListBlobsOptions;
+import gov.hhs.cdc.trustedintermediary.rse2e.FileFetchEnum;
 import gov.hhs.cdc.trustedintermediary.rse2e.FileFetcher;
 import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HL7FileStream;
 import java.time.LocalDate;
@@ -50,21 +51,17 @@ public class AzureBlobFileFetcher implements FileFetcher {
     }
 
     @Override
-    public List<HL7FileStream> fetchFiles() {
-        String rse2ELocalInputFilePath = System.getenv("RSE2E_LOCAL_INPUT_FILE_PATH");
-        if (rse2ELocalInputFilePath == null || rse2ELocalInputFilePath.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Environment variable RSE2E_LOCAL_INPUT_FILE_PATH is not set in azure file fetcher.");
-        }
-
+    public List<HL7FileStream> fetchFiles(FileFetchEnum fileFetchEnum) {
         List<HL7FileStream> relevantFiles = new ArrayList<>();
 
         LocalDate today = LocalDate.now(TIME_ZONE);
-        String datePrefix = AzureBlobHelper.buildDatePathPrefix(today);
 
-        String pathPrefix = datePrefix + "Automated/";
-        if (rse2ELocalInputFilePath.contains("GoldenCopy")) {
-            pathPrefix = datePrefix + "GoldenCopy/";
+        String pathPrefix = AzureBlobHelper.buildDatePathPrefix(today);
+
+        if (FileFetchEnum.AUTOMATED == fileFetchEnum) {
+            pathPrefix += "Automated/";
+        } else {
+            pathPrefix += "GoldenCopy/";
         }
 
         ListBlobsOptions options = new ListBlobsOptions().setPrefix(pathPrefix);

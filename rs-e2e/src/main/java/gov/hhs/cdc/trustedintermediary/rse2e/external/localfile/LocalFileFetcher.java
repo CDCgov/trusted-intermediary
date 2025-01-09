@@ -1,5 +1,6 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.external.localfile;
 
+import gov.hhs.cdc.trustedintermediary.rse2e.FileFetchEnum;
 import gov.hhs.cdc.trustedintermediary.rse2e.FileFetcher;
 import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HL7FileStream;
 import java.io.IOException;
@@ -26,11 +27,12 @@ public class LocalFileFetcher implements FileFetcher {
     }
 
     @Override
-    public List<HL7FileStream> fetchFiles() {
-        String rse2ELocalInputFilePath = System.getenv("RSE2E_LOCAL_INPUT_FILE_PATH");
-        if (rse2ELocalInputFilePath == null || rse2ELocalInputFilePath.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Environment variable RSE2E_LOCAL_INPUT_FILE_PATH is not set in local file fetcher.");
+    public List<HL7FileStream> fetchFiles(FileFetchEnum fileFetchEnum) {
+        String rse2ELocalInputFilePath = "../examples/Test/Automated/";
+        if (FileFetchEnum.AUTOMATED == fileFetchEnum) {
+            rse2ELocalInputFilePath += "Assertion/";
+        } else {
+            rse2ELocalInputFilePath += "GoldenCopy/Expected/";
         }
         try (Stream<Path> stream = Files.walk(Paths.get(rse2ELocalInputFilePath))) {
             return stream.filter(Files::isRegularFile)

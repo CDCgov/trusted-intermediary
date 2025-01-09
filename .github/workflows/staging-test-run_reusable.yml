@@ -13,11 +13,6 @@ on:
         description: The name of test
         required: true
         default: 'Automated'
-      RSE2E_LOCAL_INPUT_FILE_PATH:
-        type: string
-        description: The path to local files
-        required: true
-        default: '../examples/Test/Automated/Assertion/'
     secrets:
         AUTOMATED_TEST_AZURE_STORAGE_CONNECTION_STRING:
           required: true
@@ -35,7 +30,6 @@ jobs:
       - name: Run automated tests
         env:
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AUTOMATED_TEST_AZURE_STORAGE_CONNECTION_STRING }}
-          RSE2E_LOCAL_INPUT_FILE_PATH: ${{ inputs.RSE2E_LOCAL_INPUT_FILE_PATH }}
         run: |
           ./gradlew rs-e2e:clean rs-e2e:automatedTest --tests="gov.hhs.cdc.trustedintermediary.rse2e.AutomatedTest.${{inputs.TEST_TYPE}}"
 
