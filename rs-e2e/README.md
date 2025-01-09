@@ -30,17 +30,14 @@ When running locally, we usually run the tests from either the command line usin
 From the command line:
 
 1. Set the `AZURE_STORAGE_CONNECTION_STRING` environment variable in your shell
-2. Set the `RSE2E_LOCAL_INPUT_FILE_PATH` environment variable in your shell for either golden copy or assertion tests:
- - 'actual-path-to/examples/Test/Automated/Assertion'
- - 'actual-path-to/examples/Test/Automated/GoldenCopy/Expected'
 2. Run one of the following commands for either assertion or golden copy tests:
  - Run: `./gradlew rs-e2e:clean rs-e2e:automatedTest --tests="gov.hhs.cdc.trustedintermediary.rse2e.AutomatedTest.test defined assertions on relevant messages`
  - Run: `./gradlew rs-e2e:clean rs-e2e:automatedTest --tests="gov.hhs.cdc.trustedintermediary.rse2e.AutomatedTest.test golden copy files on actual files`
 
 From IntelliJ:
 
-5. Set `AZURE_STORAGE_CONNECTION_STRING` environment variable in the IntelliJ test run configuration (instructions on how to do that [here](https://stackoverflow.com/a/32761503))
-6. Go to `rs-e2e/src/test/groovy/gov/hhs/cdc/trustedintermediary/rse2e/AutomatedTest.groovy` and either run or debug `AutomatedTest` as you normally would from IntelliJ
+1. Set `AZURE_STORAGE_CONNECTION_STRING` environment variable in the IntelliJ test run configuration (instructions on how to do that [here](https://stackoverflow.com/a/32761503))
+2. Go to `rs-e2e/src/test/groovy/gov/hhs/cdc/trustedintermediary/rse2e/AutomatedTest.groovy` and either run or debug `AutomatedTest` as you normally would from IntelliJ
 
 ### Manually via Github
 
