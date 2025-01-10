@@ -56,7 +56,7 @@ jobs:
                   --silent \
                   "$host/api/waters" | jq -r ".overallStatus")
 
-              if [ response != "Received" ] then;
+              if [ response != "Received" ]; then
                   failed_to_send+="${file}\n"
               fi
           done
