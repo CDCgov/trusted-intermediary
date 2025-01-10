@@ -47,13 +47,18 @@ jobs:
 
           for file in $(pwd)/examples/Test/Automated/**/*.hl7; do
               echo "Sending $file"
-              curl \
+              response=${curl \
                   --header "Content-Type: application/hl7-v2" \
                   --header "Client: $client_id.$client_sender" \
                   --header "Authorization: Bearer $token" \
                   --data-binary "@$file" \
                   --silent \
-                  "$host/api/waters"
+                  "$host/api/waters" | jq -r ".overallStatus")
+
+              if [ response != "Received" ] then;
+                  echo "File did not send"
+                  exit 0
+              fi
           done
 
       - name: Clean up private key
