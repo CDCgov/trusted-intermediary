@@ -62,7 +62,7 @@ jobs:
           done
 
           if [ "$failed_to_send" ]; then
-            echo "Issue sending files:"$'\n $failed_to_send'
+            echo "Issue sending files:"$'\n'"${failed_to_send}"
             exit 1
           fi
 
