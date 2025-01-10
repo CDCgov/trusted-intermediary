@@ -24,16 +24,17 @@ public class AzureBlobOrganizer {
         this.blobContainerClient = blobContainerClient;
     }
 
-    //    private void deleteOldBlobs(String testType, ZoneId timeZone) {
-    //        String destinationName = LocalDate.now(timeZone) + testType;
-    //        if (blobContainerClient.getBlobClient(destinationName).exists()) {
-    //            blobContainerClient.getBlobClient(destinationName).delete();
-    //        }
-    //    }
+    private void deleteOldBlobs(String testType, ZoneId timeZone) {
+        String destinationName = LocalDate.now(timeZone) + testType;
+        if (blobContainerClient.getBlobClient(destinationName).exists()) {
+            blobContainerClient.getBlobClient(destinationName).delete();
+        }
+    }
 
+    // Organize blob into folder structure: YEAR/MONTH/DAY/Automated_OR_GoldenCopy/SOURCE_NAME
     public void organizeAndCleanupBlobsByDate(int retentionDays, ZoneId timeZone) {
-        //        deleteOldBlobs(GOLDEN_COPY, timeZone);
-        //        deleteOldBlobs(AUTOMATED, timeZone);
+        deleteOldBlobs(GOLDEN_COPY, timeZone);
+        deleteOldBlobs(AUTOMATED, timeZone);
         for (BlobItem blobItem : blobContainerClient.listBlobs()) {
             String sourceName = blobItem.getName();
             try {
