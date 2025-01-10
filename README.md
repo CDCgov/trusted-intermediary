@@ -226,7 +226,16 @@ Afterwards, you can follow these steps...
    1. Walk through the wizard, but make sure to pick the same resource group as the environment you plan to test.
 3. After creation, navigate to the Identity slice, which is under the Settings group, of your new load test.
    1. Turn the Status to On under the System assigned tab and click Save.
-4. <TBD key vault>
+4. Navigate to the TI key vault in the same resource group as the load test.
+   1. Navigate to the Secrets slice, under the Objects group, and click Generate/Import.
+   2. Provide the name `trusted-intermediary-valid-token-jwt`.
+   3. The secret value should be a newly created JWT that won't expire in a long time using the
+      `organization-trusted-intermediary-private-key-<environment>.pem` private key in Keybase as the signing key.
+   4. Click Create.
+   5. Drill into the latest version of this secret, and click the copy to clipboard button in the Secret Identifier
+      textbox.  We will be using this later during the creation of the actual load test.
+   6. Navigate to the Access policies slice, and click Create.  Select Get and List for Secrets for the permissions and
+      the name of the previously created load test as the principal.
 5. Navigate to the Tests slice, which is under the Tests group, of the previously created load test and click Create and then Upload a script to start
    walking through the wizard.
    1. Under the Test plan tab...
@@ -236,7 +245,11 @@ Afterwards, you can follow these steps...
          FHIR files.  You can inspect the `locustfile.py` file to find out which data files are used.  As of this
          writing, that is `002_ORM_O01_short.fhir` and `001_ORU_R01_short.fhir`.
    2. Under the Parameters tab, add a secret with `trusted-intermediary-valid-token-jwt` as the name.  The Value is the
-      secret URL referenced previously when you added the JWT to the key vault.
+      secret URL referenced previously when you added the secret JWT to the key vault.  Before pasting the secret,
+      remove the hexadecimal version from the end of the URL.  E.g.
+      `https://<key-vault>.vault.azure.net/secrets/trusted-intermediary-valid-token-jwt/cf7eb05481c449878f2afe6b51464fd5`
+      becomes `https://<key-vault>.vault.azure.net/secrets/trusted-intermediary-valid-token-jwt/`.  We always want to
+      reference the last version, and we can do so by omitting the specific version.
    3. Under the Load tab, configure how much load you want.  You also need to provide the URL of the application you
       want to load test.
    4. Under the Test criteria tab, fill in any client-side metrics that you want to evaluate at the end of the load
