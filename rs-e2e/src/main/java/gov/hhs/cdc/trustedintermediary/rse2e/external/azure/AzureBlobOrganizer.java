@@ -15,7 +15,7 @@ import java.time.ZoneId;
 public class AzureBlobOrganizer {
 
     public static final String GOLDEN_COPY = "GoldenCopy/";
-    public static final String AUTOMATED = "Automated/";
+    public static final String ASSERTION = "Assertion/";
     private final BlobContainerClient blobContainerClient;
 
     protected final Logger logger = ApplicationContext.getImplementation(Logger.class);
@@ -31,10 +31,10 @@ public class AzureBlobOrganizer {
         }
     }
 
-    // Organize blob into folder structure: YEAR/MONTH/DAY/Automated_OR_GoldenCopy/SOURCE_NAME
+    // Organize blob into folder structure: YEAR/MONTH/DAY/Assertion_OR_GoldenCopy/SOURCE_NAME
     public void organizeAndCleanupBlobsByDate(int retentionDays, ZoneId timeZone) {
         deleteOldBlobs(GOLDEN_COPY, timeZone);
-        deleteOldBlobs(AUTOMATED, timeZone);
+        deleteOldBlobs(ASSERTION, timeZone);
         for (BlobItem blobItem : blobContainerClient.listBlobs()) {
             String sourceName = blobItem.getName();
             try {
@@ -58,7 +58,7 @@ public class AzureBlobOrganizer {
                     continue;
                 }
 
-                String testTypeAndSourceName = AUTOMATED + sourceName;
+                String testTypeAndSourceName = ASSERTION + sourceName;
                 if (sourceBlob.getBlobName().contains("GOLDEN-COPY")) {
                     testTypeAndSourceName = GOLDEN_COPY + sourceName;
                 }

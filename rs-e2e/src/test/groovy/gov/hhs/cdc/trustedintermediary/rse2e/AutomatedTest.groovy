@@ -64,8 +64,8 @@ class AutomatedTest extends Specification  {
 
     def "test defined assertions on relevant messages"() {
         given:
-        azureFiles = azureFileFetcher.fetchFiles(FileFetchEnum.AUTOMATED)
-        localFiles = localFileFetcher.fetchFiles(FileFetchEnum.AUTOMATED)
+        azureFiles = azureFileFetcher.fetchFiles(FileFetcherEnum.ASSERTION)
+        localFiles = localFileFetcher.fetchFiles(FileFetcherEnum.ASSERTION)
         def rulesToEvaluate = engine.getRules()
         def matchedFiles = fileMatcher.matchFiles(azureFiles, localFiles)
 
@@ -86,8 +86,8 @@ class AutomatedTest extends Specification  {
 
     def "test golden copy files on actual files"() {
         given:
-        azureFiles = azureFileFetcher.fetchFiles(FileFetchEnum.GOLDEN_COPY)
-        localFiles = localFileFetcher.fetchFiles(FileFetchEnum.GOLDEN_COPY)
+        azureFiles = azureFileFetcher.fetchFiles(FileFetcherEnum.GOLDEN_COPY)
+        localFiles = localFileFetcher.fetchFiles(FileFetcherEnum.GOLDEN_COPY)
         def matchedFiles = fileMatcher.matchFiles(azureFiles, localFiles)
 
         when:

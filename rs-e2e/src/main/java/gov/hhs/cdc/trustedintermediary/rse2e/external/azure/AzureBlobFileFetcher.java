@@ -5,8 +5,8 @@ import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobContainerClientBuilder;
 import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.ListBlobsOptions;
-import gov.hhs.cdc.trustedintermediary.rse2e.FileFetchEnum;
 import gov.hhs.cdc.trustedintermediary.rse2e.FileFetcher;
+import gov.hhs.cdc.trustedintermediary.rse2e.FileFetcherEnum;
 import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HL7FileStream;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -51,15 +51,15 @@ public class AzureBlobFileFetcher implements FileFetcher {
     }
 
     @Override
-    public List<HL7FileStream> fetchFiles(FileFetchEnum fileFetchEnum) {
+    public List<HL7FileStream> fetchFiles(FileFetcherEnum fileFetcherEnum) {
         List<HL7FileStream> relevantFiles = new ArrayList<>();
 
         LocalDate today = LocalDate.now(TIME_ZONE);
 
         String pathPrefix = AzureBlobHelper.buildDatePathPrefix(today);
 
-        if (FileFetchEnum.AUTOMATED == fileFetchEnum) {
-            pathPrefix += "Automated/";
+        if (FileFetcherEnum.ASSERTION == fileFetcherEnum) {
+            pathPrefix += "Assertion/";
         } else {
             pathPrefix += "GoldenCopy/";
         }

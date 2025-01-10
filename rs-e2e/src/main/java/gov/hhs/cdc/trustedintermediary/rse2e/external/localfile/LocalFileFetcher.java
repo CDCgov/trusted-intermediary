@@ -1,7 +1,7 @@
 package gov.hhs.cdc.trustedintermediary.rse2e.external.localfile;
 
-import gov.hhs.cdc.trustedintermediary.rse2e.FileFetchEnum;
 import gov.hhs.cdc.trustedintermediary.rse2e.FileFetcher;
+import gov.hhs.cdc.trustedintermediary.rse2e.FileFetcherEnum;
 import gov.hhs.cdc.trustedintermediary.rse2e.hl7.HL7FileStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,9 +27,9 @@ public class LocalFileFetcher implements FileFetcher {
     }
 
     @Override
-    public List<HL7FileStream> fetchFiles(FileFetchEnum fileFetchEnum) {
+    public List<HL7FileStream> fetchFiles(FileFetcherEnum fileFetcherEnum) {
         String rse2ELocalInputFilePath = "../examples/Test/Automated/";
-        if (FileFetchEnum.AUTOMATED == fileFetchEnum) {
+        if (FileFetcherEnum.ASSERTION == fileFetcherEnum) {
             rse2ELocalInputFilePath += "Assertion/";
         } else {
             rse2ELocalInputFilePath += "GoldenCopy/Expected/";
