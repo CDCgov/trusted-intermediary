@@ -45,6 +45,7 @@ jobs:
                   --silent \
                   "$host/api/token" | jq -r ".access_token")
 
+          failed_to_send=""
           for file in $(pwd)/examples/Test/Automated/**/*.hl7; do
               echo "Sending $file"
               response=$(curl \
@@ -56,10 +57,14 @@ jobs:
                   "$host/api/waters" | jq -r ".overallStatus")
 
               if [ response != "Received" ] then;
-                  echo "File did not send"
-                  exit 1
+                  failed_to_send+="${file}\n"
               fi
           done
+
+          if [ "$failed_to_send" ]; then
+            echo "Issue sending files:\n $failed_to_send"
+            exit 1
+          fi
 
       - name: Send slack notification on test failure
         if: failure()
