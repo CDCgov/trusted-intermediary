@@ -176,6 +176,9 @@ weekday via Github actions. See [the rs-e2e readme](rs-e2e/README.md) for more d
 #### Load Testing
 
 Load tests are completed with [Locust.io](https://docs.locust.io/en/stable/installation.html).
+
+##### Running Locally
+
 Run the load tests by running...
 
 ```shell
@@ -184,13 +187,15 @@ Run the load tests by running...
 ./docker-load-execute.sh
 ```
 
-Currently, we are migrating to using Azure. Local load testing is using gradle, however a docker load test is available to mimic the Azure environment settings until the azure migration is complete.
+The Gradle version runs our API via Gradle.  The Docker version JARs our application and runs it in Docker.
 
 This will run the API for you, so no need to run it manually.
+
 >**Note:**
 >
 >**If you are already running the API, stop it before running the load tests or the cleanup steps won't work.**
->
+
+
 The load tests will also spin up (and clean up) a local test DB on port 5434 that should not interfere with the local dev DB.
 
 The `locustfile.py` that specifies the load test is located at
@@ -205,6 +210,12 @@ locust -f ./operations/locustfile.py
 The terminal will start a local web interface, and you can enter
 the swarm parameters for the test and the local url where the app is running
 (usually `http://localhost:8080`).  You can also set time limits for the tests under 'Advanced Settings'.
+
+##### Running and Configuring in Azure
+
+To run, navigate to the
+[Azure Load Tests GitHub Action](https://github.com/CDCgov/trusted-intermediary/actions/workflows/azure-load-tests.yml)
+and click on Run workflow.
 
 ### Debugging
 
