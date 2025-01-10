@@ -57,9 +57,19 @@ jobs:
 
               if [ response != "Received" ] then;
                   echo "File did not send"
-                  exit 0
+                  exit 1
               fi
           done
+
+      - name: Send slack notification on test failure
+        if: failure()
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            text: "Submit Staging RS Integration Test Failed!: https://github.com/CDCgov/trusted-intermediary/actions/runs/${{ github.run_id }}"
+
 
       - name: Clean up private key
         if: always()
