@@ -10,6 +10,7 @@ import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 /* AzureBlobOrganizer is responsible for organizing and cleaning up blobs in an Azure container */
 public class AzureBlobOrganizer {
@@ -25,14 +26,17 @@ public class AzureBlobOrganizer {
     }
 
     private void deleteOldBlobs(String testType, ZoneId timeZone) {
-        String destinationName = LocalDate.now(timeZone) + testType;
-        System.out.println("Checking folder:" + destinationName);
-        if (blobContainerClient.getBlobClient(destinationName).exists()) {
-            System.out.println("Deleting old blobs in folder " + destinationName + "...");
-            blobContainerClient.getBlobClient(destinationName).delete();
-        } else {
-            System.out.println("No old blobs in folder " + destinationName);
+        String prefix =
+                LocalDate.now(timeZone).format(DateTimeFormatter.ofPattern("yyyy/M/d"))
+                        + "/"
+                        + testType;
+        System.out.println("Checking folder: " + prefix);
+
+        for (BlobItem blobItem : blobContainerClient.listBlobsByHierarchy(prefix)) {
+            System.out.println("Deleting blob: " + blobItem.getName());
+            blobContainerClient.getBlobClient(blobItem.getName()).delete();
         }
+        System.out.println("End of checking folder: " + prefix);
     }
 
     // Organize blob into folder structure: YEAR/MONTH/DAY/Assertion_OR_GoldenCopy/SOURCE_NAME
