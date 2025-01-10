@@ -26,8 +26,12 @@ public class AzureBlobOrganizer {
 
     private void deleteOldBlobs(String testType, ZoneId timeZone) {
         String destinationName = LocalDate.now(timeZone) + testType;
+        System.out.println("Checking folder:" + destinationName);
         if (blobContainerClient.getBlobClient(destinationName).exists()) {
+            System.out.println("Deleting old blobs in folder " + destinationName + "...");
             blobContainerClient.getBlobClient(destinationName).delete();
+        } else {
+            System.out.println("No old blobs in folder " + destinationName);
         }
     }
 
