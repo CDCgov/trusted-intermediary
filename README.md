@@ -211,11 +211,38 @@ The terminal will start a local web interface, and you can enter
 the swarm parameters for the test and the local url where the app is running
 (usually `http://localhost:8080`).  You can also set time limits for the tests under 'Advanced Settings'.
 
-##### Running and Configuring in Azure
+##### Running and Creating in Azure
 
 To run, navigate to the
 [Azure Load Tests GitHub Action](https://github.com/CDCgov/trusted-intermediary/actions/workflows/azure-load-tests.yml)
 and click on Run workflow.
+
+To create a new load test in Azure, the subscription first needs to be opted into Azure's Locust preview feature.
+Afterwards, you can follow these steps...
+
+1. Navigate to the Azure Portal with the `?Microsoft_Azure_CloudNativeTesting_locust=true` query parameter.  For
+   example, this [link](https://portal.azure.com/?Microsoft_Azure_CloudNativeTesting_locust=true) will work.
+2. Navigate or search for the Azure Load Testing service and click Create.
+   1. Walk through the wizard, but make sure to pick the same resource group as the environment you plan to test.
+3. After creation, navigate to the Identity slice, which is under the Settings group, of your new load test.
+   1. Turn the Status to On under the System assigned tab and click Save.
+4. <TBD key vault>
+5. Navigate to the Tests slice, which is under the Tests group, of the previously created load test and click Create and then Upload a script to start
+   walking through the wizard.
+   1. Under the Test plan tab...
+      1. Select the Locust radio button.
+      2. Upload the [`./operations/locustfile.py`](./operations/locustfile.py) file.
+      3. Additional data files from our repository used by the load test need to be uploaded.  E.g. order and result
+         FHIR files.  You can inspect the `locustfile.py` file to find out which data files are used.  As of this
+         writing, that is `002_ORM_O01_short.fhir` and `001_ORU_R01_short.fhir`.
+   2. Under the Parameters tab, add a secret with `trusted-intermediary-valid-token-jwt` as the name.  The Value is the
+      secret URL referenced previously when you added the JWT to the key vault.
+   3. Under the Load tab, configure how much load you want.  You also need to provide the URL of the application you
+      want to load test.
+   4. Under the Test criteria tab, fill in any client-side metrics that you want to evaluate at the end of the load
+      test.  This makes it easy to tell whether the application has the performance we want.  Consider whether you want
+      the test to automatically stop if there are too many errors.
+   5. Create the test.  All the other options not covered here should be looked at and considered.
 
 ### Debugging
 
