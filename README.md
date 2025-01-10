@@ -218,7 +218,7 @@ To run, navigate to the
 and click on Run workflow.
 
 To create a new load test in Azure, the subscription first needs to be opted into Azure's Locust preview feature.
-Afterwards, you can follow these steps...
+Sadly, the Azure Terraform provider doesn't support load tests so we need to create this via ClickOps.  Therefore, you can follow these steps...
 
 1. Navigate to the Azure Portal with the `?Microsoft_Azure_CloudNativeTesting_locust=true` query parameter.  For
    example, this [link](https://portal.azure.com/?Microsoft_Azure_CloudNativeTesting_locust=true) will work.
