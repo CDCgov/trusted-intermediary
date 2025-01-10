@@ -9,6 +9,7 @@ import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
@@ -27,14 +28,25 @@ public class AzureBlobOrganizer {
 
     private void deleteOldBlobs(String testType, ZoneId timeZone) {
         String prefix =
-                LocalDate.now(timeZone).format(DateTimeFormatter.ofPattern("yyyy/M/d"))
+                LocalDate.now(timeZone).format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
                         + "/"
                         + testType;
         System.out.println("Checking folder: " + prefix);
 
         for (BlobItem blobItem : blobContainerClient.listBlobsByHierarchy(prefix)) {
-            System.out.println("Deleting blob: " + blobItem.getName());
-            blobContainerClient.getBlobClient(blobItem.getName()).delete();
+            LocalDateTime blobItemCreationDate =
+                    blobContainerClient
+                            .getBlobClient(blobItem.getName())
+                            .getProperties()
+                            .getCreationTime()
+                            .toInstant()
+                            .atZone(timeZone)
+                            .toLocalDate()
+                            .atStartOfDay();
+            if (blobItemCreationDate.isBefore(LocalDateTime.now(timeZone).minusMinutes(7))) {
+                System.out.println("Deleting blob: " + blobItem.getName());
+                blobContainerClient.getBlobClient(blobItem.getName()).delete();
+            }
         }
         System.out.println("End of checking folder: " + prefix);
     }
