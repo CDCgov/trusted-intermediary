@@ -9,7 +9,6 @@ import gov.hhs.cdc.trustedintermediary.context.ApplicationContext;
 import gov.hhs.cdc.trustedintermediary.wrappers.Logger;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
@@ -34,19 +33,8 @@ public class AzureBlobOrganizer {
         System.out.println("Checking folder: " + prefix);
 
         for (BlobItem blobItem : blobContainerClient.listBlobsByHierarchy(prefix)) {
-            LocalDateTime blobItemCreationDate =
-                    blobContainerClient
-                            .getBlobClient(blobItem.getName())
-                            .getProperties()
-                            .getCreationTime()
-                            .toInstant()
-                            .atZone(timeZone)
-                            .toLocalDate()
-                            .atStartOfDay();
-            if (blobItemCreationDate.isBefore(LocalDateTime.now(timeZone).minusMinutes(7))) {
-                System.out.println("Deleting blob: " + blobItem.getName());
-                blobContainerClient.getBlobClient(blobItem.getName()).delete();
-            }
+            System.out.println("Deleting blob: " + blobItem.getName());
+            blobContainerClient.getBlobClient(blobItem.getName()).delete();
         }
         System.out.println("End of checking folder: " + prefix);
     }
