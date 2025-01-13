@@ -54,7 +54,6 @@ This document provides instructions for setting up the environment, running the 
     - [Additional Standard Notices](#additional-standard-notices)
     - [Troubleshooting](#troubleshooting)
 
-
 ## Requirements
 
 Any distribution of the Java 17 JDK.
@@ -194,7 +193,6 @@ This will run the API for you, so no need to run it manually.
 >**Note:**
 >
 >**If you are already running the API, stop it before running the load tests or the cleanup steps won't work.**
-
 
 The load tests will also spin up (and clean up) a local test DB on port 5434 that should not interfere with the local dev DB.
 
@@ -444,7 +442,7 @@ For Apple Silicon you will want to enable the Docker option for `Use Rosetta for
 After enabling this option it is recommended that you delete all docker images and containers and rebuild them
 with this option enabled.
 
-1. Checkout `master` branch for `CDCgov/prime-reportstream`
+1. Checkout `main` branch for `CDCgov/prime-reportstream`
 2. Build RS (for more information please refer to the [ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/getting-started/README.md)):
    - If building for the first time, run: `./cleanslate` in `prime-reportstream/prime-router`
    - Otherwise run: `./gradlew clean package` in `prime-reportstream` root folder
