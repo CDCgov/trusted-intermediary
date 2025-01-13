@@ -1,0 +1,46 @@
+name: Azure Load Tests
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 2" # Midnight UTC on Tuesdays
+
+  workflow_call:
+    secrets:
+      AZURE_CLIENT_ID:
+        required: true
+      AZURE_TENANT_ID:
+        required: true
+      AZURE_SUBSCRIPTION_ID:
+        required: true
+
+jobs:
+  loadtest:
+    name: Load Test
+    environment:
+      name: internal
+
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Login via Azure CLI
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Run Load Test
+        run: |
+          az load test-run create \
+            --resource-group "csels-rsti-internal-moderate-rg" \
+            --load-test-resource "load-testing-internal" \
+            --test-id "47a5e722-d63b-4ec9-8b05-17372866f00a" \
+            --test-run-id "run_"`date +"%Y%m%d%_H%M%S"` \
+            --description "Run by Github Action"
