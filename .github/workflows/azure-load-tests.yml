@@ -42,5 +42,5 @@ jobs:
             --resource-group "csels-rsti-internal-moderate-rg" \
             --load-test-resource "load-testing-internal" \
             --test-id "47a5e722-d63b-4ec9-8b05-17372866f00a" \
-            --test-run-id "run_"`date +"%Y%m%d%_H%M%S"` \
+            --test-run-id "run_"`date +"%Y%m%d%H%M%S"` \
             --description "Run by Github Action"
