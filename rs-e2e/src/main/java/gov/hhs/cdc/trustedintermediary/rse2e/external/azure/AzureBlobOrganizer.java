@@ -71,6 +71,8 @@ public class AzureBlobOrganizer {
                     testTypeAndSourceName = GOLDEN_COPY + sourceName;
                 }
 
+                System.out.println("Organizing blob: " + testTypeAndSourceName);
+
                 String destinationName =
                         AzureBlobHelper.createDateBasedPath(
                                 sourceCreationDate, testTypeAndSourceName);
