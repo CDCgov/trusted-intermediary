@@ -76,6 +76,8 @@ jobs:
           distribution: corretto
           cache: gradle
 
+      - uses: hashicorp/setup-terraform@v3
+
       - name: Code Formatting
         run: ./gradlew spotlessCheck
 

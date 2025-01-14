@@ -173,6 +173,15 @@ public class EtorDomainRegistration implements DomainConnector {
     }
 
     DomainResponse handleMetadata(DomainRequest request) {
+        // Any new endpoint that will call RS **must** include this check.
+        if (Boolean.parseBoolean(request.getHeaders().get("load-test"))
+                && ApplicationContext.isPropertyPresent("REPORT_STREAM_URL_PREFIX")) {
+            // register the mock RS endpoint for this HTTP request because we don't want to call RS
+            // for real when doing a load test.
+            ApplicationContext.registerForThread(
+                    RSEndpointClient.class, MockRSEndpointClient.getInstance());
+        }
+
         try {
             String metadataId = request.getPathParams().get("id");
             Optional<PartnerMetadata> metadataOptional =
@@ -225,6 +234,15 @@ public class EtorDomainRegistration implements DomainConnector {
         String inboundReportId = getInboundReportId(request);
         boolean markMetadataAsFailed = false;
         String errorMessage = "";
+
+        // Any new endpoint that will call RS **must** include this check.
+        if (Boolean.parseBoolean(request.getHeaders().get("load-test"))
+                && ApplicationContext.isPropertyPresent("REPORT_STREAM_URL_PREFIX")) {
+            // register the mock RS endpoint for this HTTP request because we don't want to call RS
+            // for real when doing a load test.
+            ApplicationContext.registerForThread(
+                    RSEndpointClient.class, MockRSEndpointClient.getInstance());
+        }
 
         try {
             return requestHandler.handle(inboundReportId);

@@ -64,6 +64,8 @@ jobs:
 
       - uses: actions/checkout@v4
 
+      - uses: hashicorp/setup-terraform@v3
+
       - name: Terraform Init
         id: init
         run: terraform init ${{ inputs.TERRAFORM_INIT_PARAMETERS }}
