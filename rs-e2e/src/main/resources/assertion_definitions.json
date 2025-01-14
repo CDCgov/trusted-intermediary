@@ -123,13 +123,13 @@
       ]
     },
     {
-      "name": "Ochsner-LA OML: PD1-4 mapping",
+      "name": "Ochsner-LA OML: ReportStream PD1-4 mapping",
       "conditions": [
         "MSH-9.2 = 'O21'",
         "MSH-10 = '012'"
       ],
       "rules": [
-        "MSH-9 = 'OML^O21'",
+        "MSH-9 = 'OML^O21^OML_O21'",
         "PD1-4 = input.PD1-4"
       ]
     }
