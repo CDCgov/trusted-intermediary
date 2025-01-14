@@ -446,7 +446,7 @@ with this option enabled.
 2. Build RS (for more information please refer to the [ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/getting-started/README.md)):
    - If building for the first time, run: `./cleanslate` in `prime-reportstream/prime-router`
    - Otherwise run: `./gradlew clean package` in `prime-reportstream` root folder
-   - If attempting to access the metadata endpoint in RS add the variable `ETOR_TI_baseurl="http://host.docker.internal:8080"` to `prime-router/.vault/env/.env.local` file before building the container
+   - **Note**: if attempting to access the metadata endpoint in RS add the variable `ETOR_TI_baseurl="http://host.docker.internal:8080"` to `prime-router/.vault/env/.env.local` file before building the container
 3. Run RS with `docker compose up -d`. You may also use `./gradlew quickRun`
 4. Run the RS setup script in this repository: `/scripts/setup/setup-reportstream.sh`
    - Before running the script, make sure to follow the instructions in [/scripts/README.md](/scripts/README.md)
@@ -454,17 +454,19 @@ with this option enabled.
 
 #### Submit request to ReportStream
 
+We have a `submit.sh` script that simplifies the process of preparing, sending and tracking messages in [scripts/](scripts/). Otherwise, you'll find instructions below on how to send messages using `curl`
+
 ##### Locally
 
 ###### Orders
 
-To test sending from a simulated hospital:
+To test sending a HL7 order from a simulated hospital:
 
 ```
 curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-hospital' --header 'Authorization: Bearer dummy_token' --data-binary '@/path/to/orm_message.hl7' 'http://localhost:7071/api/waters'
 ```
 
-To test sending from TI:
+To test sending a FHIR order from TI:
 
 ```
 curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.etor-service-sender' --header 'Authorization: Bearer dummy_token' --data-binary '@/path/to/oml_message.fhir' 'http://localhost:7071/api/waters'
@@ -472,13 +474,13 @@ curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.
 
 ###### Results
 
-To test sending from a simulated lab:
+To test sending an HL7 result from a simulated lab:
 
 ```
 curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-lab' --header 'Authorization: Bearer dummy_token' --data-binary '@/path/to/oru_message.hl7' 'http://localhost:7071/api/waters'
 ```
 
-To test sending from TI:
+To test sending a FHIR result from TI:
 
 ```
 curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.etor-service-sender' --header 'Authorization: Bearer dummy_token' --data-binary '@/path/to/oru_message.fhir' 'http://localhost:7071/api/waters'
