@@ -35,8 +35,10 @@ public class AzureBlobOrganizer {
         logger.logInfo("Checking folder: " + prefix);
 
         for (BlobItem blobItem : blobContainerClient.listBlobsByHierarchy(prefix)) {
-            logger.logInfo("Deleting blob: " + blobItem.getName());
-            blobContainerClient.getBlobClient(blobItem.getName()).delete();
+            if (blobItem.getName().endsWith(".hl7")) {
+                logger.logInfo("Deleting blob: " + blobItem.getName());
+                blobContainerClient.getBlobClient(blobItem.getName()).delete();
+            }
         }
         logger.logInfo("End of checking folder: " + prefix);
     }
