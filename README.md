@@ -444,7 +444,7 @@ For Apple Silicon users, please make sure the Docker/Podman option to use `Roset
 2. Build RS (for more information please refer to the [ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/getting-started/README.md))
    - If building for the first time:
       - Run: `./cleanslate.sh` in `prime-reportstream/prime-router/`
-      - **Note**: if you're using an Apple Silicon computer, before running the script edit `cleanslate.sh` to commentout the following lines:
+      - **Note**: if you're using an Apple Silicon computer, before running the script edit `cleanslate.sh` to comment out the following lines:
 
          ```
          if [ "$(uname -m)" = "arm64" ] && [[ $(uname -av) == _"Darwin"_ ]]; then
@@ -458,7 +458,7 @@ For Apple Silicon users, please make sure the Docker/Podman option to use `Roset
       - Run: `docker compose -f docker-compose.build.yml up -d` in `prime-reportstream/prime-router/`
       - Run: `./gradlew clean quickPackage` in `prime-reportstream/`
          - **Note**: if the command fails, try removing the `.gradle` folder in `prime-reportstream/`: `rm -rf .gradle`
-   - **Note**: if attempting to access the metadata endpoint in RS add the variable `ETOR_TI_baseurl="http://host.docker.internal:8080"` to `prime-router/.vault/env/.env.local` file before building the container
+         - **Note**: if attempting to access the metadata endpoint in RS, add the variable `ETOR_TI_baseurl="http://host.docker.internal:8080"` to `prime-router/.vault/env/.env.local` file before running
 3. Run RS with gradle: `./gradlew quickRun`
 4. Run the RS setup script in this repository: `/scripts/setup/setup-reportstream.sh`
    - Before running the script, make sure to follow the instructions in [/scripts/README.md](/scripts/README.md)
