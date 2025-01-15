@@ -21,7 +21,7 @@ public class AzureBlobHelper {
     public static boolean isInDateFolder(String testType, String blobPath, LocalDate creationDate) {
         // /GOLDEN_COPY/2021/09/01/
         // /ASSERTION/2021/09/01/
-        String expectedPath = testType + buildDatePathPrefix(creationDate);
+        String expectedPath = buildDatePathPrefix(creationDate) + testType;
         return blobPath.startsWith(expectedPath);
     }
 }
