@@ -441,7 +441,7 @@ For database documentation: [/docs/database.md](/docs/database.md)
 For Apple Silicon users, please make sure the Docker/Podman option to use `Rosetta` is enabled. If it was disabled, after enabling it is recommended that you delete all images and containers and rebuild them with this option enabled.
 
 1. Checkout `main` branch for `CDCgov/prime-reportstream`
-2. Build RS (for more information please refer to the [ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/getting-started/README.md))
+2. Build and package RS (for more information please refer to the [ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/getting-started/README.md))
    - If building for the first time:
       - Run: `./cleanslate.sh` in `prime-reportstream/prime-router/`
       - **Note**: if you're using an Apple Silicon computer, before running the script edit `cleanslate.sh` to comment out the following lines:
@@ -455,8 +455,9 @@ For Apple Silicon users, please make sure the Docker/Podman option to use `Roset
          ```
 
    - If not building for the first time:
-      - Run: `docker compose -f docker-compose.build.yml up -d` in `prime-reportstream/prime-router/`
-      - Run: `./gradlew clean quickPackage` in `prime-reportstream/`
+      1. Make sure no `prime-router` containers are running. If they are, stop them
+      2. Run: `docker compose -f docker-compose.build.yml up -d` in `prime-reportstream/prime-router/`
+      3. Run: `./gradlew clean quickPackage` in `prime-reportstream/`
          - **Note**: if the command fails, try removing the `.gradle` folder in `prime-reportstream/`: `rm -rf .gradle`
          - **Note**: if attempting to access the metadata endpoint in RS, add the variable `ETOR_TI_baseurl="http://host.docker.internal:8080"` to `prime-router/.vault/env/.env.local` file before running
 3. Run RS with gradle: `./gradlew quickRun`
