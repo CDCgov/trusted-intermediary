@@ -32,13 +32,13 @@ public class AzureBlobOrganizer {
                 LocalDate.now(timeZone).format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
                         + "/"
                         + testType;
-        System.out.println("Checking folder: " + prefix);
+        logger.logInfo("Checking folder: " + prefix);
 
         for (BlobItem blobItem : blobContainerClient.listBlobsByHierarchy(prefix)) {
-            System.out.println("Deleting blob: " + blobItem.getName());
+            logger.logInfo("Deleting blob: " + blobItem.getName());
             blobContainerClient.getBlobClient(blobItem.getName()).delete();
         }
-        System.out.println("End of checking folder: " + prefix);
+        logger.logInfo("End of checking folder: " + prefix);
     }
 
     // Organize blob into folder structure: YEAR/MONTH/DAY/Assertion_OR_GoldenCopy/SOURCE_NAME
