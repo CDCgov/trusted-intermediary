@@ -46,7 +46,7 @@ jobs:
                   "$host/api/token" | jq -r ".access_token")
 
           failed_to_send=""
-          for file in $(pwd)/examples/Test/Automated/**/*.hl7; do
+          for file in $(pwd)/examples/Test/Automated/{Assertion,GoldenCopy/Input}/*.hl7; do
               echo "Sending $file"
               response=$(curl \
                   --header "Content-Type: application/hl7-v2" \
