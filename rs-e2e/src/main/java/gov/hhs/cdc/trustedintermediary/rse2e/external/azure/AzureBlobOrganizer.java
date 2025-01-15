@@ -25,7 +25,9 @@ public class AzureBlobOrganizer {
         this.blobContainerClient = blobContainerClient;
     }
 
-    private void deleteOldBlobs(String testType, ZoneId timeZone) {
+    //    Delete the current date folder's blobs to prevent buildup when ran manually
+    private void deleteOldBlobsFromToday(String testType, ZoneId timeZone) {
+        // Check folder structures: YEAR/MONTH/DAY/Assertion_OR_GoldenCopy/
         String prefix =
                 LocalDate.now(timeZone).format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
                         + "/"
@@ -41,8 +43,8 @@ public class AzureBlobOrganizer {
 
     // Organize blob into folder structure: YEAR/MONTH/DAY/Assertion_OR_GoldenCopy/SOURCE_NAME
     public void organizeAndCleanupBlobsByDate(int retentionDays, ZoneId timeZone) {
-        deleteOldBlobs(GOLDEN_COPY, timeZone);
-        deleteOldBlobs(ASSERTION, timeZone);
+        deleteOldBlobsFromToday(GOLDEN_COPY, timeZone);
+        deleteOldBlobsFromToday(ASSERTION, timeZone);
         for (BlobItem blobItem : blobContainerClient.listBlobs()) {
             String sourceName = blobItem.getName();
             try {
@@ -62,13 +64,15 @@ public class AzureBlobOrganizer {
                     continue;
                 }
 
-                if (AzureBlobHelper.isInDateFolder(sourceName, sourceCreationDate)) {
-                    continue;
+                String testType = ASSERTION;
+                String testTypeAndSourceName = testType + sourceName;
+                if (sourceBlob.getBlobName().contains("GOLDEN-COPY")) {
+                    testType = GOLDEN_COPY;
+                    testTypeAndSourceName = GOLDEN_COPY + sourceName;
                 }
 
-                String testTypeAndSourceName = ASSERTION + sourceName;
-                if (sourceBlob.getBlobName().contains("GOLDEN-COPY")) {
-                    testTypeAndSourceName = GOLDEN_COPY + sourceName;
+                if (AzureBlobHelper.isInDateFolder(testType, sourceName, sourceCreationDate)) {
+                    continue;
                 }
 
                 System.out.println("Organizing blob: " + testTypeAndSourceName);
