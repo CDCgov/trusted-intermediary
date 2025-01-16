@@ -54,7 +54,6 @@ This document provides instructions for setting up the environment, running the 
     - [Additional Standard Notices](#additional-standard-notices)
     - [Troubleshooting](#troubleshooting)
 
-
 ## Requirements
 
 Any distribution of the Java 17 JDK.
@@ -194,7 +193,6 @@ This will run the API for you, so no need to run it manually.
 >**Note:**
 >
 >**If you are already running the API, stop it before running the load tests or the cleanup steps won't work.**
-
 
 The load tests will also spin up (and clean up) a local test DB on port 5434 that should not interfere with the local dev DB.
 
@@ -440,33 +438,48 @@ For database documentation: [/docs/database.md](/docs/database.md)
 
 #### ReportStream Setup
 
-For Apple Silicon you will want to enable the Docker option for `Use Rosetta for x86/amd64 emulation on Apple Silicon`.
-After enabling this option it is recommended that you delete all docker images and containers and rebuild them
-with this option enabled.
+For Apple Silicon users, please make sure the Docker/Podman option to use `Rosetta` is enabled. If it was disabled, after enabling it is recommended that you delete all images and containers and rebuild them with this option enabled.
 
-1. Checkout `master` branch for `CDCgov/prime-reportstream`
-2. Build RS (for more information please refer to the [ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/getting-started/README.md)):
-   - If building for the first time, run: `./cleanslate` in `prime-reportstream/prime-router`
-   - Otherwise run: `./gradlew clean package` in `prime-reportstream` root folder
-   - If attempting to access the metadata endpoint in RS add the variable `ETOR_TI_baseurl="http://host.docker.internal:8080"` to `prime-router/.vault/env/.env.local` file before building the container
-3. Run RS with `docker compose up -d`. You may also use `./gradlew quickRun`
+1. Checkout `main` branch for `CDCgov/prime-reportstream`
+2. Build and package RS (for more information please refer to the [ReportStream docs](https://github.com/CDCgov/prime-reportstream/blob/master/prime-router/docs/getting-started/README.md))
+   - If building for the first time:
+      - Run: `./cleanslate.sh` in `prime-reportstream/prime-router/`
+      - **Note**: if you're using an Apple Silicon computer, before running the script edit `cleanslate.sh` to comment out the following lines:
+
+         ```
+         if [ "$(uname -m)" = "arm64" ] && [[ $(uname -av) == _"Darwin"_ ]]; then
+            PROFILE=apple_silicon
+            SERVICES=(sftp azurite vault) # Only these services are M1 compatible
+            BUILD_SERVICES=(postgresql)
+         fi
+         ```
+
+   - If not building for the first time:
+      1. Make sure no `prime-router` containers are running. If they are, stop them
+      2. Run: `docker compose -f docker-compose.build.yml up -d` in `prime-reportstream/prime-router/`
+      3. Run: `./gradlew clean quickPackage` in `prime-reportstream/`
+         - **Note**: if the command fails, try removing the `.gradle` folder in `prime-reportstream/`: `rm -rf .gradle`
+         - **Note**: if attempting to access the metadata endpoint in RS, add the variable `ETOR_TI_baseurl="http://host.docker.internal:8080"` to `prime-router/.vault/env/.env.local` file before running
+3. Run RS with gradle: `./gradlew quickRun`
 4. Run the RS setup script in this repository: `/scripts/setup/setup-reportstream.sh`
    - Before running the script, make sure to follow the instructions in [/scripts/README.md](/scripts/README.md)
    - You can verify the script created vault secrets successfully by going to `http://localhost:8200/` in your browser, use the token in `prime-router/.vault/env/.env.local` to authenticate, and then go to `Secrets engines` > `secret/` to check the available secrets
 
 #### Submit request to ReportStream
 
+We have a `submit.sh` script that simplifies the process of preparing, sending and tracking messages in [scripts/](scripts/). Otherwise, you'll find instructions below on how to send messages using `curl`
+
 ##### Locally
 
 ###### Orders
 
-To test sending from a simulated hospital:
+To test sending a HL7 order from a simulated hospital:
 
 ```
 curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-hospital' --header 'Authorization: Bearer dummy_token' --data-binary '@/path/to/orm_message.hl7' 'http://localhost:7071/api/waters'
 ```
 
-To test sending from TI:
+To test sending a FHIR order from TI:
 
 ```
 curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.etor-service-sender' --header 'Authorization: Bearer dummy_token' --data-binary '@/path/to/oml_message.fhir' 'http://localhost:7071/api/waters'
@@ -474,13 +487,13 @@ curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.
 
 ###### Results
 
-To test sending from a simulated lab:
+To test sending an HL7 result from a simulated lab:
 
 ```
 curl --header 'Content-Type: application/hl7-v2' --header 'Client: flexion.simulated-lab' --header 'Authorization: Bearer dummy_token' --data-binary '@/path/to/oru_message.hl7' 'http://localhost:7071/api/waters'
 ```
 
-To test sending from TI:
+To test sending a FHIR result from TI:
 
 ```
 curl --header 'Content-Type: application/fhir+ndjson' --header 'Client: flexion.etor-service-sender' --header 'Authorization: Bearer dummy_token' --data-binary '@/path/to/oru_message.fhir' 'http://localhost:7071/api/waters'
