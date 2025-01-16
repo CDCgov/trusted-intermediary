@@ -1,0 +1,2907 @@
+{
+    "resourceType": "Bundle",
+    "id": "1736788732681056806.cfda87ad-ee08-4dc9-bdb3-a3e0cde6a926",
+    "meta": {
+        "lastUpdated": "2025-01-13T17:18:52.688+00:00"
+    },
+    "identifier": {
+        "system": "https://reportstream.cdc.gov/prime-router",
+        "value": "29"
+    },
+    "type": "message",
+    "timestamp": "2024-11-13T13:19:17.000+00:00",
+    "entry": [
+        {
+            "fullUrl": "MessageHeader/1736788732902424963.258d8572-0217-4c67-a15a-0890e1096d75",
+            "resource": {
+                "resourceType": "MessageHeader",
+                "id": "1736788732902424963.258d8572-0217-4c67-a15a-0890e1096d75",
+                "meta": {
+                    "security": [
+                        {
+                            "code": "739"
+                        }
+                    ],
+                    "tag": [
+                        {
+                            "system": "http://terminology.hl7.org/CodeSystem/v2-0103",
+                            "code": "D"
+                        },
+                        {
+                            "system": "http://localcodes.org/ETOR",
+                            "code": "ETOR",
+                            "display": "Processed by ETOR"
+                        }
+                    ]
+                },
+                "extension": [
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/msh-message-header",
+                        "extension": [
+                            {
+                                "url": "MSH.7",
+                                "valueString": "20241113131917"
+                            },
+                            {
+                                "url": "MSH.15",
+                                "valueString": "AL"
+                            },
+                            {
+                                "url": "MSH.16",
+                                "valueString": "NE"
+                            }
+                        ]
+                    }
+                ],
+                "eventCoding": {
+                    "system": "http://terminology.hl7.org/CodeSystem/v2-0003",
+                    "code": "O21",
+                    "display": "OML^O21^OML_O21"
+                },
+                "destination": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id",
+                                "valueString": "2.16.840.1.114222.4.3.26.3.2"
+                            },
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "MSH.5"
+                            }
+                        ],
+                        "name": "Natus.LA.STAG",
+                        "_endpoint": {
+                            "extension": [
+                                {
+                                    "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
+                                    "valueCode": "unknown"
+                                }
+                            ]
+                        },
+                        "receiver": {
+                            "reference": "Organization/1736788732899360028.729ba962-d6f9-4738-a11a-8e23f86a953e"
+                        }
+                    }
+                ],
+                "sender": {
+                    "reference": "Organization/1736788732831567233.d614f4e1-e870-48c0-a713-1726b5de8572"
+                },
+                "source": {
+                    "extension": [
+                        {
+                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id",
+                            "valueString": "13"
+                        },
+                        {
+                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id",
+                            "valueString": "1.2.840.114350.1.13.286.2.7.2.695071"
+                        },
+                        {
+                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/universal-id-type",
+                            "valueString": "ISO"
+                        },
+                        {
+                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                            "valueString": "MSH.3"
+                        }
+                    ],
+                    "endpoint": "urn:oid:1.2.840.114350.1.13.286.2.7.2.695071"
+                }
+            }
+        },
+        {
+            "fullUrl": "Organization/1736788732831567233.d614f4e1-e870-48c0-a713-1726b5de8572",
+            "resource": {
+                "resourceType": "Organization",
+                "id": "1736788732831567233.d614f4e1-e870-48c0-a713-1726b5de8572",
+                "identifier": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "HD.1"
+                            }
+                        ],
+                        "value": "4169"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Organization/1736788732899360028.729ba962-d6f9-4738-a11a-8e23f86a953e",
+            "resource": {
+                "resourceType": "Organization",
+                "id": "1736788732899360028.729ba962-d6f9-4738-a11a-8e23f86a953e",
+                "extension": [
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                        "valueString": "MSH.6"
+                    }
+                ],
+                "identifier": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "HD.1"
+                            }
+                        ],
+                        "value": "Louisiana Office of Public Health Laboratory"
+                    },
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "HD.2,HD.3"
+                            }
+                        ],
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/v2-0301"
+                                }
+                            ]
+                        },
+                        "value": "2.16.840.1.114222.4.3.22.17.1.1"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Provenance/1736788733022451714.a3e8319b-fe4f-4446-b5b9-31616ba22d9e",
+            "resource": {
+                "resourceType": "Provenance",
+                "id": "1736788733022451714.a3e8319b-fe4f-4446-b5b9-31616ba22d9e",
+                "recorded": "2024-11-13T13:19:17Z",
+                "activity": {
+                    "coding": [
+                        {
+                            "display": "OML^O21^OML_O21"
+                        }
+                    ]
+                },
+                "agent": [
+                    {
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/provenance-participant-type",
+                                    "code": "author"
+                                }
+                            ]
+                        },
+                        "who": {
+                            "reference": "Organization/1736788733021228439.e6fd6203-18f6-49f8-993f-ffd569dbdb1f"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Organization/1736788733021228439.e6fd6203-18f6-49f8-993f-ffd569dbdb1f",
+            "resource": {
+                "resourceType": "Organization",
+                "id": "1736788733021228439.e6fd6203-18f6-49f8-993f-ffd569dbdb1f",
+                "identifier": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "HD.1"
+                            }
+                        ],
+                        "value": "4169"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Provenance/1736788733066834005.cbd0d4a2-d8ca-4f97-ae4d-83077fd7f934",
+            "resource": {
+                "resourceType": "Provenance",
+                "id": "1736788733066834005.cbd0d4a2-d8ca-4f97-ae4d-83077fd7f934",
+                "recorded": "2025-01-13T17:18:53Z",
+                "policy": [
+                    "http://hl7.org/fhir/uv/v2mappings/message-oru-r01-to-bundle"
+                ],
+                "activity": {
+                    "coding": [
+                        {
+                            "code": "v2-FHIR transformation"
+                        }
+                    ]
+                },
+                "agent": [
+                    {
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/provenance-participant-type",
+                                    "code": "assembler"
+                                }
+                            ]
+                        },
+                        "who": {
+                            "reference": "Organization/1736788733065583234.7541e797-15c2-4536-8ed1-38f5c70d0997"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Organization/1736788733065583234.7541e797-15c2-4536-8ed1-38f5c70d0997",
+            "resource": {
+                "resourceType": "Organization",
+                "id": "1736788733065583234.7541e797-15c2-4536-8ed1-38f5c70d0997",
+                "identifier": [
+                    {
+                        "value": "CDC PRIME - Atlanta"
+                    },
+                    {
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/v2-0301"
+                                }
+                            ]
+                        },
+                        "system": "urn:ietf:rfc:3986",
+                        "value": "2.16.840.1.114222.4.1.237821"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Patient/1736788733186008206.5a213a9f-1ab3-4116-97ec-e3c3ce93e22d",
+            "resource": {
+                "resourceType": "Patient",
+                "id": "1736788733186008206.5a213a9f-1ab3-4116-97ec-e3c3ce93e22d",
+                "extension": [
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/pid-patient",
+                        "extension": [
+                            {
+                                "url": "PID.8",
+                                "valueCodeableConcept": {
+                                    "coding": [
+                                        {
+                                            "extension": [
+                                                {
+                                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                                    "valueString": "coding"
+                                                }
+                                            ],
+                                            "code": "F"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "url": "PID.24",
+                                "valueString": "Y"
+                            },
+                            {
+                                "url": "PID.30",
+                                "valueString": "N"
+                            }
+                        ]
+                    },
+                    {
+                        "url": "http://ibm.com/fhir/cdm/StructureDefinition/local-race-cd",
+                        "valueCodeableConcept": {
+                            "coding": [
+                                {
+                                    "extension": [
+                                        {
+                                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                            "valueString": "coding"
+                                        },
+                                        {
+                                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding-system",
+                                            "valueString": "CDCREC"
+                                        }
+                                    ],
+                                    "system": "http://hl7.org/fhir/us/core/CodeSystem-cdcrec.html",
+                                    "code": "2054-5",
+                                    "display": "Black or African-American"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/ethnic-group",
+                        "valueCodeableConcept": {
+                            "coding": [
+                                {
+                                    "extension": [
+                                        {
+                                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                            "valueString": "coding"
+                                        }
+                                    ],
+                                    "code": "HISPANIC"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "identifier": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cx-identifier",
+                                "extension": [
+                                    {
+                                        "url": "CX.5",
+                                        "valueString": "MRN"
+                                    }
+                                ]
+                            },
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "PID.2"
+                            }
+                        ],
+                        "type": {
+                            "coding": [
+                                {
+                                    "code": "MRN"
+                                }
+                            ]
+                        },
+                        "value": "10453873",
+                        "assigner": {
+                            "reference": "Organization/1736788733077151587.2f2ecbb3-f23f-41e6-a189-874904d410ce"
+                        }
+                    },
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cx-identifier",
+                                "extension": [
+                                    {
+                                        "url": "CX.5",
+                                        "valueString": "MRN"
+                                    }
+                                ]
+                            },
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "PID.3"
+                            }
+                        ],
+                        "type": {
+                            "coding": [
+                                {
+                                    "code": "MRN"
+                                }
+                            ]
+                        },
+                        "value": "10453873",
+                        "assigner": {
+                            "reference": "Organization/1736788733089918283.3693a1d1-4365-4f96-a46d-ba3d543dcec9"
+                        }
+                    }
+                ],
+                "name": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xpn-human-name",
+                                "extension": [
+                                    {
+                                        "url": "XPN.2",
+                                        "valueString": "GIRL BEAKER"
+                                    }
+                                ]
+                            }
+                        ],
+                        "family": "PKUSS",
+                        "given": [
+                            "GIRL BEAKER"
+                        ]
+                    }
+                ],
+                "telecom": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xtn-contact-point",
+                                "extension": [
+                                    {
+                                        "url": "XTN.1",
+                                        "valueString": "(557)559-5559"
+                                    },
+                                    {
+                                        "url": "XTN.2",
+                                        "valueString": "P"
+                                    },
+                                    {
+                                        "url": "XTN.3",
+                                        "valueString": "PH"
+                                    }
+                                ]
+                            }
+                        ],
+                        "system": "phone",
+                        "value": "(557)559-5559",
+                        "use": "home"
+                    }
+                ],
+                "gender": "female",
+                "birthDate": "2024-11-08",
+                "_birthDate": {
+                    "extension": [
+                        {
+                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2-date-time",
+                            "valueString": "20241108103900"
+                        },
+                        {
+                            "url": "http://hl7.org/fhir/StructureDefinition/patient-birthTime",
+                            "valueDateTime": "2024-11-08T10:39:00Z"
+                        }
+                    ]
+                },
+                "deceasedBoolean": false,
+                "address": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xad-address",
+                                "extension": [
+                                    {
+                                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/sad-address-line",
+                                        "extension": [
+                                            {
+                                                "url": "SAD.1",
+                                                "valueString": "1202 COOLIDGE ST."
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "url": "XAD.7",
+                                        "valueCode": "P"
+                                    }
+                                ]
+                            }
+                        ],
+                        "line": [
+                            "1202 COOLIDGE ST."
+                        ],
+                        "city": "LAFAYETTE",
+                        "district": "LAFAYETTE",
+                        "state": "LA",
+                        "postalCode": "70503",
+                        "country": "US"
+                    }
+                ],
+                "maritalStatus": {
+                    "coding": [
+                        {
+                            "extension": [
+                                {
+                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                    "valueString": "coding"
+                                }
+                            ],
+                            "code": "Single"
+                        }
+                    ]
+                },
+                "multipleBirthInteger": 1,
+                "contact": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://hl7.org/fhir/StructureDefinition/relationship",
+                                "valueCodeableConcept": {
+                                    "coding": [
+                                        {
+                                            "extension": [
+                                                {
+                                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                                    "valueString": "coding"
+                                                }
+                                            ],
+                                            "code": "Mother"
+                                        }
+                                    ]
+                                }
+                            }
+                        ],
+                        "relationship": [
+                            {
+                                "coding": [
+                                    {
+                                        "extension": [
+                                            {
+                                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                                "valueString": "coding"
+                                            }
+                                        ],
+                                        "code": "Mother"
+                                    }
+                                ]
+                            }
+                        ],
+                        "name": {
+                            "extension": [
+                                {
+                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xpn-human-name",
+                                    "extension": [
+                                        {
+                                            "url": "XPN.2",
+                                            "valueString": "BEAKER"
+                                        },
+                                        {
+                                            "url": "XPN.3",
+                                            "valueString": "MOM"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "family": "PKUSS",
+                            "given": [
+                                "BEAKER",
+                                "MOM"
+                            ]
+                        },
+                        "telecom": [
+                            {
+                                "extension": [
+                                    {
+                                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xtn-contact-point",
+                                        "extension": [
+                                            {
+                                                "url": "XTN.1",
+                                                "valueString": "(557)559-5559"
+                                            },
+                                            {
+                                                "url": "XTN.3",
+                                                "valueString": "PH"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "system": "phone",
+                                "value": "(557)559-5559"
+                            }
+                        ],
+                        "address": {
+                            "extension": [
+                                {
+                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xad-address",
+                                    "extension": [
+                                        {
+                                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/sad-address-line",
+                                            "extension": [
+                                                {
+                                                    "url": "SAD.1",
+                                                    "valueString": "1202 Coolidge St."
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ],
+                            "line": [
+                                "1202 Coolidge St."
+                            ],
+                            "city": "LAFAYETTE",
+                            "state": "LA",
+                            "postalCode": "70503",
+                            "country": "US"
+                        }
+                    },
+                    {
+                        "relationship": [
+                            {
+                                "coding": [
+                                    {
+                                        "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+                                        "code": "MTH",
+                                        "display": "mother"
+                                    }
+                                ]
+                            }
+                        ],
+                        "telecom": [
+                            {
+                                "extension": [
+                                    {
+                                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xtn-contact-point",
+                                        "extension": [
+                                            {
+                                                "url": "XTN.1",
+                                                "valueString": "(557)559-5559"
+                                            },
+                                            {
+                                                "url": "XTN.2",
+                                                "valueString": "P"
+                                            },
+                                            {
+                                                "url": "XTN.3",
+                                                "valueString": "PH"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "system": "phone",
+                                "value": "(557)559-5559",
+                                "use": "home"
+                            }
+                        ],
+                        "address": {
+                            "extension": [
+                                {
+                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xad-address",
+                                    "extension": [
+                                        {
+                                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/sad-address-line",
+                                            "extension": [
+                                                {
+                                                    "url": "SAD.1",
+                                                    "valueString": "1202 COOLIDGE ST."
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "url": "XAD.7",
+                                            "valueCode": "P"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "line": [
+                                "1202 COOLIDGE ST."
+                            ],
+                            "city": "LAFAYETTE",
+                            "district": "LAFAYETTE",
+                            "state": "LA",
+                            "postalCode": "70503",
+                            "country": "US"
+                        }
+                    }
+                ],
+                "communication": [
+                    {
+                        "language": {
+                            "coding": [
+                                {
+                                    "extension": [
+                                        {
+                                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                            "valueString": "coding"
+                                        }
+                                    ],
+                                    "code": "ENGLISH"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "generalPractitioner": [
+                    {
+                        "reference": "Practitioner/1736788733182776216.9c3e5f18-4cc1-464f-8ec8-920880f66220"
+                    }
+                ],
+                "link": [
+                    {
+                        "other": {
+                            "reference": "RelatedPerson/1736788733126920436.4819a236-c21a-4ea6-af4d-296c650ae058"
+                        },
+                        "type": "seealso"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Organization/1736788733077151587.2f2ecbb3-f23f-41e6-a189-874904d410ce",
+            "resource": {
+                "resourceType": "Organization",
+                "id": "1736788733077151587.2f2ecbb3-f23f-41e6-a189-874904d410ce",
+                "identifier": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "HD.1"
+                            }
+                        ],
+                        "value": "MRN"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Organization/1736788733089918283.3693a1d1-4365-4f96-a46d-ba3d543dcec9",
+            "resource": {
+                "resourceType": "Organization",
+                "id": "1736788733089918283.3693a1d1-4365-4f96-a46d-ba3d543dcec9",
+                "identifier": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "HD.1"
+                            }
+                        ],
+                        "value": "MRN"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "RelatedPerson/1736788733126920436.4819a236-c21a-4ea6-af4d-296c650ae058",
+            "resource": {
+                "resourceType": "RelatedPerson",
+                "id": "1736788733126920436.4819a236-c21a-4ea6-af4d-296c650ae058",
+                "identifier": [
+                    {
+                        "extension": [
+                            {
+                                "url": "http://hl7.org/fhir/StructureDefinition/identifier-checkDigit",
+                                "valueString": "BEAKER"
+                            },
+                            {
+                                "url": "http://hl7.org/fhir/StructureDefinition/namingsystem-checkDigit",
+                                "valueString": "MOM"
+                            }
+                        ],
+                        "value": "PKUSS"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Organization/1736788733180590107.e33df29b-2e05-4782-9764-08825f4c276d",
+            "resource": {
+                "resourceType": "Organization",
+                "id": "1736788733180590107.e33df29b-2e05-4782-9764-08825f4c276d",
+                "identifier": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "HD.1"
+                            }
+                        ],
+                        "value": "NPI"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Practitioner/1736788733182776216.9c3e5f18-4cc1-464f-8ec8-920880f66220",
+            "resource": {
+                "resourceType": "Practitioner",
+                "id": "1736788733182776216.9c3e5f18-4cc1-464f-8ec8-920880f66220",
+                "extension": [
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/assigning-authority",
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id",
+                                "valueString": "NPI"
+                            }
+                        ]
+                    },
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xcn-practitioner",
+                        "extension": [
+                            {
+                                "url": "XCN.3",
+                                "valueString": "TROY"
+                            },
+                            {
+                                "url": "XCN.4",
+                                "valueString": "U."
+                            }
+                        ]
+                    }
+                ],
+                "identifier": [
+                    {
+                        "type": {
+                            "coding": [
+                                {
+                                    "extension": [
+                                        {
+                                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/codeable-concept-id",
+                                            "valueBoolean": true
+                                        }
+                                    ],
+                                    "code": "NPI"
+                                }
+                            ]
+                        },
+                        "value": "1184608010",
+                        "assigner": {
+                            "reference": "Organization/1736788733180590107.e33df29b-2e05-4782-9764-08825f4c276d"
+                        }
+                    }
+                ],
+                "name": [
+                    {
+                        "family": "DREWITZ",
+                        "given": [
+                            "TROY",
+                            "U."
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Provenance/1736788733201382336.7a7655e6-5f47-452e-b915-338eb000bc78",
+            "resource": {
+                "resourceType": "Provenance",
+                "id": "1736788733201382336.7a7655e6-5f47-452e-b915-338eb000bc78",
+                "target": [
+                    {
+                        "reference": "Patient/1736788733186008206.5a213a9f-1ab3-4116-97ec-e3c3ce93e22d"
+                    }
+                ],
+                "recorded": "2025-01-13T17:18:53Z",
+                "activity": {
+                    "coding": [
+                        {
+                            "system": "https://terminology.hl7.org/CodeSystem/v3-DataOperation",
+                            "code": "UPDATE"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "fullUrl": "RelatedPerson/1736788733208462677.dd2d6266-9143-40d6-ba5d-bc547ff720c9",
+            "resource": {
+                "resourceType": "RelatedPerson",
+                "id": "1736788733208462677.dd2d6266-9143-40d6-ba5d-bc547ff720c9",
+                "extension": [
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Segment",
+                        "valueString": "NK1"
+                    }
+                ],
+                "patient": {
+                    "reference": "Patient/1736788733186008206.5a213a9f-1ab3-4116-97ec-e3c3ce93e22d"
+                },
+                "relationship": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "NK1.3"
+                            }
+                        ],
+                        "coding": [
+                            {
+                                "extension": [
+                                    {
+                                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                        "valueString": "coding"
+                                    }
+                                ],
+                                "code": "Mother"
+                            }
+                        ]
+                    }
+                ],
+                "name": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "NK1.2"
+                            },
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xpn-human-name",
+                                "extension": [
+                                    {
+                                        "url": "XPN.2",
+                                        "valueString": "BEAKER"
+                                    },
+                                    {
+                                        "url": "XPN.3",
+                                        "valueString": "MOM"
+                                    }
+                                ]
+                            }
+                        ],
+                        "family": "PKUSS",
+                        "given": [
+                            "BEAKER",
+                            "MOM"
+                        ]
+                    }
+                ],
+                "telecom": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xtn-contact-point",
+                                "extension": [
+                                    {
+                                        "url": "XTN.1",
+                                        "valueString": "(557)559-5559"
+                                    },
+                                    {
+                                        "url": "XTN.3",
+                                        "valueString": "PH"
+                                    }
+                                ]
+                            },
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "NK1.5"
+                            }
+                        ],
+                        "system": "phone",
+                        "value": "(557)559-5559"
+                    }
+                ],
+                "address": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "NK1.4"
+                            },
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xad-address",
+                                "extension": [
+                                    {
+                                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/sad-address-line",
+                                        "extension": [
+                                            {
+                                                "url": "SAD.1",
+                                                "valueString": "1202 Coolidge St."
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "line": [
+                            "1202 Coolidge St."
+                        ],
+                        "city": "LAFAYETTE",
+                        "state": "LA",
+                        "postalCode": "70503",
+                        "country": "US"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Encounter/1736788733221836312.59eb66f1-02f9-4555-997c-835a9d169a33",
+            "resource": {
+                "resourceType": "Encounter",
+                "id": "1736788733221836312.59eb66f1-02f9-4555-997c-835a9d169a33",
+                "subject": {
+                    "reference": "Patient/1736788733186008206.5a213a9f-1ab3-4116-97ec-e3c3ce93e22d"
+                },
+                "episodeOfCare": [
+                    {
+                        "reference": "EpisodeOfCare/1736788733222039160.517d1c43-e88b-40d2-b0a8-60ea8d26633c"
+                    }
+                ],
+                "participant": [
+                    {
+                        "type": [
+                            {
+                                "coding": [
+                                    {
+                                        "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
+                                        "code": "ADM"
+                                    }
+                                ],
+                                "text": "admitter"
+                            }
+                        ],
+                        "individual": {
+                            "reference": "Practitioner/1736788733219044576.3882d339-ef78-419b-9594-5a9aa8410e29"
+                        }
+                    }
+                ],
+                "location": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "PV1.3"
+                            }
+                        ],
+                        "location": {
+                            "reference": "Location/1736788733221512000.33666b24-3f2e-4a28-ba59-727cb4e33625"
+                        },
+                        "status": "active"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Organization/1736788733217488893.62df9dec-f267-4610-80f5-219b88b065c8",
+            "resource": {
+                "resourceType": "Organization",
+                "id": "1736788733217488893.62df9dec-f267-4610-80f5-219b88b065c8",
+                "identifier": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "HD.1"
+                            }
+                        ],
+                        "value": "NPI"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Practitioner/1736788733219044576.3882d339-ef78-419b-9594-5a9aa8410e29",
+            "resource": {
+                "resourceType": "Practitioner",
+                "id": "1736788733219044576.3882d339-ef78-419b-9594-5a9aa8410e29",
+                "extension": [
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/assigning-authority",
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id",
+                                "valueString": "NPI"
+                            }
+                        ]
+                    },
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xcn-practitioner",
+                        "extension": [
+                            {
+                                "url": "XCN.3",
+                                "valueString": "TROY"
+                            },
+                            {
+                                "url": "XCN.4",
+                                "valueString": "U."
+                            }
+                        ]
+                    },
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                        "valueString": "PV1.17"
+                    }
+                ],
+                "identifier": [
+                    {
+                        "type": {
+                            "coding": [
+                                {
+                                    "extension": [
+                                        {
+                                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/codeable-concept-id",
+                                            "valueBoolean": true
+                                        }
+                                    ],
+                                    "code": "NPI"
+                                }
+                            ]
+                        },
+                        "value": "1184608010",
+                        "assigner": {
+                            "reference": "Organization/1736788733217488893.62df9dec-f267-4610-80f5-219b88b065c8"
+                        }
+                    }
+                ],
+                "name": [
+                    {
+                        "family": "DREWITZ",
+                        "given": [
+                            "TROY",
+                            "U."
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Location/1736788733220963440.927e2f60-6b0b-4a37-86e1-dd18977adba0",
+            "resource": {
+                "resourceType": "Location",
+                "id": "1736788733220963440.927e2f60-6b0b-4a37-86e1-dd18977adba0",
+                "identifier": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "HD.1"
+                            }
+                        ],
+                        "value": "8288"
+                    },
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "HD.2,HD.3"
+                            }
+                        ]
+                    }
+                ],
+                "physicalType": {
+                    "coding": [
+                        {
+                            "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+                            "code": "ro"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "fullUrl": "Location/1736788733221512000.33666b24-3f2e-4a28-ba59-727cb4e33625",
+            "resource": {
+                "resourceType": "Location",
+                "id": "1736788733221512000.33666b24-3f2e-4a28-ba59-727cb4e33625",
+                "identifier": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "HD.1"
+                            }
+                        ],
+                        "value": "24826"
+                    },
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "HD.2,HD.3"
+                            }
+                        ]
+                    }
+                ],
+                "mode": "instance",
+                "physicalType": {
+                    "coding": [
+                        {
+                            "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+                            "code": "bd"
+                        }
+                    ]
+                },
+                "partOf": {
+                    "reference": "Location/1736788733220963440.927e2f60-6b0b-4a37-86e1-dd18977adba0"
+                }
+            }
+        },
+        {
+            "fullUrl": "EpisodeOfCare/1736788733222039160.517d1c43-e88b-40d2-b0a8-60ea8d26633c",
+            "resource": {
+                "resourceType": "EpisodeOfCare",
+                "id": "1736788733222039160.517d1c43-e88b-40d2-b0a8-60ea8d26633c",
+                "extension": [
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                        "valueString": "PV1.54"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Observation/1736788733880989299.e3335109-f92f-4e72-aa51-6533ad3391e6",
+            "resource": {
+                "resourceType": "Observation",
+                "id": "1736788733880989299.e3335109-f92f-4e72-aa51-6533ad3391e6",
+                "extension": [
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/obx-observation",
+                        "extension": [
+                            {
+                                "url": "OBX.2",
+                                "valueId": "ST"
+                            },
+                            {
+                                "url": "OBX.29",
+                                "valueId": "QST"
+                            },
+                            {
+                                "url": "OBX.11",
+                                "valueString": "F"
+                            }
+                        ]
+                    }
+                ],
+                "status": "final",
+                "code": {
+                    "coding": [
+                        {
+                            "extension": [
+                                {
+                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                    "valueString": "coding"
+                                }
+                            ],
+                            "code": "57714-8",
+                            "display": "Gestational Age (Weeks + Days)"
+                        }
+                    ]
+                },
+                "subject": {
+                    "reference": "Patient/1736788733186008206.5a213a9f-1ab3-4116-97ec-e3c3ce93e22d"
+                },
+                "encounter": {
+                    "reference": "Encounter/1736788733221836312.59eb66f1-02f9-4555-997c-835a9d169a33"
+                },
+                "effectiveDateTime": "2024-11-13T13:17:19Z",
+                "_effectiveDateTime": {
+                    "extension": [
+                        {
+                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2-date-time",
+                            "valueString": "20241113131719"
+                        }
+                    ]
+                },
+                "valueString": "384"
+            }
+        },
+        {
+            "fullUrl": "Observation/1736788733892235236.25375c34-adaf-4260-b668-97133bcbbf59",
+            "resource": {
+                "resourceType": "Observation",
+                "id": "1736788733892235236.25375c34-adaf-4260-b668-97133bcbbf59",
+                "extension": [
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/obx-observation",
+                        "extension": [
+                            {
+                                "url": "OBX.2",
+                                "valueId": "ST"
+                            },
+                            {
+                                "url": "OBX.29",
+                                "valueId": "QST"
+                            },
+                            {
+                                "url": "OBX.11",
+                                "valueString": "F"
+                            }
+                        ]
+                    }
+                ],
+                "status": "final",
+                "code": {
+                    "coding": [
+                        {
+                            "extension": [
+                                {
+                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                    "valueString": "coding"
+                                }
+                            ],
+                            "code": "82312-0",
+                            "display": "Infant Blood Transfusion?"
+                        }
+                    ]
+                },
+                "subject": {
+                    "reference": "Patient/1736788733186008206.5a213a9f-1ab3-4116-97ec-e3c3ce93e22d"
+                },
+                "encounter": {
+                    "reference": "Encounter/1736788733221836312.59eb66f1-02f9-4555-997c-835a9d169a33"
+                },
+                "effectiveDateTime": "2024-11-13T13:17:19Z",
+                "_effectiveDateTime": {
+                    "extension": [
+                        {
+                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2-date-time",
+                            "valueString": "20241113131719"
+                        }
+                    ]
+                },
+                "valueString": "No"
+            }
+        },
+        {
+            "fullUrl": "Observation/1736788733898158892.2a461cb0-2c10-4013-a566-f8dede2d65cd",
+            "resource": {
+                "resourceType": "Observation",
+                "id": "1736788733898158892.2a461cb0-2c10-4013-a566-f8dede2d65cd",
+                "extension": [
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/obx-observation",
+                        "extension": [
+                            {
+                                "url": "OBX.2",
+                                "valueId": "ST"
+                            },
+                            {
+                                "url": "OBX.29",
+                                "valueId": "QST"
+                            },
+                            {
+                                "url": "OBX.11",
+                                "valueString": "F"
+                            }
+                        ]
+                    }
+                ],
+                "status": "final",
+                "code": {
+                    "coding": [
+                        {
+                            "extension": [
+                                {
+                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                    "valueString": "coding"
+                                }
+                            ],
+                            "code": "67704-7",
+                            "display": "All Feeding Since Birth"
+                        }
+                    ]
+                },
+                "subject": {
+                    "reference": "Patient/1736788733186008206.5a213a9f-1ab3-4116-97ec-e3c3ce93e22d"
+                },
+                "encounter": {
+                    "reference": "Encounter/1736788733221836312.59eb66f1-02f9-4555-997c-835a9d169a33"
+                },
+                "effectiveDateTime": "2024-11-13T13:17:19Z",
+                "_effectiveDateTime": {
+                    "extension": [
+                        {
+                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2-date-time",
+                            "valueString": "20241113131719"
+                        }
+                    ]
+                },
+                "valueString": "Human Milk & Formula"
+            }
+        },
+        {
+            "fullUrl": "Observation/1736788733906927363.3c7bbd97-468f-48f6-86b8-a575947c512c",
+            "resource": {
+                "resourceType": "Observation",
+                "id": "1736788733906927363.3c7bbd97-468f-48f6-86b8-a575947c512c",
+                "extension": [
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/obx-observation",
+                        "extension": [
+                            {
+                                "url": "OBX.2",
+                                "valueId": "ST"
+                            },
+                            {
+                                "url": "OBX.29",
+                                "valueId": "QST"
+                            },
+                            {
+                                "url": "OBX.11",
+                                "valueString": "F"
+                            }
+                        ]
+                    }
+                ],
+                "status": "final",
+                "code": {
+                    "coding": [
+                        {
+                            "extension": [
+                                {
+                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                    "valueString": "coding"
+                                }
+                            ],
+                            "code": "PLT3280",
+                            "display": "Name of Formula(s)"
+                        }
+                    ]
+                },
+                "subject": {
+                    "reference": "Patient/1736788733186008206.5a213a9f-1ab3-4116-97ec-e3c3ce93e22d"
+                },
+                "encounter": {
+                    "reference": "Encounter/1736788733221836312.59eb66f1-02f9-4555-997c-835a9d169a33"
+                },
+                "effectiveDateTime": "2024-11-13T13:17:19Z",
+                "_effectiveDateTime": {
+                    "extension": [
+                        {
+                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2-date-time",
+                            "valueString": "20241113131719"
+                        }
+                    ]
+                },
+                "valueString": "Enfomil, Similac, Katrina"
+            }
+        },
+        {
+            "fullUrl": "Specimen/1736788733915635003.2be65ec0-c245-44fd-82ea-725bdc5c6188",
+            "resource": {
+                "resourceType": "Specimen",
+                "id": "1736788733915635003.2be65ec0-c245-44fd-82ea-725bdc5c6188",
+                "extension": [
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Segment",
+                        "valueString": "OBR"
+                    }
+                ],
+                "collection": {
+                    "collector": {
+                        "reference": "Practitioner/1736788733917455724.75ad185f-0e0f-4984-a821-5120e23ea8d7"
+                    },
+                    "collectedDateTime": "2024-11-13T13:18:59Z",
+                    "_collectedDateTime": {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2-date-time",
+                                "valueString": "20241113131859"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "fullUrl": "Practitioner/1736788733917455724.75ad185f-0e0f-4984-a821-5120e23ea8d7",
+            "resource": {
+                "resourceType": "Practitioner",
+                "id": "1736788733917455724.75ad185f-0e0f-4984-a821-5120e23ea8d7",
+                "extension": [
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xcn-practitioner",
+                        "extension": [
+                            {
+                                "url": "XCN.3",
+                                "valueString": "PHLEBOTOMIST"
+                            }
+                        ]
+                    }
+                ],
+                "identifier": [
+                    {
+                        "value": "739"
+                    }
+                ],
+                "name": [
+                    {
+                        "family": "BEAKER",
+                        "given": [
+                            "PHLEBOTOMIST"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Specimen/1736788733922756673.d5a4feac-1572-4231-96bb-e25c9dea788a",
+            "resource": {
+                "resourceType": "Specimen",
+                "id": "1736788733922756673.d5a4feac-1572-4231-96bb-e25c9dea788a",
+                "extension": [
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Segment",
+                        "valueString": "SPM"
+                    },
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/spm-specimen",
+                        "extension": [
+                            {
+                                "url": "SPM.20",
+                                "valueString": "Y"
+                            }
+                        ]
+                    }
+                ],
+                "identifier": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id",
+                                "valueString": "Beaker"
+                            },
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Component",
+                                "valueString": "SPM.2.2"
+                            }
+                        ],
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                                    "code": "FGN"
+                                }
+                            ]
+                        },
+                        "value": "24LADH-318X0008"
+                    }
+                ],
+                "status": "available",
+                "type": {
+                    "coding": [
+                        {
+                            "extension": [
+                                {
+                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                    "valueString": "coding"
+                                }
+                            ],
+                            "code": "BLOOD",
+                            "display": "Blood"
+                        }
+                    ]
+                },
+                "receivedTime": "2024-11-13T13:19:00Z",
+                "_receivedTime": {
+                    "extension": [
+                        {
+                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2-date-time",
+                            "valueString": "20241113131900"
+                        }
+                    ]
+                },
+                "collection": {
+                    "collectedDateTime": "2024-11-13T13:18:59Z",
+                    "_collectedDateTime": {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2-date-time",
+                                "valueString": "20241113131859"
+                            }
+                        ]
+                    },
+                    "bodySite": {
+                        "coding": [
+                            {
+                                "extension": [
+                                    {
+                                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                        "valueString": "coding"
+                                    }
+                                ],
+                                "code": "BLOOD",
+                                "display": "Blood"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "fullUrl": "Coverage/1736788733941774922.49be8cd0-7333-49ac-9412-766c3bf2f74c",
+            "resource": {
+                "resourceType": "Coverage",
+                "id": "1736788733941774922.49be8cd0-7333-49ac-9412-766c3bf2f74c",
+                "extension": [
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/in1-coverage",
+                        "extension": [
+                            {
+                                "url": "IN1.2",
+                                "valueCodeableConcept": {
+                                    "coding": [
+                                        {
+                                            "extension": [
+                                                {
+                                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                                    "valueString": "coding"
+                                                }
+                                            ],
+                                            "code": "114420"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "url": "IN1.3",
+                                "valueIdentifier": {
+                                    "value": "308114401"
+                                }
+                            },
+                            {
+                                "url": "IN1.16",
+                                "valueHumanName": {
+                                    "extension": [
+                                        {
+                                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xpn-human-name",
+                                            "extension": [
+                                                {
+                                                    "url": "XPN.2",
+                                                    "valueString": "GIRL"
+                                                },
+                                                {
+                                                    "url": "XPN.3",
+                                                    "valueString": "BEAKER"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "family": "PKUSS",
+                                    "given": [
+                                        "GIRL",
+                                        "BEAKER"
+                                    ]
+                                }
+                            },
+                            {
+                                "url": "IN1.17",
+                                "valueCodeableConcept": {
+                                    "coding": [
+                                        {
+                                            "extension": [
+                                                {
+                                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                                    "valueString": "coding"
+                                                }
+                                            ],
+                                            "code": "Self"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "url": "IN1.18",
+                                "valueDateTime": "2024-11-08",
+                                "_valueDateTime": {
+                                    "extension": [
+                                        {
+                                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2-date-time",
+                                            "valueString": "20241108"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "url": "IN1.19",
+                                "valueAddress": {
+                                    "extension": [
+                                        {
+                                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xad-address",
+                                            "extension": [
+                                                {
+                                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/sad-address-line",
+                                                    "extension": [
+                                                        {
+                                                            "url": "SAD.1",
+                                                            "valueString": "1202 COOLIDGE ST."
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "line": [
+                                        "1202 COOLIDGE ST."
+                                    ],
+                                    "city": "LAFAYETTE",
+                                    "district": "LAFAYETTE",
+                                    "state": "LA",
+                                    "postalCode": "70503",
+                                    "country": "US"
+                                }
+                            },
+                            {
+                                "url": "IN1.22",
+                                "valueString": "1"
+                            },
+                            {
+                                "url": "IN1.4",
+                                "valueReference": {
+                                    "reference": "Organization/1736788733931914857.e8867e4a-d4d4-405a-affb-4ade290623f2"
+                                }
+                            },
+                            {
+                                "url": "IN1.5",
+                                "valueAddress": {
+                                    "extension": [
+                                        {
+                                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xad-address",
+                                            "extension": [
+                                                {
+                                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/sad-address-line",
+                                                    "extension": [
+                                                        {
+                                                            "url": "SAD.1",
+                                                            "valueString": "P. O. BOX 98029"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "line": [
+                                        "P. O. BOX 98029"
+                                    ],
+                                    "city": "BATON ROUGE",
+                                    "state": "LA",
+                                    "postalCode": "70898-9029"
+                                }
+                            },
+                            {
+                                "url": "IN1.42",
+                                "valueCodeableConcept": {
+                                    "coding": [
+                                        {
+                                            "extension": [
+                                                {
+                                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                                    "valueString": "coding"
+                                                }
+                                            ],
+                                            "code": "None"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "url": "IN1.43",
+                                "valueCodeableConcept": {
+                                    "coding": [
+                                        {
+                                            "extension": [
+                                                {
+                                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                                    "valueString": "coding"
+                                                }
+                                            ],
+                                            "code": "F"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "url": "IN1.7",
+                                "valueContactPoint": {
+                                    "extension": [
+                                        {
+                                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xtn-contact-point",
+                                            "extension": [
+                                                {
+                                                    "url": "XTN.1",
+                                                    "valueString": "(800)495-2583"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "_system": {
+                                        "extension": [
+                                            {
+                                                "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
+                                                "valueCode": "unknown"
+                                            }
+                                        ]
+                                    },
+                                    "value": "(800)495-2583"
+                                }
+                            }
+                        ]
+                    }
+                ],
+                "subscriber": {
+                    "reference": "RelatedPerson/1736788733940883870.f1175308-ad76-4b0e-be7f-7cfe6d85b48d"
+                },
+                "beneficiary": {
+                    "reference": "Patient/1736788733186008206.5a213a9f-1ab3-4116-97ec-e3c3ce93e22d"
+                },
+                "relationship": {
+                    "coding": [
+                        {
+                            "extension": [
+                                {
+                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                    "valueString": "coding"
+                                }
+                            ],
+                            "code": "Self"
+                        }
+                    ]
+                },
+                "payor": [
+                    {
+                        "reference": "Organization/1736788733937705787.73fb2988-fb18-436e-8167-3b497d737d94"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Organization/1736788733931914857.e8867e4a-d4d4-405a-affb-4ade290623f2",
+            "resource": {
+                "resourceType": "Organization",
+                "id": "1736788733931914857.e8867e4a-d4d4-405a-affb-4ade290623f2",
+                "name": "BLUE CROSS BLUE SHIELD"
+            }
+        },
+        {
+            "fullUrl": "Organization/1736788733937705787.73fb2988-fb18-436e-8167-3b497d737d94",
+            "resource": {
+                "resourceType": "Organization",
+                "id": "1736788733937705787.73fb2988-fb18-436e-8167-3b497d737d94",
+                "name": "BLUE CROSS BLUE SHIELD",
+                "address": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xad-address",
+                                "extension": [
+                                    {
+                                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/sad-address-line",
+                                        "extension": [
+                                            {
+                                                "url": "SAD.1",
+                                                "valueString": "P. O. BOX 98029"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "line": [
+                            "P. O. BOX 98029"
+                        ],
+                        "city": "BATON ROUGE",
+                        "state": "LA",
+                        "postalCode": "70898-9029"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "RelatedPerson/1736788733940883870.f1175308-ad76-4b0e-be7f-7cfe6d85b48d",
+            "resource": {
+                "resourceType": "RelatedPerson",
+                "id": "1736788733940883870.f1175308-ad76-4b0e-be7f-7cfe6d85b48d",
+                "name": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xpn-human-name",
+                                "extension": [
+                                    {
+                                        "url": "XPN.2",
+                                        "valueString": "GIRL"
+                                    },
+                                    {
+                                        "url": "XPN.3",
+                                        "valueString": "BEAKER"
+                                    }
+                                ]
+                            }
+                        ],
+                        "family": "PKUSS",
+                        "given": [
+                            "GIRL",
+                            "BEAKER"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "ServiceRequest/1736788734011079352.eef6bb07-e4c9-4a98-8dae-ffece6d2ebbd",
+            "resource": {
+                "resourceType": "ServiceRequest",
+                "id": "1736788734011079352.eef6bb07-e4c9-4a98-8dae-ffece6d2ebbd",
+                "extension": [
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/business-event",
+                        "valueCode": "NW"
+                    },
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/business-event",
+                        "valueString": "20241113131721"
+                    },
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/orc-common-order",
+                        "extension": [
+                            {
+                                "url": "orc-21-ordering-facility-name",
+                                "valueReference": {
+                                    "reference": "Organization/1736788733985619503.909ce43d-b20b-47c9-961f-a941811a2a25"
+                                }
+                            },
+                            {
+                                "url": "orc-22-ordering-facility-address",
+                                "valueAddress": {
+                                    "extension": [
+                                        {
+                                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xad-address",
+                                            "extension": [
+                                                {
+                                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/sad-address-line",
+                                                    "extension": [
+                                                        {
+                                                            "url": "SAD.1",
+                                                            "valueString": "1214 COOLIDGE BLVD"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "url": "XAD.7",
+                                                    "valueCode": "B"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "use": "work",
+                                    "line": [
+                                        "1214 COOLIDGE BLVD"
+                                    ],
+                                    "city": "LAFAYETTE",
+                                    "district": "LAFAYETTE",
+                                    "state": "LA",
+                                    "postalCode": "70503-2621",
+                                    "country": "US"
+                                }
+                            },
+                            {
+                                "url": "orc-24-ordering-provider-address",
+                                "valueAddress": {
+                                    "extension": [
+                                        {
+                                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xad-address",
+                                            "extension": [
+                                                {
+                                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/sad-address-line",
+                                                    "extension": [
+                                                        {
+                                                            "url": "SAD.1",
+                                                            "valueString": "120 OCHSNER BLVD"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "url": "XAD.2",
+                                                    "valueString": "SUITE 360"
+                                                },
+                                                {
+                                                    "url": "XAD.7",
+                                                    "valueCode": "C"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "use": "temp",
+                                    "line": [
+                                        "120 OCHSNER BLVD",
+                                        "SUITE 360"
+                                    ],
+                                    "city": "GRETNA",
+                                    "state": "LA",
+                                    "postalCode": "70056"
+                                }
+                            },
+                            {
+                                "url": "ORC.30",
+                                "valueCodeableConcept": {
+                                    "coding": [
+                                        {
+                                            "extension": [
+                                                {
+                                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cne-coding",
+                                                    "valueString": "coding"
+                                                }
+                                            ],
+                                            "code": "VERBAL WITH"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "url": "ORC.10",
+                                "valueReference": {
+                                    "reference": "Practitioner/1736788733991619755.af2f3303-8de6-4826-b69b-7a008619e853"
+                                }
+                            },
+                            {
+                                "url": "orc-12-ordering-provider",
+                                "valueReference": {
+                                    "reference": "Practitioner/1736788733996808621.4496c07e-24ec-4b9a-bec3-ac4c82252178"
+                                }
+                            },
+                            {
+                                "url": "ORC.13",
+                                "valueReference": {
+                                    "reference": "Location/1736788733998887994.0cbb9110-0db9-41f0-8d59-1d1d10863c4b"
+                                }
+                            },
+                            {
+                                "url": "ORC.18",
+                                "valueCodeableConcept": {
+                                    "coding": [
+                                        {
+                                            "extension": [
+                                                {
+                                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                                    "valueString": "coding"
+                                                }
+                                            ],
+                                            "code": "OCH155315",
+                                            "display": "OCH155315"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/obr-observation-request",
+                        "extension": [
+                            {
+                                "url": "OBR.2",
+                                "valueIdentifier": {
+                                    "extension": [
+                                        {
+                                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/assigning-authority",
+                                            "extension": [
+                                                {
+                                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id",
+                                                    "valueString": "EPC"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "value": "243217771"
+                                }
+                            },
+                            {
+                                "url": "OBR.16",
+                                "valueReference": {
+                                    "reference": "Practitioner/1736788734003135190.9e7edfb8-19e0-4689-8b3e-e0d4ac703317"
+                                }
+                            },
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/callback-number",
+                                "valueContactPoint": {
+                                    "extension": [
+                                        {
+                                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xtn-contact-point",
+                                            "extension": [
+                                                {
+                                                    "url": "XTN.1",
+                                                    "valueString": "(504)391-8896"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                            "valueString": "OBR.17"
+                                        }
+                                    ],
+                                    "_system": {
+                                        "extension": [
+                                            {
+                                                "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
+                                                "valueCode": "unknown"
+                                            }
+                                        ]
+                                    },
+                                    "value": "(504)391-8896"
+                                }
+                            },
+                            {
+                                "url": "OBR.20",
+                                "valueString": "193989"
+                            },
+                            {
+                                "url": "OBR.7",
+                                "valueDateTime": "2024-11-13T13:18:59Z",
+                                "_valueDateTime": {
+                                    "extension": [
+                                        {
+                                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2-date-time",
+                                            "valueString": "20241113131859"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "url": "OBR.24",
+                                "valueId": "Lab"
+                            },
+                            {
+                                "url": "OBR.36",
+                                "valueString": "20241113131800"
+                            },
+                            {
+                                "url": "OBR.10",
+                                "valueReference": {
+                                    "reference": "Practitioner/1736788734007841451.61e2b8ff-6c63-48f6-9911-6fb22a6c1765"
+                                }
+                            },
+                            {
+                                "url": "OBR.11",
+                                "valueString": "Lab Collect"
+                            }
+                        ]
+                    }
+                ],
+                "identifier": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "ORC.2"
+                            },
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/assigning-authority",
+                                "extension": [
+                                    {
+                                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id",
+                                        "valueString": "EPC"
+                                    }
+                                ]
+                            }
+                        ],
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                                    "code": "PLAC"
+                                }
+                            ]
+                        },
+                        "value": "243217771"
+                    },
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "OBR.3"
+                            },
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/assigning-authority",
+                                "extension": [
+                                    {
+                                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id",
+                                        "valueString": "Beaker"
+                                    }
+                                ]
+                            }
+                        ],
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                                    "code": "FILL"
+                                }
+                            ]
+                        },
+                        "value": "1000319697"
+                    },
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "ORC.4"
+                            }
+                        ],
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                                    "code": "PGN"
+                                }
+                            ]
+                        },
+                        "value": "71414746"
+                    },
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "ORC.4"
+                            }
+                        ],
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                                    "code": "FGN"
+                                }
+                            ]
+                        },
+                        "value": "71414746"
+                    }
+                ],
+                "status": "unknown",
+                "intent": "order",
+                "code": {
+                    "coding": [
+                        {
+                            "extension": [
+                                {
+                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                    "valueString": "coding"
+                                },
+                                {
+                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding-system",
+                                    "valueString": "LN"
+                                }
+                            ],
+                            "system": "http://loinc.org",
+                            "version": "2.72",
+                            "code": "54089-8",
+                            "display": "Newborn screening panel American Health Information Community (AHIC)"
+                        }
+                    ]
+                },
+                "subject": {
+                    "reference": "Patient/1736788733186008206.5a213a9f-1ab3-4116-97ec-e3c3ce93e22d"
+                },
+                "occurrenceDateTime": "2024-11-13T13:18:00Z",
+                "_occurrenceDateTime": {
+                    "extension": [
+                        {
+                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2-date-time",
+                            "valueString": "20241113131800"
+                        }
+                    ]
+                },
+                "authoredOn": "2024-11-13T13:17:21Z",
+                "_authoredOn": {
+                    "extension": [
+                        {
+                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2-date-time",
+                            "valueString": "20241113131721"
+                        }
+                    ]
+                },
+                "requester": {
+                    "extension": [
+                        {
+                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/callback-number",
+                            "valueContactPoint": {
+                                "extension": [
+                                    {
+                                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xtn-contact-point",
+                                        "extension": [
+                                            {
+                                                "url": "XTN.1",
+                                                "valueString": "(504)391-8896"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                        "valueString": "ORC.14"
+                                    }
+                                ],
+                                "_system": {
+                                    "extension": [
+                                        {
+                                            "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
+                                            "valueCode": "unknown"
+                                        }
+                                    ]
+                                },
+                                "value": "(504)391-8896"
+                            }
+                        }
+                    ],
+                    "reference": "PractitionerRole/1736788733949615304.a5647587-2e3f-4704-a383-fddcabaac6e3"
+                },
+                "locationCode": [
+                    {
+                        "coding": [
+                            {
+                                "extension": [
+                                    {
+                                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                        "valueString": "coding"
+                                    }
+                                ],
+                                "code": "I"
+                            }
+                        ]
+                    }
+                ],
+                "supportingInfo": [
+                    {
+                        "reference": "Observation/1736788733880989299.e3335109-f92f-4e72-aa51-6533ad3391e6"
+                    },
+                    {
+                        "reference": "Observation/1736788733892235236.25375c34-adaf-4260-b668-97133bcbbf59"
+                    },
+                    {
+                        "reference": "Observation/1736788733898158892.2a461cb0-2c10-4013-a566-f8dede2d65cd"
+                    },
+                    {
+                        "reference": "Observation/1736788733906927363.3c7bbd97-468f-48f6-86b8-a575947c512c"
+                    }
+                ],
+                "specimen": [
+                    {
+                        "reference": "Specimen/1736788733922756673.d5a4feac-1572-4231-96bb-e25c9dea788a"
+                    },
+                    {
+                        "reference": "Specimen/1736788733915635003.2be65ec0-c245-44fd-82ea-725bdc5c6188"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Organization/1736788733953013612.8ea1a811-793e-4e89-8828-d35bbbb6f2c3",
+            "resource": {
+                "resourceType": "Organization",
+                "id": "1736788733953013612.8ea1a811-793e-4e89-8828-d35bbbb6f2c3",
+                "identifier": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "HD.1"
+                            }
+                        ],
+                        "value": "NPI"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Practitioner/1736788733962187436.39cf9d67-7525-4028-9c39-051134b3c035",
+            "resource": {
+                "resourceType": "Practitioner",
+                "id": "1736788733962187436.39cf9d67-7525-4028-9c39-051134b3c035",
+                "extension": [
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/assigning-authority",
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id",
+                                "valueString": "NPI"
+                            }
+                        ]
+                    },
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xcn-practitioner",
+                        "extension": [
+                            {
+                                "url": "XCN.3",
+                                "valueString": "TROY"
+                            },
+                            {
+                                "url": "XCN.4",
+                                "valueString": "U."
+                            }
+                        ]
+                    },
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                        "valueString": "ORC.12"
+                    }
+                ],
+                "identifier": [
+                    {
+                        "type": {
+                            "coding": [
+                                {
+                                    "extension": [
+                                        {
+                                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/codeable-concept-id",
+                                            "valueBoolean": true
+                                        }
+                                    ],
+                                    "code": "NPI"
+                                }
+                            ]
+                        },
+                        "value": "1184608010",
+                        "assigner": {
+                            "reference": "Organization/1736788733953013612.8ea1a811-793e-4e89-8828-d35bbbb6f2c3"
+                        }
+                    }
+                ],
+                "name": [
+                    {
+                        "family": "DREWITZ",
+                        "given": [
+                            "TROY",
+                            "U."
+                        ]
+                    }
+                ],
+                "address": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xad-address",
+                                "extension": [
+                                    {
+                                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/sad-address-line",
+                                        "extension": [
+                                            {
+                                                "url": "SAD.1",
+                                                "valueString": "120 OCHSNER BLVD"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "url": "XAD.2",
+                                        "valueString": "SUITE 360"
+                                    },
+                                    {
+                                        "url": "XAD.7",
+                                        "valueCode": "C"
+                                    }
+                                ]
+                            }
+                        ],
+                        "use": "temp",
+                        "line": [
+                            "120 OCHSNER BLVD",
+                            "SUITE 360"
+                        ],
+                        "city": "GRETNA",
+                        "state": "LA",
+                        "postalCode": "70056"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Organization/1736788733970089437.cfd0b767-adff-430f-adfb-38a7fd638d51",
+            "resource": {
+                "resourceType": "Organization",
+                "id": "1736788733970089437.cfd0b767-adff-430f-adfb-38a7fd638d51",
+                "extension": [
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/organization-name-type",
+                        "valueCoding": {
+                            "extension": [
+                                {
+                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                    "valueCodeableConcept": {
+                                        "extension": [
+                                            {
+                                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                                "valueString": "XON.2"
+                                            }
+                                        ],
+                                        "coding": [
+                                            {
+                                                "extension": [
+                                                    {
+                                                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                                        "valueString": "coding"
+                                                    }
+                                                ],
+                                                "code": "D"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            "code": "D"
+                        }
+                    },
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xon-organization",
+                        "extension": [
+                            {
+                                "url": "XON.10",
+                                "valueString": "30100"
+                            }
+                        ]
+                    }
+                ],
+                "identifier": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/assigning-authority",
+                                "extension": [
+                                    {
+                                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id",
+                                        "valueString": "OCHSNER HEALTH SYSTEM"
+                                    }
+                                ]
+                            }
+                        ],
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                                    "code": "XX"
+                                }
+                            ]
+                        },
+                        "value": "30100"
+                    }
+                ],
+                "name": "OCHSNER LAFAYETTE GENERAL MEDICAL HOSPITAL",
+                "telecom": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xtn-contact-point",
+                                "extension": [
+                                    {
+                                        "url": "XTN.1",
+                                        "valueString": "(337)289-7991"
+                                    },
+                                    {
+                                        "url": "XTN.3",
+                                        "valueString": "PH"
+                                    }
+                                ]
+                            }
+                        ],
+                        "system": "phone",
+                        "value": "(337)289-7991"
+                    }
+                ],
+                "address": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xad-address",
+                                "extension": [
+                                    {
+                                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/sad-address-line",
+                                        "extension": [
+                                            {
+                                                "url": "SAD.1",
+                                                "valueString": "1214 COOLIDGE BLVD"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "url": "XAD.7",
+                                        "valueCode": "B"
+                                    }
+                                ]
+                            }
+                        ],
+                        "use": "work",
+                        "line": [
+                            "1214 COOLIDGE BLVD"
+                        ],
+                        "city": "LAFAYETTE",
+                        "district": "LAFAYETTE",
+                        "state": "LA",
+                        "postalCode": "70503-2621",
+                        "country": "US"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "PractitionerRole/1736788733949615304.a5647587-2e3f-4704-a383-fddcabaac6e3",
+            "resource": {
+                "resourceType": "PractitionerRole",
+                "id": "1736788733949615304.a5647587-2e3f-4704-a383-fddcabaac6e3",
+                "practitioner": {
+                    "reference": "Practitioner/1736788733962187436.39cf9d67-7525-4028-9c39-051134b3c035"
+                },
+                "organization": {
+                    "reference": "Organization/1736788733970089437.cfd0b767-adff-430f-adfb-38a7fd638d51"
+                }
+            }
+        },
+        {
+            "fullUrl": "Organization/1736788733985619503.909ce43d-b20b-47c9-961f-a941811a2a25",
+            "resource": {
+                "resourceType": "Organization",
+                "id": "1736788733985619503.909ce43d-b20b-47c9-961f-a941811a2a25",
+                "extension": [
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/organization-name-type",
+                        "valueCoding": {
+                            "extension": [
+                                {
+                                    "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                    "valueCodeableConcept": {
+                                        "extension": [
+                                            {
+                                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                                "valueString": "XON.2"
+                                            }
+                                        ],
+                                        "coding": [
+                                            {
+                                                "extension": [
+                                                    {
+                                                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/cwe-coding",
+                                                        "valueString": "coding"
+                                                    }
+                                                ],
+                                                "code": "D"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            "code": "D"
+                        }
+                    },
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xon-organization",
+                        "extension": [
+                            {
+                                "url": "XON.10",
+                                "valueString": "30100"
+                            }
+                        ]
+                    }
+                ],
+                "identifier": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/assigning-authority",
+                                "extension": [
+                                    {
+                                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id",
+                                        "valueString": "OCHSNER HEALTH SYSTEM"
+                                    }
+                                ]
+                            }
+                        ],
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                                    "code": "XX"
+                                }
+                            ]
+                        },
+                        "value": "30100"
+                    }
+                ],
+                "name": "OCHSNER LAFAYETTE GENERAL MEDICAL HOSPITAL"
+            }
+        },
+        {
+            "fullUrl": "Practitioner/1736788733991619755.af2f3303-8de6-4826-b69b-7a008619e853",
+            "resource": {
+                "resourceType": "Practitioner",
+                "id": "1736788733991619755.af2f3303-8de6-4826-b69b-7a008619e853",
+                "extension": [
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xcn-practitioner",
+                        "extension": [
+                            {
+                                "url": "XCN.3",
+                                "valueString": "PHLEBOTOMIST"
+                            }
+                        ]
+                    }
+                ],
+                "identifier": [
+                    {
+                        "value": "739"
+                    }
+                ],
+                "name": [
+                    {
+                        "family": "BEAKER",
+                        "given": [
+                            "PHLEBOTOMIST"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Organization/1736788733992671678.f5cc80c2-7ed5-4544-a911-7d52c4b40ec1",
+            "resource": {
+                "resourceType": "Organization",
+                "id": "1736788733992671678.f5cc80c2-7ed5-4544-a911-7d52c4b40ec1",
+                "identifier": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "HD.1"
+                            }
+                        ],
+                        "value": "NPI"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Practitioner/1736788733996808621.4496c07e-24ec-4b9a-bec3-ac4c82252178",
+            "resource": {
+                "resourceType": "Practitioner",
+                "id": "1736788733996808621.4496c07e-24ec-4b9a-bec3-ac4c82252178",
+                "extension": [
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/assigning-authority",
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id",
+                                "valueString": "NPI"
+                            }
+                        ]
+                    },
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xcn-practitioner",
+                        "extension": [
+                            {
+                                "url": "XCN.3",
+                                "valueString": "TROY"
+                            },
+                            {
+                                "url": "XCN.4",
+                                "valueString": "U."
+                            }
+                        ]
+                    }
+                ],
+                "identifier": [
+                    {
+                        "type": {
+                            "coding": [
+                                {
+                                    "extension": [
+                                        {
+                                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/codeable-concept-id",
+                                            "valueBoolean": true
+                                        }
+                                    ],
+                                    "code": "NPI"
+                                }
+                            ]
+                        },
+                        "value": "1184608010",
+                        "assigner": {
+                            "reference": "Organization/1736788733992671678.f5cc80c2-7ed5-4544-a911-7d52c4b40ec1"
+                        }
+                    }
+                ],
+                "name": [
+                    {
+                        "family": "DREWITZ",
+                        "given": [
+                            "TROY",
+                            "U."
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Location/1736788733998887994.0cbb9110-0db9-41f0-8d59-1d1d10863c4b",
+            "resource": {
+                "resourceType": "Location",
+                "id": "1736788733998887994.0cbb9110-0db9-41f0-8d59-1d1d10863c4b",
+                "description": "OLGH LABOR AND DELIVERY",
+                "mode": "instance"
+            }
+        },
+        {
+            "fullUrl": "Organization/1736788734001584405.520ad2de-1e00-405d-8177-c4437a5583ac",
+            "resource": {
+                "resourceType": "Organization",
+                "id": "1736788734001584405.520ad2de-1e00-405d-8177-c4437a5583ac",
+                "identifier": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/hl7v2Field",
+                                "valueString": "HD.1"
+                            }
+                        ],
+                        "value": "NPI"
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Practitioner/1736788734003135190.9e7edfb8-19e0-4689-8b3e-e0d4ac703317",
+            "resource": {
+                "resourceType": "Practitioner",
+                "id": "1736788734003135190.9e7edfb8-19e0-4689-8b3e-e0d4ac703317",
+                "extension": [
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/assigning-authority",
+                        "extension": [
+                            {
+                                "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/namespace-id",
+                                "valueString": "NPI"
+                            }
+                        ]
+                    },
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xcn-practitioner",
+                        "extension": [
+                            {
+                                "url": "XCN.3",
+                                "valueString": "TROY"
+                            },
+                            {
+                                "url": "XCN.4",
+                                "valueString": "U."
+                            }
+                        ]
+                    }
+                ],
+                "identifier": [
+                    {
+                        "type": {
+                            "coding": [
+                                {
+                                    "extension": [
+                                        {
+                                            "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/codeable-concept-id",
+                                            "valueBoolean": true
+                                        }
+                                    ],
+                                    "code": "NPI"
+                                }
+                            ]
+                        },
+                        "value": "1184608010",
+                        "assigner": {
+                            "reference": "Organization/1736788734001584405.520ad2de-1e00-405d-8177-c4437a5583ac"
+                        }
+                    }
+                ],
+                "name": [
+                    {
+                        "family": "DREWITZ",
+                        "given": [
+                            "TROY",
+                            "U."
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "fullUrl": "Practitioner/1736788734007841451.61e2b8ff-6c63-48f6-9911-6fb22a6c1765",
+            "resource": {
+                "resourceType": "Practitioner",
+                "id": "1736788734007841451.61e2b8ff-6c63-48f6-9911-6fb22a6c1765",
+                "extension": [
+                    {
+                        "url": "https://reportstream.cdc.gov/fhir/StructureDefinition/xcn-practitioner",
+                        "extension": [
+                            {
+                                "url": "XCN.3",
+                                "valueString": "PHLEBOTOMIST"
+                            }
+                        ]
+                    }
+                ],
+                "identifier": [
+                    {
+                        "value": "739"
+                    }
+                ],
+                "name": [
+                    {
+                        "family": "BEAKER",
+                        "given": [
+                            "PHLEBOTOMIST"
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

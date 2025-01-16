@@ -321,6 +321,23 @@
           }
         }
       ]
+    },
+    {
+      "name": "laphlOmlConvertKilogramsToGrams",
+      "description": "Convert kilograms to grams on Observations with an OBX-3.1 value of '8339-4' or '58229-6'",
+      "message": "",
+      "conditions": [
+        "MSH-33 is 13^1.2.840.114350.1.13.286.2.7.2.695071^ISO //@todo this is just the description, replace with actual code"
+      ],
+      "rules": [
+        {
+          "name": "MultiplyObservationValue",
+          "args": {
+            "multiplier": "1000",
+            "unitText": "g^gram^UCUM //@todo this is going to OBX-6 think how to send these values"
+          }
+        }
+      ]
     }
   ]
 }
