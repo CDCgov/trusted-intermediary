@@ -1,4 +1,4 @@
-FROM amazoncorretto:17.0.13-alpine
+FROM amazoncorretto:17.0.14-alpine
 
 # Uppdate dependencies and clear the dependency cache.
 RUN apk update && apk -U upgrade && rm -rf /var/cache/apk/*
