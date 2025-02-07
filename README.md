@@ -1,8 +1,11 @@
 # CDC Trusted Intermediary
 
+> [!WARNING]
+> This application is no longer being developed or maintained.
+
 This document provides instructions for setting up the environment, running the application, and performing various tasks such as compiling, testing, and contributing to the project.
 
-# Table of Contents
+## Table of Contents
 
 - [CDC Trusted Intermediary](#cdc-trusted-intermediary)
 - [Table of Contents](#table-of-contents)
